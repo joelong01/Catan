@@ -1,0 +1,382 @@
+[Game]
+Rows=7
+Columns=7
+GameName=Seafarers Game 1
+TileIndexArray=0,20,21,22,5,1,23,19,16,4,3,2,24,18,17,32,31,30,29,25,26,27,6,7,33,10,11,28,9,8,34,15,12,36,35,14,13,
+TileCount=37
+NumberOfPlayers=3 to 5
+Version=1.0
+UseClassic=True
+Randomize=True
+GameType=Regular
+
+[Tile 0]
+Number=12
+ResourceType=Sheep
+HarborType=Brick
+HarborLocation=BottomLeft
+TileOrientation=FaceUp
+zIndex=0
+Index=0
+UseClassic=True
+
+[Tile 1]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=20
+UseClassic=True
+
+[Tile 2]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=21
+UseClassic=True
+
+[Tile 3]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=22
+UseClassic=True
+
+[Tile 4]
+Number=5
+ResourceType=Wood
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=5
+UseClassic=True
+
+[Tile 5]
+Number=9
+ResourceType=Sheep
+HarborType=Brick
+HarborLocation=BottomLeft
+TileOrientation=FaceUp
+zIndex=0
+Index=1
+UseClassic=True
+
+[Tile 6]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=23
+UseClassic=True
+
+[Tile 7]
+Number=2
+ResourceType=Ore
+HarborType=Brick
+HarborLocation=TopRight
+TileOrientation=FaceUp
+zIndex=0
+Index=19
+UseClassic=True
+
+[Tile 8]
+Number=5
+ResourceType=Wheat
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=16
+UseClassic=True
+
+[Tile 9]
+Number=11
+ResourceType=Wheat
+HarborType=Brick
+HarborLocation=TopLeft
+TileOrientation=FaceUp
+zIndex=0
+Index=4
+UseClassic=True
+
+[Tile 10]
+Number=8
+ResourceType=Ore
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=3
+UseClassic=True
+
+[Tile 11]
+Number=3
+ResourceType=Wood
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=2
+UseClassic=True
+
+[Tile 12]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=-1
+Index=24
+UseClassic=True
+
+[Tile 13]
+Number=10
+ResourceType=Brick
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=18
+UseClassic=True
+
+[Tile 14]
+Number=6
+ResourceType=Brick
+HarborType=Brick
+HarborLocation=BottomLeft
+TileOrientation=FaceUp
+zIndex=0
+Index=17
+UseClassic=True
+
+[Tile 15]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=32
+UseClassic=True
+
+[Tile 16]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=31
+UseClassic=True
+
+[Tile 17]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=30
+UseClassic=True
+
+[Tile 18]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=29
+UseClassic=True
+
+[Tile 19]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=25
+UseClassic=True
+
+[Tile 20]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=26
+UseClassic=True
+
+[Tile 21]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=27
+UseClassic=True
+
+[Tile 22]
+Number=6
+ResourceType=Sheep
+HarborType=Brick
+HarborLocation=TopRight
+TileOrientation=FaceUp
+zIndex=0
+Index=6
+UseClassic=True
+
+[Tile 23]
+Number=10
+ResourceType=Ore
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=7
+UseClassic=True
+
+[Tile 24]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=33
+UseClassic=True
+
+[Tile 25]
+Number=8
+ResourceType=Wood
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=10
+UseClassic=True
+
+[Tile 26]
+Number=11
+ResourceType=Wheat
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=11
+UseClassic=True
+
+[Tile 27]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=28
+UseClassic=True
+
+[Tile 28]
+Number=4
+ResourceType=Ore
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=9
+UseClassic=True
+
+[Tile 29]
+Number=9
+ResourceType=Wood
+HarborType=Brick
+HarborLocation=BottomLeft
+TileOrientation=FaceUp
+zIndex=0
+Index=8
+UseClassic=True
+
+[Tile 30]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=34
+UseClassic=True
+
+[Tile 31]
+Number=9
+ResourceType=Wheat
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=15
+UseClassic=True
+
+[Tile 32]
+Number=5
+ResourceType=Brick
+HarborType=Brick
+HarborLocation=BottomRight
+TileOrientation=FaceUp
+zIndex=0
+Index=12
+UseClassic=True
+
+[Tile 33]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=36
+UseClassic=True
+
+[Tile 34]
+Number=0
+ResourceType=Sea
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=35
+UseClassic=True
+
+[Tile 35]
+Number=4
+ResourceType=Wheat
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=14
+UseClassic=True
+
+[Tile 36]
+Number=3
+ResourceType=Sheep
+HarborType=Brick
+HarborLocation=None
+TileOrientation=FaceUp
+zIndex=0
+Index=13
+UseClassic=True
+

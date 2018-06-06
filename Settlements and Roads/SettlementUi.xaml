@@ -1,0 +1,44 @@
+﻿<UserControl
+    x:Class="Catan10.SettlementUi"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <!-- Converted from svg with ViewerSvg and Ab2d.ReaderSvg -->
+    <Viewbox Stretch="Uniform" >
+        <Canvas Height="474" Width="474">
+
+            <Ellipse Fill="{x:Bind FillColor, FallbackValue=#FF0000FF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" Width="473.8" Height="473.8" Canvas.Left="184" Canvas.Top="60.7">
+                <Ellipse.RenderTransform>
+                    <MatrixTransform Matrix="1 0 0 1 -184 -60.7"/>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Canvas >
+                <Canvas.RenderTransform>
+                    <CompositeTransform ScaleX="1.4" ScaleY="1.4" TranslateX="-90" TranslateY="-100" />
+                </Canvas.RenderTransform>
+                <Polygon Points="213.4,160.1 213.4,235.7 231.4,235.7 231.4,219.8 251.3,219.8 251.3,235.7 270.1,235.7 270.1,219.8 290.8,219.8 290.8,235.7 309.2,235.7 309.2,219.8 329.2,219.8 329.2,235.7 329.2,240.3 329.2,367.4 153.6,367.4 153.6,160.1" 
+                     Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+                <Polygon Points="153.8,156.3 213.9,156.3 223,140.6 144.7,140.6"  Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+                <Polygon Points="144.7,106.4 161.7,106.4 161.7,117.4 175.4,117.4 175.4,106.4 192.4,106.4 192.4,117.4 206,117.4 206,106.4 223,106.4 223,117.4 223,122.1 223,136.9 144.7,136.9 144.7,122.1 144.7,122.1"  Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+                <Path Fill="{x:Bind FillColor, FallbackValue=#FF0000FF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1" Data="F1M213.3,360.8L271.5,360.8 271.5,306.5C271.5,306.5 273.4,284.3 242.4,284.3 212.5,284.3 213.3,306.5 213.3,306.5L213.3,360.8z"/>
+                <Polygon Points="262.4,305.5 262.4,279.9 265.5,279.9 265.5,305.5 267.3,305.6 265.6,308 263.8,310.5 262.2,308 260.6,305.5"    Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+                <Polygon Points="251.6,305.5 251.6,279.9 254.7,279.9 254.7,305.5 256.5,305.6 254.8,308 253.1,310.5 251.4,308 249.8,305.5"    Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+                <Polygon Points="240.8,305.5 240.8,279.9 243.9,279.9 243.9,305.5 245.7,305.6 244,308 242.3,310.5 240.7,308 239,305.5"        Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+                <Polygon Points="230.1,305.5 230.1,279.9 233.2,279.9 233.2,305.5 235,305.6 233.2,308 231.5,310.5 229.9,308 228.3,305.5"      Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+                <Polygon Points="219.3,305.5 219.3,279.9 222.4,279.9 222.4,305.5 224.2,305.6 222.5,308 220.8,310.5 219.1,308 217.5,305.5"    Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+                <Rectangle  Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1" Width="61.3" Height="3.2" Canvas.Left="211.7" Canvas.Top="294.6"/>
+                <Path Fill="{x:Bind FillColor, FallbackValue=#FF0000FF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1" Data="F1M172.8,218.3L194.7,218.3 194.7,190.8C194.7,190.8 195.4,179.6 183.8,179.6 172.6,179.6 172.9,190.8 172.9,190.8L172.9,218.3z"/>
+                <Polygon Points="171.5,193.3 171.5,191.2 182.7,191.2 182.7,178.7 185.1,178.7 185.1,191.2 195.9,191.2 195.9,191.8 195.9,193.3 185.1,193.3 185.1,204.9 196,204.9 196,205.5 196,206.9 185.1,206.9 185.1,219.2 184.4,219.2 182.7,219.2 182.7,206.9 171.6,206.9 171.6,204.9 182.7,204.9 182.7,193.3" 
+                      Fill="{x:Bind BorderColor, FallbackValue=#FFFFFFFF, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}" StrokeThickness="1"/>
+            </Canvas>
+        </Canvas>
+
+    </Viewbox>
+
+</UserControl>

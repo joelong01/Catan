@@ -1,0 +1,40 @@
+﻿<UserControl
+    x:Class="Catan10.PlayerPickerItemCtrl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"       
+    Margin="0"
+    CanDrag="True"
+    Width="125"
+    Height="175"
+    >
+
+
+
+
+    <Grid x:Name="LayoutRoot" Background="Black">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="125"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="0"/>
+        </Grid.RowDefinitions>
+        <Rectangle Grid.Row="0" Grid.RowSpan="3" Fill="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Blue, Mode=OneWay, Path=FillColor}" />
+        <Rectangle Grid.Row="1" Fill="{x:Bind ImageBrush, Mode=OneWay}" CanDrag="False" />
+        <!--<Image Grid.Row="1" Stretch="Uniform" Source="{x:Bind ImageFileName, FallbackValue=ms-appx:///Assets/guest.jpg, Mode=OneTime}" CanDrag="False"/>-->
+        <Viewbox HorizontalAlignment="Center" Grid.Row="2" Margin="1">
+            <TextBlock HorizontalAlignment="Center"  Text="{x:Bind PlayerName, FallbackValue=Nameless, Mode=OneTime}" FontSize="22" 
+                    Foreground="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=White, Mode=OneWay, Path=ForegroundColor}"/>
+        </Viewbox>
+        <Viewbox Margin="1" Grid.Row="3" >
+            <CheckBox Content="First" Checked="OnFirstChecked" IsChecked="{x:Bind IsFirst, FallbackValue=false, Mode=TwoWay}" />
+
+        </Viewbox>
+
+    </Grid>
+</UserControl>

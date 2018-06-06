@@ -1,0 +1,57 @@
+﻿<UserControl
+    x:Class="Catan10.GameCtrl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Height="325"
+    Width="240">
+
+    
+    
+    <Grid Name="ControlGrid" Height="325" Width="240">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="19*"/>
+        </Grid.RowDefinitions>
+        <Rectangle Fill="Blue" Stroke="White" StrokeThickness="1" PointerPressed="OnPointerPressed" PointerReleased="OnPointerReleased" PointerMoved="OnPointerMoved"  />
+        <Viewbox HorizontalAlignment="Center" >
+            <TextBlock Text="Catan" CharacterSpacing="0" />
+        </Viewbox>
+        <Border Grid.Row="1" BorderBrush="White" BorderThickness="1">
+
+            <StackPanel Orientation="Vertical" Background="Black" >
+
+               
+                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
+                    <StackPanel Orientation="Vertical" >
+                        <Button Content="&#xE101;" Style="{StaticResource GameControllerStyle}" Click="OnNextPlayer"/>
+                        <TextBlock Text="Next Player" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" >
+                        <Button Content="&#xE10E;" Style="{StaticResource GameControllerStyle}" Click="OnUndo"/>
+                        <TextBlock Text="Undo" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
+                    <StackPanel Orientation="Vertical" >
+                        <Button Content="&#xE109;" Style="{StaticResource GameControllerStyle}" Click="OnNewGame" />
+                        <TextBlock Text="New Game" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2"/>
+                    </StackPanel>
+                    <StackPanel >
+                        <Button Content="&#xE115;" Style="{StaticResource GameControllerStyle}" Click="OnViewSettings"/>
+                        <TextBlock Text="Settings" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
+                    <StackPanel  >
+                        <Button Content="&#xE19F;" Style="{StaticResource GameControllerStyle}" Click="OnWinner"/>
+                        <TextBlock Text="Winner" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,176 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Windows.Storage.Pickers;
+using Windows.UI;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
+
+// The Content Dialog item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
+
+namespace Catan10
+{
+    public sealed partial class PlayerManagementDlg : ContentDialog
+    {
+        public PlayerManagementDlg()
+        {
+            this.InitializeComponent();
+        }
+
+
+
+
+        public ObservableCollection<PlayerData> PlayerDataList { get; } = new ObservableCollection<PlayerData>();
+
+
+
+        public PlayerManagementDlg(IList<PlayerData> playerData)
+        {
+            this.InitializeComponent();
+
+            PlayerDataList.AddRange(playerData);
+
+        }
+
+
+
+        private async void OnAddPlayer(object sender, RoutedEventArgs e)
+        {
+            PlayerData pd = new PlayerData();
+            await pd.LoadImage();
+            PlayerDataList.Add(pd);
+            _gvPlayers.ScrollIntoView(pd);
+        }
+
+        private void OnDeletePlayer(object sender, RoutedEventArgs e)
+        {
+            if (_selectedPlayer != null)
+            {
+                PlayerDataList.Remove(_selectedPlayer);
+                _selectedPlayer = PlayerDataList.FirstOrDefault();
+                _selectedPlayer.IsCurrentPlayer = true;
+                _gvPlayers.ScrollIntoView(_selectedPlayer);
+            }
+        }
+
+
+        private void OnPlayerColorChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void OnCurrentPlayerChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (e.AddedItems.Count == 0)
+            {
+                if (e.RemovedItems.Count > 0)
+                {
+                    //
+                    //   unselected
+                    _selectedPlayer.IsCurrentPlayer = false;
+                    _selectedPlayer = null;
+                    
+                }
+
+                return;
+            }
+
+            PlayerData player = e.AddedItems[0] as PlayerData; // single select only
+            if (_selectedPlayer != null)
+            {
+                _selectedPlayer.IsCurrentPlayer = false;
+            }
+            _selectedPlayer = player;
+            _selectedPlayer.IsCurrentPlayer = true;
+            this.TraceMessage($"Selected {_selectedPlayer}");
+
+
+        }
+
+        PlayerData _selectedPlayer = null;
+
+        private void OnSavePlayer(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async void OnImageDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            PlayerData data = ((Grid)sender).Tag as PlayerData;
+            await LoadNewImage(data);
+
+        }
+
+        private async System.Threading.Tasks.Task LoadNewImage(PlayerData player)
+        {
+            _gvPlayers.IsEnabled = false;                        
+            _gvPlayers.SelectedItem = player;
+            try
+            {
+                var folder = await StaticHelpers.GetSaveFolder();
+                var picker = new FileOpenPicker()
+                {
+                    ViewMode = PickerViewMode.List,
+                    SuggestedStartLocation = PickerLocationId.PicturesLibrary
+                };
+                picker.FileTypeFilter.Add(".jpg");
+                picker.FileTypeFilter.Add(".jpeg");
+                picker.FileTypeFilter.Add(".png");
+                picker.FileTypeFilter.Add(".gif");
+
+                var file = await picker.PickSingleFileAsync();
+                if (file != null)
+                {
+
+                    if (player != null)
+                    {
+                        var fileCopy = await player.CopyImage(file);
+                        player.ImageFileName = fileCopy.Name;
+                        await player.LoadImage();
+
+                    }
+
+                }
+            }
+            finally
+            {
+                _gvPlayers.IsEnabled = true;
+            }
+        }
+
+        private async void OnSaveAndclose(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            await MainPage.SavePlayers(PlayerDataList, "players.data");
+            args.Cancel = false; // continue to close
+            
+        }
+
+        private async void OnImageRightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            PlayerData data = ((Grid)sender).Tag as PlayerData;
+            await LoadNewImage(data);
+        }
+    }
+
+
+    public class ColorChoices
+    {
+        public Color Background { get; set; } = Colors.Blue;
+        public Color Foreground { get; set; } = Colors.White;
+        public string Name { get; set; } = "Blue";
+        public ColorChoices(string name, Color background, Color foreground)
+        {
+            Background = background;
+            Foreground = foreground;
+            Name = name;
+        }
+        public override string ToString()
+        {
+            return String.Format($"{Name} - {Background}:{Foreground}");
+        }
+    }
+}
+

@@ -1,0 +1,44 @@
+﻿<UserControl
+    x:Class="Catan10.SettlementCtrl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="30"
+    d:DesignWidth="30">
+
+    <!-- The actual Settlement/City UI is dynamically created to speed up loading.  here we just hold the ViewBoxes and Canvases to control Visibility -->
+    
+    <Grid Name="LayoutRoot">
+
+
+        <Grid Name="_gridBuildEllipse" Opacity="1" Canvas.ZIndex="-1" >
+            <Ellipse Name="_buildEllipse"  Width="30" Height="30" Fill="BurlyWood"  />
+
+            <TextBlock x:Name="_txtError" Text="X" CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
+            
+        </Grid>
+
+        <Canvas Name="_canvasCity" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}" Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent" Visibility="Visible"
+                IsHitTestVisible="False" IsTapEnabled="False">
+
+            <Viewbox Name="_vbCity" Width="30" Height="30" Stretch="Uniform">
+               
+            </Viewbox>
+           
+        </Canvas>
+
+        <Canvas Name="_canvasSettlement" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}" Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent" Visibility="Collapsed"                
+                IsHitTestVisible="False" IsTapEnabled="False">
+            <Viewbox Name="_vbSettlement" Width="30" Height="30" Stretch="Uniform">
+               
+            </Viewbox>
+        </Canvas>
+
+
+    </Grid>
+
+
+</UserControl>

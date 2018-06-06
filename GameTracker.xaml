@@ -1,0 +1,112 @@
+﻿<UserControl
+    x:Class="Catan10.GameTracker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+     mc:Ignorable="d"
+    RequestedTheme="Dark"
+    Height="600"
+    Width="600"    
+    GotFocus="Control_GotFocus">
+    <UserControl.Resources>
+        <Storyboard x:Name="_sbRotateCurrentPlayer">
+            <DoubleAnimation x:Name="_daRotateCurrentPlayer" Duration="0" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" Storyboard.TargetName="_gridTurnTracker" d:IsOptimized="True"/>
+        </Storyboard>
+
+
+    </UserControl.Resources>
+
+    <Grid Name="LayoutRoot" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="125"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="125"/>
+            <RowDefinition Height="5"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="125"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="125"/>
+            <ColumnDefinition Width="5"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Name="_gridTurnTracker" Grid.RowSpan="7" Grid.ColumnSpan="7" Background="Transparent">
+            <Ellipse Fill="Transparent" StrokeThickness="10" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="3">
+                <Ellipse.Stroke>
+                    <ImageBrush Stretch="Fill" ImageSource="Assets/back.jpg"/>
+                </Ellipse.Stroke>
+            </Ellipse>
+            <TextBlock Text="" FontFamily="Segoe MDL2 Assets" FontSize="50" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin=".5 .5" Margin="0,0,0,0"  >
+                <TextBlock.Foreground>
+                    <ImageBrush Stretch="Fill" ImageSource="Assets/Old Visuals/old desert.png"/>
+                </TextBlock.Foreground>
+                <TextBlock.RenderTransform>
+                    <CompositeTransform Rotation="180" />
+                </TextBlock.RenderTransform>
+            </TextBlock>
+
+            <Grid.RenderTransform>
+                <CompositeTransform CenterX="300" CenterY="300" Rotation="0" />
+            </Grid.RenderTransform>
+        </Grid>
+
+        <Border Grid.RowSpan="7" Grid.ColumnSpan="7" BorderBrush="Blue" BorderThickness="2" Margin="0" />
+
+        <Ellipse StrokeThickness="10"  Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="3">
+            <Ellipse.Stroke>
+                <ImageBrush Stretch="UniformToFill" ImageSource="Assets/back.jpg"/>
+            </Ellipse.Stroke>
+        </Ellipse>
+
+
+        <Button Name="_button" Content="Suppl -> Next" Height="50" FontFamily="Segoi UI" FontSize="28" Canvas.ZIndex="10" IsEnabled="False"
+                         Grid.Row="3" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.ColumnSpan="1" Grid.RowSpan="1" Margin="10,125,96,125" Width="194" Click="OnButtonClicked" PointerPressed="MainButton_PointerPressed" />
+
+
+
+        <TextBox x:Name="_txtInput" TextAlignment="Left" Text="" FontFamily="Segoi UI" FontSize="30" 
+                     Grid.Row="3" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.ColumnSpan="1" Grid.RowSpan="1" Margin="0,124,27,124" MaxLength="2"/>
+
+       
+
+        <TextBlock x:Name="_txtName"  Grid.Row="3" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.ColumnSpan="1" Margin="10,189,0,63" Visibility="Visible"
+                       Text="{x:Bind CurrentPlayer.PlayerName, Mode=TwoWay}" FontFamily="Segoi UI" FontSize="40" TextAlignment="Center" />
+
+        <Viewbox HorizontalAlignment="Center" Height="60" Margin="0" Grid.Row="3" VerticalAlignment="Top" Grid.ColumnSpan="1" Grid.Column="3" >
+            <TextBlock Name="_tbTime" Text="00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Green"  />
+        </Viewbox>
+
+
+        <!--<Ellipse Width="100" Height="100" Fill="Red" Canvas.ZIndex="100" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"
+                 Grid.Row="0" Grid.Column="0" Grid.RowSpan="10" Grid.ColumnSpan="10"  >
+            <Ellipse.RenderTransform>
+                <CompositeTransform TranslateX="30" TranslateY="250" Rotation="180" CenterX="220" CenterY="0" />
+            </Ellipse.RenderTransform>
+        </Ellipse>
+
+        <Ellipse Width="100" Height="100" Fill="Green" Canvas.ZIndex="100" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"
+                 Grid.Row="0" Grid.Column="0" Grid.RowSpan="10" Grid.ColumnSpan="10"  >
+            <Ellipse.RenderTransform>
+                <CompositeTransform TranslateX="30" TranslateY="250" Rotation="270" CenterX="220" CenterY="0" />
+            </Ellipse.RenderTransform>
+
+        </Ellipse>
+
+        <Ellipse Width="100" Height="100" Fill="Yellow" Canvas.ZIndex="100" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"
+                 Grid.Row="0" Grid.Column="0" Grid.RowSpan="10" Grid.ColumnSpan="10"  >
+            <Ellipse.RenderTransform>
+                <CompositeTransform TranslateX="30" TranslateY="250" Rotation="0" CenterX="220" CenterY="0" />
+            </Ellipse.RenderTransform>
+
+        </Ellipse>-->
+
+    </Grid>
+</UserControl>

@@ -1,0 +1,433 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{7BF299E8-84B0-4F39-972A-E5A30E5D343B}</ProjectGuid>
+    <OutputType>AppContainerExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Catan10</RootNamespace>
+    <AssemblyName>Catan Game Board</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
+    <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PackageCertificateKeyFile>Catan10_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x86</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>400063350650A633A564C222D46746A0A376A971</PackageCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE;WINDOWS_UWP;CODE_ANALYSIS;</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <LangVersion>7.2</LangVersion>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <OutputPath>bin\ARM\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <Content Include="ApplicationInsights.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="Assets\Games\Expansion.catangame" />
+    <EmbeddedResource Include="Assets\Games\Regular.catangame" />
+    <EmbeddedResource Include="Assets\Games\BuildDate.dat" />
+    <EmbeddedResource Include="Assets\Games\Heading for New Shores.catangame" />
+    <None Include="Catan10_StoreKey.pfx" />
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CatanService\ServiceClient.cs" />
+    <Compile Include="NetworkService.cs" />
+    <Compile Include="ResourceCardCtrl.xaml.cs">
+      <DependentUpon>ResourceCardCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ResourceCountCtrl.xaml.cs">
+      <DependentUpon>ResourceCountCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\GameSummaryCtrl.xaml.cs">
+      <DependentUpon>GameSummaryCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ContentDialogs\LostCardsDlg.xaml.cs">
+      <DependentUpon>LostCardsDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainPage\logging.cs" />
+    <Compile Include="ContentDialogs\NewGameDlg.xaml.cs">
+      <DependentUpon>NewGameDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\PlayerPickerItemCtrl.xaml.cs">
+      <DependentUpon>PlayerPickerItemCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ContentDialogs\PlayerManagementDlg.xaml.cs">
+      <DependentUpon>PlayerManagementDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\ScoreViewCtrl.xaml.cs">
+      <DependentUpon>ScoreViewCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settlements and Roads\CityCtrl.xaml.cs">
+      <DependentUpon>CityCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GameView\TileParsing.cs" />
+    <Compile Include="Settlements and Roads\RoadCtrl.xaml.cs">
+      <DependentUpon>RoadCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settlements and Roads\SettlementUi.xaml.cs">
+      <DependentUpon>SettlementUi.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ContentDialogs\SetttingsDlg.xaml.cs">
+      <DependentUpon>SetttingsDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Ship.xaml.cs">
+      <DependentUpon>Ship.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\BaronCtrl.xaml.cs">
+      <DependentUpon>BaronCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\PirateShip.xaml.cs">
+      <DependentUpon>PirateShip.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\CatanNumber.xaml.cs">
+      <DependentUpon>CatanNumber.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Games\FourIsland3Ctrl.xaml.cs">
+      <DependentUpon>FourIsland3Ctrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Games\ExpansionCtrl.xaml.cs">
+      <DependentUpon>ExpansionCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GameView\GameContainerCtrl.xaml.cs">
+      <DependentUpon>GameContainerCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Games\RegularGameCtrl.xaml.cs">
+      <DependentUpon>RegularGameCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainPage\GameCommands.cs" />
+    <Compile Include="MainPage\MainPageUiState.cs" />
+    <Compile Include="globaldefs.cs" />
+    <Compile Include="UI Controls\Harbor.xaml.cs">
+      <DependentUpon>Harbor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainPage\MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainPage\MainPageCatanSettings.cs" />
+    <Compile Include="ContentDialogs\OpenGameDlg.xaml.cs">
+      <DependentUpon>OpenGameDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainPage\PageCallback.cs" />
+    <Compile Include="MersenneTwister.cs" />
+    <Compile Include="Player\PlayerData.cs" />
+    <Compile Include="Player\PlayerView.xaml.cs">
+      <DependentUpon>PlayerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Games\Seafarers4PlayerCtrl.xaml.cs">
+      <DependentUpon>Seafarers4PlayerCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\SettingsCtrl.xaml.cs">
+      <DependentUpon>SettingsCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GameView\CatanHexPanel.cs" />
+    <Compile Include="StaticHelpers.cs" />
+    <Compile Include="UI Controls\StopWatchCtrl.xaml.cs">
+      <DependentUpon>StopWatchCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settlements and Roads\SettlementCtrl.xaml.cs">
+      <DependentUpon>SettlementCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\TileCtrl.xaml.cs">
+      <DependentUpon>TileCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ValueConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+    <None Include="Catan10_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\back.jpg" />
+    <Content Include="Assets\brick.jpg" />
+    <Content Include="Assets\cherry.jpg" />
+    <Content Include="Assets\DefaultPlayers\Chris.jpg" />
+    <Content Include="Assets\DefaultPlayers\cort.jpg" />
+    <Content Include="Assets\DefaultPlayers\craig.jpg" />
+    <Content Include="Assets\DefaultPlayers\dodgy.jpg" />
+    <Content Include="Assets\DefaultPlayers\doug.jpg" />
+    <Content Include="Assets\DefaultPlayers\guest.jpg" />
+    <Content Include="Assets\DefaultPlayers\joe.jpg" />
+    <Content Include="Assets\DefaultPlayers\john.jpg" />
+    <Content Include="Assets\DefaultPlayers\robert.jpg" />
+    <Content Include="Assets\desert.jpg" />
+    <Content Include="Assets\guest.jpg" />
+    <Content Include="Assets\maple.jpg" />
+    <Content Include="Assets\money.jpg" />
+    <Content Include="Assets\Old Visuals\baron.png" />
+    <Content Include="Assets\Old Visuals\gold mine 2.png" />
+    <Content Include="Assets\Old Visuals\old 2 for 1 brick.png" />
+    <Content Include="Assets\Old Visuals\old 2 for 1 ore.png" />
+    <Content Include="Assets\Old Visuals\old 2 for 1 sheep.png" />
+    <Content Include="Assets\Old Visuals\old 2 for 1 wheat.png" />
+    <Content Include="Assets\Old Visuals\old 2 for 1 wood.png" />
+    <Content Include="Assets\Old Visuals\old 3 for 1.png" />
+    <Content Include="Assets\Old Visuals\old brick.png" />
+    <Content Include="Assets\Old Visuals\old desert.png" />
+    <Content Include="Assets\Old Visuals\old ore.png" />
+    <Content Include="Assets\Old Visuals\old sheep.png" />
+    <Content Include="Assets\Old Visuals\old wheat.png" />
+    <Content Include="Assets\Old Visuals\old wood.png" />
+    <Content Include="Assets\Old Visuals\ship.png" />
+    <Content Include="Assets\ore.jpg" />
+    <Content Include="Assets\sailboat.png" />
+    <Content Include="Assets\sheep.jpg" />
+    <Content Include="Assets\ship.png" />
+    <Content Include="Assets\ship.svg" />
+    <Content Include="Assets\SmallIcons\brick.png" />
+    <Content Include="Assets\SmallIcons\gold.jpg" />
+    <Content Include="Assets\SmallIcons\ore.jpg" />
+    <Content Include="Assets\SmallIcons\Sheep.png" />
+    <Content Include="Assets\SmallIcons\wheat.png" />
+    <Content Include="Assets\SmallIcons\wood.png" />
+    <Content Include="Assets\SplashScreen.scale-100.png" />
+    <Content Include="Assets\SplashScreen.scale-200.png" />
+    <Content Include="Assets\square 71x71 logo.scale-100.png" />
+    <Content Include="Assets\square 71x71 logo.scale-200.png" />
+    <Content Include="Assets\SquareImages\back.png" />
+    <Content Include="Assets\SquareImages\brick.png" />
+    <Content Include="Assets\SquareImages\gold.png" />
+    <Content Include="Assets\SquareImages\ore.png" />
+    <Content Include="Assets\SquareImages\sheep.png" />
+    <Content Include="Assets\SquareImages\wheat.png" />
+    <Content Include="Assets\SquareImages\wood.png" />
+    <Content Include="Assets\StoreLogo.scale-100.png" />
+    <Content Include="Assets\StoreLogo.scale-200.png" />
+    <Content Include="Assets\StoreLogo.scale-400.png" />
+    <Content Include="Assets\water.png" />
+    <Content Include="Assets\wheat.jpg" />
+    <Content Include="Assets\wood.jpg" />
+    <None Include="Package.StoreAssociation.xml" />
+    <Content Include="Properties\Default.rd.xml" />
+    <Content Include="Assets\LockScreenLogo.scale-200.png" />
+    <Content Include="Assets\Square150x150Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="ResourceCardCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ResourceCountCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\GameSummaryCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentDialogs\LostCardsDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentDialogs\NewGameDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\PlayerPickerItemCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentDialogs\PlayerManagementDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\ScoreViewCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Settlements and Roads\CityCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Settlements and Roads\RoadCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Settlements and Roads\SettlementUi.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentDialogs\SetttingsDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Ship.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\BaronCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\PirateShip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\CatanNumber.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Games\FourIsland3Ctrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Games\ExpansionCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GameView\GameContainerCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Games\RegularGameCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Harbor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainPage\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ContentDialogs\OpenGameDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Player\PlayerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Games\Seafarers4PlayerCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\SettingsCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\StopWatchCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Settlements and Roads\SettlementCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\TileCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NewGameDlg\" />
+    <Folder Include="Themes\" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
+    <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

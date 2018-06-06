@@ -1,0 +1,103 @@
+﻿<UserControl
+    x:Class="Catan10.TileCtrl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="_TileCtrl"
+    Width="110"
+  
+    Height="96"
+    mc:Ignorable="d" >
+
+    <Control.Resources>
+        <Style TargetType="local:Harbor" x:Key="HarborStyle">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Canvas.ZIndex"   Value="-1" />
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Setter Property="RenderTransformOrigin" Value=".5 .5" />
+        </Style>
+
+
+        <Storyboard x:Name="_sbFlipTile">
+            <DoubleAnimation x:Name="_daFlipBackTile"  Duration="0:0:2" To="-90" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" Storyboard.TargetName="_hexBackGrid"/>
+            <DoubleAnimation x:Name="_daFlipFrontTile" Duration="0:0:2" To="0"   Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" Storyboard.TargetName="_hexFrontGrid"/>
+        </Storyboard>
+
+        <Storyboard x:Name="_sbMoveTile">
+            <DoubleAnimation x:Name="_daToX" Duration="0:0:0.250" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="ResourceTileGrid" d:IsOptimized="True"/>
+            <DoubleAnimation x:Name="_daToY" Duration="0:0:0.250" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" Storyboard.TargetName="ResourceTileGrid" d:IsOptimized="True"/>
+        </Storyboard>
+
+        <Storyboard x:Name="_sbRotate">
+            <DoubleAnimation x:Name="_daRotateTile" To="0" Duration="0:0:2" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" Storyboard.TargetName="ResourceTileGrid" d:IsOptimized="True"/>
+        </Storyboard>
+        <Storyboard x:Name="_sbAnimateOpacity">
+            <DoubleAnimation x:Name="_daAnimateOpacity" Duration="0:0:3" To="0.5" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="_hexFront" AutoReverse="False"/>
+        </Storyboard>
+    </Control.Resources>
+
+    <Canvas Name="LayoutRoot" Height="{x:Bind _TileCtrl.Height, FallbackValue=96, Mode=TwoWay}" Width="{x:Bind _TileCtrl.Width, FallbackValue=110, Mode=TwoWay}" Background="Transparent" >
+        <!--<Polygon Stroke="Blue" Fill="Black" StrokeThickness="1"  Grid.ColumnSpan="3" Grid.RowSpan="3"    Points="24.5,-6 85.5,-6 79,5.5 31.2,5.5" Canvas.ZIndex="999" />
+        <Polygon Stroke="Red" Fill="Black" StrokeThickness="1"  Grid.ColumnSpan="3" Grid.RowSpan="3"          Points="23.25,-6 -6,47.5 6.5,47.5 30,6" Canvas.ZIndex="999" Visibility="Visible" />
+        <Polygon Stroke="Blue" Fill="Black" StrokeThickness="1"  Grid.ColumnSpan="3" Grid.RowSpan="3"         Points="-6,48.5 23.5,101.5 30,90 6.5,48.5" Canvas.ZIndex="999"  Visibility="Visible" Margin="0"/>
+        <Polygon Stroke="Red" Fill="Black" StrokeThickness="1"  Grid.ColumnSpan="3" Grid.RowSpan="3"          Points="24.5,102 85.5,102 79,90 31.2, 90" Canvas.ZIndex="999"  Visibility="Visible" Margin="0"/>
+        <Polygon Stroke="Blue" Fill="Black" StrokeThickness="1"  Grid.ColumnSpan="3" Grid.RowSpan="3"         Points="118,48.5 86.5,102 80,90 103, 48.5" Canvas.ZIndex="999"  Visibility="Visible" Margin="0"/>
+        <Polygon Stroke="Red" Fill="Black" StrokeThickness="1"  Grid.ColumnSpan="3" Grid.RowSpan="3"          Points="87,-6 118,47.5 103.5,47.5 80,5.5" Canvas.ZIndex="999"  Visibility="Visible" Margin="0"/>-->
+        <!--29	3 81 3 106.5 48 81 93 29 93 3.5 48-->
+        
+
+        <Grid Name="VisualGrid" Height="{x:Bind _TileCtrl.Height, FallbackValue=96, Mode=TwoWay}" Width="{x:Bind _TileCtrl.Width, FallbackValue=110, Mode=TwoWay}"  >
+            
+            <Rectangle x:Name="_border" Fill="Transparent" StrokeDashArray="1 3" Stroke="Blue" StrokeThickness="1" Visibility="Collapsed" Margin="0"  StrokeDashCap="Round" Canvas.ZIndex="-1"                           
+                    StrokeEndLineCap="Round" StrokeLineJoin="Round" StrokeStartLineCap="Round" Grid.RowSpan="3" Grid.ColumnSpan="3" IsTapEnabled="False" IsRightTapEnabled="False" IsDoubleTapEnabled="False"/>
+
+            <Grid Name="ResourceTileGrid"  RenderTransformOrigin=".5 .5"  Canvas.ZIndex="-1" Margin="0" 
+                  Tapped="OnTileLeftTapped" RightTapped="OnTileRightTapped" 
+                  Background="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.RowSpan="3" Grid.ColumnSpan="3"  >
+
+                <Grid.RenderTransform>
+                    <CompositeTransform x:Name="_transformResourceTileGrid" />
+                </Grid.RenderTransform>
+                                                                                                                 
+                
+                <Grid Name="_hexFrontGrid" Canvas.ZIndex="10" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0" >
+
+                    <Grid.Projection>
+                        <PlaneProjection x:Name="_ppHexFront" RotationY="0"/>
+                    </Grid.Projection>
+                    <Polygon Name="_hexFront" Stroke="BurlyWood" StrokeThickness="6" Margin="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Points="29,3 81,3 106.5,48 81,93 29,93 3.5,48" >
+                        <Polygon.Fill>
+                            <ImageBrush x:Name="_hexFrontBrush"  ImageSource="ms-appx:///Assets/Old Visuals/old sheep.png" Stretch="UniformToFill" />
+                        </Polygon.Fill>
+                    </Polygon>
+                    <!--<Polygon Name="_hexInsideBorder" Stroke="Red" StrokeThickness="1" Margin="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Points="31,6.5 79,6.5 102.5,48 79,89.5 31,89.5 7.5,48" />-->
+
+
+                    <local:CatanNumber x:Name="_number" Number="12" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-10,0,0" Width="80" Height="80" >
+                        <local:CatanNumber.RenderTransform>
+                            <CompositeTransform ScaleX="0.5" ScaleY="0.5"/>
+                        </local:CatanNumber.RenderTransform>
+                    </local:CatanNumber>
+                    <TextBlock Name="_txtIndex" Visibility="Collapsed" Text="{x:Bind Index, FallbackValue=27, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="20" Foreground="Red" Margin="0, 0 ,0 , 5" />
+                </Grid>
+                <Grid x:Name="_hexBackGrid" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Grid.Projection>
+                        <PlaneProjection x:Name="_ppHexBack" RotationY="0" />
+                    </Grid.Projection>
+
+                    <Polygon VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="BurlyWood" StrokeThickness="6" Margin="0" Points="29,3 81,3 106.5,48 81,93 29,93 3.5,48">
+                        <Polygon.Fill>
+                            <ImageBrush   ImageSource="ms-appx:///Assets/back.jpg" Stretch="UniformToFill" />
+                        </Polygon.Fill>
+                    </Polygon>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Canvas>
+</UserControl>
+
+
