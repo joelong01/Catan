@@ -115,10 +115,10 @@
     </Compile>
     <Compile Include="CatanService\ServiceClient.cs" />
     <Compile Include="NetworkService.cs" />
-    <Compile Include="ResourceCardCtrl.xaml.cs">
+    <Compile Include="UI Controls\ResourceCardCtrl.xaml.cs">
       <DependentUpon>ResourceCardCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ResourceCountCtrl.xaml.cs">
+    <Compile Include="UI Controls\ResourceCountCtrl.xaml.cs">
       <DependentUpon>ResourceCountCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\GameSummaryCtrl.xaml.cs">
@@ -294,11 +294,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="ResourceCardCtrl.xaml">
+    <Page Include="UI Controls\ResourceCardCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ResourceCountCtrl.xaml">
+    <Page Include="UI Controls\ResourceCountCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
