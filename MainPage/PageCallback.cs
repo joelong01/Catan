@@ -84,6 +84,7 @@ namespace Catan10
                     break;
                 case CatanAction.ChangedState:
                     LogStateTranstion lst = logLine.Tag as LogStateTranstion;
+                    if (lst.OldState == GameState.WaitingForStart) break;
                     await SetStateAsync(logLine.PlayerData, lst.OldState, true, LogType.Undo);
 
                     break;
