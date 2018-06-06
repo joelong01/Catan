@@ -1,0 +1,96 @@
+﻿<UserControl
+    x:Class="Catan10.CatanPlayer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Width="100"
+    Height="100"
+    d:DesignHeight="100"
+    d:DesignWidth="100" PointerPressed="Player_PointerPressed">
+    <UserControl.Resources>
+        <Storyboard x:Name="_sbRotatePlayer">
+            <DoubleAnimation x:Name="_daRotatePlayer" To="360" Duration="0:0:1" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" Storyboard.TargetName="_gridPlayer" d:IsOptimized="True"/>
+        </Storyboard>
+        <Storyboard x:Name="_sbRotateControl">
+            <DoubleAnimation x:Name="_daRotateControl" To="360" Duration="0:0:1" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" Storyboard.TargetName="LayoutRoot" d:IsOptimized="True"/>
+        </Storyboard>
+    </UserControl.Resources>
+    <Grid Name="LayoutRoot" Grid.ColumnSpan="10" Grid.RowSpan="10" RenderTransformOrigin="0.5 0.5" Canvas.ZIndex="10">
+        <Grid.RenderTransform>
+            <CompositeTransform x:Name="_gridTransform" Rotation="0"/>
+        </Grid.RenderTransform>
+
+        <Grid Name="_gridPlayer"  RenderTransformOrigin="0.5 0.5" >
+            <Grid.RenderTransform>
+                <CompositeTransform x:Name="_transformPictureGrid"  />
+            </Grid.RenderTransform>
+            <Ellipse x:Name="_ellipse" Width="100" Height="100"  HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5 0.5" Canvas.ZIndex="-1" Visibility="Visible">
+                <Ellipse.Fill>
+                    <ImageBrush x:Name="_picBrush" Stretch="UniformToFill" ImageSource="Assets/guest.jpg"/>
+                </Ellipse.Fill>
+            </Ellipse>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Background="Black" Margin="0, 0, 0, 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="22" />
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="_tbLongestRoad" Text="&#xEA5E;" Visibility="Collapsed" FontFamily="Segoe MDL2 Assets" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Red"  CharacterSpacing="0" Padding="0" Margin="0,-10,0,0"/>
+            </Grid>
+            <TextBlock Name="_tbIndex" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoi Ui" FontSize="30" Foreground="Red" Grid.ColumnSpan="10" Grid.RowSpan="10" Text="6" RenderTransformOrigin="0.5 0.5" Canvas.ZIndex="10"/>
+            <Grid Name="_gridCounters" RenderTransformOrigin=".5 .5" >
+                <Grid Name="_gridTimesTargeted" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.ZIndex="10" RenderTransformOrigin=".5 .5" Margin="0">
+                    <Grid.RenderTransform>
+                        <CompositeTransform TranslateY="0" TranslateX="-10"/>
+                    </Grid.RenderTransform>
+                    <Ellipse Fill="Red" Stroke="Black" StrokeThickness="1" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <Rectangle Width="1" Height="30" Fill="Black" HorizontalAlignment="Center" />
+                    <Rectangle Height="1" Width="30" Fill="Black" VerticalAlignment="Center" />
+                    <Ellipse Fill="Red" Stroke="Black" StrokeThickness="1" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20"/>
+                    <TextBlock Name="_txtCardsTaken" Text="0" Foreground="White" FontFamily="Segoi UI" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0" TextLineBounds="Tight" Margin="0" FontWeight="Bold"/>
+                </Grid>
+                <Grid Name="_gridCardsLostToMonopoly" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Bottom" Canvas.ZIndex="10" RenderTransformOrigin=".5 .5">
+                    <Grid.RenderTransform>
+                        <CompositeTransform TranslateX="-10"/>
+                    </Grid.RenderTransform>
+                    <Ellipse Fill="Green" Stroke="Black" StrokeThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <TextBlock  Name="_txtCardsLostToMonopoly" Text="0" Foreground="White" FontFamily="Segoi UI" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0" TextLineBounds="Tight" FontWeight="Bold"/>
+                </Grid>
+                <Grid Name="_gridTimer" Width="Auto" Height="15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Canvas.ZIndex="10" RenderTransformOrigin=".5 .5" Visibility="Visible" Margin="0">
+                    <Grid.RenderTransform>
+                        <CompositeTransform TranslateY="0"/>
+                    </Grid.RenderTransform>
+                    <local:StopWatchCtrl x:Name="_stopWatch" Margin="0" />
+                </Grid>
+                <Grid Name="_gridCardsLostToSeven" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Canvas.ZIndex="10" RenderTransformOrigin=".5 .5" Margin="0" >
+                    <Grid.RenderTransform>
+                        <CompositeTransform TranslateX="10"/>
+                    </Grid.RenderTransform>
+                    <Ellipse Fill="Yellow" Stroke="Black" StrokeThickness="1" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <TextBlock  Name="_txtCardsLostToSeven" Text="0" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0" TextLineBounds="Tight" FontWeight="Bold"/>
+                </Grid>
+                <Grid Name="_gridMissedOppportunity" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.ZIndex="10" RenderTransformOrigin=".5 .5" Margin="0" >
+                    <Grid.RenderTransform>
+                        <CompositeTransform TranslateX="10" TranslateY="0"/>
+                    </Grid.RenderTransform>
+                    <Ellipse Fill="Blue" Stroke="Black" StrokeThickness="1" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <TextBlock  Name="_txtMissedOpportunity" Text="0" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0" TextLineBounds="Tight" FontWeight="Bold"/>
+                </Grid>
+            </Grid>
+            <Grid Name="_gridScore" Margin="0,-20,0,100" Background="Black">
+
+                <TextBlock x:Name="_tbScore" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoi Ui" FontSize="22" Foreground="HotPink" 
+                    Text="{x:Bind Score, Converter={StaticResource ScoreIntToStringConverter}, FallbackValue=Score: 10, Mode=TwoWay}" 
+                    RenderTransformOrigin="0.5 0.5" Canvas.ZIndex="10" Visibility="Visible" Margin="0" />
+
+            </Grid>
+            <Grid Name="_gridResourceCount" Margin="0,104,0,-24" Background="Black">
+
+                <TextBlock x:Name="_tbResourceCount" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoi Ui" FontSize="22" Foreground="BurlyWood" 
+                    Text="{x:Bind ResourceCount, Converter={StaticResource IntToStringConverter}, FallbackValue=20, Mode=TwoWay}" 
+                    RenderTransformOrigin="0.5 0.5" Canvas.ZIndex="10" Visibility="Visible"  Margin="0" CharacterSpacing="0"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

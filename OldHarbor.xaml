@@ -1,0 +1,61 @@
+﻿<UserControl
+    x:Class="Catan10.OldHarbor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    UseLayoutRounding="False"
+    IsTabStop="False"
+    Width="68.11"
+    Height="61"
+    d:DesignHeight="60"
+    d:DesignWidth="68.11">
+    <UserControl.Resources>
+        <Storyboard x:Name="_sbFlip">
+            <DoubleAnimation x:Name="_daFlipBack"  Duration="0:0:2" To="-90" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" Storyboard.TargetName="_back"/>
+            <DoubleAnimation x:Name="_daFlipFront" Duration="0:0:2" To="0"   Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" Storyboard.TargetName="_gridFront"/>
+        </Storyboard>
+
+        <Storyboard x:Name="_sbMoveTile" AutoReverse="False">
+            <DoubleAnimation x:Name="_daToX" Duration="0:0:0.250" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="LayoutRoot" d:IsOptimized="True"/>
+            <DoubleAnimation x:Name="_daToY" Duration="0:0:0.250" To="0" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" Storyboard.TargetName="LayoutRoot" d:IsOptimized="True"/>
+        </Storyboard>
+
+        <Storyboard x:Name="_sbRotate">
+            <DoubleAnimation x:Name="_daRotate" To="0" Duration="0:0:2" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" Storyboard.TargetName="LayoutRoot" d:IsOptimized="True"/>
+        </Storyboard>
+
+    </UserControl.Resources>
+    <UserControl.RenderTransform>
+        <CompositeTransform/>
+    </UserControl.RenderTransform>
+    <Grid Name="LayoutRoot" PointerPressed="HarborGrid_PointerPressed" RenderTransformOrigin=".5 .5">
+        <Grid.RenderTransform>
+            <CompositeTransform x:Name="_gridTransform" />
+        </Grid.RenderTransform>
+
+        <Grid Name="_gridFront" Margin="0">
+            <Grid.Projection>
+                <PlaneProjection x:Name="_ppHarborFront" RotationY="90" />
+            </Grid.Projection>
+            <Grid.RenderTransform>
+                <CompositeTransform x:Name="_gridFrontTransform" />
+            </Grid.RenderTransform>
+            <Rectangle x:Name="_front"   Fill="{StaticResource bmBrick}"  RadiusY="3" RadiusX="3" Stroke="White"/>
+            <TextBlock x:Name="_text" Text="2:1" FontFamily="Segoie UI" FontSize="14" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Visible"/>
+        </Grid>
+
+        <Rectangle x:Name="_back" Fill="{StaticResource bmBack}"  RadiusY="3" RadiusX="3" Stroke="White" Margin="0" >
+            <Rectangle.Projection>
+                <PlaneProjection x:Name="_ppHarborBack" RotationY="0" />
+            </Rectangle.Projection>
+            <Rectangle.RenderTransform>
+                <CompositeTransform x:Name="_gridBackTransform" />
+            </Rectangle.RenderTransform>
+        </Rectangle>
+
+        
+    </Grid>
+</UserControl>

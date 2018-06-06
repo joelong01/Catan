@@ -1,0 +1,77 @@
+﻿<UserControl
+    x:Class="Catan10.SeaScenario3"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+   >
+
+    <Grid>
+        <Viewbox Stretch="Uniform">
+
+
+            <local:HexPanel x:Name="LayoutRoot" Columns="7" Rows="7" RenderTransformOrigin=".5 .5" NormalHeight="96" NormalWidth="110"  >
+                <local:HexPanel.RenderTransform>
+                    <CompositeTransform x:Name="_transform" ScaleX="1" ScaleY="1" Rotation="0"/>
+                </local:HexPanel.RenderTransform>
+
+                <!--Column 1-->
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sheep" Number="12" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+
+                <!--Column 2-->
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Wood" Number="5" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="BottomLeft" TileOrientation="FaceUp" ResourceType="Sheep" Number="9" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="TopRight" TileOrientation="FaceUp" ResourceType="Ore" Number="2" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Wheat" Number="5" UseClassic="True"/>
+                
+                <!--Column 3-->
+                <local:TileCtrl HarborLocation="TopLeft" TileOrientation="FaceUp" ResourceType="Wheat" Number="11"  UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Ore" Number="8" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Wood" Number="3" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" Canvas.ZIndex="-1" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Brick" Number="10" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="BottomLeft" TileOrientation="FaceUp" ResourceType="Brick" Number="6" UseClassic="True"/>
+
+                <!--Column 4-->
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+
+                <!--Column 5-->
+
+                <local:TileCtrl HarborLocation="TopRight" TileOrientation="FaceUp" ResourceType="Sheep" Number="6" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Ore" Number="10" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Wood" Number="8" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Wheat" Number="11" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" UseClassic="True" Number="0"/>
+                
+                <!--Column 6-->
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Ore" Number="4" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="BottomLeft" TileOrientation="FaceUp" ResourceType="Wood" Number="9" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Wheat" Number="9" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="BottomRight" TileOrientation="FaceUp" ResourceType="Brick" Number="5" UseClassic="True"/>
+                
+                <!--Column 7-->
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sea" Number="0" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Wheat" Number="4" UseClassic="True"/>
+                <local:TileCtrl HarborLocation="None" TileOrientation="FaceUp" ResourceType="Sheep" Number="3" UseClassic="True"/>
+                
+
+            </local:HexPanel>
+
+        </Viewbox>
+    </Grid>
+</UserControl>
