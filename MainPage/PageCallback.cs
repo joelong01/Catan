@@ -45,7 +45,7 @@ namespace Catan10
       
         //
         //  returns True if it undid something, false if the undo action has no UI affect (e.g. true if the user would think undo happened)
-        private async Task<bool> UndoLogLine(LogEntry logLine)
+        private async Task<bool> UndoLogLine(LogEntry logLine, bool replayingLog)
         {
             switch (logLine.Action)
             {
@@ -110,12 +110,18 @@ namespace Catan10
                     break;
                 case CatanAction.UpdatedRoadState:
                     LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
-                    await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo); /// NOTE:  New and Old have been swapped       
+                    if (replayingLog)
+                        await UpdateRoadState(roadUpdate.Road,  roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Undo); 
+                    else
+                        await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo); 
                     SetLongestRoadFromLog();                            
                     break;
                 case CatanAction.UpdateSettlementState:
                     LogSettlementUpdate settlementUpdate = logLine.Tag as LogSettlementUpdate;
-                    await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.NewSettlementType, settlementUpdate.OldSettlementType, LogType.Undo); // NOTE:  New and Old have been swapped                      
+                    if (replayingLog)
+                        await UpdateSettlementState(settlementUpdate.Settlement,  settlementUpdate.OldSettlementType, settlementUpdate.NewSettlementType, LogType.Undo); 
+                    else
+                        await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.NewSettlementType, settlementUpdate.OldSettlementType, LogType.Undo); // NOTE:  New and Old have been swapped                      
                     break;
                 default:
                     break;
@@ -139,7 +145,7 @@ namespace Catan10
                     if (_log[i].LogType == LogType.Undo) continue; // if we have an undo action, skip it
                     if (_log[i].Undone == true) continue;   // we already undid this one
 
-                    bool ret = await UndoLogLine(_log[i]);
+                    bool ret = await UndoLogLine(_log[i], false);
                     if (ret) break;
                 }
             }
@@ -755,6 +761,7 @@ namespace Catan10
 
         //
         //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
+        ///
         private async Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
         {
             road.RoadState = newState;

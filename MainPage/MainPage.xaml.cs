@@ -1248,7 +1248,7 @@ namespace Catan10
                 n++;
                 if (logLine.LogType == LogType.Undo)
                 {
-                    await UndoLogLine(logLine);
+                    await UndoLogLine(logLine, true);
                     continue;
                 }
                 switch (logLine.Action)
