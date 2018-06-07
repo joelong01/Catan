@@ -561,7 +561,19 @@ namespace Catan10
             PlayingPlayers.Clear();
             _stateStack.Clear();
             _GameSummary.Reset();
+            foreach (var kvp in _playerToResourceCount)
+            {
+                kvp.Value.Visibility = Visibility.Collapsed;
+                kvp.Value.SetOrientation(TileOrientation.FaceDown);
+                kvp.Value.SettlementsLeft = _gameView.CurrentGame.MaxSettlements;
+                kvp.Value.CitiesLeft = _gameView.CurrentGame.MaxCities;
+                kvp.Value.RoadsLeft = _gameView.CurrentGame.MaxRoads;
+                kvp.Value.ShipsLeft = _gameView.CurrentGame.MaxShips;
+                kvp.Value.ResetTotalCards();
+            }
         }
+
+       
 
         /// <summary>
         /// Update this because you did the sorting work in the dialog
@@ -578,22 +590,13 @@ namespace Catan10
 
             ResetDataForNewGame();
 
-            foreach (var kvp in _playerToResourceCount)
-            {
-                kvp.Value.Visibility = Visibility.Collapsed;
-                kvp.Value.SetOrientation(TileOrientation.FaceDown);
-                kvp.Value.SettlementsLeft = _gameView.CurrentGame.MaxSettlements;
-                kvp.Value.CitiesLeft = _gameView.CurrentGame.MaxCities;
-                kvp.Value.RoadsLeft = _gameView.CurrentGame.MaxRoads;
-                kvp.Value.ShipsLeft = _gameView.CurrentGame.MaxShips;
-                kvp.Value.ResetTotalCards();
-            }
-
             foreach (PlayerData pData in players)
             {
                 await AddPlayer(pData, LogType.Normal);
-                _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
+               
             }
+
+
 
             _GameSummary.AddPlayers(PlayingPlayers);
             ScoreGrid.AddPlayers(PlayingPlayers);
@@ -625,6 +628,8 @@ namespace Catan10
             _currentPlayerIndex = 0;
             _rolls.Clear();
 
+            SetResourceTrackingOrientation(TileOrientation.FaceDown);
+
         }
         bool _undoingCardLostHack = false;
         private async void OnPlayerLostCards(PlayerData player, int oldVal, int newVal)
@@ -653,7 +658,7 @@ namespace Catan10
             pData.GameData.OnCardsLost += OnPlayerLostCards;
             AddPlayerMenu(pData);
             pData.Reset();
-
+            _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
             await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
 
         }
@@ -1238,6 +1243,7 @@ namespace Catan10
             _progress.IsActive = true;
             _progress.Visibility = Visibility.Visible;
             await Task.Delay(0);
+            await this.Reset();
             ResetDataForNewGame();
             int n = 0;
 
@@ -1248,7 +1254,7 @@ namespace Catan10
                 n++;
                 if (logLine.LogType == LogType.Undo)
                 {
-                    await UndoLogLine(logLine);
+                    await UndoLogLine(logLine, true);
                     continue;
                 }
                 switch (logLine.Action)
