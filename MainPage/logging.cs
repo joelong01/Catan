@@ -96,29 +96,45 @@ namespace Catan10
         }
 
 
-        public async Task AppendPersistentLog(LogEntry le)
+        public async Task AppendPersistentLog(LogEntry le, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
-            if (le.LogType == LogType.Replay) return;
-            if (Replaying) return;
 
-            if (_file == null)
-                return;
-            try
+            int count = 0;
+            
+            do
             {
-                string s = String.Format($"{le}\r\n");
+                if (le.LogType == LogType.Replay) return;
+                if (Replaying) return;
 
-                await FileIO.AppendTextAsync(_file, s);
+                if (_file == null)
+                    return;
+                try
+                {
+                    string s = String.Format($"{le}\r\n");
+                    await FileIO.AppendTextAsync(_file, s);
+                    break;
+
+                }
+                catch (Exception exception)
+                {                    
+                    count++;
+                    if (count == 2)
+                    {
+                        string s = StaticHelpers.GetErrorMessage($"Error saving to file {_saveFileName}", exception, cfp, cmb, cln);
+                        MessageDialog dlg = new MessageDialog(s);
+                        await dlg.ShowAsync();
+                        break;
+
+                    }
+                    else
+                    {
+                        this.TraceMessage($"Error writing log file.  retrying. LogEntry: {le}", cmb, cln, cfp);
+                        await Task.Delay(500);
+                    }
 
 
-            }
-            catch (Exception exception)
-            {
-
-                string s = StaticHelpers.GetErrorMessage($"Error saving to file {_saveFileName}", exception);
-                MessageDialog dlg = new MessageDialog(s);
-                await dlg.ShowAsync();
-
-            }
+                }
+            } while (true);
         }
 
         public async Task<bool> Parse(ILogParserHelper helper)
@@ -235,7 +251,7 @@ namespace Catan10
 
             if (PlayerData != null && PlayerDataString == "")
             {
-                PlayerDataString = String.Format($"{PlayerData.PlayerName}.{PlayerData.AllPlayerIndex}");
+                PlayerDataString = String.Format($"{PlayerData.PlayerName}.{PlayerData.AllPlayerIndex}.{PlayerData.PlayerPosition}");
             }
 
             return StaticHelpers.SerializeObject<LogEntry>(this, _serializeProperties, "=", "|");
@@ -296,14 +312,34 @@ namespace Catan10
 
         private void ParsePlayer(string player, ILogParserHelper parseHelper)
         {
+            //
+            //  should be in the form of "Joe.0.BottomRight
+            //  
             string[] tokens = player.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (tokens.Length == 0)
+            {
+               // this.TraceMessage($"Bad player string in log file: {player}"); // turns out this is a normal occurance when there isn't a player, like the beginning of the game
                 return;
+            }
+                
+
 
             if (Int32.TryParse(tokens[1], out int index))
             {
                 PlayerData = parseHelper.GetPlayerData(index);
+                if (tokens.Length > 2)
+                {
+                    if (Enum.TryParse<PlayerPosition>(tokens[2], out PlayerPosition pos))
+                    {
+                        PlayerData.PlayerPosition = pos;
+                    }
+                    else
+                    {
+                        this.TraceMessage($"No player Position in PlayerData: {PlayerData}");
+                    }
+
+                }
             }
         }
 
