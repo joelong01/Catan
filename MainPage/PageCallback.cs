@@ -74,9 +74,9 @@ namespace Catan10
                 case CatanAction.CardsLost:
                     LogCardsLost lcl = logLine.Tag as LogCardsLost;
                     _undoingCardLostHack = true;
-                    logLine.PlayerData.GameData.CardsLost = lcl.oldVal;
+                    logLine.PlayerData.GameData.CardsLost = lcl.OldVal;
                     _undoingCardLostHack = false;
-                    await LogPlayerLostCards(logLine.PlayerData, lcl.newVal, lcl.oldVal, LogType.Undo); // values swapped                    
+                    await LogPlayerLostCards(logLine.PlayerData, lcl.NewVal, lcl.OldVal, LogType.Undo); // values swapped                    
                     break;
                 case CatanAction.MissedOpportunity:
                 case CatanAction.CardsLostToSeven:
@@ -516,14 +516,14 @@ namespace Catan10
             if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
                 return;
 
-            RoutedEventHandler Baron_MenuClicked = async (s, e) =>
+            async void Baron_MenuClicked(object s, RoutedEventArgs e)
             {
                 PlayerData player = (PlayerData)((MenuFlyoutItem)s).Tag;
 
                 await AssignBaronOrKnight(player, targetTile, weapon, action, LogType.Normal);
-                
 
-            };
+
+            }
 
 
 

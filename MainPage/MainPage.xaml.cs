@@ -25,11 +25,6 @@ using Windows.UI.Xaml.Navigation;
 namespace Catan10
 {
 
-
-
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
 
@@ -44,6 +39,7 @@ namespace Catan10
         private const string SERIALIZATION_VERSION = "3";
 
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
+        public ObservableCollection<ResourceCountCtrl> PlayerResourceCountList { get; } = new ObservableCollection<ResourceCountCtrl>();
 
 
         DispatcherTimer _timer = new DispatcherTimer();
@@ -374,20 +370,12 @@ namespace Catan10
 
         void ShowNumberUi()
         {
-            //_daShowHideNumbers.To = 0;
-            //_sbShowHideNumbers.Begin();
             _daNumberOpacity.To = 1.0;
             _sbNumberOpacity.Begin();
             RollGrid.IsHitTestVisible = true;
         }
         void HideNumberUi()
         {
-            //if (_daShowHideNumbers.To != -RollGrid.ActualWidth)
-            //{
-            //    _daShowHideNumbers.To = -RollGrid.ActualWidth;
-            //    _sbShowHideNumbers.Begin();
-            //}
-
             _daNumberOpacity.To = 0;
             _sbNumberOpacity.Begin();
             RollGrid.IsHitTestVisible = false;
@@ -646,19 +634,29 @@ namespace Catan10
 
         private async Task AddPlayer(PlayerData pData, LogType logType)
         {
-            //PlayerView playerView = PlayerPositionToView[pData.PlayerPosition];
-            //playerView.Visibility = Visibility.Visible;
-            //playerView.PlayerData = pData;
-            //_playerViewDictionary[pData.PlayerPosition] = playerView;
-            //playerView.Index = PlayingPlayers.Count;
-            //if (_menuHidePlayersOnNext.IsChecked) playerView.Close();
-            //playerView.UpdateView();
-
+          
             PlayingPlayers.Add(pData);
             pData.GameData.OnCardsLost += OnPlayerLostCards;
             AddPlayerMenu(pData);
             pData.Reset();
-            _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
+
+            var resourceCountCtrl = new ResourceCountCtrl
+            {
+                Background = pData.Background,
+                CitiesLeft = _gameView.CurrentGame.MaxCities,
+                RoadsLeft = _gameView.CurrentGame.MaxRoads,
+                SettlementsLeft = _gameView.CurrentGame.MaxSettlements,
+                ShipsLeft = _gameView.CurrentGame.MaxShips,                
+                PlayerImageSource = pData.ImageBrush.ImageSource,                
+
+            };
+
+            PlayerResourceCountList.Add(resourceCountCtrl);
+
+
+            
+
+            //  _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
             await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
 
         }
@@ -666,9 +664,6 @@ namespace Catan10
         private async Task AddPlayer(LogEntry le, LogType logType)
         {
 
-            //PlayerView playerView = PlayerPositionToView[(PlayerPosition)le.Tag];            
-            //playerView.PlayerData = le.PlayerData;            
-            //playerView.PlayerData.PlayerPosition = (PlayerPosition)le.Tag;
             await AddPlayer(le.PlayerData, logType);
 
         }
@@ -1273,7 +1268,7 @@ namespace Catan10
                         break;
                     case CatanAction.CardsLost:
                         LogCardsLost lcl = logLine.Tag as LogCardsLost;
-                        await LogPlayerLostCards(logLine.PlayerData, lcl.oldVal, lcl.newVal, LogType.Replay);
+                        await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
                         break;
                     case CatanAction.CardsLostToSeven:
                         break;

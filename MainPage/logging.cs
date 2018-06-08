@@ -319,7 +319,7 @@ namespace Catan10
 
             if (tokens.Length == 0)
             {
-               // this.TraceMessage($"Bad player string in log file: {player}"); // turns out this is a normal occurance when there isn't a player, like the beginning of the game
+                // this is a normal occurance when there isn't a player, like the beginning of the game
                 return;
             }
                 
@@ -459,16 +459,16 @@ namespace Catan10
 
     public class LogCardsLost
     {
-        public int oldVal { get; set; } = 0;
-        public int newVal { get; set; } = 0;
+        public int OldVal { get; set; } = 0;
+        public int NewVal { get; set; } = 0;
         
 
         private string[] _serializedProperties = new string[] { "oldVal", "newVal"};
 
         public LogCardsLost(int old, int newState)
         {
-            oldVal = old;
-            newVal = newState;
+            OldVal = old;
+            NewVal = newState;
          
         }
 

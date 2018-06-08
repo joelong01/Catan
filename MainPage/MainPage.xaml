@@ -49,26 +49,26 @@
 
     <Grid x:Name="ContentRoot">
 
-        <Rectangle Fill="{StaticResource bmCherry}" RadiusX="344" RadiusY="344"  Stroke="{StaticResource bmMaple}" StrokeThickness="4" Visibility="Visible"/>
+        <Rectangle Fill="{StaticResource bmCherry}" RadiusX="50" RadiusY="50"  Stroke="{StaticResource bmMaple}" StrokeThickness="4" Visibility="Visible"/>
 
-        <local:ResourceCountCtrl x:Name="_rccPlayer1" HorizontalAlignment="Left" VerticalAlignment="Bottom"  />
-        <local:ResourceCountCtrl x:Name="_rccPlayer2" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"  >
+        <local:ResourceCountCtrl x:Name="_rccPlayer1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Visibility="Collapsed" />
+        <local:ResourceCountCtrl x:Name="_rccPlayer2" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"  Visibility="Collapsed">
             <local:ResourceCountCtrl.RenderTransform>
                 <CompositeTransform Rotation="180"/>
             </local:ResourceCountCtrl.RenderTransform>
         </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer3" HorizontalAlignment="Right" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"  >
+        <local:ResourceCountCtrl x:Name="_rccPlayer3" HorizontalAlignment="Right" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Visibility="Collapsed" >
             <local:ResourceCountCtrl.RenderTransform>
                 <CompositeTransform Rotation="180"/>
             </local:ResourceCountCtrl.RenderTransform>
         </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer4" HorizontalAlignment="Right" VerticalAlignment="Bottom"  />
-        <local:ResourceCountCtrl x:Name="_rccPlayer5" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0,1"  >
+        <local:ResourceCountCtrl x:Name="_rccPlayer4" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Visibility="Collapsed"/>
+        <local:ResourceCountCtrl x:Name="_rccPlayer5" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0,1" Visibility="Collapsed" >
             <local:ResourceCountCtrl.RenderTransform>
                 <CompositeTransform Rotation="90" TranslateY="-210"/>
             </local:ResourceCountCtrl.RenderTransform>
         </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer6" HorizontalAlignment="Right" VerticalAlignment="Center" RenderTransformOrigin="1 1"  >
+        <local:ResourceCountCtrl x:Name="_rccPlayer6" HorizontalAlignment="Right" VerticalAlignment="Center" RenderTransformOrigin="1 1" Visibility="Collapsed" >
             <local:ResourceCountCtrl.RenderTransform>
                 <CompositeTransform Rotation="-90" TranslateY="-210"/>
             </local:ResourceCountCtrl.RenderTransform>
@@ -81,10 +81,32 @@
             </Button.Flyout>
         </Button>
 
+        <Grid Name="Grid_PlayerResourceCount" HorizontalAlignment="Right" Width="440" Margin="20" Background="{StaticResource bmCherry}" BorderBrush="{StaticResource bmMaple}" BorderThickness="2" CornerRadius="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="110"/>
+                <RowDefinition Height="2"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Name="StackPanel_TotalResourceCount" Orientation="Horizontal" Grid.RowSpan="1" Grid.Row="0" Grid.Column="0" Margin="8,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                        BorderBrush="{StaticResource bmMaple}" BorderThickness="1" CornerRadius="10">
+                <local:ResourceCardCtrl ResourceType="Wood"     Count="0" />
+                <local:ResourceCardCtrl ResourceType="Brick"    Count="1" />
+                <local:ResourceCardCtrl ResourceType="Sheep"    Count="2" />
+                <local:ResourceCardCtrl ResourceType="Wheat"    Count="3" />
+                <local:ResourceCardCtrl ResourceType="Ore"      Count="4" />
+                <local:ResourceCardCtrl ResourceType="GoldMine" Count="5" />
+            </StackPanel>
+            <Rectangle Fill="{StaticResource bmMaple}" Grid.Row="1" Margin="5,0,5,0" />
+            <ListBox Name="ListBox_PlayerResourceCountList " Grid.Row="2" ItemsSource="{x:Bind PlayerResourceCountList}"  UseSystemFocusVisuals="False" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <ListBoxItem Padding="0">
+                    
+                </ListBoxItem>
+                
+            </ListBox>
+        </Grid>
 
 
-
-        <Viewbox  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0,5,0,5">
+        <Viewbox  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0,5,0,5" >
             <local:GameContainerCtrl x:Name="_gameView"  DoubleTapped="GameViewControlDoubleTapped"
                     Canvas.ZIndex="-1" RenderTransformOrigin="0.5,0.5"    IsEnabled="True" PointerPressed="GameViewControlPointerPressed"      >
                 <local:GameContainerCtrl.RenderTransform>
@@ -211,7 +233,7 @@
 
         </Grid>
 
-        <Grid Name="RollGrid"  Width="300" Height="450" BorderBrush="White" PointerPressed="OnPointerPressed" HorizontalAlignment="Right" VerticalAlignment="Center"
+        <Grid Name="RollGrid"  Width="300" Height="450" BorderBrush="White" PointerPressed="OnPointerPressed" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                   BorderThickness="1" IsHitTestVisible="True" Margin="0" >
             <Grid.RenderTransform>
                 <CompositeTransform TranslateX="-0" ScaleX="1" ScaleY="1" />
@@ -324,7 +346,7 @@
 
         </Grid>
 
-        <local:GameSummaryCtrl x:Name="_GameSummary" Width="650" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" PointerPressed="OnPointerPressed" Margin="0,185,0,0">
+        <local:GameSummaryCtrl x:Name="_GameSummary" Width="650" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" PointerPressed="OnPointerPressed" Margin="0,0,0,0">
             <local:GameSummaryCtrl.RenderTransform>
                 <CompositeTransform SkewX=".9" ScaleY=".9"/>
             </local:GameSummaryCtrl.RenderTransform>
@@ -332,7 +354,7 @@
 
 
         <local:ScoreViewCtrl x:Name="ScoreGrid" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="310" Height="265" Margin="0"  />
-        <local:ScoreViewCtrl x:Name="ScoreGrid2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="310" Height="265"  Margin="0" RenderTransformOrigin=".5 .5">
+        <local:ScoreViewCtrl x:Name="ScoreGrid2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="310" Height="265"  Margin="0" RenderTransformOrigin=".5 .5" Visibility="Collapsed">
             <local:ScoreViewCtrl.RenderTransform>
                 <CompositeTransform Rotation="180" />
             </local:ScoreViewCtrl.RenderTransform>
@@ -372,7 +394,7 @@
             </ListBox>
         </Grid>
 
-        <ProgressRing Name="_progress" Grid.Row="0"  Canvas.ZIndex="9999" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsActive="True" Width="100" Height="100" Visibility="Visible"/>
+        <ProgressRing Name="_progress" Grid.Row="0"  Canvas.ZIndex="9999" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="True" Width="100" Height="100" Visibility="Visible"/>
 
     </Grid>
 
