@@ -146,12 +146,21 @@ namespace Catan10
 
         private void UpdateGridLocations()
         {
-            foreach (GridPosition pos in _settings.GridPositions)
+            try
             {
-                UIElement el = (UIElement)this.FindName(pos.Name);                
-                CompositeTransform ct = (CompositeTransform)el.RenderTransform;
-                ct.TranslateX = pos.TranslateX;
-                ct.TranslateY = pos.TranslateY;
+
+
+                foreach (GridPosition pos in _settings.GridPositions)
+                {
+                    UIElement el = (UIElement)this.FindName(pos.Name);
+                    CompositeTransform ct = (CompositeTransform)el.RenderTransform;
+                    ct.TranslateX = pos.TranslateX;
+                    ct.TranslateY = pos.TranslateY;
+                }
+            }
+            catch(Exception e)
+            {
+                this.TraceMessage($"Exception: {e}");
             }
         }
 

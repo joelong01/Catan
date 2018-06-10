@@ -11,6 +11,9 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
+    //
+    //  DON'T FORGET: add your converter class to app.xaml as a resource...
+
     public class IntToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
@@ -23,6 +26,38 @@ namespace Catan10
             try
             {
                 return Int32.Parse((string)value);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+    }
+
+    public class CountToOrientationConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return ((int)value) > 0 ? TileOrientation.FaceUp : TileOrientation.FaceDown;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            try
+            {
+                if (value is TileOrientation)
+                {
+                    if (((TileOrientation)value) == TileOrientation.FaceDown)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        return 100;
+                    }
+                }
+
+                return 60;
             }
             catch
             {

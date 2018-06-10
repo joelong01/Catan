@@ -31,14 +31,11 @@ namespace Catan10
         }
         private void SetPlayerData(ObservableCollection<PlayerData> value)
         {
-
+            _ListView.ItemsSource = value;
         }
 
-        public void AddPlayers(IEnumerable<PlayerData> players)
+        public void StartGame()
         {
-            if (this == null) return;
-            if (_gameTimer == null) return;
-
             this.Height = (PlayingPlayers.Count + 1) * 45 + LayoutRoot.RowDefinitions[0].ActualHeight;
             _gameTimer.StartTimer();
         }

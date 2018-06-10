@@ -40,32 +40,30 @@ namespace Catan10
         public static readonly DependencyProperty CitiesLeftProperty = DependencyProperty.Register("CitiesLeft", typeof(int), typeof(ResourceCountCtrl), new PropertyMetadata(4));
         public static readonly DependencyProperty ShipsLeftProperty = DependencyProperty.Register("ShipsLeft", typeof(int), typeof(ResourceCountCtrl), new PropertyMetadata(0));
         public static readonly DependencyProperty PlayerImageSourceProperty = DependencyProperty.Register("PlayerImageSource", typeof(ImageSource), typeof(ResourceCountCtrl), new PropertyMetadata(new BitmapImage(new Uri("ms-appx:///Assets/guest.jpg", UriKind.RelativeOrAbsolute))));
-        new public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register("Foreground", typeof(Color), typeof(ResourceCountCtrl), new PropertyMetadata(Colors.White));
-        new public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register("Background", typeof(Color), typeof(ResourceCountCtrl), new PropertyMetadata(Colors.White, BackgroundChanged));
+        public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("FillColor", typeof(Color), typeof(ResourceCountCtrl), new PropertyMetadata(Colors.White));
+        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(Color), typeof(ResourceCountCtrl), new PropertyMetadata(Colors.White, PlayerColorChanged));
 
         //
         //  the background of the rectangle that the stats are stored in
-        new public Color Background
+        public Color PlayerColor
         {
-            get { return (Color)GetValue(BackgroundProperty); }
-            set { SetValue(BackgroundProperty, value); }
+            get { return (Color)GetValue(PlayerColorProperty); }
+            set { SetValue(PlayerColorProperty, value); }
         }
-        private static void BackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void PlayerColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ResourceCountCtrl depPropClass = d as ResourceCountCtrl;
             Color depPropValue = (Color)e.NewValue;
-            depPropClass.SetBackground(depPropValue);
+            depPropClass.SetPlayerColor(depPropValue);
         }
-        private void SetBackground(Color color)
+        private void SetPlayerColor(Color color)
         {
-            Foreground = StaticHelpers.BackgroundToForegroundColorDictionary[color];
+        //    FillColor = StaticHelpers.BackgroundToForegroundColorDictionary[color];
         }
-        //
-        //  this is also the fill color of the settlements
-        new public Color Foreground
+          public Color FillColor
         {
-            get { return (Color)GetValue(ForegroundProperty); }
-            set { SetValue(ForegroundProperty, value); }
+            get { return (Color)GetValue(FillColorProperty); }
+            set { SetValue(FillColorProperty, value); }
         }
 
 

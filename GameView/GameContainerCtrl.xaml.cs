@@ -24,8 +24,10 @@ namespace Catan10
             ControlType = type;
             Description = s;
             Index = idx;
+            
         }
 
+        
 
 
         public UserControl Control { get; set; } = null;
@@ -135,6 +137,7 @@ namespace Catan10
             new CatanGame (typeof (Seafarers4PlayerCtrl), "Seafarers (4 Player)", 1),
             new CatanGame (typeof (ExpansionCtrl), "Expansion (5-6 Players)", 2),
             new CatanGame (typeof (FourIsland3Ctrl), "Four Islands (3 Player)", 3),
+            
         };
 
         IGameCallback _gameCallback = null;

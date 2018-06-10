@@ -80,8 +80,8 @@
                 </MenuFlyout>
             </Button.Flyout>
         </Button>
-
-        <Grid Name="Grid_PlayerResourceCount" HorizontalAlignment="Right" Width="440" Margin="20" Background="{StaticResource bmCherry}" BorderBrush="{StaticResource bmMaple}" BorderThickness="2" CornerRadius="20">
+        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" HorizontalAlignment="Right" Width="440" Margin="20" />
+        <!--<Grid Name="Grid_PlayerResourceCount" HorizontalAlignment="Right" Width="440" Margin="20" Background="Transparent" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="110"/>
                 <RowDefinition Height="2"/>
@@ -97,13 +97,20 @@
                 <local:ResourceCardCtrl ResourceType="GoldMine" Count="5" />
             </StackPanel>
             <Rectangle Fill="{StaticResource bmMaple}" Grid.Row="1" Margin="5,0,5,0" />
-            <ListBox Name="ListBox_PlayerResourceCountList " Grid.Row="2" ItemsSource="{x:Bind PlayerResourceCountList}"  UseSystemFocusVisuals="False" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                <ListBoxItem Padding="0">
+            <ListBox Name="ListBox_PlayerResourceCountList " Grid.Row="2" ItemsSource="{x:Bind PlayerResourceCountList}"  
+                     Background="Transparent"
+                     UseSystemFocusVisuals="False" ScrollViewer.VerticalScrollBarVisibility="Disabled" Margin="0,0,-30,0" >
+                <ListBoxItem Padding="0" Margin="0,20,0,0">
                     
                 </ListBoxItem>
-                
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Margin" Value="8,10,0,0"/>
+                        <Setter Property="Padding" Value="0" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
             </ListBox>
-        </Grid>
+        </Grid>-->
 
 
         <Viewbox  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0,5,0,5" >
@@ -354,11 +361,7 @@
 
 
         <local:ScoreViewCtrl x:Name="ScoreGrid" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="310" Height="265" Margin="0"  />
-        <local:ScoreViewCtrl x:Name="ScoreGrid2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="310" Height="265"  Margin="0" RenderTransformOrigin=".5 .5" Visibility="Collapsed">
-            <local:ScoreViewCtrl.RenderTransform>
-                <CompositeTransform Rotation="180" />
-            </local:ScoreViewCtrl.RenderTransform>
-        </local:ScoreViewCtrl>
+        
 
         <Grid Name="_savedGameGrid" Width="383" Height="280" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0" Grid.Row="1" PointerPressed="OnPointerPressed" Visibility="Collapsed" Background="{StaticResource bmCherry}"
               BorderBrush="{StaticResource bmMaple}" BorderThickness="4" CornerRadius="4">

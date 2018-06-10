@@ -286,11 +286,11 @@ namespace Catan10
         {
             if (_settlement != null)
             {
-                _settlement.FillColor = _brush.Color;
+                _settlement.CircleFillColor = _brush.Color;
             }
             if (_city != null)
             {
-                _city.FillColor = _brush.Color;
+                _city.CircleFillColor = _brush.Color;
             }
 
 

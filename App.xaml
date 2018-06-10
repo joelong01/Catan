@@ -22,8 +22,9 @@
             <local:ColorToColorChoice x:Key="ColorToColorChoiceConverter" />
             <local:ColorToColorChoiceIndex x:Key="ColorToColorChoiceIndexConverter" />
             <local:StringToImageBrushConverter x:Key="StringToImageBrushConverter" />
-            
-            
+            <local:CountToOrientationConverter x:Key="CountToOrientationConverter" />
+
+
 
             <ImageBrush x:Key="bmWheat" ImageSource="Assets/Old Visuals/old wheat.png" Stretch="Fill" />
             <ImageBrush x:Key="bmSheep" ImageSource="Assets/Old Visuals/old sheep.png" Stretch="Fill" />

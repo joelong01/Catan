@@ -14,7 +14,7 @@ namespace Catan10
     {
 
     
-        public ObservableCollection<PlayerData> PlayingPlayers { get; set; } = new ObservableCollection<PlayerData>();
+        
         public ScoreViewCtrl()
         {
             this.InitializeComponent();
@@ -22,9 +22,26 @@ namespace Catan10
 
         public static readonly DependencyProperty ActivePlayerBackgroundProperty = DependencyProperty.Register("ActivePlayerBackground", typeof(string), typeof(MainPage), new PropertyMetadata("Blue"));
         public static readonly DependencyProperty ActivePlayerForegroundProperty = DependencyProperty.Register("ActivePlayerForeground", typeof(string), typeof(MainPage), new PropertyMetadata("Blue"));
-        
-      
-      
+        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerData>), typeof(ScoreViewCtrl), new PropertyMetadata(new ObservableCollection<PlayerData>(), PlayingPlayersChanged));
+        public ObservableCollection<PlayerData> PlayingPlayers
+        {
+            get => (ObservableCollection<PlayerData>)GetValue(PlayingPlayersProperty);
+            set => SetValue(PlayingPlayersProperty, value);
+        }
+        private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as ScoreViewCtrl;
+            var depPropValue = (ObservableCollection<PlayerData>)e.NewValue;
+            depPropClass?.SetPlayingPlayers(depPropValue);
+        }
+        private void SetPlayingPlayers(ObservableCollection<PlayerData> newPlayers)
+        {
+            _lstScores.ItemsSource = null;
+            _lstScores.ItemsSource = newPlayers;
+        }
+
+
+
         public string ActivePlayerBackground
         {
             get
@@ -49,13 +66,9 @@ namespace Catan10
             }
         }
 
-        public void AddPlayers(IEnumerable<PlayerData> players)
+       public void StartGame()
         {
-            PlayingPlayers.Clear();
-            PlayingPlayers.AddRange(players);
-
             this.Height = PlayingPlayers.Count * 75 + 49;
-
         }
 
         private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)

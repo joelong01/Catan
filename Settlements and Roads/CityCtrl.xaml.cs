@@ -15,12 +15,12 @@ namespace Catan10
         {
             this.InitializeComponent();
         }
-        public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("Background", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Blue, FillColorChanged));
-        public static readonly DependencyProperty BorderColorProperty = DependencyProperty.Register("BorderColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black, BorderColorChanged));
-        public Color BorderColor
+        public static readonly DependencyProperty CircleFillColorProperty = DependencyProperty.Register("CircleFillColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Blue, CircleFillColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black, BorderColorChanged));
+        public Color CastleColor
         {
-            get { return (Color)GetValue(BorderColorProperty); }
-            set { SetValue(BorderColorProperty, value); }
+            get { return (Color)GetValue(CastleColorProperty); }
+            set { SetValue(CastleColorProperty, value); }
         }
         private static void BorderColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -33,12 +33,12 @@ namespace Catan10
 
         }
 
-        public Color FillColor
+        public Color CircleFillColor
         {
-            get { return (Color)GetValue(FillColorProperty); }
-            set { SetValue(FillColorProperty, value); }
+            get { return (Color)GetValue(CircleFillColorProperty); }
+            set { SetValue(CircleFillColorProperty, value); }
         }
-        private static void FillColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void CircleFillColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             CityCtrl depPropClass = d as CityCtrl;
             Color depPropValue = (Color)e.NewValue;
@@ -46,7 +46,7 @@ namespace Catan10
         }
         private void SetFillColor(Color color)
         {
-            BorderColor = StaticHelpers.BackgroundToForegroundColorDictionary[color];
+            CastleColor = StaticHelpers.BackgroundToForegroundColorDictionary[color];
         }
     }
 }

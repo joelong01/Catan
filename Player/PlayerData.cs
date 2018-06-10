@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Media.Imaging;
 namespace Catan10
 {
     public delegate void CardsLostUpdatedHandler(PlayerData player, int oldVal, int newVal);
+    public delegate void PlayerResourceUpdateHandler(PlayerData player, ResourceType resource, int count);
 
     public class PlayerGameData : INotifyPropertyChanged
     {
@@ -42,6 +43,7 @@ namespace Catan10
             Cities.CollectionChanged += Cities_CollectionChanged;
             Ships.CollectionChanged += Ships_CollectionChanged;
             _playerData = pData;
+            PlayerResourceData = new PlayerResourceData(pData);
         }
 
         private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -104,11 +106,49 @@ namespace Catan10
             Rolls.Clear();
             Ships.Clear();
             IsCurrentPlayer = false;
+            MaxShips = 0;
+            MaxRoads = 0;
+            MaxSettlements = 0;
+            MaxCities = 0;
+            PlayerResourceData.Reset();
+
+
+
+        }
 
 
 
 
+        public int CitiesLeft
+        {
+            get
+            {
+                return MaxCities - CitiesPlayed;
+            }
+        }
 
+        public int SettlementsLeft
+        {
+            get
+            {
+                return MaxSettlements - SettlementsPlayed;
+            }
+        }
+
+        public int RoadsLeft
+        {
+            get
+            {
+                return MaxRoads - RoadsPlayed;
+            }
+        }
+
+        public int ShipsLeft
+        {
+            get
+            {
+                return MaxShips - ShipsPlayed;
+            }
         }
 
         public void AddIsland(Island island)
@@ -206,6 +246,77 @@ namespace Catan10
 
         int _IslandsPlayed = 0;
         bool _isCurrentPlayer = false;
+        int _MaxShips = 0;
+        int _MaxRoads = 0;
+        int _MaxCities = 0;
+        int _MaxSettlements = 0;
+        public PlayerResourceData PlayerResourceData { get; set;} = null;
+
+        public int MaxSettlements
+        {
+            get
+            {
+                return _MaxSettlements;
+            }
+            set
+            {
+                if (_MaxSettlements != value)
+                {
+                    _MaxSettlements = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("SettlementsLeft");
+                }
+            }
+        }
+        public int MaxCities
+        {
+            get
+            {
+                return _MaxCities;
+            }
+            set
+            {
+                if (_MaxCities != value)
+                {
+                    _MaxCities = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("CitiesLeft");
+                }
+            }
+        }
+        public int MaxRoads
+        {
+            get
+            {
+                return _MaxRoads;
+            }
+            set
+            {
+                if (_MaxRoads != value)
+                {
+                    _MaxRoads = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("RoadsLeft");
+
+                }
+            }
+        }
+        public int MaxShips
+        {
+            get
+            {
+                return _MaxShips;
+            }
+            set
+            {
+                if (_MaxShips != value)
+                {
+                    _MaxShips = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("ShipsLeft");
+                }
+            }
+        }
         public bool IsCurrentPlayer
         {
             get
@@ -372,6 +483,7 @@ namespace Catan10
                 {
                     _SettlementsPlayed = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("SettlementsLeft");
                 }
             }
         }
@@ -387,6 +499,7 @@ namespace Catan10
                 {
                     _CitiesPlayed = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("CitiesLeft");
                 }
             }
         }
@@ -402,6 +515,7 @@ namespace Catan10
                 {
                     _RoadsPlayed = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("RoadsLeft");
                 }
             }
         }
@@ -417,6 +531,7 @@ namespace Catan10
                 {
                     _ShipsPlayed = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("ShipsLeft");
                 }
             }
         }
@@ -697,11 +812,172 @@ namespace Catan10
         }
     }
 
+    /// <summary>
+    ///     PlayerResourceData:  a class that keeps track of the number of resources that happen on a per roll basis.
+    /// </summary>
 
+
+    public class PlayerResourceData : INotifyPropertyChanged
+    {
+        private PlayerData _playerData = null;
+        public PlayerResourceUpdateHandler OnPlayerResourceUpdate;
+
+        public PlayerResourceData(PlayerData player)
+        {
+            _playerData = player;
+        }
+
+        public void Reset()
+        {
+            Gold = 0;
+            Wheat = 0;
+            Ore = 0;
+            Sheep = 0;
+            Brick = 0;
+            Wood = 0;
+        }
+
+        int _Sheep = 0;
+        int _Wood = 0;
+        int _Ore = 0;
+        int _Brick = 0;
+        int _Wheat = 0;
+        int _Gold = 0;
+        public int Gold
+        {
+            get
+            {
+                return _Gold;
+            }
+            set
+            {
+                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.GoldMine, value);
+                if (_Gold != value)
+                {
+                    _Gold = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Wheat
+        {
+            get
+            {
+                return _Wheat;
+            }
+            set
+            {
+                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Wheat, value);
+                if (_Wheat != value)
+                {
+                    _Wheat = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Brick
+        {
+            get
+            {
+                return _Brick;
+            }
+            set
+            {
+                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Brick, value);
+                if (_Brick != value)
+                {
+                    _Brick = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Ore
+        {
+            get
+            {
+                return _Ore;
+            }
+            set
+            {
+                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Ore, value);
+                if (_Ore != value)
+                {
+                    _Ore = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Wood
+        {
+            get
+            {
+                return _Wood;
+            }
+            set
+            {
+                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Wood, value);
+                if (_Wood != value)
+                {
+                    _Wood = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Sheep
+        {
+            get
+            {
+                return _Sheep;
+            }
+            set
+            {
+                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Sheep, value);
+                if (_Sheep != value)
+                {
+                    _Sheep = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        }
+
+        internal void AddResourceCount(ResourceType resource, int count)
+        {
+            switch (resource)
+            {
+                case ResourceType.Sheep:
+                    Sheep += count;
+                    break;
+                case ResourceType.Wood:
+                    Wood += count;
+                    break;
+                case ResourceType.Ore:
+                    Ore += count;
+                    break;
+                case ResourceType.Wheat:
+                    Wheat += count;
+                    break;
+                case ResourceType.Brick:
+                    Brick += count;
+                    break;              
+                case ResourceType.GoldMine:
+                    Gold += count;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
 
     //
-    //  this is where data goes that is application to players and all gamves
+    //  this is where data goes that is applicable to players and all games
 
     public class PlayerData : INotifyPropertyChanged
     {

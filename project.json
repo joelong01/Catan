@@ -2,7 +2,7 @@
   "dependencies": {
     "Microsoft.ApplicationInsights.PersistenceChannel": "1.2.3",
     "Microsoft.ApplicationInsights.WindowsApps": "1.1.1",
-    "Microsoft.NETCore.UniversalWindowsPlatform": "6.0.1"
+    "Microsoft.NETCore.UniversalWindowsPlatform": "6.1.5"
   },
   "frameworks": {
     "uap10.0.10586": {}

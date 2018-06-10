@@ -39,7 +39,7 @@ namespace Catan10
         private const string SERIALIZATION_VERSION = "3";
 
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
-        public ObservableCollection<ResourceCountCtrl> PlayerResourceCountList { get; } = new ObservableCollection<ResourceCountCtrl>();
+        
 
 
         DispatcherTimer _timer = new DispatcherTimer();
@@ -56,6 +56,8 @@ namespace Catan10
         public ObservableCollection<PlayerData> PlayingPlayers { get; set; } = new ObservableCollection<PlayerData>();
         public ObservableCollection<PlayerData> AllPlayers { get; set; } = new ObservableCollection<PlayerData>();
         private Dictionary<PlayerPosition, ResourceCountCtrl> _playerToResourceCount = new Dictionary<PlayerPosition, ResourceCountCtrl>();
+
+        
 
         public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("Hit Start"));
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
@@ -270,8 +272,8 @@ namespace Catan10
             _timer.Interval = TimeSpan.FromSeconds(FadeSeconds);
             _timer.Tick += AsyncReverseFade;
 
-            _GameSummary.PlayingPlayers = this.PlayingPlayers;
-
+            
+            
 
 
             _playerToResourceCount[PlayerPosition.BottomLeft] = _rccPlayer1;
@@ -280,6 +282,16 @@ namespace Catan10
             _playerToResourceCount[PlayerPosition.BottomRight] = _rccPlayer4;
             _playerToResourceCount[PlayerPosition.Left] = _rccPlayer5;
             _playerToResourceCount[PlayerPosition.Right] = _rccPlayer6;
+
+
+            //
+            //  this sets the view's listboxes.  from now on it will 
+            //  dynamically changes as we add/remove players who are playing.
+            //  note that we should never new a new collection -- just modify it.
+            Ctrl_PlayerResourceCountCtrl.PlayingPlayers = PlayingPlayers;
+            ScoreGrid.PlayingPlayers = PlayingPlayers;
+            _GameSummary.PlayingPlayers = PlayingPlayers;
+
 
         }
 
@@ -454,11 +466,14 @@ namespace Catan10
                     AllPlayers.Add(p);
 
                 }
+
+                
             }
             catch
             {
 
             }
+            
         }
 
 
@@ -547,6 +562,7 @@ namespace Catan10
             _lbGames.SelectedValue = _log;
             await ResetTiles(true);
             PlayingPlayers.Clear();
+            Ctrl_PlayerResourceCountCtrl.GameResourceData.Reset();
             _stateStack.Clear();
             _GameSummary.Reset();
             foreach (var kvp in _playerToResourceCount)
@@ -559,6 +575,8 @@ namespace Catan10
                 kvp.Value.ShipsLeft = _gameView.CurrentGame.MaxShips;
                 kvp.Value.ResetTotalCards();
             }
+
+            
         }
 
        
@@ -580,18 +598,15 @@ namespace Catan10
 
             foreach (PlayerData pData in players)
             {
+                //
+                //  add it to the collection that all the views bind to
                 await AddPlayer(pData, LogType.Normal);
                
             }
 
-
-
-            _GameSummary.AddPlayers(PlayingPlayers);
-            ScoreGrid.AddPlayers(PlayingPlayers);
-            ScoreGrid2.AddPlayers(PlayingPlayers);
-
-
-
+            _GameSummary.StartGame();
+            ScoreGrid.StartGame();
+           
             await VisualShuffle();
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
@@ -639,22 +654,14 @@ namespace Catan10
             pData.GameData.OnCardsLost += OnPlayerLostCards;
             AddPlayerMenu(pData);
             pData.Reset();
+            //
+            //  need to give the players some data about the game
+            pData.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
+            pData.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
+            pData.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
+            pData.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
 
-            var resourceCountCtrl = new ResourceCountCtrl
-            {
-                Background = pData.Background,
-                CitiesLeft = _gameView.CurrentGame.MaxCities,
-                RoadsLeft = _gameView.CurrentGame.MaxRoads,
-                SettlementsLeft = _gameView.CurrentGame.MaxSettlements,
-                ShipsLeft = _gameView.CurrentGame.MaxShips,                
-                PlayerImageSource = pData.ImageBrush.ImageSource,                
-
-            };
-
-            PlayerResourceCountList.Add(resourceCountCtrl);
-
-
-            
+                     
 
             //  _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
             await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
@@ -875,8 +882,10 @@ namespace Catan10
 
         private void AddResourceCountForPlayer(PlayerData player, ResourceType resource, int count)
         {
+            player.GameData.PlayerResourceData.AddResourceCount(resource, count);
 
-            _playerToResourceCount[player.PlayerPosition].AddResourceCount(resource, count);
+            _playerToResourceCount[player.PlayerPosition].AddResourceCount(resource, count); // update for the player
+            Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(resource, count); // update for the game
             if (player.GameData.GoodRoll == false)
             {
                 player.GameData.GoodRoll = true;
@@ -1007,8 +1016,12 @@ namespace Catan10
                 t.ResetTileRotation();
 
             }
-
-
+            //
+            //  on next, reset the resources for the turn to 0
+            foreach (var player in PlayingPlayers)
+            {
+                player.GameData.PlayerResourceData.Reset();
+            }
 
 
 
@@ -1337,10 +1350,6 @@ namespace Catan10
             }
 
 
-            _GameSummary.AddPlayers(PlayingPlayers);
-            ScoreGrid.AddPlayers(PlayingPlayers);
-            ScoreGrid2.AddPlayers(PlayingPlayers);
-
             _gameView.FlipAllAsync(TileOrientation.FaceUp);
             _progress.IsActive = false;
             _progress.Visibility = Visibility.Collapsed;
@@ -1459,6 +1468,7 @@ namespace Catan10
             {
                 AllPlayers.Clear();
                 AllPlayers.AddRange(dlg.PlayerDataList);
+                
             }
         }
 
