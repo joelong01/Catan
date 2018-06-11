@@ -9,26 +9,26 @@ namespace Catan10
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class CityCtrl : Page
+    public sealed partial class CityCtrl : UserControl
     {
         public CityCtrl()
         {
             this.InitializeComponent();
         }
         public static readonly DependencyProperty CircleFillColorProperty = DependencyProperty.Register("CircleFillColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Blue, CircleFillColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black, BorderColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black, CastleColorChanged));
         public Color CastleColor
         {
             get { return (Color)GetValue(CastleColorProperty); }
             set { SetValue(CastleColorProperty, value); }
         }
-        private static void BorderColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void CastleColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             CityCtrl depPropClass = d as CityCtrl;
             Color depPropValue = (Color)e.NewValue;
-            depPropClass.SetBorderColor(depPropValue);
+            depPropClass.SetCastleColor(depPropValue);
         }
-        private void SetBorderColor(Color color)
+        private void SetCastleColor(Color color)
         {
 
         }

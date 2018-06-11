@@ -579,7 +579,15 @@ namespace Catan10
             
         }
 
-       
+        //
+        //  when we start or load a game, set the height of the ScoreView and the GameSummary
+        private void SetViewHeights()
+        {
+            _GameSummary.StartGame();
+            ScoreGrid.StartGame();
+
+        }
+
 
         /// <summary>
         /// Update this because you did the sorting work in the dialog
@@ -604,9 +612,7 @@ namespace Catan10
                
             }
 
-            _GameSummary.StartGame();
-            ScoreGrid.StartGame();
-           
+            SetViewHeights();
             await VisualShuffle();
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
@@ -1487,7 +1493,7 @@ namespace Catan10
                         await newLog.Parse(this);
                         await ReplayLog(newLog);
                         UpdateUiForState(_log.Last().GameState);
-
+                        SetViewHeights();
                     }
                     else
                     {
