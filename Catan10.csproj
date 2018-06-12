@@ -248,6 +248,8 @@
     <Content Include="Assets\guest.jpg" />
     <Content Include="Assets\maple.jpg" />
     <Content Include="Assets\money.jpg" />
+    <Content Include="Assets\monopoly_dark.svg" />
+    <Content Include="Assets\monopoly_light.svg" />
     <Content Include="Assets\Old Visuals\baron.png" />
     <Content Include="Assets\Old Visuals\gold mine 2.png" />
     <Content Include="Assets\Old Visuals\old 2 for 1 brick.png" />

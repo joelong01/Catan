@@ -80,7 +80,7 @@
                 </MenuFlyout>
             </Button.Flyout>
         </Button>
-        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" HorizontalAlignment="Right" Width="440" Margin="20" />
+        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" HorizontalAlignment="Right" Width="615" Margin="20" />
         <!--<Grid Name="Grid_PlayerResourceCount" HorizontalAlignment="Right" Width="440" Margin="20" Background="Transparent" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="110"/>
