@@ -1365,7 +1365,7 @@ namespace Catan10
 
         }
         int toggle = 1;
-        private void OnTest(object sender, RoutedEventArgs rea)
+        private async void OnTest(object sender, RoutedEventArgs rea)
         {
             // Frame.Navigate(typeof(TestPage));
             // _gameView.CalculateAdjacentSettlements();
@@ -1379,6 +1379,40 @@ namespace Catan10
             //Log newLog = await _log.LoadLog(fileName, this);
             //await ReplayLog(newLog);
             //_log = newLog;
+
+
+            //
+            //  for every settlement, what is the max pips?
+            int max = 0;
+            foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
+            {
+                if (s.SettlementType != SettlementType.None) continue;
+                int pips = 0;
+                foreach (var kvp in s.SettlementToTileDict)
+                {
+                    pips += kvp.Value.Pips;
+                }
+                if (pips > max)
+                {
+                    max = pips;
+                }
+            }
+            ValidateBuilding = false;
+            foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
+            {
+                int pips = 0;
+                foreach (var kvp in s.SettlementToTileDict)
+                {
+                    pips += kvp.Value.Pips;
+                }
+                if (pips == max)
+                {
+                    s.Color = CurrentPlayer.Background;
+                    SettlementPointerPressed(s, null);
+                }
+            }
+
+            //ValidateBuilding = true;
 #if false
             #region probability testing
             string s = "";

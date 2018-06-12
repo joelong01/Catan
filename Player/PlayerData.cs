@@ -56,17 +56,17 @@ namespace Catan10
         {
             CitiesPlayed = Cities.Count;
             UpdateScore();
-            CalculatePips();
+            Pips = CalculatePips(Settlements, Cities);
         }
 
         private void Settlements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             SettlementsPlayed = Settlements.Count;
             UpdateScore();
-            CalculatePips();
+            Pips = CalculatePips(Settlements, Cities);
         }
 
-        private void CalculatePips()
+        public static int CalculatePips(IEnumerable<SettlementCtrl> Settlements, IEnumerable<SettlementCtrl> Cities)
         {
             int pips = 0;
             foreach (var s in Settlements)
@@ -84,7 +84,7 @@ namespace Catan10
                 }
             }
 
-            Pips = pips;
+            return pips;
         }
 
         private void Roads_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
