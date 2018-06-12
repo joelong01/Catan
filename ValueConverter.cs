@@ -215,7 +215,16 @@ namespace Catan10
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (value.GetType() == typeof(bool))
+            {
+                if (parameter is string)
+                {
+                    if (((string)parameter).ToLower() == "true")  // pass in TRUE to invert!
+                    {
+                        return ((bool)value == false) ? Visibility.Visible : Visibility.Collapsed;
+                    }
+                }
                 return (bool)value ? Visibility.Visible : Visibility.Collapsed;
+            }
 
             return Visibility.Visible;
         }

@@ -243,6 +243,8 @@
     <Content Include="Assets\DefaultPlayers\john.jpg" />
     <Content Include="Assets\DefaultPlayers\robert.jpg" />
     <Content Include="Assets\desert.jpg" />
+    <Content Include="Assets\dice_dark.svg" />
+    <Content Include="Assets\dice_light.svg" />
     <Content Include="Assets\guest.jpg" />
     <Content Include="Assets\maple.jpg" />
     <Content Include="Assets\money.jpg" />

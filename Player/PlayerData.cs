@@ -29,6 +29,7 @@ namespace Catan10
         public ObservableCollection<SettlementCtrl> Settlements { get; set; } = new ObservableCollection<SettlementCtrl>();
         public ObservableCollection<SettlementCtrl> Cities { get; set; } = new ObservableCollection<SettlementCtrl>();
         public ObservableCollection<int> Rolls { get; set; } = new ObservableCollection<int>();
+        public PlayerResourceData PlayerResourceData { get; set; } = null;
         private List<string> _savedGameProperties = new List<string> { "PlayerIdentified", "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
                                                                        "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
                                                                         "Roads", "Ships", "Settlements", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
@@ -55,12 +56,35 @@ namespace Catan10
         {
             CitiesPlayed = Cities.Count;
             UpdateScore();
+            CalculatePips();
         }
 
         private void Settlements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             SettlementsPlayed = Settlements.Count;
             UpdateScore();
+            CalculatePips();
+        }
+
+        private void CalculatePips()
+        {
+            int pips = 0;
+            foreach (var s in Settlements)
+            {
+                foreach (var kvp in s.SettlementToTileDict)
+                {
+                    pips += kvp.Value.Pips;
+                }
+            }
+            foreach (var s in Cities)
+            {
+                foreach (var kvp in s.SettlementToTileDict)
+                {
+                    pips += kvp.Value.Pips*2;
+                }
+            }
+
+            Pips = pips;
         }
 
         private void Roads_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -111,6 +135,7 @@ namespace Catan10
             MaxSettlements = 0;
             MaxCities = 0;
             PlayerResourceData.Reset();
+            Pips = 0;
 
 
 
@@ -250,7 +275,23 @@ namespace Catan10
         int _MaxRoads = 0;
         int _MaxCities = 0;
         int _MaxSettlements = 0;
-        public PlayerResourceData PlayerResourceData { get; set;} = null;
+        
+        int pips = 0;
+        public int Pips
+        {
+            get
+            {
+                return pips;
+            }
+            set
+            {
+                if (pips != value)
+                {
+                    pips = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         public int MaxSettlements
         {
@@ -983,6 +1024,7 @@ namespace Catan10
     {
         string _playerName = "Nameless";
         string _ImageFileName = "ms-appx:///Assets/guest.jpg";
+
         int _GamesPlayed = 0;
         Color _backgroundColor = Colors.HotPink;
         int _gamesWon = 0;
@@ -998,6 +1040,23 @@ namespace Catan10
         public event PropertyChangedEventHandler PropertyChanged;
         private List<string> _savedProperties = new List<string> { "PlayerIdentifier", "GamesWon", "GamesPlayed", "PlayerName", "ImageFileName", "ColorAsString" };
         bool _isCurrentPlayer = false;
+
+        bool _useLightFile = true;
+        public bool UseLightFile
+        {
+            get
+            {
+                return _useLightFile;
+            }
+            set
+            {
+                if (_useLightFile != value)
+                {
+                    _useLightFile = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         public bool IsCurrentPlayer
         {
             get
@@ -1228,7 +1287,8 @@ namespace Catan10
                     if (StaticHelpers.BackgroundToForegroundColorDictionary.TryGetValue(value, out c) == true)
                     {
                         Foreground = c;
-
+                        UseLightFile = (c == Colors.White ? false : true);
+                                                
                     }
                     NotifyPropertyChanged();
                 }

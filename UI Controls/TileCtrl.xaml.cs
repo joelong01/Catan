@@ -412,6 +412,32 @@ namespace Catan10
             }
         }
 
+        public int Pips
+        {
+            get
+            {
+                switch (Number)
+                {
+                    case 12:
+                    case 2:
+                        return 1;
+                    case 11:
+                    case 3:
+                        return 2;
+                    case 4:
+                    case 10:
+                        return 3;
+                    case 5:
+                    case 9:
+                        return 4;
+                    case 6:
+                    case 8:
+                        return 5;
+                    default:
+                        return 0; //7
+                }                
+            }
+        }
 
 
         public void ResetTileRotation()

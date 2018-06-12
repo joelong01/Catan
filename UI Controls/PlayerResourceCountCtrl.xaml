@@ -37,22 +37,22 @@
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="30"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="5"/>
+
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="0*"/>
                     </Grid.ColumnDefinitions>
                     <!--Top Row-->
                     <Viewbox Grid.Column="2">
@@ -91,49 +91,83 @@
                            Grid.Column="7" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
                     </Viewbox>
                     <!--<Bottom Row-->
-                    <Viewbox Grid.Column="2" Grid.Row="3">
+                    <Viewbox Grid.Column="2" Grid.Row="2">
                         <TextBlock  Text="&#xF272;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"  
                                     Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" />
                     </Viewbox>
-                    <Viewbox Grid.Column="3" Grid.Row="3">
+                    <Viewbox Grid.Column="3" Grid.Row="2">
                         <TextBlock  Text="{x:Bind GameData.TimesTargeted, Mode=OneWay, FallbackValue=0}"  
                                     Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"
                                     HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
                     </Viewbox>
-                    <Viewbox Grid.Column="5" Grid.Row="3">
 
-                        <local:BaronCtrl />
-
-
-                    </Viewbox>
-                    <Viewbox Grid.Column="6" Grid.Row="3">
-                        <TextBlock   Text="{x:Bind GameData.CardsLostToBaron, Mode=OneWay, FallbackValue=7}"  
-                                             HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" 
-                                              Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
-                    </Viewbox>
-                    <Viewbox Grid.Column="8" Grid.Row="3">
+                    <Viewbox Grid.Column="5" Grid.Row="2">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="17.5" />
-                                <ColumnDefinition Width="12.5" />
+                                <ColumnDefinition Width="28" />
+                                <ColumnDefinition Width="12" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="30" />
+                                <RowDefinition Height="35" />
+                                <RowDefinition Height="5" />
                             </Grid.RowDefinitions>
-                            <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top" Stretch="Fill">
+                            <Viewbox HorizontalAlignment="Left" VerticalAlignment="Top" Stretch="Fill" Grid.RowSpan="2">
                                 <local:ResourceCardCtrl Orientation="FaceDown"/>
                             </Viewbox>
-                            <Viewbox Grid.Column="2" VerticalAlignment="Bottom">
+                            <Viewbox Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Width="30" Height="30" HorizontalAlignment="Right" >
                                 <TextBlock Grid.Column="1" Text="&#xF272;" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"  
                                     Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" />
                             </Viewbox>
                         </Grid>
                     </Viewbox>
-                    <Viewbox Grid.Column="9" Grid.Row="3">
+                    <Viewbox Grid.Column="6" Grid.Row="2" >
                         <TextBlock   Text="{x:Bind GameData.CardsLostToBaron, Mode=OneWay, FallbackValue=7}"  
                                              HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" 
                                               Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
                     </Viewbox>
+
+                    <Viewbox Grid.Column="8" Grid.Row="2">
+                        <Grid>
+                            <Image Source="ms-appx:///Assets/dice_light.svg" Width="40" Height="40" Visibility="{x:Bind UseLightFile, FallbackValue=Visible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=true}" />
+                            <Image Source="ms-appx:///Assets/dice_dark.svg" Width="40" Height="40" Visibility="{x:Bind UseLightFile, FallbackValue=Visible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=false}" />
+                        </Grid>
+                    </Viewbox>
+                    <Viewbox Grid.Column="9" Grid.Row="2" >
+                        <TextBlock   Text="{x:Bind GameData.NoResourceCount, Mode=OneWay, FallbackValue=7}"  
+                                             HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" 
+                                              Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Column="11" Grid.Row="2" >
+                        <Grid Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="15"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4" />
+                                <ColumnDefinition Width="1" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="1" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="1" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="4" />
+                            </Grid.ColumnDefinitions>
+
+                            <Ellipse Grid.Row="1" Grid.Column="2" Fill="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" />
+                            <Ellipse Grid.Row="1" Grid.Column="4" Fill="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" />
+                            <Ellipse Grid.Row="1" Grid.Column="6" Fill="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" />
+
+
+                        </Grid>
+                    </Viewbox>
+                    <Viewbox Grid.Column="12" Grid.Row="2">
+                        <TextBlock  Text="{x:Bind GameData.Pips, Mode=OneWay, FallbackValue=0}"  
+                                    Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
+                    </Viewbox>
+
 
                 </Grid>
                 <!--  Middle Row -->
