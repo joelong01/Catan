@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -34,6 +35,34 @@ namespace Catan10
             ListBox_PlayerResourceCountList.ItemsSource = newList;
             
         }
-                
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is TextBox tb)) return;
+
+            tb.SelectAll();
+        }
+
+      
+        private async void Picture_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            Ellipse ellipse = sender as Ellipse;
+            ellipse.IsTapEnabled = false;
+            try
+            {
+
+                PlayerData player = ((Ellipse)sender).Tag as PlayerData;
+
+                if (await StaticHelpers.AskUserYesNoQuestion($"Let {player.PlayerName} go first?", "Yes", "No"))
+                {
+                    await MainPage.Current.SetFirst(player); //manipulates the shared PlayingPlayers list, but also does logging and other book keeping.
+                }
+            }
+            finally
+            {
+                ellipse.IsTapEnabled = true;
+            }
+
+        }
     }
 }

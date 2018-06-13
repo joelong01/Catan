@@ -51,66 +51,15 @@
 
         <Rectangle Fill="{StaticResource bmCherry}" RadiusX="50" RadiusY="50"  Stroke="{StaticResource bmMaple}" StrokeThickness="4" Visibility="Visible"/>
 
-        <local:ResourceCountCtrl x:Name="_rccPlayer1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Visibility="Collapsed" />
-        <local:ResourceCountCtrl x:Name="_rccPlayer2" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"  Visibility="Collapsed">
-            <local:ResourceCountCtrl.RenderTransform>
-                <CompositeTransform Rotation="180"/>
-            </local:ResourceCountCtrl.RenderTransform>
-        </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer3" HorizontalAlignment="Right" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Visibility="Collapsed" >
-            <local:ResourceCountCtrl.RenderTransform>
-                <CompositeTransform Rotation="180"/>
-            </local:ResourceCountCtrl.RenderTransform>
-        </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer4" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Visibility="Collapsed"/>
-        <local:ResourceCountCtrl x:Name="_rccPlayer5" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0,1" Visibility="Collapsed" >
-            <local:ResourceCountCtrl.RenderTransform>
-                <CompositeTransform Rotation="90" TranslateY="-210"/>
-            </local:ResourceCountCtrl.RenderTransform>
-        </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer6" HorizontalAlignment="Right" VerticalAlignment="Center" RenderTransformOrigin="1 1" Visibility="Collapsed" >
-            <local:ResourceCountCtrl.RenderTransform>
-                <CompositeTransform Rotation="-90" TranslateY="-210"/>
-            </local:ResourceCountCtrl.RenderTransform>
-        </local:ResourceCountCtrl>
-
+       
         <Button Visibility="Collapsed">
             <Button.Flyout>
                 <MenuFlyout x:Name="_menuBaron"  Placement="Right" >
                 </MenuFlyout>
             </Button.Flyout>
         </Button>
-        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" HorizontalAlignment="Right" Width="615" Margin="20" />
-        <!--<Grid Name="Grid_PlayerResourceCount" HorizontalAlignment="Right" Width="440" Margin="20" Background="Transparent" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="110"/>
-                <RowDefinition Height="2"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <StackPanel Name="StackPanel_TotalResourceCount" Orientation="Horizontal" Grid.RowSpan="1" Grid.Row="0" Grid.Column="0" Margin="8,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" 
-                        BorderBrush="{StaticResource bmMaple}" BorderThickness="1" CornerRadius="10">
-                <local:ResourceCardCtrl ResourceType="Wood"     Count="0" />
-                <local:ResourceCardCtrl ResourceType="Brick"    Count="1" />
-                <local:ResourceCardCtrl ResourceType="Sheep"    Count="2" />
-                <local:ResourceCardCtrl ResourceType="Wheat"    Count="3" />
-                <local:ResourceCardCtrl ResourceType="Ore"      Count="4" />
-                <local:ResourceCardCtrl ResourceType="GoldMine" Count="5" />
-            </StackPanel>
-            <Rectangle Fill="{StaticResource bmMaple}" Grid.Row="1" Margin="5,0,5,0" />
-            <ListBox Name="ListBox_PlayerResourceCountList " Grid.Row="2" ItemsSource="{x:Bind PlayerResourceCountList}"  
-                     Background="Transparent"
-                     UseSystemFocusVisuals="False" ScrollViewer.VerticalScrollBarVisibility="Disabled" Margin="0,0,-30,0" >
-                <ListBoxItem Padding="0" Margin="0,20,0,0">
-                    
-                </ListBoxItem>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Margin" Value="8,10,0,0"/>
-                        <Setter Property="Padding" Value="0" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
-        </Grid>-->
+
+        
 
 
         <Viewbox  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0,5,0,5" >
@@ -122,7 +71,7 @@
             </local:GameContainerCtrl>
         </Viewbox>
 
-
+        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" HorizontalAlignment="Right" Width="615" Margin="20" />
 
         <Grid x:Name="ControlGrid" PointerPressed="OnPointerPressed" Width="250" Height="500" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" >
             <Grid.RenderTransform>
@@ -352,16 +301,6 @@
 
 
         </Grid>
-
-        <local:GameSummaryCtrl x:Name="_GameSummary" Width="650" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" PointerPressed="OnPointerPressed" Margin="0,0,0,0">
-            <local:GameSummaryCtrl.RenderTransform>
-                <CompositeTransform SkewX=".9" ScaleY=".9"/>
-            </local:GameSummaryCtrl.RenderTransform>
-        </local:GameSummaryCtrl>
-
-
-        <local:ScoreViewCtrl x:Name="ScoreGrid" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="310" Height="265" Margin="0"  />
-        
 
         <Grid Name="_savedGameGrid" Width="383" Height="280" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0" Grid.Row="1" PointerPressed="OnPointerPressed" Visibility="Collapsed" Background="{StaticResource bmCherry}"
               BorderBrush="{StaticResource bmMaple}" BorderThickness="4" CornerRadius="4">

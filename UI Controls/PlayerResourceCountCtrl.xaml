@@ -193,7 +193,9 @@
                 </StackPanel>
 
                 <!-- Player Picture:  Picutre doesn't show up in the dsigner -->
-                <Ellipse Width="60" Height="60" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.RowSpan="2" Ellipse.Fill="{x:Bind ImageBrush, FallbackValue=HotPink, Mode=OneWay}"/>
+                <Ellipse Width="60" Height="60" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.RowSpan="2" Canvas.ZIndex="999"
+                         Tag="{x:Bind PlayerDataInstance, Mode=OneTime}" IsTapEnabled="True"
+                         Ellipse.Fill="{x:Bind ImageBrush, FallbackValue=HotPink, Mode=OneWay}" PointerPressed="Picture_PointerPressed"/>
 
                 <!-- ScoreView stuff -->
                 <Grid HorizontalAlignment="Left" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Margin="0,1,0,0">
@@ -280,13 +282,13 @@
                                        Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
                         </Viewbox>
                         <Viewbox HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                            <TextBlock Grid.Column="0" Grid.Row="0" Text="⚂" FontFamily="Segoe UI Symbol" FontSize="24" CharacterSpacing="0"  Margin="0"
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="⚂" FontFamily="Segoe UI Symbol" FontSize="24" CharacterSpacing="0"  Margin="0" GotFocus="TextBox_GotFocus"
                                        Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
                         </Viewbox>
                         </StackPanel>
                         <Viewbox Grid.Column="1" Grid.Row="0">
-                            <TextBlock Grid.Column="1" FontSize="44" 
-                                          Text="{x:Bind Path=GameData.CardsLostToSeven, Mode=OneWay, FallbackValue=88, Converter={StaticResource ResourceKey=IntToStringConverter}}"
+                            <TextBox Grid.Column="1" FontSize="44" BorderBrush="Transparent" Background="Transparent"
+                                          Text="{x:Bind Path=GameData.CardsLostToSeven, Mode=TwoWay, FallbackValue=88, Converter={StaticResource ResourceKey=IntToStringConverter}}"
                                           Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" />
                         </Viewbox>
                         
@@ -300,8 +302,8 @@
                             <Image Grid.Column="0" Grid.Row="1"  Source="ms-appx:///Assets/monopoly_dark.svg" Width="25" Height="25" Visibility="{x:Bind UseLightFile, FallbackValue=Collapsed, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=false}" />
                         </Viewbox>
                         <Viewbox Grid.Column="1" Grid.Row="1" >
-                            <TextBlock  FontSize="44" Grid.Column="1"
-                                            Text="{x:Bind Path=GameData.CardsLostToMonopoly, Mode=OneWay, FallbackValue=20, Converter={StaticResource ResourceKey=IntToStringConverter}}"  
+                            <TextBox  FontSize="44" Grid.Column="1" BorderBrush="Transparent" Background="Transparent" GotFocus="TextBox_GotFocus"
+                                            Text="{x:Bind Path=GameData.CardsLostToMonopoly, Mode=TwoWay, FallbackValue=20, Converter={StaticResource ResourceKey=IntToStringConverter}}"  
                                             Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" />
                         </Viewbox>
 

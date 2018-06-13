@@ -258,7 +258,7 @@ namespace Catan10
             {
 
                 _gameView.Reset();
-                SetResourceTrackingOrientation(TileOrientation.FaceDown);
+                
 
                 if (AllPlayers.Count == 0)
                 {
@@ -804,12 +804,7 @@ namespace Catan10
                 SetLongestRoadFromLog();
             }
 
-            //
-            //  update the UI to indicate how many roads the player has left to play
-
-            _playerToResourceCount[CurrentPlayer.PlayerPosition].RoadsLeft = _gameView.CurrentGame.MaxRoads - CurrentPlayer.GameData.Roads.Count;
-            _playerToResourceCount[CurrentPlayer.PlayerPosition].ShipsLeft = _gameView.CurrentGame.MaxShips- CurrentPlayer.GameData.Ships.Count;
-        }
+         }
 
         private PlayerData MaxRoadPlayer
         {
@@ -1032,8 +1027,6 @@ namespace Catan10
             }
             RecalcLongestRoadAfterSettlementIsPlayed(null, settlement, player);
             settlement.HideBuildEllipse();
-            _playerToResourceCount[CurrentPlayer.PlayerPosition].SettlementsLeft = _gameView.CurrentGame.MaxSettlements - CurrentPlayer.GameData.Settlements.Count;
-            _playerToResourceCount[CurrentPlayer.PlayerPosition].CitiesLeft = _gameView.CurrentGame.MaxCities - CurrentPlayer.GameData.Cities.Count;
             await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, logType, settlement.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, settlement, oldType, newType));
         }
 
