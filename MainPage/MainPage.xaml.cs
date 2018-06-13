@@ -983,7 +983,18 @@ namespace Catan10
             }
 
 
+        }
 
+        //
+        //  we use the build ellipses during the allocation phase to see what settlements have the most pips
+        //  when we move to the next player, hide the build ellipses
+
+        private void HideAllBuildEllipses()
+        {
+            foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
+            {
+                s.HideBuildEllipse();
+            }
         }
 
 
@@ -1312,7 +1323,7 @@ namespace Catan10
 
 
         }
-        
+
         private async void OnTest(object sender, RoutedEventArgs rea)
         {
             // Frame.Navigate(typeof(TestPage));
@@ -1335,6 +1346,8 @@ namespace Catan10
             foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
             {
                 if (s.SettlementType != SettlementType.None) continue;
+                if (s.BuildEllipseVisible) continue;
+                if (ValidateSettlementBuildLocation(s, out bool showerror) == false) continue; // can't build here
                 int pips = 0;
                 foreach (var kvp in s.SettlementToTileDict)
                 {
@@ -1342,10 +1355,11 @@ namespace Catan10
                 }
                 if (pips > max)
                 {
+
                     max = pips;
                 }
             }
-            ValidateBuilding = false;
+            ValidateBuilding = true;
             foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
             {
                 int pips = 0;
@@ -1356,7 +1370,8 @@ namespace Catan10
                 if (pips == max)
                 {
                     s.Color = CurrentPlayer.Background;
-                    SettlementPointerPressed(s, null);
+                    if (ValidateSettlementBuildLocation(s, out bool showerror))
+                        s.ShowBuildEllipse();
                 }
             }
 

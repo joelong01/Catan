@@ -97,6 +97,20 @@ namespace Catan10
                 }
             }
         }
+        public int Pips
+        {
+            get
+            {
+                int pips = 0;
+                foreach (var kvp in SettlementToTileDict)
+                {
+                    pips += kvp.Value.Pips;
+                   
+                }
+                return pips;
+                
+            }
+        }
         public Color Color
         {
             get
@@ -275,6 +289,14 @@ namespace Catan10
 
         }
 
+        public bool BuildEllipseVisible
+        {
+            get
+            {
+                return _gridBuildEllipse.Opacity > 0;
+
+            }
+        }
 
 
         public void HideBuildEllipse()
