@@ -92,8 +92,8 @@ namespace Catan10
             {
                 if (_playerData != value)
                 {
-                 //   this.TraceMessage($"\nOwner for {this} set to {value}");
-                    _playerData = value;                   
+                    //   this.TraceMessage($"\nOwner for {this} set to {value}");
+                    _playerData = value;
                 }
             }
         }
@@ -105,10 +105,10 @@ namespace Catan10
                 foreach (var kvp in SettlementToTileDict)
                 {
                     pips += kvp.Value.Pips;
-                   
+
                 }
                 return pips;
-                
+
             }
         }
         public Color Color
@@ -271,8 +271,10 @@ namespace Catan10
 
         public SettlementLocation SettlementLocation { get; set; } = SettlementLocation.None;
 
-        public void ShowBuildEllipse(bool canBuild = true)
+        public void ShowBuildEllipse(bool canBuild = true, string colorAsString = "", string msg = "X")
         {
+            _txtError.Text = msg;
+
             if (_canvasCity.Visibility == Visibility.Visible)
                 return;
 
@@ -281,6 +283,11 @@ namespace Catan10
 
             double opacity = 1.0;
             if (!canBuild) opacity = .25;
+
+            if (colorAsString != "")
+            {
+                _buildEllipse.Fill = new SolidColorBrush(StaticHelpers.StringToColorDictionary[colorAsString]);
+            }
 
 
             _gridBuildEllipse.Opacity = opacity;
@@ -358,7 +365,7 @@ namespace Catan10
 
             if (type == SettlementType.Settlement)
             {
-                
+
                 _canvasSettlement.Visibility = Visibility.Visible;
             }
 
@@ -399,7 +406,7 @@ namespace Catan10
                 //  need to do this by value because .Contains looks for the same pointer value
                 if (clone.Tile.Index == tile.Index && clone.Location == loc)
                 {
-                   // this.TraceMessage($"{tile} @ {loc} already in Clones list!");
+                    // this.TraceMessage($"{tile} @ {loc} already in Clones list!");
                     return;
                 }
             }

@@ -1324,7 +1324,7 @@ namespace Catan10
 
         }
 
-        private async void OnTest(object sender, RoutedEventArgs rea)
+        private void OnTest(object sender, RoutedEventArgs rea)
         {
             // Frame.Navigate(typeof(TestPage));
             // _gameView.CalculateAdjacentSettlements();
@@ -1369,9 +1369,8 @@ namespace Catan10
                 }
                 if (pips == max)
                 {
-                    s.Color = CurrentPlayer.Background;
                     if (ValidateSettlementBuildLocation(s, out bool showerror))
-                        s.ShowBuildEllipse();
+                        s.ShowBuildEllipse(true, CurrentPlayer.ColorAsString, "1");
                 }
             }
 
