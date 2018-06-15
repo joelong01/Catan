@@ -1323,7 +1323,7 @@ namespace Catan10
 
 
         }
-
+        private int _showSettlementByPipsIndex = 0;
         private void OnTest(object sender, RoutedEventArgs rea)
         {
             // Frame.Navigate(typeof(TestPage));
@@ -1342,36 +1342,35 @@ namespace Catan10
 
             //
             //  for every settlement, what is the max pips?
-            int max = 0;
-            foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
+            List<SettlementCtrl> settlementsByPips = _gameView.CurrentGame.HexPanel.Settlements;
+            settlementsByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+            ValidateBuilding = true;
+            int currentPipCount = 0;
+            _showSettlementByPipsIndex++;
+            for (int idx = 0; idx < settlementsByPips.Count; idx++)
             {
+                var s = settlementsByPips[idx];
+                if (s.Pips == 0) continue; // outside the main map
                 if (s.SettlementType != SettlementType.None) continue;
                 if (s.BuildEllipseVisible) continue;
                 if (ValidateSettlementBuildLocation(s, out bool showerror) == false) continue; // can't build here
-                int pips = 0;
-                foreach (var kvp in s.SettlementToTileDict)
-                {
-                    pips += kvp.Value.Pips;
-                }
-                if (pips > max)
-                {
 
-                    max = pips;
-                }
-            }
-            ValidateBuilding = true;
-            foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
-            {
-                int pips = 0;
-                foreach (var kvp in s.SettlementToTileDict)
+                currentPipCount = s.Pips;
+
+
+                while (currentPipCount == s.Pips)
                 {
-                    pips += kvp.Value.Pips;
+                    if ((s.SettlementType == SettlementType.None) && !s.BuildEllipseVisible && ValidateSettlementBuildLocation(s, out showerror) && currentPipCount == s.Pips)
+                    {
+                        s.ShowBuildEllipse(false, CurrentPlayer.ColorAsString, _showSettlementByPipsIndex.ToString());
+
+                    }
+                    idx++;
+                    if (idx == settlementsByPips.Count) break;
+                    s = settlementsByPips[idx];                    
+
                 }
-                if (pips == max)
-                {
-                    if (ValidateSettlementBuildLocation(s, out bool showerror))
-                        s.ShowBuildEllipse(true, CurrentPlayer.ColorAsString, "1");
-                }
+                break;
             }
 
             //ValidateBuilding = true;

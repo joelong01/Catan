@@ -1493,6 +1493,7 @@ namespace Catan10
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
                 HideAllBuildEllipses();
+                _showSettlementByPipsIndex = 0;
             }
         }
 

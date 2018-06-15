@@ -140,7 +140,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"Index={Index};Type={SettlementType};Location={this.SettlementLocation};Background={Color}");
+            return String.Format($"Index={Index};Type={SettlementType};Location={this.SettlementLocation};Background={Color};Pips={Pips}");
         }
         public SettlementType SettlementType
         {
@@ -284,15 +284,15 @@ namespace Catan10
             double opacity = 1.0;
             if (!canBuild) opacity = .25;
 
-            if (colorAsString != "")
-            {
-                _buildEllipse.Fill = new SolidColorBrush(StaticHelpers.StringToColorDictionary[colorAsString]);
-            }
-
-
             _gridBuildEllipse.Opacity = opacity;
 
             _txtError.Visibility = canBuild ? Visibility.Collapsed : Visibility.Visible;
+            if (colorAsString != "")
+            {
+                _buildEllipse.Fill = new SolidColorBrush(StaticHelpers.StringToColorDictionary[colorAsString]);
+                _gridBuildEllipse.Opacity = 1.0;
+
+            }
 
         }
 
