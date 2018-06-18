@@ -49,31 +49,9 @@
 
     <Grid x:Name="ContentRoot">
 
-        <Rectangle Fill="{StaticResource bmCherry}" RadiusX="344" RadiusY="344"  Stroke="{StaticResource bmMaple}" StrokeThickness="4" Visibility="Visible"/>
+        <Rectangle Fill="{StaticResource bmCherry}" RadiusX="50" RadiusY="50"  Stroke="{StaticResource bmMaple}" StrokeThickness="4" Visibility="Visible"/>
 
-        <local:ResourceCountCtrl x:Name="_rccPlayer1" HorizontalAlignment="Left" VerticalAlignment="Bottom"  />
-        <local:ResourceCountCtrl x:Name="_rccPlayer2" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"  >
-            <local:ResourceCountCtrl.RenderTransform>
-                <CompositeTransform Rotation="180"/>
-            </local:ResourceCountCtrl.RenderTransform>
-        </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer3" HorizontalAlignment="Right" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"  >
-            <local:ResourceCountCtrl.RenderTransform>
-                <CompositeTransform Rotation="180"/>
-            </local:ResourceCountCtrl.RenderTransform>
-        </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer4" HorizontalAlignment="Right" VerticalAlignment="Bottom"  />
-        <local:ResourceCountCtrl x:Name="_rccPlayer5" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0,1"  >
-            <local:ResourceCountCtrl.RenderTransform>
-                <CompositeTransform Rotation="90" TranslateY="-210"/>
-            </local:ResourceCountCtrl.RenderTransform>
-        </local:ResourceCountCtrl>
-        <local:ResourceCountCtrl x:Name="_rccPlayer6" HorizontalAlignment="Right" VerticalAlignment="Center" RenderTransformOrigin="1 1"  >
-            <local:ResourceCountCtrl.RenderTransform>
-                <CompositeTransform Rotation="-90" TranslateY="-210"/>
-            </local:ResourceCountCtrl.RenderTransform>
-        </local:ResourceCountCtrl>
-
+       
         <Button Visibility="Collapsed">
             <Button.Flyout>
                 <MenuFlyout x:Name="_menuBaron"  Placement="Right" >
@@ -81,10 +59,10 @@
             </Button.Flyout>
         </Button>
 
+        
 
 
-
-        <Viewbox  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0,5,0,5">
+        <Viewbox  HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0,5,0,5" >
             <local:GameContainerCtrl x:Name="_gameView"  DoubleTapped="GameViewControlDoubleTapped"
                     Canvas.ZIndex="-1" RenderTransformOrigin="0.5,0.5"    IsEnabled="True" PointerPressed="GameViewControlPointerPressed"      >
                 <local:GameContainerCtrl.RenderTransform>
@@ -93,7 +71,7 @@
             </local:GameContainerCtrl>
         </Viewbox>
 
-
+        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" HorizontalAlignment="Right" Width="615" Margin="20" />
 
         <Grid x:Name="ControlGrid" PointerPressed="OnPointerPressed" Width="250" Height="500" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" >
             <Grid.RenderTransform>
@@ -211,7 +189,7 @@
 
         </Grid>
 
-        <Grid Name="RollGrid"  Width="300" Height="450" BorderBrush="White" PointerPressed="OnPointerPressed" HorizontalAlignment="Right" VerticalAlignment="Center"
+        <Grid Name="RollGrid"  Width="300" Height="450" BorderBrush="White" PointerPressed="OnPointerPressed" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                   BorderThickness="1" IsHitTestVisible="True" Margin="0" >
             <Grid.RenderTransform>
                 <CompositeTransform TranslateX="-0" ScaleX="1" ScaleY="1" />
@@ -324,20 +302,6 @@
 
         </Grid>
 
-        <local:GameSummaryCtrl x:Name="_GameSummary" Width="650" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top" PointerPressed="OnPointerPressed" Margin="0,185,0,0">
-            <local:GameSummaryCtrl.RenderTransform>
-                <CompositeTransform SkewX=".9" ScaleY=".9"/>
-            </local:GameSummaryCtrl.RenderTransform>
-        </local:GameSummaryCtrl>
-
-
-        <local:ScoreViewCtrl x:Name="ScoreGrid" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="310" Height="265" Margin="0"  />
-        <local:ScoreViewCtrl x:Name="ScoreGrid2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="310" Height="265"  Margin="0" RenderTransformOrigin=".5 .5">
-            <local:ScoreViewCtrl.RenderTransform>
-                <CompositeTransform Rotation="180" />
-            </local:ScoreViewCtrl.RenderTransform>
-        </local:ScoreViewCtrl>
-
         <Grid Name="_savedGameGrid" Width="383" Height="280" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0" Grid.Row="1" PointerPressed="OnPointerPressed" Visibility="Collapsed" Background="{StaticResource bmCherry}"
               BorderBrush="{StaticResource bmMaple}" BorderThickness="4" CornerRadius="4">
             <Grid.RenderTransform>
@@ -372,7 +336,7 @@
             </ListBox>
         </Grid>
 
-        <ProgressRing Name="_progress" Grid.Row="0"  Canvas.ZIndex="9999" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsActive="True" Width="100" Height="100" Visibility="Visible"/>
+        <ProgressRing Name="_progress" Grid.Row="0"  Canvas.ZIndex="9999" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="True" Width="100" Height="100" Visibility="Visible"/>
 
     </Grid>
 

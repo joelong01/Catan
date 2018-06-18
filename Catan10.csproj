@@ -24,7 +24,7 @@
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>400063350650A633A564C222D46746A0A376A971</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>B3EBF0A01F204F9D5223EB139039A3E2677E2DDC</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -84,6 +84,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -115,6 +116,9 @@
     </Compile>
     <Compile Include="CatanService\ServiceClient.cs" />
     <Compile Include="NetworkService.cs" />
+    <Compile Include="UI Controls\PlayerResourceCountCtrl.xaml.cs">
+      <DependentUpon>PlayerResourceCountCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\ResourceCardCtrl.xaml.cs">
       <DependentUpon>ResourceCardCtrl.xaml</DependentUpon>
     </Compile>
@@ -136,6 +140,9 @@
     </Compile>
     <Compile Include="ContentDialogs\PlayerManagementDlg.xaml.cs">
       <DependentUpon>PlayerManagementDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\SailboatCtrl.xaml.cs">
+      <DependentUpon>SailboatCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\ScoreViewCtrl.xaml.cs">
       <DependentUpon>ScoreViewCtrl.xaml</DependentUpon>
@@ -236,9 +243,13 @@
     <Content Include="Assets\DefaultPlayers\john.jpg" />
     <Content Include="Assets\DefaultPlayers\robert.jpg" />
     <Content Include="Assets\desert.jpg" />
+    <Content Include="Assets\dice_dark.svg" />
+    <Content Include="Assets\dice_light.svg" />
     <Content Include="Assets\guest.jpg" />
     <Content Include="Assets\maple.jpg" />
     <Content Include="Assets\money.jpg" />
+    <Content Include="Assets\monopoly_dark.svg" />
+    <Content Include="Assets\monopoly_light.svg" />
     <Content Include="Assets\Old Visuals\baron.png" />
     <Content Include="Assets\Old Visuals\gold mine 2.png" />
     <Content Include="Assets\Old Visuals\old 2 for 1 brick.png" />
@@ -255,7 +266,8 @@
     <Content Include="Assets\Old Visuals\old wood.png" />
     <Content Include="Assets\Old Visuals\ship.png" />
     <Content Include="Assets\ore.jpg" />
-    <Content Include="Assets\sailboat.png" />
+    <Content Include="Assets\sailboat_light.png" />
+    <Content Include="Assets\sailboat_dark.png" />
     <Content Include="Assets\sheep.jpg" />
     <Content Include="Assets\ship.png" />
     <Content Include="Assets\ship.svg" />
@@ -294,6 +306,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="UI Controls\PlayerResourceCountCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\ResourceCardCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -319,6 +335,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ContentDialogs\PlayerManagementDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\SailboatCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

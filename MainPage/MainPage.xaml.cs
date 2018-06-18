@@ -25,11 +25,6 @@ using Windows.UI.Xaml.Navigation;
 namespace Catan10
 {
 
-
-
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
 
@@ -46,6 +41,7 @@ namespace Catan10
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
 
 
+
         DispatcherTimer _timer = new DispatcherTimer();
 
         bool _doDragDrop = false;
@@ -59,7 +55,8 @@ namespace Catan10
 
         public ObservableCollection<PlayerData> PlayingPlayers { get; set; } = new ObservableCollection<PlayerData>();
         public ObservableCollection<PlayerData> AllPlayers { get; set; } = new ObservableCollection<PlayerData>();
-        private Dictionary<PlayerPosition, ResourceCountCtrl> _playerToResourceCount = new Dictionary<PlayerPosition, ResourceCountCtrl>();
+
+
 
         public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("Hit Start"));
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
@@ -274,16 +271,11 @@ namespace Catan10
             _timer.Interval = TimeSpan.FromSeconds(FadeSeconds);
             _timer.Tick += AsyncReverseFade;
 
-            _GameSummary.PlayingPlayers = this.PlayingPlayers;
-
-
-
-            _playerToResourceCount[PlayerPosition.BottomLeft] = _rccPlayer1;
-            _playerToResourceCount[PlayerPosition.TopLeft] = _rccPlayer2;
-            _playerToResourceCount[PlayerPosition.TopRight] = _rccPlayer3;
-            _playerToResourceCount[PlayerPosition.BottomRight] = _rccPlayer4;
-            _playerToResourceCount[PlayerPosition.Left] = _rccPlayer5;
-            _playerToResourceCount[PlayerPosition.Right] = _rccPlayer6;
+            //
+            //  this sets the view's listboxes.  from now on it will 
+            //  dynamically changes as we add/remove players who are playing.
+            //  note that we should never new a new collection -- just modify it.
+            Ctrl_PlayerResourceCountCtrl.PlayingPlayers = PlayingPlayers;
 
         }
 
@@ -374,20 +366,12 @@ namespace Catan10
 
         void ShowNumberUi()
         {
-            //_daShowHideNumbers.To = 0;
-            //_sbShowHideNumbers.Begin();
             _daNumberOpacity.To = 1.0;
             _sbNumberOpacity.Begin();
             RollGrid.IsHitTestVisible = true;
         }
         void HideNumberUi()
         {
-            //if (_daShowHideNumbers.To != -RollGrid.ActualWidth)
-            //{
-            //    _daShowHideNumbers.To = -RollGrid.ActualWidth;
-            //    _sbShowHideNumbers.Begin();
-            //}
-
             _daNumberOpacity.To = 0;
             _sbNumberOpacity.Begin();
             RollGrid.IsHitTestVisible = false;
@@ -405,7 +389,7 @@ namespace Catan10
         {
             base.OnNavigatedTo(e);
 
-           if (e.Parameter is Windows.ApplicationModel.Activation.IActivatedEventArgs args)
+            if (e.Parameter is Windows.ApplicationModel.Activation.IActivatedEventArgs args)
             {
 
                 if (args.Kind == Windows.ApplicationModel.Activation.ActivationKind.File)
@@ -434,7 +418,7 @@ namespace Catan10
 
             }
 
-            
+
 
 
         }
@@ -466,11 +450,14 @@ namespace Catan10
                     AllPlayers.Add(p);
 
                 }
+
+
             }
             catch
             {
 
             }
+
         }
 
 
@@ -559,21 +546,15 @@ namespace Catan10
             _lbGames.SelectedValue = _log;
             await ResetTiles(true);
             PlayingPlayers.Clear();
+            Ctrl_PlayerResourceCountCtrl.GameResourceData.Reset();
             _stateStack.Clear();
-            _GameSummary.Reset();
-            foreach (var kvp in _playerToResourceCount)
-            {
-                kvp.Value.Visibility = Visibility.Collapsed;
-                kvp.Value.SetOrientation(TileOrientation.FaceDown);
-                kvp.Value.SettlementsLeft = _gameView.CurrentGame.MaxSettlements;
-                kvp.Value.CitiesLeft = _gameView.CurrentGame.MaxCities;
-                kvp.Value.RoadsLeft = _gameView.CurrentGame.MaxRoads;
-                kvp.Value.ShipsLeft = _gameView.CurrentGame.MaxShips;
-                kvp.Value.ResetTotalCards();
-            }
-        }
 
-       
+            foreach (var player in AllPlayers)
+            {
+                player.Reset();
+            }
+
+        }
 
         /// <summary>
         /// Update this because you did the sorting work in the dialog
@@ -592,16 +573,11 @@ namespace Catan10
 
             foreach (PlayerData pData in players)
             {
+                //
+                //  add it to the collection that all the views bind to
                 await AddPlayer(pData, LogType.Normal);
-               
+
             }
-
-
-
-            _GameSummary.AddPlayers(PlayingPlayers);
-            ScoreGrid.AddPlayers(PlayingPlayers);
-            ScoreGrid2.AddPlayers(PlayingPlayers);
-
 
 
             await VisualShuffle();
@@ -628,7 +604,7 @@ namespace Catan10
             _currentPlayerIndex = 0;
             _rolls.Clear();
 
-            SetResourceTrackingOrientation(TileOrientation.FaceDown);
+
 
         }
         bool _undoingCardLostHack = false;
@@ -646,19 +622,21 @@ namespace Catan10
 
         private async Task AddPlayer(PlayerData pData, LogType logType)
         {
-            //PlayerView playerView = PlayerPositionToView[pData.PlayerPosition];
-            //playerView.Visibility = Visibility.Visible;
-            //playerView.PlayerData = pData;
-            //_playerViewDictionary[pData.PlayerPosition] = playerView;
-            //playerView.Index = PlayingPlayers.Count;
-            //if (_menuHidePlayersOnNext.IsChecked) playerView.Close();
-            //playerView.UpdateView();
 
             PlayingPlayers.Add(pData);
             pData.GameData.OnCardsLost += OnPlayerLostCards;
             AddPlayerMenu(pData);
             pData.Reset();
-            _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
+            //
+            //  need to give the players some data about the game
+            pData.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
+            pData.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
+            pData.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
+            pData.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
+
+
+
+            //  _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
             await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
 
         }
@@ -666,9 +644,6 @@ namespace Catan10
         private async Task AddPlayer(LogEntry le, LogType logType)
         {
 
-            //PlayerView playerView = PlayerPositionToView[(PlayerPosition)le.Tag];            
-            //playerView.PlayerData = le.PlayerData;            
-            //playerView.PlayerData.PlayerPosition = (PlayerPosition)le.Tag;
             await AddPlayer(le.PlayerData, logType);
 
         }
@@ -777,7 +752,6 @@ namespace Catan10
                         break;
                     case GameState.WaitingForNewGame:
                         await OnNewGame();
-                        SetResourceTrackingOrientation(TileOrientation.FaceDown);
                         break;
                     case GameState.WaitingForStart:
                         await CopyScreenShotToClipboard(_gameView);
@@ -817,9 +791,6 @@ namespace Catan10
                         await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, true);
                         break;
                     case GameState.WaitingForNext:
-                        //
-                        //  flip all the resource tracking controls to face down
-                        SetResourceTrackingOrientation(TileOrientation.FaceDown);
                         if (HasSupplementalBuild)
                         {
                             _supplementalStartIndex = _currentPlayerIndex;
@@ -869,19 +840,11 @@ namespace Catan10
             }
         }
 
-        private void SetResourceTrackingOrientation(TileOrientation orientation)
-        {
-            foreach (var kvp in _playerToResourceCount)
-            {
-                kvp.Value.SetOrientation(orientation);
-            }
-
-        }
 
         private void AddResourceCountForPlayer(PlayerData player, ResourceType resource, int count)
         {
-
-            _playerToResourceCount[player.PlayerPosition].AddResourceCount(resource, count);
+            player.GameData.PlayerResourceData.AddResourceCount(resource, count); // update the player
+            Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(resource, count); // update for the game
             if (player.GameData.GoodRoll == false)
             {
                 player.GameData.GoodRoll = true;
@@ -1012,11 +975,26 @@ namespace Catan10
                 t.ResetTileRotation();
 
             }
+            //
+            //  on next, reset the resources for the turn to 0
+            foreach (var player in PlayingPlayers)
+            {
+                player.GameData.PlayerResourceData.Reset();
+            }
 
 
+        }
 
+        //
+        //  we use the build ellipses during the allocation phase to see what settlements have the most pips
+        //  when we move to the next player, hide the build ellipses
 
-
+        private void HideAllBuildEllipses()
+        {
+            foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
+            {
+                s.HideBuildEllipse();
+            }
         }
 
 
@@ -1128,12 +1106,7 @@ namespace Catan10
                     //
                     //  need to look up the control given the player and add it to the right one
                     AddResourceCountForPlayer(settlement.Owner, tile.ResourceType, value);
-                    //
-                    //  now update the totals so everybody can see how many resources/Type are being generated
-                    foreach (var kvp in _playerToResourceCount)
-                    {
-                        kvp.Value.UpdateTotaResourceCount(tile.ResourceType, value);
-                    }
+
                 }
             }
 
@@ -1273,7 +1246,7 @@ namespace Catan10
                         break;
                     case CatanAction.CardsLost:
                         LogCardsLost lcl = logLine.Tag as LogCardsLost;
-                        await LogPlayerLostCards(logLine.PlayerData, lcl.oldVal, lcl.newVal, LogType.Replay);
+                        await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
                         break;
                     case CatanAction.CardsLostToSeven:
                         break;
@@ -1342,10 +1315,6 @@ namespace Catan10
             }
 
 
-            _GameSummary.AddPlayers(PlayingPlayers);
-            ScoreGrid.AddPlayers(PlayingPlayers);
-            ScoreGrid2.AddPlayers(PlayingPlayers);
-
             _gameView.FlipAllAsync(TileOrientation.FaceUp);
             _progress.IsActive = false;
             _progress.Visibility = Visibility.Collapsed;
@@ -1354,7 +1323,7 @@ namespace Catan10
 
 
         }
-        int toggle = 1;
+        private int _showSettlementByPipsIndex = 0;
         private void OnTest(object sender, RoutedEventArgs rea)
         {
             // Frame.Navigate(typeof(TestPage));
@@ -1369,6 +1338,42 @@ namespace Catan10
             //Log newLog = await _log.LoadLog(fileName, this);
             //await ReplayLog(newLog);
             //_log = newLog;
+
+
+            //
+            //  for every settlement, what is the max pips?
+            List<SettlementCtrl> settlementsByPips = _gameView.CurrentGame.HexPanel.Settlements;
+            settlementsByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+            ValidateBuilding = true;
+            int currentPipCount = 0;
+            _showSettlementByPipsIndex++;
+            for (int idx = 0; idx < settlementsByPips.Count; idx++)
+            {
+                var s = settlementsByPips[idx];
+                if (s.Pips == 0) continue; // outside the main map
+                if (s.SettlementType != SettlementType.None) continue;
+                if (s.BuildEllipseVisible) continue;
+                if (ValidateSettlementBuildLocation(s, out bool showerror) == false) continue; // can't build here
+
+                currentPipCount = s.Pips;
+
+
+                while (currentPipCount == s.Pips)
+                {
+                    if ((s.SettlementType == SettlementType.None) && !s.BuildEllipseVisible && ValidateSettlementBuildLocation(s, out showerror) && currentPipCount == s.Pips)
+                    {
+                        s.ShowBuildEllipse(false, CurrentPlayer.ColorAsString, _showSettlementByPipsIndex.ToString());
+
+                    }
+                    idx++;
+                    if (idx == settlementsByPips.Count) break;
+                    s = settlementsByPips[idx];                    
+
+                }
+                break;
+            }
+
+            //ValidateBuilding = true;
 #if false
             #region probability testing
             string s = "";
@@ -1388,18 +1393,7 @@ namespace Catan10
             await StaticHelpers.ShowErrorText(s);
             #endregion
 #endif
-#if true
-            #region ResourceCardTesting
-            toggle = 1 - toggle;
-            TileOrientation orientation = TileOrientation.FaceUp;
-            if (toggle == 1)
-                orientation = TileOrientation.FaceDown;
-            _rccPlayer1.SetOrientation(orientation);
 
-
-
-            #endregion
-#endif
 
         }
 
@@ -1432,7 +1426,7 @@ namespace Catan10
         {
             await _gameView.RandomizeCatanBoard(true);
             await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
-            if (CurrentPlayer != null ) await ProcessEnter(CurrentPlayer, "");
+            if (CurrentPlayer != null) await ProcessEnter(CurrentPlayer, "");
         }
 
         private const int SMALLEST_STATE_COUNT = 1; // game starts with NewGame and then Deal
@@ -1464,6 +1458,7 @@ namespace Catan10
             {
                 AllPlayers.Clear();
                 AllPlayers.AddRange(dlg.PlayerDataList);
+
             }
         }
 
@@ -1482,7 +1477,6 @@ namespace Catan10
                         await newLog.Parse(this);
                         await ReplayLog(newLog);
                         UpdateUiForState(_log.Last().GameState);
-
                     }
                     else
                     {

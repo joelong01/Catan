@@ -92,9 +92,23 @@ namespace Catan10
             {
                 if (_playerData != value)
                 {
-                 //   this.TraceMessage($"\nOwner for {this} set to {value}");
-                    _playerData = value;                   
+                    //   this.TraceMessage($"\nOwner for {this} set to {value}");
+                    _playerData = value;
                 }
+            }
+        }
+        public int Pips
+        {
+            get
+            {
+                int pips = 0;
+                foreach (var kvp in SettlementToTileDict)
+                {
+                    pips += kvp.Value.Pips;
+
+                }
+                return pips;
+
             }
         }
         public Color Color
@@ -126,7 +140,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"Index={Index};Type={SettlementType};Location={this.SettlementLocation};Background={Color}");
+            return String.Format($"Index={Index};Type={SettlementType};Location={this.SettlementLocation};Background={Color};Pips={Pips}");
         }
         public SettlementType SettlementType
         {
@@ -257,8 +271,10 @@ namespace Catan10
 
         public SettlementLocation SettlementLocation { get; set; } = SettlementLocation.None;
 
-        public void ShowBuildEllipse(bool canBuild = true)
+        public void ShowBuildEllipse(bool canBuild = true, string colorAsString = "", string msg = "X")
         {
+            _txtError.Text = msg;
+
             if (_canvasCity.Visibility == Visibility.Visible)
                 return;
 
@@ -268,13 +284,26 @@ namespace Catan10
             double opacity = 1.0;
             if (!canBuild) opacity = .25;
 
-
             _gridBuildEllipse.Opacity = opacity;
 
             _txtError.Visibility = canBuild ? Visibility.Collapsed : Visibility.Visible;
+            if (colorAsString != "")
+            {
+                _buildEllipse.Fill = new SolidColorBrush(StaticHelpers.StringToColorDictionary[colorAsString]);
+                _gridBuildEllipse.Opacity = 1.0;
+
+            }
 
         }
 
+        public bool BuildEllipseVisible
+        {
+            get
+            {
+                return _gridBuildEllipse.Opacity > 0;
+
+            }
+        }
 
 
         public void HideBuildEllipse()
@@ -286,11 +315,11 @@ namespace Catan10
         {
             if (_settlement != null)
             {
-                _settlement.FillColor = _brush.Color;
+                _settlement.CircleFillColor = _brush.Color;
             }
             if (_city != null)
             {
-                _city.FillColor = _brush.Color;
+                _city.CircleFillColor = _brush.Color;
             }
 
 
@@ -336,7 +365,7 @@ namespace Catan10
 
             if (type == SettlementType.Settlement)
             {
-                
+
                 _canvasSettlement.Visibility = Visibility.Visible;
             }
 
@@ -377,7 +406,7 @@ namespace Catan10
                 //  need to do this by value because .Contains looks for the same pointer value
                 if (clone.Tile.Index == tile.Index && clone.Location == loc)
                 {
-                   // this.TraceMessage($"{tile} @ {loc} already in Clones list!");
+                    // this.TraceMessage($"{tile} @ {loc} already in Clones list!");
                     return;
                 }
             }

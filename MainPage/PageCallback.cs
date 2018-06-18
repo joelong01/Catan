@@ -36,13 +36,13 @@ namespace Catan10
 
             }
         }
-        
+
         public async Task OnEnter(PlayerData ActivePlayerView, string txtInput)
         {
             await ProcessEnter(ActivePlayerView, txtInput);
         }
 
-      
+
         //
         //  returns True if it undid something, false if the undo action has no UI affect (e.g. true if the user would think undo happened)
         private async Task<bool> UndoLogLine(LogEntry logLine, bool replayingLog)
@@ -74,9 +74,9 @@ namespace Catan10
                 case CatanAction.CardsLost:
                     LogCardsLost lcl = logLine.Tag as LogCardsLost;
                     _undoingCardLostHack = true;
-                    logLine.PlayerData.GameData.CardsLost = lcl.oldVal;
+                    logLine.PlayerData.GameData.CardsLost = lcl.OldVal;
                     _undoingCardLostHack = false;
-                    await LogPlayerLostCards(logLine.PlayerData, lcl.newVal, lcl.oldVal, LogType.Undo); // values swapped                    
+                    await LogPlayerLostCards(logLine.PlayerData, lcl.NewVal, lcl.OldVal, LogType.Undo); // values swapped                    
                     break;
                 case CatanAction.MissedOpportunity:
                 case CatanAction.CardsLostToSeven:
@@ -92,10 +92,10 @@ namespace Catan10
                     LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
                     await AnimateToPlayerIndex(lcp.From, LogType.Undo);
                     break;
-                case CatanAction.DoneSupplemental:                    
+                case CatanAction.DoneSupplemental:
                     _supplementalStartIndex = logLine.Number; // we don't stop undoing on this one -- just set the number we need to terminate the loop and continue on
                     await AddLogEntry(CurrentPlayer, GameState, CatanAction.DoneSupplemental, false, LogType.Undo);
-                    break;                                  
+                    break;
                 case CatanAction.Dealt:
                     await Reshuffle();
                     // don't take out the log line because Reshuffle doesn't log...
@@ -112,15 +112,15 @@ namespace Catan10
                 case CatanAction.UpdatedRoadState:
                     LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
                     if (replayingLog)
-                        await UpdateRoadState(roadUpdate.Road,  roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Undo); 
+                        await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Undo);
                     else
-                        await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo); 
-                    SetLongestRoadFromLog();                            
+                        await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo);
+                    SetLongestRoadFromLog();
                     break;
                 case CatanAction.UpdateSettlementState:
                     LogSettlementUpdate settlementUpdate = logLine.Tag as LogSettlementUpdate;
                     if (replayingLog)
-                        await UpdateSettlementState(settlementUpdate.Settlement,  settlementUpdate.OldSettlementType, settlementUpdate.NewSettlementType, LogType.Undo); 
+                        await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.OldSettlementType, settlementUpdate.NewSettlementType, LogType.Undo);
                     else
                         await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.NewSettlementType, settlementUpdate.OldSettlementType, LogType.Undo); // NOTE:  New and Old have been swapped                      
                     break;
@@ -235,15 +235,15 @@ namespace Catan10
         private async Task UndoMoveBaron(LogEntry logLine)
         {
 
-            LogBaronOrPirate undoObject = logLine.Tag as LogBaronOrPirate;            
+            LogBaronOrPirate undoObject = logLine.Tag as LogBaronOrPirate;
             await AssignBaronOrKnight(undoObject.TargetPlayer, undoObject.StartTile, undoObject.TargetWeapon, logLine.Action, LogType.Undo);
 
 
         }
-        
+
         public async Task OnNewGame()
         {
-            if (_log != null && _log.Count != 0)           
+            if (_log != null && _log.Count != 0)
             {
                 if (State.GameState != GameState.WaitingForNewGame)
                 {
@@ -258,7 +258,7 @@ namespace Catan10
             {
 
                 _gameView.Reset();
-                SetResourceTrackingOrientation(TileOrientation.FaceDown);
+
 
                 if (AllPlayers.Count == 0)
                 {
@@ -289,9 +289,9 @@ namespace Catan10
                     await this.Reset();
                     await SetStateAsync(null, GameState.WaitingForNewGame, true);
                     _gameView.CurrentGame = dlg.SelectedGame;
-                    
+
                     _log = new Log();
-                    await _log.Init(dlg.SaveFileName);                    
+                    await _log.Init(dlg.SaveFileName);
                     SavedGames.Insert(0, _log);
                     await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
                     await StartGame(dlg.PlayerDataList);
@@ -480,7 +480,7 @@ namespace Catan10
             {
                 await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false, logType);
             }
-            
+
 
         }
 
@@ -499,7 +499,7 @@ namespace Catan10
         //  
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
-            if (GameState != GameState.MustMoveBaron  && GameState != GameState.WaitingForNext &&
+            if (GameState != GameState.MustMoveBaron && GameState != GameState.WaitingForNext &&
                 GameState != GameState.WaitingForRoll)
                 return;
 
@@ -516,14 +516,14 @@ namespace Catan10
             if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
                 return;
 
-            RoutedEventHandler Baron_MenuClicked = async (s, e) =>
+            async void Baron_MenuClicked(object s, RoutedEventArgs e)
             {
                 PlayerData player = (PlayerData)((MenuFlyoutItem)s).Tag;
 
                 await AssignBaronOrKnight(player, targetTile, weapon, action, LogType.Normal);
-                
 
-            };
+
+            }
 
 
 
@@ -789,8 +789,8 @@ namespace Catan10
                 default:
                     break;
             }
-                            
-            
+
+
 
             await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdatedRoadState, true, logType, road.Number, new LogRoadUpdate(_gameView.CurrentGame.Index, road, oldState, road.RoadState));
 
@@ -804,11 +804,6 @@ namespace Catan10
                 SetLongestRoadFromLog();
             }
 
-            //
-            //  update the UI to indicate how many roads the player has left to play
-
-            _playerToResourceCount[CurrentPlayer.PlayerPosition].RoadsLeft = _gameView.CurrentGame.MaxRoads - CurrentPlayer.GameData.Roads.Count;
-            _playerToResourceCount[CurrentPlayer.PlayerPosition].ShipsLeft = _gameView.CurrentGame.MaxShips- CurrentPlayer.GameData.Ships.Count;
         }
 
         private PlayerData MaxRoadPlayer
@@ -960,9 +955,9 @@ namespace Catan10
             }
             else
             {
-                settlement.Owner = player;  
+                settlement.Owner = player;
             }
-            
+
             foreach (var key in settlement.Clones)
             {
                 // tell the tile that this settlement is owned
@@ -993,9 +988,9 @@ namespace Catan10
                         Island island = _gameView.GetIsland(key.Tile);
                         if (island != null)
                         {
-                            if (island.BonusPoint  && oldType == SettlementType.None) // only addref when you go from none
+                            if (island.BonusPoint && oldType == SettlementType.None) // only addref when you go from none
                             {
-                                player?.GameData.AddIsland(island);                                
+                                player?.GameData.AddIsland(island);
                             }
                         }
                     }
@@ -1005,35 +1000,33 @@ namespace Catan10
 
         private async Task UpdateSettlementState(SettlementCtrl settlement, SettlementType oldType, SettlementType newType, LogType logType)
         {
-            
+
             PlayerData player = CurrentPlayer;
 
             //
             //  remove everything -- we will add it back below
             player.GameData.Cities.Remove(settlement);
-            player.GameData.Settlements.Remove(settlement);            
+            player.GameData.Settlements.Remove(settlement);
             settlement.SettlementType = newType;
             UpdateSettlementOwner(player, settlement, newType, oldType);
-            
+
             switch (settlement.SettlementType)
             {
-                case SettlementType.None:                   
+                case SettlementType.None:
                     //
                     //  work done above                    
                     break;
-                case SettlementType.Settlement:                    
-                    player.GameData.Settlements.Add(settlement);                    
+                case SettlementType.Settlement:
+                    player.GameData.Settlements.Add(settlement);
                     break;
                 case SettlementType.City:
-                    player.GameData.Cities.Add(settlement);                    
+                    player.GameData.Cities.Add(settlement);
                     break;
                 default:
                     break;
             }
             RecalcLongestRoadAfterSettlementIsPlayed(null, settlement, player);
             settlement.HideBuildEllipse();
-            _playerToResourceCount[CurrentPlayer.PlayerPosition].SettlementsLeft = _gameView.CurrentGame.MaxSettlements - CurrentPlayer.GameData.Settlements.Count;
-            _playerToResourceCount[CurrentPlayer.PlayerPosition].CitiesLeft = _gameView.CurrentGame.MaxCities - CurrentPlayer.GameData.Cities.Count;
             await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, logType, settlement.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, settlement, oldType, newType));
         }
 
@@ -1226,7 +1219,7 @@ namespace Catan10
 
 
 
-            
+
             Menu_Undo.IsEnabled = false;
             Menu_Winner.IsEnabled = false;
 
@@ -1278,13 +1271,13 @@ namespace Catan10
             await OnWin();
         }
 
-       
-       
+
+
         public void CurrentPlayerChanged()
         {
 
-          
-        
+
+
             ActivePlayerBackground = CurrentPlayer.ColorAsString;
             ActivePlayerName = CurrentPlayer.PlayerName;
 
@@ -1429,6 +1422,21 @@ namespace Catan10
 
             error = SettlementsWithinOneSpace(settlement);
 
+            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            {
+                if (settlement.SettlementToTileDict.Count > 0)
+                {
+                    if (_gameView.GetIsland(settlement.SettlementToTileDict.First().Value) != null)
+                    {
+                        this.TraceMessage($"{settlement} is on an island");
+                        //
+                        //  we are on an island - you can't build on an island when you are allocating resources
+                        error = true;
+                        return false;
+                    }
+                }
+            }
+
             if (!allocationPhase && error == false)
             {
                 error = true;
@@ -1482,6 +1490,11 @@ namespace Catan10
 
             await UpdateSettlementState(settlement, settlement.SettlementType, NextSettlementType(settlement), LogType.Normal);
 
+            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            {
+                HideAllBuildEllipses();
+                _showSettlementByPipsIndex = 0;
+            }
         }
 
         public TileCtrl GetTile(int tileIndex, int gameIndex)
@@ -1504,7 +1517,7 @@ namespace Catan10
             return AllPlayers[playerIndex];
         }
 
-     
+
 
 
     }

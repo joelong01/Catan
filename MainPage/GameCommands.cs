@@ -126,32 +126,47 @@ namespace Catan10
         }
 
         //
-        //   put a section in CatanSettings.ini that looks liek
+        //  save all the grids.  since I add/delete them frequently, this can throw if/when a grid is removed after it has been saved.
+        //  just swallow the exception.
         //
         private async Task SaveGridLocations()
         {
-            
-            _settings.GridPositions.Clear();
-            foreach (string name in GridPositionName)
+            try
             {
-                UIElement el = (UIElement)this.FindName(name);
-                CompositeTransform ct = (CompositeTransform)el.RenderTransform;
-                GridPosition pos = new GridPosition(name, ct.TranslateX, ct.TranslateY);
-                _settings.GridPositions.Add(pos);
+                _settings.GridPositions.Clear();
+                foreach (string name in GridPositionName)
+                {
+                    UIElement el = (UIElement)this.FindName(name);
+                    CompositeTransform ct = (CompositeTransform)el.RenderTransform;
+                    GridPosition pos = new GridPosition(name, ct.TranslateX, ct.TranslateY);
+                    _settings.GridPositions.Add(pos);
+                }
+
+                await _settings.SaveSettings(_settingsFileName);
             }
-
-            await _settings.SaveSettings(_settingsFileName);
-
+            catch(Exception e)
+            {
+                this.TraceMessage($"caught the exception: {e}");
+            }
         }
 
         private void UpdateGridLocations()
         {
-            foreach (GridPosition pos in _settings.GridPositions)
+            try
             {
-                UIElement el = (UIElement)this.FindName(pos.Name);                
-                CompositeTransform ct = (CompositeTransform)el.RenderTransform;
-                ct.TranslateX = pos.TranslateX;
-                ct.TranslateY = pos.TranslateY;
+
+
+                foreach (GridPosition pos in _settings.GridPositions)
+                {
+                    UIElement el = (UIElement)this.FindName(pos.Name);
+                    CompositeTransform ct = (CompositeTransform)el.RenderTransform;
+                    ct.TranslateX = pos.TranslateX;
+                    ct.TranslateY = pos.TranslateY;
+                }
+            }
+            catch(Exception e)
+            {
+                this.TraceMessage($"Exception: {e}");
             }
         }
 

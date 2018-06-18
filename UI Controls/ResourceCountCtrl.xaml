@@ -1,4 +1,4 @@
-﻿<UserControl
+﻿<UserControl xmlns:UI_Controls="using:Catan10.UI_Controls" 
     x:Class="Catan10.ResourceCountCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,15 +6,33 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="140" 
+    d:DesignHeight="170" 
     d:DesignWidth="420">
+    
+   
 
     <Grid Name="LayoutRoot" >
         <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
-        <Grid Name="_gridResourceCount" Grid.Row="0" Background="Black">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-2" BorderThickness="2" CornerRadius="12" >
+            <Border.BorderBrush>
+                <ImageBrush Stretch="Fill" ImageSource="ms-appx:///Assets/maple.jpg"/>
+            </Border.BorderBrush>
+        </Border>
+
+        <Grid Name="_gridResourceCount" Grid.Row="1"  Grid.Column="1" Grid.RowSpan="2" Background="{x:Bind PlayerColor, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" CornerRadius="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="30"/>
@@ -33,57 +51,49 @@
                 <ColumnDefinition Width="30"/>
 
             </Grid.ColumnDefinitions>
-
-            <Viewbox Grid.Column="0">
-                <TextBlock Grid.Column="0" Text="⛙" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"   />
+            <!--<Rectangle Grid.ColumnSpan="15" Fill="{x:Bind PlayerColor, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" RadiusX="12" RadiusY="12"/>-->
+            <Viewbox Grid.Column="2">
+                <TextBlock Grid.Column="0" Text="⛙" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"  
+                           Foreground="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" />
             </Viewbox>
-            <Viewbox Grid.Column="1">
+            <Viewbox Grid.Column="3">
                 <TextBlock Name="_txtRoads"         Text="{x:Bind RoadsLeft, Mode=TwoWay, FallbackValue=15}"  
+                           Foreground="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"
                        Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
             </Viewbox>
-            <Viewbox Grid.Column="2">
-                <local:SettlementUi Width="30" Height="30" FillColor="Black" BorderColor="White" />
-            </Viewbox>
-            <Viewbox  Grid.Column="3">
-                <TextBlock Name="_txtSettlements"   Text="{x:Bind SettlementsLeft, Mode=TwoWay, FallbackValue=5}"   HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
-            </Viewbox>
-            <Viewbox Grid.Column="4">
-                <local:CityCtrl Width="30" Height="30" FillColor="Black" BorderColor="White"/>
-            </Viewbox>
-
             <Viewbox Grid.Column="5">
-                <TextBlock Name="_txtCities"        Text="{x:Bind CitiesLeft, Mode=TwoWay, FallbackValue=4}"   HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
+                <local:SettlementUi Width="30" Height="30" CastleColor="White" CircleFillColor="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=White}"/>
             </Viewbox>
-            <Viewbox Grid.Column="6">
-                <Image  Source="Assets/sailboat.png" Grid.ColumnSpan="1" Margin="0" Width="30" Height="30" />
+            <Viewbox  Grid.Column="6">
+                <TextBlock Name="_txtSettlements"   Text="{x:Bind SettlementsLeft, Mode=TwoWay, FallbackValue=5}"  
+                           HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" 
+                           Foreground="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
+            </Viewbox>
+            <Viewbox Grid.Column="9">
+                <local:CityCtrl Width="30" Height="30" CastleColor="White" CircleFillColor="{x:Bind Path=FillColor, Mode=OneWay}"/>
             </Viewbox>
 
-            <Viewbox   Grid.Column="7">
-                <TextBlock Name="_txtShips"         Text="{x:Bind ShipsLeft, Mode=TwoWay, FallbackValue=15}"    Grid.Column="7" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
+            <Viewbox Grid.Column="10">
+                <TextBlock Name="_txtCities" Text="{x:Bind CitiesLeft, Mode=TwoWay, FallbackValue=4}"   
+                           HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" 
+                           Foreground="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
             </Viewbox>
-        
-            <Viewbox  Grid.Column="9" >
-                <local:ResourceCardCtrl x:Name="_wood" ResourceType="Wood"  Count="0" />
+            <Viewbox Grid.Column="12">
+                <local:SailboatCtrl  CircleColor="{x:Bind FillColor}"/>
+                <!--<Image  Source="ms-appx:///Assets/sailboat.png" Grid.ColumnSpan="1" Margin="0" Width="30" Height="30" Stretch="UniformToFill" Canvas.ZIndex="999"/>-->
             </Viewbox>
-            <Viewbox  Grid.Column="10" >
-                <local:ResourceCardCtrl x:Name="_brick" ResourceType="Brick"    Count="1" />
+
+            <Viewbox   Grid.Column="13">
+                <TextBlock Name="_txtShips"  Text="{x:Bind ShipsLeft, Mode=TwoWay, FallbackValue=15}"    
+                           Foreground="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"
+                           Grid.Column="7" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
             </Viewbox>
-            <Viewbox  Grid.Column="11" >
-                <local:ResourceCardCtrl x:Name="_sheep" ResourceType="Sheep"    Count="2" />
-            </Viewbox>
-            <Viewbox  Grid.Column="12" >
-                <local:ResourceCardCtrl x:Name="_wheat" ResourceType="Wheat"    Count="3" />
-            </Viewbox>
-            <Viewbox  Grid.Column="13" >
-                <local:ResourceCardCtrl x:Name="_ore" ResourceType="Ore"      Count="4" />
-            </Viewbox>
-            <Viewbox  Grid.Column="14" >
-                <local:ResourceCardCtrl x:Name="_goldmine" ResourceType="GoldMine" Count="5" />
-            </Viewbox>
+
+
 
 
         </Grid>
-        <StackPanel Name="_stackpanel" Orientation="Horizontal" Grid.RowSpan="1" Grid.Row="1" >
+        <StackPanel Name="_stackpanel" Orientation="Horizontal" Grid.RowSpan="1" Grid.Row="2" Grid.Column="1" >
             <local:ResourceCardCtrl ResourceType="Wood"     Count="0" />
             <local:ResourceCardCtrl ResourceType="Brick"    Count="1" />
             <local:ResourceCardCtrl ResourceType="Sheep"    Count="2" />
@@ -91,5 +101,11 @@
             <local:ResourceCardCtrl ResourceType="Ore"      Count="4" />
             <local:ResourceCardCtrl ResourceType="GoldMine" Count="5" />
         </StackPanel>
+
+        <Ellipse Width="60" Height="60" Grid.ColumnSpan="2" HorizontalAlignment="Left" Grid.RowSpan="2">
+            <Ellipse.Fill>
+                <ImageBrush x:Name="ImageBrush_Player"  ImageSource="{x:Bind PlayerImageSource}" AlignmentX="Left" AlignmentY="Top" Stretch="UniformToFill"/>
+            </Ellipse.Fill>
+        </Ellipse>
     </Grid>
 </UserControl>
