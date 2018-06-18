@@ -149,8 +149,8 @@ namespace Catan10
 
 
         void BuildingEntered(BuildingCtrl settlement, PointerRoutedEventArgs e);
-        void SettlementExited(BuildingCtrl settlement, PointerRoutedEventArgs e);
-        void SettlementPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e);
+        void BuildingExited(BuildingCtrl settlement, PointerRoutedEventArgs e);
+        void BuildingPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e);
 
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
     }

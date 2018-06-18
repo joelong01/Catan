@@ -10,26 +10,28 @@
     d:DesignWidth="30">
 
     <!-- The actual Settlement/City UI is dynamically created to speed up loading.  here we just hold the ViewBoxes and Canvases to control Visibility -->
-    
-    <Grid Name="LayoutRoot">
 
-        <!--<Grid Name="_gridPipCount">
+    <Grid Name="LayoutRoot" PointerEntered ="Building_PointerEntered" PointerExited =  "Building_PointerExited" PointerPressed = "Building_PointerPressed">
+
+        <Grid Name="_gridPipCount" Visibility="{x:Bind BuildingState, FallbackValue=Visible, ConverterParameter=Pips, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
             <Ellipse Name="_pipEllipse"  Width="30" Height="30" Fill="BurlyWood"  />
-            <TextBlock x:Name="_txtPipCount" Text="{x:Bind}" CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
-        </Grid>-->
-        
-        <Grid Name="_gridBuildEllipse" Opacity="1" Canvas.ZIndex="-1" >
+            <TextBlock Text="{x:Bind Pips, FallbackValue=2, Converter={StaticResource ResourceKey=IntToStringConverter}}" 
+                       CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
+        </Grid>
+
+        <Grid Name="_gridBuildEllipse" Opacity="1" Canvas.ZIndex="-1" 
+              Visibility="{x:Bind BuildingState, FallbackValue=Collapsed, ConverterParameter=None, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
             <Ellipse Name="_buildEllipse"  Width="30" Height="30" Fill="BurlyWood"  />
             <TextBlock x:Name="_txtError" Text="X" CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
         </Grid>
 
-        <Canvas Name="_canvasCity" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}" Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent" Visibility="Visible"
-                IsHitTestVisible="False" IsTapEnabled="False">
+        <Canvas Name="_canvasCity" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}" Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent" 
+                Visibility="{x:Bind BuildingState, FallbackValue=Collapsed, ConverterParameter=City, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
             <Viewbox Name="_vbCity" Width="30" Height="30" Stretch="Uniform"/>
         </Canvas>
 
-        <Canvas Name="_canvasSettlement" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}" Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent" Visibility="Collapsed"                
-                IsHitTestVisible="False" IsTapEnabled="False">
+        <Canvas Name="_canvasSettlement" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}" Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent" 
+                Visibility="{x:Bind BuildingState, FallbackValue=Collapsed, ConverterParameter=Settlement, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
             <Viewbox Name="_vbSettlement" Width="30" Height="30" Stretch="Uniform"/>
         </Canvas>
 

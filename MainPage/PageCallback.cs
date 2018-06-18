@@ -998,7 +998,7 @@ namespace Catan10
             }
         }
 
-        private async Task UpdateSettlementState(BuildingCtrl settlement, BuildingState oldType, BuildingState newType, LogType logType)
+        private async Task UpdateSettlementState(BuildingCtrl settlement, BuildingState newState, BuildingState newType, LogType logType)
         {
 
             PlayerData player = CurrentPlayer;
@@ -1008,7 +1008,7 @@ namespace Catan10
             player.GameData.Cities.Remove(settlement);
             player.GameData.Buildings.Remove(settlement);
             settlement.BuildingState = newType;
-            UpdateSettlementOwner(player, settlement, newType, oldType);
+            UpdateSettlementOwner(player, settlement, newType, newState);
 
             switch (settlement.BuildingState)
             {
@@ -1027,7 +1027,7 @@ namespace Catan10
             }
             RecalcLongestRoadAfterSettlementIsPlayed(null, settlement, player);
             settlement.HideBuildEllipse();
-            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, logType, settlement.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, settlement, oldType, newType));
+            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, logType, settlement.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, settlement, newState, newType));
         }
 
 
@@ -1463,7 +1463,7 @@ namespace Catan10
             return !error;
         }
 
-        public void SettlementExited(BuildingCtrl settlement, PointerRoutedEventArgs e)
+        public void BuildingExited(BuildingCtrl settlement, PointerRoutedEventArgs e)
         {
 
             if (settlement.Owner == null)
@@ -1479,7 +1479,7 @@ namespace Catan10
             //}
         }
 
-        public async void SettlementPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e)
+        public async void BuildingPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e)
         {
             if (!ValidateSettlementBuildLocation(settlement, out bool showErrorUi)) return;
 

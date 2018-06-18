@@ -41,6 +41,52 @@ namespace Catan10
         public IGameCallback Callback { get; internal set; }
 
         PlayerData _playerData = null;
+        public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
+        public BuildingState BuildingState
+        {
+            get { return (BuildingState)GetValue(BuildingStateProperty); }
+            set { SetValue(BuildingStateProperty, value); }
+        }
+        private static void BuildingStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            BuildingCtrl depPropClass = d as BuildingCtrl;
+            BuildingState depPropValue = (BuildingState)e.NewValue;
+            depPropClass.SetBuildingState(depPropValue);
+        }
+      
+        /// <summary>
+        ///     the Visibility is bound to the property (and converted from the State with a value converter)
+        ///     but the City/Settlement doesn't exist until we hit the state to save the startup cost.  so 
+        ///     we create them here.
+        /// </summary>
+        /// <param name="value"></param>
+        private void SetBuildingState(BuildingState value)
+        {
+            switch (value)
+            {
+                case BuildingState.Settlement:
+                    if (_settlement == null)
+                    {
+                        _settlement = new SettlementCtrl();
+                        _vbSettlement.Child = _settlement;
+                        UpdateColors();
+                    }                  
+                    break;
+                case BuildingState.City:
+                    if (_city == null)
+                    {
+                        _city = new CityCtrl();
+                        _vbCity.Child = _city;
+                        UpdateColors();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+
         public PlayerData Owner
         {
             get
@@ -101,52 +147,7 @@ namespace Catan10
         {
             return String.Format($"Index={Index};Type={BuildingState};Location={this.SettlementLocation};Background={Color};Pips={Pips}");
         }
-        public BuildingState BuildingState
-        {
-            get
-            {
-                if (_canvasSettlement.Visibility == Visibility.Visible)
-                    return BuildingState.Settlement;
-
-                if (_canvasCity.Visibility == Visibility.Visible)
-                    return BuildingState.City;
-
-                return BuildingState.None;
-
-            }
-            set
-            {
-                switch (value)
-                {
-                    case BuildingState.None:
-                        _canvasSettlement.Visibility = Visibility.Collapsed;
-                        _canvasCity.Visibility = Visibility.Collapsed;
-                        break;
-                    case BuildingState.Settlement:
-                        if (_settlement == null)
-                        {
-                            _settlement = new SettlementCtrl();
-                            _vbSettlement.Child = _settlement;
-                            UpdateColors();
-                        }
-                        _canvasSettlement.Visibility = Visibility.Visible;
-                        _canvasCity.Visibility = Visibility.Collapsed;
-                        break;
-                    case BuildingState.City:
-                        if (_city == null)
-                        {
-                            _city = new CityCtrl();
-                            _vbCity.Child = _city;
-                            UpdateColors();
-                        }
-                        _canvasSettlement.Visibility = Visibility.Collapsed;
-                        _canvasCity.Visibility = Visibility.Visible;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+       
 
         public bool IsCity
         {
@@ -168,8 +169,7 @@ namespace Catan10
         {
             this.InitializeComponent();
             _gridBuildEllipse.Opacity = _baseOpacity;
-            _canvasCity.Visibility = Visibility.Collapsed;
-            _canvasSettlement.Visibility = Visibility.Collapsed;
+         
             _buildEllipse.Fill = new SolidColorBrush(Colors.BurlyWood);
             if (StaticHelpers.IsInVisualStudioDesignMode)
             {
@@ -192,16 +192,14 @@ namespace Catan10
             };
 
             this.RenderTransform = transform;
-            this.PointerEntered += Settlement_PointerEntered;
-            this.PointerExited += Settlement_PointerExited;
-            this.PointerPressed += Settlement_PointerPressed;
+            
 
 
         }
-        private void Settlement_PointerPressed(object sender, PointerRoutedEventArgs e)
+        private void Building_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             //  OutputKeyInfo();
-            Callback?.SettlementPointerPressed(this, e);
+            Callback?.BuildingPointerPressed(this, e);
         }
 
         private void OutputKeyInfo()
@@ -215,13 +213,13 @@ namespace Catan10
             this.TraceMessage(s);
         }
 
-        private void Settlement_PointerExited(object sender, PointerRoutedEventArgs e)
+        private void Building_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            Callback?.SettlementExited(this, e);
+            Callback?.BuildingExited(this, e);
             // BuildingCtrl.HideBuildEllipse();
         }
 
-        private void Settlement_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private void Building_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             //BuildingCtrl.ShowBuildEllipse();
             Callback?.BuildingEntered(this, e);
@@ -234,18 +232,14 @@ namespace Catan10
         {
             _txtError.Text = msg;
 
-            if (_canvasCity.Visibility == Visibility.Visible)
-                return;
-
-            if (_canvasSettlement.Visibility == Visibility.Visible)
-                return;
+          
 
             double opacity = 1.0;
             if (!canBuild) opacity = .25;
 
             _gridBuildEllipse.Opacity = opacity;
 
-            _txtError.Visibility = canBuild ? Visibility.Collapsed : Visibility.Visible;
+            
             if (colorAsString != "")
             {
                 _buildEllipse.Fill = new SolidColorBrush(StaticHelpers.StringToColorDictionary[colorAsString]);
@@ -306,8 +300,7 @@ namespace Catan10
             _baseOpacity = type == BuildingState.None ? 0.0 : 1.0;
 
 
-            _canvasCity.Visibility = Visibility.Collapsed;
-            _canvasSettlement.Visibility = Visibility.Collapsed;
+     
 
             //
             //  make the ellipse we use to show PointerEnter/Leaved locations
@@ -317,16 +310,7 @@ namespace Catan10
             else
                 _buildEllipse.Fill = new SolidColorBrush(Colors.Transparent);
 
-            if (type == BuildingState.City)
-            {
-                _canvasSettlement.Visibility = Visibility.Visible;
-            }
-
-            if (type == BuildingState.Settlement)
-            {
-
-                _canvasSettlement.Visibility = Visibility.Visible;
-            }
+          
 
             BuildingState = type;
 
