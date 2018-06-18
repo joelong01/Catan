@@ -630,7 +630,7 @@ namespace Catan10
         {
             get
             {
-                return PlayerData.GameData.Settlements;
+                return PlayerData.GameData.Buildings;
             }
         }
 
@@ -754,26 +754,26 @@ namespace Catan10
         internal void AddSettlement(BuildingCtrl settlement)
         {
             
-            this.PlayerGameData.Settlements.Add(settlement);
+            this.PlayerGameData.Buildings.Add(settlement);
             UpdateSettlementCounts();
 
         }
         internal void RemoveSettlement(BuildingCtrl settlement)
         {           
-            this.PlayerGameData.Settlements.Remove(settlement);
+            this.PlayerGameData.Buildings.Remove(settlement);
             UpdateSettlementCounts();
         }
 
         internal void AddCity(BuildingCtrl settlement)
         {           
-            this.PlayerGameData.Settlements.Add(settlement);
+            this.PlayerGameData.Buildings.Add(settlement);
             UpdateSettlementCounts();
 
         }
         internal void RemoveCity(BuildingCtrl settlement)
         {
             
-            this.PlayerGameData.Settlements.Remove(settlement);
+            this.PlayerGameData.Buildings.Remove(settlement);
             UpdateSettlementCounts();
         }
 
@@ -782,7 +782,7 @@ namespace Catan10
             int Cities = 0;
             int Settlements = 0;
 
-            foreach (BuildingCtrl s in this.PlayerGameData.Settlements)
+            foreach (BuildingCtrl s in this.PlayerGameData.Buildings)
             {
                 if (s.BuildingState == BuildingState.City)
                 {

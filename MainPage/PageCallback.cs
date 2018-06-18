@@ -397,9 +397,9 @@ namespace Catan10
 
             }
 
-            foreach (BuildingCtrl settlement in player.GameData.Settlements)
+            foreach (BuildingCtrl buildings in player.GameData.Buildings)
             {
-                settlement.Color = player.Background;
+                buildings.Color = player.Background;
 
             }
 
@@ -877,7 +877,7 @@ namespace Catan10
 
             //
             //   is it next to a Settlement
-            foreach (var s in road.AdjacentSettlements)
+            foreach (var s in road.AdjacentBuildings)
             {
                 if (s.Owner == CurrentPlayer)
                     return true;
@@ -904,7 +904,7 @@ namespace Catan10
         //  to build you want this to return FALSE
         private bool SettlementsWithinOneSpace(BuildingCtrl settlement)
         {
-            foreach (var adjacent in settlement.AdjacentSettlements)
+            foreach (var adjacent in settlement.AdjacentBuildings)
             {
                 if (adjacent.BuildingState != BuildingState.None)
                 {
@@ -1006,7 +1006,7 @@ namespace Catan10
             //
             //  remove everything -- we will add it back below
             player.GameData.Cities.Remove(settlement);
-            player.GameData.Settlements.Remove(settlement);
+            player.GameData.Buildings.Remove(settlement);
             settlement.BuildingState = newType;
             UpdateSettlementOwner(player, settlement, newType, oldType);
 
@@ -1017,7 +1017,7 @@ namespace Catan10
                     //  work done above                    
                     break;
                 case BuildingState.Settlement:
-                    player.GameData.Settlements.Add(settlement);
+                    player.GameData.Buildings.Add(settlement);
                     break;
                 case BuildingState.City:
                     player.GameData.Cities.Add(settlement);
@@ -1375,19 +1375,19 @@ namespace Catan10
             await UpdateRoadState(road, road.RoadState, NextRoadState(road), LogType.Normal);
         }
 
-        public void SettlementEntered(BuildingCtrl settlement, PointerRoutedEventArgs e)
+        public void BuildingEntered(BuildingCtrl building, PointerRoutedEventArgs e)
         {
             if (CurrentPlayer == null) return;
-            bool canBuild = ValidateSettlementBuildLocation(settlement, out bool showErrorUi);
+            bool canBuild = ValidateSettlementBuildLocation(building, out bool showErrorUi);
 
             if (showErrorUi == false && canBuild == false)
                 return;
 
-            if (settlement.Owner == null)
+            if (building.Owner == null)
             {
 
-                settlement.Color = CurrentPlayer.Background;
-                settlement.ShowBuildEllipse(canBuild);
+                building.Color = CurrentPlayer.Background;
+                building.ShowBuildEllipse(canBuild);
 
                 //settlement.ShowBuildEllipse(true);
                 //foreach (var r in settlement.AdjacentRoads)
@@ -1430,9 +1430,9 @@ namespace Catan10
 
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
-                if (settlement.SettlementToTileDict.Count > 0)
+                if (settlement.BuildingToTileDictionary.Count > 0)
                 {
-                    if (_gameView.GetIsland(settlement.SettlementToTileDict.First().Value) != null)
+                    if (_gameView.GetIsland(settlement.BuildingToTileDictionary.First().Value) != null)
                     {
                         this.TraceMessage($"{settlement} is on an island");
                         //

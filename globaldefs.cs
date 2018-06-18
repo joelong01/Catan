@@ -148,7 +148,7 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
 
-        void SettlementEntered(BuildingCtrl settlement, PointerRoutedEventArgs e);
+        void BuildingEntered(BuildingCtrl settlement, PointerRoutedEventArgs e);
         void SettlementExited(BuildingCtrl settlement, PointerRoutedEventArgs e);
         void SettlementPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e);
 
@@ -195,7 +195,7 @@ namespace Catan10
     public enum RoadLocation { None = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
     public enum TileLocation { Self = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
     public enum ValidNumbers { Two = 2, Three = 3, Four = 4, Five = 5, Six = 6, Seven = 7, Eight = 8, Nine = 9, Ten = 10, Eleven = 11, Twelve = 12 };
-    public enum SettlementLocation { TopRight, MiddleRight, BottomRight, BottomLeft, MiddleLeft, TopLeft, None };
+    public enum BuildingLocation { TopRight, MiddleRight, BottomRight, BottomLeft, MiddleLeft, TopLeft, None };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };
     public enum TargetWeapon { PirateShip, Baron };

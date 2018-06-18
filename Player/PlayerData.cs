@@ -26,13 +26,13 @@ namespace Catan10
 
         public ObservableCollection<RoadCtrl> Roads { get; set; } = new ObservableCollection<RoadCtrl>();
         public ObservableCollection<RoadCtrl> Ships { get; set; } = new ObservableCollection<RoadCtrl>();
-        public ObservableCollection<BuildingCtrl> Settlements { get; set; } = new ObservableCollection<BuildingCtrl>();
+        public ObservableCollection<BuildingCtrl> Buildings { get; set; } = new ObservableCollection<BuildingCtrl>();
         public ObservableCollection<BuildingCtrl> Cities { get; set; } = new ObservableCollection<BuildingCtrl>();
         public ObservableCollection<int> Rolls { get; set; } = new ObservableCollection<int>();
         public PlayerResourceData PlayerResourceData { get; set; } = null;
         private List<string> _savedGameProperties = new List<string> { "PlayerIdentified", "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
                                                                        "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
-                                                                        "Roads", "Ships", "Settlements", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
+                                                                        "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
 
         private PlayerData _playerData = null; // back pointer
@@ -40,7 +40,7 @@ namespace Catan10
         public PlayerGameData(PlayerData pData)
         {
             Roads.CollectionChanged += Roads_CollectionChanged;
-            Settlements.CollectionChanged += Settlements_CollectionChanged;
+            Buildings.CollectionChanged += Settlements_CollectionChanged;
             Cities.CollectionChanged += Cities_CollectionChanged;
             Ships.CollectionChanged += Ships_CollectionChanged;
             _playerData = pData;
@@ -56,14 +56,14 @@ namespace Catan10
         {
             CitiesPlayed = Cities.Count;
             UpdateScore();
-            Pips = CalculatePips(Settlements, Cities);
+            Pips = CalculatePips(Buildings, Cities);
         }
 
         private void Settlements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            SettlementsPlayed = Settlements.Count;
+            SettlementsPlayed = Buildings.Count;
             UpdateScore();
-            Pips = CalculatePips(Settlements, Cities);
+            Pips = CalculatePips(Buildings, Cities);
         }
 
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
@@ -71,14 +71,14 @@ namespace Catan10
             int pips = 0;
             foreach (var s in Settlements)
             {
-                foreach (var kvp in s.SettlementToTileDict)
+                foreach (var kvp in s.BuildingToTileDictionary)
                 {
                     pips += kvp.Value.Pips;
                 }
             }
             foreach (var s in Cities)
             {
-                foreach (var kvp in s.SettlementToTileDict)
+                foreach (var kvp in s.BuildingToTileDictionary)
                 {
                     pips += kvp.Value.Pips*2;
                 }
@@ -125,7 +125,7 @@ namespace Catan10
             MovedBaronAfterRollingSeven = null;
             PlayedKnightThisTurn = false;
             Roads.Clear();
-            Settlements.Clear();
+            Buildings.Clear();
             Cities.Clear();
             Rolls.Clear();
             Ships.Clear();
@@ -226,7 +226,7 @@ namespace Catan10
 
         public static string[] NonDisplayData()
         {
-            return new string[] { "PlayerIdentifier", "Roads", "Ships", "Settlements", "Rolls" };
+            return new string[] { "PlayerIdentifier", "Roads", "Ships", "Buildings", "Rolls" };
         }
 
         public string Serialize(bool oneLine)

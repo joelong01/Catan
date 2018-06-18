@@ -20,9 +20,9 @@ namespace Catan10
     public partial class CatanHexPanel : Canvas
     {
         //
-        //  ways to look Road/Settlements/Tiles up
+        //  ways to look Road/Buildings/Tiles up
         public Dictionary<RoadKey, RoadCtrl> RoadKeyToRoadDictionary { get; } = new Dictionary<RoadKey, RoadCtrl>(new RoadKeyComparer());
-        public Dictionary<SettlementKey, BuildingCtrl> SettlementKeyToSettlementCtrlDictionary = new Dictionary<SettlementKey, BuildingCtrl>(new KeyComparer());
+        public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
         public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
         private List<TileCtrl> _desertTiles = new List<TileCtrl>();
         private List<TileGroup> _tileSets = new List<TileGroup>();
@@ -39,7 +39,7 @@ namespace Catan10
 
         //
         //   UI Elements
-        public List<BuildingCtrl> Settlements { get; } = new List<BuildingCtrl>();
+        public List<BuildingCtrl> Buildings { get; } = new List<BuildingCtrl>();
         public List<RoadCtrl> Roads { get; } = new List<RoadCtrl>();
         public List<TileCtrl> Tiles { get; } = new List<TileCtrl>();
         public List<Harbor> Harbors { get; } = new List<Harbor>();
@@ -602,7 +602,7 @@ namespace Catan10
                     road.Callback = _gameCallback;
                 }
 
-                foreach (BuildingCtrl s in Settlements)
+                foreach (BuildingCtrl s in Buildings)
                 {
                     s.Callback = _gameCallback;
                 }
@@ -727,7 +727,7 @@ namespace Catan10
                 road.Reset();
             }
 
-            foreach (BuildingCtrl s in Settlements)
+            foreach (BuildingCtrl s in Buildings)
             {
                 s.Reset();
             }
@@ -870,7 +870,7 @@ namespace Catan10
 
         /// <summary>
         ///     Fit the Tiles into the right size
-        ///     ther are also Harbors, Roads, and Settlements in the panel, but none of these take up space
+        ///     ther are also Harbors, Roads, and Buildings in the panel, but none of these take up space
         ///     as they are implemented in their own layer
         /// </summary>
         /// <param name="availableSize"></param>
@@ -890,8 +890,8 @@ namespace Catan10
 
             BuildChildList();
             //
-            //  Build the roads and settlements on the TopLayer
-            CreateSettlements();
+            //  Build the roads and buildings on the TopLayer
+            CreateBuildings();
             
             maxSize.Width = (_normalWidth + TileGap) * (_colCount - 1) + 2 * UniformMargin;
 
@@ -899,7 +899,7 @@ namespace Catan10
 
             return maxSize;
         }
-        private void CreateSettlements()
+        private void CreateBuildings()
         {
             if (_colCount == 0)
                 return;
@@ -921,17 +921,17 @@ namespace Catan10
 
             for (int i = 0; i < count; i++)
             {
-                BuildingCtrl settlement = new BuildingCtrl();
+                BuildingCtrl building = new BuildingCtrl();
                 if (StaticHelpers.IsInVisualStudioDesignMode)
                 {
-                    settlement.Opacity = 0.0;
+                    building.Opacity = 0.0;
                 }
-                settlement.Index = Settlements.Count;
-                Settlements.Add(settlement);
+                building.Index = Buildings.Count;
+                Buildings.Add(building);
                 
-                settlement.Callback = _gameCallback;
+                building.Callback = _gameCallback;
 
-                TopLayer.Children.Add(settlement);
+                TopLayer.Children.Add(building);
 
             }
         }
@@ -976,7 +976,7 @@ namespace Catan10
 
         }
 
-        private void ArrangeSettlements()
+        private void ArrangeBuildings()
         {
             if (Columns == 0)
                 return;
@@ -993,35 +993,35 @@ namespace Catan10
                     GeneralTransform gt = tile.Visual.TransformToVisual(TopLayer);
 
                     Point point = new Point();
-                    foreach (SettlementLocation location in Enum.GetValues(typeof(SettlementLocation)))
+                    foreach (BuildingLocation location in Enum.GetValues(typeof(BuildingLocation)))
                     {
                         switch (location)
                         {
-                            case SettlementLocation.TopRight:
+                            case BuildingLocation.TopRight:
                                 point.X = 81;
                                 point.Y = 3;
                                 break;
-                            case SettlementLocation.MiddleRight:
+                            case BuildingLocation.MiddleRight:
                                 point.X = 106.5;
                                 point.Y = 48;
                                 break;
-                            case SettlementLocation.BottomRight:
+                            case BuildingLocation.BottomRight:
                                 point.X = 81;
                                 point.Y = 93;
                                 break;
-                            case SettlementLocation.BottomLeft:
+                            case BuildingLocation.BottomLeft:
                                 point.X = 29;
                                 point.Y = 93;
                                 break;
-                            case SettlementLocation.MiddleLeft:
+                            case BuildingLocation.MiddleLeft:
                                 point.X = 3.5;
                                 point.Y = 48;
                                 break;
-                            case SettlementLocation.TopLeft:
+                            case BuildingLocation.TopLeft:
                                 point.X = 29;
                                 point.Y = 3;
                                 break;
-                            case SettlementLocation.None:
+                            case BuildingLocation.None:
                                 continue;
                             default:
                                 continue;
@@ -1032,40 +1032,40 @@ namespace Catan10
                         point = gt.TransformPoint(point);
 
                         //
-                        //  tag the Settlement with the tile and the position
+                        //  tag the Building with the tile and the position
 
 
 
 
-                        bool cloned = FindSettlementAtVisualLocation(point, Settlements, location, tile, out BuildingCtrl settlement);
+                        bool cloned = FindBuildingAtVisualLocation(point, Buildings, location, tile, out BuildingCtrl building);
                         if (!cloned)
                         {
-                            settlement = Settlements[count];
-                            settlement.LayoutPoint = point;
-                            settlement.Transform.TranslateX = point.X - .5 * settlement.Width;
-                            settlement.Transform.TranslateY = point.Y - .5 * settlement.Height;
-                            settlement.Color = _buildColor;
+                            building = Buildings[count];
+                            building.LayoutPoint = point;
+                            building.Transform.TranslateX = point.X - .5 * building.Width;
+                            building.Transform.TranslateY = point.Y - .5 * building.Height;
+                            building.Color = _buildColor;
 
                             //
                             //  add to dictionary...                            
-                            if (!settlement.SettlementToTileDict.ContainsKey(location))
+                            if (!building.BuildingToTileDictionary.ContainsKey(location))
                             {
-                                settlement.SettlementToTileDict[location] = tile;
+                                building.BuildingToTileDictionary[location] = tile;
                             }
                             else
                             {
                                 // this.TraceMessage($"{tile} @ {location} already in map!");
                             }
-                            settlement.AddKey(tile, location);
+                            building.AddKey(tile, location);
                             // setl2.BuildingCtrl.Show(BuildingState.City);
                             count++;
 
                         }
 
-                        SettlementKey key = new SettlementKey(tile, location);
-                        SettlementKeyToSettlementCtrlDictionary[key] = settlement;
+                        BuildingKey key = new BuildingKey(tile, location);
+                        BuildingKeyToBuildingCtrlDictionary[key] = building;
 
-                        if (count == Settlements.Count)
+                        if (count == Buildings.Count)
                         {
 
                         }
@@ -1075,7 +1075,7 @@ namespace Catan10
 
             }
 
-            //foreach (var kvp in SettlementKeyToSettlementCtrlDictionary)
+            //foreach (var kvp in BuildingKeyToBuildingCtrlDictionary)
             //{
             //    Debug.Write($"{kvp.Key}: {kvp.Value.LayoutPoint}\t");
             //    foreach (var clone in kvp.Value.Clones)
@@ -1087,7 +1087,7 @@ namespace Catan10
 
 
         }
-        public void FindRoadAdjacentToSettlements()
+        public void FindRoadAdjacentToBuildings()
         {
             int middleCol = VisualTiles.Count / 2;
 
@@ -1097,95 +1097,95 @@ namespace Catan10
                 {
                     TileCtrl tile = VisualTiles.ElementAt(col).ElementAt(row);
 
-                    foreach (SettlementLocation location in Enum.GetValues(typeof(SettlementLocation)))
+                    foreach (BuildingLocation location in Enum.GetValues(typeof(BuildingLocation)))
                     {
-                        if (location == SettlementLocation.None) continue;
+                        if (location == BuildingLocation.None) continue;
 
-                        if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(new SettlementKey(tile, location), out BuildingCtrl currentSettlement) == false)
+                        if (BuildingKeyToBuildingCtrlDictionary.TryGetValue(new BuildingKey(tile, location), out BuildingCtrl currentBuilding) == false)
                             continue;
 
                         switch (location)
                         {
-                            case SettlementLocation.TopRight:
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.Top);
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.TopRight);
+                            case BuildingLocation.TopRight:
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Top);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopRight);
                                 if (col < middleCol)
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col + 1, row), RoadLocation.TopLeft);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.TopLeft);
                                 }
                                 else
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col, row - 1), RoadLocation.BottomRight);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row - 1), RoadLocation.BottomRight);
                                 }
                                 break;
-                            case SettlementLocation.MiddleRight:
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.TopRight);
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.BottomRight);
+                            case BuildingLocation.MiddleRight:
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopRight);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomRight);
                                 if (col < middleCol)
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col + 1, row), RoadLocation.Bottom);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.Bottom);
                                 }
                                 else
                                 {
-                                    if (!AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col + 1, row), RoadLocation.Top))
-                                        AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col + 1, row - 1), RoadLocation.Bottom);
+                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.Top))
+                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row - 1), RoadLocation.Bottom);
                                 }
                                 break;
-                            case SettlementLocation.BottomRight:
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.Bottom);
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.BottomRight);
+                            case BuildingLocation.BottomRight:
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Bottom);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomRight);
                                 if (col < middleCol)
                                 {
-                                    if (!AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col + 1, row + 1), RoadLocation.BottomLeft))
-                                        AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col, row + 1), RoadLocation.TopRight);
+                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row + 1), RoadLocation.BottomLeft))
+                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row + 1), RoadLocation.TopRight);
                                 }
                                 else
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col + 1, row), RoadLocation.BottomLeft);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.BottomLeft);
 
                                 }
                                 break;
-                            case SettlementLocation.BottomLeft:
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.Bottom);
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.BottomLeft);
+                            case BuildingLocation.BottomLeft:
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Bottom);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomLeft);
                                 if (col <= middleCol)
                                 {
-                                    if (!AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col - 1, row), RoadLocation.BottomRight))
-                                        AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col, row + 1), RoadLocation.TopLeft);
+                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.BottomRight))
+                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row + 1), RoadLocation.TopLeft);
                                 }
                                 else
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col - 1, row + 1), RoadLocation.BottomRight);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row + 1), RoadLocation.BottomRight);
 
                                 }
                                 break;
-                            case SettlementLocation.MiddleLeft:
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.TopLeft);
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.BottomLeft);
+                            case BuildingLocation.MiddleLeft:
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopLeft);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomLeft);
                                 if (col <= middleCol)
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col - 1, row), RoadLocation.Top);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.Top);
                                 }
                                 else
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col - 1, row), RoadLocation.Bottom);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.Bottom);
 
                                 }
                                 break;
-                            case SettlementLocation.TopLeft:
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.TopLeft);
-                                AddSettlementAdjacentRoad(currentSettlement, tile, RoadLocation.Top);
+                            case BuildingLocation.TopLeft:
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopLeft);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Top);
                                 if (col <= middleCol)
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col, row - 1), RoadLocation.BottomLeft);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row - 1), RoadLocation.BottomLeft);
                                 }
                                 else
                                 {
-                                    AddSettlementAdjacentRoad(currentSettlement, GetTileAt(col - 1, row), RoadLocation.TopRight);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.TopRight);
 
                                 }
                                 break;
-                            case SettlementLocation.None:
+                            case BuildingLocation.None:
                                 break;
                             default:
                                 break;
@@ -1196,16 +1196,16 @@ namespace Catan10
             }
         }
 
-        private bool AddSettlementAdjacentRoad(BuildingCtrl settlement, TileCtrl tile, RoadLocation location)
+        private bool AddBuildingAdjacentRoad(BuildingCtrl building, TileCtrl tile, RoadLocation location)
         {
             if (tile == null)
                 return false;
 
             RoadKey key = new RoadKey(tile, location);
             RoadCtrl road = RoadKeyToRoadDictionary[key];
-            if (settlement.AdjacentRoads.Contains(road, new RoadCloneComparer()) == false)
+            if (building.AdjacentRoads.Contains(road, new RoadCloneComparer()) == false)
             {
-                settlement.AdjacentRoads.Add(road);
+                building.AdjacentRoads.Add(road);
             }
             return true;
         }
@@ -1248,8 +1248,8 @@ namespace Catan10
                                     }
                                 }
 
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.TopLeft));
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.TopRight));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.TopLeft));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.TopRight));
                                 break;
                             case RoadLocation.TopRight:
                                 AddAdjacentRoad(road, tile, RoadLocation.Top);
@@ -1270,8 +1270,8 @@ namespace Catan10
 
 
 
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.MiddleRight));
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.TopRight));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.MiddleRight));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.TopRight));
                                 break;
                             case RoadLocation.BottomRight:
                                 AddAdjacentRoad(road, tile, RoadLocation.TopRight);
@@ -1290,8 +1290,8 @@ namespace Catan10
                                     AddAdjacentRoad(road, GetTileAt(col + 1, row - 1), RoadLocation.Bottom);
                                 }
 
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.MiddleRight));
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.BottomRight));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.MiddleRight));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.BottomRight));
                                 break;
                             case RoadLocation.Bottom:
                                 AddAdjacentRoad(road, tile, RoadLocation.BottomLeft);
@@ -1312,8 +1312,8 @@ namespace Catan10
                                         AddAdjacentRoad(road, GetTileAt(col - 1, row + 1), RoadLocation.BottomRight);
                                     }
                                 }
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.BottomRight));
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.BottomLeft));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.BottomRight));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.BottomLeft));
                                 break;
                             case RoadLocation.BottomLeft:
                                 AddAdjacentRoad(road, tile, RoadLocation.TopLeft);
@@ -1332,8 +1332,8 @@ namespace Catan10
                                     AddAdjacentRoad(road, GetTileAt(col - 1, row + 1), RoadLocation.BottomRight);
                                     AddAdjacentRoad(road, GetTileAt(col - 1, row + 1), RoadLocation.Top);
                                 }
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.BottomLeft));
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.MiddleLeft));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.BottomLeft));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.MiddleLeft));
                                 break;
                             case RoadLocation.TopLeft:
                                 AddAdjacentRoad(road, tile, RoadLocation.Top);
@@ -1349,8 +1349,8 @@ namespace Catan10
                                     AddAdjacentRoad(road, GetTileAt(col - 1, row), RoadLocation.TopRight);
                                     AddAdjacentRoad(road, GetTileAt(col - 1, row), RoadLocation.Bottom);
                                 }
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.TopLeft));
-                                road.AdjacentSettlements.Add(GetSettlementAt(tile, SettlementLocation.MiddleLeft));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.TopLeft));
+                                road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.MiddleLeft));
                                 break;
                             default:
                                 continue;
@@ -1362,10 +1362,10 @@ namespace Catan10
 
         }
 
-        private BuildingCtrl GetSettlementAt(TileCtrl tile, SettlementLocation location)
+        private BuildingCtrl GetBuildingAt(TileCtrl tile, BuildingLocation location)
         {
-            SettlementKey key = new SettlementKey(tile, location);
-            return SettlementKeyToSettlementCtrlDictionary[key];
+            BuildingKey key = new BuildingKey(tile, location);
+            return BuildingKeyToBuildingCtrlDictionary[key];
         }
 
         private bool AddAdjacentRoad(RoadCtrl currentRoad, TileCtrl tile, RoadLocation location)
@@ -1388,10 +1388,10 @@ namespace Catan10
         }
 
         //
-        //  we should have all of the settlements on the board when this is called.
+        //  we should have all of the buildings on the board when this is called.
         //  every tile/location combo should be in the map, or somethign screwed up.
         //  don't use TryGet* so that you'll know when it messes up...
-        public void CalculateAdjacentSettlements()
+        public void CalculateAdjacentBuildings()
         {
 
             int middleCol = VisualTiles.Count / 2;
@@ -1402,68 +1402,68 @@ namespace Catan10
                 {
                     TileCtrl tile = VisualTiles.ElementAt(col).ElementAt(row);
 
-                    foreach (SettlementLocation location in Enum.GetValues(typeof(SettlementLocation)))
+                    foreach (BuildingLocation location in Enum.GetValues(typeof(BuildingLocation)))
                     {
-                        if (location == SettlementLocation.None) continue;
+                        if (location == BuildingLocation.None) continue;
 
-                        if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(new SettlementKey(tile, location), out BuildingCtrl currentSettlement) == false)
+                        if (BuildingKeyToBuildingCtrlDictionary.TryGetValue(new BuildingKey(tile, location), out BuildingCtrl currentBuilding) == false)
                             continue;
 
                         switch (location)
                         {
-                            case SettlementLocation.TopRight:
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.TopLeft);
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.MiddleRight);
+                            case BuildingLocation.TopRight:
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopLeft);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleRight);
                                 if (col < middleCol)
                                 {
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col + 1, row), SettlementLocation.TopLeft); //checked
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.TopLeft); //checked
                                 }
                                 else
                                 {
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col + 1, row - 1), SettlementLocation.TopLeft);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row - 1), BuildingLocation.TopLeft);
                                 }
                                 break;
-                            case SettlementLocation.MiddleRight: //checked
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.TopRight);
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.BottomRight);
+                            case BuildingLocation.MiddleRight: //checked
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomRight);
                                 if (col < middleCol)
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col + 1, row), SettlementLocation.BottomRight); //checked
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.BottomRight); //checked
                                 else
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col + 1, row), SettlementLocation.TopRight); // checked
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.TopRight); // checked
                                 break;
-                            case SettlementLocation.BottomRight:
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.MiddleRight);
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.BottomLeft);
+                            case BuildingLocation.BottomRight:
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomLeft);
                                 if (col < middleCol)
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col, row + 1), SettlementLocation.MiddleRight); //checked
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col, row + 1), BuildingLocation.MiddleRight); //checked
                                 else
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col + 1, row), SettlementLocation.BottomLeft);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.BottomLeft);
                                 break;
-                            case SettlementLocation.BottomLeft:
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.BottomRight);
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.MiddleLeft);
+                            case BuildingLocation.BottomLeft:
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleLeft);
                                 if (col <= middleCol)
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col - 1, row), SettlementLocation.BottomRight);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.BottomRight);
                                 else
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col - 1, row), SettlementLocation.BottomRight);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.BottomRight);
                                 break;
-                            case SettlementLocation.MiddleLeft:
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.TopLeft);
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.BottomLeft);
+                            case BuildingLocation.MiddleLeft:
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopLeft);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomLeft);
                                 if (col <= middleCol)
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col - 1, row - 1), SettlementLocation.BottomLeft);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row - 1), BuildingLocation.BottomLeft);
                                 else
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col - 1, row + 1), SettlementLocation.TopLeft);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row + 1), BuildingLocation.TopLeft);
                                 break;
-                            case SettlementLocation.TopLeft:
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.TopRight);
-                                AddAdjacentSettlement(currentSettlement, tile, SettlementLocation.MiddleLeft);
+                            case BuildingLocation.TopLeft:
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleLeft);
                                 if (col < middleCol)
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col, row - 1), SettlementLocation.MiddleLeft);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col, row - 1), BuildingLocation.MiddleLeft);
                                 else
-                                    AddAdjacentSettlement(currentSettlement, GetTileAt(col - 1, row), SettlementLocation.TopRight); // checked
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.TopRight); // checked
                                 break;
-                            case SettlementLocation.None:
+                            case BuildingLocation.None:
                                 break;
                             default:
                                 break;
@@ -1489,15 +1489,15 @@ namespace Catan10
 
 
 
-        private void AddAdjacentSettlement(BuildingCtrl currentSettlement, TileCtrl tile, SettlementLocation location)
+        private void AddAdjacentBuildings(BuildingCtrl currentBuilding, TileCtrl tile, BuildingLocation location)
         {
             if (tile != null)
             {
-                SettlementKey key = new SettlementKey(tile, location);
-                if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(key, out BuildingCtrl adjacentSettlement))
+                BuildingKey key = new BuildingKey(tile, location);
+                if (BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out BuildingCtrl adjacentBuilding))
                 {
-                    if (currentSettlement.AdjacentSettlements.Contains(adjacentSettlement) == false)
-                        currentSettlement.AdjacentSettlements.Add(adjacentSettlement);
+                    if (currentBuilding.AdjacentBuildings.Contains(adjacentBuilding) == false)
+                        currentBuilding.AdjacentBuildings.Add(adjacentBuilding);
                 }
             }
         }
@@ -1573,10 +1573,10 @@ namespace Catan10
             HarborLayer.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
             TopLayer.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
 
-            ArrangeSettlements();
+            ArrangeBuildings();
             ArrangeRoads();
 
-            CalculateAdjacentSettlements();
+            CalculateAdjacentBuildings();
             return finalSize;
         }
         private bool _arrangeRoadsDone = false;
@@ -1592,7 +1592,7 @@ namespace Catan10
                 RoadLayer.Children.Clear();
                 CreateAndArrangeRoads();
                 FindAdjacentRoads();
-                FindRoadAdjacentToSettlements();
+                FindRoadAdjacentToBuildings();
                 _arrangeRoadsDone = true;
             }
         }
@@ -1744,25 +1744,25 @@ namespace Catan10
 
 
         //
-        //  we have here an n! algorythm where we keep a list of all of the settlements and then when we add one, we check to see if there is another "close" to the one
+        //  we have here an n! algorythm where we keep a list of all of the building and then when we add one, we check to see if there is another "close" to the one
         //  we are trying to add. if they are close, we add it to the Clone map and return "true".  if it isn't a Clone, we return false
         //  
-        //  this makes it so that one settlement can "connect" to multiple tiles.
+        //  this makes it so that one building can "connect" to multiple tiles.
         //
-        private bool FindSettlementAtVisualLocation(Point p, List<BuildingCtrl> settlements, SettlementLocation location, TileCtrl tile, out BuildingCtrl clone)
+        private bool FindBuildingAtVisualLocation(Point p, List<BuildingCtrl> buildings, BuildingLocation location, TileCtrl tile, out BuildingCtrl clone)
         {
 
 
             //  this.TraceMessage($"looking for a clone for {tile} at {location}");
-            foreach (var s in settlements)
+            foreach (var s in buildings)
             {
                 //  this.TraceMessage($"\t\tChecking {s.Clones[0].Tile} at {s.Clones[0].Location} DelatX: {Math.Abs(s.LayoutPoint.X - p.X)} DeltaY: {Math.Abs(s.LayoutPoint.Y - p.Y)}");
                 if (Math.Abs(s.LayoutPoint.X - p.X) < 20 && Math.Abs(s.LayoutPoint.Y - p.Y) < 20)
                 {
                     //  this.TraceMessage($"found clone of {s} from {s.LayoutPoint} at {p} deltaX={Math.Abs(s.LayoutPoint.X - p.X)} deltaY={Math.Abs(s.LayoutPoint.Y - p.Y)}");
-                    if (!s.SettlementToTileDict.ContainsKey(location))
+                    if (!s.BuildingToTileDictionary.ContainsKey(location))
                     {
-                        s.SettlementToTileDict[location] = tile;
+                        s.BuildingToTileDictionary[location] = tile;
                     }
                     else
                     {

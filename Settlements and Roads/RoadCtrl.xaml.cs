@@ -99,7 +99,7 @@ namespace Catan10
         Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
         SolidColorBrush _brush = new SolidColorBrush(Colors.Black);
         SolidColorBrush _hightlightColor = new SolidColorBrush(Colors.Blue);        
-        public List<BuildingCtrl> AdjacentSettlements { get; } = new List<BuildingCtrl>();
+        public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
      
         public List<RoadKey> Keys { get; set; } = new List<RoadKey>();
         public IGameCallback Callback { get; internal set; }
@@ -449,9 +449,9 @@ namespace Catan10
                 if (r.IsOwned && r.Color == this.Color)
                 {
 
-                    if (r.AdjacentSettlements[0].Color != this.Color && r.AdjacentSettlements[0].BuildingState != BuildingState.None)
+                    if (r.AdjacentBuildings[0].Color != this.Color && r.AdjacentBuildings[0].BuildingState != BuildingState.None)
                         continue;
-                    if (r.AdjacentSettlements[1].Color != this.Color && r.AdjacentSettlements[1].BuildingState != BuildingState.None)
+                    if (r.AdjacentBuildings[1].Color != this.Color && r.AdjacentBuildings[1].BuildingState != BuildingState.None)
                         continue;
                     if (owned.Contains(r) == false)
                     {

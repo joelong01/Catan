@@ -238,7 +238,7 @@ namespace Catan10
             {
                 CurrentGame = _games[gameIndex];
             }
-            return _currentHexPanel.Settlements[settlementIndex];
+            return _currentHexPanel.Buildings[settlementIndex];
         }
 
         public void Init(IGameCallback gameCallback, ITileControlCallback tileCallback)
@@ -642,11 +642,11 @@ namespace Catan10
             }
         }
 
-        public List<BuildingCtrl> AllSettlements
+        public List<BuildingCtrl> AllBuildings
         {
             get
             {
-                return _currentHexPanel.Settlements;
+                return _currentHexPanel.Buildings;
             }
         }
 
@@ -866,15 +866,15 @@ namespace Catan10
             return road;
         }
 
-        internal void CalculateAdjacentSettlements()
+        internal void CalculateAdjacentBuildings()
         {
             _currentHexPanel.FindAdjacentRoads();
         }
 
-        internal bool GetSettlement(TileCtrl tile, SettlementLocation location, out BuildingCtrl control)
+        internal bool GetBuilding(TileCtrl tile, BuildingLocation location, out BuildingCtrl control)
         {
-            SettlementKey key = new SettlementKey(tile, location);
-            return _currentHexPanel.SettlementKeyToSettlementCtrlDictionary.TryGetValue(key, out control);
+            BuildingKey key = new BuildingKey(tile, location);
+            return _currentHexPanel.BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out control);
         }
 
         int toggle = 0;

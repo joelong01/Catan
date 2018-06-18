@@ -13,52 +13,11 @@ namespace Catan10
 {
 
 
-
+    /// <summary>
+    ///     The states that a building can be in
+    /// </summary>
     public enum BuildingState { None, Settlement, City, Pips };
-    public class KeyComparer : IEqualityComparer<SettlementKey>
-    {
-        //
-        //  Note:  Once the board is created, we never change the Tiles or the Location of a Settlement...
-        public bool Equals(SettlementKey x, SettlementKey y)
-        {
-            if (x.Tile.Index == y.Tile.Index)
-            {
-                if (x.Location == y.Location)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public int GetHashCode(SettlementKey obj)
-        {
-            return obj.Tile.GetHashCode() * 17 + obj.Location.GetHashCode();
-        }
-    }
-
-    public class SettlementKey
-    {
-        public TileCtrl Tile { get; set; }
-
-        public SettlementLocation Location { get; set; }
-
-        public SettlementKey(TileCtrl t, SettlementLocation loc)
-        {
-            Tile = t;
-
-            Location = loc;
-
-        }
-
-        public override string ToString()
-        {
-            return String.Format($"[{Tile}. IDX={Tile.Index} @ {Location}]");
-        }
-
-
-    }
-
+  
     public sealed partial class BuildingCtrl : UserControl
     {
         double _baseOpacity = 0.0;
@@ -67,15 +26,15 @@ namespace Catan10
         SettlementCtrl _settlement = null;
 
         SolidColorBrush _brush = new SolidColorBrush(Colors.Blue);
-        public Dictionary<SettlementLocation, TileCtrl> SettlementToTileDict { get; set; } = new Dictionary<SettlementLocation, TileCtrl>();
+        public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
 
         public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
 
-        public List<BuildingCtrl> AdjacentSettlements { get; } = new List<BuildingCtrl>();
+        public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
 
         //
         //  this the list of Tile/SettlmentLocations that are the same for this settlement
-        public List<SettlementKey> Clones = new List<SettlementKey>();
+        public List<BuildingKey> Clones = new List<BuildingKey>();
         public Point LayoutPoint { get; set; }
         public CompositeTransform Transform { get { return (CompositeTransform)this.RenderTransform; } }
 
@@ -102,7 +61,7 @@ namespace Catan10
             get
             {
                 int pips = 0;
-                foreach (var kvp in SettlementToTileDict)
+                foreach (var kvp in BuildingToTileDictionary)
                 {
                     pips += kvp.Value.Pips;
 
@@ -265,11 +224,11 @@ namespace Catan10
         private void Settlement_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             //BuildingCtrl.ShowBuildEllipse();
-            Callback?.SettlementEntered(this, e);
+            Callback?.BuildingEntered(this, e);
 
         }
 
-        public SettlementLocation SettlementLocation { get; set; } = SettlementLocation.None;
+        public BuildingLocation SettlementLocation { get; set; } = BuildingLocation.None;
 
         public void ShowBuildEllipse(bool canBuild = true, string colorAsString = "", string msg = "X")
         {
@@ -397,9 +356,9 @@ namespace Catan10
             Callback = callback;
         }
 
-        public void AddKey(TileCtrl tile, SettlementLocation loc)
+        public void AddKey(TileCtrl tile, BuildingLocation loc)
         {
-            SettlementKey key = new SettlementKey(tile, loc);
+            BuildingKey key = new BuildingKey(tile, loc);
             foreach (var clone in Clones)
             {
                 //
@@ -417,4 +376,52 @@ namespace Catan10
 
 
     }
+
+    public class KeyComparer : IEqualityComparer<BuildingKey>
+    {
+        //
+        //  Note:  Once the board is created, we never change the Tiles or the Location of a Settlement...
+        public bool Equals(BuildingKey x, BuildingKey y)
+        {
+            if (x.Tile.Index == y.Tile.Index)
+            {
+                if (x.Location == y.Location)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public int GetHashCode(BuildingKey obj)
+        {
+            return obj.Tile.GetHashCode() * 17 + obj.Location.GetHashCode();
+        }
+    }
+
+    /// <summary>
+    ///  This is for the "clones" support. the issue is that you can have multiple Tile/BuildingLocation pairs that map to the same
+    ///  visual location for a Building.  We want to have exactly one building per location, so that datastructure allows us to find
+    ///  duplicates and map the tuple (Tile,Location) to a unique Building
+    /// </summary>
+    public class BuildingKey
+    {
+        public TileCtrl Tile { get; set; }
+
+        public BuildingLocation Location { get; set; }
+
+        public BuildingKey(TileCtrl t, BuildingLocation loc)
+        {
+            Tile = t;
+            Location = loc;
+        }
+
+        public override string ToString()
+        {
+            return String.Format($"[{Tile}. IDX={Tile.Index} @ {Location}]");
+        }
+
+
+    }
+
 }

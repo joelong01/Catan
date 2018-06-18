@@ -991,7 +991,7 @@ namespace Catan10
 
         private void HideAllBuildEllipses()
         {
-            foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
+            foreach (var s in _gameView.CurrentGame.HexPanel.Buildings)
             {
                 s.HideBuildEllipse();
             }
@@ -1473,7 +1473,7 @@ namespace Catan10
 
             //
             //  for every settlement, what is the max pips?
-            List<BuildingCtrl> settlementsByPips = _gameView.CurrentGame.HexPanel.Settlements;
+            List<BuildingCtrl> settlementsByPips = _gameView.CurrentGame.HexPanel.Buildings;
             settlementsByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
             ValidateBuilding = true;
             int currentPipCount = 0;
