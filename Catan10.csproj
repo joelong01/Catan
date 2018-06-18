@@ -154,8 +154,8 @@
     <Compile Include="Settlements and Roads\RoadCtrl.xaml.cs">
       <DependentUpon>RoadCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settlements and Roads\SettlementUi.xaml.cs">
-      <DependentUpon>SettlementUi.xaml</DependentUpon>
+    <Compile Include="Settlements and Roads\SettlementCtrl.xaml.cs">
+      <DependentUpon>SettlementCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ContentDialogs\SetttingsDlg.xaml.cs">
       <DependentUpon>SetttingsDlg.xaml</DependentUpon>
@@ -354,7 +354,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settlements and Roads\SettlementUi.xaml">
+    <Page Include="Settlements and Roads\SettlementCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

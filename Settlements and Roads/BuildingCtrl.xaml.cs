@@ -64,7 +64,7 @@ namespace Catan10
         double _baseOpacity = 0.0;
         public int Index { get; set; } = -1; // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
         CityCtrl _city = null;
-        SettlementUi _settlement = null;
+        SettlementCtrl _settlement = null;
 
         SolidColorBrush _brush = new SolidColorBrush(Colors.Blue);
         public Dictionary<SettlementLocation, TileCtrl> SettlementToTileDict { get; set; } = new Dictionary<SettlementLocation, TileCtrl>();
@@ -166,7 +166,7 @@ namespace Catan10
                     case BuildingState.Settlement:
                         if (_settlement == null)
                         {
-                            _settlement = new SettlementUi();
+                            _settlement = new SettlementCtrl();
                             _vbSettlement.Child = _settlement;
                             UpdateColors();
                         }

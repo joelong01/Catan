@@ -6,15 +6,15 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-    public sealed partial class SettlementUi : UserControl
+    public sealed partial class SettlementCtrl : UserControl
     {
-        public SettlementUi()
+        public SettlementCtrl()
         {
             this.InitializeComponent();
         }
 
-        public static readonly DependencyProperty CircleColorProperty = DependencyProperty.Register("CircleFillColor", typeof(Color), typeof(SettlementUi), new PropertyMetadata(Colors.Green, CircleFillColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(SettlementUi), new PropertyMetadata(Colors.Purple, CastleColorChanged));
+        public static readonly DependencyProperty CircleColorProperty = DependencyProperty.Register("CircleFillColor", typeof(Color), typeof(SettlementCtrl), new PropertyMetadata(Colors.Green, CircleFillColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(SettlementCtrl), new PropertyMetadata(Colors.Purple, CastleColorChanged));
         public Color CastleColor
         {
             get { return (Color)GetValue(CastleColorProperty); }
@@ -22,7 +22,7 @@ namespace Catan10
         }
         private static void CastleColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            SettlementUi depPropClass = d as SettlementUi;
+            SettlementCtrl depPropClass = d as SettlementCtrl;
             Color depPropValue = (Color)e.NewValue;
             depPropClass.SetCastleColor(depPropValue);
         }
@@ -38,7 +38,7 @@ namespace Catan10
         }
         private static void CircleFillColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            SettlementUi depPropClass = d as SettlementUi;
+            SettlementCtrl depPropClass = d as SettlementCtrl;
             Color depPropValue = (Color)e.NewValue;
             depPropClass.SetCircleFillColorChanged(depPropValue);
         }
