@@ -215,8 +215,8 @@
     <Compile Include="UI Controls\StopWatchCtrl.xaml.cs">
       <DependentUpon>StopWatchCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settlements and Roads\SettlementCtrl.xaml.cs">
-      <DependentUpon>SettlementCtrl.xaml</DependentUpon>
+    <Compile Include="Settlements and Roads\BuildingCtrl.xaml.cs">
+      <DependentUpon>BuildingCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\TileCtrl.xaml.cs">
       <DependentUpon>TileCtrl.xaml</DependentUpon>
@@ -422,7 +422,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settlements and Roads\SettlementCtrl.xaml">
+    <Page Include="Settlements and Roads\BuildingCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -432,7 +432,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="NewGameDlg\" />
     <Folder Include="Themes\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

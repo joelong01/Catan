@@ -26,8 +26,8 @@ namespace Catan10
 
         public ObservableCollection<RoadCtrl> Roads { get; set; } = new ObservableCollection<RoadCtrl>();
         public ObservableCollection<RoadCtrl> Ships { get; set; } = new ObservableCollection<RoadCtrl>();
-        public ObservableCollection<SettlementCtrl> Settlements { get; set; } = new ObservableCollection<SettlementCtrl>();
-        public ObservableCollection<SettlementCtrl> Cities { get; set; } = new ObservableCollection<SettlementCtrl>();
+        public ObservableCollection<BuildingCtrl> Settlements { get; set; } = new ObservableCollection<BuildingCtrl>();
+        public ObservableCollection<BuildingCtrl> Cities { get; set; } = new ObservableCollection<BuildingCtrl>();
         public ObservableCollection<int> Rolls { get; set; } = new ObservableCollection<int>();
         public PlayerResourceData PlayerResourceData { get; set; } = null;
         private List<string> _savedGameProperties = new List<string> { "PlayerIdentified", "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
@@ -66,7 +66,7 @@ namespace Catan10
             Pips = CalculatePips(Settlements, Cities);
         }
 
-        public static int CalculatePips(IEnumerable<SettlementCtrl> Settlements, IEnumerable<SettlementCtrl> Cities)
+        public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
         {
             int pips = 0;
             foreach (var s in Settlements)
@@ -815,9 +815,9 @@ namespace Catan10
 
         Dictionary<ResourceType, ResourceCount> _dictResourceCount = new Dictionary<ResourceType, ResourceCount>();
         // returns the number of resources the user actually got
-        internal int UpdateResourceCount(ResourceType resourceType, SettlementType settlementType, bool hasBaron, bool undo)
+        internal int UpdateResourceCount(ResourceType resourceType, BuildingState buildingState, bool hasBaron, bool undo)
         {
-            if (settlementType == SettlementType.None)
+            if (buildingState == BuildingState.None)
             {
                 throw new InvalidDataException("the settlement type shouldn't be None!");
             }
@@ -829,9 +829,9 @@ namespace Catan10
             }
 
             int value = 0;
-            if (settlementType == SettlementType.Settlement)
+            if (buildingState == BuildingState.Settlement)
                 value = 1;
-            else if (settlementType == SettlementType.City)
+            else if (buildingState == BuildingState.City)
                 value = 2;
 
             if (undo) value = -value;

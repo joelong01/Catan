@@ -123,6 +123,9 @@
                                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed" >
                                         <MenuFlyoutItem x:Name="Menu_Test" Text ="Test" Click="OnTest" />
                                         <MenuFlyoutSeparator/>
+                                        <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
+                                        <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
+                                        <MenuFlyoutSeparator/>
                                         <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
                                         <MenuFlyoutSeparator/>
                                         <MenuFlyoutSubItem Text="Options" >

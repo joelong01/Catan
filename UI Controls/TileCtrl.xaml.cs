@@ -54,11 +54,11 @@ namespace Catan10
         SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
         SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
         TileOrientation _tileOrientation = TileOrientation.FaceDown;
-        public List<SettlementCtrl> Settlements { get; } = new List<SettlementCtrl>();
+        public List<BuildingCtrl> Settlements { get; } = new List<BuildingCtrl>();
         public bool HasBaron { get; set; } = false;
         public bool HasPirateShip { get; set; } = false;
 
-        public List<SettlementCtrl> OwnedSettlements { get; } = new List<SettlementCtrl>(); // this are the settlements that pay if this tile's number is rolled
+        public List<BuildingCtrl> OwnedSettlements { get; } = new List<BuildingCtrl>(); // this are the settlements that pay if this tile's number is rolled
         public bool RandomTile { get; set; } = true;
         bool _useClassic = true;
         int _index = -1;
@@ -121,7 +121,7 @@ namespace Catan10
         {
             foreach (var s in Settlements)
             {
-                s.Show(SettlementType.None);
+                s.Show(BuildingState.None);
             }
 
             OwnedSettlements.Clear();

@@ -626,7 +626,7 @@ namespace Catan10
             }
         }
 
-        public ObservableCollection<SettlementCtrl> Settlements
+        public ObservableCollection<BuildingCtrl> Settlements
         {
             get
             {
@@ -714,9 +714,9 @@ namespace Catan10
         }
 
         Dictionary<ResourceType, ResourceCount> _dictResourceCount = new Dictionary<ResourceType, ResourceCount>();
-        internal void UpdateResourceCount(ResourceType resourceType, SettlementType settlementType, bool hasBaron, bool undo)
+        internal void UpdateResourceCount(ResourceType resourceType, BuildingState buildingState, bool hasBaron, bool undo)
         {
-            if (settlementType == SettlementType.None)
+            if (buildingState == BuildingState.None)
             {
                 throw new InvalidDataException("the settlement type shouldn't be None!");
             }
@@ -728,9 +728,9 @@ namespace Catan10
             }
 
             int value = 0;
-            if (settlementType == SettlementType.Settlement)
+            if (buildingState == BuildingState.Settlement)
                 value = 1;
-            else if (settlementType == SettlementType.City)
+            else if (buildingState == BuildingState.City)
                 value = 2;
 
             if (undo) value = -value;
@@ -751,26 +751,26 @@ namespace Catan10
             this.TraceMessage($"{this.PlayerName} {s} {value} of {resourceType} ");
         }
 
-        internal void AddSettlement(SettlementCtrl settlement)
+        internal void AddSettlement(BuildingCtrl settlement)
         {
             
             this.PlayerGameData.Settlements.Add(settlement);
             UpdateSettlementCounts();
 
         }
-        internal void RemoveSettlement(SettlementCtrl settlement)
+        internal void RemoveSettlement(BuildingCtrl settlement)
         {           
             this.PlayerGameData.Settlements.Remove(settlement);
             UpdateSettlementCounts();
         }
 
-        internal void AddCity(SettlementCtrl settlement)
+        internal void AddCity(BuildingCtrl settlement)
         {           
             this.PlayerGameData.Settlements.Add(settlement);
             UpdateSettlementCounts();
 
         }
-        internal void RemoveCity(SettlementCtrl settlement)
+        internal void RemoveCity(BuildingCtrl settlement)
         {
             
             this.PlayerGameData.Settlements.Remove(settlement);
@@ -782,13 +782,13 @@ namespace Catan10
             int Cities = 0;
             int Settlements = 0;
 
-            foreach (SettlementCtrl s in this.PlayerGameData.Settlements)
+            foreach (BuildingCtrl s in this.PlayerGameData.Settlements)
             {
-                if (s.SettlementType == SettlementType.City)
+                if (s.BuildingState == BuildingState.City)
                 {
                     Cities++;
                 }
-                else if (s.SettlementType == SettlementType.Settlement)
+                else if (s.BuildingState == BuildingState.Settlement)
                 {
                     Settlements++;
                 }

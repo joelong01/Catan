@@ -120,9 +120,9 @@ namespace Catan10
                 case CatanAction.UpdateSettlementState:
                     LogSettlementUpdate settlementUpdate = logLine.Tag as LogSettlementUpdate;
                     if (replayingLog)
-                        await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.OldSettlementType, settlementUpdate.NewSettlementType, LogType.Undo);
+                        await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.OldBuildingState, settlementUpdate.NewBuildingState, LogType.Undo);
                     else
-                        await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.NewSettlementType, settlementUpdate.OldSettlementType, LogType.Undo); // NOTE:  New and Old have been swapped                      
+                        await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.NewBuildingState, settlementUpdate.OldBuildingState, LogType.Undo); // NOTE:  New and Old have been swapped                      
                     break;
                 default:
                     break;
@@ -397,7 +397,7 @@ namespace Catan10
 
             }
 
-            foreach (SettlementCtrl settlement in player.GameData.Settlements)
+            foreach (BuildingCtrl settlement in player.GameData.Settlements)
             {
                 settlement.Color = player.Background;
 
@@ -611,7 +611,7 @@ namespace Catan10
             }
             else
             {
-                foreach (SettlementCtrl settlement in targetTile.OwnedSettlements)
+                foreach (BuildingCtrl settlement in targetTile.OwnedSettlements)
                 {
                     string s = "";
                     if (playerGameData.MovedBaronAfterRollingSeven == false)
@@ -902,11 +902,11 @@ namespace Catan10
         //  but after that, a road you must have!
         //
         //  to build you want this to return FALSE
-        private bool SettlementsWithinOneSpace(SettlementCtrl settlement)
+        private bool SettlementsWithinOneSpace(BuildingCtrl settlement)
         {
             foreach (var adjacent in settlement.AdjacentSettlements)
             {
-                if (adjacent.SettlementType != SettlementType.None)
+                if (adjacent.BuildingState != BuildingState.None)
                 {
                     return true;
                 }
@@ -927,19 +927,19 @@ namespace Catan10
             return null;
         }
 
-        private SettlementType NextSettlementType(SettlementCtrl settlement)
+        private BuildingState NextSettlementStype(BuildingCtrl settlement)
         {
-            SettlementType newType = SettlementType.None;
-            switch (settlement.SettlementType)
+            BuildingState newType = BuildingState.None;
+            switch (settlement.BuildingState)
             {
-                case SettlementType.None:
-                    newType = SettlementType.Settlement;
+                case BuildingState.None:
+                    newType = BuildingState.Settlement;
                     break;
-                case SettlementType.Settlement:
-                    newType = SettlementType.City;
+                case BuildingState.Settlement:
+                    newType = BuildingState.City;
                     break;
-                case SettlementType.City:
-                    newType = SettlementType.None;
+                case BuildingState.City:
+                    newType = BuildingState.None;
                     break;
                 default:
                     break;
@@ -947,9 +947,9 @@ namespace Catan10
             return newType;
         }
 
-        private void UpdateSettlementOwner(PlayerData player, SettlementCtrl settlement, SettlementType newType, SettlementType oldType)
+        private void UpdateSettlementOwner(PlayerData player, BuildingCtrl settlement, BuildingState newType, BuildingState oldType)
         {
-            if (newType == SettlementType.None)
+            if (newType == BuildingState.None)
             {
                 settlement.Owner = null;
             }
@@ -961,7 +961,7 @@ namespace Catan10
             foreach (var key in settlement.Clones)
             {
                 // tell the tile that this settlement is owned
-                if (newType == SettlementType.None)
+                if (newType == BuildingState.None)
                 {
                     // tell the tile that this settlement is no longer owned
                     key.Tile.OwnedSettlements.Remove(settlement);
@@ -988,7 +988,7 @@ namespace Catan10
                         Island island = _gameView.GetIsland(key.Tile);
                         if (island != null)
                         {
-                            if (island.BonusPoint && oldType == SettlementType.None) // only addref when you go from none
+                            if (island.BonusPoint && oldType == BuildingState.None) // only addref when you go from none
                             {
                                 player?.GameData.AddIsland(island);
                             }
@@ -998,7 +998,7 @@ namespace Catan10
             }
         }
 
-        private async Task UpdateSettlementState(SettlementCtrl settlement, SettlementType oldType, SettlementType newType, LogType logType)
+        private async Task UpdateSettlementState(BuildingCtrl settlement, BuildingState oldType, BuildingState newType, LogType logType)
         {
 
             PlayerData player = CurrentPlayer;
@@ -1007,19 +1007,19 @@ namespace Catan10
             //  remove everything -- we will add it back below
             player.GameData.Cities.Remove(settlement);
             player.GameData.Settlements.Remove(settlement);
-            settlement.SettlementType = newType;
+            settlement.BuildingState = newType;
             UpdateSettlementOwner(player, settlement, newType, oldType);
 
-            switch (settlement.SettlementType)
+            switch (settlement.BuildingState)
             {
-                case SettlementType.None:
+                case BuildingState.None:
                     //
                     //  work done above                    
                     break;
-                case SettlementType.Settlement:
+                case BuildingState.Settlement:
                     player.GameData.Settlements.Add(settlement);
                     break;
-                case SettlementType.City:
+                case BuildingState.City:
                     player.GameData.Cities.Add(settlement);
                     break;
                 default:
@@ -1031,7 +1031,7 @@ namespace Catan10
         }
 
 
-        private void RecalcLongestRoadAfterSettlementIsPlayed(TileCtrl tileCtrl, SettlementCtrl settlementCtrl, PlayerData player)
+        private void RecalcLongestRoadAfterSettlementIsPlayed(TileCtrl tileCtrl, BuildingCtrl settlementCtrl, PlayerData player)
         {
 
             //
@@ -1292,6 +1292,12 @@ namespace Catan10
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
             _stopWatchForTurn.StartTimer();
 
+            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            {
+                HideAllBuildEllipses();
+                _showSettlementByPipsIndex = 0;
+            }
+
         }
 
         private void UpdateTurnFlag()
@@ -1369,7 +1375,7 @@ namespace Catan10
             await UpdateRoadState(road, road.RoadState, NextRoadState(road), LogType.Normal);
         }
 
-        public void SettlementEntered(SettlementCtrl settlement, PointerRoutedEventArgs e)
+        public void SettlementEntered(BuildingCtrl settlement, PointerRoutedEventArgs e)
         {
             if (CurrentPlayer == null) return;
             bool canBuild = ValidateSettlementBuildLocation(settlement, out bool showErrorUi);
@@ -1393,7 +1399,7 @@ namespace Catan10
         }
         //
         //  returns True if it is OK to build this settlement - this is basically a Road check
-        bool ValidateSettlementBuildLocation(SettlementCtrl settlement, out bool showErrorUI)
+        bool ValidateSettlementBuildLocation(BuildingCtrl settlement, out bool showErrorUI)
         {
             showErrorUI = true;
             if (GameState == GameState.WaitingForNewGame || GameState == GameState.WaitingForStart)
@@ -1457,7 +1463,7 @@ namespace Catan10
             return !error;
         }
 
-        public void SettlementExited(SettlementCtrl settlement, PointerRoutedEventArgs e)
+        public void SettlementExited(BuildingCtrl settlement, PointerRoutedEventArgs e)
         {
 
             if (settlement.Owner == null)
@@ -1473,7 +1479,7 @@ namespace Catan10
             //}
         }
 
-        public async void SettlementPointerPressed(SettlementCtrl settlement, PointerRoutedEventArgs e)
+        public async void SettlementPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e)
         {
             if (!ValidateSettlementBuildLocation(settlement, out bool showErrorUi)) return;
 
@@ -1488,7 +1494,7 @@ namespace Catan10
                 return;
 
 
-            await UpdateSettlementState(settlement, settlement.SettlementType, NextSettlementType(settlement), LogType.Normal);
+            await UpdateSettlementState(settlement, settlement.BuildingState, NextSettlementStype(settlement), LogType.Normal);
 
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
@@ -1507,7 +1513,7 @@ namespace Catan10
             return _gameView.GetRoad(roadIndex, gameIndex);
         }
 
-        public SettlementCtrl GetSettlement(int settlementIndex, int gameIndex)
+        public BuildingCtrl GetSettlement(int settlementIndex, int gameIndex)
         {
             return _gameView.GetSettlement(settlementIndex, gameIndex);
         }

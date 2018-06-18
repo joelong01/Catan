@@ -148,9 +148,9 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
 
-        void SettlementEntered(SettlementCtrl settlement, PointerRoutedEventArgs e);
-        void SettlementExited(SettlementCtrl settlement, PointerRoutedEventArgs e);
-        void SettlementPointerPressed(SettlementCtrl settlement, PointerRoutedEventArgs e);
+        void SettlementEntered(BuildingCtrl settlement, PointerRoutedEventArgs e);
+        void SettlementExited(BuildingCtrl settlement, PointerRoutedEventArgs e);
+        void SettlementPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e);
 
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
     }

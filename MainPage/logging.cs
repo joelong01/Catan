@@ -190,7 +190,7 @@ namespace Catan10
     {
         TileCtrl GetTile(int tileIndex, int gameIndex);
         RoadCtrl GetRoad(int roadIndex, int gameIndex);
-        SettlementCtrl GetSettlement(int settlementIndex, int gameIndex);
+        BuildingCtrl GetSettlement(int settlementIndex, int gameIndex);
         PlayerData GetPlayerData(int playerIndex);        
     }
 
@@ -632,17 +632,17 @@ namespace Catan10
 
     public class LogSettlementUpdate
     {
-        public SettlementCtrl Settlement { get; set; } = null;
+        public BuildingCtrl Settlement { get; set; } = null;
         public TileCtrl Tile { get; set; } = null;
 
-        public SettlementType OldSettlementType { get; set; } = SettlementType.None;
-        public SettlementType NewSettlementType { get; set; } = SettlementType.None;
+        public BuildingState OldBuildingState { get; set; } = BuildingState.None;
+        public BuildingState NewBuildingState { get; set; } = BuildingState.None;
         public int TileIndex { get; set; } = -1;
         public int SettlementIndex { get; set; } = -1;
         public int GameIndex { get; set; } = -1;
 
 
-        private string[] _serializedProperties = new string[] { "OldSettlementType", "NewSettlementType", "SettlementIndex", "TileIndex", "GameIndex" };
+        private string[] _serializedProperties = new string[] { "OldBuildingState", "NewBuildingState", "SettlementIndex", "TileIndex", "GameIndex" };
 
         public LogSettlementUpdate(string s, ILogParserHelper parseHelper)
         {
@@ -654,14 +654,14 @@ namespace Catan10
             }
         }
 
-        public LogSettlementUpdate(int gameIndex, TileCtrl tileCtrl, SettlementCtrl settlementCtrl, SettlementType oldState, SettlementType newState)
+        public LogSettlementUpdate(int gameIndex, TileCtrl tileCtrl, BuildingCtrl settlementCtrl, BuildingState oldState, BuildingState newState)
         {
             GameIndex = gameIndex;
             Tile = tileCtrl;
             Settlement = settlementCtrl;
-            OldSettlementType = oldState;
+            OldBuildingState = oldState;
             SettlementIndex = settlementCtrl.Index;
-            NewSettlementType = newState;
+            NewBuildingState = newState;
             if (tileCtrl != null)
                 TileIndex = tileCtrl.Index;
         }

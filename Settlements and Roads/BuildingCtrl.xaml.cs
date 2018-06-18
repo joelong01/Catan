@@ -14,7 +14,7 @@ namespace Catan10
 
 
 
-    public enum SettlementType { None, Settlement, City };
+    public enum BuildingState { None, Settlement, City, Pips };
     public class KeyComparer : IEqualityComparer<SettlementKey>
     {
         //
@@ -59,7 +59,7 @@ namespace Catan10
 
     }
 
-    public sealed partial class SettlementCtrl : UserControl
+    public sealed partial class BuildingCtrl : UserControl
     {
         double _baseOpacity = 0.0;
         public int Index { get; set; } = -1; // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
@@ -71,7 +71,7 @@ namespace Catan10
 
         public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
 
-        public List<SettlementCtrl> AdjacentSettlements { get; } = new List<SettlementCtrl>();
+        public List<BuildingCtrl> AdjacentSettlements { get; } = new List<BuildingCtrl>();
 
         //
         //  this the list of Tile/SettlmentLocations that are the same for this settlement
@@ -134,36 +134,36 @@ namespace Catan10
         internal void Reset()
         {
             Owner = null;
-            Show(SettlementType.None);
+            Show(BuildingState.None);
 
         }
 
         public override string ToString()
         {
-            return String.Format($"Index={Index};Type={SettlementType};Location={this.SettlementLocation};Background={Color};Pips={Pips}");
+            return String.Format($"Index={Index};Type={BuildingState};Location={this.SettlementLocation};Background={Color};Pips={Pips}");
         }
-        public SettlementType SettlementType
+        public BuildingState BuildingState
         {
             get
             {
                 if (_canvasSettlement.Visibility == Visibility.Visible)
-                    return SettlementType.Settlement;
+                    return BuildingState.Settlement;
 
                 if (_canvasCity.Visibility == Visibility.Visible)
-                    return SettlementType.City;
+                    return BuildingState.City;
 
-                return SettlementType.None;
+                return BuildingState.None;
 
             }
             set
             {
                 switch (value)
                 {
-                    case SettlementType.None:
+                    case BuildingState.None:
                         _canvasSettlement.Visibility = Visibility.Collapsed;
                         _canvasCity.Visibility = Visibility.Collapsed;
                         break;
-                    case SettlementType.Settlement:
+                    case BuildingState.Settlement:
                         if (_settlement == null)
                         {
                             _settlement = new SettlementUi();
@@ -173,7 +173,7 @@ namespace Catan10
                         _canvasSettlement.Visibility = Visibility.Visible;
                         _canvasCity.Visibility = Visibility.Collapsed;
                         break;
-                    case SettlementType.City:
+                    case BuildingState.City:
                         if (_city == null)
                         {
                             _city = new CityCtrl();
@@ -193,7 +193,7 @@ namespace Catan10
         {
             get
             {
-                return SettlementType == SettlementType.City;
+                return BuildingState == BuildingState.City;
             }
         }
 
@@ -201,11 +201,11 @@ namespace Catan10
         {
             get
             {
-                return SettlementType == SettlementType.Settlement;
+                return BuildingState == BuildingState.Settlement;
             }
         }
 
-        public SettlementCtrl()
+        public BuildingCtrl()
         {
             this.InitializeComponent();
             _gridBuildEllipse.Opacity = _baseOpacity;
@@ -220,8 +220,8 @@ namespace Catan10
 
             this.Width = 30;
             this.Height = 30;
-            this.SettlementType = SettlementType.None;
-            //this..Show(SettlementType.Settlement);
+            this.BuildingState = BuildingState.None;
+            //this..Show(BuildingState.Settlement);
             Canvas.SetZIndex(this, 20);
             this.RenderTransformOrigin = new Point(.5, .5);
             this.HorizontalAlignment = HorizontalAlignment.Left;
@@ -259,12 +259,12 @@ namespace Catan10
         private void Settlement_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             Callback?.SettlementExited(this, e);
-            // SettlementCtrl.HideBuildEllipse();
+            // BuildingCtrl.HideBuildEllipse();
         }
 
         private void Settlement_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            //SettlementCtrl.ShowBuildEllipse();
+            //BuildingCtrl.ShowBuildEllipse();
             Callback?.SettlementEntered(this, e);
 
         }
@@ -342,9 +342,9 @@ namespace Catan10
 
 
 
-        public void Show(SettlementType type)
+        public void Show(BuildingState type)
         {
-            _baseOpacity = type == SettlementType.None ? 0.0 : 1.0;
+            _baseOpacity = type == BuildingState.None ? 0.0 : 1.0;
 
 
             _canvasCity.Visibility = Visibility.Collapsed;
@@ -353,23 +353,23 @@ namespace Catan10
             //
             //  make the ellipse we use to show PointerEnter/Leaved locations
             _gridBuildEllipse.Opacity = _baseOpacity;
-            if (type == SettlementType.None)
+            if (type == BuildingState.None)
                 _buildEllipse.Fill = new SolidColorBrush(Color);
             else
                 _buildEllipse.Fill = new SolidColorBrush(Colors.Transparent);
 
-            if (type == SettlementType.City)
+            if (type == BuildingState.City)
             {
                 _canvasSettlement.Visibility = Visibility.Visible;
             }
 
-            if (type == SettlementType.Settlement)
+            if (type == BuildingState.Settlement)
             {
 
                 _canvasSettlement.Visibility = Visibility.Visible;
             }
 
-            SettlementType = type;
+            BuildingState = type;
 
         }
 
@@ -377,13 +377,13 @@ namespace Catan10
         {
             get
             {
-                switch (SettlementType)
+                switch (BuildingState)
                 {
-                    case SettlementType.None:
+                    case BuildingState.None:
                         return 0;
-                    case SettlementType.Settlement:
+                    case BuildingState.Settlement:
                         return 1;
-                    case SettlementType.City:
+                    case BuildingState.City:
                         return 2;
                     default:
                         return 999;

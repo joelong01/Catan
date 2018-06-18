@@ -232,7 +232,7 @@ namespace Catan10
             return _currentHexPanel.Roads[roadIndex];
         }
 
-        public SettlementCtrl GetSettlement(int settlementIndex, int gameIndex)
+        public BuildingCtrl GetSettlement(int settlementIndex, int gameIndex)
         {
             if (CurrentGame.Index != gameIndex)
             {
@@ -642,7 +642,7 @@ namespace Catan10
             }
         }
 
-        public List<SettlementCtrl> AllSettlements
+        public List<BuildingCtrl> AllSettlements
         {
             get
             {
@@ -871,7 +871,7 @@ namespace Catan10
             _currentHexPanel.FindAdjacentRoads();
         }
 
-        internal bool GetSettlement(TileCtrl tile, SettlementLocation location, out SettlementCtrl control)
+        internal bool GetSettlement(TileCtrl tile, SettlementLocation location, out BuildingCtrl control)
         {
             SettlementKey key = new SettlementKey(tile, location);
             return _currentHexPanel.SettlementKeyToSettlementCtrlDictionary.TryGetValue(key, out control);

@@ -1099,10 +1099,10 @@ namespace Catan10
 
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                foreach (SettlementCtrl settlement in tile.OwnedSettlements)
+                foreach (BuildingCtrl settlement in tile.OwnedSettlements)
                 {
 
-                    int value = settlement.Owner.GameData.UpdateResourceCount(tile.ResourceType, settlement.SettlementType, tile.HasBaron, undo);
+                    int value = settlement.Owner.GameData.UpdateResourceCount(tile.ResourceType, settlement.BuildingState, tile.HasBaron, undo);
                     //
                     //  need to look up the control given the player and add it to the right one
                     AddResourceCountForPlayer(settlement.Owner, tile.ResourceType, value);
@@ -1279,12 +1279,12 @@ namespace Catan10
                     case CatanAction.UpdateSettlementState:
 
                         LogSettlementUpdate lsu = (LogSettlementUpdate)logLine.Tag;
-                        if (lsu.OldSettlementType != SettlementType.City)
+                        if (lsu.OldBuildingState != BuildingState.City)
                         {
                             lsu.Settlement.Color = CurrentPlayer.Background;
                         }
 
-                        await UpdateSettlementState(lsu.Settlement, lsu.OldSettlementType, lsu.NewSettlementType, LogType.Replay);
+                        await UpdateSettlementState(lsu.Settlement, lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
                         break;
                     case CatanAction.AddPlayer:
                         await AddPlayer(logLine, LogType.Replay);
@@ -1323,7 +1323,7 @@ namespace Catan10
 
 
         }
-        private int _showSettlementByPipsIndex = 0;
+
         private void OnTest(object sender, RoutedEventArgs rea)
         {
             // Frame.Navigate(typeof(TestPage));
@@ -1340,38 +1340,6 @@ namespace Catan10
             //_log = newLog;
 
 
-            //
-            //  for every settlement, what is the max pips?
-            List<SettlementCtrl> settlementsByPips = _gameView.CurrentGame.HexPanel.Settlements;
-            settlementsByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
-            ValidateBuilding = true;
-            int currentPipCount = 0;
-            _showSettlementByPipsIndex++;
-            for (int idx = 0; idx < settlementsByPips.Count; idx++)
-            {
-                var s = settlementsByPips[idx];
-                if (s.Pips == 0) continue; // outside the main map
-                if (s.SettlementType != SettlementType.None) continue;
-                if (s.BuildEllipseVisible) continue;
-                if (ValidateSettlementBuildLocation(s, out bool showerror) == false) continue; // can't build here
-
-                currentPipCount = s.Pips;
-
-
-                while (currentPipCount == s.Pips)
-                {
-                    if ((s.SettlementType == SettlementType.None) && !s.BuildEllipseVisible && ValidateSettlementBuildLocation(s, out showerror) && currentPipCount == s.Pips)
-                    {
-                        s.ShowBuildEllipse(false, CurrentPlayer.ColorAsString, _showSettlementByPipsIndex.ToString());
-
-                    }
-                    idx++;
-                    if (idx == settlementsByPips.Count) break;
-                    s = settlementsByPips[idx];                    
-
-                }
-                break;
-            }
 
             //ValidateBuilding = true;
 #if false
@@ -1499,7 +1467,52 @@ namespace Catan10
             _savedGameGrid.Visibility = Visibility.Collapsed;
         }
 
+        private int _showSettlementByPipsIndex = 0;
+        private void OnShowPips(object sender, RoutedEventArgs e)
+        {
 
+            //
+            //  for every settlement, what is the max pips?
+            List<BuildingCtrl> settlementsByPips = _gameView.CurrentGame.HexPanel.Settlements;
+            settlementsByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+            ValidateBuilding = true;
+            int currentPipCount = 0;
+            _showSettlementByPipsIndex++;
+            for (int idx = 0; idx < settlementsByPips.Count; idx++)
+            {
+                var s = settlementsByPips[idx];
+                if (s.Pips == 0) continue; // outside the main map
+                if (s.BuildingState != BuildingState.None) continue;
+                if (s.BuildEllipseVisible) continue;
+                if (ValidateSettlementBuildLocation(s, out bool showerror) == false) continue; // can't build here
+
+                currentPipCount = s.Pips;
+
+
+                while (currentPipCount == s.Pips)
+                {
+                    if ((s.BuildingState == BuildingState.None) && !s.BuildEllipseVisible && ValidateSettlementBuildLocation(s, out showerror) && currentPipCount == s.Pips)
+                    {
+                        s.ShowBuildEllipse(false, CurrentPlayer.ColorAsString, _showSettlementByPipsIndex.ToString());
+
+                    }
+                    idx++;
+                    if (idx == settlementsByPips.Count) break;
+                    s = settlementsByPips[idx];
+
+                }
+                break;
+            }
+
+        }
+
+        private void OnClearPips(object sender, RoutedEventArgs e)
+        {
+
+            HideAllBuildEllipses();
+            _showSettlementByPipsIndex = 0;
+
+        }
     }
 }
 

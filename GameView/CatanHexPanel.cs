@@ -22,7 +22,7 @@ namespace Catan10
         //
         //  ways to look Road/Settlements/Tiles up
         public Dictionary<RoadKey, RoadCtrl> RoadKeyToRoadDictionary { get; } = new Dictionary<RoadKey, RoadCtrl>(new RoadKeyComparer());
-        public Dictionary<SettlementKey, SettlementCtrl> SettlementKeyToSettlementCtrlDictionary = new Dictionary<SettlementKey, SettlementCtrl>(new KeyComparer());
+        public Dictionary<SettlementKey, BuildingCtrl> SettlementKeyToSettlementCtrlDictionary = new Dictionary<SettlementKey, BuildingCtrl>(new KeyComparer());
         public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
         private List<TileCtrl> _desertTiles = new List<TileCtrl>();
         private List<TileGroup> _tileSets = new List<TileGroup>();
@@ -39,7 +39,7 @@ namespace Catan10
 
         //
         //   UI Elements
-        public List<SettlementCtrl> Settlements { get; } = new List<SettlementCtrl>();
+        public List<BuildingCtrl> Settlements { get; } = new List<BuildingCtrl>();
         public List<RoadCtrl> Roads { get; } = new List<RoadCtrl>();
         public List<TileCtrl> Tiles { get; } = new List<TileCtrl>();
         public List<Harbor> Harbors { get; } = new List<Harbor>();
@@ -602,7 +602,7 @@ namespace Catan10
                     road.Callback = _gameCallback;
                 }
 
-                foreach (SettlementCtrl s in Settlements)
+                foreach (BuildingCtrl s in Settlements)
                 {
                     s.Callback = _gameCallback;
                 }
@@ -727,7 +727,7 @@ namespace Catan10
                 road.Reset();
             }
 
-            foreach (SettlementCtrl s in Settlements)
+            foreach (BuildingCtrl s in Settlements)
             {
                 s.Reset();
             }
@@ -921,7 +921,7 @@ namespace Catan10
 
             for (int i = 0; i < count; i++)
             {
-                SettlementCtrl settlement = new SettlementCtrl();
+                BuildingCtrl settlement = new BuildingCtrl();
                 if (StaticHelpers.IsInVisualStudioDesignMode)
                 {
                     settlement.Opacity = 0.0;
@@ -1037,7 +1037,7 @@ namespace Catan10
 
 
 
-                        bool cloned = FindSettlementAtVisualLocation(point, Settlements, location, tile, out SettlementCtrl settlement);
+                        bool cloned = FindSettlementAtVisualLocation(point, Settlements, location, tile, out BuildingCtrl settlement);
                         if (!cloned)
                         {
                             settlement = Settlements[count];
@@ -1057,7 +1057,7 @@ namespace Catan10
                                 // this.TraceMessage($"{tile} @ {location} already in map!");
                             }
                             settlement.AddKey(tile, location);
-                            // setl2.SettlementCtrl.Show(SettlementType.City);
+                            // setl2.BuildingCtrl.Show(BuildingState.City);
                             count++;
 
                         }
@@ -1101,7 +1101,7 @@ namespace Catan10
                     {
                         if (location == SettlementLocation.None) continue;
 
-                        if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(new SettlementKey(tile, location), out SettlementCtrl currentSettlement) == false)
+                        if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(new SettlementKey(tile, location), out BuildingCtrl currentSettlement) == false)
                             continue;
 
                         switch (location)
@@ -1196,7 +1196,7 @@ namespace Catan10
             }
         }
 
-        private bool AddSettlementAdjacentRoad(SettlementCtrl settlement, TileCtrl tile, RoadLocation location)
+        private bool AddSettlementAdjacentRoad(BuildingCtrl settlement, TileCtrl tile, RoadLocation location)
         {
             if (tile == null)
                 return false;
@@ -1362,7 +1362,7 @@ namespace Catan10
 
         }
 
-        private SettlementCtrl GetSettlementAt(TileCtrl tile, SettlementLocation location)
+        private BuildingCtrl GetSettlementAt(TileCtrl tile, SettlementLocation location)
         {
             SettlementKey key = new SettlementKey(tile, location);
             return SettlementKeyToSettlementCtrlDictionary[key];
@@ -1406,7 +1406,7 @@ namespace Catan10
                     {
                         if (location == SettlementLocation.None) continue;
 
-                        if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(new SettlementKey(tile, location), out SettlementCtrl currentSettlement) == false)
+                        if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(new SettlementKey(tile, location), out BuildingCtrl currentSettlement) == false)
                             continue;
 
                         switch (location)
@@ -1489,12 +1489,12 @@ namespace Catan10
 
 
 
-        private void AddAdjacentSettlement(SettlementCtrl currentSettlement, TileCtrl tile, SettlementLocation location)
+        private void AddAdjacentSettlement(BuildingCtrl currentSettlement, TileCtrl tile, SettlementLocation location)
         {
             if (tile != null)
             {
                 SettlementKey key = new SettlementKey(tile, location);
-                if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(key, out SettlementCtrl adjacentSettlement))
+                if (SettlementKeyToSettlementCtrlDictionary.TryGetValue(key, out BuildingCtrl adjacentSettlement))
                 {
                     if (currentSettlement.AdjacentSettlements.Contains(adjacentSettlement) == false)
                         currentSettlement.AdjacentSettlements.Add(adjacentSettlement);
@@ -1749,7 +1749,7 @@ namespace Catan10
         //  
         //  this makes it so that one settlement can "connect" to multiple tiles.
         //
-        private bool FindSettlementAtVisualLocation(Point p, List<SettlementCtrl> settlements, SettlementLocation location, TileCtrl tile, out SettlementCtrl clone)
+        private bool FindSettlementAtVisualLocation(Point p, List<BuildingCtrl> settlements, SettlementLocation location, TileCtrl tile, out BuildingCtrl clone)
         {
 
 
