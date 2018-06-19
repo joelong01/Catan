@@ -42,6 +42,24 @@ namespace Catan10
         public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerData), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerData), typeof(BuildingCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
+        public int PipGroup
+        {
+            get { return (int)GetValue(PipGroupProperty); }
+            set { SetValue(PipGroupProperty, value); }
+        }
+        private static void PipGroupChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            BuildingCtrl depPropClass = d as BuildingCtrl;
+            int depPropValue = (int)e.NewValue;
+            depPropClass.SetPipGroup(depPropValue);
+        }
+        private void SetPipGroup(int value)
+        {
+            this.TraceMessage(this.ToString());
+        }
+
+
         public PlayerData Owner
         {
             get => (PlayerData)GetValue(OwnerProperty);
@@ -108,7 +126,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"Index={Index};Type={BuildingState};Owner={Owner};Pips={Pips}");
+            return String.Format($"Index={Index};State={BuildingState};Owner={Owner};Pips={Pips};PipGroup={PipGroup}");
         }
 
 

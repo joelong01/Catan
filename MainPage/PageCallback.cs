@@ -618,7 +618,7 @@ namespace Catan10
             }
             else
             {
-                foreach (BuildingCtrl settlement in targetTile.OwnedSettlements)
+                foreach (BuildingCtrl settlement in targetTile.OwnedBuilding)
                 {
                     string s = "";
                     if (playerGameData.MovedBaronAfterRollingSeven == false)
@@ -656,7 +656,7 @@ namespace Catan10
 
                 }
 
-                if (targetTile.OwnedSettlements.Count == 0)
+                if (targetTile.OwnedBuilding.Count == 0)
                 {
                     if (playerGameData.MovedBaronAfterRollingSeven == false)
                     {
@@ -913,7 +913,7 @@ namespace Catan10
         {
             foreach (var adjacent in settlement.AdjacentBuildings)
             {
-                if (adjacent.BuildingState != BuildingState.None)
+                if (adjacent.BuildingState == BuildingState.City || adjacent.BuildingState == BuildingState.Settlement)
                 {
                     return true;
                 }
@@ -954,16 +954,16 @@ namespace Catan10
             return newState;
         }
 
-        private void UpdateSettlementOwner(PlayerData player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
+        private void UpdateTileBuildingOwner(PlayerData player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
             
             foreach (var key in building.Clones)
             {
-                // tell the tile that this settlement is owned
+                
                 if (newState == BuildingState.None)
                 {
                     // tell the tile that this settlement is no longer owned
-                    key.Tile.OwnedSettlements.Remove(building);
+                    key.Tile.OwnedBuilding.Remove(building);
                     if (_gameView.HasIslands)
                     {
                         Island island = _gameView.GetIsland(key.Tile);
@@ -978,9 +978,10 @@ namespace Catan10
                 }
                 else
                 {
-                    if (key.Tile.OwnedSettlements.Contains(building) == false)
+                    // tell the tile that this settlement is owned
+                    if (key.Tile.OwnedBuilding.Contains(building) == false)
                     {
-                        key.Tile.OwnedSettlements.Add(building);
+                        key.Tile.OwnedBuilding.Add(building);
                     }
                     if (_gameView.HasIslands)
                     {
@@ -1009,7 +1010,7 @@ namespace Catan10
             player.GameData.Cities.Remove(building);
             player.GameData.Settlements.Remove(building);
             building.BuildingState = newType;
-            UpdateSettlementOwner(player, building, newType, newState);
+            UpdateTileBuildingOwner(player, building, newType, newState);
 
             switch (building.BuildingState)
             {
@@ -1292,7 +1293,7 @@ namespace Catan10
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
                 HideAllPipEllipses();
-                _showSettlementByPipsIndex = 0;
+                _showPipGroupIndex = 0;
             }
 
             // tell all the Buildings that the CurrentPlayer has changed
@@ -1445,8 +1446,7 @@ namespace Catan10
                 {
                     if (_gameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
                     {
-                        this.TraceMessage($"{building} is on an island");
-                        //
+
                         //  we are on an island - you can't build on an island when you are allocating resources
                         error = true;
                         return false;
@@ -1523,10 +1523,10 @@ namespace Catan10
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
                 HideAllPipEllipses();
-                _showSettlementByPipsIndex = 0;
+                _showPipGroupIndex = 0;
             }
 
-            UpdateSettlementOwner(player, building, oldState, building.BuildingState);
+            UpdateTileBuildingOwner(player, building, oldState, building.BuildingState);
         }
         /// <summary>
         ///     called by the BuildingCtrl during PointerPressed to see if it is ok to change the state of the building.

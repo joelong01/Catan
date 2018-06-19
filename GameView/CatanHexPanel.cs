@@ -907,6 +907,15 @@ namespace Catan10
             if (VisualTiles.Count == 0)
                 return;
 
+
+            if (Buildings.Count > 0)
+            {
+                this.TraceMessage("returning from CreateBuildings because there are already Buildings here.");
+                return;
+            }
+            //TopLayer.Children.Clear();
+            //Buildings.Clear();
+            
             int count = 0;
             int middleCol = _colCount / 2;
 
@@ -919,12 +928,14 @@ namespace Catan10
             count += VisualTiles[middleCol].Count + 1;
             count *= 2;
 
+            this.TraceMessage($"Creating Buildings Count={count}");
+
             for (int i = 0; i < count; i++)
             {
                 BuildingCtrl building = new BuildingCtrl();
                 if (StaticHelpers.IsInVisualStudioDesignMode)
                 {
-                    building.Opacity = 0.0;
+                    building.Opacity = 0.5;
                 }
                 building.Index = Buildings.Count;
                 Buildings.Add(building);

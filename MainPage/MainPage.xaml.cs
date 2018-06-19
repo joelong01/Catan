@@ -579,10 +579,11 @@ namespace Catan10
 
             }
 
-
+           
             await VisualShuffle();
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
+
 
             //
             //  we used to wait until somebody clicked "Start" after starting a new game.  this was annoying. do it for them.
@@ -590,6 +591,8 @@ namespace Catan10
 
 
         }
+
+       
 
         private void ResetDataForNewGame()
         {
@@ -1099,7 +1102,7 @@ namespace Catan10
 
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                foreach (BuildingCtrl building in tile.OwnedSettlements)
+                foreach (BuildingCtrl building in tile.OwnedBuilding)
                 {
 
                     int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
@@ -1466,51 +1469,74 @@ namespace Catan10
         {
             _savedGameGrid.Visibility = Visibility.Collapsed;
         }
-
-        private int _showSettlementByPipsIndex = 0;
+        /// <summary>
+        ///     This will go through all the buildings and find the ones that are
+        ///        1. Buildable
+        ///        2. in the "none" state (e.g. not already shown in some way) 
+        ///      and then have them show the PipGroup.  
+        ///      you have to do this every time because people might have built in locations that change the PipGroup
+        /// </summary>
+        private int _showPipGroupIndex = 0;
         private void OnShowPips(object sender, RoutedEventArgs e)
         {
-
-            //
-            //  for every settlement, what is the max pips?
-            List<BuildingCtrl> settlementsByPips = _gameView.CurrentGame.HexPanel.Buildings;
-            settlementsByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
-            ValidateBuilding = true;
-            int currentPipCount = 0;
-            _showSettlementByPipsIndex++;
-            for (int idx = 0; idx < settlementsByPips.Count; idx++)
+            _showPipGroupIndex++;
+            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
+            buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+            int currentPipCount = -1;
+            int pipGroup = 0;
+            if (_showPipGroupIndex == 1)
             {
-                var s = settlementsByPips[idx];
-                if (s.Pips == 0) continue; // outside the main map
-                if (s.BuildingState != BuildingState.None) continue;
-                if (s.BuildingState == BuildingState.Pips) continue;
-                if (ValidateBuildingLocation(s, out bool showerror) == false) continue; // can't build here
-
-                currentPipCount = s.Pips;
-
-
-                while (currentPipCount == s.Pips)
+                foreach (var building in buildingsOrderedByPips)
                 {
-                    if ((s.BuildingState == BuildingState.None) && !(s.BuildingState == BuildingState.Pips) && ValidateBuildingLocation(s, out showerror) && currentPipCount == s.Pips)
+                    if (building.Pips == 0)
                     {
-                        s.ShowBuildEllipse(false, CurrentPlayer.ColorAsString, _showSettlementByPipsIndex.ToString());
-
+                        building.PipGroup = -1;
+                        continue; // outside the main map or a desert next to nothing
                     }
-                    idx++;
-                    if (idx == settlementsByPips.Count) break;
-                    s = settlementsByPips[idx];
 
+                    if (ValidateBuildingLocation(building, out bool showerror) == false)
+                    {
+                        continue;
+                    }
+
+                    if (currentPipCount != building.Pips)
+                    {
+                        pipGroup++;
+                        currentPipCount = building.Pips;
+                    }
+
+                    building.PipGroup = pipGroup;
                 }
-                break;
+            }
+
+            foreach (var building in buildingsOrderedByPips)
+            {
+                if (ValidateBuildingLocation(building, out bool showerror) == false)
+                {
+                    this.TraceMessage($"building {building} is in an invalid location");
+                    continue;
+                }
+
+                if (building.BuildingState == BuildingState.None)
+                {
+                    if (building.PipGroup == _showPipGroupIndex)
+                    {
+                        building.BuildingState = BuildingState.Pips;                        
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
 
         }
-
+       
         private void OnClearPips(object sender, RoutedEventArgs e)
         {
 
             HideAllPipEllipses();
-            _showSettlementByPipsIndex = 0;
+            _showPipGroupIndex = 0;
 
         }
     }

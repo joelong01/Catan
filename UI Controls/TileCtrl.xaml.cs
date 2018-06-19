@@ -58,7 +58,7 @@ namespace Catan10
         public bool HasBaron { get; set; } = false;
         public bool HasPirateShip { get; set; } = false;
 
-        public List<BuildingCtrl> OwnedSettlements { get; } = new List<BuildingCtrl>(); // this are the settlements that pay if this tile's number is rolled
+        public List<BuildingCtrl> OwnedBuilding { get; } = new List<BuildingCtrl>(); // this are the settlements that pay if this tile's number is rolled
         public bool RandomTile { get; set; } = true;
         bool _useClassic = true;
         int _index = -1;
@@ -124,7 +124,7 @@ namespace Catan10
                 s.Reset();
             }
 
-            OwnedSettlements.Clear();
+            OwnedBuilding.Clear();
         }
 
 
