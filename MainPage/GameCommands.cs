@@ -524,28 +524,7 @@ namespace Catan10
             ActivePlayerBackground = item.Text;
             CurrentPlayerColorChanged(CurrentPlayer);
         }
-        /// <summary>
-        /// this is called when the current player changes -- probably because somebody clicked on Next or Undo
-        /// </summary>
-        private void UpdateColorForCurrentPlayer()
-        {
-            if (CurrentPlayer != null)
-            {
-                foreach (ToggleMenuFlyoutItem subItem in Menu_Colors.Items)
-                {
-                    if (subItem.Text == CurrentPlayer.ColorAsString)
-                    {
-                        subItem.IsChecked = true;
-                    }
-                    else
-                    {
-                        subItem.IsChecked = false;
-                    }
-                }
-            }
-
-            CurrentPlayerChanged();
-        }
+       
         internal void AddPlayerMenu(PlayerData player)
         {
 

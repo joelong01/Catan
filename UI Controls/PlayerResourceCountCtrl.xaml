@@ -77,7 +77,7 @@
                                     Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
                     </Viewbox>
                     <Viewbox Grid.Column="5">
-                        <local:SettlementCtrl Width="30" Height="30" CastleColor="White" CircleFillColor="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White}"/>
+                        <local:SettlementCtrl Width="30" Height="30" CastleColor="{x:Bind Path=Foreground, FallbackValue=Black,Mode=OneWay}" CircleFillColor="{x:Bind Path=Background, FallbackValue=White, Mode=OneWay}"/>
                     </Viewbox>
                     <Viewbox  Grid.Column="6">
                         <TextBlock Name="_txtSettlements"   Text="{x:Bind GameData.SettlementsLeft, Mode=OneWay, FallbackValue=7}"  
@@ -85,7 +85,7 @@
                            Foreground="{x:Bind Path=Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
                     </Viewbox>
                     <Viewbox Grid.Column="8">
-                        <local:CityCtrl Width="30" Height="30" CastleColor="White" CircleFillColor="{x:Bind Path=Foreground, FallbackValue=White, Mode=OneWay}"/>
+                        <local:CityCtrl Width="30" Height="30" CastleColor="{x:Bind Path=Foreground, FallbackValue=Black,Mode=OneWay}" CircleFillColor="{x:Bind Path=Background, FallbackValue=White, Mode=OneWay}"/>
                     </Viewbox>
 
                     <Viewbox Grid.Column="9">

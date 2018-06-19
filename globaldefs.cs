@@ -150,9 +150,11 @@ namespace Catan10
 
         void BuildingEntered(BuildingCtrl settlement, PointerRoutedEventArgs e);
         void BuildingExited(BuildingCtrl settlement, PointerRoutedEventArgs e);
-        void BuildingPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e);
+        void BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState);
 
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
+        Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl sender);
+        bool BuildingStateChangedOk(BuildingCtrl building);
     }
 
     public interface ICatanSettings

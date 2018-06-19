@@ -989,11 +989,11 @@ namespace Catan10
         //  we use the build ellipses during the allocation phase to see what settlements have the most pips
         //  when we move to the next player, hide the build ellipses
 
-        private void HideAllBuildEllipses()
+        private void HideAllPipEllipses()
         {
             foreach (var s in _gameView.CurrentGame.HexPanel.Buildings)
             {
-                s.HideBuildEllipse();
+                if (s.BuildingState == BuildingState.Pips) s.BuildingState = BuildingState.None;
             }
         }
 
@@ -1099,13 +1099,13 @@ namespace Catan10
 
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                foreach (BuildingCtrl settlement in tile.OwnedSettlements)
+                foreach (BuildingCtrl building in tile.OwnedSettlements)
                 {
 
-                    int value = settlement.Owner.GameData.UpdateResourceCount(tile.ResourceType, settlement.BuildingState, tile.HasBaron, undo);
+                    int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
                     //
                     //  need to look up the control given the player and add it to the right one
-                    AddResourceCountForPlayer(settlement.Owner, tile.ResourceType, value);
+                    AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
 
                 }
             }
@@ -1281,7 +1281,7 @@ namespace Catan10
                         LogSettlementUpdate lsu = (LogSettlementUpdate)logLine.Tag;
                         if (lsu.OldBuildingState != BuildingState.City)
                         {
-                            lsu.Settlement.Color = CurrentPlayer.Background;
+                            lsu.Settlement.Owner = CurrentPlayer;
                         }
 
                         await UpdateSettlementState(lsu.Settlement, lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
@@ -1483,15 +1483,15 @@ namespace Catan10
                 var s = settlementsByPips[idx];
                 if (s.Pips == 0) continue; // outside the main map
                 if (s.BuildingState != BuildingState.None) continue;
-                if (s.BuildEllipseVisible) continue;
-                if (ValidateSettlementBuildLocation(s, out bool showerror) == false) continue; // can't build here
+                if (s.BuildingState == BuildingState.Pips) continue;
+                if (ValidateBuildingLocation(s, out bool showerror) == false) continue; // can't build here
 
                 currentPipCount = s.Pips;
 
 
                 while (currentPipCount == s.Pips)
                 {
-                    if ((s.BuildingState == BuildingState.None) && !s.BuildEllipseVisible && ValidateSettlementBuildLocation(s, out showerror) && currentPipCount == s.Pips)
+                    if ((s.BuildingState == BuildingState.None) && !(s.BuildingState == BuildingState.Pips) && ValidateBuildingLocation(s, out showerror) && currentPipCount == s.Pips)
                     {
                         s.ShowBuildEllipse(false, CurrentPlayer.ColorAsString, _showSettlementByPipsIndex.ToString());
 
@@ -1509,7 +1509,7 @@ namespace Catan10
         private void OnClearPips(object sender, RoutedEventArgs e)
         {
 
-            HideAllBuildEllipses();
+            HideAllPipEllipses();
             _showSettlementByPipsIndex = 0;
 
         }

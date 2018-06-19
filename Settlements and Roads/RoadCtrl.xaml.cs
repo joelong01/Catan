@@ -449,9 +449,9 @@ namespace Catan10
                 if (r.IsOwned && r.Color == this.Color)
                 {
 
-                    if (r.AdjacentBuildings[0].Color != this.Color && r.AdjacentBuildings[0].BuildingState != BuildingState.None)
+                    if (r.AdjacentBuildings[0].Owner?.Background != this.Color && r.AdjacentBuildings[0].BuildingState != BuildingState.None)
                         continue;
-                    if (r.AdjacentBuildings[1].Color != this.Color && r.AdjacentBuildings[1].BuildingState != BuildingState.None)
+                    if (r.AdjacentBuildings[1].Owner?.Background != this.Color && r.AdjacentBuildings[1].BuildingState != BuildingState.None)
                         continue;
                     if (owned.Contains(r) == false)
                     {

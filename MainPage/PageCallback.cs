@@ -389,6 +389,10 @@ namespace Catan10
 
 
 
+        /// <summary>
+        ///     Somebody picked a menu item to change the color
+        /// </summary>
+        /// <param name="player"></param>
         public void CurrentPlayerColorChanged(PlayerData player)
         {
             foreach (RoadCtrl road in player.GameData.Roads)
@@ -397,11 +401,14 @@ namespace Catan10
 
             }
 
-            foreach (BuildingCtrl buildings in player.GameData.Buildings)
-            {
-                buildings.Color = player.Background;
+            //
+            //  TODO: delete this comment.  I don't think it is needed after we used databinding for the colors.
 
-            }
+            //foreach (BuildingCtrl buildings in player.GameData.Buildings)
+            //{
+            //    buildings.Color = player.Background;
+
+            //}
 
         }
 
@@ -927,44 +934,36 @@ namespace Catan10
             return null;
         }
 
-        private BuildingState NextSettlementStype(BuildingCtrl settlement)
+        private BuildingState NextBuildingState(BuildingCtrl building)
         {
-            BuildingState newType = BuildingState.None;
-            switch (settlement.BuildingState)
+            BuildingState newState = BuildingState.None;
+            switch (building.BuildingState)
             {
                 case BuildingState.None:
-                    newType = BuildingState.Settlement;
+                    newState = BuildingState.Settlement;
                     break;
                 case BuildingState.Settlement:
-                    newType = BuildingState.City;
+                    newState = BuildingState.City;
                     break;
                 case BuildingState.City:
-                    newType = BuildingState.None;
+                    newState = BuildingState.None;
                     break;
                 default:
                     break;
             }
-            return newType;
+            return newState;
         }
 
-        private void UpdateSettlementOwner(PlayerData player, BuildingCtrl settlement, BuildingState newType, BuildingState oldType)
+        private void UpdateSettlementOwner(PlayerData player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
-            if (newType == BuildingState.None)
-            {
-                settlement.Owner = null;
-            }
-            else
-            {
-                settlement.Owner = player;
-            }
-
-            foreach (var key in settlement.Clones)
+            
+            foreach (var key in building.Clones)
             {
                 // tell the tile that this settlement is owned
-                if (newType == BuildingState.None)
+                if (newState == BuildingState.None)
                 {
                     // tell the tile that this settlement is no longer owned
-                    key.Tile.OwnedSettlements.Remove(settlement);
+                    key.Tile.OwnedSettlements.Remove(building);
                     if (_gameView.HasIslands)
                     {
                         Island island = _gameView.GetIsland(key.Tile);
@@ -979,16 +978,16 @@ namespace Catan10
                 }
                 else
                 {
-                    if (key.Tile.OwnedSettlements.Contains(settlement) == false)
+                    if (key.Tile.OwnedSettlements.Contains(building) == false)
                     {
-                        key.Tile.OwnedSettlements.Add(settlement);
+                        key.Tile.OwnedSettlements.Add(building);
                     }
                     if (_gameView.HasIslands)
                     {
                         Island island = _gameView.GetIsland(key.Tile);
                         if (island != null)
                         {
-                            if (island.BonusPoint && oldType == BuildingState.None) // only addref when you go from none
+                            if (island.BonusPoint && oldState == BuildingState.None) // only addref when you go from none
                             {
                                 player?.GameData.AddIsland(island);
                             }
@@ -998,40 +997,41 @@ namespace Catan10
             }
         }
 
-        private async Task UpdateSettlementState(BuildingCtrl settlement, BuildingState newState, BuildingState newType, LogType logType)
+
+        
+        private async Task UpdateSettlementState(BuildingCtrl building, BuildingState newState, BuildingState newType, LogType logType)
         {
 
             PlayerData player = CurrentPlayer;
 
             //
             //  remove everything -- we will add it back below
-            player.GameData.Cities.Remove(settlement);
-            player.GameData.Buildings.Remove(settlement);
-            settlement.BuildingState = newType;
-            UpdateSettlementOwner(player, settlement, newType, newState);
+            player.GameData.Cities.Remove(building);
+            player.GameData.Settlements.Remove(building);
+            building.BuildingState = newType;
+            UpdateSettlementOwner(player, building, newType, newState);
 
-            switch (settlement.BuildingState)
+            switch (building.BuildingState)
             {
                 case BuildingState.None:
                     //
                     //  work done above                    
                     break;
                 case BuildingState.Settlement:
-                    player.GameData.Buildings.Add(settlement);
+                    player.GameData.Settlements.Add(building);
                     break;
                 case BuildingState.City:
-                    player.GameData.Cities.Add(settlement);
+                    player.GameData.Cities.Add(building);
                     break;
                 default:
                     break;
             }
-            RecalcLongestRoadAfterSettlementIsPlayed(null, settlement, player);
-            settlement.HideBuildEllipse();
-            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, logType, settlement.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, settlement, newState, newType));
+            RecalcLongestRoadAfterBuildingChanges(null, building, player);
+            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, logType, building.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, building, newState, newType));
         }
 
 
-        private void RecalcLongestRoadAfterSettlementIsPlayed(TileCtrl tileCtrl, BuildingCtrl settlementCtrl, PlayerData player)
+        private void RecalcLongestRoadAfterBuildingChanges(TileCtrl tileCtrl, BuildingCtrl settlementCtrl, PlayerData player)
         {
 
             //
@@ -1276,11 +1276,8 @@ namespace Catan10
         public void CurrentPlayerChanged()
         {
 
-
-
             ActivePlayerBackground = CurrentPlayer.ColorAsString;
             ActivePlayerName = CurrentPlayer.PlayerName;
-
 
             //
             //  the next player can always play a baron once
@@ -1294,8 +1291,14 @@ namespace Catan10
 
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
-                HideAllBuildEllipses();
+                HideAllPipEllipses();
                 _showSettlementByPipsIndex = 0;
+            }
+
+            // tell all the Buildings that the CurrentPlayer has changed
+            foreach (var building in _gameView.AllBuildings)
+            {
+                building.CurrentPlayer = CurrentPlayer;
             }
 
         }
@@ -1378,7 +1381,7 @@ namespace Catan10
         public void BuildingEntered(BuildingCtrl building, PointerRoutedEventArgs e)
         {
             if (CurrentPlayer == null) return;
-            bool canBuild = ValidateSettlementBuildLocation(building, out bool showErrorUi);
+            bool canBuild = ValidateBuildingLocation(building, out bool showErrorUi);
 
             if (showErrorUi == false && canBuild == false)
                 return;
@@ -1386,8 +1389,9 @@ namespace Catan10
             if (building.Owner == null)
             {
 
-                building.Color = CurrentPlayer.Background;
-                building.ShowBuildEllipse(canBuild);
+                building.BuildingState = BuildingState.None;
+
+                
 
                 //settlement.ShowBuildEllipse(true);
                 //foreach (var r in settlement.AdjacentRoads)
@@ -1397,9 +1401,16 @@ namespace Catan10
             }
 
         }
+
+        public Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl building)
+        {
+            bool ret = ValidateBuildingLocation(building, out bool showError);
+            return new Tuple<bool, bool>(ret, showError);
+        }
+
         //
         //  returns True if it is OK to build this settlement - this is basically a Road check
-        bool ValidateSettlementBuildLocation(BuildingCtrl settlement, out bool showErrorUI)
+        bool ValidateBuildingLocation(BuildingCtrl building, out bool showErrorUI)
         {
             showErrorUI = true;
             if (GameState == GameState.WaitingForNewGame || GameState == GameState.WaitingForStart)
@@ -1426,15 +1437,15 @@ namespace Catan10
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
                 allocationPhase = true;
 
-            error = SettlementsWithinOneSpace(settlement);
+            error = SettlementsWithinOneSpace(building);
 
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
-                if (settlement.BuildingToTileDictionary.Count > 0)
+                if (building.BuildingToTileDictionary.Count > 0)
                 {
-                    if (_gameView.GetIsland(settlement.BuildingToTileDictionary.First().Value) != null)
+                    if (_gameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
                     {
-                        this.TraceMessage($"{settlement} is on an island");
+                        this.TraceMessage($"{building} is on an island");
                         //
                         //  we are on an island - you can't build on an island when you are allocating resources
                         error = true;
@@ -1443,12 +1454,30 @@ namespace Catan10
                 }
             }
 
+            //
+            //  make sure that we have at least one buildable tile
+            bool buildableTile = false;
+            foreach (var kvp in building.BuildingToTileDictionary)
+            {
+                if (kvp.Value.ResourceType != ResourceType.Sea)
+                {
+                    buildableTile = true;
+                    break;
+                }
+            }
+            
+            if (!buildableTile)
+            {
+                showErrorUI = false;
+                return false;
+            }
+
             if (!allocationPhase && error == false)
             {
                 error = true;
                 //
                 //   if the settlement is not next to another settlement and we are not in allocation phase, we have to be next to a road
-                foreach (RoadCtrl road in settlement.AdjacentRoads)
+                foreach (RoadCtrl road in building.AdjacentRoads)
                 {
                     if (road.Color == CurrentPlayer.Background && road.RoadState != RoadState.Unowned)
                     {
@@ -1463,12 +1492,12 @@ namespace Catan10
             return !error;
         }
 
-        public void BuildingExited(BuildingCtrl settlement, PointerRoutedEventArgs e)
+        public void BuildingExited(BuildingCtrl building, PointerRoutedEventArgs e)
         {
 
-            if (settlement.Owner == null)
+            if (building.Owner == null)
             {
-                settlement.HideBuildEllipse();
+                building.BuildingState = BuildingState.None;
             }
 
 
@@ -1479,28 +1508,44 @@ namespace Catan10
             //}
         }
 
-        public async void BuildingPointerPressed(BuildingCtrl settlement, PointerRoutedEventArgs e)
+        /// <summary>
+        ///     called after the settlement status has been updated.  the PlayerData has already been fixed to represent the new state
+        ///     the Views bind directly to the PlayerData, so we don't do anything with the Score (or anything else with PlayerData)
+        ///     This View knows how to Log and about the other Buildings and Roads, so put anything in here that is impacted by building something (or "unbuilding" it)
+        ///     in this case, recalc the longest road (a buidling can "break" a road) and then log it.
+        ///     we also clear all the Pipe ellipses if we are in the allocating phase
+        /// </summary>
+        public async void BuildingStateChanged(BuildingCtrl building, BuildingState oldState)
         {
-            if (!ValidateSettlementBuildLocation(settlement, out bool showErrorUi)) return;
-
-
-            int currentScore = settlement.ScoreValue;
-
             PlayerData player = CurrentPlayer;
-
-            //
-            //  this is if somebody clicks on anothe player's settlement
-            if (settlement.Owner != null && settlement.Owner != player)
-                return;
-
-
-            await UpdateSettlementState(settlement, settlement.BuildingState, NextSettlementStype(settlement), LogType.Normal);
-
+            RecalcLongestRoadAfterBuildingChanges(null, building, player);
+            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, LogType.Normal, building.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState ));
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
-                HideAllBuildEllipses();
+                HideAllPipEllipses();
                 _showSettlementByPipsIndex = 0;
             }
+
+            UpdateSettlementOwner(player, building, oldState, building.BuildingState);
+        }
+        /// <summary>
+        ///     called by the BuildingCtrl during PointerPressed to see if it is ok to change the state of the building.
+        ///     we can only do that if the state is WaitingForNext and the CurrentPlayer == the owner of the building
+        /// </summary>
+        /// <returns></returns>
+        public bool BuildingStateChangedOk(BuildingCtrl building)
+        {
+            if (building.Owner != null)
+            {
+                if (building.Owner.ColorAsString != CurrentPlayer?.ColorAsString) // you can only click on your own stuff and when it is your turn
+                {
+                    return false;
+                }
+            }
+            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse || GameState == GameState.Supplemental || GameState == GameState.WaitingForNext)
+                return true;
+
+            return false;
         }
 
         public TileCtrl GetTile(int tileIndex, int gameIndex)

@@ -1044,8 +1044,7 @@ namespace Catan10
                             building.LayoutPoint = point;
                             building.Transform.TranslateX = point.X - .5 * building.Width;
                             building.Transform.TranslateY = point.Y - .5 * building.Height;
-                            building.Color = _buildColor;
-
+                            
                             //
                             //  add to dictionary...                            
                             if (!building.BuildingToTileDictionary.ContainsKey(location))

@@ -44,7 +44,10 @@ namespace Catan10
         {
             BuildingState desiredState = StaticHelpers.ParseEnum<BuildingState>((string)parameter);
             BuildingState actualState = (BuildingState)value;
-            if (actualState == desiredState) return Visibility.Visible;
+            if (actualState == desiredState)
+            {
+                return Visibility.Visible;
+            }
             return Visibility.Collapsed;
         }
 

@@ -16,14 +16,12 @@ namespace Catan10
     /// <summary>
     ///     The states that a building can be in
     /// </summary>
-    public enum BuildingState { None, Settlement, City, Pips };
-  
+    public enum BuildingState { None, Build, Error, Pips, Settlement, City };
+
     public sealed partial class BuildingCtrl : UserControl
     {
-        double _baseOpacity = 0.0;
         public int Index { get; set; } = -1; // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
-        CityCtrl _city = null;
-        SettlementCtrl _settlement = null;
+
 
         SolidColorBrush _brush = new SolidColorBrush(Colors.Blue);
         public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
@@ -40,8 +38,31 @@ namespace Catan10
 
         public IGameCallback Callback { get; internal set; }
 
-        PlayerData _playerData = null;
+
         public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerData), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerData), typeof(BuildingCtrl), new PropertyMetadata(null));
+        public PlayerData Owner
+        {
+            get => (PlayerData)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+        public PlayerData CurrentPlayer
+        {
+            get => (PlayerData)GetValue(CurrentPlayerProperty);
+            set => SetValue(CurrentPlayerProperty, value);
+        }
+        private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as BuildingCtrl;
+            var depPropValue = (PlayerData)e.NewValue;
+            depPropClass?.SetCurrentPlayer(depPropValue);
+        }
+        private void SetCurrentPlayer(PlayerData value)
+        {
+
+        }
+
         public BuildingState BuildingState
         {
             get { return (BuildingState)GetValue(BuildingStateProperty); }
@@ -53,55 +74,15 @@ namespace Catan10
             BuildingState depPropValue = (BuildingState)e.NewValue;
             depPropClass.SetBuildingState(depPropValue);
         }
-      
-        /// <summary>
-        ///     the Visibility is bound to the property (and converted from the State with a value converter)
-        ///     but the City/Settlement doesn't exist until we hit the state to save the startup cost.  so 
-        ///     we create them here.
-        /// </summary>
-        /// <param name="value"></param>
+
         private void SetBuildingState(BuildingState value)
         {
-            switch (value)
-            {
-                case BuildingState.Settlement:
-                    if (_settlement == null)
-                    {
-                        _settlement = new SettlementCtrl();
-                        _vbSettlement.Child = _settlement;
-                        UpdateColors();
-                    }                  
-                    break;
-                case BuildingState.City:
-                    if (_city == null)
-                    {
-                        _city = new CityCtrl();
-                        _vbCity.Child = _city;
-                        UpdateColors();
-                    }
-                    break;
-                default:
-                    break;
-            }
+
         }
 
 
 
-        public PlayerData Owner
-        {
-            get
-            {
-                return _playerData;
-            }
-            set
-            {
-                if (_playerData != value)
-                {
-                    //   this.TraceMessage($"\nOwner for {this} set to {value}");
-                    _playerData = value;
-                }
-            }
-        }
+
         public int Pips
         {
             get
@@ -116,38 +97,20 @@ namespace Catan10
 
             }
         }
-        public Color Color
-        {
-            get
-            {
-                return _brush.Color;
-            }
-            set
-            {
-                _brush = new SolidColorBrush(value);
 
-                if (value == Colors.White)
-                    _txtError.Foreground = new SolidColorBrush(Colors.Red);
-                else
-                    _txtError.Foreground = new SolidColorBrush(Colors.White);
-
-                UpdateColors();
-
-            }
-        }
 
         internal void Reset()
         {
             Owner = null;
-            Show(BuildingState.None);
+            this.BuildingState = BuildingState.None;
 
         }
 
         public override string ToString()
         {
-            return String.Format($"Index={Index};Type={BuildingState};Location={this.SettlementLocation};Background={Color};Pips={Pips}");
+            return String.Format($"Index={Index};Type={BuildingState};Owner={Owner};Pips={Pips}");
         }
-       
+
 
         public bool IsCity
         {
@@ -168,13 +131,8 @@ namespace Catan10
         public BuildingCtrl()
         {
             this.InitializeComponent();
-            _gridBuildEllipse.Opacity = _baseOpacity;
-         
-            _buildEllipse.Fill = new SolidColorBrush(Colors.BurlyWood);
-            if (StaticHelpers.IsInVisualStudioDesignMode)
-            {
-                _gridBuildEllipse.Opacity = 1.0;
-            }
+
+
 
 
             this.Width = 30;
@@ -192,15 +150,11 @@ namespace Catan10
             };
 
             this.RenderTransform = transform;
-            
+
 
 
         }
-        private void Building_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            //  OutputKeyInfo();
-            Callback?.BuildingPointerPressed(this, e);
-        }
+        
 
         private void OutputKeyInfo()
         {
@@ -213,108 +167,97 @@ namespace Catan10
             this.TraceMessage(s);
         }
 
-        private void Building_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            Callback?.BuildingExited(this, e);
-            // BuildingCtrl.HideBuildEllipse();
-        }
 
+        /// <summary>
+        ///     When we enter a building, we check to see if there is nothing being shown
+        ///     if so and if it is a valid building location, show the build ellipse
+        ///     otherwise show the Error
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Building_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            //BuildingCtrl.ShowBuildEllipse();
-            Callback?.BuildingEntered(this, e);
+           if (this.BuildingState == BuildingState.None)
+            {
+                
+                Tuple<bool, bool> validate = Callback?.IsValidBuildingLocation(this);
+                if (validate.Item1) // it is a valid location
+                {
+                    this.BuildingState = BuildingState.Build;
+                }
+                else if (validate.Item2) // it is not a valid location and we should show an error
+                {
+                    this.BuildingState = BuildingState.Error;
+                    
+                }
+            }
 
         }
+        private void Building_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            //
+            //  need to validate that the GameState is a valid state to change the state of a building
 
-        public BuildingLocation SettlementLocation { get; set; } = BuildingLocation.None;
+            bool valid = (bool) Callback?.BuildingStateChangedOk(this);
+            if (!valid)
+            {
+                return;
+            }
 
+            //Tuple<bool, bool> validate = Callback?.IsValidBuildingLocation(this);
+            //if (validate.Item1 == false) return; // not a valid building site
+            BuildingState oldState = this.BuildingState;
+            switch (BuildingState)
+            {
+                case BuildingState.Error: // do nothing
+                case BuildingState.None: // do nothing
+                    break;
+                case BuildingState.Pips: // Pips and build transition to Settlement
+                case BuildingState.Build:
+                    BuildingState = BuildingState.Settlement;
+                    Owner = CurrentPlayer;
+                    CurrentPlayer.GameData.Settlements.Add(this);
+                    Callback?.BuildingStateChanged(this, oldState);
+                    break;
+                case BuildingState.Settlement: //transition to City
+                    BuildingState = BuildingState.City;
+                    CurrentPlayer.GameData.Settlements.Remove(this);
+                    CurrentPlayer.GameData.Cities.Add(this);
+                    Callback?.BuildingStateChanged(this, oldState);
+                    break;
+                case BuildingState.City: // transtion to Build
+                    BuildingState = BuildingState.Build;
+                    CurrentPlayer.GameData.Cities.Remove(this);
+                    Owner = null;
+                    Callback?.BuildingStateChanged(this, oldState);
+                    break;
+                default:
+                    break;
+            }
+            
+            
+        }
+
+        /// <summary>
+        ///  if we leave and it was an Error or Build, reset state to None
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Building_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+           if (this.BuildingState == BuildingState.Build || BuildingState == BuildingState.Error)
+            {
+                this.BuildingState = BuildingState.None;
+            }
+        }
         public void ShowBuildEllipse(bool canBuild = true, string colorAsString = "", string msg = "X")
         {
-            _txtError.Text = msg;
+            _txtPipCount.Text = msg;
 
-          
-
-            double opacity = 1.0;
-            if (!canBuild) opacity = .25;
-
-            _gridBuildEllipse.Opacity = opacity;
-
-            
-            if (colorAsString != "")
-            {
-                _buildEllipse.Fill = new SolidColorBrush(StaticHelpers.StringToColorDictionary[colorAsString]);
-                _gridBuildEllipse.Opacity = 1.0;
-
-            }
+            this.BuildingState = BuildingState.Pips;
 
         }
 
-        public bool BuildEllipseVisible
-        {
-            get
-            {
-                return _gridBuildEllipse.Opacity > 0;
-
-            }
-        }
-
-
-        public void HideBuildEllipse()
-        {
-            _gridBuildEllipse.Opacity = _baseOpacity;
-        }
-
-        private void UpdateColors()
-        {
-            if (_settlement != null)
-            {
-                _settlement.CircleFillColor = _brush.Color;
-            }
-            if (_city != null)
-            {
-                _city.CircleFillColor = _brush.Color;
-            }
-
-
-            //_polySettlement.Fill = _brush;
-            //_polySettlement.Stroke = _brush;
-
-            //_polyCity.Fill = _brush;
-            //_polyCity.Stroke = _brush;
-            //_shade.Fill = _brush;
-            _buildEllipse.Fill = _brush;
-
-
-
-
-        }
-
-
-
-
-
-
-
-        public void Show(BuildingState type)
-        {
-            _baseOpacity = type == BuildingState.None ? 0.0 : 1.0;
-
-
-     
-
-            //
-            //  make the ellipse we use to show PointerEnter/Leaved locations
-            _gridBuildEllipse.Opacity = _baseOpacity;
-            if (type == BuildingState.None)
-                _buildEllipse.Fill = new SolidColorBrush(Color);
-            else
-                _buildEllipse.Fill = new SolidColorBrush(Colors.Transparent);
-
-          
-
-            BuildingState = type;
-
-        }
 
         public int ScoreValue
         {
@@ -333,11 +276,6 @@ namespace Catan10
 
                 }
             }
-        }
-
-        internal void SetCallback(IGameCallback callback)
-        {
-            Callback = callback;
         }
 
         public void AddKey(TileCtrl tile, BuildingLocation loc)

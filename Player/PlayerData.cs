@@ -26,7 +26,7 @@ namespace Catan10
 
         public ObservableCollection<RoadCtrl> Roads { get; set; } = new ObservableCollection<RoadCtrl>();
         public ObservableCollection<RoadCtrl> Ships { get; set; } = new ObservableCollection<RoadCtrl>();
-        public ObservableCollection<BuildingCtrl> Buildings { get; set; } = new ObservableCollection<BuildingCtrl>();
+        public ObservableCollection<BuildingCtrl> Settlements { get; set; } = new ObservableCollection<BuildingCtrl>();
         public ObservableCollection<BuildingCtrl> Cities { get; set; } = new ObservableCollection<BuildingCtrl>();
         public ObservableCollection<int> Rolls { get; set; } = new ObservableCollection<int>();
         public PlayerResourceData PlayerResourceData { get; set; } = null;
@@ -40,7 +40,7 @@ namespace Catan10
         public PlayerGameData(PlayerData pData)
         {
             Roads.CollectionChanged += Roads_CollectionChanged;
-            Buildings.CollectionChanged += Settlements_CollectionChanged;
+            Settlements.CollectionChanged += Settlements_CollectionChanged;
             Cities.CollectionChanged += Cities_CollectionChanged;
             Ships.CollectionChanged += Ships_CollectionChanged;
             _playerData = pData;
@@ -56,14 +56,14 @@ namespace Catan10
         {
             CitiesPlayed = Cities.Count;
             UpdateScore();
-            Pips = CalculatePips(Buildings, Cities);
+            Pips = CalculatePips(Settlements, Cities);
         }
 
         private void Settlements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            SettlementsPlayed = Buildings.Count;
+            SettlementsPlayed = Settlements.Count;
             UpdateScore();
-            Pips = CalculatePips(Buildings, Cities);
+            Pips = CalculatePips(Settlements, Cities);
         }
 
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
@@ -125,7 +125,7 @@ namespace Catan10
             MovedBaronAfterRollingSeven = null;
             PlayedKnightThisTurn = false;
             Roads.Clear();
-            Buildings.Clear();
+            Settlements.Clear();
             Cities.Clear();
             Rolls.Clear();
             Ships.Clear();

@@ -54,7 +54,7 @@ namespace Catan10
         SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
         SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
         TileOrientation _tileOrientation = TileOrientation.FaceDown;
-        public List<BuildingCtrl> Settlements { get; } = new List<BuildingCtrl>();
+        public List<BuildingCtrl> Buildings { get; } = new List<BuildingCtrl>();
         public bool HasBaron { get; set; } = false;
         public bool HasPirateShip { get; set; } = false;
 
@@ -119,9 +119,9 @@ namespace Catan10
 
         internal void Reset()
         {
-            foreach (var s in Settlements)
+            foreach (var s in Buildings)
             {
-                s.Show(BuildingState.None);
+                s.Reset();
             }
 
             OwnedSettlements.Clear();
