@@ -65,7 +65,9 @@ namespace Catan10
 
         };
 
-        private string[] GridPositionName = new string[] { "RollGrid", "ScoreGrid", "ScoreGrid2", "ControlGrid", "_GameSummary", "_savedGameGrid" };
+        //
+        //  this is the name of the grids in MainPage.xaml that we want to store and retrieve locations
+        private string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView" };
 
         //
         //  this just creates our saved file
