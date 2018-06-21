@@ -279,77 +279,6 @@ namespace Catan10
 
         }
 
-        private void PlayerView_TitlebarClicked(PlayerView playerView)
-        {
-            CompositeTransform transform = ((CompositeTransform)playerView.RenderTransform);
-            double x = transform.TranslateX;
-            double y = transform.TranslateY;
-            double titleBarHeight = playerView.TitlebarHeight;
-
-
-            switch (playerView.Orientation)
-            {
-                case PlayerViewOrientation.Bottom:
-                    if (playerView.IsOpen)
-                    {
-                        y = playerView.ActualHeight - titleBarHeight;
-                        playerView.IsOpen = false;
-
-                    }
-                    else
-                    {
-                        y = 0;
-                        playerView.IsOpen = true;
-                    }
-                    break;
-                case PlayerViewOrientation.Right:
-                    if (playerView.IsOpen)
-                    {
-                        x = -titleBarHeight;
-                        playerView.IsOpen = false;
-
-                    }
-                    else
-                    {
-                        x = -(playerView.ActualHeight);
-                        playerView.IsOpen = true;
-                    }
-                    break;
-                case PlayerViewOrientation.Top:
-                    if (playerView.IsOpen)
-                    {
-                        y = titleBarHeight;
-                        playerView.IsOpen = false;
-
-                    }
-                    else
-                    {
-                        y = playerView.ActualHeight;
-                        playerView.IsOpen = true;
-                    }
-                    break;
-                case PlayerViewOrientation.Left:
-                    if (playerView.IsOpen)
-                    {
-                        x = titleBarHeight;
-                        playerView.IsOpen = false;
-                    }
-                    else
-                    {
-                        x = (playerView.ActualHeight);
-                        playerView.IsOpen = true;
-
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            playerView.AnimatePosition(x, y);
-
-
-        }
-
         public static double GetAnimationSpeed(AnimationSpeed speed)
         {
             double baseSpeed = 2;
@@ -579,7 +508,7 @@ namespace Catan10
 
             }
 
-           
+
             await VisualShuffle();
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
@@ -592,7 +521,7 @@ namespace Catan10
 
         }
 
-       
+
 
         private void ResetDataForNewGame()
         {
@@ -728,16 +657,6 @@ namespace Catan10
                 default:
                     break;
             }
-        }
-
-        private async Task WaitForNext(string message)
-        {
-            StateDescription = message;
-            _btnNextStep.IsEnabled = true;
-            _btnNextStep.Click -= OnNextStep;
-            await _btnNextStep.WhenClicked();
-            _btnNextStep.Click += OnNextStep;
-
         }
 
 
@@ -1482,56 +1401,49 @@ namespace Catan10
             _showPipGroupIndex++;
             List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
             buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
-            int currentPipCount = -1;
-            int pipGroup = 0;
-            if (_showPipGroupIndex == 1)
-            {
-                foreach (var building in buildingsOrderedByPips)
-                {
-                    if (building.Pips == 0)
-                    {
-                        building.PipGroup = -1;
-                        continue; // outside the main map or a desert next to nothing
-                    }
-
-                    if (ValidateBuildingLocation(building, out bool showerror) == false)
-                    {
-                        continue;
-                    }
-
-                    if (currentPipCount != building.Pips)
-                    {
-                        pipGroup++;
-                        currentPipCount = building.Pips;
-                    }
-
-                    building.PipGroup = pipGroup;
-                }
-            }
-
+           
+            int pipCountToShow = buildingsOrderedByPips[0].Pips;
+            bool shownOne = false;
             foreach (var building in buildingsOrderedByPips)
             {
-                if (ValidateBuildingLocation(building, out bool showerror) == false)
+                //
+                //  keep going until the pip count changes - but we have to show at least one
+                if (pipCountToShow != building.Pips  && shownOne)
                 {
-                    this.TraceMessage($"building {building} is in an invalid location");
+                    break;
+                }
+
+                if (building.Pips == 0)  // throw out the ones that have no pips
+                {
+                    building.PipGroup = -1;
+                    continue; // outside the main map or a desert next to nothing
+                }
+
+                if (ValidateBuildingLocation(building, out bool showerror) == false) // throw out the ones you can't build in
+                {
                     continue;
                 }
 
-                if (building.BuildingState == BuildingState.None)
+                if (building.BuildingState != BuildingState.None) continue;  // throw out the non-empty ones
+
+                //
+                //  if we've got here, we can build on this location and we need to show everythign tha thas this pipcount
+                if (!shownOne)
                 {
-                    if (building.PipGroup == _showPipGroupIndex)
-                    {
-                        building.BuildingState = BuildingState.Pips;                        
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    pipCountToShow = building.Pips;
+                    shownOne = true;
                 }
+
+                building.PipGroup = _showPipGroupIndex;
+                building.BuildingState = BuildingState.Pips;
+                
+
             }
 
+
+
         }
-       
+
         private void OnClearPips(object sender, RoutedEventArgs e)
         {
 

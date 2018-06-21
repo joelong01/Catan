@@ -56,7 +56,7 @@ namespace Catan10
         }
         private void SetPipGroup(int value)
         {
-            this.TraceMessage(this.ToString());
+           
         }
 
 
