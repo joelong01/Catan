@@ -19,7 +19,7 @@
             <Ellipse Name="_pipEllipse"  Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.Background , Mode=OneWay, FallbackValue=Green, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"  />
             <Viewbox>
                 <StackPanel>
-                    <TextBlock Text="{x:Bind PipGroup, FallbackValue=2, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}" 
+                    <TextBlock Text="{x:Bind Pips, FallbackValue=2, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}" 
                        Foreground="{x:Bind Path=CurrentPlayer.Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"
                        CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                     <!--<TextBlock Text="{x:Bind Index, FallbackValue=52, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}" 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -218,7 +219,12 @@ namespace Catan10
             }
 
         }
-        private void Building_PointerPressed(object sender, PointerRoutedEventArgs e)
+        /// <summary>
+        ///     user clicked on a building.  change the state to the new state and then update the BuildingState (which does the proper logging)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Building_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             //
             //  need to validate that the GameState is a valid state to change the state of a building
@@ -229,46 +235,88 @@ namespace Catan10
                 return;
             }
 
-            //Tuple<bool, bool> validate = Callback?.IsValidBuildingLocation(this);
-            //if (validate.Item1 == false) return; // not a valid building site
+            
+            
             BuildingState oldState = this.BuildingState;
-            switch (BuildingState)
+            BuildingState newState = BuildingState.None;
+            switch (oldState)
             {
                 case BuildingState.Error: // do nothing
                 case BuildingState.None: // do nothing
-                    break;
+                    return;                    
                 case BuildingState.Pips: // Pips and build transition to Settlement
                 case BuildingState.Build:
-                    BuildingState = BuildingState.Settlement;
-                    Owner = CurrentPlayer;
-                    CurrentPlayer.GameData.Settlements.Add(this);
-                    Callback?.BuildingStateChanged(this, oldState);
-                    break;
+                    oldState = BuildingState.None; // when you have Pips and then Undo it, go back to None;
+                    newState = BuildingState.Settlement;
+                    break;                
                 case BuildingState.Settlement: //transition to City
-                    BuildingState = BuildingState.City;
-                    CurrentPlayer.GameData.Settlements.Remove(this);
-                    CurrentPlayer.GameData.Cities.Add(this);
-                    Callback?.BuildingStateChanged(this, oldState);
+                    newState = BuildingState.City;
                     break;
                 case BuildingState.City: // transtion to Build
-                    BuildingState = BuildingState.Build;
-                    CurrentPlayer.GameData.Cities.Remove(this);
-                    Owner = null;
-                    Callback?.BuildingStateChanged(this, oldState);
+                    newState = BuildingState.Build;
                     break;
                 default:
                     break;
             }
-            
-            
+
+            await UpdateBuildingState(oldState, newState, LogType.Normal);
+
+
         }
 
         /// <summary>
-        ///  if we leave and it was an Error or Build, reset state to None
+        ///     Sets the state of a building *directly* - eg. doesn't validate state transitions.
+        ///     we need this functionality in Undo/Redo and ReplayLog
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Building_PointerExited(object sender, PointerRoutedEventArgs e)
+        /// <param name="building"></param>
+        /// <param name="oldState"></param>
+        /// <param name="newState"></param>
+        /// <param name="logType"></param>
+        /// <returns></returns>
+        public async Task UpdateBuildingState(BuildingState oldState, BuildingState newState, LogType logType)
+        {
+            PlayerData player = CurrentPlayer;
+
+            //
+            //  remove everything -- we will add it back below
+            player.GameData.Cities.Remove(this);
+            player.GameData.Settlements.Remove(this);
+            this.BuildingState = newState;
+            
+
+            switch (newState)
+            {
+                case BuildingState.Pips:
+                //    Owner = player;
+                    break;
+
+                //
+                //  work done above                    
+                case BuildingState.None:
+                case BuildingState.Build:
+                    Owner = null;
+                    break;
+                case BuildingState.Settlement:
+                    Owner = player;
+                    player.GameData.Settlements.Add(this);
+                    break;
+                case BuildingState.City:
+                    Owner = player;
+                    player.GameData.Cities.Add(this);
+                    break;
+                default:
+                    break;
+            }
+
+            await Callback?.BuildingStateChanged(this, oldState, logType);
+        }
+
+            /// <summary>
+            ///  if we leave and it was an Error or Build, reset state to None
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+            private void Building_PointerExited(object sender, PointerRoutedEventArgs e)
         {
            if (this.BuildingState == BuildingState.Build || BuildingState == BuildingState.Error)
             {

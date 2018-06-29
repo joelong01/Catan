@@ -190,7 +190,7 @@ namespace Catan10
     {
         TileCtrl GetTile(int tileIndex, int gameIndex);
         RoadCtrl GetRoad(int roadIndex, int gameIndex);
-        BuildingCtrl GetSettlement(int settlementIndex, int gameIndex);
+        BuildingCtrl GetBuilding(int buildingIndex, int gameIndex);
         PlayerData GetPlayerData(int playerIndex);        
     }
 
@@ -283,8 +283,8 @@ namespace Catan10
                 case CatanAction.UpdatedRoadState:
                     Tag = new LogRoadUpdate(val, parseHelper);
                     break;
-                case CatanAction.UpdateSettlementState:
-                    Tag = new LogSettlementUpdate(val, parseHelper);
+                case CatanAction.UpdateBuildingState:
+                    Tag = new LogBuildingUpdate(val, parseHelper);
                     break;
                 case CatanAction.AddPlayer:
                     Tag = Enum.Parse(typeof(PlayerPosition), val);
@@ -613,37 +613,37 @@ namespace Catan10
         }
     }
 
-    public class LogSettlementUpdate
+    public class LogBuildingUpdate
     {
-        public BuildingCtrl Settlement { get; set; } = null;
+        public BuildingCtrl Building { get; set; } = null;
         public TileCtrl Tile { get; set; } = null;
 
         public BuildingState OldBuildingState { get; set; } = BuildingState.None;
         public BuildingState NewBuildingState { get; set; } = BuildingState.None;
         public int TileIndex { get; set; } = -1;
-        public int SettlementIndex { get; set; } = -1;
+        public int BuildingIndex { get; set; } = -1;
         public int GameIndex { get; set; } = -1;
 
 
-        private string[] _serializedProperties = new string[] { "OldBuildingState", "NewBuildingState", "SettlementIndex", "TileIndex", "GameIndex" };
+        private string[] _serializedProperties = new string[] { "OldBuildingState", "NewBuildingState", "BuildingIndex", "TileIndex", "GameIndex" };
 
-        public LogSettlementUpdate(string s, ILogParserHelper parseHelper)
+        public LogBuildingUpdate(string s, ILogParserHelper parseHelper)
         {
             Deserialize(s);
-            Settlement = parseHelper.GetSettlement(SettlementIndex, GameIndex);
+            Building = parseHelper.GetBuilding(BuildingIndex, GameIndex);
             if (TileIndex != -1)
             {
                 Tile = parseHelper.GetTile(TileIndex, GameIndex);
             }
         }
 
-        public LogSettlementUpdate(int gameIndex, TileCtrl tileCtrl, BuildingCtrl settlementCtrl, BuildingState oldState, BuildingState newState)
+        public LogBuildingUpdate(int gameIndex, TileCtrl tileCtrl, BuildingCtrl buildingCtrl, BuildingState oldState, BuildingState newState)
         {
             GameIndex = gameIndex;
             Tile = tileCtrl;
-            Settlement = settlementCtrl;
+            Building = buildingCtrl;
             OldBuildingState = oldState;
-            SettlementIndex = settlementCtrl.Index;
+            BuildingIndex = buildingCtrl.Index;
             NewBuildingState = newState;
             if (tileCtrl != null)
                 TileIndex = tileCtrl.Index;
@@ -655,12 +655,12 @@ namespace Catan10
 
         public string Serialize()
         {
-            return StaticHelpers.SerializeObject<LogSettlementUpdate>(this, _serializedProperties, ":", ",");
+            return StaticHelpers.SerializeObject<LogBuildingUpdate>(this, _serializedProperties, ":", ",");
         }
 
         public void Deserialize(string s)
         {
-            StaticHelpers.DeserializeObject<LogSettlementUpdate>(this, s, ":", ",");
+            StaticHelpers.DeserializeObject<LogBuildingUpdate>(this, s, ":", ",");
         }
     }
 }

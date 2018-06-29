@@ -1198,15 +1198,15 @@ namespace Catan10
 
                         await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
                         break;
-                    case CatanAction.UpdateSettlementState:
+                    case CatanAction.UpdateBuildingState:
 
-                        LogSettlementUpdate lsu = (LogSettlementUpdate)logLine.Tag;
+                        LogBuildingUpdate lsu = (LogBuildingUpdate)logLine.Tag;
                         if (lsu.OldBuildingState != BuildingState.City)
                         {
-                            lsu.Settlement.Owner = CurrentPlayer;
+                            lsu.Building.Owner = CurrentPlayer;
                         }
 
-                        await UpdateSettlementState(lsu.Settlement, lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
+                        await lsu.Building.UpdateBuildingState(lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
                         break;
                     case CatanAction.AddPlayer:
                         await AddPlayer(logLine, LogType.Replay);
@@ -1396,7 +1396,7 @@ namespace Catan10
         ///      you have to do this every time because people might have built in locations that change the PipGroup
         /// </summary>
         private int _showPipGroupIndex = 0;
-        private void OnShowPips(object sender, RoutedEventArgs e)
+        private async void OnShowPips(object sender, RoutedEventArgs e)
         {
             _showPipGroupIndex++;
             List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
@@ -1435,9 +1435,8 @@ namespace Catan10
                 }
 
                 building.PipGroup = _showPipGroupIndex;
-                building.BuildingState = BuildingState.Pips;
+                await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.Normal);
                 
-
             }
 
 

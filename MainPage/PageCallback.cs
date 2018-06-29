@@ -112,12 +112,17 @@ namespace Catan10
                         await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo);
                     SetLongestRoadFromLog();
                     break;
-                case CatanAction.UpdateSettlementState:
-                    LogSettlementUpdate settlementUpdate = logLine.Tag as LogSettlementUpdate;
+                case CatanAction.UpdateBuildingState:
+                    LogBuildingUpdate buildingUpdate = logLine.Tag as LogBuildingUpdate;
                     if (replayingLog)
-                        await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.OldBuildingState, settlementUpdate.NewBuildingState, LogType.Undo);
+                    {
+                        await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.OldBuildingState, buildingUpdate.NewBuildingState, LogType.Undo);
+                    }                        
                     else
-                        await UpdateSettlementState(settlementUpdate.Settlement, settlementUpdate.NewBuildingState, settlementUpdate.OldBuildingState, LogType.Undo); // NOTE:  New and Old have been swapped                      
+                    {
+                        await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState, LogType.Undo); // NOTE:  New and Old have been swapped                      
+                    }
+                        
                     break;
                 default:
                     break;
@@ -886,10 +891,10 @@ namespace Catan10
 
         private void UpdateTileBuildingOwner(PlayerData player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
-            
+
             foreach (var key in building.Clones)
             {
-                
+
                 if (newState == BuildingState.None)
                 {
                     // tell the tile that this settlement is no longer owned
@@ -928,38 +933,6 @@ namespace Catan10
             }
         }
 
-
-        
-        private async Task UpdateSettlementState(BuildingCtrl building, BuildingState newState, BuildingState newType, LogType logType)
-        {
-
-            PlayerData player = CurrentPlayer;
-
-            //
-            //  remove everything -- we will add it back below
-            player.GameData.Cities.Remove(building);
-            player.GameData.Settlements.Remove(building);
-            building.BuildingState = newType;
-            UpdateTileBuildingOwner(player, building, newType, newState);
-
-            switch (building.BuildingState)
-            {
-                case BuildingState.None:
-                    //
-                    //  work done above                    
-                    break;
-                case BuildingState.Settlement:
-                    player.GameData.Settlements.Add(building);
-                    break;
-                case BuildingState.City:
-                    player.GameData.Cities.Add(building);
-                    break;
-                default:
-                    break;
-            }
-            RecalcLongestRoadAfterBuildingChanges(null, building, player);
-            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, logType, building.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, building, newState, newType));
-        }
 
 
         private void RecalcLongestRoadAfterBuildingChanges(TileCtrl tileCtrl, BuildingCtrl settlementCtrl, PlayerData player)
@@ -1302,29 +1275,7 @@ namespace Catan10
             await UpdateRoadState(road, road.RoadState, NextRoadState(road), LogType.Normal);
         }
 
-        public void BuildingEntered(BuildingCtrl building, PointerRoutedEventArgs e)
-        {
-            if (CurrentPlayer == null) return;
-            bool canBuild = ValidateBuildingLocation(building, out bool showErrorUi);
-
-            if (showErrorUi == false && canBuild == false)
-                return;
-
-            if (building.Owner == null)
-            {
-
-                building.BuildingState = BuildingState.None;
-
-                
-
-                //settlement.ShowBuildEllipse(true);
-                //foreach (var r in settlement.AdjacentRoads)
-                //{
-                //    r.Show(true);
-                //}
-            }
-
-        }
+        
 
         public Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl building)
         {
@@ -1388,7 +1339,7 @@ namespace Catan10
                     break;
                 }
             }
-            
+
             if (!buildableTile)
             {
                 showErrorUI = false;
@@ -1415,21 +1366,6 @@ namespace Catan10
             return !error;
         }
 
-        public void BuildingExited(BuildingCtrl building, PointerRoutedEventArgs e)
-        {
-
-            if (building.Owner == null)
-            {
-                building.BuildingState = BuildingState.None;
-            }
-
-
-            //settlement.HideBuildEllipse();
-            //foreach (var r in settlement.AdjacentRoads)
-            //{
-            //    r.Show(false);
-            //}
-        }
 
         /// <summary>
         ///     called after the settlement status has been updated.  the PlayerData has already been fixed to represent the new state
@@ -1438,19 +1374,27 @@ namespace Catan10
         ///     in this case, recalc the longest road (a buidling can "break" a road) and then log it.
         ///     we also clear all the Pipe ellipses if we are in the allocating phase
         /// </summary>
-        public async void BuildingStateChanged(BuildingCtrl building, BuildingState oldState)
+        public async Task BuildingStateChanged(BuildingCtrl building, BuildingState oldState, LogType logType)
         {
             PlayerData player = CurrentPlayer;
             RecalcLongestRoadAfterBuildingChanges(null, building, player);
-            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateSettlementState, true, LogType.Normal, building.Index, new LogSettlementUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState ));
+            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
+
+            //
+            //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
-                HideAllPipEllipses();
-                _showPipGroupIndex = 0;
+                if (building.BuildingState != BuildingState.Pips) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
+                {
+
+                    HideAllPipEllipses();
+                    _showPipGroupIndex = 0;
+                }
             }
 
             UpdateTileBuildingOwner(player, building, oldState, building.BuildingState);
         }
+
         /// <summary>
         ///     called by the BuildingCtrl during PointerPressed to see if it is ok to change the state of the building.
         ///     we can only do that if the state is WaitingForNext and the CurrentPlayer == the owner of the building
@@ -1481,7 +1425,7 @@ namespace Catan10
             return _gameView.GetRoad(roadIndex, gameIndex);
         }
 
-        public BuildingCtrl GetSettlement(int settlementIndex, int gameIndex)
+        public BuildingCtrl GetBuilding(int settlementIndex, int gameIndex)
         {
             return _gameView.GetSettlement(settlementIndex, gameIndex);
         }

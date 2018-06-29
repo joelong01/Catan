@@ -48,7 +48,7 @@ namespace Catan10
         RolledSeven,                              // 10
         AssignedBaron,                            // 11
         UpdatedRoadState,                         // 12
-        UpdateSettlementState,                    // 13
+        UpdateBuildingState,                    // 13
         AssignedPirateShip,                       // 14
         AddPlayer,                                // 15
         AssignRandomNumbersToTileGroup,           // 16
@@ -148,9 +148,8 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
 
-        void BuildingEntered(BuildingCtrl settlement, PointerRoutedEventArgs e);
-        void BuildingExited(BuildingCtrl settlement, PointerRoutedEventArgs e);
-        void BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState);
+      
+        Task BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState, LogType logType);
 
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
         Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl sender);
