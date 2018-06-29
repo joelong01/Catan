@@ -43,6 +43,26 @@ namespace Catan10
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerData), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerData), typeof(BuildingCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
+        public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
+        public int Pips
+        {
+            get { return (int)GetValue(PipsProperty); }
+            set { SetValue(PipsProperty, value); }
+        }
+        private static void PipsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            BuildingCtrl depPropClass = d as BuildingCtrl;
+            int depPropValue = (int)e.NewValue;
+            depPropClass.SetPips(depPropValue);
+        }
+        private void SetPips(int value)
+        {
+            
+        }
+
+
+
+
         public int PipGroup
         {
             get { return (int)GetValue(PipGroupProperty); }
@@ -101,20 +121,7 @@ namespace Catan10
 
 
 
-        public int Pips
-        {
-            get
-            {
-                int pips = 0;
-                foreach (var kvp in BuildingToTileDictionary)
-                {
-                    pips += kvp.Value.Pips;
-
-                }
-                return pips;
-
-            }
-        }
+       
 
 
         internal void Reset()

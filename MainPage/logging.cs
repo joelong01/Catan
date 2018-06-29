@@ -345,23 +345,6 @@ namespace Catan10
 
 
 
-       
-        public LogEntry(LogEntry a)
-        {
-            this.GameState = a.GameState;
-            this.PlayerData = a.PlayerData;
-            this.Action = a.Action;
-            this.Tag = a.Tag;            
-        }
-
-        public LogEntry(LogEntry a, CatanAction action)
-        {
-            this.GameState = a.GameState;
-            this.PlayerData = a.PlayerData;
-            this.Action = action;
-            this.Tag = Tag;
-        }
-
         public bool Undoable
         {
             get

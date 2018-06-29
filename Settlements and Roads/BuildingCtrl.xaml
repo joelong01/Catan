@@ -33,6 +33,11 @@
         <Grid Opacity="1" Name="GRID_Build"              
              Visibility="{x:Bind BuildingState, FallbackValue=Visible, ConverterParameter=Build, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
             <Ellipse Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.Background, Mode=OneWay, FallbackValue=Green, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"  />
+            <Viewbox>
+            <TextBlock Text="{x:Bind Pips, FallbackValue=52, Mode=TwoWay,Converter={StaticResource ResourceKey=IntToStringConverter}}" 
+                                   Foreground="{x:Bind Path=CurrentPlayer.Foreground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"
+                                   CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
+            </Viewbox>
             <!-- this is just here for debugging purposed -->
             <!--<Viewbox>
                 <StackPanel>

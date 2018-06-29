@@ -513,7 +513,7 @@ namespace Catan10
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
 
-
+            
             //
             //  we used to wait until somebody clicked "Start" after starting a new game.  this was annoying. do it for them.
             await ProcessEnter(CurrentPlayer, "");
@@ -1454,65 +1454,4 @@ namespace Catan10
     }
 }
 
-
-
-
-public class RollStats : INotifyPropertyChanged
-{
-    int _roll = 0;
-    int _count = 0;
-    string _percent = "0";
-
-    public int Roll
-    {
-        get
-        {
-            return _roll;
-        }
-        set
-        {
-            _roll = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public int Count
-    {
-        get
-        {
-            return _count;
-        }
-        set
-        {
-            _count = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public string Percent
-    {
-        get
-        {
-            return _percent;
-        }
-        set
-        {
-            _percent = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public void CalcPercent(int total)
-    {
-        double p = (double)Count / (double)total * (double)100.0;
-        Percent = String.Format("{0:0.#}", p);
-    }
-
-
-    private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-    public event PropertyChangedEventHandler PropertyChanged;
-}
 

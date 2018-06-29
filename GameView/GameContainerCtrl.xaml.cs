@@ -393,6 +393,17 @@ namespace Catan10
                 await InitialPlaceBaron();
             }
 
+            foreach (var building in AllBuildings)
+            {
+                int pips = 0;
+                foreach (var kvp in building.BuildingToTileDictionary)
+                {
+                    pips += kvp.Value.Pips;
+
+                }
+                building.Pips = pips;
+            }
+
         }
 
         public async Task AssignRandomTilesToTileGroup(int tileGroupIndex, List<int> randomTileList)

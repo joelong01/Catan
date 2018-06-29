@@ -37,11 +37,6 @@ namespace Catan10
             }
         }
 
-        public async Task OnEnter(PlayerData ActivePlayerView, string txtInput)
-        {
-            await ProcessEnter(ActivePlayerView, txtInput);
-        }
-
 
         //
         //  returns True if it undid something, false if the undo action has no UI affect (e.g. true if the user would think undo happened)
@@ -303,15 +298,6 @@ namespace Catan10
             }
         }
 
-        public Task LostToCard(PlayerView targetedPlayer, string txtInput)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-
-
         private async Task PromptForLostCards(PlayerData targetedPlayer, CatanAction action)
         {
             await Task.Delay(0);
@@ -370,23 +356,6 @@ namespace Catan10
 
             throw new NotImplementedException();
         }
-
-
-        public async Task PlayerLostToCardLikeMonopoly(PlayerData targetedPlayer, string txtInput)
-        {
-
-            if (targetedPlayer == null) // many players targeted
-            {
-
-                await DoIteration(true, CatanAction.CardsLost);
-            }
-            else
-            {
-                await PromptForLostCards(targetedPlayer, CatanAction.CardsLost);
-            }
-        }
-
-
 
 
         /// <summary>
@@ -894,14 +863,6 @@ namespace Catan10
         }
 
 
-
-
-        private bool AllocatePhase()
-        {
-            return (GameState == GameState.AllocateResourceForward ||
-                    GameState == GameState.AllocateResourceReverse);
-        }
-
         //
         //  location is where you want to build something
         //  Catan doesn't allow settlemnts next to each other
@@ -922,37 +883,6 @@ namespace Catan10
             return false;
         }
 
-
-        private PlayerData ColorToPlayer(Color color)
-        {
-            foreach (PlayerData player in PlayingPlayers)
-            {
-                if (color == player.Background)
-                    return player;
-            }
-
-            return null;
-        }
-
-        private BuildingState NextBuildingState(BuildingCtrl building)
-        {
-            BuildingState newState = BuildingState.None;
-            switch (building.BuildingState)
-            {
-                case BuildingState.None:
-                    newState = BuildingState.Settlement;
-                    break;
-                case BuildingState.Settlement:
-                    newState = BuildingState.City;
-                    break;
-                case BuildingState.City:
-                    newState = BuildingState.None;
-                    break;
-                default:
-                    break;
-            }
-            return newState;
-        }
 
         private void UpdateTileBuildingOwner(PlayerData player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
@@ -1267,13 +1197,6 @@ namespace Catan10
 
         }
 
-        public async Task OnWinner(PlayerView currentPlayer, string txtInput)
-        {
-            await OnWin();
-        }
-
-
-
         public void CurrentPlayerChanged()
         {
 
@@ -1567,8 +1490,6 @@ namespace Catan10
         {
             return AllPlayers[playerIndex];
         }
-
-
 
 
     }
