@@ -117,12 +117,12 @@ namespace Catan10
                     if (replayingLog)
                     {
                         await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.OldBuildingState, buildingUpdate.NewBuildingState, LogType.Undo);
-                    }                        
+                    }
                     else
                     {
                         await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState, LogType.Undo); // NOTE:  New and Old have been swapped                      
                     }
-                        
+
                     break;
                 default:
                     break;
@@ -1170,7 +1170,7 @@ namespace Catan10
 
         }
 
-        public void CurrentPlayerChanged()
+        public async Task CurrentPlayerChanged()
         {
 
             ActivePlayerBackground = CurrentPlayer.ColorAsString;
@@ -1188,8 +1188,10 @@ namespace Catan10
 
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
-                HideAllPipEllipses();
+
+                await HideAllPipEllipses();
                 _showPipGroupIndex = 0;
+
             }
 
             // tell all the Buildings that the CurrentPlayer has changed
@@ -1275,7 +1277,7 @@ namespace Catan10
             await UpdateRoadState(road, road.RoadState, NextRoadState(road), LogType.Normal);
         }
 
-        
+
 
         public Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl building)
         {
@@ -1387,7 +1389,7 @@ namespace Catan10
                 if (building.BuildingState != BuildingState.Pips) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
                 {
 
-                    HideAllPipEllipses();
+                    await HideAllPipEllipses();
                     _showPipGroupIndex = 0;
                 }
             }

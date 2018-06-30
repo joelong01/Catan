@@ -63,6 +63,7 @@ namespace Catan10
         public async Task AppendLogLine(LogEntry le, bool save = true)
         {
             if (le.LogType == LogType.Replay) return;
+            if (le.LogType == LogType.DoNotLog) return;
 
             if (Replaying) return;
 
@@ -194,7 +195,7 @@ namespace Catan10
         PlayerData GetPlayerData(int playerIndex);        
     }
 
-    public enum LogType {Normal, Undo, Replay};
+    public enum LogType {Normal, Undo, Replay, DoNotLog };
 
 
     //   an object that encapsulates an action that has happned in the game

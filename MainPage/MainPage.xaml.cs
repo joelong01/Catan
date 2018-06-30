@@ -513,7 +513,7 @@ namespace Catan10
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
 
-            
+
             //
             //  we used to wait until somebody clicked "Start" after starting a new game.  this was annoying. do it for them.
             await ProcessEnter(CurrentPlayer, "");
@@ -911,11 +911,14 @@ namespace Catan10
         //  we use the build ellipses during the allocation phase to see what settlements have the most pips
         //  when we move to the next player, hide the build ellipses
 
-        private void HideAllPipEllipses()
+        private async Task HideAllPipEllipses()
         {
             foreach (var s in _gameView.CurrentGame.HexPanel.Buildings)
             {
-                if (s.BuildingState == BuildingState.Pips) s.BuildingState = BuildingState.None;
+                if (s.BuildingState == BuildingState.Pips)
+                {
+                    await s.UpdateBuildingState(s.BuildingState, BuildingState.None, LogType.DoNotLog);
+                }
             }
         }
 
@@ -1401,14 +1404,14 @@ namespace Catan10
             _showPipGroupIndex++;
             List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
             buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
-           
+
             int pipCountToShow = buildingsOrderedByPips[0].Pips;
             bool shownOne = false;
             foreach (var building in buildingsOrderedByPips)
             {
                 //
                 //  keep going until the pip count changes - but we have to show at least one
-                if (pipCountToShow != building.Pips  && shownOne)
+                if (pipCountToShow != building.Pips && shownOne)
                 {
                     break;
                 }
@@ -1436,17 +1439,17 @@ namespace Catan10
 
                 building.PipGroup = _showPipGroupIndex;
                 await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.Normal);
-                
+
             }
 
 
 
         }
 
-        private void OnClearPips(object sender, RoutedEventArgs e)
+        private async void OnClearPips(object sender, RoutedEventArgs e)
         {
 
-            HideAllPipEllipses();
+            await HideAllPipEllipses();
             _showPipGroupIndex = 0;
 
         }

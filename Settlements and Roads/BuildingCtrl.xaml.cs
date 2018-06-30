@@ -58,7 +58,7 @@ namespace Catan10
         }
         private void SetPips(int value)
         {
-            
+
         }
 
 
@@ -77,7 +77,7 @@ namespace Catan10
         }
         private void SetPipGroup(int value)
         {
-           
+
         }
 
 
@@ -105,7 +105,7 @@ namespace Catan10
         public BuildingState BuildingState
         {
             get { return (BuildingState)GetValue(BuildingStateProperty); }
-            set { SetValue(BuildingStateProperty, value); }
+            private set { SetValue(BuildingStateProperty, value); } // call UpdateBuildingState instead
         }
         private static void BuildingStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -122,7 +122,7 @@ namespace Catan10
 
 
 
-       
+
 
 
         internal void Reset()
@@ -180,7 +180,7 @@ namespace Catan10
 
 
         }
-        
+
 
         private void OutputKeyInfo()
         {
@@ -203,9 +203,9 @@ namespace Catan10
         /// <param name="e"></param>
         private void Building_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-           if (this.BuildingState == BuildingState.None)
+            if (this.BuildingState == BuildingState.None)
             {
-                
+
                 Tuple<bool, bool> validate = Callback?.IsValidBuildingLocation(this);
                 if (validate.Item1) // it is a valid location
                 {
@@ -214,7 +214,7 @@ namespace Catan10
                 else if (validate.Item2) // it is not a valid location and we should show an error
                 {
                     this.BuildingState = BuildingState.Error;
-                    
+
                 }
             }
 
@@ -229,26 +229,26 @@ namespace Catan10
             //
             //  need to validate that the GameState is a valid state to change the state of a building
 
-            bool valid = (bool) Callback?.BuildingStateChangedOk(this);
+            bool valid = (bool)Callback?.BuildingStateChangedOk(this);
             if (!valid)
             {
                 return;
             }
 
-            
-            
+
+
             BuildingState oldState = this.BuildingState;
             BuildingState newState = BuildingState.None;
             switch (oldState)
             {
                 case BuildingState.Error: // do nothing
                 case BuildingState.None: // do nothing
-                    return;                    
+                    return;
                 case BuildingState.Pips: // Pips and build transition to Settlement
                 case BuildingState.Build:
                     oldState = BuildingState.None; // when you have Pips and then Undo it, go back to None;
                     newState = BuildingState.Settlement;
-                    break;                
+                    break;
                 case BuildingState.Settlement: //transition to City
                     newState = BuildingState.City;
                     break;
@@ -282,12 +282,12 @@ namespace Catan10
             player.GameData.Cities.Remove(this);
             player.GameData.Settlements.Remove(this);
             this.BuildingState = newState;
-            
+
 
             switch (newState)
             {
                 case BuildingState.Pips:
-                //    Owner = player;
+                    //    Owner = player;
                     break;
 
                 //
@@ -311,14 +311,14 @@ namespace Catan10
             await Callback?.BuildingStateChanged(this, oldState, logType);
         }
 
-            /// <summary>
-            ///  if we leave and it was an Error or Build, reset state to None
-            /// </summary>
-            /// <param name="sender"></param>
-            /// <param name="e"></param>
-            private void Building_PointerExited(object sender, PointerRoutedEventArgs e)
+        /// <summary>
+        ///  if we leave and it was an Error or Build, reset state to None
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Building_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-           if (this.BuildingState == BuildingState.Build || BuildingState == BuildingState.Error)
+            if (this.BuildingState == BuildingState.Build || BuildingState == BuildingState.Error)
             {
                 this.BuildingState = BuildingState.None;
             }

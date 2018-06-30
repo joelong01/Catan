@@ -152,7 +152,7 @@ namespace Catan10
             int from = PlayingPlayers.IndexOf(CurrentPlayer);            
             _currentPlayerIndex = to;
             //To.Open();
-            CurrentPlayerChanged();
+            await CurrentPlayerChanged();
             if (_log != null)
             {
                 await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to));
