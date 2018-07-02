@@ -61,9 +61,37 @@ namespace Catan10
 
         }
 
+        /// <summary>
+        ///     this is an unused experiement (at this point) for delay loading the buildinds.
+        /// </summary>
+        bool loaded = false;
+        public async Task LoadUiElements()
+        {
+            if (loaded)
+                return;
 
+            var tcs = new TaskCompletionSource<object>();
 
+            void finishedLoading(object sender, RoutedEventArgs e)
+            {
+                tcs.TrySetResult(null);
+            }
 
+            try
+            {
+                ((Grid)FindName("LayoutRoot")).Loaded += finishedLoading;                
+                await tcs.Task;
+                loaded = true;
+            }
+            catch
+            {
+                LayoutRoot.Loaded -= finishedLoading;
+            }
+            
+
+        }
+
+    
         public int PipGroup
         {
             get { return (int)GetValue(PipGroupProperty); }
@@ -111,12 +139,12 @@ namespace Catan10
         {
             BuildingCtrl depPropClass = d as BuildingCtrl;
             BuildingState depPropValue = (BuildingState)e.NewValue;
-            depPropClass.SetBuildingState(depPropValue);
+            depPropClass.SetBuildingState(depPropClass, depPropValue);
         }
 
-        private void SetBuildingState(BuildingState value)
+        private async void SetBuildingState(BuildingCtrl ctrl, BuildingState value)
         {
-
+           // await ctrl.LoadUiElements();
         }
 
 

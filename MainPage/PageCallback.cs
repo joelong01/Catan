@@ -894,9 +894,11 @@ namespace Catan10
 
             foreach (var key in building.Clones)
             {
+                if (key.Tile.ResourceType == ResourceType.Sea) continue;
 
                 if (newState == BuildingState.None)
                 {
+                    
                     // tell the tile that this settlement is no longer owned
                     key.Tile.OwnedBuilding.Remove(building);
                     if (_gameView.HasIslands)

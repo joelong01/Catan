@@ -12,7 +12,8 @@
 
     <!-- The actual Settlement/City UI is dynamically created to speed up loading.  here we just hold the ViewBoxes and Canvases to control Visibility -->
 
-    <Grid Name="LayoutRoot" PointerEntered ="Building_PointerEntered" PointerExited =  "Building_PointerExited" PointerPressed = "Building_PointerPressed" Background="Transparent" Opacity="1.0">
+    <Grid x:Name="LayoutRoot" 
+          PointerEntered ="Building_PointerEntered" PointerExited =  "Building_PointerExited" PointerPressed = "Building_PointerPressed" Background="Transparent" Opacity="1.0">
         <!--Used for debugging the layout and number of Buildings.  Left here for easy uncommenting-->
         <!--<TextBlock Text="{x:Bind Index, Mode=OneWay, FallbackValue=1}" HorizontalAlignment="Center" FontSize="24" Visibility="Collapsed" />-->
         <Grid Name="GRID_Pips" Visibility="{x:Bind BuildingState, FallbackValue=Collapsed, ConverterParameter=Pips, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
