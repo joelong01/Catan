@@ -1396,7 +1396,7 @@ namespace Catan10
                 }
             }
 
-            UpdateTileBuildingOwner(player, building, oldState, building.BuildingState);
+            UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
         }
 
         /// <summary>

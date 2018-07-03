@@ -1026,6 +1026,11 @@ namespace Catan10
             {
                 foreach (BuildingCtrl building in tile.OwnedBuilding)
                 {
+                    if (building.Owner == null)
+                    {
+                        System.Diagnostics.Debug.Assert(false);
+                        
+                    }
 
                     int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
                     //
