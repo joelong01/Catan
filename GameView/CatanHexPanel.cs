@@ -11,7 +11,6 @@ namespace Catan10
 {
     public class Island
     {
-        public List<PlayerView> OwnedPlayers { get; } = new List<PlayerView>();
         public int Start = -1;
         public int End = -1;
         public bool BonusPoint = false;

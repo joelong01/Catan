@@ -89,7 +89,8 @@ namespace Catan10
             { Colors.Green    , Colors.Black },
             { Colors.Brown, Colors.White},
             { Colors.DarkGray , Colors.White},
-            { Colors.Black   , Colors.White }
+            { Colors.Black   , Colors.White },
+            { Colors.HotPink   , Colors.Purple},
 
 
         };

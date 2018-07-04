@@ -371,7 +371,7 @@ namespace Catan10
         {
             foreach (RoadCtrl road in player.GameData.Roads)
             {
-                road.Color = player.Background;
+                road.Color = player.GameData.PlayerColor;
 
             }
 
@@ -1175,8 +1175,7 @@ namespace Catan10
         public async Task CurrentPlayerChanged()
         {
 
-            ActivePlayerBackground = CurrentPlayer.ColorAsString;
-            ActivePlayerName = CurrentPlayer.PlayerName;
+            
 
             //
             //  the next player can always play a baron once
@@ -1220,7 +1219,7 @@ namespace Catan10
             if (!CanBuild()) return;
             if (road.IsOwned) return;
 
-            road.Color = CurrentPlayer.Background;
+            road.Color = CurrentPlayer.GameData.PlayerColor;
 
 
 
@@ -1272,7 +1271,7 @@ namespace Catan10
                 return;
             if (road.IsOwned)
             {
-                if (road.Color != CurrentPlayer.Background) // this is not my road I'm clicking on -- bail
+                if (road.Color != CurrentPlayer.GameData.PlayerColor) // this is not my road I'm clicking on -- bail
                     return;
             }
 
@@ -1357,7 +1356,7 @@ namespace Catan10
                 //   if the settlement is not next to another settlement and we are not in allocation phase, we have to be next to a road
                 foreach (RoadCtrl road in building.AdjacentRoads)
                 {
-                    if (road.Color == CurrentPlayer.Background && road.RoadState != RoadState.Unowned)
+                    if (road.Color == CurrentPlayer.GameData.PlayerColor && road.RoadState != RoadState.Unowned)
                     {
                         error = false;
                         break;

@@ -92,29 +92,7 @@ namespace Catan10
 
 
 
-    public interface IPageCallback
-    {
 
-
-        Task OnEnter(PlayerView currentPlayer, string txtInput);
-        Task OnUndo();
-        Task OnWinner(PlayerView currentPlayer, string txtInput);
-        Task OnNewGame();
-        Task PlayerTargeted(PlayerView targetedPlayer, string txtInput);
-        Task MissedOpportunity(PlayerView targetedPlayer, string txtInput);
-        Task LostToSeven(PlayerView targetedPlayer, string txtInput);
-        Task LostToCard(PlayerView targetedPlayer, string txtInput);
-        Task PlayerLostToCardLikeMonopoly(PlayerView targetedPlayer, string txtInput);
-
-        
-
-        Task SaveDefaultGamesLocally();
-        Task EnterDesignMode(bool isChecked);
-
-        void CurrentPlayerChanged();
-        void CurrentPlayerColorChanged(PlayerView player);
-        void UpdateUiForState(GameState state);
-    }
     //
     //  this interface is implemented by the Controls that wrap the SimpleHexPanel
     //  and exposes the data needed by the Views/Pages

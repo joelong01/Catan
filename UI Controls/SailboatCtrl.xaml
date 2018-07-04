@@ -10,7 +10,7 @@
     d:DesignWidth="30">
 
     <Grid>
-        <Ellipse Width="30" Height="30" Fill="{x:Bind CircleColor, FallbackValue=White, Converter={StaticResource ColorToBrushConverter}}" />
+        <Ellipse Width="30" Height="30" Fill="{x:Bind CircleColor, Mode=OneWay, FallbackValue=White, Converter={StaticResource ColorToBrushConverter}}" />
         <Ellipse Width="30" Height="30" >
             <Ellipse.Fill>
                 <ImageBrush x:Name="ImageBrush_Sailboat" Stretch="Uniform" ImageSource="ms-appx:///Assets/sailboat_dark.png"/>

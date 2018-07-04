@@ -13,89 +13,8 @@ using Windows.UI.Xaml.Shapes;
 
 namespace Catan10
 {
-    public class RoadKeyComparer : IEqualityComparer<RoadKey>
-    {
-        public bool Equals(RoadKey x, RoadKey y)
-        {
-            if (x.Tile.Index == y.Tile.Index)
-            {
-                if (x.RoadLocation == y.RoadLocation)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public int GetHashCode(RoadKey obj)
-        {
-            return obj.Tile.GetHashCode() * 17 + obj.RoadLocation.GetHashCode();
-        }
-    }
-
-    public class RoadCloneComparer : IEqualityComparer<RoadCtrl>
-    {
-        RoadKeyComparer roadKeyComparer = new RoadKeyComparer();
-        //
-        //  when are two Roads "equal"?  When they have at least one clone that matches
-        public bool Equals(RoadCtrl x, RoadCtrl y)
-        {
-            
-
-            foreach (RoadKey key in x.Keys)
-            {
-                if (y.Keys.Contains(key, roadKeyComparer) == true)
-                    return true;
-            }
-
-            return false;
-        }
-
-        public int GetHashCode(RoadCtrl obj)
-        {
-            return obj.GetHashCode();
-        }
-    }
-
-    public class RoadKey
-    {
-        public TileCtrl Tile { get; set; }
-        public RoadLocation RoadLocation { get; set; }
-        public RoadKey(TileCtrl tile, RoadLocation loc)
-        {
-            Tile = tile;
-            RoadLocation = loc;
-        }
-
-        public override string ToString()
-        {
-            return String.Format($"{Tile} {Tile.Index} {RoadLocation}");
-        }
-    }
-    public class RoadLocationData
-    {
-        public double Left;
-        public double Top;
-        public double Angle;
-        public RoadLocationData(double left, double top, double angle)
-        {
-            Left = left;
-            Top = top;
-            Angle = angle;
-        }
-
-        public override string ToString()
-        {
-            return String.Format($"Left={Left} Top={Top} Angle={Angle}");
-        }
-
-    }
-
-    public enum RoadType { Single, Double };
     public sealed partial class RoadCtrl : UserControl
     {
-        SolidColorBrush _foregroundBrush = null;
-        SolidColorBrush _backgroundBrush = null;
         Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
         SolidColorBrush _brush = new SolidColorBrush(Colors.Black);
         SolidColorBrush _hightlightColor = new SolidColorBrush(Colors.Blue);        
@@ -268,8 +187,7 @@ namespace Catan10
         }
         private void SetColor(Color color)
         {
-            _backgroundBrush = new SolidColorBrush(color);
-            _foregroundBrush = new SolidColorBrush(StaticHelpers.BackgroundToForegroundColorDictionary[color]);
+            
             SetColors(_gridRoads);
         }
 
@@ -298,22 +216,20 @@ namespace Catan10
             {
                 if (el.GetType() == typeof(Polygon))
                 {
-                    ((Polygon)el).Stroke = _backgroundBrush;
-                    //((Polygon)el).Stroke = _foregroundBrush;
-                    ((Polygon)el).Fill = _backgroundBrush;
+                    ((Polygon)el).Stroke = MainPage.Current.CurrentPlayer.GameData.Background;
+                    ((Polygon)el).Fill = MainPage.Current.CurrentPlayer?.GameData.Background;
 
                 }
                 if (el.GetType() == typeof(Line))
                 {
-                    ((Line)el).Stroke = _foregroundBrush;
+                    ((Line)el).Stroke = MainPage.Current.CurrentPlayer?.GameData.Foreground;
                 }
             }
 
             
-            _shipPolygon.Fill = _backgroundBrush;
-            _shipPolygon.Stroke = _foregroundBrush;
-        //    UpdateVisuals(new Windows.Foundation.Size(this.ActualWidth, this.ActualHeight));
-
+            _shipPolygon.Fill = MainPage.Current.CurrentPlayer?.GameData.Background;
+            _shipPolygon.Stroke = MainPage.Current.CurrentPlayer?.GameData.Foreground;
+        
         }
 
       
@@ -449,9 +365,9 @@ namespace Catan10
                 if (r.IsOwned && r.Color == this.Color)
                 {
 
-                    if (r.AdjacentBuildings[0].Owner?.Background != this.Color && r.AdjacentBuildings[0].BuildingState != BuildingState.None)
+                    if (r.AdjacentBuildings[0].Owner?.GameData.PlayerColor != this.Color && r.AdjacentBuildings[0].BuildingState != BuildingState.None)
                         continue;
-                    if (r.AdjacentBuildings[1].Owner?.Background != this.Color && r.AdjacentBuildings[1].BuildingState != BuildingState.None)
+                    if (r.AdjacentBuildings[1].Owner?.GameData.PlayerColor!= this.Color && r.AdjacentBuildings[1].BuildingState != BuildingState.None)
                         continue;
                     if (owned.Contains(r) == false)
                     {
@@ -472,6 +388,7 @@ namespace Catan10
 
         public void Show(bool show, bool valid = true)
         {
+            
             double opacity = 1.0;
             if (show)
             {
@@ -536,4 +453,83 @@ namespace Catan10
     }
 
 
+    public class RoadKeyComparer : IEqualityComparer<RoadKey>
+    {
+        public bool Equals(RoadKey x, RoadKey y)
+        {
+            if (x.Tile.Index == y.Tile.Index)
+            {
+                if (x.RoadLocation == y.RoadLocation)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public int GetHashCode(RoadKey obj)
+        {
+            return obj.Tile.GetHashCode() * 17 + obj.RoadLocation.GetHashCode();
+        }
+    }
+
+    public class RoadCloneComparer : IEqualityComparer<RoadCtrl>
+    {
+        RoadKeyComparer roadKeyComparer = new RoadKeyComparer();
+        //
+        //  when are two Roads "equal"?  When they have at least one clone that matches
+        public bool Equals(RoadCtrl x, RoadCtrl y)
+        {
+
+
+            foreach (RoadKey key in x.Keys)
+            {
+                if (y.Keys.Contains(key, roadKeyComparer) == true)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public int GetHashCode(RoadCtrl obj)
+        {
+            return obj.GetHashCode();
+        }
+    }
+
+    public class RoadKey
+    {
+        public TileCtrl Tile { get; set; }
+        public RoadLocation RoadLocation { get; set; }
+        public RoadKey(TileCtrl tile, RoadLocation loc)
+        {
+            Tile = tile;
+            RoadLocation = loc;
+        }
+
+        public override string ToString()
+        {
+            return String.Format($"{Tile} {Tile.Index} {RoadLocation}");
+        }
+    }
+    public class RoadLocationData
+    {
+        public double Left;
+        public double Top;
+        public double Angle;
+        public RoadLocationData(double left, double top, double angle)
+        {
+            Left = left;
+            Top = top;
+            Angle = angle;
+        }
+
+        public override string ToString()
+        {
+            return String.Format($"Left={Left} Top={Top} Angle={Angle}");
+        }
+
+    }
+
+    public enum RoadType { Single, Double };
 }

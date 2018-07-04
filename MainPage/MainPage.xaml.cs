@@ -58,207 +58,8 @@ namespace Catan10
 
 
 
-        public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("Hit Start"));
-        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
-        public static readonly DependencyProperty ActivePlayerBackgroundProperty = DependencyProperty.Register("ActivePlayerBackground", typeof(string), typeof(MainPage), new PropertyMetadata("Blue"));
-        public static readonly DependencyProperty ActivePlayerForegroundProperty = DependencyProperty.Register("ActivePlayerForeground", typeof(string), typeof(MainPage), new PropertyMetadata("Blue"));
-        public static readonly DependencyProperty ActivePlayerNameProperty = DependencyProperty.Register("ActivePlayerName", typeof(string), typeof(PlayerView), new PropertyMetadata("Nobody (hit +)"));
+        
 
-        #region RollProperties
-        public static readonly DependencyProperty TotalRollsProperty = DependencyProperty.Register("TotalRolls", typeof(int), typeof(MainPage), new PropertyMetadata(0));
-        public static readonly DependencyProperty TwoPercentProperty = DependencyProperty.Register("TwoPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty ThreePercentProperty = DependencyProperty.Register("ThreePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty FourPercentProperty = DependencyProperty.Register("FourPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty FivePercentProperty = DependencyProperty.Register("FivePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty SixPercentProperty = DependencyProperty.Register("SixPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty SevenPercentProperty = DependencyProperty.Register("SevenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty EightPercentProperty = DependencyProperty.Register("EightPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty NinePercentProperty = DependencyProperty.Register("NinePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty TenPercentProperty = DependencyProperty.Register("TenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty ElevenPercentProperty = DependencyProperty.Register("ElevenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty TwelvePercentProperty = DependencyProperty.Register("TwelvePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-
-
-
-        public string TwelvePercent
-        {
-            get
-            {
-                return (string)GetValue(TwelvePercentProperty);
-            }
-            set
-            {
-                SetValue(TwelvePercentProperty, value);
-            }
-        }
-        public string ElevenPercent
-        {
-            get
-            {
-                return (string)GetValue(ElevenPercentProperty);
-            }
-            set
-            {
-                SetValue(ElevenPercentProperty, value);
-            }
-        }
-        public string TenPercent
-        {
-            get
-            {
-                return (string)GetValue(TenPercentProperty);
-            }
-            set
-            {
-                SetValue(TenPercentProperty, value);
-            }
-        }
-
-        public string NinePercent
-        {
-            get
-            {
-                return (string)GetValue(NinePercentProperty);
-            }
-            set
-            {
-                SetValue(NinePercentProperty, value);
-            }
-        }
-        public string EightPercent
-        {
-            get
-            {
-                return (string)GetValue(EightPercentProperty);
-            }
-            set
-            {
-                SetValue(EightPercentProperty, value);
-            }
-        }
-        public string SevenPercent
-        {
-            get
-            {
-                return (string)GetValue(SevenPercentProperty);
-            }
-            set
-            {
-                SetValue(SevenPercentProperty, value);
-            }
-        }
-        public string SixPercent
-        {
-            get
-            {
-                return (string)GetValue(SixPercentProperty);
-            }
-            set
-            {
-                SetValue(SixPercentProperty, value);
-            }
-        }
-        public string FivePercent
-        {
-            get
-            {
-                return (string)GetValue(FivePercentProperty);
-            }
-            set
-            {
-                SetValue(FivePercentProperty, value);
-            }
-        }
-        public string FourPercent
-        {
-            get
-            {
-                return (string)GetValue(FourPercentProperty);
-            }
-            set
-            {
-                SetValue(FourPercentProperty, value);
-            }
-        }
-        public string ThreePercent
-        {
-            get
-            {
-                return (string)GetValue(ThreePercentProperty);
-            }
-            set
-            {
-                SetValue(ThreePercentProperty, value);
-            }
-        }
-        public string TwoPercent
-        {
-            get
-            {
-                return (string)GetValue(TwoPercentProperty);
-            }
-            set
-            {
-                SetValue(TwoPercentProperty, value);
-            }
-        }
-        public int TotalRolls
-        {
-            get
-            {
-                return (int)GetValue(TotalRollsProperty);
-            }
-            set
-            {
-                SetValue(TotalRollsProperty, value);
-            }
-        }
-        #endregion
-        public string ActivePlayerName
-        {
-            get
-            {
-                return (string)GetValue(ActivePlayerNameProperty);
-            }
-            set
-            {
-                SetValue(ActivePlayerNameProperty, value);
-            }
-        }
-        public string ActivePlayerBackground
-        {
-            get
-            {
-                return (string)GetValue(ActivePlayerBackgroundProperty);
-            }
-            set
-            {
-                SetValue(ActivePlayerBackgroundProperty, value);
-                ActivePlayerForeground = StaticHelpers.BackgroundToForegroundDictionary[value];
-            }
-        }
-        public string ActivePlayerForeground
-        {
-            get
-            {
-                return (string)GetValue(ActivePlayerForegroundProperty);
-            }
-            set
-            {
-                SetValue(ActivePlayerForegroundProperty, value);
-            }
-        }
-        public string StateDescription
-        {
-            get
-            {
-                return (string)GetValue(StateDescriptionProperty);
-            }
-            set
-            {
-                SetValue(StateDescriptionProperty, value);
-            }
-        }
 
 
         public MainPage()
@@ -1200,7 +1001,7 @@ namespace Catan10
                     case CatanAction.UpdatedRoadState:
                         LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
                         if (roadUpdate.NewRoadState != RoadState.Unowned)
-                            roadUpdate.Road.Color = CurrentPlayer.Background;
+                            roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
                         else
                             roadUpdate.Road.Color = Colors.Transparent;
 
@@ -1457,6 +1258,34 @@ namespace Catan10
             await HideAllPipEllipses();
             _showPipGroupIndex = 0;
 
+        }
+
+        private async void OnTestGame(object sender, RoutedEventArgs e)
+        {
+            AnimationSpeedBase = 4; // speed up the animations
+            await this.Reset();
+            await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            _gameView.CurrentGame = _gameView.Games[0];
+
+            _log = new Log();
+            await _log.Init(CreateSaveFileName("Test"));
+            SavedGames.Insert(0, _log);
+            await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
+            List<PlayerData> PlayerDataList = new List<PlayerData>();
+            PlayerDataList.Add(AllPlayers[0]);
+            PlayerDataList.Add(AllPlayers[1]);
+            PlayerDataList.Add(AllPlayers[2]);
+            await StartGame(PlayerDataList);
+        }
+
+        public static string CreateSaveFileName(string Description)
+        {
+            DateTime dt = DateTime.Now;
+
+            string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
+            string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
+
+            return  String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
         }
     }
 }

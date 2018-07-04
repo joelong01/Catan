@@ -142,7 +142,7 @@ namespace Catan10
             depPropClass.SetBuildingState(depPropClass, depPropValue);
         }
 
-        private async void SetBuildingState(BuildingCtrl ctrl, BuildingState value)
+        private void SetBuildingState(BuildingCtrl ctrl, BuildingState value)
         {
            // await ctrl.LoadUiElements();
         }

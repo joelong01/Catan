@@ -82,7 +82,7 @@ namespace Catan10
                 };
                 string[] tokens = kvp.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 string bitmapPath = String.Format($"ms-appx:Assets/DefaultPlayers/{tokens[0]}");
-                p.Background = StaticHelpers.StringToColorDictionary[tokens[1]];
+                p.ColorAsString = tokens[1];
                 p.ImageFileName = bitmapPath;
                 await p.LoadImage();
                 list.Add(p);
@@ -114,12 +114,7 @@ namespace Catan10
                     await StaticHelpers.DragAsync(grid, e);
                 }
 
-                if (sender.GetType() == typeof(GameSummaryCtrl))
-                {
-                    GameSummaryCtrl ctrl = sender as GameSummaryCtrl;
-                    await StaticHelpers.DragAsync(ctrl, e);
-
-                }
+               
                 
                 await SaveGridLocations();
                 Canvas.SetZIndex(uiElement, zIndex);
@@ -522,8 +517,10 @@ namespace Catan10
                 }
             }
 
-            CurrentPlayer.Background = StaticHelpers.StringToColorDictionary[item.Text];
-            ActivePlayerBackground = item.Text;
+            CurrentPlayer.ColorAsString = item.Text;
+
+            //
+            //  this is only needed because Roads don't do proper data binding yet.
             CurrentPlayerColorChanged(CurrentPlayer);
         }
        
@@ -534,12 +531,6 @@ namespace Catan10
 
         }
 
-        private async void OnLostCards(object sender, RoutedEventArgs e)
-        {
-            if (PlayingPlayers.Count == 0) return;
-            LostCardsDlg dlg = new LostCardsDlg(PlayingPlayers);            
-            await dlg.ShowAsync();
-        }
 
 
 

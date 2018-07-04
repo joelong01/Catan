@@ -17,7 +17,6 @@ namespace Catan10
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        Dictionary<PlayerPosition, PlayerView> _playerViewDictionary = new Dictionary<PlayerPosition, PlayerView>(); // this has all the players and their location of the current game        
         List<int> _rolls = new List<int>(); // a useful cache of all the rolls the players have made
         Stack<GameState> _stateStack = new Stack<GameState>();
         
@@ -83,16 +82,7 @@ namespace Catan10
             return n;
         }
 
-        private PlayerData CurrentPlayer
-        {
-            get
-            {
-                if (PlayingPlayers == null) return null;
-                if (PlayingPlayers.Count == 0) return null;
-
-                return PlayingPlayers[_currentPlayerIndex];                
-            }           
-        }
+     
 
 
         //
@@ -151,8 +141,14 @@ namespace Catan10
             
             int from = PlayingPlayers.IndexOf(CurrentPlayer);            
             _currentPlayerIndex = to;
-            //To.Open();
-            await CurrentPlayerChanged();
+            
+            // this is the one spot where the CurrentPlayer is changed.  it shoudl update all the bindings
+            // the setter will update all the associated state changes that happen when the CurrentPlayer
+            // changes
+
+            CurrentPlayer = PlayingPlayers[_currentPlayerIndex]; 
+
+          
             if (_log != null)
             {
                 await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to));

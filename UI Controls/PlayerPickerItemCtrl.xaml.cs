@@ -81,8 +81,8 @@ namespace Catan10
         public PlayerPickerItemCtrl(PlayerData data)
         {
             this.InitializeComponent();            
-            ForegroundColor = data.Foreground;
-            FillColor = data.Background;
+            ForegroundColor = data.GameData.Foreground.Color;
+            FillColor = data.GameData.PlayerColor;
             PlayerName = data.PlayerName;
             ImageFileName = data.ImageFileName;
             PlayerData = data;

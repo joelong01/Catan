@@ -13,36 +13,27 @@ namespace Catan10
             this.InitializeComponent();
         }
 
-        public static readonly DependencyProperty CircleColorProperty = DependencyProperty.Register("CircleFillColor", typeof(Color), typeof(SettlementCtrl), new PropertyMetadata(Colors.Green, CircleFillColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(SettlementCtrl), new PropertyMetadata(Colors.Purple, CastleColorChanged));
+        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(Color), typeof(SettlementCtrl), new PropertyMetadata(Colors.Blue, PlayerColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black));
         public Color CastleColor
         {
-            get { return (Color)GetValue(CastleColorProperty); }
-            set { SetValue(CastleColorProperty, value); }
+           get { return (Color)GetValue(CastleColorProperty); }
+           private set { SetValue(CastleColorProperty, value); }
         }
-        private static void CastleColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        
+
+        public Color PlayerColor
+        {
+            get { return (Color)GetValue(PlayerColorProperty); }
+            set { SetValue(PlayerColorProperty, value); }
+        }
+        private static void PlayerColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             SettlementCtrl depPropClass = d as SettlementCtrl;
             Color depPropValue = (Color)e.NewValue;
-            depPropClass.SetCastleColor(depPropValue);
+            depPropClass.SetPlayerColor(depPropValue);
         }
-        private void SetCastleColor(Color color)
-        {
-
-        }
-
-        public Color CircleFillColor
-        {
-            get { return (Color)GetValue(CircleColorProperty); }
-            set { SetValue(CircleColorProperty, value); }
-        }
-        private static void CircleFillColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettlementCtrl depPropClass = d as SettlementCtrl;
-            Color depPropValue = (Color)e.NewValue;
-            depPropClass.SetCircleFillColorChanged(depPropValue);
-        }
-        private void SetCircleFillColorChanged(Color color)
+        private void SetPlayerColor(Color color)
         {
             CastleColor = StaticHelpers.BackgroundToForegroundColorDictionary[color];
         }

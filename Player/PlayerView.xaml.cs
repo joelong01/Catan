@@ -208,7 +208,7 @@ namespace Catan10
         {
 
             _data.GameData.FillColor = color;
-            _data.Background = color;
+            _data.Color = color;
            
             Color c = Colors.HotPink;
             if (StaticHelpers.BackgroundToForegroundColorDictionary.TryGetValue(color, out c) == true)
