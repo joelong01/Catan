@@ -84,9 +84,9 @@ namespace Catan10
         //    }
         //}
 
-            //
-            //  the controls Opacity is what controls the user seeing a build shape
-            //  so we can set the visibility of the grids inside the cotnrol
+        //
+        //  the controls Opacity is what controls the user seeing a build shape
+        //  so we can set the visibility of the grids inside the control
         private void SetRoadState(RoadState roadstate)
         {
             SetColors(_gridRoads);
@@ -216,7 +216,7 @@ namespace Catan10
             {
                 if (el.GetType() == typeof(Polygon))
                 {
-                    ((Polygon)el).Stroke = MainPage.Current.CurrentPlayer.GameData.Background;
+                    ((Polygon)el).Stroke = MainPage.Current.CurrentPlayer?.GameData.Background;
                     ((Polygon)el).Fill = MainPage.Current.CurrentPlayer?.GameData.Background;
 
                 }
@@ -392,13 +392,11 @@ namespace Catan10
             double opacity = 1.0;
             if (show)
             {
-                
                 if (!valid) opacity = 0.25;
                 
             }
             else
             {
-
                 opacity = 0.0;
             }
 

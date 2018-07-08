@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -18,6 +19,7 @@ namespace Catan10
 {
     public class PlayerGameData : INotifyPropertyChanged
     {
+        private bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
 
         public CardsLostUpdatedHandler OnCardsLost;
 
@@ -134,12 +136,42 @@ namespace Catan10
             PlayerResourceData.Reset();
             Pips = 0;
 
-
+            for (int i=0; i< _RoadTie.Count(); i++)
+            {
+                _RoadTie[i] = false;
+            }
 
         }
 
+        /// <summary>
+        ///     called if this particular player is the first to reach the road count of 5...14
+        ///     this is important because this is the Player that wins ties.
+        ///     
+        /// </summary>
+        /// <param name="roadCount"></param>
+        public void SetRoadCountTie(int roadCount, bool winTie)
+        {
+            Debug.Assert (roadCount >= 5 && roadCount <= 15, "bad roadcount");
+            _RoadTie[roadCount - 5] = winTie;
 
+        }
 
+        public bool WinsRoadCountTie(int roadCount)
+        {
+            Debug.Assert(roadCount >= 5 && roadCount <= 15, "bad roadcount");
+            return _RoadTie[roadCount - 5];
+        }
+
+        public ObservableCollection<RoadCtrl> RoadsAndShips
+        {
+            get
+            {
+                ObservableCollection<RoadCtrl> ret = new ObservableCollection<RoadCtrl>();
+                ret.AddRange(Roads);
+                ret.AddRange(Ships);
+                return ret;
+            }
+        }
 
         public int CitiesLeft
         {

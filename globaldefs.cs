@@ -28,7 +28,8 @@ namespace Catan10
         LostCardsToSeven,                   // 14
         MissedOpportunity,                  // 15
         GamePicked,                         // 16
-        MustMoveBaron                       // 17
+        MustMoveBaron,                       // 17
+        
     };                                     
 
     //
@@ -57,7 +58,8 @@ namespace Catan10
         AssignRandomTiles,                        // 19
         InitialAssignBaron,                       // 20
         None,                                      // 21
-        SetFirstPlayer
+        SetFirstPlayer,                            // 22
+        RoadTrackingChanged                         // 23
     };
     public enum AnimationSpeed { Ultra = 50, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 }; // typical animation speeds in ms
     public enum UndoOrder { PreviousThenUndo, UndoNoPrevious, None };

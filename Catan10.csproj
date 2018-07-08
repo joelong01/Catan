@@ -24,7 +24,7 @@
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>B3EBF0A01F204F9D5223EB139039A3E2677E2DDC</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>D67097A99262F4D8C1D2D702F5AAF19A0F3C2B8C</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -116,6 +116,7 @@
     </Compile>
     <Compile Include="CatanService\ServiceClient.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
+    <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="NetworkService.cs" />
     <Compile Include="Player\PlayerGameData.cs" />
     <Compile Include="UI Controls\PlayerResourceCountCtrl.xaml.cs">

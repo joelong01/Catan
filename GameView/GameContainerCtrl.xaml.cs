@@ -888,26 +888,10 @@ namespace Catan10
             return _currentHexPanel.BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out control);
         }
 
-        int toggle = 0;
+       
         internal void OnTest()
         {
-            if (toggle == 0)
-            {
-                _currentHexPanel.Reset();
-
-            }
-
-            foreach (var tile in _currentHexPanel.Tiles)
-            {
-                tile.SetTileOrientationAsync(TileOrientation.FaceUp);
-                tile.ShowIndex = true;
-            }
-
-            if (toggle == 1)
-            {
-                _currentHexPanel.ArrangeRoads();
-            }
-            toggle = 1 - toggle;
+           
         }
 
         public bool HasIslands

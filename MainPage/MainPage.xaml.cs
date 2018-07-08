@@ -25,7 +25,7 @@ using Windows.UI.Xaml.Navigation;
 namespace Catan10
 {
 
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, ILog
     {
 
 
@@ -57,8 +57,8 @@ namespace Catan10
         public ObservableCollection<PlayerData> AllPlayers { get; set; } = new ObservableCollection<PlayerData>();
 
 
+        RoadRaceTracking _raceTracking = null;
 
-        
 
 
 
@@ -78,6 +78,7 @@ namespace Catan10
             //  note that we should never new a new collection -- just modify it.
             Ctrl_PlayerResourceCountCtrl.PlayingPlayers = PlayingPlayers;
 
+            _raceTracking = new RoadRaceTracking(this);
         }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
@@ -284,6 +285,7 @@ namespace Catan10
                 player.Reset();
             }
 
+            _raceTracking.Reset();
         }
 
         /// <summary>
@@ -1037,6 +1039,10 @@ namespace Catan10
                         _gameView.CurrentGame = _gameView.Games[logLine.Number];
                         await Task.Delay(0);
                         break;
+                    case CatanAction.RoadTrackingChanged:
+                        LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
+                        _raceTracking.Deserialize(lrtc.NewState, this);
+                        break;
                     default:
                         break;
                 }
@@ -1057,43 +1063,31 @@ namespace Catan10
 
         private void OnTest(object sender, RoutedEventArgs rea)
         {
-            // Frame.Navigate(typeof(TestPage));
-            // _gameView.CalculateAdjacentSettlements();
-            //_gameView.PirateShipTile = _gameView.AllTiles[18];
-            // _gameView.BaronTile = _gameView.AllTiles.Last();
-            // _gameView.OnTest();
+            RoadRaceTracking roadRaceTracking = new RoadRaceTracking(this);
+            roadRaceTracking.AddPlayer(this.AllPlayers[0], 5);
+            roadRaceTracking.AddPlayer(this.AllPlayers[1], 5);
+            roadRaceTracking.AddPlayer(this.AllPlayers[2], 5);
+            roadRaceTracking.AddPlayer(this.AllPlayers[0], 6);
+            roadRaceTracking.AddPlayer(this.AllPlayers[1], 6);
+            roadRaceTracking.AddPlayer(this.AllPlayers[3], 5);
+            roadRaceTracking.AddPlayer(this.AllPlayers[3], 6);
+            roadRaceTracking.AddPlayer(this.AllPlayers[3], 7);
 
+            this.TraceMessage(roadRaceTracking.GetRaceWinner(5)?.ToString());
+            this.TraceMessage(roadRaceTracking.GetRaceWinner(6)?.ToString());
+            this.TraceMessage(roadRaceTracking.GetRaceWinner(7)?.ToString());
+            string s = roadRaceTracking.Serialize();
+            roadRaceTracking.RemovePlayer(AllPlayers[3], 7); // simulates undo
 
-            //take 2
-            //string fileName = "replace this";
-            //Log newLog = await _log.LoadLog(fileName, this);
-            //await ReplayLog(newLog);
-            //_log = newLog;
+            this.TraceMessage(roadRaceTracking.GetRaceWinner(5)?.ToString());
+            this.TraceMessage(roadRaceTracking.GetRaceWinner(6)?.ToString());
+            this.TraceMessage(roadRaceTracking.GetRaceWinner(7)?.ToString());
 
-
-
-            //ValidateBuilding = true;
-#if false
-            #region probability testing
-            string s = "";
-
-            foreach (ResourceType res in Enum.GetValues(typeof(ResourceType)))
-            {
-                if (_gameView.Probabilities[res] == 0)
-                    continue;
-
-                if (res == ResourceType.Sea || res == ResourceType.Desert) continue;
-
-                string tabs = "\t\t";
-                if (res == ResourceType.GoldMine) tabs = "\t";
-                s += String.Format($"{res}:{tabs}{_gameView.Probabilities[res]}\n");
-                
-            }
-            await StaticHelpers.ShowErrorText(s);
-            #endregion
-#endif
-
-
+            RoadRaceTracking rct = new RoadRaceTracking(this);
+            rct.Deserialize(s, this);
+            this.TraceMessage(rct.GetRaceWinner(5)?.ToString());
+            this.TraceMessage(rct.GetRaceWinner(6)?.ToString());
+            this.TraceMessage(rct.GetRaceWinner(7)?.ToString());
         }
 
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
@@ -1271,10 +1265,12 @@ namespace Catan10
             await _log.Init(CreateSaveFileName("Test"));
             SavedGames.Insert(0, _log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
-            List<PlayerData> PlayerDataList = new List<PlayerData>();
-            PlayerDataList.Add(AllPlayers[0]);
-            PlayerDataList.Add(AllPlayers[1]);
-            PlayerDataList.Add(AllPlayers[2]);
+            List<PlayerData> PlayerDataList = new List<PlayerData>
+            {
+                AllPlayers[0],
+                AllPlayers[1],
+                AllPlayers[2]
+            };
             await StartGame(PlayerDataList);
         }
 

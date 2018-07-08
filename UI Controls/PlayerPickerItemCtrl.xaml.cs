@@ -19,7 +19,7 @@ namespace Catan10
             return String.Format($"{PlayerName}:{IsFirst}");
         }
         public PlayerData PlayerData { get; set; } = null;
-        public static readonly DependencyProperty IsFirstProperty = DependencyProperty.Register("IsFirst", typeof(bool?), typeof(PlayerPickerItemCtrl), new PropertyMetadata(false, IsFirstChanged));
+        public static readonly DependencyProperty IsFirstProperty = DependencyProperty.Register("To", typeof(bool?), typeof(PlayerPickerItemCtrl), new PropertyMetadata(false, IsFirstChanged));
         public static readonly DependencyProperty ForegroundColorProperty = DependencyProperty.Register("Foreground", typeof(Color), typeof(PlayerPickerItemCtrl), new PropertyMetadata(Colors.HotPink, null));
         public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("Background", typeof(Color), typeof(PlayerPickerItemCtrl), new PropertyMetadata(Colors.HotPink, null));
         public static readonly DependencyProperty PlayerNameProperty = DependencyProperty.Register("PlayerName", typeof(string), typeof(PlayerPickerItemCtrl), new PropertyMetadata("Nameless"));

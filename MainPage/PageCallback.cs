@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
@@ -42,6 +43,7 @@ namespace Catan10
         //  returns True if it undid something, false if the undo action has no UI affect (e.g. true if the user would think undo happened)
         private async Task<bool> UndoLogLine(LogEntry logLine, bool replayingLog)
         {
+             //this.TraceMessage($"Replay:{replayingLog} Line:{logLine}");
             switch (logLine.Action)
             {
                 case CatanAction.Rolled:
@@ -110,7 +112,9 @@ namespace Catan10
                         await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Undo);
                     else
                         await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo);
-                    SetLongestRoadFromLog();
+
+                    //SetLongestRoadFromLog();
+                    await CalculateAndSetLongestRoad(LogType.Undo);
                     break;
                 case CatanAction.UpdateBuildingState:
                     LogBuildingUpdate buildingUpdate = logLine.Tag as LogBuildingUpdate;
@@ -123,6 +127,12 @@ namespace Catan10
                         await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState, LogType.Undo); // NOTE:  New and Old have been swapped                      
                     }
 
+                    break;
+                case CatanAction.RoadTrackingChanged:
+                    LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
+                    _raceTracking.Undo(lrtc.OldState, lrtc.NewState, logLine.PlayerData, this, this.GameState); // this will log the undo action to balance the log write
+                    Debug.Assert(logLine.StopProcessingUndo == false, "this has no UI affect");
+                    await CalculateAndSetLongestRoad(LogType.Undo);  // this executes with the new tracking -- things may change since ties are different.
                     break;
                 default:
                     break;
@@ -145,6 +155,7 @@ namespace Catan10
                 {
                     if (_log[i].LogType == LogType.Undo) continue; // if we have an undo action, skip it
                     if (_log[i].Undone == true) continue;   // we already undid this one
+                    if (_log[i].LogType == LogType.DoNotUndo) continue;
 
                     bool ret = await UndoLogLine(_log[i], false);
                     if (ret) break;
@@ -157,80 +168,7 @@ namespace Catan10
             }
         }
 
-        private void SetLongestRoadFromLog()
-        {
-            int longestRoad = 0;
-
-
-            //
-            //  find who has the longest road and how long it is
-            foreach (PlayerData p in PlayingPlayers)
-            {
-                if (p.GameData.HasLongestRoad)
-                {
-                    longestRoad = p.GameData.LongestRoad;
-                }
-            }
-
-            if (longestRoad == 0) // nobody has longest road
-                return;
-
-            //
-            //  next see if there are any ties
-            List<PlayerData> tiedPlayers = new List<PlayerData>();
-            foreach (var p in PlayingPlayers)
-            {
-                if (p.GameData.LongestRoad == longestRoad)
-                {
-                    tiedPlayers.Add(p);
-                }
-            }
-
-            if (tiedPlayers.Count == 1)
-                return; // no ties, no work to do.
-
-            //
-            //  turn off longest road flag
-            foreach (var p in tiedPlayers)
-            {
-                p.GameData.HasLongestRoad = false;
-            }
-
-            //
-            //  go through the log to see who got there first
-            int[] roadCount = new int[tiedPlayers.Count];
-
-            foreach (LogEntry logline in _log)
-            {
-                if (logline.Action == CatanAction.UpdatedRoadState)
-                {
-                    LogRoadUpdate roadUpdate = logline.Tag as LogRoadUpdate;
-                    if (roadUpdate.NewRoadState == RoadState.Road && roadUpdate.OldRoadState == RoadState.Unowned)
-                    {
-                        int idx = tiedPlayers.IndexOf(logline.PlayerData); // not the index of the playerdata...
-                        if (idx == -1) continue; // a player other than the tied player has a log entry
-                        roadCount[idx]++;
-                        if (roadCount[idx] == longestRoad)
-                        {
-                            tiedPlayers[idx].GameData.HasLongestRoad = true;
-                            return;
-                        }
-                    }
-                    if (roadUpdate.NewRoadState == RoadState.Unowned)
-                    {
-                        int idx = tiedPlayers.IndexOf(logline.PlayerData);
-                        if (idx != -1)
-                        {
-                            roadCount[idx]--;
-                        }
-
-                    }
-
-                }
-            }
-
-
-        }
+       
 
         private async Task UndoMoveBaron(LogEntry logLine)
         {
@@ -698,6 +636,15 @@ namespace Catan10
 
         //
         //   when a user clicks on a Road, return the next state for it
+        //
+        //  7/6/2018:  Made a change so that you don't cycle the states - instead
+        //             of going back to Unowned when you click on a Road (or a ship)
+        //             it just stays where it is.  if you want to go back to Unowned,
+        //             use Undo. This makes the semantics of figuring out longest road
+        //             easier since I don't have to figure out if you landed on Unowned
+        //             because of an implicit Undo (e.g. if we've logged a state change
+        //             in a road, and RoadState == UnOwned then LogType must be LogType.Undo)
+        //  
         private RoadState NextRoadState(RoadCtrl road)
         {
             bool nextToSea = false;
@@ -727,10 +674,10 @@ namespace Catan10
                     if (nextToSea)
                         nextState = RoadState.Ship;
                     else
-                        nextState = RoadState.Unowned;
+                        nextState = RoadState.Road;
                     break;
                 case RoadState.Ship:
-                    nextState = RoadState.Unowned;
+                    nextState = RoadState.Ship;
                     break;
                 default:
                     break;
@@ -746,6 +693,8 @@ namespace Catan10
         ///
         private async Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
         {
+            if (newState == oldState) return;
+
             road.RoadState = newState;
             switch (newState)
             {
@@ -774,16 +723,7 @@ namespace Catan10
 
 
             await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdatedRoadState, true, logType, road.Number, new LogRoadUpdate(_gameView.CurrentGame.Index, road, oldState, road.RoadState));
-
-            ObservableCollection<RoadCtrl> roads = new ObservableCollection<RoadCtrl>();
-            roads.AddRange(CurrentPlayer.GameData.Roads);
-            roads.AddRange(CurrentPlayer.GameData.Ships);
-
-            CalculateAndSetLongestRoad(CurrentPlayer, roads);
-            if (road.RoadState == RoadState.Unowned)
-            {
-                SetLongestRoadFromLog();
-            }
+            await CalculateAndSetLongestRoad(logType);
 
         }
 
@@ -801,39 +741,107 @@ namespace Catan10
             }
         }
 
-
-
-        private void CalculateAndSetLongestRoad(PlayerData pData, ObservableCollection<RoadCtrl> roads)
+        /// <summary>
+        ///         this looks at the global state of all the roads and makes sure that it
+        ///         1. keeps track of who gets to a road count >= 5 first
+        ///         2. makes sure that the right player gets the longest road
+        ///         3. works when an Undo action happens
+        ///         5. works when a road is "broken"
+        /// </summary>
+        private async Task CalculateAndSetLongestRoad(LogType logType)
         {
-            int longestRoad = CalculateLongestRoad(pData, roads);
-            pData.GameData.LongestRoad = longestRoad;
-            PlayerData maxRoadPlayer = this.MaxRoadPlayer;
-            int maxRoads = 4;
-            if (maxRoadPlayer != null)
-            {
-                maxRoads = maxRoadPlayer.GameData.LongestRoad;
-                if (maxRoads < 5)
-                {
-                    maxRoadPlayer.GameData.HasLongestRoad = false; // happens if you undo the 5th road
-                }
-            }
-            foreach (PlayerData player in PlayingPlayers)
+            //
+            //  make the compiler error go away
+            await Task.Delay(0);
+
+            PlayerData longestRoadPlayer = null;
+            int maxRoads = -1;
+            List<PlayerData> tiedPlayers = new List<PlayerData>();
+
+            try
             {
 
-                if (player.GameData.LongestRoad > maxRoads) // ">" becuase it preserves ties
+                _raceTracking.BeginChanges();
+                //
+                //  first loop over the players and find the set of players that have the longest road
+                //
+                foreach (var p in PlayingPlayers)
                 {
-                    if (maxRoadPlayer != null)
+                    if (p.GameData.HasLongestRoad) longestRoadPlayer = p;  // this one currently has the longest road bit -- it may or may not be correct now
+                    p.GameData.LongestRoad = CalculateLongestRoad(p, p.GameData.RoadsAndShips);
+                    //
+                    //  remove any tracking for roads greater than their current longest road
+                    //  e.g. if they had a road of length 7 and somebody broke it, remove the
+                    //  entries that said they had built roads of length 5+
+                    for (int i = p.GameData.LongestRoad + 1; i < 15; i++)
                     {
-                        maxRoadPlayer.GameData.HasLongestRoad = false;
+                        _raceTracking.RemovePlayer(p, i);
                     }
 
-                    maxRoadPlayer = player;
-                    maxRoads = player.GameData.LongestRoad;
-                    maxRoadPlayer.GameData.HasLongestRoad = true;
+
+                    if (p.GameData.LongestRoad >= 5)
+                    {
+                        _raceTracking.AddPlayer(p, p.GameData.LongestRoad); // throws away duplicates
+                    }
+                    if (p.GameData.LongestRoad > maxRoads)
+                    {
+                        tiedPlayers.Clear();
+                        tiedPlayers.Add(p);
+                        maxRoads = p.GameData.LongestRoad;
+                    }
+                    else if (p.GameData.LongestRoad == maxRoads)
+                    {
+                        tiedPlayers.Add(p);
+                    }
                 }
 
+                //
+                //  somebody had longest road, but they are not tied for max roads - turn off the bit
+                if (longestRoadPlayer != null && !tiedPlayers.Contains(longestRoadPlayer))
+                {
+                    longestRoadPlayer.GameData.HasLongestRoad = false;
+                    longestRoadPlayer = null;
+                }
 
+                //
+                //  can't have longest road if there aren't enough of them
+                if (maxRoads < 5)
+                {
+                    if (longestRoadPlayer != null)
+                    {
+                        longestRoadPlayer.GameData.HasLongestRoad = false;
+                    }
+                    return;
+                }
+
+                //
+                //  if only one person has longest road
+                if (tiedPlayers.Count == 1)
+                {
+
+                    tiedPlayers[0].GameData.HasLongestRoad = true;
+                    return;
+                }
+
+                //
+                //  more than one player has it -- give it to the one that has won the tie
+                //  first turn it off for everybody...this is needed because somebody might
+                //  be tied, but second in the race. they get the next number of roads and then undo it.
+                //  we need to give the longest road back to the first player to get to the road count
+                foreach (var p in tiedPlayers)
+                {
+                    p.GameData.HasLongestRoad = false;
+
+                }
+                //
+                //  now turn it on for the winner!
+                _raceTracking.GetRaceWinner(maxRoads).GameData.HasLongestRoad = true;
             }
+            finally
+            {
+                _raceTracking.EndChanges(CurrentPlayer, GameState, logType);
+            }
+
 
 
 
@@ -898,7 +906,7 @@ namespace Catan10
 
                 if (newState == BuildingState.None)
                 {
-                    
+
                     // tell the tile that this settlement is no longer owned
                     key.Tile.OwnedBuilding.Remove(building);
                     if (_gameView.HasIslands)
@@ -937,30 +945,6 @@ namespace Catan10
 
 
 
-        private void RecalcLongestRoadAfterBuildingChanges(TileCtrl tileCtrl, BuildingCtrl settlementCtrl, PlayerData player)
-        {
-
-            //
-            //   turn off longest road...they'll get it back if they deserve it
-            foreach (var pView in PlayingPlayers)
-            {
-                if (pView.GameData.HasLongestRoad)
-                {
-                    pView.GameData.HasLongestRoad = false;
-                }
-            }
-            //
-            //  do recalc
-            foreach (PlayerData pData in PlayingPlayers)
-            {
-                ObservableCollection<RoadCtrl> roads = new ObservableCollection<RoadCtrl>();
-                roads.AddRange(pData.GameData.Roads);
-                roads.AddRange(pData.GameData.Ships);
-                CalculateAndSetLongestRoad(pData, roads);
-            }
-
-        }
-
         int _roadSkipped = 0;
         //
         //  loop through all the players roads calculating the longest road from that point and then return the max found
@@ -981,7 +965,6 @@ namespace Catan10
                     }
                 }
             }
-            // this.TraceMessage($"RoadsSkipped:{_roadSkipped} count: {max} Road:{maxRoadStartedAt}");
             return max;
 
         }
@@ -1175,7 +1158,7 @@ namespace Catan10
         public async Task CurrentPlayerChanged()
         {
 
-            
+
 
             //
             //  the next player can always play a baron once
@@ -1380,9 +1363,10 @@ namespace Catan10
         public async Task BuildingStateChanged(BuildingCtrl building, BuildingState oldState, LogType logType)
         {
             PlayerData player = CurrentPlayer;
-            RecalcLongestRoadAfterBuildingChanges(null, building, player);
+            //
+            //  NOTE:  these have to be called in this order so that the undo works correctly
             await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
-
+            await CalculateAndSetLongestRoad(logType);
             //
             //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)

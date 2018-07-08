@@ -195,7 +195,12 @@ namespace Catan10
         PlayerData GetPlayerData(int playerIndex);        
     }
 
-    public enum LogType {Normal, Undo, Replay, DoNotLog };
+    public interface ILog
+    {
+        Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
+    }
+
+    public enum LogType {Normal, Undo, Replay, DoNotLog, DoNotUndo };
 
 
     //   an object that encapsulates an action that has happned in the game
@@ -303,6 +308,9 @@ namespace Catan10
                     break;
                 case CatanAction.SetFirstPlayer:
                     Tag = new LogSetFirstPlayer(val);
+                    break;
+                case CatanAction.RoadTrackingChanged:
+                    Tag = new LogRoadTrackingChanged(val);
                     break;
                 default:
                     break;
@@ -472,6 +480,36 @@ namespace Catan10
             StaticHelpers.DeserializeObject<LogCardsLost>(this, saved, ":", ",");
         }
 
+    }
+    
+    internal class LogRoadTrackingChanged
+    {
+        public string OldState { get; set; } = "";
+        public string NewState { get; set; } = "";
+
+        private string[] _serializedProperties = new string[] { "OldState", "NewState" };
+
+        public LogRoadTrackingChanged(string oldState, string newState)
+        {
+            this.OldState = oldState;
+            this.NewState = newState;
+        }
+
+        public LogRoadTrackingChanged(string saved)
+        {
+            Deserialize(saved);
+        }
+
+        public override string ToString()
+        {
+            return StaticHelpers.SerializeObject<LogRoadTrackingChanged>(this, _serializedProperties, ":", "-");
+
+        }
+
+        public void Deserialize(string saved)
+        {
+            StaticHelpers.DeserializeObject<LogRoadTrackingChanged>(this, saved, ":", "-");
+        }
     }
 
     public class LogList<T> : List<T>
