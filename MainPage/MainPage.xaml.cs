@@ -1063,31 +1063,7 @@ namespace Catan10
 
         private void OnTest(object sender, RoutedEventArgs rea)
         {
-            RoadRaceTracking roadRaceTracking = new RoadRaceTracking(this);
-            roadRaceTracking.AddPlayer(this.AllPlayers[0], 5);
-            roadRaceTracking.AddPlayer(this.AllPlayers[1], 5);
-            roadRaceTracking.AddPlayer(this.AllPlayers[2], 5);
-            roadRaceTracking.AddPlayer(this.AllPlayers[0], 6);
-            roadRaceTracking.AddPlayer(this.AllPlayers[1], 6);
-            roadRaceTracking.AddPlayer(this.AllPlayers[3], 5);
-            roadRaceTracking.AddPlayer(this.AllPlayers[3], 6);
-            roadRaceTracking.AddPlayer(this.AllPlayers[3], 7);
-
-            this.TraceMessage(roadRaceTracking.GetRaceWinner(5)?.ToString());
-            this.TraceMessage(roadRaceTracking.GetRaceWinner(6)?.ToString());
-            this.TraceMessage(roadRaceTracking.GetRaceWinner(7)?.ToString());
-            string s = roadRaceTracking.Serialize();
-            roadRaceTracking.RemovePlayer(AllPlayers[3], 7); // simulates undo
-
-            this.TraceMessage(roadRaceTracking.GetRaceWinner(5)?.ToString());
-            this.TraceMessage(roadRaceTracking.GetRaceWinner(6)?.ToString());
-            this.TraceMessage(roadRaceTracking.GetRaceWinner(7)?.ToString());
-
-            RoadRaceTracking rct = new RoadRaceTracking(this);
-            rct.Deserialize(s, this);
-            this.TraceMessage(rct.GetRaceWinner(5)?.ToString());
-            this.TraceMessage(rct.GetRaceWinner(6)?.ToString());
-            this.TraceMessage(rct.GetRaceWinner(7)?.ToString());
+            StaticHelpers.SetKeyValue<PlayerGameData>(PlayingPlayers[0].GameData, "TimesTargetted","10");
         }
 
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)

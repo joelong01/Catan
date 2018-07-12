@@ -960,6 +960,7 @@ namespace Catan10
                 {
                     _Gold = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("Total");
                 }
             }
         }
@@ -976,6 +977,7 @@ namespace Catan10
                 {
                     _Wheat = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("Total");
                 }
             }
         }
@@ -992,6 +994,7 @@ namespace Catan10
                 {
                     _Brick = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("Total");
                 }
             }
         }
@@ -1008,6 +1011,7 @@ namespace Catan10
                 {
                     _Ore = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("Total");
                 }
             }
         }
@@ -1024,6 +1028,7 @@ namespace Catan10
                 {
                     _Wood = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("Total");
                 }
             }
         }
@@ -1040,6 +1045,7 @@ namespace Catan10
                 {
                     _Sheep = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("Total");
                 }
             }
         }
@@ -1075,6 +1081,14 @@ namespace Catan10
                     break;
                 default:
                     break;
+            }
+        }
+
+         public int Total
+        {
+            get
+            {
+                return Sheep + Wood + Ore + Wheat + Brick + Gold;
             }
         }
     }
