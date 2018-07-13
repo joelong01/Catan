@@ -120,11 +120,11 @@ namespace Catan10
                     LogBuildingUpdate buildingUpdate = logLine.Tag as LogBuildingUpdate;
                     if (replayingLog)
                     {
-                        await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.OldBuildingState, buildingUpdate.NewBuildingState, LogType.Undo);
+                        await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.OldBuildingState, buildingUpdate.NewBuildingState);
                     }
                     else
                     {
-                        await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState, LogType.Undo); // NOTE:  New and Old have been swapped                      
+                        await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState); // NOTE:  New and Old have been swapped                      
                     }
 
                     break;
@@ -151,6 +151,7 @@ namespace Catan10
 
             try
             {
+                _log.State = LogState.Undo;
                 for (int i = _log.Count - 1; i >= SMALLEST_STATE_COUNT - 1; i--)
                 {
                     if (_log[i].LogType == LogType.Undo) continue; // if we have an undo action, skip it
@@ -163,6 +164,7 @@ namespace Catan10
             }
             finally
             {
+                _log.State = LogState.Undo;
                 UpdateChart();
                 UpdateUiForState(_log.Last().GameState);
             }

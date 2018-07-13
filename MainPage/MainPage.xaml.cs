@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,6 +13,7 @@ using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -891,7 +893,7 @@ namespace Catan10
         public async Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null) return;
-            await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
+            await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
         }
 
 
@@ -946,124 +948,154 @@ namespace Catan10
 
         public async Task<bool> ReplayLog(Log log)
         {
-            _progress.IsActive = true;
-            _progress.Visibility = Visibility.Visible;
-            await Task.Delay(0);
-            await this.Reset();
-            ResetDataForNewGame();
-            int n = 0;
-
-            log.Replaying = true;
-
-            foreach (LogEntry logLine in log.LogEntries)
+            try
             {
-                n++;
-                if (logLine.LogType == LogType.Undo)
+                _progress.IsActive = true;
+                _progress.Visibility = Visibility.Visible;
+                await Task.Delay(0);
+                await this.Reset();
+                ResetDataForNewGame();
+                int n = 0;
+                log.State = LogState.Replay;
+                
+
+                foreach (LogEntry logLine in log.LogEntries)
                 {
-                    await UndoLogLine(logLine, true);
-                    continue;
+                    n++;
+                    if (logLine.LogType == LogType.Undo)
+                    {
+                        await UndoLogLine(logLine, true);
+                        continue;
+                    }
+                    switch (logLine.Action)
+                    {
+                        case CatanAction.Rolled:
+                            PushRoll(logLine.Number);
+                            UpdateChart();
+                            break;
+                        case CatanAction.ChangedState:
+                            break;
+                        case CatanAction.ChangedPlayer:
+                            LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
+                            await AnimateToPlayerIndex(lcp.To, LogType.Replay);
+                            break;
+                        case CatanAction.Dealt:
+                            break;
+                        case CatanAction.CardsLost:
+                            LogCardsLost lcl = logLine.Tag as LogCardsLost;
+                            await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
+                            break;
+                        case CatanAction.CardsLostToSeven:
+                            break;
+                        case CatanAction.MissedOpportunity:
+                            break;
+                        case CatanAction.DoneSupplemental:
+                            break;
+                        case CatanAction.DoneResourceAllocation:
+                            break;
+                        case CatanAction.SetFirstPlayer:
+                            if (logLine.Tag == null) continue;
+                            LogSetFirstPlayer lsfp = logLine.Tag as LogSetFirstPlayer;
+                            await SetFirst(PlayingPlayers[lsfp.FirstPlayerIndex]);
+                            break;
+                        case CatanAction.PlayedKnight:
+                        case CatanAction.AssignedBaron:
+                        case CatanAction.AssignedPirateShip:
+                            LogBaronOrPirate lbp = logLine.Tag as LogBaronOrPirate;
+                            await AssignBaronOrKnight(lbp.TargetPlayer, lbp.TargetTile, lbp.TargetWeapon, lbp.Action, LogType.Replay);
+                            break;
+                        case CatanAction.UpdatedRoadState:
+                            LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
+                            if (roadUpdate.NewRoadState != RoadState.Unowned)
+                                roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
+                            else
+                                roadUpdate.Road.Color = Colors.Transparent;
+
+                            await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
+                            break;
+                        case CatanAction.UpdateBuildingState:
+
+                            LogBuildingUpdate lsu = (LogBuildingUpdate)logLine.Tag;
+                            if (lsu.OldBuildingState != BuildingState.City)
+                            {
+                                lsu.Building.Owner = CurrentPlayer;
+                            }
+
+                            await lsu.Building.UpdateBuildingState(lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
+                            break;
+                        case CatanAction.AddPlayer:
+                            await AddPlayer(logLine, LogType.Replay);
+                            break;
+                        case CatanAction.AssignRandomNumbersToTileGroup:
+                            List<int> randomNumbers = logLine.Tag as List<int>;
+                            await _gameView.AssignRandomNumbersToTileGroup(logLine.Number, randomNumbers);
+                            break;
+                        case CatanAction.AssignHarbors:
+                            _gameView.AssignRandomNumbersToHarbors((List<int>)logLine.Tag);
+                            break;
+                        case CatanAction.AssignRandomTiles:
+                            await _gameView.AssignRandomTilesToTileGroup(logLine.Number, (List<int>)logLine.Tag);
+                            break;
+                        case CatanAction.InitialAssignBaron:
+                            _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
+                            break;
+                        case CatanAction.SelectGame:
+                            _gameView.CurrentGame = _gameView.Games[logLine.Number];
+                            await Task.Delay(0);
+                            break;
+                        case CatanAction.RoadTrackingChanged:
+                            LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
+                            _raceTracking.Deserialize(lrtc.NewState, this);
+                            break;
+                        default:
+                            break;
+                    }
+
+
+
                 }
-                switch (logLine.Action)
-                {
-                    case CatanAction.Rolled:
-                        PushRoll(logLine.Number);
-                        UpdateChart();
-                        break;
-                    case CatanAction.ChangedState:
-                        break;
-                    case CatanAction.ChangedPlayer:
-                        LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
-                        await AnimateToPlayerIndex(lcp.To, LogType.Replay);
-                        break;
-                    case CatanAction.Dealt:
-                        break;
-                    case CatanAction.CardsLost:
-                        LogCardsLost lcl = logLine.Tag as LogCardsLost;
-                        await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
-                        break;
-                    case CatanAction.CardsLostToSeven:
-                        break;
-                    case CatanAction.MissedOpportunity:
-                        break;
-                    case CatanAction.DoneSupplemental:
-                        break;
-                    case CatanAction.DoneResourceAllocation:
-                        break;
-                    case CatanAction.SetFirstPlayer:
-                        if (logLine.Tag == null) continue;
-                        LogSetFirstPlayer lsfp = logLine.Tag as LogSetFirstPlayer;
-                        await SetFirst(PlayingPlayers[lsfp.FirstPlayerIndex]);
-                        break;
-                    case CatanAction.PlayedKnight:
-                    case CatanAction.AssignedBaron:
-                    case CatanAction.AssignedPirateShip:
-                        LogBaronOrPirate lbp = logLine.Tag as LogBaronOrPirate;
-                        await AssignBaronOrKnight(lbp.TargetPlayer, lbp.TargetTile, lbp.TargetWeapon, lbp.Action, LogType.Replay);
-                        break;
-                    case CatanAction.UpdatedRoadState:
-                        LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
-                        if (roadUpdate.NewRoadState != RoadState.Unowned)
-                            roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
-                        else
-                            roadUpdate.Road.Color = Colors.Transparent;
-
-                        await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
-                        break;
-                    case CatanAction.UpdateBuildingState:
-
-                        LogBuildingUpdate lsu = (LogBuildingUpdate)logLine.Tag;
-                        if (lsu.OldBuildingState != BuildingState.City)
-                        {
-                            lsu.Building.Owner = CurrentPlayer;
-                        }
-
-                        await lsu.Building.UpdateBuildingState(lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
-                        break;
-                    case CatanAction.AddPlayer:
-                        await AddPlayer(logLine, LogType.Replay);
-                        break;
-                    case CatanAction.AssignRandomNumbersToTileGroup:
-                        List<int> randomNumbers = logLine.Tag as List<int>;
-                        await _gameView.AssignRandomNumbersToTileGroup(logLine.Number, randomNumbers);
-                        break;
-                    case CatanAction.AssignHarbors:
-                        _gameView.AssignRandomNumbersToHarbors((List<int>)logLine.Tag);
-                        break;
-                    case CatanAction.AssignRandomTiles:
-                        await _gameView.AssignRandomTilesToTileGroup(logLine.Number, (List<int>)logLine.Tag);
-                        break;
-                    case CatanAction.InitialAssignBaron:
-                        _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
-                        break;
-                    case CatanAction.SelectGame:
-                        _gameView.CurrentGame = _gameView.Games[logLine.Number];
-                        await Task.Delay(0);
-                        break;
-                    case CatanAction.RoadTrackingChanged:
-                        LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
-                        _raceTracking.Deserialize(lrtc.NewState, this);
-                        break;
-                    default:
-                        break;
-                }
 
 
-
+                _gameView.FlipAllAsync(TileOrientation.FaceUp);
             }
-
-
-            _gameView.FlipAllAsync(TileOrientation.FaceUp);
-            _progress.IsActive = false;
-            _progress.Visibility = Visibility.Collapsed;
-            log.Replaying = false;
+            finally
+            {
+                _progress.IsActive = false;
+                _progress.Visibility = Visibility.Collapsed;
+                log.State = LogState.Normal;
+                
+            }
             return true;
 
 
         }
-
+        ConcurrentBag<KeyValuePair<string, string>> concurrentBag = new ConcurrentBag<KeyValuePair<string, string>>();
         private void OnTest(object sender, RoutedEventArgs rea)
         {
-            StaticHelpers.SetKeyValue<PlayerGameData>(PlayingPlayers[0].GameData, "TimesTargetted","10");
+            //StaticHelpers.SetKeyValue<PlayerGameData>(PlayingPlayers[0].GameData, "TimesTargeted","10");
+            concurrentBag.Add(new KeyValuePair<string, string>("TimesTargeted", "10"));
+            concurrentBag.Add(new KeyValuePair<string, string>("UseLightFile", "True"));
+            concurrentBag.Add(new KeyValuePair<string, string>("ColorAsString", "Yellow"));
+            StartCallback();
+        }
+
+        private void StartCallback()
+        {
+           var ignored = Task.Run(async () =>
+            {
+                while (!concurrentBag.IsEmpty)
+                {
+                    if (concurrentBag.TryTake(out KeyValuePair<string, string> kvp))
+                    {
+
+                        this.TraceMessage($"{kvp.Key}={kvp.Value}");
+                        await Task.Delay(1000);
+                    }
+                    else
+                        return;
+                }
+
+            });
         }
 
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)

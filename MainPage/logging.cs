@@ -9,13 +9,29 @@ using Windows.UI.Popups;
 namespace Catan10
 {
 
+    /// <summary>
+    ///     I've moved to having a state machine for the log from having a Type on each logline
+    ///     this means we can set the state on the log, do a bunch of actions, and then change
+    ///     the log state and we don't have to flow the logType through the whole system. This is possible
+    ///     because we Undo and Replay in specific places so we can set the right state there.
+    ///     
+    ///     the only LogType that is special then is an "override" that is LogType.DoNotLog
+    /// </summary>
+    public enum LogState
+    {
+        Normal,
+        Replay,
+        Undo
+    }
+
     public class Log : List<LogEntry>
     {
         private string _saveFileName = "";
         StorageFolder _folder = null;
         StorageFile _file = null;
 
-        public bool Replaying { get; set; } = false;
+        
+        public LogState State { get; set; } = LogState.Normal;
 
         public string DisplayName
         {
@@ -62,10 +78,24 @@ namespace Catan10
       
         public async Task AppendLogLine(LogEntry le, bool save = true)
         {
-            if (le.LogType == LogType.Replay) return;
+            
             if (le.LogType == LogType.DoNotLog) return;
+            
+            switch (this.State)
+            {
+                case LogState.Normal:
+                    le.LogType = LogType.Normal;
+                    break;
+                case LogState.Replay:
+                    return;                    
+                case LogState.Undo:
+                    le.LogType = LogType.Undo;
+                    break;
+                default:
+                    break;
+            }
 
-            if (Replaying) return;
+           
 
 
             le.LogLineIndex = Count;
@@ -104,8 +134,7 @@ namespace Catan10
             
             do
             {
-                if (le.LogType == LogType.Replay) return;
-                if (Replaying) return;
+                if (this.State == LogState.Replay) return;
 
                 if (_file == null)
                     return;
@@ -200,7 +229,7 @@ namespace Catan10
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
     }
 
-    public enum LogType {Normal, Undo, Replay, DoNotLog, DoNotUndo };
+    public enum LogType {Normal, Undo, Replay, DoNotLog, DoNotUndo, Test };
 
 
     //   an object that encapsulates an action that has happned in the game

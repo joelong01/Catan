@@ -315,6 +315,7 @@ namespace Catan10
             {
                 if (_useLightFile != value)
                 {
+
                     _useLightFile = value;
                     NotifyPropertyChanged();
                 }

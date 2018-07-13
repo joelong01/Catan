@@ -287,7 +287,7 @@ namespace Catan10
                     break;
             }
 
-            await UpdateBuildingState(oldState, newState, LogType.Normal);
+            await UpdateBuildingState(oldState, newState);
 
 
         }
@@ -301,7 +301,7 @@ namespace Catan10
         /// <param name="newState"></param>
         /// <param name="logType"></param>
         /// <returns></returns>
-        public async Task UpdateBuildingState(BuildingState oldState, BuildingState newState, LogType logType)
+        public async Task UpdateBuildingState(BuildingState oldState, BuildingState newState, LogType logType = LogType.Normal)
         {
             PlayerData player = CurrentPlayer;
 
