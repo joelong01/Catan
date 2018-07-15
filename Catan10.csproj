@@ -24,7 +24,7 @@
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>B3EBF0A01F204F9D5223EB139039A3E2677E2DDC</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>D67097A99262F4D8C1D2D702F5AAF19A0F3C2B8C</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -115,21 +115,15 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CatanService\ServiceClient.cs" />
+    <Compile Include="MainPage\MainPageDependencyProperties.cs" />
+    <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="NetworkService.cs" />
+    <Compile Include="Player\PlayerGameData.cs" />
     <Compile Include="UI Controls\PlayerResourceCountCtrl.xaml.cs">
       <DependentUpon>PlayerResourceCountCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\ResourceCardCtrl.xaml.cs">
       <DependentUpon>ResourceCardCtrl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI Controls\ResourceCountCtrl.xaml.cs">
-      <DependentUpon>ResourceCountCtrl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI Controls\GameSummaryCtrl.xaml.cs">
-      <DependentUpon>GameSummaryCtrl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ContentDialogs\LostCardsDlg.xaml.cs">
-      <DependentUpon>LostCardsDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage\logging.cs" />
     <Compile Include="ContentDialogs\NewGameDlg.xaml.cs">
@@ -144,9 +138,6 @@
     <Compile Include="UI Controls\SailboatCtrl.xaml.cs">
       <DependentUpon>SailboatCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\ScoreViewCtrl.xaml.cs">
-      <DependentUpon>ScoreViewCtrl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Settlements and Roads\CityCtrl.xaml.cs">
       <DependentUpon>CityCtrl.xaml</DependentUpon>
     </Compile>
@@ -154,8 +145,8 @@
     <Compile Include="Settlements and Roads\RoadCtrl.xaml.cs">
       <DependentUpon>RoadCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settlements and Roads\SettlementUi.xaml.cs">
-      <DependentUpon>SettlementUi.xaml</DependentUpon>
+    <Compile Include="Settlements and Roads\SettlementCtrl.xaml.cs">
+      <DependentUpon>SettlementCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ContentDialogs\SetttingsDlg.xaml.cs">
       <DependentUpon>SetttingsDlg.xaml</DependentUpon>
@@ -200,9 +191,6 @@
     <Compile Include="MainPage\PageCallback.cs" />
     <Compile Include="MersenneTwister.cs" />
     <Compile Include="Player\PlayerData.cs" />
-    <Compile Include="Player\PlayerView.xaml.cs">
-      <DependentUpon>PlayerView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Games\Seafarers4PlayerCtrl.xaml.cs">
       <DependentUpon>Seafarers4PlayerCtrl.xaml</DependentUpon>
@@ -215,8 +203,8 @@
     <Compile Include="UI Controls\StopWatchCtrl.xaml.cs">
       <DependentUpon>StopWatchCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settlements and Roads\SettlementCtrl.xaml.cs">
-      <DependentUpon>SettlementCtrl.xaml</DependentUpon>
+    <Compile Include="Settlements and Roads\BuildingCtrl.xaml.cs">
+      <DependentUpon>BuildingCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\TileCtrl.xaml.cs">
       <DependentUpon>TileCtrl.xaml</DependentUpon>
@@ -314,18 +302,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\ResourceCountCtrl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI Controls\GameSummaryCtrl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ContentDialogs\LostCardsDlg.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="ContentDialogs\NewGameDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -342,10 +318,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\ScoreViewCtrl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Settlements and Roads\CityCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -354,7 +326,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settlements and Roads\SettlementUi.xaml">
+    <Page Include="Settlements and Roads\SettlementCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -406,10 +378,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Player\PlayerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Games\Seafarers4PlayerCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -422,7 +390,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settlements and Roads\SettlementCtrl.xaml">
+    <Page Include="Settlements and Roads\BuildingCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -432,7 +400,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="NewGameDlg\" />
     <Folder Include="Themes\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

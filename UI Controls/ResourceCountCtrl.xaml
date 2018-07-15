@@ -62,7 +62,7 @@
                        Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Century Schoolbook" FontSize="18" />
             </Viewbox>
             <Viewbox Grid.Column="5">
-                <local:SettlementUi Width="30" Height="30" CastleColor="White" CircleFillColor="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=White}"/>
+                <local:SettlementCtrl Width="30" Height="30" CastleColor="White" CircleFillColor="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=White}"/>
             </Viewbox>
             <Viewbox  Grid.Column="6">
                 <TextBlock Name="_txtSettlements"   Text="{x:Bind SettlementsLeft, Mode=TwoWay, FallbackValue=5}"  

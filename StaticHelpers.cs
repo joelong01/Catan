@@ -89,7 +89,8 @@ namespace Catan10
             { Colors.Green    , Colors.Black },
             { Colors.Brown, Colors.White},
             { Colors.DarkGray , Colors.White},
-            { Colors.Black   , Colors.White }
+            { Colors.Black   , Colors.White },
+            { Colors.HotPink   , Colors.Purple},
 
 
         };
@@ -497,6 +498,76 @@ namespace Catan10
             return taskCompletionSource.Task;
         }
 
+        public static void SetKeyValue<T>(this T t, string key, string value)
+        {
+            PropertyInfo propInfo = t.GetType().GetTypeInfo().GetDeclaredProperty(key);
+            if (propInfo == null)
+            {
+                t.TraceMessage($"No property named {key} in DeserializeObject");
+                return;
+            }
+            TypeInfo typeInfo = propInfo.PropertyType.GetTypeInfo();
+            if (typeInfo.Name == "Guid")
+            {
+                // typeInfo.TraceMessage("Need to support Guid in deserializer!");
+                return;
+            }
+            if (typeInfo.IsEnum)
+            {
+                propInfo.SetValue(t, Enum.Parse(propInfo.PropertyType, value));
+            }
+            else if (typeInfo.IsPrimitive)
+            {
+                propInfo.SetValue(t, Convert.ChangeType(value, propInfo.PropertyType));
+            }
+            else if (propInfo.PropertyType == typeof(System.TimeSpan))
+            {
+                propInfo.SetValue(t, TimeSpan.Parse(value));
+            }
+            else if (propInfo.PropertyType == typeof(string))
+            {
+                propInfo.SetValue(t, value);
+            }
+            else if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                Type elementType = typeInfo.GenericTypeArguments[0];
+                string[] arrayValues = value.Split(listSeperator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+                Type listType = typeof(List<>).MakeGenericType(typeInfo.GenericTypeArguments);
+                IList listInstance = (IList)Activator.CreateInstance(listType);
+
+                bool isPrimitive = elementType.GetTypeInfo().IsPrimitive;
+                bool isEnum = elementType.GetTypeInfo().IsEnum;
+                foreach (string val in arrayValues)
+                {
+                    if (isPrimitive)
+                    {
+                        object o = Convert.ChangeType(val, elementType);
+                        listInstance.Add(o);
+                    }
+                    else if (isEnum)
+                    {
+                        object e = Enum.Parse(elementType, val);
+                        listInstance.Add(e);
+                    }
+                    else
+                    {
+                        t.TraceMessage($"Can't deserialize list of type {elementType.GetTypeInfo()}");
+                        break;
+                    }
+
+                }
+                propInfo.SetValue(t, listInstance);
+            }
+            else
+            {
+                string error = String.Format($"need to support {propInfo.PropertyType.ToString()} in the deserilizer to load {key} whose value is {value}");
+                t.TraceMessage(error);
+                throw new Exception(error);
+
+            }
+        }
+
         public static void DeserializeObject<T>(this T t, string s, string kvpSep = kvpSeperatorOneLine, string propSep = propertySeperator)
         {
 
@@ -509,72 +580,8 @@ namespace Catan10
             foreach (string line in properties)
             {
                 kvp = StaticHelpers.GetKeyValue(line, kvpSep[0]);
-                PropertyInfo propInfo = t.GetType().GetTypeInfo().GetDeclaredProperty(kvp.Key);
-                if (propInfo == null)
-                {
-                    t.TraceMessage($"No property named {kvp.Key} in DeserializeObject");
-                    continue;
-                }
-                TypeInfo typeInfo = propInfo.PropertyType.GetTypeInfo();
-                if (typeInfo.Name == "Guid")
-                {
-                    // typeInfo.TraceMessage("Need to support Guid in deserializer!");
-                    continue;
-                }
-                if (typeInfo.IsEnum)
-                {
-                    propInfo.SetValue(t, Enum.Parse(propInfo.PropertyType, kvp.Value));
-                }
-                else if (typeInfo.IsPrimitive)
-                {
-                    propInfo.SetValue(t, Convert.ChangeType(kvp.Value, propInfo.PropertyType));
-                }
-                else if (propInfo.PropertyType == typeof(System.TimeSpan))
-                {
-                    propInfo.SetValue(t, TimeSpan.Parse(kvp.Value));
-                }
-                else if (propInfo.PropertyType == typeof(string))
-                {
-                    propInfo.SetValue(t, kvp.Value);
-                }
-                else if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(List<>))
-                {
-                    Type elementType = typeInfo.GenericTypeArguments[0];
-                    string[] arrayValues = kvp.Value.Split(listSeperator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-
-                    Type listType = typeof(List<>).MakeGenericType(typeInfo.GenericTypeArguments);
-                    IList listInstance = (IList)Activator.CreateInstance(listType);
-
-                    bool isPrimitive = elementType.GetTypeInfo().IsPrimitive;
-                    bool isEnum = elementType.GetTypeInfo().IsEnum;
-                    foreach (string val in arrayValues)
-                    {
-                        if (isPrimitive)
-                        {
-                            object o = Convert.ChangeType(val, elementType);
-                            listInstance.Add(o);
-                        }
-                        else if (isEnum)
-                        {
-                            object e = Enum.Parse(elementType, val);
-                            listInstance.Add(e);
-                        }
-                        else
-                        {
-                            t.TraceMessage($"Can't deserialize list of type {elementType.GetTypeInfo()}");
-                            break;
-                        }
-
-                    }
-                    propInfo.SetValue(t, listInstance);
-                }
-                else
-                {
-                    string error = String.Format($"need to support {propInfo.PropertyType.ToString()} in the deserilizer to load {kvp.Key} whose value is {kvp.Value}");
-                    t.TraceMessage(error);
-                    throw new Exception(error);
-
-                }
+                t.SetKeyValue(kvp.Key, kvp.Value);
+               
             }
 
         }

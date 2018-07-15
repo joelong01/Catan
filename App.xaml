@@ -23,7 +23,7 @@
             <local:ColorToColorChoiceIndex x:Key="ColorToColorChoiceIndexConverter" />
             <local:StringToImageBrushConverter x:Key="StringToImageBrushConverter" />
             <local:CountToOrientationConverter x:Key="CountToOrientationConverter" />
-
+            <local:BuildingStateToVisibilityConverter x:Key="BuildingStateToVisibilityConverter" />
 
 
             <ImageBrush x:Key="bmWheat" ImageSource="Assets/Old Visuals/old wheat.png" Stretch="Fill" />

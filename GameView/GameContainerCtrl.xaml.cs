@@ -232,13 +232,13 @@ namespace Catan10
             return _currentHexPanel.Roads[roadIndex];
         }
 
-        public SettlementCtrl GetSettlement(int settlementIndex, int gameIndex)
+        public BuildingCtrl GetSettlement(int settlementIndex, int gameIndex)
         {
             if (CurrentGame.Index != gameIndex)
             {
                 CurrentGame = _games[gameIndex];
             }
-            return _currentHexPanel.Settlements[settlementIndex];
+            return _currentHexPanel.Buildings[settlementIndex];
         }
 
         public void Init(IGameCallback gameCallback, ITileControlCallback tileCallback)
@@ -391,6 +391,17 @@ namespace Catan10
             if (placeBaron)
             {
                 await InitialPlaceBaron();
+            }
+
+            foreach (var building in AllBuildings)
+            {
+                int pips = 0;
+                foreach (var kvp in building.BuildingToTileDictionary)
+                {
+                    pips += kvp.Value.Pips;
+
+                }
+                building.Pips = pips;
             }
 
         }
@@ -642,11 +653,11 @@ namespace Catan10
             }
         }
 
-        public List<SettlementCtrl> AllSettlements
+        public List<BuildingCtrl> AllBuildings
         {
             get
             {
-                return _currentHexPanel.Settlements;
+                return _currentHexPanel.Buildings;
             }
         }
 
@@ -866,37 +877,21 @@ namespace Catan10
             return road;
         }
 
-        internal void CalculateAdjacentSettlements()
+        internal void CalculateAdjacentBuildings()
         {
             _currentHexPanel.FindAdjacentRoads();
         }
 
-        internal bool GetSettlement(TileCtrl tile, SettlementLocation location, out SettlementCtrl control)
+        internal bool GetBuilding(TileCtrl tile, BuildingLocation location, out BuildingCtrl control)
         {
-            SettlementKey key = new SettlementKey(tile, location);
-            return _currentHexPanel.SettlementKeyToSettlementCtrlDictionary.TryGetValue(key, out control);
+            BuildingKey key = new BuildingKey(tile, location);
+            return _currentHexPanel.BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out control);
         }
 
-        int toggle = 0;
+       
         internal void OnTest()
         {
-            if (toggle == 0)
-            {
-                _currentHexPanel.Reset();
-
-            }
-
-            foreach (var tile in _currentHexPanel.Tiles)
-            {
-                tile.SetTileOrientationAsync(TileOrientation.FaceUp);
-                tile.ShowIndex = true;
-            }
-
-            if (toggle == 1)
-            {
-                _currentHexPanel.ArrangeRoads();
-            }
-            toggle = 1 - toggle;
+           
         }
 
         public bool HasIslands

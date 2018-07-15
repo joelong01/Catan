@@ -15,30 +15,20 @@ namespace Catan10
         {
             this.InitializeComponent();
         }
-        public static readonly DependencyProperty CircleFillColorProperty = DependencyProperty.Register("CircleFillColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Blue, CircleFillColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black, CastleColorChanged));
+        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Blue, PlayerColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black));
         public Color CastleColor
         {
             get { return (Color)GetValue(CastleColorProperty); }
             set { SetValue(CastleColorProperty, value); }
         }
-        private static void CastleColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+       
+        public Color PlayerColor
         {
-            CityCtrl depPropClass = d as CityCtrl;
-            Color depPropValue = (Color)e.NewValue;
-            depPropClass.SetCastleColor(depPropValue);
+            get { return (Color)GetValue(PlayerColorProperty); }
+            set { SetValue(PlayerColorProperty, value); }
         }
-        private void SetCastleColor(Color color)
-        {
-
-        }
-
-        public Color CircleFillColor
-        {
-            get { return (Color)GetValue(CircleFillColorProperty); }
-            set { SetValue(CircleFillColorProperty, value); }
-        }
-        private static void CircleFillColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void PlayerColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             CityCtrl depPropClass = d as CityCtrl;
             Color depPropValue = (Color)e.NewValue;

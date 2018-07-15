@@ -34,6 +34,53 @@ namespace Catan10
         }
     }
 
+    /// <summary>
+    ///     used in the building control.  this takes a parameter to indicate which state should be Visible and all others should be collapsed
+    ///     parameter is a string
+    /// </summary>
+    public class BuildingStateToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            BuildingState desiredState = StaticHelpers.ParseEnum<BuildingState>((string)parameter);
+            BuildingState actualState = (BuildingState)value;
+            if (actualState == desiredState)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");           
+        }
+    }
+
+
+    /// <summary>
+    ///     used in the road control.  this takes a parameter to indicate which state should be Visible and all others should be collapsed
+    ///     parameter is a string
+    /// </summary>
+    public class RoadStateToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            RoadState desiredState = StaticHelpers.ParseEnum<RoadState>((string)parameter);
+            RoadState actualState = (RoadState)value;
+            if (actualState == desiredState)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
+        }
+    }
+
     public class CountToOrientationConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)

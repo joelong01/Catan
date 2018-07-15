@@ -84,13 +84,14 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Rectangle Grid.Row="0" Fill="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Green, Mode=OneWay, Path=ActivePlayerBackground}" Stroke="White" StrokeThickness="1"   />
+            <Rectangle Grid.Row="0" Fill="{x:Bind  FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.GameData.Background}" Stroke="White" StrokeThickness="1"   />
             <Viewbox HorizontalAlignment="Right" VerticalAlignment="Stretch" >
                 <Button Background="Transparent" Click="OnGrowOrShrinkControls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" />
             </Viewbox>
             <Viewbox HorizontalAlignment="Center" >
 
-                <TextBlock Text="{x:Bind FallbackValue=Nobody (yet), Mode=OneWay, Path=ActivePlayerName}" CharacterSpacing="0" Foreground="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=White, Mode=OneWay, Path=ActivePlayerForeground}"/>
+                <TextBlock Text="{x:Bind FallbackValue=Nobody (yet), Mode=OneWay, Path=CurrentPlayer.PlayerName}" CharacterSpacing="0" 
+                           Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=CurrentPlayer.GameData.Foreground}"/>
 
             </Viewbox>
 
@@ -123,17 +124,18 @@
                                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed" >
                                         <MenuFlyoutItem x:Name="Menu_Test" Text ="Test" Click="OnTest" />
                                         <MenuFlyoutSeparator/>
+                                        <MenuFlyoutItem x:Name="Menu_TestGame" Text ="Test Game" Click="OnTestGame" />
+                                        <MenuFlyoutSeparator/>
+                                        <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
+                                        <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
+                                        <MenuFlyoutSeparator/>
                                         <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
                                         <MenuFlyoutSeparator/>
                                         <MenuFlyoutSubItem Text="Options" >
                                             <ToggleMenuFlyoutItem Text="Hide Players On Next" IsChecked="False" x:Name="_menuHidePlayersOnNext"/>
                                             <MenuFlyoutItem Text="Add Default Users" Click="OnAddDefaultUsers" />
                                         </MenuFlyoutSubItem>
-                                        <MenuFlyoutSeparator/>
-                                        <MenuFlyoutItem Text="Cards Lost..." Click="OnLostCards" />
-
-                                        <MenuFlyoutSeparator/>
-
+                                        
                                         <MenuFlyoutItem x:Name="Menu_Undo" Text="Undo" Click="OnUndoClicked"  />
                                         <MenuFlyoutItem x:Name="Menu_AssignNumbers" Text="Assign Tile Numbers" Click="OnAssignNumbers"  />
                                         <MenuFlyoutItem x:Name="Menu_Winner" Text="Winner" Click="OnWinnerClicked" />
@@ -199,9 +201,9 @@
                 <RowDefinition Height="10*"/>
             </Grid.RowDefinitions>
 
-            <Rectangle Grid.Row="0" Fill="{x:Bind Path=ActivePlayerBackground, Mode=OneWay, FallbackValue=Green, Converter={StaticResource ResourceKey=ColorToBrushConverter}}" Stroke="White" StrokeThickness="1"   />
+            <Rectangle Grid.Row="0" Fill="{x:Bind Path=CurrentPlayer.GameData.Background, Mode=OneWay}" Stroke="White" StrokeThickness="1"   />
             <Viewbox HorizontalAlignment="Center" >
-                <TextBlock Text="Catan" CharacterSpacing="0" Foreground="{x:Bind Path=ActivePlayerForeground, Mode=OneWay, FallbackValue=White, Converter={StaticResource ResourceKey=ColorToBrushConverter}}"/>
+                <TextBlock Text="Catan" CharacterSpacing="0" Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"/>
             </Viewbox>
             <Viewbox Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Stretch" >
                 <Button Click="OnGrowOrShrinkRolls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" />

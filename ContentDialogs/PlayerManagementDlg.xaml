@@ -31,14 +31,14 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="36"/>
                 </Grid.RowDefinitions>
-                <Rectangle Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.RowSpan="3" Fill="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Blue, Mode=OneWay, Path=Background}" />
+                <Rectangle Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.RowSpan="3" Fill="{x:Bind  FallbackValue=Blue, Mode=OneWay, Path=GameData.Background}" />
                 <Rectangle Grid.Row="0" Fill="{x:Bind ImageBrush, Mode=OneWay}" CanDrag="False"  />
                 <Viewbox HorizontalAlignment="Center" Grid.Row="1" Margin="1">
                     <TextBox HorizontalAlignment="Center"  Text="{x:Bind PlayerName, FallbackValue=Nameless, Mode=TwoWay}" FontSize="22" 
-                    Foreground="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=White, Mode=OneWay, Path=Foreground}"/>
+                    Foreground="{x:Bind  FallbackValue=White, Mode=OneWay, Path=GameData.Foreground}"/>
                 </Viewbox>
                 <ComboBox HorizontalAlignment="Stretch" Grid.Row="2" ItemTemplate="{StaticResource ColorListDataTemplate}" ItemsSource="{x:Bind AvailableColors}" 
-                          SelectedValue="{x:Bind Path=Background, Mode=TwoWay, Converter={StaticResource ResourceKey=ColorToColorChoiceConverter}}" SelectionChanged="OnPlayerColorChanged"  />
+                          SelectedValue="{x:Bind Path=GameData.Background, Mode=OneWay}" SelectionChanged="OnPlayerColorChanged"  />
 
                 <Grid Name="_gridSelected" Grid.RowSpan="3" Visibility="{x:Bind IsCurrentPlayer, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"
                       Tag="{x:Bind This}" 
@@ -47,12 +47,12 @@
                     <ColumnDefinition Width="100*" />
                     <ColumnDefinition Width="20" />
                     </Grid.ColumnDefinitions>
-                    <Rectangle  Fill="Transparent" Stroke="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=White, Mode=OneWay, Path=Background}"  
+                    <Rectangle  Fill="Transparent" Stroke="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.Background}"  
                                StrokeDashArray="1" StrokeThickness="4" Grid.RowSpan="3" Margin="1" IsHitTestVisible="False" Grid.ColumnSpan="2"  />
-                    <Rectangle Grid.Column="1" Width="20" Height="20" Fill="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Black, Mode=OneWay, Path=Foreground}" 
+                    <Rectangle Grid.Column="1" Width="20" Height="20" Fill="{x:Bind FallbackValue=Black, Mode=OneWay, Path=GameData.Foreground}" 
                                 Margin="-10,7,0,0" VerticalAlignment="Top" IsHitTestVisible="False"/>
                     <TextBlock Grid.Column="1" Text="&#xE0E7;" FontFamily="Segoe UI Symbol" FontSize="20" IsHitTestVisible="False"
-                               Foreground="{x:Bind Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=White, Mode=OneWay, Path=Background}" 
+                               Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.Background}" 
                                Margin="-5,2,0,0" />
 
                 </Grid>

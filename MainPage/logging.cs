@@ -9,13 +9,29 @@ using Windows.UI.Popups;
 namespace Catan10
 {
 
+    /// <summary>
+    ///     I've moved to having a state machine for the log from having a Type on each logline
+    ///     this means we can set the state on the log, do a bunch of actions, and then change
+    ///     the log state and we don't have to flow the logType through the whole system. This is possible
+    ///     because we Undo and Replay in specific places so we can set the right state there.
+    ///     
+    ///     the only LogType that is special then is an "override" that is LogType.DoNotLog
+    /// </summary>
+    public enum LogState
+    {
+        Normal,
+        Replay,
+        Undo
+    }
+
     public class Log : List<LogEntry>
     {
         private string _saveFileName = "";
         StorageFolder _folder = null;
         StorageFile _file = null;
 
-        public bool Replaying { get; set; } = false;
+        
+        public LogState State { get; set; } = LogState.Normal;
 
         public string DisplayName
         {
@@ -62,9 +78,24 @@ namespace Catan10
       
         public async Task AppendLogLine(LogEntry le, bool save = true)
         {
-            if (le.LogType == LogType.Replay) return;
+            
+            if (le.LogType == LogType.DoNotLog) return;
+            
+            switch (this.State)
+            {
+                case LogState.Normal:
+                    le.LogType = LogType.Normal;
+                    break;
+                case LogState.Replay:
+                    return;                    
+                case LogState.Undo:
+                    le.LogType = LogType.Undo;
+                    break;
+                default:
+                    break;
+            }
 
-            if (Replaying) return;
+           
 
 
             le.LogLineIndex = Count;
@@ -103,8 +134,7 @@ namespace Catan10
             
             do
             {
-                if (le.LogType == LogType.Replay) return;
-                if (Replaying) return;
+                if (this.State == LogState.Replay) return;
 
                 if (_file == null)
                     return;
@@ -190,11 +220,16 @@ namespace Catan10
     {
         TileCtrl GetTile(int tileIndex, int gameIndex);
         RoadCtrl GetRoad(int roadIndex, int gameIndex);
-        SettlementCtrl GetSettlement(int settlementIndex, int gameIndex);
+        BuildingCtrl GetBuilding(int buildingIndex, int gameIndex);
         PlayerData GetPlayerData(int playerIndex);        
     }
 
-    public enum LogType {Normal, Undo, Replay};
+    public interface ILog
+    {
+        Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
+    }
+
+    public enum LogType {Normal, Undo, Replay, DoNotLog, DoNotUndo, Test };
 
 
     //   an object that encapsulates an action that has happned in the game
@@ -283,8 +318,8 @@ namespace Catan10
                 case CatanAction.UpdatedRoadState:
                     Tag = new LogRoadUpdate(val, parseHelper);
                     break;
-                case CatanAction.UpdateSettlementState:
-                    Tag = new LogSettlementUpdate(val, parseHelper);
+                case CatanAction.UpdateBuildingState:
+                    Tag = new LogBuildingUpdate(val, parseHelper);
                     break;
                 case CatanAction.AddPlayer:
                     Tag = Enum.Parse(typeof(PlayerPosition), val);
@@ -302,6 +337,9 @@ namespace Catan10
                     break;
                 case CatanAction.SetFirstPlayer:
                     Tag = new LogSetFirstPlayer(val);
+                    break;
+                case CatanAction.RoadTrackingChanged:
+                    Tag = new LogRoadTrackingChanged(val);
                     break;
                 default:
                     break;
@@ -344,23 +382,6 @@ namespace Catan10
         }
 
 
-
-       
-        public LogEntry(LogEntry a)
-        {
-            this.GameState = a.GameState;
-            this.PlayerData = a.PlayerData;
-            this.Action = a.Action;
-            this.Tag = a.Tag;            
-        }
-
-        public LogEntry(LogEntry a, CatanAction action)
-        {
-            this.GameState = a.GameState;
-            this.PlayerData = a.PlayerData;
-            this.Action = action;
-            this.Tag = Tag;
-        }
 
         public bool Undoable
         {
@@ -488,6 +509,36 @@ namespace Catan10
             StaticHelpers.DeserializeObject<LogCardsLost>(this, saved, ":", ",");
         }
 
+    }
+    
+    internal class LogRoadTrackingChanged
+    {
+        public string OldState { get; set; } = "";
+        public string NewState { get; set; } = "";
+
+        private string[] _serializedProperties = new string[] { "OldState", "NewState" };
+
+        public LogRoadTrackingChanged(string oldState, string newState)
+        {
+            this.OldState = oldState;
+            this.NewState = newState;
+        }
+
+        public LogRoadTrackingChanged(string saved)
+        {
+            Deserialize(saved);
+        }
+
+        public override string ToString()
+        {
+            return StaticHelpers.SerializeObject<LogRoadTrackingChanged>(this, _serializedProperties, ":", "-");
+
+        }
+
+        public void Deserialize(string saved)
+        {
+            StaticHelpers.DeserializeObject<LogRoadTrackingChanged>(this, saved, ":", "-");
+        }
     }
 
     public class LogList<T> : List<T>
@@ -630,38 +681,38 @@ namespace Catan10
         }
     }
 
-    public class LogSettlementUpdate
+    public class LogBuildingUpdate
     {
-        public SettlementCtrl Settlement { get; set; } = null;
+        public BuildingCtrl Building { get; set; } = null;
         public TileCtrl Tile { get; set; } = null;
 
-        public SettlementType OldSettlementType { get; set; } = SettlementType.None;
-        public SettlementType NewSettlementType { get; set; } = SettlementType.None;
+        public BuildingState OldBuildingState { get; set; } = BuildingState.None;
+        public BuildingState NewBuildingState { get; set; } = BuildingState.None;
         public int TileIndex { get; set; } = -1;
-        public int SettlementIndex { get; set; } = -1;
+        public int BuildingIndex { get; set; } = -1;
         public int GameIndex { get; set; } = -1;
 
 
-        private string[] _serializedProperties = new string[] { "OldSettlementType", "NewSettlementType", "SettlementIndex", "TileIndex", "GameIndex" };
+        private string[] _serializedProperties = new string[] { "OldBuildingState", "NewBuildingState", "BuildingIndex", "TileIndex", "GameIndex" };
 
-        public LogSettlementUpdate(string s, ILogParserHelper parseHelper)
+        public LogBuildingUpdate(string s, ILogParserHelper parseHelper)
         {
             Deserialize(s);
-            Settlement = parseHelper.GetSettlement(SettlementIndex, GameIndex);
+            Building = parseHelper.GetBuilding(BuildingIndex, GameIndex);
             if (TileIndex != -1)
             {
                 Tile = parseHelper.GetTile(TileIndex, GameIndex);
             }
         }
 
-        public LogSettlementUpdate(int gameIndex, TileCtrl tileCtrl, SettlementCtrl settlementCtrl, SettlementType oldState, SettlementType newState)
+        public LogBuildingUpdate(int gameIndex, TileCtrl tileCtrl, BuildingCtrl buildingCtrl, BuildingState oldState, BuildingState newState)
         {
             GameIndex = gameIndex;
             Tile = tileCtrl;
-            Settlement = settlementCtrl;
-            OldSettlementType = oldState;
-            SettlementIndex = settlementCtrl.Index;
-            NewSettlementType = newState;
+            Building = buildingCtrl;
+            OldBuildingState = oldState;
+            BuildingIndex = buildingCtrl.Index;
+            NewBuildingState = newState;
             if (tileCtrl != null)
                 TileIndex = tileCtrl.Index;
         }
@@ -672,12 +723,12 @@ namespace Catan10
 
         public string Serialize()
         {
-            return StaticHelpers.SerializeObject<LogSettlementUpdate>(this, _serializedProperties, ":", ",");
+            return StaticHelpers.SerializeObject<LogBuildingUpdate>(this, _serializedProperties, ":", ",");
         }
 
         public void Deserialize(string s)
         {
-            StaticHelpers.DeserializeObject<LogSettlementUpdate>(this, s, ":", ",");
+            StaticHelpers.DeserializeObject<LogBuildingUpdate>(this, s, ":", ",");
         }
     }
 }

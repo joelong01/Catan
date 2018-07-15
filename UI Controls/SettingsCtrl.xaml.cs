@@ -111,8 +111,10 @@ namespace Catan10
                 if (saveString == "")
                     return;
 
-                Dictionary<string, string> dict = new Dictionary<string, string>();
-                dict["Settings"] = saveString;
+                Dictionary<string, string> dict = new Dictionary<string, string>
+                {
+                    ["Settings"] = saveString
+                };
 
 
                 var folder = await StaticHelpers.GetSaveFolder();

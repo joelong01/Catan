@@ -65,7 +65,9 @@ namespace Catan10
 
         };
 
-        private string[] GridPositionName = new string[] { "RollGrid", "ScoreGrid", "ScoreGrid2", "ControlGrid", "_GameSummary", "_savedGameGrid" };
+        //
+        //  this is the name of the grids in MainPage.xaml that we want to store and retrieve locations
+        private string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView" };
 
         //
         //  this just creates our saved file
@@ -80,7 +82,7 @@ namespace Catan10
                 };
                 string[] tokens = kvp.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 string bitmapPath = String.Format($"ms-appx:Assets/DefaultPlayers/{tokens[0]}");
-                p.Background = StaticHelpers.StringToColorDictionary[tokens[1]];
+                p.ColorAsString = tokens[1];
                 p.ImageFileName = bitmapPath;
                 await p.LoadImage();
                 list.Add(p);
@@ -112,18 +114,15 @@ namespace Catan10
                     await StaticHelpers.DragAsync(grid, e);
                 }
 
-                if (sender.GetType() == typeof(GameSummaryCtrl))
-                {
-                    GameSummaryCtrl ctrl = sender as GameSummaryCtrl;
-                    await StaticHelpers.DragAsync(ctrl, e);
-
-                }
+               
                 
                 await SaveGridLocations();
                 Canvas.SetZIndex(uiElement, zIndex);
             }
 
         }
+
+        
 
         //
         //  save all the grids.  since I add/delete them frequently, this can throw if/when a grid is removed after it has been saved.
@@ -518,32 +517,13 @@ namespace Catan10
                 }
             }
 
-            CurrentPlayer.Background = StaticHelpers.StringToColorDictionary[item.Text];
-            ActivePlayerBackground = item.Text;
+            CurrentPlayer.ColorAsString = item.Text;
+
+            //
+            //  this is only needed because Roads don't do proper data binding yet.
             CurrentPlayerColorChanged(CurrentPlayer);
         }
-        /// <summary>
-        /// this is called when the current player changes -- probably because somebody clicked on Next or Undo
-        /// </summary>
-        private void UpdateColorForCurrentPlayer()
-        {
-            if (CurrentPlayer != null)
-            {
-                foreach (ToggleMenuFlyoutItem subItem in Menu_Colors.Items)
-                {
-                    if (subItem.Text == CurrentPlayer.ColorAsString)
-                    {
-                        subItem.IsChecked = true;
-                    }
-                    else
-                    {
-                        subItem.IsChecked = false;
-                    }
-                }
-            }
-
-            CurrentPlayerChanged();
-        }
+       
         internal void AddPlayerMenu(PlayerData player)
         {
 
@@ -551,12 +531,6 @@ namespace Catan10
 
         }
 
-        private async void OnLostCards(object sender, RoutedEventArgs e)
-        {
-            if (PlayingPlayers.Count == 0) return;
-            LostCardsDlg dlg = new LostCardsDlg(PlayingPlayers);            
-            await dlg.ShowAsync();
-        }
 
 
 

@@ -28,7 +28,8 @@ namespace Catan10
         LostCardsToSeven,                   // 14
         MissedOpportunity,                  // 15
         GamePicked,                         // 16
-        MustMoveBaron                       // 17
+        MustMoveBaron,                       // 17
+        
     };                                     
 
     //
@@ -48,7 +49,7 @@ namespace Catan10
         RolledSeven,                              // 10
         AssignedBaron,                            // 11
         UpdatedRoadState,                         // 12
-        UpdateSettlementState,                    // 13
+        UpdateBuildingState,                    // 13
         AssignedPirateShip,                       // 14
         AddPlayer,                                // 15
         AssignRandomNumbersToTileGroup,           // 16
@@ -57,7 +58,8 @@ namespace Catan10
         AssignRandomTiles,                        // 19
         InitialAssignBaron,                       // 20
         None,                                      // 21
-        SetFirstPlayer
+        SetFirstPlayer,                            // 22
+        RoadTrackingChanged                         // 23
     };
     public enum AnimationSpeed { Ultra = 50, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 }; // typical animation speeds in ms
     public enum UndoOrder { PreviousThenUndo, UndoNoPrevious, None };
@@ -92,29 +94,7 @@ namespace Catan10
 
 
 
-    public interface IPageCallback
-    {
 
-
-        Task OnEnter(PlayerView currentPlayer, string txtInput);
-        Task OnUndo();
-        Task OnWinner(PlayerView currentPlayer, string txtInput);
-        Task OnNewGame();
-        Task PlayerTargeted(PlayerView targetedPlayer, string txtInput);
-        Task MissedOpportunity(PlayerView targetedPlayer, string txtInput);
-        Task LostToSeven(PlayerView targetedPlayer, string txtInput);
-        Task LostToCard(PlayerView targetedPlayer, string txtInput);
-        Task PlayerLostToCardLikeMonopoly(PlayerView targetedPlayer, string txtInput);
-
-        
-
-        Task SaveDefaultGamesLocally();
-        Task EnterDesignMode(bool isChecked);
-
-        void CurrentPlayerChanged();
-        void CurrentPlayerColorChanged(PlayerView player);
-        void UpdateUiForState(GameState state);
-    }
     //
     //  this interface is implemented by the Controls that wrap the SimpleHexPanel
     //  and exposes the data needed by the Views/Pages
@@ -148,11 +128,12 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
 
-        void SettlementEntered(SettlementCtrl settlement, PointerRoutedEventArgs e);
-        void SettlementExited(SettlementCtrl settlement, PointerRoutedEventArgs e);
-        void SettlementPointerPressed(SettlementCtrl settlement, PointerRoutedEventArgs e);
+      
+        Task BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState, LogType logType);
 
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
+        Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl sender);
+        bool BuildingStateChangedOk(BuildingCtrl building);
     }
 
     public interface ICatanSettings
@@ -195,7 +176,7 @@ namespace Catan10
     public enum RoadLocation { None = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
     public enum TileLocation { Self = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
     public enum ValidNumbers { Two = 2, Three = 3, Four = 4, Five = 5, Six = 6, Seven = 7, Eight = 8, Nine = 9, Ten = 10, Eleven = 11, Twelve = 12 };
-    public enum SettlementLocation { TopRight, MiddleRight, BottomRight, BottomLeft, MiddleLeft, TopLeft, None };
+    public enum BuildingLocation { TopRight, MiddleRight, BottomRight, BottomLeft, MiddleLeft, TopLeft, None };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };
     public enum TargetWeapon { PirateShip, Baron };

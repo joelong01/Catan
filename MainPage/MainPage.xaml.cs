@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,6 +13,7 @@ using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -25,7 +27,7 @@ using Windows.UI.Xaml.Navigation;
 namespace Catan10
 {
 
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, ILog
     {
 
 
@@ -57,208 +59,9 @@ namespace Catan10
         public ObservableCollection<PlayerData> AllPlayers { get; set; } = new ObservableCollection<PlayerData>();
 
 
-
-        public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("Hit Start"));
-        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
-        public static readonly DependencyProperty ActivePlayerBackgroundProperty = DependencyProperty.Register("ActivePlayerBackground", typeof(string), typeof(MainPage), new PropertyMetadata("Blue"));
-        public static readonly DependencyProperty ActivePlayerForegroundProperty = DependencyProperty.Register("ActivePlayerForeground", typeof(string), typeof(MainPage), new PropertyMetadata("Blue"));
-        public static readonly DependencyProperty ActivePlayerNameProperty = DependencyProperty.Register("ActivePlayerName", typeof(string), typeof(PlayerView), new PropertyMetadata("Nobody (hit +)"));
-
-        #region RollProperties
-        public static readonly DependencyProperty TotalRollsProperty = DependencyProperty.Register("TotalRolls", typeof(int), typeof(MainPage), new PropertyMetadata(0));
-        public static readonly DependencyProperty TwoPercentProperty = DependencyProperty.Register("TwoPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty ThreePercentProperty = DependencyProperty.Register("ThreePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty FourPercentProperty = DependencyProperty.Register("FourPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty FivePercentProperty = DependencyProperty.Register("FivePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty SixPercentProperty = DependencyProperty.Register("SixPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty SevenPercentProperty = DependencyProperty.Register("SevenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty EightPercentProperty = DependencyProperty.Register("EightPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty NinePercentProperty = DependencyProperty.Register("NinePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty TenPercentProperty = DependencyProperty.Register("TenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty ElevenPercentProperty = DependencyProperty.Register("ElevenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
-        public static readonly DependencyProperty TwelvePercentProperty = DependencyProperty.Register("TwelvePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
+        RoadRaceTracking _raceTracking = null;
 
 
-
-        public string TwelvePercent
-        {
-            get
-            {
-                return (string)GetValue(TwelvePercentProperty);
-            }
-            set
-            {
-                SetValue(TwelvePercentProperty, value);
-            }
-        }
-        public string ElevenPercent
-        {
-            get
-            {
-                return (string)GetValue(ElevenPercentProperty);
-            }
-            set
-            {
-                SetValue(ElevenPercentProperty, value);
-            }
-        }
-        public string TenPercent
-        {
-            get
-            {
-                return (string)GetValue(TenPercentProperty);
-            }
-            set
-            {
-                SetValue(TenPercentProperty, value);
-            }
-        }
-
-        public string NinePercent
-        {
-            get
-            {
-                return (string)GetValue(NinePercentProperty);
-            }
-            set
-            {
-                SetValue(NinePercentProperty, value);
-            }
-        }
-        public string EightPercent
-        {
-            get
-            {
-                return (string)GetValue(EightPercentProperty);
-            }
-            set
-            {
-                SetValue(EightPercentProperty, value);
-            }
-        }
-        public string SevenPercent
-        {
-            get
-            {
-                return (string)GetValue(SevenPercentProperty);
-            }
-            set
-            {
-                SetValue(SevenPercentProperty, value);
-            }
-        }
-        public string SixPercent
-        {
-            get
-            {
-                return (string)GetValue(SixPercentProperty);
-            }
-            set
-            {
-                SetValue(SixPercentProperty, value);
-            }
-        }
-        public string FivePercent
-        {
-            get
-            {
-                return (string)GetValue(FivePercentProperty);
-            }
-            set
-            {
-                SetValue(FivePercentProperty, value);
-            }
-        }
-        public string FourPercent
-        {
-            get
-            {
-                return (string)GetValue(FourPercentProperty);
-            }
-            set
-            {
-                SetValue(FourPercentProperty, value);
-            }
-        }
-        public string ThreePercent
-        {
-            get
-            {
-                return (string)GetValue(ThreePercentProperty);
-            }
-            set
-            {
-                SetValue(ThreePercentProperty, value);
-            }
-        }
-        public string TwoPercent
-        {
-            get
-            {
-                return (string)GetValue(TwoPercentProperty);
-            }
-            set
-            {
-                SetValue(TwoPercentProperty, value);
-            }
-        }
-        public int TotalRolls
-        {
-            get
-            {
-                return (int)GetValue(TotalRollsProperty);
-            }
-            set
-            {
-                SetValue(TotalRollsProperty, value);
-            }
-        }
-        #endregion
-        public string ActivePlayerName
-        {
-            get
-            {
-                return (string)GetValue(ActivePlayerNameProperty);
-            }
-            set
-            {
-                SetValue(ActivePlayerNameProperty, value);
-            }
-        }
-        public string ActivePlayerBackground
-        {
-            get
-            {
-                return (string)GetValue(ActivePlayerBackgroundProperty);
-            }
-            set
-            {
-                SetValue(ActivePlayerBackgroundProperty, value);
-                ActivePlayerForeground = StaticHelpers.BackgroundToForegroundDictionary[value];
-            }
-        }
-        public string ActivePlayerForeground
-        {
-            get
-            {
-                return (string)GetValue(ActivePlayerForegroundProperty);
-            }
-            set
-            {
-                SetValue(ActivePlayerForegroundProperty, value);
-            }
-        }
-        public string StateDescription
-        {
-            get
-            {
-                return (string)GetValue(StateDescriptionProperty);
-            }
-            set
-            {
-                SetValue(StateDescriptionProperty, value);
-            }
-        }
 
 
         public MainPage()
@@ -277,77 +80,7 @@ namespace Catan10
             //  note that we should never new a new collection -- just modify it.
             Ctrl_PlayerResourceCountCtrl.PlayingPlayers = PlayingPlayers;
 
-        }
-
-        private void PlayerView_TitlebarClicked(PlayerView playerView)
-        {
-            CompositeTransform transform = ((CompositeTransform)playerView.RenderTransform);
-            double x = transform.TranslateX;
-            double y = transform.TranslateY;
-            double titleBarHeight = playerView.TitlebarHeight;
-
-
-            switch (playerView.Orientation)
-            {
-                case PlayerViewOrientation.Bottom:
-                    if (playerView.IsOpen)
-                    {
-                        y = playerView.ActualHeight - titleBarHeight;
-                        playerView.IsOpen = false;
-
-                    }
-                    else
-                    {
-                        y = 0;
-                        playerView.IsOpen = true;
-                    }
-                    break;
-                case PlayerViewOrientation.Right:
-                    if (playerView.IsOpen)
-                    {
-                        x = -titleBarHeight;
-                        playerView.IsOpen = false;
-
-                    }
-                    else
-                    {
-                        x = -(playerView.ActualHeight);
-                        playerView.IsOpen = true;
-                    }
-                    break;
-                case PlayerViewOrientation.Top:
-                    if (playerView.IsOpen)
-                    {
-                        y = titleBarHeight;
-                        playerView.IsOpen = false;
-
-                    }
-                    else
-                    {
-                        y = playerView.ActualHeight;
-                        playerView.IsOpen = true;
-                    }
-                    break;
-                case PlayerViewOrientation.Left:
-                    if (playerView.IsOpen)
-                    {
-                        x = titleBarHeight;
-                        playerView.IsOpen = false;
-                    }
-                    else
-                    {
-                        x = (playerView.ActualHeight);
-                        playerView.IsOpen = true;
-
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            playerView.AnimatePosition(x, y);
-
-
+            _raceTracking = new RoadRaceTracking(this);
         }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
@@ -554,6 +287,7 @@ namespace Catan10
                 player.Reset();
             }
 
+            _raceTracking.Reset();
         }
 
         /// <summary>
@@ -584,12 +318,15 @@ namespace Catan10
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
 
+
             //
             //  we used to wait until somebody clicked "Start" after starting a new game.  this was annoying. do it for them.
             await ProcessEnter(CurrentPlayer, "");
 
 
         }
+
+
 
         private void ResetDataForNewGame()
         {
@@ -725,16 +462,6 @@ namespace Catan10
                 default:
                     break;
             }
-        }
-
-        private async Task WaitForNext(string message)
-        {
-            StateDescription = message;
-            _btnNextStep.IsEnabled = true;
-            _btnNextStep.Click -= OnNextStep;
-            await _btnNextStep.WhenClicked();
-            _btnNextStep.Click += OnNextStep;
-
         }
 
 
@@ -989,11 +716,14 @@ namespace Catan10
         //  we use the build ellipses during the allocation phase to see what settlements have the most pips
         //  when we move to the next player, hide the build ellipses
 
-        private void HideAllBuildEllipses()
+        private async Task HideAllPipEllipses()
         {
-            foreach (var s in _gameView.CurrentGame.HexPanel.Settlements)
+            foreach (var s in _gameView.CurrentGame.HexPanel.Buildings)
             {
-                s.HideBuildEllipse();
+                if (s.BuildingState == BuildingState.Pips)
+                {
+                    await s.UpdateBuildingState(s.BuildingState, BuildingState.None, LogType.DoNotLog);
+                }
             }
         }
 
@@ -1099,13 +829,18 @@ namespace Catan10
 
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                foreach (SettlementCtrl settlement in tile.OwnedSettlements)
+                foreach (BuildingCtrl building in tile.OwnedBuilding)
                 {
+                    if (building.Owner == null)
+                    {
+                        System.Diagnostics.Debug.Assert(false);
+                        
+                    }
 
-                    int value = settlement.Owner.GameData.UpdateResourceCount(tile.ResourceType, settlement.SettlementType, tile.HasBaron, undo);
+                    int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
                     //
                     //  need to look up the control given the player and add it to the right one
-                    AddResourceCountForPlayer(settlement.Owner, tile.ResourceType, value);
+                    AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
 
                 }
             }
@@ -1158,7 +893,7 @@ namespace Catan10
         public async Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null) return;
-            await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
+            await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
         }
 
 
@@ -1213,188 +948,154 @@ namespace Catan10
 
         public async Task<bool> ReplayLog(Log log)
         {
-            _progress.IsActive = true;
-            _progress.Visibility = Visibility.Visible;
-            await Task.Delay(0);
-            await this.Reset();
-            ResetDataForNewGame();
-            int n = 0;
-
-            log.Replaying = true;
-
-            foreach (LogEntry logLine in log.LogEntries)
+            try
             {
-                n++;
-                if (logLine.LogType == LogType.Undo)
+                _progress.IsActive = true;
+                _progress.Visibility = Visibility.Visible;
+                await Task.Delay(0);
+                await this.Reset();
+                ResetDataForNewGame();
+                int n = 0;
+                log.State = LogState.Replay;
+                
+
+                foreach (LogEntry logLine in log.LogEntries)
                 {
-                    await UndoLogLine(logLine, true);
-                    continue;
+                    n++;
+                    if (logLine.LogType == LogType.Undo)
+                    {
+                        await UndoLogLine(logLine, true);
+                        continue;
+                    }
+                    switch (logLine.Action)
+                    {
+                        case CatanAction.Rolled:
+                            PushRoll(logLine.Number);
+                            UpdateChart();
+                            break;
+                        case CatanAction.ChangedState:
+                            break;
+                        case CatanAction.ChangedPlayer:
+                            LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
+                            await AnimateToPlayerIndex(lcp.To, LogType.Replay);
+                            break;
+                        case CatanAction.Dealt:
+                            break;
+                        case CatanAction.CardsLost:
+                            LogCardsLost lcl = logLine.Tag as LogCardsLost;
+                            await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
+                            break;
+                        case CatanAction.CardsLostToSeven:
+                            break;
+                        case CatanAction.MissedOpportunity:
+                            break;
+                        case CatanAction.DoneSupplemental:
+                            break;
+                        case CatanAction.DoneResourceAllocation:
+                            break;
+                        case CatanAction.SetFirstPlayer:
+                            if (logLine.Tag == null) continue;
+                            LogSetFirstPlayer lsfp = logLine.Tag as LogSetFirstPlayer;
+                            await SetFirst(PlayingPlayers[lsfp.FirstPlayerIndex]);
+                            break;
+                        case CatanAction.PlayedKnight:
+                        case CatanAction.AssignedBaron:
+                        case CatanAction.AssignedPirateShip:
+                            LogBaronOrPirate lbp = logLine.Tag as LogBaronOrPirate;
+                            await AssignBaronOrKnight(lbp.TargetPlayer, lbp.TargetTile, lbp.TargetWeapon, lbp.Action, LogType.Replay);
+                            break;
+                        case CatanAction.UpdatedRoadState:
+                            LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
+                            if (roadUpdate.NewRoadState != RoadState.Unowned)
+                                roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
+                            else
+                                roadUpdate.Road.Color = Colors.Transparent;
+
+                            await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
+                            break;
+                        case CatanAction.UpdateBuildingState:
+
+                            LogBuildingUpdate lsu = (LogBuildingUpdate)logLine.Tag;
+                            if (lsu.OldBuildingState != BuildingState.City)
+                            {
+                                lsu.Building.Owner = CurrentPlayer;
+                            }
+
+                            await lsu.Building.UpdateBuildingState(lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
+                            break;
+                        case CatanAction.AddPlayer:
+                            await AddPlayer(logLine, LogType.Replay);
+                            break;
+                        case CatanAction.AssignRandomNumbersToTileGroup:
+                            List<int> randomNumbers = logLine.Tag as List<int>;
+                            await _gameView.AssignRandomNumbersToTileGroup(logLine.Number, randomNumbers);
+                            break;
+                        case CatanAction.AssignHarbors:
+                            _gameView.AssignRandomNumbersToHarbors((List<int>)logLine.Tag);
+                            break;
+                        case CatanAction.AssignRandomTiles:
+                            await _gameView.AssignRandomTilesToTileGroup(logLine.Number, (List<int>)logLine.Tag);
+                            break;
+                        case CatanAction.InitialAssignBaron:
+                            _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
+                            break;
+                        case CatanAction.SelectGame:
+                            _gameView.CurrentGame = _gameView.Games[logLine.Number];
+                            await Task.Delay(0);
+                            break;
+                        case CatanAction.RoadTrackingChanged:
+                            LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
+                            _raceTracking.Deserialize(lrtc.NewState, this);
+                            break;
+                        default:
+                            break;
+                    }
+
+
+
                 }
-                switch (logLine.Action)
-                {
-                    case CatanAction.Rolled:
-                        PushRoll(logLine.Number);
-                        UpdateChart();
-                        break;
-                    case CatanAction.ChangedState:
-                        break;
-                    case CatanAction.ChangedPlayer:
-                        LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
-                        await AnimateToPlayerIndex(lcp.To, LogType.Replay);
-                        break;
-                    case CatanAction.Dealt:
-                        break;
-                    case CatanAction.CardsLost:
-                        LogCardsLost lcl = logLine.Tag as LogCardsLost;
-                        await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
-                        break;
-                    case CatanAction.CardsLostToSeven:
-                        break;
-                    case CatanAction.MissedOpportunity:
-                        break;
-                    case CatanAction.DoneSupplemental:
-                        break;
-                    case CatanAction.DoneResourceAllocation:
-                        break;
-                    case CatanAction.SetFirstPlayer:
-                        if (logLine.Tag == null) continue;
-                        LogSetFirstPlayer lsfp = logLine.Tag as LogSetFirstPlayer;
-                        await SetFirst(PlayingPlayers[lsfp.FirstPlayerIndex]);
-                        break;
-                    case CatanAction.PlayedKnight:
-                    case CatanAction.AssignedBaron:
-                    case CatanAction.AssignedPirateShip:
-                        LogBaronOrPirate lbp = logLine.Tag as LogBaronOrPirate;
-                        await AssignBaronOrKnight(lbp.TargetPlayer, lbp.TargetTile, lbp.TargetWeapon, lbp.Action, LogType.Replay);
-                        break;
-                    case CatanAction.UpdatedRoadState:
-                        LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
-                        if (roadUpdate.NewRoadState != RoadState.Unowned)
-                            roadUpdate.Road.Color = CurrentPlayer.Background;
-                        else
-                            roadUpdate.Road.Color = Colors.Transparent;
-
-                        await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
-                        break;
-                    case CatanAction.UpdateSettlementState:
-
-                        LogSettlementUpdate lsu = (LogSettlementUpdate)logLine.Tag;
-                        if (lsu.OldSettlementType != SettlementType.City)
-                        {
-                            lsu.Settlement.Color = CurrentPlayer.Background;
-                        }
-
-                        await UpdateSettlementState(lsu.Settlement, lsu.OldSettlementType, lsu.NewSettlementType, LogType.Replay);
-                        break;
-                    case CatanAction.AddPlayer:
-                        await AddPlayer(logLine, LogType.Replay);
-                        break;
-                    case CatanAction.AssignRandomNumbersToTileGroup:
-                        List<int> randomNumbers = logLine.Tag as List<int>;
-                        await _gameView.AssignRandomNumbersToTileGroup(logLine.Number, randomNumbers);
-                        break;
-                    case CatanAction.AssignHarbors:
-                        _gameView.AssignRandomNumbersToHarbors((List<int>)logLine.Tag);
-                        break;
-                    case CatanAction.AssignRandomTiles:
-                        await _gameView.AssignRandomTilesToTileGroup(logLine.Number, (List<int>)logLine.Tag);
-                        break;
-                    case CatanAction.InitialAssignBaron:
-                        _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
-                        break;
-                    case CatanAction.SelectGame:
-                        _gameView.CurrentGame = _gameView.Games[logLine.Number];
-                        await Task.Delay(0);
-                        break;
-                    default:
-                        break;
-                }
 
 
-
+                _gameView.FlipAllAsync(TileOrientation.FaceUp);
             }
-
-
-            _gameView.FlipAllAsync(TileOrientation.FaceUp);
-            _progress.IsActive = false;
-            _progress.Visibility = Visibility.Collapsed;
-            log.Replaying = false;
+            finally
+            {
+                _progress.IsActive = false;
+                _progress.Visibility = Visibility.Collapsed;
+                log.State = LogState.Normal;
+                
+            }
             return true;
 
 
         }
-        private int _showSettlementByPipsIndex = 0;
+        ConcurrentBag<KeyValuePair<string, string>> concurrentBag = new ConcurrentBag<KeyValuePair<string, string>>();
         private void OnTest(object sender, RoutedEventArgs rea)
         {
-            // Frame.Navigate(typeof(TestPage));
-            // _gameView.CalculateAdjacentSettlements();
-            //_gameView.PirateShipTile = _gameView.AllTiles[18];
-            // _gameView.BaronTile = _gameView.AllTiles.Last();
-            // _gameView.OnTest();
+            //StaticHelpers.SetKeyValue<PlayerGameData>(PlayingPlayers[0].GameData, "TimesTargeted","10");
+            concurrentBag.Add(new KeyValuePair<string, string>("TimesTargeted", "10"));
+            concurrentBag.Add(new KeyValuePair<string, string>("UseLightFile", "True"));
+            concurrentBag.Add(new KeyValuePair<string, string>("ColorAsString", "Yellow"));
+            StartCallback();
+        }
 
-
-            //take 2
-            //string fileName = "replace this";
-            //Log newLog = await _log.LoadLog(fileName, this);
-            //await ReplayLog(newLog);
-            //_log = newLog;
-
-
-            //
-            //  for every settlement, what is the max pips?
-            List<SettlementCtrl> settlementsByPips = _gameView.CurrentGame.HexPanel.Settlements;
-            settlementsByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
-            ValidateBuilding = true;
-            int currentPipCount = 0;
-            _showSettlementByPipsIndex++;
-            for (int idx = 0; idx < settlementsByPips.Count; idx++)
+        private void StartCallback()
+        {
+           var ignored = Task.Run(async () =>
             {
-                var s = settlementsByPips[idx];
-                if (s.Pips == 0) continue; // outside the main map
-                if (s.SettlementType != SettlementType.None) continue;
-                if (s.BuildEllipseVisible) continue;
-                if (ValidateSettlementBuildLocation(s, out bool showerror) == false) continue; // can't build here
-
-                currentPipCount = s.Pips;
-
-
-                while (currentPipCount == s.Pips)
+                while (!concurrentBag.IsEmpty)
                 {
-                    if ((s.SettlementType == SettlementType.None) && !s.BuildEllipseVisible && ValidateSettlementBuildLocation(s, out showerror) && currentPipCount == s.Pips)
+                    if (concurrentBag.TryTake(out KeyValuePair<string, string> kvp))
                     {
-                        s.ShowBuildEllipse(false, CurrentPlayer.ColorAsString, _showSettlementByPipsIndex.ToString());
 
+                        this.TraceMessage($"{kvp.Key}={kvp.Value}");
+                        await Task.Delay(1000);
                     }
-                    idx++;
-                    if (idx == settlementsByPips.Count) break;
-                    s = settlementsByPips[idx];                    
-
+                    else
+                        return;
                 }
-                break;
-            }
 
-            //ValidateBuilding = true;
-#if false
-            #region probability testing
-            string s = "";
-
-            foreach (ResourceType res in Enum.GetValues(typeof(ResourceType)))
-            {
-                if (_gameView.Probabilities[res] == 0)
-                    continue;
-
-                if (res == ResourceType.Sea || res == ResourceType.Desert) continue;
-
-                string tabs = "\t\t";
-                if (res == ResourceType.GoldMine) tabs = "\t";
-                s += String.Format($"{res}:{tabs}{_gameView.Probabilities[res]}\n");
-                
-            }
-            await StaticHelpers.ShowErrorText(s);
-            #endregion
-#endif
-
-
+            });
         }
 
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
@@ -1498,70 +1199,99 @@ namespace Catan10
         {
             _savedGameGrid.Visibility = Visibility.Collapsed;
         }
+        /// <summary>
+        ///     This will go through all the buildings and find the ones that are
+        ///        1. Buildable
+        ///        2. in the "none" state (e.g. not already shown in some way) 
+        ///      and then have them show the PipGroup.  
+        ///      you have to do this every time because people might have built in locations that change the PipGroup
+        /// </summary>
+        private int _showPipGroupIndex = 0;
+        private async void OnShowPips(object sender, RoutedEventArgs e)
+        {
+            _showPipGroupIndex++;
+            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
+            buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+
+            int pipCountToShow = buildingsOrderedByPips[0].Pips;
+            bool shownOne = false;
+            foreach (var building in buildingsOrderedByPips)
+            {
+                //
+                //  keep going until the pip count changes - but we have to show at least one
+                if (pipCountToShow != building.Pips && shownOne)
+                {
+                    break;
+                }
+
+                if (building.Pips == 0)  // throw out the ones that have no pips
+                {
+                    building.PipGroup = -1;
+                    continue; // outside the main map or a desert next to nothing
+                }
+
+                if (ValidateBuildingLocation(building, out bool showerror) == false) // throw out the ones you can't build in
+                {
+                    continue;
+                }
+
+                if (building.BuildingState != BuildingState.None) continue;  // throw out the non-empty ones
+
+                //
+                //  if we've got here, we can build on this location and we need to show everythign tha thas this pipcount
+                if (!shownOne)
+                {
+                    pipCountToShow = building.Pips;
+                    shownOne = true;
+                }
+
+                building.PipGroup = _showPipGroupIndex;
+                await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.Normal);
+
+            }
 
 
+
+        }
+
+        private async void OnClearPips(object sender, RoutedEventArgs e)
+        {
+
+            await HideAllPipEllipses();
+            _showPipGroupIndex = 0;
+
+        }
+
+        private async void OnTestGame(object sender, RoutedEventArgs e)
+        {
+            AnimationSpeedBase = 4; // speed up the animations
+            await this.Reset();
+            await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            _gameView.CurrentGame = _gameView.Games[0];
+
+            _log = new Log();
+            await _log.Init(CreateSaveFileName("Test"));
+            SavedGames.Insert(0, _log);
+            await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
+            List<PlayerData> PlayerDataList = new List<PlayerData>
+            {
+                AllPlayers[0],
+                AllPlayers[1],
+                AllPlayers[2]
+            };
+            await StartGame(PlayerDataList);
+        }
+
+        public static string CreateSaveFileName(string Description)
+        {
+            DateTime dt = DateTime.Now;
+
+            string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
+            string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
+
+            return  String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
+        }
     }
 }
 
-
-
-
-public class RollStats : INotifyPropertyChanged
-{
-    int _roll = 0;
-    int _count = 0;
-    string _percent = "0";
-
-    public int Roll
-    {
-        get
-        {
-            return _roll;
-        }
-        set
-        {
-            _roll = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public int Count
-    {
-        get
-        {
-            return _count;
-        }
-        set
-        {
-            _count = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public string Percent
-    {
-        get
-        {
-            return _percent;
-        }
-        set
-        {
-            _percent = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public void CalcPercent(int total)
-    {
-        double p = (double)Count / (double)total * (double)100.0;
-        Percent = String.Format("{0:0.#}", p);
-    }
-
-
-    private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-    public event PropertyChangedEventHandler PropertyChanged;
-}
 
