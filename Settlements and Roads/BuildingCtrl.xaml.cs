@@ -257,7 +257,7 @@ namespace Catan10
             //
             //  need to validate that the GameState is a valid state to change the state of a building
 
-            bool valid = (bool)Callback?.BuildingStateChangedOk(this);
+            bool valid = (bool)Callback?.BuildingStateChangeOk(this);
             if (!valid)
             {
                 return;
@@ -295,20 +295,31 @@ namespace Catan10
         /// <summary>
         ///     Sets the state of a building *directly* - eg. doesn't validate state transitions.
         ///     we need this functionality in Undo/Redo and ReplayLog
-        /// </summary>
-        /// <param name="building"></param>
-        /// <param name="oldState"></param>
-        /// <param name="newState"></param>
-        /// <param name="logType"></param>
+        /// </summary>      
         /// <returns></returns>
         public async Task UpdateBuildingState(BuildingState oldState, BuildingState newState, LogType logType = LogType.Normal)
         {
             PlayerData player = CurrentPlayer;
+            bool ret = false;
+            switch (oldState)
+            {
+                case BuildingState.None:
+                case BuildingState.Build:
+                case BuildingState.Error:
+                case BuildingState.Pips:                  
+                    break;
+                case BuildingState.Settlement:                   
+                    ret = player.GameData.Settlements.Remove(this);
+                    this.Assert(ret, "a settlement needs to be in the Settlements Collection");
+                    break;
+                case BuildingState.City:
+                    ret = player.GameData.Cities.Remove(this);
+                    this.Assert(ret, "a settlement needs to be in the Settlements Collection");
+                    break;
+                default:
+                    break;
+            }
 
-            //
-            //  remove everything -- we will add it back below
-            player.GameData.Cities.Remove(this);
-            player.GameData.Settlements.Remove(this);
             this.BuildingState = newState;
 
 

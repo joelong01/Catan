@@ -135,7 +135,7 @@ namespace Catan10
 
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
         Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl sender);
-        bool BuildingStateChangedOk(BuildingCtrl building);
+        bool BuildingStateChangeOk(BuildingCtrl building);
     }
 
     public interface ICatanSettings

@@ -778,18 +778,20 @@ namespace Catan10
             }
         }
 
-        /// <summary>
-        ///         this looks at the global state of all the roads and makes sure that it
-        ///         1. keeps track of who gets to a road count >= 5 first
-        ///         2. makes sure that the right player gets the longest road
-        ///         3. works when an Undo action happens
-        ///         5. works when a road is "broken"
-        /// </summary>
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+                              /// <summary>
+                              ///         this looks at the global state of all the roads and makes sure that it
+                              ///         1. keeps track of who gets to a road count >= 5 first
+                              ///         2. makes sure that the right player gets the longest road
+                              ///         3. works when an Undo action happens
+                              ///         5. works when a road is "broken"
+                              /// </summary>
         private async Task CalculateAndSetLongestRoad(LogType logType)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //
             //  make the compiler error go away
-            await Task.Delay(0);
+           // await Task.Delay(0);
 
             PlayerData longestRoadPlayer = null;
             int maxRoads = -1;
@@ -805,19 +807,24 @@ namespace Catan10
                 foreach (var p in PlayingPlayers)
                 {
                     if (p.GameData.HasLongestRoad) longestRoadPlayer = p;  // this one currently has the longest road bit -- it may or may not be correct now
-                    p.GameData.LongestRoad = CalculateLongestRoad(p, p.GameData.RoadsAndShips);
+                    // calculate the longest road each player has -- we do this for *every* road/bulding state transition as one person can impact another (e.g. break a road)
+                    p.GameData.LongestRoad = CalculateLongestRoad(p, p.GameData.RoadsAndShips); 
+                    
                     //
                     //  remove any tracking for roads greater than their current longest road
                     //  e.g. if they had a road of length 7 and somebody broke it, remove the
                     //  entries that said they had built roads of length 5+
-                    for (int i = p.GameData.LongestRoad + 1; i < 15; i++)
+                    for (int i = p.GameData.LongestRoad + 1; i < _gameView.CurrentGame.MaxRoads; i++)
                     {
                         _raceTracking.RemovePlayer(p, i);
                     }
 
-
+                    
                     if (p.GameData.LongestRoad >= 5)
                     {
+                        //
+                        //  Now we add everybody who has more than 5 rows to the "race" tracking -- 
+                        //  this has a Dictionary<int, List> where the list is ordered by road count
                         _raceTracking.AddPlayer(p, p.GameData.LongestRoad); // throws away duplicates
                     }
                     if (p.GameData.LongestRoad > maxRoads)
@@ -842,7 +849,7 @@ namespace Catan10
 
                 //
                 //  can't have longest road if there aren't enough of them
-                if (maxRoads < 5)
+                if (maxRoads < 5) // "5" is a "magic" Catan number - you need at least 5 roads to get Longest Road
                 {
                     if (longestRoadPlayer != null)
                     {
@@ -876,11 +883,11 @@ namespace Catan10
             }
             finally
             {
+                //
+                //  this pattern makes it so we can change race tracking multiple times but only end up with 
+                //  one log write
                 _raceTracking.EndChanges(CurrentPlayer, GameState, logType);
             }
-
-
-
 
         }
 
@@ -1402,15 +1409,12 @@ namespace Catan10
         ///     the Views bind directly to the PlayerData, so we don't do anything with the Score (or anything else with PlayerData)
         ///     This View knows how to Log and about the other Buildings and Roads, so put anything in here that is impacted by building something (or "unbuilding" it)
         ///     in this case, recalc the longest road (a buidling can "break" a road) and then log it.
-        ///     we also clear all the Pipe ellipses if we are in the allocating phase
+        ///     we also clear all the Pip ellipses if we are in the allocating phase
         /// </summary>
         public async Task BuildingStateChanged(BuildingCtrl building, BuildingState oldState, LogType logType)
         {
             PlayerData player = CurrentPlayer;
-            //
-            //  NOTE:  these have to be called in this order so that the undo works correctly
-            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
-            await CalculateAndSetLongestRoad(logType);
+           
             //
             //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
@@ -1423,7 +1427,12 @@ namespace Catan10
                 }
             }
 
+            //
+            //  NOTE:  these have to be called in this order so that the undo works correctly
+            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
+            await CalculateAndSetLongestRoad(logType);
+            
         }
 
         /// <summary>
@@ -1431,7 +1440,7 @@ namespace Catan10
         ///     we can only do that if the state is WaitingForNext and the CurrentPlayer == the owner of the building
         /// </summary>
         /// <returns></returns>
-        public bool BuildingStateChangedOk(BuildingCtrl building)
+        public bool BuildingStateChangeOk(BuildingCtrl building)
         {
             if (building.Owner != null)
             {
