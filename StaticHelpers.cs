@@ -148,7 +148,7 @@ namespace Catan10
 
                 return folder;
             }
-            catch(Exception except)
+            catch (Exception except)
             {
                 Debug.WriteLine(except.ToString());
             }
@@ -528,6 +528,18 @@ namespace Catan10
             {
                 propInfo.SetValue(t, value);
             }
+            else if (propInfo.PropertyType == typeof(bool?))
+            {
+                if (bool.TryParse(value, out bool res))
+                {
+                    propInfo.SetValue(t, res);
+                }
+                else
+                {
+                    propInfo.SetValue(t, null);
+                }
+
+            }
             else if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(List<>))
             {
                 Type elementType = typeInfo.GenericTypeArguments[0];
@@ -581,7 +593,7 @@ namespace Catan10
             {
                 kvp = StaticHelpers.GetKeyValue(line, kvpSep[0]);
                 t.SetKeyValue(kvp.Key, kvp.Value);
-               
+
             }
 
         }

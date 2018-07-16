@@ -14,9 +14,12 @@ namespace Catan10
 {
     public sealed partial class PlayerManagementDlg : ContentDialog
     {
-        public PlayerManagementDlg()
+        private ILog _log = null;
+
+        public PlayerManagementDlg(ILog log)
         {
             this.InitializeComponent();
+            _log = log;
         }
 
 
@@ -38,7 +41,7 @@ namespace Catan10
 
         private async void OnAddPlayer(object sender, RoutedEventArgs e)
         {
-            PlayerData pd = new PlayerData();
+            PlayerData pd = new PlayerData(_log);
             await pd.LoadImage();
             PlayerDataList.Add(pd);
             _gvPlayers.ScrollIntoView(pd);

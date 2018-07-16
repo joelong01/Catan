@@ -176,8 +176,8 @@ namespace Catan10
             if (newState == "") return;
             if (newState == _beginState)
                 return;
-        //    this.TraceMessage($"RoadRace - old:{_beginState} new: {newState}");
-            _log.AddLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
+            this.TraceMessage($"RoadRace - old:{_beginState} new: {newState}");
+            _log.PostLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
         }
     }
 

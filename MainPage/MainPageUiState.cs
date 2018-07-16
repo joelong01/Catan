@@ -17,7 +17,7 @@ namespace Catan10
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        List<int> _rolls = new List<int>(); // a useful cache of all the rolls the players have made
+        public List<int> Rolls { get; set; } = new List<int>();
         Stack<GameState> _stateStack = new Stack<GameState>();
         
 
@@ -63,9 +63,11 @@ namespace Catan10
             if (roll < 2 || roll > 12)
                 return false;
 
-            _rolls.Push(roll);
-            CurrentPlayerRolls.Push(roll);
-            //   this.TraceMessage($"\n{CurrentPlayer.PlayerName} rolled {roll}\n");
+            Rolls.Push(roll);
+            
+            PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll);
+            UpdateRollStats();
+            this.TraceMessage($"pushed Roll: {roll}");
             return true;
         }
 
@@ -73,13 +75,15 @@ namespace Catan10
 
         public int PopRoll()
         {
-            if (_rolls.Count == 0)
+            if (Rolls.Count == 0)
                 return -1;
 
-            int n = _rolls.Pop();
-            int m = CurrentPlayerRolls.Pop();
-
-            return n;
+            
+            var lastRoll = Rolls.Pop();
+            this.TraceMessage($"pushed Roll: {lastRoll}");
+            PostLogEntry(CurrentPlayer, GameState, CatanAction.Rolled, true, LogType.Undo, lastRoll);
+            UpdateRollStats();
+            return lastRoll;
         }
 
      
@@ -188,26 +192,9 @@ namespace Catan10
             return percents;
         }
 
-        public ObservableCollection<int> CurrentPlayerRolls
-        {
-            get
 
-            {
-                return CurrentPlayer.GameData.Rolls;
-            }
-        }
-
-        public List<int> AllRolls
-        {
-            get
-            {
-                return _rolls;
-            }
-            set
-            {
-                _rolls = value;
-            }
-        }
+       
+       
 
         public static int[] RollCount(IEnumerable<int> stack)
         {

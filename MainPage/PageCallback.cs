@@ -47,27 +47,15 @@ namespace Catan10
             switch (logLine.Action)
             {
                 case CatanAction.Rolled:
-                    int roll = PopRoll(); // we keep a side list of all rolls...remove this one
-                    if (roll != 7)
-                    {
-                        //
-                        //  take the resources away from the players who got resources because of the roll
-                        //  
-
-                        List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
-                        foreach (TileCtrl t in _gameView.AllTiles)
-                        {
-                            if (t.Number == roll)
-                                tilesWithNumber.Add(t);
-                        }
-
-                        CountResourcesForRoll(tilesWithNumber, true);
-                        CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null; // it wasn't a 7, so don't set this to true or falce
-                    }
-                    await AddLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Undo, roll);
-                    UpdateChart();
+                    int roll = PopRoll(); 
                     break;
-
+                case CatanAction.AddResourceCount:
+                    LogResourceCount lrc = logLine.Tag as LogResourceCount;
+                    if (logLine.PlayerData != null)
+                        logLine.PlayerData.GameData.PlayerResourceData.AddResourceCount(lrc.ResourceType, -logLine.Number);
+                    else
+                        Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(lrc.ResourceType, -logLine.Number);
+                    break;
                 case CatanAction.CardsLost:
                     LogCardsLost lcl = logLine.Tag as LogCardsLost;
                     _undoingCardLostHack = true;
@@ -82,8 +70,7 @@ namespace Catan10
                 case CatanAction.ChangedState:
                     LogStateTranstion lst = logLine.Tag as LogStateTranstion;
                     if (lst.OldState == GameState.WaitingForStart) break;
-                    await SetStateAsync(logLine.PlayerData, lst.OldState, true, LogType.Undo);
-
+                    await SetStateAsync(logLine.PlayerData, lst.OldState, logLine.StopProcessingUndo, LogType.Undo);                   
                     break;
                 case CatanAction.ChangedPlayer:
                     LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
@@ -134,6 +121,12 @@ namespace Catan10
                     Debug.Assert(logLine.StopProcessingUndo == false, "this has no UI affect");
                     await CalculateAndSetLongestRoad(LogType.Undo);  // this executes with the new tracking -- things may change since ties are different.
                     break;
+                case CatanAction.ChangedPlayerProperty:
+                    LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
+                    logLine.PlayerData.GameData.SetKeyValue<PlayerGameData>(lpc.PropertyName, lpc.OldVal);
+
+                    break;
+
                 default:
                     break;
             }
@@ -159,15 +152,55 @@ namespace Catan10
                     if (_log[i].LogType == LogType.DoNotUndo) continue;
 
                     bool ret = await UndoLogLine(_log[i], false);
-                    if (ret) break;
+                    //
+                    //  if you undo and land on one of these states, then stop processing undo
+                    bool stop = false;
+                    //switch (_log[i].GameState)
+                    //{
+                    //    case GameState.MustMoveBaron:
+                    //        stop = true;
+                    //        break;
+                    //    default:
+                    //        break;
+                    //}
+                    //if (stop)
+                    //{
+                    //    this.TraceMessage($"Stopping because of GameState. Action:{_log[i].Action} State:{_log[i].GameState} Stop Undo: {stop}");
+                    //    break;
+                    //}
+
+                    // if it was this action, we also stop the Unfo
+                    switch (_log[i].Action)
+                    {
+                        case CatanAction.Rolled:
+                        case CatanAction.ChangedPlayer:
+                        case CatanAction.PlayedKnight:
+                        case CatanAction.AssignedBaron:
+                        case CatanAction.UpdatedRoadState:
+                        case CatanAction.UpdateBuildingState:
+                        case CatanAction.AssignedPirateShip:
+                        case CatanAction.RolledSeven:
+                            stop = true;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    this.TraceMessage($"Action:{_log[i].Action} State:{_log[i].GameState} Stop Undo: {stop}");
+
+                    if (stop) break;
+
+                    // if (_log[i - 1].StopProcessingUndo) break;
+                    //if (ret) break;
                 }
             }
             finally
             {
-                _log.State = LogState.Undo;
-                UpdateChart();
+                _log.State = LogState.Normal;
                 UpdateUiForState(_log.Last().GameState);
             }
+
+            await _log.WriteUnwrittenLinesToDisk();
         }
 
        
@@ -697,6 +730,8 @@ namespace Catan10
         {
             if (newState == oldState) return;
 
+            this.TraceMessage($"Updating Road State.  Idx={road.Index} newState={newState}");
+
             road.RoadState = newState;
             switch (newState)
             {
@@ -1103,56 +1138,63 @@ namespace Catan10
         };
         public void UpdateUiForState(GameState state)
         {
-            StateDescription = _StateMessages[(int)state];
-            _btnNextStep.IsEnabled = false;
-            _btnUndo.IsEnabled = true;
-            _btnWinner.IsEnabled = false;
-
-
-
-
-            Menu_Undo.IsEnabled = false;
-            Menu_Winner.IsEnabled = false;
-
-            switch (state)
+            try
             {
-                case GameState.Uninitialized:
-                case GameState.Dealing:
-                case GameState.MustMoveBaron:
-                    break;
-                case GameState.WaitingForNewGame:
-                    _btnNextStep.IsEnabled = true;
-                    break;
-                case GameState.WaitingForStart:
-                case GameState.WaitingForNext:
-                    Menu_Undo.IsEnabled = true;
-                    Menu_Winner.IsEnabled = true;
-                    _btnNextStep.IsEnabled = true;
-                    _btnUndo.IsEnabled = true;
-                    Menu_Undo.IsEnabled = true;
-                    break;
-                case GameState.DoneSupplemental:
-                case GameState.DoneResourceAllocation:
-                case GameState.AllocateResourceForward:
-                case GameState.AllocateResourceReverse:
-                case GameState.Supplemental:
-                    _btnNextStep.IsEnabled = true;
-                    _btnUndo.IsEnabled = true;
-                    Menu_Undo.IsEnabled = true;
-                    break;
-                case GameState.WaitingForRoll:
-                    Menu_Undo.IsEnabled = true;
-                    Menu_Winner.IsEnabled = true;
-                    _btnNextStep.IsEnabled = false;
-                    ShowNumberUi();
-                    break;
-                case GameState.Targeted:
-                case GameState.LostCardsToSeven:
-                case GameState.MissedOpportunity:
-                case GameState.LostToCardsLikeMonopoly:
-                    break;
-                default:
-                    break;
+                StateDescription = _StateMessages[(int)state];
+                _btnNextStep.IsEnabled = false;
+                _btnUndo.IsEnabled = true;
+                _btnWinner.IsEnabled = false;
+
+
+
+
+                Menu_Undo.IsEnabled = false;
+                Menu_Winner.IsEnabled = false;
+
+                switch (state)
+                {
+                    case GameState.Uninitialized:
+                    case GameState.Dealing:
+                    case GameState.MustMoveBaron:
+                        break;
+                    case GameState.WaitingForNewGame:
+                        _btnNextStep.IsEnabled = true;
+                        break;
+                    case GameState.WaitingForStart:
+                    case GameState.WaitingForNext:
+                        Menu_Undo.IsEnabled = true;
+                        Menu_Winner.IsEnabled = true;
+                        _btnNextStep.IsEnabled = true;
+                        _btnUndo.IsEnabled = true;
+                        Menu_Undo.IsEnabled = true;
+                        break;
+                    case GameState.DoneSupplemental:
+                    case GameState.DoneResourceAllocation:
+                    case GameState.AllocateResourceForward:
+                    case GameState.AllocateResourceReverse:
+                    case GameState.Supplemental:
+                        _btnNextStep.IsEnabled = true;
+                        _btnUndo.IsEnabled = true;
+                        Menu_Undo.IsEnabled = true;
+                        break;
+                    case GameState.WaitingForRoll:
+                        Menu_Undo.IsEnabled = true;
+                        Menu_Winner.IsEnabled = true;
+                        _btnNextStep.IsEnabled = false;
+                        ShowNumberUi();
+                        break;
+                    case GameState.Targeted:
+                    case GameState.LostCardsToSeven:
+                    case GameState.MissedOpportunity:
+                    case GameState.LostToCardsLikeMonopoly:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch
+            {
+                this.TraceMessage($"You didn't add a description for the GameState {state}");
             }
 
         }

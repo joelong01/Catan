@@ -8,8 +8,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -27,7 +29,6 @@ namespace Catan10
         public ObservableCollection<RoadCtrl> Ships { get; set; } = new ObservableCollection<RoadCtrl>();
         public ObservableCollection<BuildingCtrl> Settlements { get; set; } = new ObservableCollection<BuildingCtrl>();
         public ObservableCollection<BuildingCtrl> Cities { get; set; } = new ObservableCollection<BuildingCtrl>();
-        public ObservableCollection<int> Rolls { get; set; } = new ObservableCollection<int>();
         public PlayerResourceData PlayerResourceData { get; set; } = null;
         private List<string> _savedGameProperties = new List<string> { "PlayerIdentified", "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
                                                                        "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
@@ -44,6 +45,36 @@ namespace Catan10
             Ships.CollectionChanged += Ships_CollectionChanged;
             _playerData = pData;
             PlayerResourceData = new PlayerResourceData(pData);
+            PlayerResourceData.OnPlayerResourceUpdate += OnPlayerResourceUpdate;
+        }
+
+        
+        private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
+        {
+            _playerData.Log.PostLogEntry(_playerData, GameState.Unknown,
+                                                             CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
+                                                             new LogPropertyChanged(propertyName, oldVal, newVal));
+        }
+
+        private void LogPropertyChanged(int oldVal, int newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+
+        private void LogPropertyChanged(bool oldVal, bool newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+        private void LogPropertyChanged(bool? oldVal, bool? newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+        private void OnPlayerResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
+        {
+            _playerData.Log.PostLogEntry(player, GameState.WaitingForRoll,
+                                                             CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
+                                                             new LogResourceCount(oldVal, newVal, resource));
+   
         }
 
         private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -100,14 +131,8 @@ namespace Catan10
             TimesTargeted = 0;
             NoResourceCount = 0;
             RollsWithResource = 0;
-            //
-            //  sigh.  when you make it easy to set MaxNoResourceRolls, you make it hard to
-            //         make the value less.  I'll just go around the property setter to make 
-            //         it zero, and update the UI
-            _maxNoResourceRolls = 0;
-            NotifyPropertyChanged("MaxNoResourceRolls");
+            MaxNoResourceRolls = 0;
             GoodRoll = false;
-
             CardsLost = 0;
             CardsLostToBaron = 0;
             CardsLostToSeven = 0;
@@ -126,7 +151,6 @@ namespace Catan10
             Roads.Clear();
             Settlements.Clear();
             Cities.Clear();
-            Rolls.Clear();
             Ships.Clear();
             IsCurrentPlayer = false;
             MaxShips = 0;
@@ -136,7 +160,7 @@ namespace Catan10
             PlayerResourceData.Reset();
             Pips = 0;
 
-            for (int i=0; i< _RoadTie.Count(); i++)
+            for (int i = 0; i < _RoadTie.Count(); i++)
             {
                 _RoadTie[i] = false;
             }
@@ -151,7 +175,7 @@ namespace Catan10
         /// <param name="roadCount"></param>
         public void SetRoadCountTie(int roadCount, bool winTie)
         {
-            Debug.Assert (roadCount >= 5 && roadCount <= 15, "bad roadcount");
+            Debug.Assert(roadCount >= 5 && roadCount <= 15, "bad roadcount");
             _RoadTie[roadCount - 5] = winTie;
 
         }
@@ -345,6 +369,7 @@ namespace Catan10
             {
                 if (_ColorAsString != value)
                 {
+                    LogPropertyChanged(_ColorAsString, value, true); // when you change the color, it will look like something you shoudl be able to undo, hence the "true"
                     _ColorAsString = value;
                     NotifyPropertyChanged();
                     Background = CreateBrushFromResource(value);
@@ -361,7 +386,7 @@ namespace Catan10
                     {
                         UseLightFile = false;
                     }
-                   
+
 
                 }
             }
@@ -393,6 +418,7 @@ namespace Catan10
             {
                 if (pips != value)
                 {
+                    LogPropertyChanged(pips, value); // this needs to be here so that the Pips are set when the log is replayed.  it'd be unfortunate if this was Undone...
                     pips = value;
                     NotifyPropertyChanged();
                 }
@@ -524,6 +550,7 @@ namespace Catan10
             {
                 if (_CardsLostToBaron != value)
                 {
+                    LogPropertyChanged(_CardsLostToBaron, value);
                     _CardsLostToBaron = value;
                     NotifyPropertyChanged();
                 }
@@ -569,6 +596,7 @@ namespace Catan10
             {
                 if (_MovedBaronAfterRollingSeven != value)
                 {
+                    LogPropertyChanged(_MovedBaronAfterRollingSeven, value);
                     _MovedBaronAfterRollingSeven = value;
                     NotifyPropertyChanged();
                 }
@@ -712,6 +740,7 @@ namespace Catan10
             {
                 if (_ResourcesAcquired != value)
                 {
+                    LogPropertyChanged(_ResourcesAcquired, value);
                     _ResourcesAcquired = value;
                     NotifyPropertyChanged();
                 }
@@ -727,6 +756,7 @@ namespace Catan10
             {
                 if (_CardsLostToSeven != value)
                 {
+                    LogPropertyChanged(_CardsLostToSeven, value);
                     _CardsLostToSeven = value;
                     NotifyPropertyChanged();
                 }
@@ -744,6 +774,7 @@ namespace Catan10
             {
                 if (_CardsLostToMonopoly != value)
                 {
+                    LogPropertyChanged(_CardsLostToMonopoly, value);
                     _CardsLostToMonopoly = value;
                     NotifyPropertyChanged();
                 }
@@ -760,6 +791,7 @@ namespace Catan10
             {
                 if (_cardsLost != value)
                 {
+                    LogPropertyChanged(_cardsLost, value);
                     OnCardsLost?.Invoke(_playerData, _cardsLost, value);
                     _cardsLost = value;
                     NotifyPropertyChanged();
@@ -776,7 +808,7 @@ namespace Catan10
             {
                 if (_timesTargeted != value)
                 {
-
+                    LogPropertyChanged(_timesTargeted, value);
                     _timesTargeted = value;
                     NotifyPropertyChanged();
                 }
@@ -795,9 +827,10 @@ namespace Catan10
             {
                 if (_noResourceCount != value)
                 {
-
+                    LogPropertyChanged(_noResourceCount, value);
                     _noResourceCount = value;
-                    MaxNoResourceRolls = value; // only takes on Set
+                    if (value > MaxNoResourceRolls)
+                        MaxNoResourceRolls = value; // only takes on Set
                     NotifyPropertyChanged();
                 }
             }
@@ -812,7 +845,7 @@ namespace Catan10
             {
                 if (_rollsWithResource != value)
                 {
-
+                    LogPropertyChanged(_rollsWithResource, value);
                     _rollsWithResource = value;
                     NotifyPropertyChanged();
                 }
@@ -826,13 +859,11 @@ namespace Catan10
             }
             set
             {
-                if (_maxNoResourceRolls < value) // only record the max
+                if (_maxNoResourceRolls != value) // only record the max
                 {
-
+                    LogPropertyChanged(_maxNoResourceRolls, value);
                     _maxNoResourceRolls = value;
-                    //
-                    //  TODO:  log this value
-                    NotifyPropertyChanged();
+                   NotifyPropertyChanged();
                 }
             }
         }
@@ -847,6 +878,7 @@ namespace Catan10
             {
                 if (_knightsPlayed != value)
                 {
+                    LogPropertyChanged(_knightsPlayed, value);
                     _knightsPlayed = value;
                     NotifyPropertyChanged();
                 }
@@ -875,10 +907,14 @@ namespace Catan10
 
         }
 
-
+       
 
         Dictionary<ResourceType, ResourceCount> _dictResourceCount = new Dictionary<ResourceType, ResourceCount>();
-        // returns the number of resources the user actually got
+        // 
+        /// <summary>
+        ///     returns the number of resources the user actually got
+        ///     this is Acquired and Lost *only*
+        /// </summary>
         internal int UpdateResourceCount(ResourceType resourceType, BuildingState buildingState, bool hasBaron, bool undo)
         {
             if (buildingState == BuildingState.None)
@@ -927,6 +963,7 @@ namespace Catan10
         private PlayerData _playerData = null;
         public PlayerResourceUpdateHandler OnPlayerResourceUpdate;
 
+
         public PlayerResourceData(PlayerData player)
         {
             _playerData = player;
@@ -956,9 +993,10 @@ namespace Catan10
             }
             set
             {
-                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.GoldMine, value);
+
                 if (_Gold != value)
                 {
+                    OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.GoldMine, _Gold, value);
                     _Gold = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -973,9 +1011,10 @@ namespace Catan10
             }
             set
             {
-                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Wheat, value);
+
                 if (_Wheat != value)
                 {
+                    OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Wheat, _Wheat, value);
                     _Wheat = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -990,9 +1029,10 @@ namespace Catan10
             }
             set
             {
-                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Brick, value);
+
                 if (_Brick != value)
                 {
+                    OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Brick, _Brick, value);
                     _Brick = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1007,9 +1047,10 @@ namespace Catan10
             }
             set
             {
-                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Ore, value);
+
                 if (_Ore != value)
                 {
+                    OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Ore, _Ore, value);
                     _Ore = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1024,9 +1065,10 @@ namespace Catan10
             }
             set
             {
-                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Wood, value);
+
                 if (_Wood != value)
                 {
+                    OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Wood, _Wood, value);
                     _Wood = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1041,9 +1083,10 @@ namespace Catan10
             }
             set
             {
-                OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Sheep, value);
+
                 if (_Sheep != value)
                 {
+                    OnPlayerResourceUpdate?.Invoke(_playerData, ResourceType.Sheep, _Sheep, value);
                     _Sheep = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1058,39 +1101,50 @@ namespace Catan10
 
         }
 
-        internal void AddResourceCount(ResourceType resource, int count)
+        internal int AddResourceCount(ResourceType resource, int count)
         {
+            int oldVal = 0;
             switch (resource)
             {
                 case ResourceType.Sheep:
+                    oldVal = Sheep;
                     Sheep += count;
                     break;
                 case ResourceType.Wood:
+                    oldVal = Wood;
                     Wood += count;
                     break;
                 case ResourceType.Ore:
+                    oldVal = Ore;
                     Ore += count;
                     break;
                 case ResourceType.Wheat:
+                    oldVal = Wheat;
                     Wheat += count;
                     break;
                 case ResourceType.Brick:
+                    oldVal = Brick;
                     Brick += count;
                     break;
                 case ResourceType.GoldMine:
+                    oldVal = Gold;
                     Gold += count;
                     break;
                 default:
                     break;
             }
+
+            return oldVal;
         }
 
-         public int Total
+        public int Total
         {
             get
             {
                 return Sheep + Wood + Ore + Wheat + Brick + Gold;
             }
         }
+
+
     }
 }

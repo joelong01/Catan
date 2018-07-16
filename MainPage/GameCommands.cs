@@ -76,9 +76,10 @@ namespace Catan10
             List<PlayerData> list = new List<PlayerData>();
             foreach (KeyValuePair<string, string> kvp in _defaultUsers)
             {
-                PlayerData p = new PlayerData
+                PlayerData p = new PlayerData (this)
                 {
                     PlayerName = kvp.Key
+
                 };
                 string[] tokens = kvp.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 string bitmapPath = String.Format($"ms-appx:Assets/DefaultPlayers/{tokens[0]}");

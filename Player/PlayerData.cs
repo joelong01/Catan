@@ -17,7 +17,7 @@ using Windows.UI.Xaml.Media.Imaging;
 namespace Catan10
 {
     public delegate void CardsLostUpdatedHandler(PlayerData player, int oldVal, int newVal);
-    public delegate void PlayerResourceUpdateHandler(PlayerData player, ResourceType resource, int count);
+    public delegate void PlayerResourceUpdateHandler(PlayerData player, ResourceType resource, int oldVal, int newVal);
 
   
 
@@ -41,6 +41,8 @@ namespace Catan10
         ImageBrush _imageBrush = null;
         public int AllPlayerIndex { get; set; } = -1;
         string _colorAsString = "HotPink";
+
+        public ILog Log { get; private set; } = null;
 
 
         public static ObservableCollection<ColorChoices> _availableColors = new ObservableCollection<ColorChoices>();
@@ -175,9 +177,10 @@ namespace Catan10
         }
 
 
-        public PlayerData()
+        public PlayerData(ILog log)
         {
             _playerGameData = new PlayerGameData(this);
+            Log = log;
 
             if (_availableColors.Count == 0)
             {

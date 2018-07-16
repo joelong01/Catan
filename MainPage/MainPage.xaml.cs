@@ -81,6 +81,7 @@ namespace Catan10
             Ctrl_PlayerResourceCountCtrl.PlayingPlayers = PlayingPlayers;
 
             _raceTracking = new RoadRaceTracking(this);
+            Ctrl_PlayerResourceCountCtrl.Log = this;
         }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
@@ -171,7 +172,7 @@ namespace Catan10
                 foreach (var kvp in playersDictionary)
                 {
 
-                    PlayerData p = new PlayerData();
+                    PlayerData p = new PlayerData(this);
 
                     p.Deserialize(kvp.Value, false);
                     await p.LoadImage();
@@ -339,7 +340,7 @@ namespace Catan10
             }
             PlayingPlayers.Clear();
             _currentPlayerIndex = 0;
-            _rolls.Clear();
+            Rolls.Clear();
 
 
 
@@ -568,10 +569,12 @@ namespace Catan10
         }
 
 
-        private void AddResourceCountForPlayer(PlayerData player, ResourceType resource, int count)
+        //
+        //  this needs to be called *after* the log for the Roll because we need to undo all of these prior to undoing the Roll
+        private void AddResourceCountForPlayer(PlayerData player, ResourceType resource, int count, LogType logType = LogType.Normal)
         {
-            player.GameData.PlayerResourceData.AddResourceCount(resource, count); // update the player
-            Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(resource, count); // update for the game
+            int oldValPlayer = player.GameData.PlayerResourceData.AddResourceCount(resource, count); // update the player
+            int oldValGlobal = Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(resource, count); // update for the game
             if (player.GameData.GoodRoll == false)
             {
                 player.GameData.GoodRoll = true;
@@ -583,6 +586,10 @@ namespace Catan10
                 player.GameData.NoResourceCount = 0;
             }
 
+            //
+            //  TODO:  log GoodRoll, RollsWithResource and NoResourceCount
+
+           // await AddLogEntry(player, this.GameState, CatanAction.AddResourceCount, false, logType, -1, new LogResourceCount(oldValPlayer, oldValPlayer + count, resource));
         }
 
         public async Task<IReadOnlyList<StorageFile>> GetSavedFilesInternal()
@@ -663,27 +670,26 @@ namespace Catan10
 
 
 
-        private void UpdateChart()
+        private void UpdateRollStats()
         {
-            int[] allRolls = RollCount(AllRolls);
-            double[] allPercent = RollPercents(AllRolls, allRolls);
-            int[] playerRolls = RollCount(CurrentPlayerRolls);
-            double[] playerPercent = RollPercents(CurrentPlayerRolls, playerRolls);
+            int[] roals = RollCount(Rolls);
+            double[] percent = RollPercents(Rolls, roals);
+           
 
             //String.Format("{0:0.#}%", percent * 100)
-            TotalRolls = AllRolls.Count();
+            TotalRolls = Rolls.Count();
 
-            TwoPercent = String.Format($"{allRolls[0]} ({allPercent[0] * 100:0.#}%)");
-            ThreePercent = String.Format($"{allRolls[1]} ({allPercent[1] * 100:0.#}%)");
-            FourPercent = String.Format($"{allRolls[2]} ({allPercent[2] * 100:0.#}%)");
-            FivePercent = String.Format($"{allRolls[3]} ({allPercent[3] * 100:0.#}%)");
-            SixPercent = String.Format($"{allRolls[4]} ({allPercent[4] * 100:0.#}%)");
-            SevenPercent = String.Format($"{allRolls[5]} ({allPercent[5] * 100:0.#}%)");
-            EightPercent = String.Format($"{allRolls[6]} ({allPercent[6] * 100:0.#}%)");
-            NinePercent = String.Format($"{allRolls[7]} ({allPercent[7] * 100:0.#}%)");
-            TenPercent = String.Format($"{allRolls[8]} ({allPercent[8] * 100:0.#}%)");
-            ElevenPercent = String.Format($"{allRolls[9]} ({allPercent[9] * 100:0.#}%)");
-            TwelvePercent = String.Format($"{allRolls[10]} ({allPercent[10] * 100:0.#}%)");
+            TwoPercent = String.Format($"{roals[0]} ({percent[0] * 100:0.#}%)");
+            ThreePercent = String.Format($"{roals[1]} ({percent[1] * 100:0.#}%)");
+            FourPercent = String.Format($"{roals[2]} ({percent[2] * 100:0.#}%)");
+            FivePercent = String.Format($"{roals[3]} ({percent[3] * 100:0.#}%)");
+            SixPercent = String.Format($"{roals[4]} ({percent[4] * 100:0.#}%)");
+            SevenPercent = String.Format($"{roals[5]} ({percent[5] * 100:0.#}%)");
+            EightPercent = String.Format($"{roals[6]} ({percent[6] * 100:0.#}%)");
+            NinePercent = String.Format($"{roals[7]} ({percent[7] * 100:0.#}%)");
+            TenPercent = String.Format($"{roals[8]} ({percent[8] * 100:0.#}%)");
+            ElevenPercent = String.Format($"{roals[9]} ({percent[9] * 100:0.#}%)");
+            TwelvePercent = String.Format($"{roals[10]} ({percent[10] * 100:0.#}%)");
 
 
         }
@@ -695,7 +701,7 @@ namespace Catan10
             await AnimatePlayers(playersToMove, logType);
 
 
-            UpdateChart();
+            UpdateRollStats();
             foreach (TileCtrl t in _gameView.AllTiles)
             {
                 t.ResetOpacity();
@@ -754,7 +760,7 @@ namespace Catan10
                 return;
 
             List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
-            UpdateChart();
+        
 
             List<Task> tasks = new List<Task>();
             foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
@@ -788,8 +794,7 @@ namespace Catan10
             // now make sure we reverse the fade
             _timer.Start();
 
-
-            await AddLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, val);
+            
 
             if (val == 7)
             {
@@ -815,7 +820,7 @@ namespace Catan10
 
         }
 
-        private void CountResourcesForRoll(List<TileCtrl> tilesWithNumber, bool undo)
+        private void  CountResourcesForRoll(List<TileCtrl> tilesWithNumber, bool undo)
         {
             //
             //  add one to the "no resources count for each player -- we will reset it if they get some
@@ -840,10 +845,12 @@ namespace Catan10
                     int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
                     //
                     //  need to look up the control given the player and add it to the right one
-                    AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
+                     AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
 
                 }
             }
+
+            
 
         }
 
@@ -893,15 +900,25 @@ namespace Catan10
         public async Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null) return;
+            if (state == GameState.Unknown)
+                state = this.GameState;
             await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
         }
+        public void  PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
+        {
+            if (_log == null) return;
+            if (state == GameState.Unknown)
+                state = this.GameState;
 
+            _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
+        }
 
         private async Task SetStateAsync(PlayerData player, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null)
                 return;
 
+            
             string n = (player != null) ? player.PlayerName : "<no player>";
 
             LogStateTranstion lst = new LogStateTranstion(GameState, newState);
@@ -970,8 +987,14 @@ namespace Catan10
                     switch (logLine.Action)
                     {
                         case CatanAction.Rolled:
-                            PushRoll(logLine.Number);
-                            UpdateChart();
+                            PushRoll(logLine.Number);                            
+                            break;
+                        case CatanAction.AddResourceCount:
+                            LogResourceCount lrc = logLine.Tag as LogResourceCount;
+                            if (logLine.PlayerData != null)
+                                logLine.PlayerData.GameData.PlayerResourceData.AddResourceCount(lrc.ResourceType, logLine.Number);
+                            else
+                                Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(lrc.ResourceType, logLine.Number);
                             break;
                         case CatanAction.ChangedState:
                             break;
@@ -1046,6 +1069,10 @@ namespace Catan10
                         case CatanAction.RoadTrackingChanged:
                             LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
                             _raceTracking.Deserialize(lrtc.NewState, this);
+                            break;
+                        case CatanAction.ChangedPlayerProperty:
+                            LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
+                            logLine.PlayerData.GameData.SetKeyValue<PlayerGameData>(lpc.PropertyName, lpc.NewVal);
                             break;
                         default:
                             break;
@@ -1130,7 +1157,7 @@ namespace Catan10
             if (CurrentPlayer != null) await ProcessEnter(CurrentPlayer, "");
         }
 
-        private const int SMALLEST_STATE_COUNT = 1; // game starts with NewGame and then Deal
+        private const int SMALLEST_STATE_COUNT = 8; // can only undo to the first resource allocation
 
 
         private async Task OnWin()
