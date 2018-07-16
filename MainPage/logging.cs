@@ -110,9 +110,19 @@ namespace Catan10
                     {
                         if (this[i].Undone == false)
                         {
-                            le.IndexOfUndoneAction = i;
-                            this[i].Undone = true;
-                            break;
+                            if (this[i].Action == le.Action)
+                            {
+                                le.IndexOfUndoneAction = i;
+                                this[i].Undone = true;
+                                break;
+                            }
+                            else
+                            {
+
+                                this.TraceMessage($"seems we have an non-balanced undo.  Action={le.Action}");
+                                le.Undone = true; // undo in place
+                                continue;
+                            }
                         }
                     }
                 }
