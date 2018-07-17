@@ -909,7 +909,7 @@ namespace Catan10
 
             if (Buildings.Count > 0)
             {
-                this.TraceMessage("returning from CreateBuildings because there are already Buildings here.");
+               // this.TraceMessage("returning from CreateBuildings because there are already Buildings here.");
                 return;
             }
             //TopLayer.Children.Clear();
@@ -926,8 +926,6 @@ namespace Catan10
 
             count += VisualTiles[middleCol].Count + 1;
             count *= 2;
-
-            this.TraceMessage($"Creating Buildings Count={count}");
 
             for (int i = 0; i < count; i++)
             {

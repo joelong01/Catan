@@ -119,9 +119,9 @@ namespace Catan10
                             else
                             {
 
-                                this.TraceMessage($"seems we have an non-balanced undo.  Action={le.Action}");
-                                le.Undone = true; // undo in place
-                                continue;
+                               // this.TraceMessage($"seems we have an non-balanced undo.  Action={le.Action}");
+                               // le.Undone = true; // undo in place
+                               // continue;
                             }
                         }
                     }
@@ -130,6 +130,7 @@ namespace Catan10
             }
 
             Add(le);
+            Debug.WriteLine(le);
         }
 
         public async Task AppendLogLine(LogEntry le, bool save = true)
@@ -166,10 +167,10 @@ namespace Catan10
                     LogEntry le = this[i];
                     if (!le.Persisted)
                     {
-                        string s = String.Format($"{le}\r\n");
+                        string s = String.Format($"{le.Serialize()}\r\n");
                         await FileIO.AppendTextAsync(file, s);
                         le.Persisted = true;
-                        Debug.WriteLine(le);
+                        
                     }
 
                 }
@@ -178,7 +179,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                this.TraceMessage($"Caught Exception when writing to disk: {e}");
+              //  this.TraceMessage($"Caught Exception when writing to disk: {e}");
                 //
                 //  just eat it.  we'll save it the next time 
             }
@@ -279,8 +280,32 @@ namespace Catan10
 
         }
 
-        private string[] _serializeProperties = new string[] { "LogLineIndex", "Persisted", "LogType", "Undone", "PlayerDataString", "GameState", "Action", "Number", "IndexOfUndoneAction", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber"}; // "Path" removed
+        static readonly private string[] _serializeProperties = new string[] { "LogLineIndex", "Persisted", "LogType", "Undone", "PlayerDataString", "GameState", "Action", "Number", "IndexOfUndoneAction", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber"}; // "Path" removed
+        /// <summary>
+        ///     this is mostly used for Console and debugging
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
+        {
+            if (TagAsString == "" && Tag != null)
+            {
+                TagAsString = Tag.ToString();
+            }
+
+            if (PlayerData != null && PlayerDataString == "")
+            {
+                PlayerDataString = String.Format($"{PlayerData.PlayerName}");
+            }
+
+            return $"Index:{this.LogLineIndex, -5}| Action:{Action, -25} | LogType:{LogType, -10} | Undone:{Undone, -6} | UndoneIndex:{IndexOfUndoneAction, 5} | {PlayerDataString, -10} | {TagAsString, -20}";
+
+
+        }
+
+        /// <summary>
+        ///     this is what is put onto disk for the LogEntry
+        /// </summary>
+        public string Serialize()
         {
             if (TagAsString == "" && Tag != null)
             {
@@ -293,8 +318,6 @@ namespace Catan10
             }
 
             return StaticHelpers.SerializeObject<LogEntry>(this, _serializeProperties, "=", "|");
-
-
         }
 
         public LogEntry(string s, ILogParserHelper parseHelper)

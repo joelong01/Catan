@@ -56,7 +56,7 @@ namespace Catan10
         {
           //  this.TraceMessage($"RoadRace Undo - setting To: {oldVal} from: {newVal}");
             this.Deserialize(oldVal, logHelper);
-            _log.AddLogEntry(player, state, CatanAction.RoadTrackingChanged, false, LogType.Undo, -1, new LogRoadTrackingChanged(newVal, oldVal)); // note: new and old switched!
+            _log.PostLogEntry(player, state, CatanAction.RoadTrackingChanged, false, LogType.Undo, -1, new LogRoadTrackingChanged(newVal, oldVal)); // note: new and old switched!
         }
 
         //
@@ -173,10 +173,9 @@ namespace Catan10
             if (logType == LogType.Undo)
                 return;
             string newState = this.Serialize();
-            if (newState == "") return;
-            if (newState == _beginState)
+            if (newState == _beginState) // no changes == don't log
                 return;
-            this.TraceMessage($"RoadRace - old:{_beginState} new: {newState}");
+
             _log.PostLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
         }
     }

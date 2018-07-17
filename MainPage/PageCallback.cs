@@ -113,13 +113,12 @@ namespace Catan10
                     {
                         await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState); // NOTE:  New and Old have been swapped                      
                     }
-
+                    await CalculateAndSetLongestRoad(LogType.Undo);  // this executes with the new tracking -- things may change since ties are different.
                     break;
                 case CatanAction.RoadTrackingChanged:
                     LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
                     _raceTracking.Undo(lrtc.OldState, lrtc.NewState, logLine.PlayerData, this, this.GameState); // this will log the undo action to balance the log write
-                    Debug.Assert(logLine.StopProcessingUndo == false, "this has no UI affect");
-                    await CalculateAndSetLongestRoad(LogType.Undo);  // this executes with the new tracking -- things may change since ties are different.
+                    Debug.Assert(logLine.StopProcessingUndo == false, "this has no UI affect");                    
                     break;
                 case CatanAction.ChangedPlayerProperty:
                     LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
@@ -186,7 +185,7 @@ namespace Catan10
                             break;
                     }
 
-                    this.TraceMessage($"Action:{_log[i].Action} State:{_log[i].GameState} Stop Undo: {stop}");
+                  //  this.TraceMessage($"Action:{_log[i].Action} State:{_log[i].GameState} Stop Undo: {stop}");
 
                     if (stop) break;
 
@@ -729,9 +728,6 @@ namespace Catan10
         private async Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
         {
             if (newState == oldState) return;
-
-            this.TraceMessage($"Updating Road State.  Idx={road.Index} newState={newState}");
-
             road.RoadState = newState;
             switch (newState)
             {
