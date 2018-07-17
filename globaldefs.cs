@@ -52,7 +52,7 @@ namespace Catan10
         UpdateBuildingState,                    // 13
         AssignedPirateShip,                       // 14
         AddPlayer,                                // 15
-        AssignRandomNumbersToTileGroup,           // 16
+        RandomizeTiles,                         // 16
         AssignHarbors,                            // 17
         SelectGame,                               // 18
         AssignRandomTiles,                        // 19

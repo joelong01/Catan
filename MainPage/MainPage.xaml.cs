@@ -1049,7 +1049,7 @@ namespace Catan10
                         case CatanAction.AddPlayer:
                             await AddPlayer(logLine, LogType.Replay);
                             break;
-                        case CatanAction.AssignRandomNumbersToTileGroup:
+                        case CatanAction.RandomizeTiles:
                             List<int> randomNumbers = logLine.Tag as List<int>;
                             await _gameView.AssignRandomNumbersToTileGroup(logLine.Number, randomNumbers);
                             break;

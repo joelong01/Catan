@@ -352,7 +352,7 @@ namespace Catan10
                     break;
                 case CatanAction.AssignHarbors:
                 case CatanAction.AssignRandomTiles:
-                case CatanAction.AssignRandomNumbersToTileGroup:
+                case CatanAction.RandomizeTiles:
                     Tag = LogList<int>.CreateAndParse(val);
                     break;
                 case CatanAction.ChangedState:

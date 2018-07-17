@@ -736,7 +736,7 @@ namespace Catan10
             //if (iterations > 50)
             //    this.TraceMessage($"tried {iterations} times to find a valid number sequence");
 
-            await _gameCallback.AddLogEntry(null, GameState.Dealing, CatanAction.AssignRandomNumbersToTileGroup, true, LogType.Normal, _currentHexPanel.TileSets.IndexOf(tileGroup), RandomNumberSequence);
+            await _gameCallback.AddLogEntry(null, GameState.Dealing, CatanAction.RandomizeTiles, true, LogType.Normal, _currentHexPanel.TileSets.IndexOf(tileGroup), RandomNumberSequence);
         }
 
 

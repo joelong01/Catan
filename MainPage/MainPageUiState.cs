@@ -67,7 +67,6 @@ namespace Catan10
             
             PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll);
             UpdateRollStats();
-            this.TraceMessage($"pushed Roll: {roll}");
             return true;
         }
 
@@ -80,7 +79,6 @@ namespace Catan10
 
             
             var lastRoll = Rolls.Pop();
-            this.TraceMessage($"pushed Roll: {lastRoll}");
             PostLogEntry(CurrentPlayer, GameState, CatanAction.Rolled, true, LogType.Undo, lastRoll);
             UpdateRollStats();
             return lastRoll;
