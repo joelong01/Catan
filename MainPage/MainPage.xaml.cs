@@ -277,6 +277,7 @@ namespace Catan10
 
         private async Task Reset()
         {
+            _log?.Reset();
             _lbGames.SelectedValue = _log;
             await ResetTiles(true);
             PlayingPlayers.Clear();
@@ -289,6 +290,7 @@ namespace Catan10
             }
 
             _raceTracking.Reset();
+            _log?.Start();
         }
 
         /// <summary>
@@ -981,9 +983,12 @@ namespace Catan10
                     n++;
                     if (logLine.LogType == LogType.Undo)
                     {
-                        await UndoLogLine(logLine, true);
-                        continue;
+                       continue;
                     }
+
+                    if (logLine.Undone == true)
+                        continue;
+
                     switch (logLine.Action)
                     {
                         case CatanAction.Rolled:
@@ -1196,7 +1201,7 @@ namespace Catan10
             {
                 if (e.AddedItems.Count > 0)
                 {
-                    Log newLog = e.AddedItems[0] as Log;
+                    Log newLog =  e.AddedItems[0] as Log;
                     if (_log == newLog)
                         return;
                     if (await StaticHelpers.AskUserYesNoQuestion($"Switch to {newLog.File.DisplayName}?", "Yes", "No"))

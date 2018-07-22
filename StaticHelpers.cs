@@ -463,8 +463,7 @@ namespace Catan10
                     Y = pt.Y - pointMouseDown.Y
                 };
 
-                CompositeTransform compositeTransform = control.RenderTransform as CompositeTransform;
-                if (compositeTransform == null)
+                if (!(control.RenderTransform is CompositeTransform compositeTransform))
                 {
                     compositeTransform = new CompositeTransform();
                     control.RenderTransform = compositeTransform;

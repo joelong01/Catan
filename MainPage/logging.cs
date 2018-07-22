@@ -57,6 +57,8 @@ namespace Catan10
         {
             _file = file;
             _saveFileName = _file.DisplayName;
+            _folder = StaticHelpers.GetSaveFolder().Result;
+            _lastLogRecordWritten = 0;
         }
 
         public Log()
@@ -117,11 +119,7 @@ namespace Catan10
                                 le.IndexOfUndoneAction = i;
                                 this[i].Undone = true;
                                 break;
-                            }
-                            else
-                            {
-                                throw new InvalidOperationException("Undo must undo an operation of the same Action and it has to exist in the log");
-                            }
+                            }                            
                         }
                     }
                 }
@@ -162,7 +160,7 @@ namespace Catan10
                 if (_didUndoSinceLastWrite)
                 {
                     collisionOptions = CreationCollisionOption.ReplaceExisting;
-                    _lastLogRecordWritten = 0;
+                    _lastLogRecordWritten = 0;                    
                 }
 
                 var file = await _folder.CreateFileAsync(_saveFileName, collisionOptions);
@@ -170,25 +168,22 @@ namespace Catan10
                 {
                     LogEntry le = this[i];
                     if (!le.Persisted || _didUndoSinceLastWrite)
-                    {
-                        if (le.Undone == false && le.LogType != LogType.Undo)
-                        {
-                            string s = String.Format($"{le.Serialize()}\r\n");
-                            await FileIO.AppendTextAsync(file, s);
-                            le.Persisted = true;
-                        }
-                        
+                    {                        
+                        string s = String.Format($"{le.Serialize()}\r\n");
+                        await FileIO.AppendTextAsync(file, s);
+                        le.Persisted = true;
+
                     }
 
                 }
 
                 _didUndoSinceLastWrite = false;
                 _lastLogRecordWritten = count;
-                
+
             }
             catch
             {
-              //  this.TraceMessage($"Caught Exception when writing to disk: {e}");
+                //  this.TraceMessage($"Caught Exception when writing to disk: {e}");
                 //
                 //  just eat it.  we'll save it the next time 
             }
@@ -211,19 +206,30 @@ namespace Catan10
             }
             foreach (string line in tokens)
             {
-                LogEntry le = new LogEntry(line, helper);
-                le.Persisted = true; 
-                AppendLogLineNoDisk(le);
+                LogEntry le = new LogEntry(line, helper)
+                {
+                    Persisted = true
+                };
 
+                Add(le);
+                Debug.WriteLine(le);
             }
 
             return true;
 
         }
 
+        internal void Reset()
+        {
+            //base.Clear();
+            //this.State = LogState.Normal;
+        }
 
-
-
+        internal void Start()
+        {
+            //base.Clear();
+            //this.State = LogState.Normal;
+        }
     }
 
     public interface ILogParserHelper
@@ -289,7 +295,7 @@ namespace Catan10
 
         }
 
-        static readonly private string[] _serializeProperties = new string[] { "LogLineIndex", "Persisted", "LogType", "Undone", "PlayerDataString", "GameState", "Action", "Number", "IndexOfUndoneAction", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber"}; // "Path" removed
+        static readonly private string[] _serializeProperties = new string[] { "LogLineIndex", "Persisted", "LogType", "Undone", "PlayerDataString", "GameState", "Action", "Number", "IndexOfUndoneAction", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber" }; // "Path" removed
         /// <summary>
         ///     this is mostly used for Console and debugging
         /// </summary>
@@ -306,7 +312,7 @@ namespace Catan10
                 PlayerDataString = String.Format($"{PlayerData.PlayerName}");
             }
 
-            return $"Index:{this.LogLineIndex, -5}| Action:{Action, -25} | LogType:{LogType, -10} | Undone:{Undone, -6} | UndoneIndex:{IndexOfUndoneAction, 5} | {PlayerDataString, -5} | {TagAsString, -20}";
+            return $"Index:{this.LogLineIndex,-5}| Action:{Action,-25} | LogType:{LogType,-10} | Undone:{Undone,-6} | UndoneIndex:{IndexOfUndoneAction,5} | {PlayerDataString,-5} | {TagAsString,-20}";
 
 
         }
@@ -402,7 +408,7 @@ namespace Catan10
                 return;
             }
 
-            
+
             if (Int32.TryParse(tokens[1], out int index))
             {
                 PlayerData = parseHelper.GetPlayerData(index);

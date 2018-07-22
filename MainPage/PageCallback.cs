@@ -41,7 +41,7 @@ namespace Catan10
 
         //
         //  returns True if it undid something, false if the undo action has no UI affect (e.g. true if the user would think undo happened)
-        private async Task<bool> UndoLogLine(LogEntry logLine, bool replayingLog)
+        private async Task<bool> UndoLogLine(LogEntry logLine)
         {
              //this.TraceMessage($"Replay:{replayingLog} Line:{logLine}");
             switch (logLine.Action)
@@ -95,23 +95,12 @@ namespace Catan10
                     break;
                 case CatanAction.UpdatedRoadState:
                     LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
-                    if (replayingLog)
-                        await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Undo);
-                    else
-                        await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo);
-
+                    await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo);
                     await CalculateAndSetLongestRoad(LogType.Undo);
                     break;
                 case CatanAction.UpdateBuildingState:
                     LogBuildingUpdate buildingUpdate = logLine.Tag as LogBuildingUpdate;
-                    if (replayingLog)
-                    {
-                        await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.OldBuildingState, buildingUpdate.NewBuildingState);
-                    }
-                    else
-                    {
-                        await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState); // NOTE:  New and Old have been swapped                      
-                    }
+                    await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState); // NOTE:  New and Old have been swapped                      
                     await CalculateAndSetLongestRoad(LogType.Undo);  // this executes with the new tracking -- things may change since ties are different.
                     break;
                 case CatanAction.RoadTrackingChanged:
@@ -149,7 +138,7 @@ namespace Catan10
                     if (_log[i].Undone == true) continue;   // we already undid this one
                     if (_log[i].LogType == LogType.DoNotUndo) continue;
 
-                    bool ret = await UndoLogLine(_log[i], false);
+                    bool ret = await UndoLogLine(_log[i]);
                     //
                     //  if you undo and land on one of these states, then stop processing undo
                     bool stop = false;
