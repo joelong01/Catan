@@ -100,7 +100,6 @@ namespace Catan10
                     else
                         await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo);
 
-                    //SetLongestRoadFromLog();
                     await CalculateAndSetLongestRoad(LogType.Undo);
                     break;
                 case CatanAction.UpdateBuildingState:

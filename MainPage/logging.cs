@@ -35,6 +35,7 @@ namespace Catan10
 
         public LogState State { get; set; } = LogState.Normal;
         private int _lastLogRecordWritten = 0;
+        private bool _didUndoSinceLastWrite = false;
 
         public string DisplayName
         {
@@ -92,6 +93,7 @@ namespace Catan10
                     return;
                 case LogState.Undo:
                     le.LogType = LogType.Undo;
+                    _didUndoSinceLastWrite = true;
                     break;
                 default:
                     break;
@@ -118,10 +120,7 @@ namespace Catan10
                             }
                             else
                             {
-
-                               // this.TraceMessage($"seems we have an non-balanced undo.  Action={le.Action}");
-                               // le.Undone = true; // undo in place
-                               // continue;
+                                throw new InvalidOperationException("Undo must undo an operation of the same Action and it has to exist in the log");
                             }
                         }
                     }
@@ -159,25 +158,35 @@ namespace Catan10
 
                 if (this.Count == 0) return;
                 int count = this.Count; // this might change while we loop because of the await
-                                        
-                                        
-                var file = await _folder.CreateFileAsync(_saveFileName, CreationCollisionOption.OpenIfExists);
+                CreationCollisionOption collisionOptions = CreationCollisionOption.OpenIfExists;
+                if (_didUndoSinceLastWrite)
+                {
+                    collisionOptions = CreationCollisionOption.ReplaceExisting;
+                    _lastLogRecordWritten = 0;
+                }
+
+                var file = await _folder.CreateFileAsync(_saveFileName, collisionOptions);
                 for (int i = _lastLogRecordWritten; i < count; i++)
                 {
                     LogEntry le = this[i];
-                    if (!le.Persisted)
+                    if (!le.Persisted || _didUndoSinceLastWrite)
                     {
-                        string s = String.Format($"{le.Serialize()}\r\n");
-                        await FileIO.AppendTextAsync(file, s);
-                        le.Persisted = true;
+                        if (le.Undone == false && le.LogType != LogType.Undo)
+                        {
+                            string s = String.Format($"{le.Serialize()}\r\n");
+                            await FileIO.AppendTextAsync(file, s);
+                            le.Persisted = true;
+                        }
                         
                     }
 
                 }
+
+                _didUndoSinceLastWrite = false;
                 _lastLogRecordWritten = count;
                 
             }
-            catch (Exception e)
+            catch
             {
               //  this.TraceMessage($"Caught Exception when writing to disk: {e}");
                 //
