@@ -306,7 +306,7 @@ namespace Catan10
                 PlayerDataString = String.Format($"{PlayerData.PlayerName}");
             }
 
-            return $"Index:{this.LogLineIndex, -5}| Action:{Action, -25} | LogType:{LogType, -10} | Undone:{Undone, -6} | UndoneIndex:{IndexOfUndoneAction, 5} | {PlayerDataString, -10} | {TagAsString, -20}";
+            return $"Index:{this.LogLineIndex, -5}| Action:{Action, -25} | LogType:{LogType, -10} | Undone:{Undone, -6} | UndoneIndex:{IndexOfUndoneAction, 5} | {PlayerDataString, -5} | {TagAsString, -20}";
 
 
         }
@@ -321,7 +321,7 @@ namespace Catan10
                 TagAsString = Tag.ToString();
             }
 
-            if (PlayerData != null && PlayerDataString == "")
+            if (PlayerData != null)
             {
                 PlayerDataString = String.Format($"{PlayerData.PlayerName}.{PlayerData.AllPlayerIndex}.{PlayerData.PlayerPosition}");
             }
@@ -402,8 +402,7 @@ namespace Catan10
                 return;
             }
 
-
-
+            
             if (Int32.TryParse(tokens[1], out int index))
             {
                 PlayerData = parseHelper.GetPlayerData(index);
