@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Shapes;
@@ -28,7 +27,7 @@ namespace Catan10
         ///     Unlike the logging in PlayerGameData, there is no PlayerData so that whole path isn't set up
         ///     here PlayerData is always null - we need to special case that in the UndoLogLine
         /// </summary>
-       private void OnResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
+        private void OnResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
         {
             System.Diagnostics.Debug.Assert(player == null, "Player shoudl be null in the global reource tracker");
             Log.PostLogEntry(player, GameState.WaitingForRoll,
@@ -44,25 +43,28 @@ namespace Catan10
         }
         private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var depPropClass = d as PlayerResourceCountCtrl;
-            var depPropValue = (ObservableCollection<PlayerData>)e.NewValue;
+            PlayerResourceCountCtrl depPropClass = d as PlayerResourceCountCtrl;
+            ObservableCollection<PlayerData> depPropValue = (ObservableCollection<PlayerData>)e.NewValue;
             depPropClass?.SetPlayingPlayers(depPropValue);
         }
         private void SetPlayingPlayers(ObservableCollection<PlayerData> newList)
         {
             ListBox_PlayerResourceCountList.ItemsSource = null;
             ListBox_PlayerResourceCountList.ItemsSource = newList;
-            
+
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (!(sender is TextBox tb)) return;
+            if (!(sender is TextBox tb))
+            {
+                return;
+            }
 
             tb.SelectAll();
         }
 
-      
+
         private async void Picture_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             Ellipse ellipse = sender as Ellipse;

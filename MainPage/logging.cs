@@ -5,8 +5,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.UI.Core;
-using Windows.UI.Popups;
 
 namespace Catan10
 {
@@ -34,15 +32,9 @@ namespace Catan10
 
 
         public LogState State { get; set; } = LogState.Normal;
-        private int _lastLogRecordWritten = 0;        
+        private int _lastLogRecordWritten = 0;
 
-        public string DisplayName
-        {
-            get
-            {
-                return File.DisplayName;
-            }
-        }
+        public string DisplayName => File.DisplayName;
 
         public async Task Init(string fileName)
         {
@@ -65,25 +57,16 @@ namespace Catan10
 
         }
 
-        public StorageFile File
-        {
-            get
-            {
-                return _file;
-            }
-        }
+        public StorageFile File => _file;
 
-        public List<LogEntry> LogEntries
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public List<LogEntry> LogEntries => this;
 
         public void AppendLogLineNoDisk(LogEntry le)
         {
-            if (le.LogType == LogType.DoNotLog) return;
+            if (le.LogType == LogType.DoNotLog)
+            {
+                return;
+            }
 
             switch (this.State)
             {
@@ -93,7 +76,7 @@ namespace Catan10
                 case LogState.Replay:
                     return;
                 case LogState.Undo:
-                    le.LogType = LogType.Undo;                    
+                    le.LogType = LogType.Undo;
                     break;
                 default:
                     break;
@@ -114,7 +97,7 @@ namespace Catan10
                                 le.IndexOfUndoneAction = i;
                                 this[i].Undone = true;
                                 break;
-                            }                            
+                            }
                         }
                     }
                 }
@@ -147,7 +130,11 @@ namespace Catan10
             {
 
 
-                if (this.Count == 0) return;
+                if (this.Count == 0)
+                {
+                    return;
+                }
+
                 int count = this.Count; // this might change while we loop because of the await
 
                 for (int i = _lastLogRecordWritten; i < count; i++)
@@ -178,7 +165,9 @@ namespace Catan10
         public async Task<bool> Parse(ILogParserHelper helper)
         {
             if (this.Count != 0)
+            {
                 return true; // already parsed this
+            }
 
             string contents = await FileIO.ReadTextAsync(_file);
 
@@ -258,7 +247,9 @@ namespace Catan10
             get
             {
                 if (PlayerData == null)
+                {
                     return "<none>";
+                }
 
                 return PlayerData.PlayerName;
             }
@@ -413,13 +404,7 @@ namespace Catan10
 
 
 
-        public bool Undoable
-        {
-            get
-            {
-                return (Action != CatanAction.ChangedState);
-            }
-        }
+        public bool Undoable => (Action != CatanAction.ChangedState);
 
 
     }
@@ -436,7 +421,7 @@ namespace Catan10
             Deserialize(saved);
         }
 
-        private string[] _serializedProperties = new string[] { "FirstPlayerIndex" };
+        private readonly string[] _serializedProperties = new string[] { "FirstPlayerIndex" };
 
         public override string ToString()
         {
@@ -454,7 +439,7 @@ namespace Catan10
     {
         public int From { get; set; } = -1;
         public int To { get; set; } = -1;
-        private string[] _serializedProperties = new string[] { "From", "To" };
+        private readonly string[] _serializedProperties = new string[] { "From", "To" };
         public LogChangePlayer(int old, int newIdx)
         {
             From = old;
@@ -483,7 +468,7 @@ namespace Catan10
         public GameState OldState { get; set; } = GameState.Uninitialized;
         public GameState NewState { get; set; } = GameState.Uninitialized;
 
-        private string[] _serializedProperties = new string[] { "OldState", "NewState" };
+        private readonly string[] _serializedProperties = new string[] { "OldState", "NewState" };
 
         public LogStateTranstion(GameState old, GameState newState)
         {
@@ -516,7 +501,7 @@ namespace Catan10
         public int NewVal { get; set; } = 0;
 
 
-        private string[] _serializedProperties = new string[] { "OldVal", "NewVal" };
+        private readonly string[] _serializedProperties = new string[] { "OldVal", "NewVal" };
 
         public LogCardsLost(int old, int newState)
         {
@@ -550,7 +535,7 @@ namespace Catan10
         public ResourceType ResourceType { get; set; } = ResourceType.None;
 
 
-        private string[] _serializedProperties = new string[] { "OldVal", "NewVal", "ResourceType" };
+        private readonly string[] _serializedProperties = new string[] { "OldVal", "NewVal", "ResourceType" };
 
         public LogResourceCount(int oldVal, int newVal, ResourceType resType)
         {
@@ -590,7 +575,7 @@ namespace Catan10
         public string NewVal { get; set; } = "";
         public string PropertyName { get; set; } = "";
 
-        private string[] _serializedProperties = new string[] { "PropertyName", "OldVal", "NewVal" };
+        private readonly string[] _serializedProperties = new string[] { "PropertyName", "OldVal", "NewVal" };
 
         public LogPropertyChanged(string name, string oldVal, string newVal)
         {
@@ -623,7 +608,7 @@ namespace Catan10
         public string OldState { get; set; } = "";
         public string NewState { get; set; } = "";
 
-        private string[] _serializedProperties = new string[] { "OldState", "NewState" };
+        private readonly string[] _serializedProperties = new string[] { "OldState", "NewState" };
 
         public LogRoadTrackingChanged(string oldState, string newState)
         {
@@ -695,7 +680,7 @@ namespace Catan10
 
         public int GameIndex { get; set; } = -1;
 
-        private string[] _serializedProperties = new string[] { "TargetWeapon", "SourcePlayerIndex", "TargetPlayerIndex", "StartTileIndex", "TargetTileIndex", "GameIndex", "Action" };
+        private readonly string[] _serializedProperties = new string[] { "TargetWeapon", "SourcePlayerIndex", "TargetPlayerIndex", "StartTileIndex", "TargetTileIndex", "GameIndex", "Action" };
 
         public LogBaronOrPirate(string serialized, ILogParserHelper parseHelper)
         {
@@ -757,7 +742,7 @@ namespace Catan10
         public int Index { get; set; } = -1;
         public RoadCtrl Road { get; set; } = null;
         public int GameIndex { get; set; } = -1;
-        private string[] _serializedProperties = new string[] { "OldRoadState", "Index", "NewRoadState", "GameIndex" };
+        private readonly string[] _serializedProperties = new string[] { "OldRoadState", "Index", "NewRoadState", "GameIndex" };
 
         public LogRoadUpdate(string s, ILogParserHelper parseHelper)
         {
@@ -800,7 +785,7 @@ namespace Catan10
         public int GameIndex { get; set; } = -1;
 
 
-        private string[] _serializedProperties = new string[] { "OldBuildingState", "NewBuildingState", "BuildingIndex", "TileIndex", "GameIndex" };
+        private readonly string[] _serializedProperties = new string[] { "OldBuildingState", "NewBuildingState", "BuildingIndex", "TileIndex", "GameIndex" };
 
         public LogBuildingUpdate(string s, ILogParserHelper parseHelper)
         {
@@ -821,7 +806,9 @@ namespace Catan10
             BuildingIndex = buildingCtrl.Index;
             NewBuildingState = newState;
             if (tileCtrl != null)
+            {
                 TileIndex = tileCtrl.Index;
+            }
         }
         public override string ToString()
         {

@@ -76,7 +76,7 @@ namespace Catan10
             List<PlayerData> list = new List<PlayerData>();
             foreach (KeyValuePair<string, string> kvp in _defaultUsers)
             {
-                PlayerData p = new PlayerData (this)
+                PlayerData p = new PlayerData(this)
                 {
                     PlayerName = kvp.Key
 
@@ -115,15 +115,15 @@ namespace Catan10
                     await StaticHelpers.DragAsync(grid, e);
                 }
 
-               
-                
+
+
                 await SaveGridLocations();
                 Canvas.SetZIndex(uiElement, zIndex);
             }
 
         }
 
-        
+
 
         //
         //  save all the grids.  since I add/delete them frequently, this can throw if/when a grid is removed after it has been saved.
@@ -144,7 +144,7 @@ namespace Catan10
 
                 await _settings.SaveSettings(_settingsFileName);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.TraceMessage($"caught the exception: {e}");
             }
@@ -164,7 +164,7 @@ namespace Catan10
                     ct.TranslateY = pos.TranslateY;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.TraceMessage($"Exception: {e}");
             }
@@ -238,13 +238,16 @@ namespace Catan10
                     if (sizeableX)
                     {
                         if (ratioX > .5)
+                        {
                             ct.ScaleX = ratioX;
-
+                        }
                     }
                     if (sizeableY)
                     {
                         if (ratioY > .5)
+                        {
                             ct.ScaleY = ratioY;
+                        }
                     }
 
                     return;
@@ -300,7 +303,11 @@ namespace Catan10
 
         private async void OnNextStep(object sender, RoutedEventArgs e)
         {
-            if (CurrentPlayer == null) return;
+            if (CurrentPlayer == null)
+            {
+                return;
+            }
+
             await ProcessEnter(CurrentPlayer, "");
 
         }
@@ -308,7 +315,9 @@ namespace Catan10
         private async void OnUndo(object sender, RoutedEventArgs e)
         {
             if (GameState == GameState.WaitingForNewGame)
+            {
                 return;
+            }
 
             Button button = sender as Button;
             button.IsEnabled = false;
@@ -381,7 +390,7 @@ namespace Catan10
         {
 
         }
-       
+
 
 
         private async void Menu_OnNewGame(object sender, RoutedEventArgs e)
@@ -456,19 +465,21 @@ namespace Catan10
         private void CreateMenuItems()
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
                 return;
+            }
 
             Menu_Games.Items.Clear();
 
 
-           
+
 
             //
             //  The Games Menu has the Description as the menu text ("Regular" should be checked)
             //  and the CatanGame object in the tag.  this is used to manipulate CurrentGame in the GameContainer
             //
-            var availableGames = _gameView.Games;
-            foreach (var game in availableGames)
+            List<CatanGame> availableGames = _gameView.Games;
+            foreach (CatanGame game in availableGames)
             {
 
                 ToggleMenuFlyoutItem item = new ToggleMenuFlyoutItem
@@ -488,7 +499,7 @@ namespace Catan10
             }
 
 
-            foreach (var kvp in StaticHelpers.StringToColorDictionary)
+            foreach (KeyValuePair<string, Windows.UI.Color> kvp in StaticHelpers.StringToColorDictionary)
             {
                 ToggleMenuFlyoutItem item = new ToggleMenuFlyoutItem
                 {
@@ -508,7 +519,11 @@ namespace Catan10
         /// <param name="e"></param>
         private void PlayerColor_Clicked(object sender, RoutedEventArgs e)
         {
-            if (CurrentPlayer == null) return;
+            if (CurrentPlayer == null)
+            {
+                return;
+            }
+
             ToggleMenuFlyoutItem item = sender as ToggleMenuFlyoutItem;
             foreach (ToggleMenuFlyoutItem subItem in Menu_Colors.Items)
             {
@@ -524,11 +539,11 @@ namespace Catan10
             //  this is only needed because Roads don't do proper data binding yet.
             CurrentPlayerColorChanged(CurrentPlayer);
         }
-       
+
         internal void AddPlayerMenu(PlayerData player)
         {
 
-           
+
 
         }
 

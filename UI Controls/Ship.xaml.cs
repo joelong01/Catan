@@ -9,9 +9,9 @@ namespace Catan10
         public Ship()
         {
             this.InitializeComponent();
-          
+
         }
 
-    
+
     }
 }

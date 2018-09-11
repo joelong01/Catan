@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -18,8 +17,9 @@ namespace Catan10
         public async Task ChangeGame(CatanGame game)
         {
             if (game == _gameView.CurrentGame)
+            {
                 return;
-
+            }
 
             if (State.GameState == GameState.WaitingForNewGame)
             {
@@ -43,18 +43,23 @@ namespace Catan10
         //  returns True if it undid something, false if the undo action has no UI affect (e.g. true if the user would think undo happened)
         private async Task<bool> UndoLogLine(LogEntry logLine)
         {
-             //this.TraceMessage($"Replay:{replayingLog} Line:{logLine}");
+            //this.TraceMessage($"Replay:{replayingLog} Line:{logLine}");
             switch (logLine.Action)
             {
                 case CatanAction.Rolled:
-                    int roll = PopRoll(); 
+                    int roll = PopRoll();
                     break;
                 case CatanAction.AddResourceCount:
                     LogResourceCount lrc = logLine.Tag as LogResourceCount;
                     if (logLine.PlayerData != null)
+                    {
                         logLine.PlayerData.GameData.PlayerResourceData.AddResourceCount(lrc.ResourceType, -logLine.Number);
+                    }
                     else
+                    {
                         Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(lrc.ResourceType, -logLine.Number);
+                    }
+
                     break;
                 case CatanAction.CardsLost:
                     LogCardsLost lcl = logLine.Tag as LogCardsLost;
@@ -69,8 +74,12 @@ namespace Catan10
                     break;
                 case CatanAction.ChangedState:
                     LogStateTranstion lst = logLine.Tag as LogStateTranstion;
-                    if (lst.OldState == GameState.WaitingForStart) break;
-                    await SetStateAsync(logLine.PlayerData, lst.OldState, logLine.StopProcessingUndo, LogType.Undo);                   
+                    if (lst.OldState == GameState.WaitingForStart)
+                    {
+                        break;
+                    }
+
+                    await SetStateAsync(logLine.PlayerData, lst.OldState, logLine.StopProcessingUndo, LogType.Undo);
                     break;
                 case CatanAction.ChangedPlayer:
                     LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
@@ -106,7 +115,7 @@ namespace Catan10
                 case CatanAction.RoadTrackingChanged:
                     LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
                     _raceTracking.Undo(lrtc.OldState, lrtc.NewState, logLine.PlayerData, this, this.GameState); // this will log the undo action to balance the log write
-                    Debug.Assert(logLine.StopProcessingUndo == false, "this has no UI affect");                    
+                    Debug.Assert(logLine.StopProcessingUndo == false, "this has no UI affect");
                     break;
                 case CatanAction.ChangedPlayerProperty:
                     LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
@@ -126,17 +135,29 @@ namespace Catan10
         public async Task OnUndo()
         {
             if (_log.Count < SMALLEST_STATE_COUNT) // the games starts with 5 states that can't be undone
+            {
                 return;
-
+            }
 
             try
             {
                 _log.State = LogState.Undo;
                 for (int i = _log.Count - 1; i >= SMALLEST_STATE_COUNT - 1; i--)
                 {
-                    if (_log[i].LogType == LogType.Undo) continue; // if we have an undo action, skip it
-                    if (_log[i].Undone == true) continue;   // we already undid this one
-                    if (_log[i].LogType == LogType.DoNotUndo) continue;
+                    if (_log[i].LogType == LogType.Undo)
+                    {
+                        continue; // if we have an undo action, skip it
+                    }
+
+                    if (_log[i].Undone == true)
+                    {
+                        continue;   // we already undid this one
+                    }
+
+                    if (_log[i].LogType == LogType.DoNotUndo)
+                    {
+                        continue;
+                    }
 
                     bool ret = await UndoLogLine(_log[i]);
                     //
@@ -173,9 +194,12 @@ namespace Catan10
                             break;
                     }
 
-                  //  this.TraceMessage($"Action:{_log[i].Action} State:{_log[i].GameState} Stop Undo: {stop}");
+                    //  this.TraceMessage($"Action:{_log[i].Action} State:{_log[i].GameState} Stop Undo: {stop}");
 
-                    if (stop) break;
+                    if (stop)
+                    {
+                        break;
+                    }
 
                     // if (_log[i - 1].StopProcessingUndo) break;
                     //if (ret) break;
@@ -190,7 +214,7 @@ namespace Catan10
             await _log.WriteUnwrittenLinesToDisk();
         }
 
-       
+
 
         private async Task UndoMoveBaron(LogEntry logLine)
         {
@@ -208,9 +232,9 @@ namespace Catan10
                 if (State.GameState != GameState.WaitingForNewGame)
                 {
                     if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
+                    {
                         return;
-
-
+                    }
                 }
             }
 
@@ -349,15 +373,24 @@ namespace Catan10
 
         public bool CanBuild()
         {
-            if (_log == null) return false;
-            if (_log.Count == 0) return false;
+            if (_log == null)
+            {
+                return false;
+            }
+
+            if (_log.Count == 0)
+            {
+                return false;
+            }
 
             GameState state = State.GameState;
 
             if (state == GameState.WaitingForNext || // I can build after I roll               
                 state == GameState.AllocateResourceForward || // I can build during the initial phase )
                 state == GameState.AllocateResourceReverse || state == GameState.Supplemental)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -442,7 +475,9 @@ namespace Catan10
         {
             if (GameState != GameState.MustMoveBaron && GameState != GameState.WaitingForNext &&
                 GameState != GameState.WaitingForRoll)
+            {
                 return;
+            }
 
             //if (GameState != GameState.WaitingForNext &&
             //    GameState != GameState.WaitingForRoll)
@@ -455,7 +490,9 @@ namespace Catan10
             TargetWeapon weapon = TargetWeapon.Baron;
 
             if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
+            {
                 return;
+            }
 
             async void Baron_MenuClicked(object s, RoutedEventArgs e)
             {
@@ -478,7 +515,11 @@ namespace Catan10
                 List<RoadCtrl> roads = new List<RoadCtrl>();
                 foreach (RoadLocation location in Enum.GetValues(typeof(RoadLocation)))
                 {
-                    if (location == RoadLocation.None) continue;
+                    if (location == RoadLocation.None)
+                    {
+                        continue;
+                    }
+
                     RoadCtrl r = _gameView.GetRoadAt(targetTile, location);
                     if (r.IsOwned && r.RoadState == RoadState.Ship)
                     {
@@ -486,7 +527,7 @@ namespace Catan10
                     }
                 }
 
-                foreach (var road in roads)
+                foreach (RoadCtrl road in roads)
                 {
                     string s = "";
                     if (playerGameData.MovedBaronAfterRollingSeven == false)
@@ -500,7 +541,9 @@ namespace Catan10
                         action = CatanAction.PlayedKnight;
                     }
                     else
+                    {
                         return;
+                    }
 
                     bool found = false;
                     foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
@@ -566,7 +609,9 @@ namespace Catan10
                         action = CatanAction.PlayedKnight;
                     }
                     else
+                    {
                         return;
+                    }
 
                     bool found = false;
                     foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
@@ -633,7 +678,7 @@ namespace Catan10
                 //  loop through and find who has largest army, and how many knights they've played
                 int knightCount = 0;
                 PlayerData largestArmyPlayer = null;
-                foreach (var p in PlayingPlayers)
+                foreach (PlayerData p in PlayingPlayers)
                 {
                     if (p.GameData.LargestArmy)
                     {
@@ -644,7 +689,11 @@ namespace Catan10
 
                 if (CurrentPlayer.GameData.KnightsPlayed > knightCount)
                 {
-                    if (largestArmyPlayer != null) largestArmyPlayer.GameData.LargestArmy = false;
+                    if (largestArmyPlayer != null)
+                    {
+                        largestArmyPlayer.GameData.LargestArmy = false;
+                    }
+
                     CurrentPlayer.GameData.LargestArmy = true;
                 }
             }
@@ -694,9 +743,14 @@ namespace Catan10
                     break;
                 case RoadState.Road:
                     if (nextToSea)
+                    {
                         nextState = RoadState.Ship;
+                    }
                     else
+                    {
                         nextState = RoadState.Road;
+                    }
+
                     break;
                 case RoadState.Ship:
                     nextState = RoadState.Ship;
@@ -715,15 +769,23 @@ namespace Catan10
         ///
         private async Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
         {
-            if (newState == oldState) return;
+            if (newState == oldState)
+            {
+                return;
+            }
+
             road.RoadState = newState;
             switch (newState)
             {
                 case RoadState.Unowned:
                     if (oldState == RoadState.Ship)
+                    {
                         CurrentPlayer.GameData.Ships.Remove(road);
+                    }
                     else
+                    {
                         CurrentPlayer.GameData.Roads.Remove(road);
+                    }
 
                     road.Owner = null;
                     road.Number = -1;
@@ -752,10 +814,12 @@ namespace Catan10
         {
             get
             {
-                foreach (var player in PlayingPlayers)
+                foreach (PlayerData player in PlayingPlayers)
                 {
                     if (player.GameData.HasLongestRoad)
+                    {
                         return player;
+                    }
                 }
 
                 return null;
@@ -763,19 +827,19 @@ namespace Catan10
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-                              /// <summary>
-                              ///         this looks at the global state of all the roads and makes sure that it
-                              ///         1. keeps track of who gets to a road count >= 5 first
-                              ///         2. makes sure that the right player gets the longest road
-                              ///         3. works when an Undo action happens
-                              ///         5. works when a road is "broken"
-                              /// </summary>
+        /// <summary>
+        ///         this looks at the global state of all the roads and makes sure that it
+        ///         1. keeps track of who gets to a road count >= 5 first
+        ///         2. makes sure that the right player gets the longest road
+        ///         3. works when an Undo action happens
+        ///         5. works when a road is "broken"
+        /// </summary>
         private async Task CalculateAndSetLongestRoad(LogType logType)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //
             //  make the compiler error go away
-           // await Task.Delay(0);
+            // await Task.Delay(0);
 
             PlayerData longestRoadPlayer = null;
             int maxRoads = -1;
@@ -788,12 +852,15 @@ namespace Catan10
                 //
                 //  first loop over the players and find the set of players that have the longest road
                 //
-                foreach (var p in PlayingPlayers)
+                foreach (PlayerData p in PlayingPlayers)
                 {
-                    if (p.GameData.HasLongestRoad) longestRoadPlayer = p;  // this one currently has the longest road bit -- it may or may not be correct now
+                    if (p.GameData.HasLongestRoad)
+                    {
+                        longestRoadPlayer = p;  // this one currently has the longest road bit -- it may or may not be correct now
+                    }
                     // calculate the longest road each player has -- we do this for *every* road/bulding state transition as one person can impact another (e.g. break a road)
-                    p.GameData.LongestRoad = CalculateLongestRoad(p, p.GameData.RoadsAndShips); 
-                    
+                    p.GameData.LongestRoad = CalculateLongestRoad(p, p.GameData.RoadsAndShips);
+
                     //
                     //  remove any tracking for roads greater than their current longest road
                     //  e.g. if they had a road of length 7 and somebody broke it, remove the
@@ -803,7 +870,7 @@ namespace Catan10
                         _raceTracking.RemovePlayer(p, i);
                     }
 
-                    
+
                     if (p.GameData.LongestRoad >= 5)
                     {
                         //
@@ -856,7 +923,7 @@ namespace Catan10
                 //  first turn it off for everybody...this is needed because somebody might
                 //  be tied, but second in the race. they get the next number of roads and then undo it.
                 //  we need to give the longest road back to the first player to get to the road count
-                foreach (var p in tiedPlayers)
+                foreach (PlayerData p in tiedPlayers)
                 {
                     p.GameData.HasLongestRoad = false;
 
@@ -879,7 +946,10 @@ namespace Catan10
 
         private bool RoadAllowed(RoadCtrl road)
         {
-            if (!ValidateBuilding) return true;
+            if (!ValidateBuilding)
+            {
+                return true;
+            }
 
             //
             //  is there an adjacent Road
@@ -894,10 +964,12 @@ namespace Catan10
 
             //
             //   is it next to a Settlement
-            foreach (var s in road.AdjacentBuildings)
+            foreach (BuildingCtrl s in road.AdjacentBuildings)
             {
                 if (s.Owner == CurrentPlayer)
+                {
                     return true;
+                }
             }
 
             return false;
@@ -913,7 +985,7 @@ namespace Catan10
         //  to build you want this to return FALSE
         private bool SettlementsWithinOneSpace(BuildingCtrl settlement)
         {
-            foreach (var adjacent in settlement.AdjacentBuildings)
+            foreach (BuildingCtrl adjacent in settlement.AdjacentBuildings)
             {
                 if (adjacent.BuildingState == BuildingState.City || adjacent.BuildingState == BuildingState.Settlement)
                 {
@@ -928,9 +1000,12 @@ namespace Catan10
         private void UpdateTileBuildingOwner(PlayerData player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
 
-            foreach (var key in building.Clones)
+            foreach (BuildingKey key in building.Clones)
             {
-                if (key.Tile.ResourceType == ResourceType.Sea) continue;
+                if (key.Tile.ResourceType == ResourceType.Sea)
+                {
+                    continue;
+                }
 
                 if (newState == BuildingState.None)
                 {
@@ -989,7 +1064,9 @@ namespace Catan10
                         max = count;
                         maxRoadStartedAt = startRoad;
                         if (max == player.GameData.Roads.Count) // the most roads you can have…only count once
+                        {
                             break;
+                        }
                     }
                 }
             }
@@ -1025,7 +1102,9 @@ namespace Catan10
 
 
                             if (count > max)
+                            {
                                 max = count;
+                            }
 
                             ownedAdjacentNotCounted = next.OwnedAdjacentRoadsNotCounted(counted, blockedFork, out adjacentFork);
                             if (adjacentFork)
@@ -1035,7 +1114,9 @@ namespace Catan10
                                 count++;
                                 counted.Add(next); // we shouldn't have to do this more than once
                                 if (count > max)
+                                {
                                     max = count;
+                                }
 
                                 return max;
 
@@ -1092,7 +1173,9 @@ namespace Catan10
                             int forkCount = CalculateLongestRoad(road, counted, forks[0]); // --> only one element in the forks list at this point
 
                             if (count + forkCount > max)
+                            {
                                 max = count + forkCount;
+                            }
 
                             forks.Add(road); // put fork back so we can count that fork
                         }
@@ -1214,7 +1297,7 @@ namespace Catan10
             }
 
             // tell all the Buildings that the CurrentPlayer has changed
-            foreach (var building in _gameView.AllBuildings)
+            foreach (BuildingCtrl building in _gameView.AllBuildings)
             {
                 building.CurrentPlayer = CurrentPlayer;
             }
@@ -1234,8 +1317,15 @@ namespace Catan10
         public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
         {
 
-            if (!CanBuild()) return;
-            if (road.IsOwned) return;
+            if (!CanBuild())
+            {
+                return;
+            }
+
+            if (road.IsOwned)
+            {
+                return;
+            }
 
             road.Color = CurrentPlayer.GameData.PlayerColor;
 
@@ -1260,10 +1350,15 @@ namespace Catan10
 
         public void RoadExited(RoadCtrl road, PointerRoutedEventArgs e)
         {
-            if (!CanBuild()) return;
+            if (!CanBuild())
+            {
+                return;
+            }
 
-
-            if (road.IsOwned) return;
+            if (road.IsOwned)
+            {
+                return;
+            }
 
             road.Show(false);
 
@@ -1284,13 +1379,22 @@ namespace Catan10
         {
 
 
-            if (!CanBuild()) return;
-            if (!RoadAllowed(road)) // clicked on a random road away from a settlement or road
+            if (!CanBuild())
+            {
                 return;
+            }
+
+            if (!RoadAllowed(road)) // clicked on a random road away from a settlement or road
+            {
+                return;
+            }
+
             if (road.IsOwned)
             {
                 if (road.Color != CurrentPlayer.GameData.PlayerColor) // this is not my road I'm clicking on -- bail
+                {
                     return;
+                }
             }
 
             await UpdateRoadState(road, road.RoadState, NextRoadState(road), LogType.Normal);
@@ -1315,10 +1419,15 @@ namespace Catan10
                 return false;
             }
 
-            if (!ValidateBuilding) return true;
+            if (!ValidateBuilding)
+            {
+                return true;
+            }
 
             if (!CanBuild())
+            {
                 return false;
+            }
 
             if (CurrentPlayer == null) // this happens if you move the mouse over the board before a new game is started
             {
@@ -1331,7 +1440,9 @@ namespace Catan10
             bool error = false;
 
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            {
                 allocationPhase = true;
+            }
 
             error = SettlementsWithinOneSpace(building);
 
@@ -1352,7 +1463,7 @@ namespace Catan10
             //
             //  make sure that we have at least one buildable tile
             bool buildableTile = false;
-            foreach (var kvp in building.BuildingToTileDictionary)
+            foreach (KeyValuePair<BuildingLocation, TileCtrl> kvp in building.BuildingToTileDictionary)
             {
                 if (kvp.Value.ResourceType != ResourceType.Sea)
                 {
@@ -1398,7 +1509,7 @@ namespace Catan10
         public async Task BuildingStateChanged(BuildingCtrl building, BuildingState oldState, LogType logType)
         {
             PlayerData player = CurrentPlayer;
-           
+
             //
             //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
@@ -1416,7 +1527,7 @@ namespace Catan10
             await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
             await CalculateAndSetLongestRoad(logType);
-            
+
         }
 
         /// <summary>
@@ -1434,7 +1545,9 @@ namespace Catan10
                 }
             }
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse || GameState == GameState.Supplemental || GameState == GameState.WaitingForNext)
+            {
                 return true;
+            }
 
             return false;
         }

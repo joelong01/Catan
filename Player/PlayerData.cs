@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -19,7 +16,7 @@ namespace Catan10
     public delegate void CardsLostUpdatedHandler(PlayerData player, int oldVal, int newVal);
     public delegate void PlayerResourceUpdateHandler(PlayerData player, ResourceType resource, int oldVal, int newVal);
 
-  
+
 
 
     //
@@ -47,16 +44,13 @@ namespace Catan10
 
         public static ObservableCollection<ColorChoices> _availableColors = new ObservableCollection<ColorChoices>();
         public event PropertyChangedEventHandler PropertyChanged;
-        private List<string> _savedProperties = new List<string> { "PlayerIdentifier", "GamesWon", "GamesPlayed", "PlayerName", "ImageFileName", "ColorAsString" };
+        private readonly List<string> _savedProperties = new List<string> { "PlayerIdentifier", "GamesWon", "GamesPlayed", "PlayerName", "ImageFileName", "ColorAsString" };
         bool _isCurrentPlayer = false;
 
-        
+
         public bool IsCurrentPlayer
         {
-            get
-            {
-                return _isCurrentPlayer;
-            }
+            get => _isCurrentPlayer;
             set
             {
                 if (_isCurrentPlayer != value)
@@ -67,14 +61,13 @@ namespace Catan10
             }
         }
 
-        public PlayerData PlayerDataInstance
-        { get { return this; } }
+        public PlayerData PlayerDataInstance => this;
 
         public async Task<StorageFile> CopyImage(StorageFile file)
         {
-            var folder = await StaticHelpers.GetSaveFolder();
+            StorageFolder folder = await StaticHelpers.GetSaveFolder();
 
-            var imageFolder = await folder.CreateFolderAsync("Player Images", CreationCollisionOption.OpenIfExists);
+            StorageFolder imageFolder = await folder.CreateFolderAsync("Player Images", CreationCollisionOption.OpenIfExists);
             return await file.CopyAsync(imageFolder, file.Name, NameCollisionOption.ReplaceExisting);
         }
 
@@ -98,8 +91,8 @@ namespace Catan10
                 }
 
 
-                var folder = await StaticHelpers.GetSaveFolder();
-                var imageFolder = await folder.GetFolderAsync("Player Images");
+                StorageFolder folder = await StaticHelpers.GetSaveFolder();
+                StorageFolder imageFolder = await folder.GetFolderAsync("Player Images");
                 StorageFile file = await imageFolder.CreateFileAsync(ImageFileName, CreationCollisionOption.OpenIfExists);
 
                 using (Windows.Storage.Streams.IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
@@ -129,20 +122,11 @@ namespace Catan10
 
         }
 
-        public PlayerData This
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public PlayerData This => this;
 
         public ImageBrush ImageBrush
         {
-            get
-            {
-                return _imageBrush;
-            }
+            get => _imageBrush;
             set
             {
                 if (value != _imageBrush)
@@ -155,10 +139,7 @@ namespace Catan10
 
         public ImageSource PlayerImageSource
         {
-            get
-            {
-                return _imageBrush.ImageSource;
-            }
+            get => _imageBrush.ImageSource;
             set
             {
                 if (_imageBrush.ImageSource != value)
@@ -168,13 +149,7 @@ namespace Catan10
                 }
             }
         }
-        public ObservableCollection<ColorChoices> AvailableColors
-        {
-            get
-            {
-                return PlayerData._availableColors;
-            }
-        }
+        public ObservableCollection<ColorChoices> AvailableColors => PlayerData._availableColors;
 
 
         public PlayerData(ILog log)
@@ -195,10 +170,7 @@ namespace Catan10
 
         public Guid PlayerIdentifier
         {
-            get
-            {
-                return _PlayerIdentifier;
-            }
+            get => _PlayerIdentifier;
             set
             {
                 if (_PlayerIdentifier != value)
@@ -210,10 +182,7 @@ namespace Catan10
         }
         public PlayerGameData GameData
         {
-            get
-            {
-                return _playerGameData;
-            }
+            get => _playerGameData;
             set
             {
                 if (_playerGameData != value)
@@ -225,10 +194,7 @@ namespace Catan10
         }
         public PlayerPosition PlayerPosition
         {
-            get
-            {
-                return _PlayerPosition;
-            }
+            get => _PlayerPosition;
             set
             {
                 if (_PlayerPosition != value)
@@ -240,10 +206,7 @@ namespace Catan10
         }
         public int GamesWon
         {
-            get
-            {
-                return _gamesWon;
-            }
+            get => _gamesWon;
             set
             {
                 if (_gamesWon != value)
@@ -253,13 +216,10 @@ namespace Catan10
                 }
             }
         }
-     
+
         public int GamesPlayed
         {
-            get
-            {
-                return _GamesPlayed;
-            }
+            get => _GamesPlayed;
             set
             {
                 if (_GamesPlayed != value)
@@ -271,10 +231,7 @@ namespace Catan10
         }
         public string ImageFileName
         {
-            get
-            {
-                return _ImageFileName;
-            }
+            get => _ImageFileName;
             set
             {
                 if (_ImageFileName != value)
@@ -286,10 +243,7 @@ namespace Catan10
         }
         public string PlayerName
         {
-            get
-            {
-                return _playerName;
-            }
+            get => _playerName;
             set
             {
                 if (_playerName != value)
@@ -303,10 +257,7 @@ namespace Catan10
         //  the color that is saved
         public string ColorAsString
         {
-            get
-            {
-                return _colorAsString;
-            }
+            get => _colorAsString;
             set
             {
                 if (value != _colorAsString)

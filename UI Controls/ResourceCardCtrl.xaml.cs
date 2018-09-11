@@ -13,16 +13,16 @@ namespace Catan10
         public ResourceCardCtrl()
         {
             this.InitializeComponent();
-            
+
         }
-        
+
         public static readonly DependencyProperty ResourceTypeProperty = DependencyProperty.Register("ResourceType", typeof(ResourceType), typeof(ResourceCardCtrl), new PropertyMetadata(ResourceType.Sheep, ResourceTypeChanged));
         public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count", typeof(int), typeof(ResourceCardCtrl), new PropertyMetadata(0, CountChanged));
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(ResourceCardCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
         public TileOrientation Orientation
         {
-            get { return (TileOrientation)GetValue(OrientationProperty); }
-            set { SetValue(OrientationProperty, value); }
+            get => (TileOrientation)GetValue(OrientationProperty);
+            set => SetValue(OrientationProperty, value);
         }
         private static void OrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -37,8 +37,8 @@ namespace Catan10
 
         public int Count
         {
-            get { return (int)GetValue(CountProperty); }
-            set { SetValue(CountProperty, value); }
+            get => (int)GetValue(CountProperty);
+            set => SetValue(CountProperty, value);
         }
         private static void CountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -53,8 +53,8 @@ namespace Catan10
 
         public ResourceType ResourceType
         {
-            get { return (ResourceType)GetValue(ResourceTypeProperty); }
-            set { SetValue(ResourceTypeProperty, value); }
+            get => (ResourceType)GetValue(ResourceTypeProperty);
+            set => SetValue(ResourceTypeProperty, value);
         }
         private static void ResourceTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -69,7 +69,7 @@ namespace Catan10
             switch (value)
             {
                 case ResourceType.Sheep:
-                    bitmapPath =  "ms-appx:Assets/SquareImages/sheep.png";
+                    bitmapPath = "ms-appx:Assets/SquareImages/sheep.png";
                     break;
                 case ResourceType.Wood:
                     bitmapPath = "ms-appx:Assets/SquareImages/wood.png";
@@ -86,7 +86,7 @@ namespace Catan10
                 case ResourceType.Desert:
                 case ResourceType.None:
                     bitmapPath = "ms-appx:Assets/SquareImages/back.png";
-                    break;                                   
+                    break;
                 case ResourceType.GoldMine:
                     bitmapPath = "ms-appx:Assets/SquareImages/gold.png";
                     break;
@@ -97,13 +97,13 @@ namespace Catan10
             }
             BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
             _imgFront.ImageSource = bitmapImage;
-            _imgFront.Stretch = Stretch.UniformToFill;            
+            _imgFront.Stretch = Stretch.UniformToFill;
 
         }
 
         public void SetOrientationAsync(TileOrientation orientation, double startAfter = 0)
         {
-            bool flipToFaceUp = (orientation == TileOrientation.FaceUp) ? true : false;           
+            bool flipToFaceUp = (orientation == TileOrientation.FaceUp) ? true : false;
             StaticHelpers.SetupFlipAnimation(flipToFaceUp, _daFlipBackCard, _daFlipFrontCard, MainPage.GetAnimationSpeed(AnimationSpeed.Normal), startAfter);
             _sbFlipTile.Begin();
         }

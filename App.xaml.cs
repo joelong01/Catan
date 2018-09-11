@@ -24,7 +24,7 @@ namespace Catan10
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.RequestedTheme = ApplicationTheme.Dark;
-            
+
 
         }
 
@@ -71,7 +71,7 @@ namespace Catan10
         protected override void OnFileActivated(FileActivatedEventArgs args)
         {
             base.OnFileActivated(args);
-            var rootFrame = new Frame();
+            Frame rootFrame = new Frame();
             rootFrame.Navigate(typeof(MainPage), args);
             rootFrame.NavigationFailed += OnNavigationFailed;
             Window.Current.Content = rootFrame;
@@ -97,7 +97,7 @@ namespace Catan10
         /// <param name="e">Details about the suspend request.</param>
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
-            var deferral = e.SuspendingOperation.GetDeferral();
+            SuspendingDeferral deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
         }

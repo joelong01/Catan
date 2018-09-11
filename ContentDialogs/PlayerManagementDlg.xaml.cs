@@ -75,7 +75,7 @@ namespace Catan10
                     //   unselected
                     _selectedPlayer.IsCurrentPlayer = false;
                     _selectedPlayer = null;
-                    
+
                 }
 
                 return;
@@ -109,12 +109,12 @@ namespace Catan10
 
         private async System.Threading.Tasks.Task LoadNewImage(PlayerData player)
         {
-            _gvPlayers.IsEnabled = false;                        
+            _gvPlayers.IsEnabled = false;
             _gvPlayers.SelectedItem = player;
             try
             {
-                var folder = await StaticHelpers.GetSaveFolder();
-                var picker = new FileOpenPicker()
+                Windows.Storage.StorageFolder folder = await StaticHelpers.GetSaveFolder();
+                FileOpenPicker picker = new FileOpenPicker()
                 {
                     ViewMode = PickerViewMode.List,
                     SuggestedStartLocation = PickerLocationId.PicturesLibrary
@@ -124,13 +124,13 @@ namespace Catan10
                 picker.FileTypeFilter.Add(".png");
                 picker.FileTypeFilter.Add(".gif");
 
-                var file = await picker.PickSingleFileAsync();
+                Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
                 if (file != null)
                 {
 
                     if (player != null)
                     {
-                        var fileCopy = await player.CopyImage(file);
+                        Windows.Storage.StorageFile fileCopy = await player.CopyImage(file);
                         player.ImageFileName = fileCopy.Name;
                         await player.LoadImage();
 
@@ -148,7 +148,7 @@ namespace Catan10
         {
             await MainPage.SavePlayers(PlayerDataList, "players.data");
             args.Cancel = false; // continue to close
-            
+
         }
 
         private async void OnImageRightTapped(object sender, RightTappedRoutedEventArgs e)

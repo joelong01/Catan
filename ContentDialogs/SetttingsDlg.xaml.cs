@@ -41,8 +41,8 @@ namespace Catan10
         public static readonly DependencyProperty FadeTimeProperty = DependencyProperty.Register("FadeTime", typeof(double), typeof(SettingsDlg), new PropertyMetadata(5, FadeTimeChanged));
         public double FadeTime
         {
-            get { return (double)GetValue(FadeTimeProperty); }
-            set { SetValue(FadeTimeProperty, value); }
+            get => (double)GetValue(FadeTimeProperty);
+            set => SetValue(FadeTimeProperty, value);
         }
         private static void FadeTimeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -62,8 +62,8 @@ namespace Catan10
 
         public bool? AnimateFadeTiles
         {
-            get { return (bool?)GetValue(AnimateFadeTilesProperty); }
-            set { SetValue(AnimateFadeTilesProperty, value); }
+            get => (bool?)GetValue(AnimateFadeTilesProperty);
+            set => SetValue(AnimateFadeTilesProperty, value);
         }
         private static void AnimateFadeTilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -80,8 +80,8 @@ namespace Catan10
 
         public bool? ValidateBuilding
         {
-            get { return (bool?)GetValue(ValidateBuildingProperty); }
-            set { SetValue(ValidateBuildingProperty, value); }
+            get => (bool?)GetValue(ValidateBuildingProperty);
+            set => SetValue(ValidateBuildingProperty, value);
         }
         private static void ValidateBuildingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -98,8 +98,8 @@ namespace Catan10
 
         public bool? RandomizeNumbers
         {
-            get { return (bool?)GetValue(RandomizeNumbersProperty); }
-            set { SetValue(RandomizeNumbersProperty, value); }
+            get => (bool?)GetValue(RandomizeNumbersProperty);
+            set => SetValue(RandomizeNumbersProperty, value);
         }
         private static void RandomizeNumbersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -116,8 +116,8 @@ namespace Catan10
 
         public bool? ShowStopWatch
         {
-            get { return (bool?)GetValue(ShowStopWatchProperty); }
-            set { SetValue(ShowStopWatchProperty, value); }
+            get => (bool?)GetValue(ShowStopWatchProperty);
+            set => SetValue(ShowStopWatchProperty, value);
         }
         private static void ShowStopWatchChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -134,8 +134,8 @@ namespace Catan10
 
         public bool? RotateTile
         {
-            get { return (bool?)GetValue(RotateTileProperty); }
-            set { SetValue(RotateTileProperty, value); }
+            get => (bool?)GetValue(RotateTileProperty);
+            set => SetValue(RotateTileProperty, value);
         }
         private static void RotateTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -152,8 +152,8 @@ namespace Catan10
 
         public bool? ResourceTracking
         {
-            get { return (bool?)GetValue(ResourceTrackingProperty); }
-            set { SetValue(ResourceTrackingProperty, value); }
+            get => (bool?)GetValue(ResourceTrackingProperty);
+            set => SetValue(ResourceTrackingProperty, value);
         }
         private static void ResourceTrackingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -171,8 +171,8 @@ namespace Catan10
 
         public double AnimationSpeed
         {
-            get { return (double)GetValue(AnimationSpeedProperty); }
-            set { SetValue(AnimationSpeedProperty, value); }
+            get => (double)GetValue(AnimationSpeedProperty);
+            set => SetValue(AnimationSpeedProperty, value);
         }
         private static void AnimationSpeedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -189,8 +189,8 @@ namespace Catan10
 
         public double Zoom
         {
-            get { return (double)GetValue(ZoomProperty); }
-            set { SetValue(ZoomProperty, value); }
+            get => (double)GetValue(ZoomProperty);
+            set => SetValue(ZoomProperty, value);
         }
         private static void ZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

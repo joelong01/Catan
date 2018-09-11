@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -19,7 +18,7 @@ namespace Catan10
     {
         public List<int> Rolls { get; set; } = new List<int>();
         Stack<GameState> _stateStack = new Stack<GameState>();
-        
+
 
         //
         //  the problem is that the GameTracker works off a list and used to not care about the physical position of the players.
@@ -27,7 +26,7 @@ namespace Catan10
         //  so that the List we pass to the game tracker is in the right order.  we should fix this...
         private PlayerPosition[] PLAY_ORDER = new PlayerPosition[] { PlayerPosition.BottomLeft, PlayerPosition.Left, PlayerPosition.TopLeft, PlayerPosition.TopRight, PlayerPosition.Right, PlayerPosition.BottomRight };
 
-      
+
 
         public async Task PlayerWon()
         {
@@ -61,10 +60,12 @@ namespace Catan10
         {
 
             if (roll < 2 || roll > 12)
+            {
                 return false;
+            }
 
             Rolls.Push(roll);
-            
+
             PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll);
             UpdateRollStats();
             return true;
@@ -75,16 +76,17 @@ namespace Catan10
         public int PopRoll()
         {
             if (Rolls.Count == 0)
+            {
                 return -1;
+            }
 
-            
-            var lastRoll = Rolls.Pop();
+            int lastRoll = Rolls.Pop();
             PostLogEntry(CurrentPlayer, GameState, CatanAction.Rolled, true, LogType.Undo, lastRoll);
             UpdateRollStats();
             return lastRoll;
         }
 
-     
+
 
 
         //
@@ -112,7 +114,7 @@ namespace Catan10
             int idx = PlayingPlayers.IndexOf(player);
             if (idx != -1)
             {
-                for (int i=0; i<idx; i++)
+                for (int i = 0; i < idx; i++)
                 {
                     PlayerData pd = PlayingPlayers[0];
                     PlayingPlayers.RemoveAt(0);
@@ -130,27 +132,27 @@ namespace Catan10
 
         public async Task AnimateToPlayerIndex(int to, LogType logType = LogType.Normal)
         {
-            if(_menuHidePlayersOnNext.IsChecked)
+            if (_menuHidePlayersOnNext.IsChecked)
             {
-                foreach (var player in PlayingPlayers)
+                foreach (PlayerData player in PlayingPlayers)
                 {
-                   // TODO: do you want this functionality?  if so, you need to get an event fired that 
-                   //       goes off when the CurrentPlayer changes so that the view can show/hide itself
+                    // TODO: do you want this functionality?  if so, you need to get an event fired that 
+                    //       goes off when the CurrentPlayer changes so that the view can show/hide itself
                     // player.Close();
                 }
             }
 
-            
-            int from = PlayingPlayers.IndexOf(CurrentPlayer);            
+
+            int from = PlayingPlayers.IndexOf(CurrentPlayer);
             _currentPlayerIndex = to;
-            
+
             // this is the one spot where the CurrentPlayer is changed.  it shoudl update all the bindings
             // the setter will update all the associated state changes that happen when the CurrentPlayer
             // changes
 
-            CurrentPlayer = PlayingPlayers[_currentPlayerIndex]; 
+            CurrentPlayer = PlayingPlayers[_currentPlayerIndex];
 
-          
+
             if (_log != null)
             {
                 await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to));
@@ -158,13 +160,13 @@ namespace Catan10
 
         }
 
-       
+
 
         public async Task AnimatePlayers(int numberofPositions, LogType logType = LogType.Normal)
         {
             int index = GetNextPlayerPosition(numberofPositions);
 
-           await  AnimateToPlayerIndex(index, logType);
+            await AnimateToPlayerIndex(index, logType);
         }
         public static double[] RollPercents(IEnumerable<int> stack, int[] counts)
         {
@@ -182,7 +184,7 @@ namespace Catan10
 
                 for (int i = 0; i < 11; i++)
                 {
-                    percents[i] = (double)counts[i] / (double)stack.Count();
+                    percents[i] = counts[i] / (double)stack.Count();
                 }
 
             }
@@ -191,8 +193,8 @@ namespace Catan10
         }
 
 
-       
-       
+
+
 
         public static int[] RollCount(IEnumerable<int> stack)
         {

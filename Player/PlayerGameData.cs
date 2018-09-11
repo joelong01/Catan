@@ -7,13 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
-using Windows.Storage;
 using Windows.UI;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -30,7 +25,7 @@ namespace Catan10
         public ObservableCollection<BuildingCtrl> Settlements { get; set; } = new ObservableCollection<BuildingCtrl>();
         public ObservableCollection<BuildingCtrl> Cities { get; set; } = new ObservableCollection<BuildingCtrl>();
         public PlayerResourceData PlayerResourceData { get; set; } = null;
-        private List<string> _savedGameProperties = new List<string> { "PlayerIdentified", "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
+        private readonly List<string> _savedGameProperties = new List<string> { "PlayerIdentified", "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
                                                                        "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
                                                                         "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
@@ -48,7 +43,7 @@ namespace Catan10
             PlayerResourceData.OnPlayerResourceUpdate += OnPlayerResourceUpdate;
         }
 
-        
+
         private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
         {
             _playerData.Log.PostLogEntry(_playerData, GameState.Unknown,
@@ -74,7 +69,7 @@ namespace Catan10
             _playerData.Log.PostLogEntry(player, GameState.WaitingForRoll,
                                                              CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
                                                              new LogResourceCount(oldVal, newVal, resource));
-   
+
         }
 
         private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -99,16 +94,16 @@ namespace Catan10
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
         {
             int pips = 0;
-            foreach (var s in Settlements)
+            foreach (BuildingCtrl s in Settlements)
             {
-                foreach (var kvp in s.BuildingToTileDictionary)
+                foreach (KeyValuePair<BuildingLocation, TileCtrl> kvp in s.BuildingToTileDictionary)
                 {
                     pips += kvp.Value.Pips;
                 }
             }
-            foreach (var s in Cities)
+            foreach (BuildingCtrl s in Cities)
             {
-                foreach (var kvp in s.BuildingToTileDictionary)
+                foreach (KeyValuePair<BuildingLocation, TileCtrl> kvp in s.BuildingToTileDictionary)
                 {
                     pips += kvp.Value.Pips * 2;
                 }
@@ -197,37 +192,13 @@ namespace Catan10
             }
         }
 
-        public int CitiesLeft
-        {
-            get
-            {
-                return MaxCities - CitiesPlayed;
-            }
-        }
+        public int CitiesLeft => MaxCities - CitiesPlayed;
 
-        public int SettlementsLeft
-        {
-            get
-            {
-                return MaxSettlements - SettlementsPlayed;
-            }
-        }
+        public int SettlementsLeft => MaxSettlements - SettlementsPlayed;
 
-        public int RoadsLeft
-        {
-            get
-            {
-                return MaxRoads - RoadsPlayed;
-            }
-        }
+        public int RoadsLeft => MaxRoads - RoadsPlayed;
 
-        public int ShipsLeft
-        {
-            get
-            {
-                return MaxShips - ShipsPlayed;
-            }
-        }
+        public int ShipsLeft => MaxShips - ShipsPlayed;
 
         public void AddIsland(Island island)
         {
@@ -331,10 +302,7 @@ namespace Catan10
         bool _useLightFile = true;
         public bool UseLightFile
         {
-            get
-            {
-                return _useLightFile;
-            }
+            get => _useLightFile;
             set
             {
                 if (_useLightFile != value)
@@ -361,10 +329,7 @@ namespace Catan10
         //  
         public string ColorAsString
         {
-            get
-            {
-                return _ColorAsString;
-            }
+            get => _ColorAsString;
             set
             {
                 if (_ColorAsString != value)
@@ -410,10 +375,7 @@ namespace Catan10
         int pips = 0;
         public int Pips
         {
-            get
-            {
-                return pips;
-            }
+            get => pips;
             set
             {
                 if (pips != value)
@@ -427,10 +389,7 @@ namespace Catan10
 
         public int MaxSettlements
         {
-            get
-            {
-                return _MaxSettlements;
-            }
+            get => _MaxSettlements;
             set
             {
                 if (_MaxSettlements != value)
@@ -443,10 +402,7 @@ namespace Catan10
         }
         public int MaxCities
         {
-            get
-            {
-                return _MaxCities;
-            }
+            get => _MaxCities;
             set
             {
                 if (_MaxCities != value)
@@ -459,10 +415,7 @@ namespace Catan10
         }
         public int MaxRoads
         {
-            get
-            {
-                return _MaxRoads;
-            }
+            get => _MaxRoads;
             set
             {
                 if (_MaxRoads != value)
@@ -476,10 +429,7 @@ namespace Catan10
         }
         public int MaxShips
         {
-            get
-            {
-                return _MaxShips;
-            }
+            get => _MaxShips;
             set
             {
                 if (_MaxShips != value)
@@ -492,10 +442,7 @@ namespace Catan10
         }
         public bool IsCurrentPlayer
         {
-            get
-            {
-                return _isCurrentPlayer;
-            }
+            get => _isCurrentPlayer;
             set
             {
                 if (_isCurrentPlayer != value)
@@ -508,10 +455,7 @@ namespace Catan10
 
         public bool GoodRoll
         {
-            get
-            {
-                return _goodRoll;
-            }
+            get => _goodRoll;
             set
             {
                 if (_goodRoll != value)
@@ -524,10 +468,7 @@ namespace Catan10
 
         public int IslandsPlayed
         {
-            get
-            {
-                return _IslandsPlayed;
-            }
+            get => _IslandsPlayed;
             set
             {
                 if (_IslandsPlayed != value)
@@ -542,10 +483,7 @@ namespace Catan10
 
         public int CardsLostToBaron
         {
-            get
-            {
-                return _CardsLostToBaron;
-            }
+            get => _CardsLostToBaron;
             set
             {
                 if (_CardsLostToBaron != value)
@@ -558,10 +496,7 @@ namespace Catan10
         }
         public Guid PlayerIdentifier
         {
-            get
-            {
-                return _PlayerIdentifier;
-            }
+            get => _PlayerIdentifier;
             set
             {
                 if (_PlayerIdentifier != value)
@@ -573,10 +508,7 @@ namespace Catan10
         }
         public bool PlayedKnightThisTurn
         {
-            get
-            {
-                return _PlayedKnightThisTurn;
-            }
+            get => _PlayedKnightThisTurn;
             set
             {
                 if (_PlayedKnightThisTurn != value)
@@ -588,10 +520,7 @@ namespace Catan10
         }
         public bool? MovedBaronAfterRollingSeven
         {
-            get
-            {
-                return _MovedBaronAfterRollingSeven;
-            }
+            get => _MovedBaronAfterRollingSeven;
             set
             {
                 if (_MovedBaronAfterRollingSeven != value)
@@ -604,10 +533,7 @@ namespace Catan10
         }
         public TimeSpan TotalTime
         {
-            get
-            {
-                return _TotalTime;
-            }
+            get => _TotalTime;
             set
             {
                 if (_TotalTime != value)
@@ -619,10 +545,7 @@ namespace Catan10
         }
         public int SettlementsPlayed
         {
-            get
-            {
-                return _SettlementsPlayed;
-            }
+            get => _SettlementsPlayed;
             set
             {
                 if (_SettlementsPlayed != value)
@@ -635,10 +558,7 @@ namespace Catan10
         }
         public int CitiesPlayed
         {
-            get
-            {
-                return _CitiesPlayed;
-            }
+            get => _CitiesPlayed;
             set
             {
                 if (_CitiesPlayed != value)
@@ -651,10 +571,7 @@ namespace Catan10
         }
         public int RoadsPlayed
         {
-            get
-            {
-                return _RoadsPlayed;
-            }
+            get => _RoadsPlayed;
             set
             {
                 if (_RoadsPlayed != value)
@@ -667,10 +584,7 @@ namespace Catan10
         }
         public int ShipsPlayed
         {
-            get
-            {
-                return _ShipsPlayed;
-            }
+            get => _ShipsPlayed;
             set
             {
                 if (_ShipsPlayed != value)
@@ -685,10 +599,7 @@ namespace Catan10
 
         public int LongestRoad
         {
-            get
-            {
-                return _LongestRoad;
-            }
+            get => _LongestRoad;
             set
             {
                 if (_LongestRoad != value)
@@ -700,10 +611,7 @@ namespace Catan10
         }
         public bool HasLongestRoad
         {
-            get
-            {
-                return _HasLongestRoad;
-            }
+            get => _HasLongestRoad;
             set
             {
                 if (_HasLongestRoad != value)
@@ -716,10 +624,7 @@ namespace Catan10
         }
         public bool LargestArmy
         {
-            get
-            {
-                return _LargestArmy;
-            }
+            get => _LargestArmy;
             set
             {
                 if (_LargestArmy != value)
@@ -732,10 +637,7 @@ namespace Catan10
         }
         public int ResourcesAcquired
         {
-            get
-            {
-                return _ResourcesAcquired;
-            }
+            get => _ResourcesAcquired;
             set
             {
                 if (_ResourcesAcquired != value)
@@ -748,10 +650,7 @@ namespace Catan10
         }
         public int CardsLostToSeven
         {
-            get
-            {
-                return _CardsLostToSeven;
-            }
+            get => _CardsLostToSeven;
             set
             {
                 if (_CardsLostToSeven != value)
@@ -766,10 +665,7 @@ namespace Catan10
         int _CardsLostToMonopoly = 0;
         public int CardsLostToMonopoly
         {
-            get
-            {
-                return _CardsLostToMonopoly;
-            }
+            get => _CardsLostToMonopoly;
             set
             {
                 if (_CardsLostToMonopoly != value)
@@ -783,10 +679,7 @@ namespace Catan10
 
         public int CardsLost
         {
-            get
-            {
-                return _cardsLost;
-            }
+            get => _cardsLost;
             set
             {
                 if (_cardsLost != value)
@@ -800,10 +693,7 @@ namespace Catan10
         }
         public int TimesTargeted
         {
-            get
-            {
-                return _timesTargeted;
-            }
+            get => _timesTargeted;
             set
             {
                 if (_timesTargeted != value)
@@ -819,10 +709,7 @@ namespace Catan10
 
         public int NoResourceCount
         {
-            get
-            {
-                return _noResourceCount;
-            }
+            get => _noResourceCount;
             set
             {
                 if (_noResourceCount != value)
@@ -830,17 +717,17 @@ namespace Catan10
                     LogPropertyChanged(_noResourceCount, value);
                     _noResourceCount = value;
                     if (value > MaxNoResourceRolls)
+                    {
                         MaxNoResourceRolls = value; // only takes on Set
+                    }
+
                     NotifyPropertyChanged();
                 }
             }
         }
         public int RollsWithResource
         {
-            get
-            {
-                return _rollsWithResource;
-            }
+            get => _rollsWithResource;
             set
             {
                 if (_rollsWithResource != value)
@@ -853,27 +740,21 @@ namespace Catan10
         }
         public int MaxNoResourceRolls
         {
-            get
-            {
-                return _maxNoResourceRolls;
-            }
+            get => _maxNoResourceRolls;
             set
             {
                 if (_maxNoResourceRolls != value) // only record the max
                 {
                     LogPropertyChanged(_maxNoResourceRolls, value);
                     _maxNoResourceRolls = value;
-                   NotifyPropertyChanged();
+                    NotifyPropertyChanged();
                 }
             }
         }
 
         public int KnightsPlayed
         {
-            get
-            {
-                return _knightsPlayed;
-            }
+            get => _knightsPlayed;
             set
             {
                 if (_knightsPlayed != value)
@@ -886,10 +767,7 @@ namespace Catan10
         }
         public int Score
         {
-            get
-            {
-                return _score;
-            }
+            get => _score;
             set
             {
                 if (_score != value)
@@ -907,7 +785,7 @@ namespace Catan10
 
         }
 
-       
+
 
         Dictionary<ResourceType, ResourceCount> _dictResourceCount = new Dictionary<ResourceType, ResourceCount>();
         // 
@@ -930,11 +808,18 @@ namespace Catan10
 
             int value = 0;
             if (buildingState == BuildingState.Settlement)
+            {
                 value = 1;
+            }
             else if (buildingState == BuildingState.City)
+            {
                 value = 2;
+            }
 
-            if (undo) value = -value;
+            if (undo)
+            {
+                value = -value;
+            }
 
             if (hasBaron)
             {
@@ -960,7 +845,7 @@ namespace Catan10
 
     public class PlayerResourceData : INotifyPropertyChanged
     {
-        private PlayerData _playerData = null;
+        private readonly PlayerData _playerData = null;
         public PlayerResourceUpdateHandler OnPlayerResourceUpdate;
 
 
@@ -987,10 +872,7 @@ namespace Catan10
         int _Gold = 0;
         public int Gold
         {
-            get
-            {
-                return _Gold;
-            }
+            get => _Gold;
             set
             {
 
@@ -1005,10 +887,7 @@ namespace Catan10
         }
         public int Wheat
         {
-            get
-            {
-                return _Wheat;
-            }
+            get => _Wheat;
             set
             {
 
@@ -1023,10 +902,7 @@ namespace Catan10
         }
         public int Brick
         {
-            get
-            {
-                return _Brick;
-            }
+            get => _Brick;
             set
             {
 
@@ -1041,10 +917,7 @@ namespace Catan10
         }
         public int Ore
         {
-            get
-            {
-                return _Ore;
-            }
+            get => _Ore;
             set
             {
 
@@ -1059,10 +932,7 @@ namespace Catan10
         }
         public int Wood
         {
-            get
-            {
-                return _Wood;
-            }
+            get => _Wood;
             set
             {
 
@@ -1077,10 +947,7 @@ namespace Catan10
         }
         public int Sheep
         {
-            get
-            {
-                return _Sheep;
-            }
+            get => _Sheep;
             set
             {
 
@@ -1137,13 +1004,7 @@ namespace Catan10
             return oldVal;
         }
 
-        public int Total
-        {
-            get
-            {
-                return Sheep + Wood + Ore + Wheat + Brick + Gold;
-            }
-        }
+        public int Total => Sheep + Wood + Ore + Wheat + Brick + Gold;
 
 
     }

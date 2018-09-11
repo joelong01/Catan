@@ -17,8 +17,8 @@ namespace Catan10
 
     public sealed partial class SettingsCtrl : UserControl
     {
-        
-        
+
+
 
         private bool _initializing = true;
         private Settings _settings = new Settings();
@@ -27,21 +27,21 @@ namespace Catan10
 
         public Settings Settings
         {
-            get { return _settings; }
-            set { _settings = value; }
+            get => _settings;
+            set => _settings = value;
         }
 
         public SettingsCtrl()
         {
             this.InitializeComponent();
-          
+
 
         }
 
         public void Init(ICatanSettings pCb)
         {
             CatanSettingsCallback = pCb;
-            
+
             if (!Windows.ApplicationModel.DesignMode.DesignModeEnabled)
             {
                 UpdateUi();
@@ -57,10 +57,13 @@ namespace Catan10
                 double width = 334;
                 HamburgerButton.IsEnabled = false;
                 if (_daMove.To == width)
+                {
                     _daMove.To = 0;
-
+                }
                 else
-                    _daMove.To = width; ;
+                {
+                    _daMove.To = width;
+                };
 
                 await _sbMove.ToTask();
             }
@@ -77,7 +80,7 @@ namespace Catan10
             _chkRotateTile.IsChecked = _settings.RotateTile;
             _sliderFadeTime.Value = _settings.FadeSeconds;
             _sliderZoom.Value = _settings.Zoom;
-            _chkShowStopwatch.IsChecked = _settings.ShowStopwatch;            
+            _chkShowStopwatch.IsChecked = _settings.ShowStopwatch;
             _sliderAnimationSpeed.Value = _settings.AnimationSpeed;
 
             _initializing = false;
@@ -90,15 +93,15 @@ namespace Catan10
         {
             CatanSettingsCallback.AnimateFade = _settings.AnimateFade;
             CatanSettingsCallback.RotateTile = _settings.RotateTile;
-            CatanSettingsCallback.FadeSeconds = _settings.FadeSeconds;           
-            CatanSettingsCallback.ShowStopwatch = _settings.ShowStopwatch;            
+            CatanSettingsCallback.FadeSeconds = _settings.FadeSeconds;
+            CatanSettingsCallback.ShowStopwatch = _settings.ShowStopwatch;
             CatanSettingsCallback.AnimationSpeedBase = _settings.AnimationSpeed;
             CatanSettingsCallback.ResourceTracking = _settings.ResourceTracking;
             CatanSettingsCallback.UseRandomNumbers = _settings.UseRandomNumbers;
             CatanSettingsCallback.ValidateBuilding = _settings.ValidateBuilding;
         }
 
-       
+
 
 
         private string SaveFileName = "CatanSettings.ini";
@@ -106,10 +109,12 @@ namespace Catan10
         {
             try
             {
-                
+
                 string saveString = _settings.Serialize(); ;
                 if (saveString == "")
+                {
                     return;
+                }
 
                 Dictionary<string, string> dict = new Dictionary<string, string>
                 {
@@ -117,9 +122,9 @@ namespace Catan10
                 };
 
 
-                var folder = await StaticHelpers.GetSaveFolder();
-                var option = CreationCollisionOption.ReplaceExisting;
-                var file = await folder.CreateFileAsync(SaveFileName, option);
+                StorageFolder folder = await StaticHelpers.GetSaveFolder();
+                CreationCollisionOption option = CreationCollisionOption.ReplaceExisting;
+                StorageFile file = await folder.CreateFileAsync(SaveFileName, option);
                 await FileIO.WriteTextAsync(file, StaticHelpers.SerializeDictionary(dict));
 
 
@@ -136,7 +141,10 @@ namespace Catan10
         private async void RotateTile_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
+            }
+
             _settings.RotateTile = (((CheckBox)sender).IsChecked == true);
             await SaveSettings();
             CatanSettingsCallback.RotateTile = _settings.RotateTile;
@@ -149,7 +157,10 @@ namespace Catan10
         private async void AnimateFadeTile_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
+            }
+
             _settings.AnimateFade = (((CheckBox)sender).IsChecked == true);
             await SaveSettings();
             CatanSettingsCallback.AnimateFade = _settings.AnimateFade;
@@ -159,7 +170,10 @@ namespace Catan10
         private async void FadeValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
+            }
+
             _settings.FadeSeconds = (int)((Slider)sender).Value;
             await SaveSettings();
             CatanSettingsCallback.FadeSeconds = _settings.FadeSeconds;
@@ -169,8 +183,11 @@ namespace Catan10
         private async void ZoomValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
-            _settings.Zoom = (double)((Slider)sender).Value;
+            }
+
+            _settings.Zoom = ((Slider)sender).Value;
             await SaveSettings();
             CatanSettingsCallback.Zoom = _settings.Zoom;
 
@@ -181,13 +198,16 @@ namespace Catan10
         private async void ShowStopwatch_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
+            }
+
             _settings.ShowStopwatch = (((CheckBox)sender).IsChecked == true);
             await SaveSettings();
             CatanSettingsCallback.ShowStopwatch = _settings.ShowStopwatch;
         }
 
-        
+
         private void OnNewGame(object sender, RoutedEventArgs e)
         {
             CatanSettingsCallback.NewGame();
@@ -203,7 +223,10 @@ namespace Catan10
         private async void AnimationSpeedChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
+            }
+
             _settings.AnimationSpeed = (int)_sliderAnimationSpeed.Value;
             await SaveSettings();
             CatanSettingsCallback.AnimationSpeedBase = _settings.AnimationSpeed;
@@ -243,18 +266,24 @@ namespace Catan10
         private async void ResourceTracking_Click(object sender, RoutedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
+            }
+
             _settings.ResourceTracking = (((CheckBox)sender).IsChecked == true);
             await SaveSettings();
             CatanSettingsCallback.ResourceTracking = _settings.ResourceTracking;
         }
 
-       
+
 
         private async void UseRandomNumbers_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
+            }
+
             _settings.UseRandomNumbers = (((CheckBox)sender).IsChecked == true);
             await SaveSettings();
             CatanSettingsCallback.UseRandomNumbers = _settings.UseRandomNumbers;
@@ -263,7 +292,10 @@ namespace Catan10
         private async void ValidateBuilding_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
+            {
                 return;
+            }
+
             _settings.ValidateBuilding = (((CheckBox)sender).IsChecked == true);
             await SaveSettings();
             CatanSettingsCallback.ValidateBuilding = _settings.ValidateBuilding;

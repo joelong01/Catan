@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,7 +13,6 @@ using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.Storage.Streams;
 using Windows.UI;
-using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -89,12 +87,16 @@ namespace Catan10
         {
             double baseSpeed = 2;
             if (Current != null)
-                baseSpeed = (double)Current.AnimationSpeedBase;
+            {
+                baseSpeed = Current.AnimationSpeedBase;
+            }
 
             if (speed == AnimationSpeed.Ultra)
+            {
                 return (double)speed;
+            }
             // AnimationSpeedFactor is a value of 1...4
-            double d = (double)speed / ((double)baseSpeed + 2);
+            double d = (double)speed / (baseSpeed + 2);
             return d;
 
         }
@@ -115,9 +117,13 @@ namespace Catan10
         void ToggleNumberUi()
         {
             if (_daNumberOpacity.To == 1.0)
+            {
                 HideNumberUi();
+            }
             else
+            {
                 ShowNumberUi();
+            }
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -166,11 +172,11 @@ namespace Catan10
             try
             {
 
-                var folder = await StaticHelpers.GetSaveFolder();
-                var playersDictionary = await StaticHelpers.LoadSectionsFromFile(folder, PlayerDataFile);
+                StorageFolder folder = await StaticHelpers.GetSaveFolder();
+                Dictionary<string, string> playersDictionary = await StaticHelpers.LoadSectionsFromFile(folder, PlayerDataFile);
 
 
-                foreach (var kvp in playersDictionary)
+                foreach (KeyValuePair<string, string> kvp in playersDictionary)
                 {
 
                     PlayerData p = new PlayerData(this);
@@ -178,8 +184,9 @@ namespace Catan10
                     p.Deserialize(kvp.Value, false);
                     await p.LoadImage();
                     if (p.PlayerIdentifier == Guid.Empty)
+                    {
                         p.PlayerIdentifier = Guid.NewGuid();
-
+                    }
 
                     p.AllPlayerIndex = AllPlayers.Count;
                     AllPlayers.Add(p);
@@ -199,11 +206,7 @@ namespace Catan10
 
         public GameType GameType
         {
-            get
-            {
-                return _gameView.CurrentGame.GameType;
-
-            }
+            get => _gameView.CurrentGame.GameType;
             set
             {
 
@@ -213,15 +216,15 @@ namespace Catan10
         private async Task CopyScreenShotToClipboard(FrameworkElement element)
         {
             IRandomAccessStream stream = new InMemoryRandomAccessStream();
-            var renderTargetBitmap = new Windows.UI.Xaml.Media.Imaging.RenderTargetBitmap();
+            Windows.UI.Xaml.Media.Imaging.RenderTargetBitmap renderTargetBitmap = new Windows.UI.Xaml.Media.Imaging.RenderTargetBitmap();
 
             await renderTargetBitmap.RenderAsync(element);
 
-            var pixelBuffer = await renderTargetBitmap.GetPixelsAsync();
+            IBuffer pixelBuffer = await renderTargetBitmap.GetPixelsAsync();
 
-            var dpi = Windows.Graphics.Display.DisplayInformation.GetForCurrentView().LogicalDpi;
+            float dpi = Windows.Graphics.Display.DisplayInformation.GetForCurrentView().LogicalDpi;
 
-            var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
             encoder.SetPixelData(
                 BitmapPixelFormat.Bgra8,
                 BitmapAlphaMode.Ignore,
@@ -241,15 +244,7 @@ namespace Catan10
 
 
 
-        public bool HasSupplementalBuild
-        {
-            get
-            {
-
-                return GameType == GameType.SupplementalBuildPhase;
-            }
-
-        }
+        public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
 
 
 
@@ -285,7 +280,7 @@ namespace Catan10
             Ctrl_PlayerResourceCountCtrl.GameResourceData.Reset();
             _stateStack.Clear();
 
-            foreach (var player in AllPlayers)
+            foreach (PlayerData player in AllPlayers)
             {
                 player.Reset();
             }
@@ -337,7 +332,7 @@ namespace Catan10
             _gameView.Reset();
             _gameView.SetCallbacks(this, this);
 
-            foreach (var p in PlayingPlayers)
+            foreach (PlayerData p in PlayingPlayers)
             {
                 p.GameData.OnCardsLost -= OnPlayerLostCards;
             }
@@ -351,7 +346,11 @@ namespace Catan10
         bool _undoingCardLostHack = false;
         private async void OnPlayerLostCards(PlayerData player, int oldVal, int newVal)
         {
-            if (_undoingCardLostHack) return;
+            if (_undoingCardLostHack)
+            {
+                return;
+            }
+
             await LogPlayerLostCards(player, oldVal, newVal, LogType.Normal);
         }
 
@@ -395,7 +394,10 @@ namespace Catan10
 
             //
             //  this should mean that we are launching for the first time
-            if (_gameView.CurrentGame.Tiles[0].TileOrientation == TileOrientation.FaceDown) return;
+            if (_gameView.CurrentGame.Tiles[0].TileOrientation == TileOrientation.FaceDown)
+            {
+                return;
+            }
 
             List<Task> tasks = new List<Task>();
             foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
@@ -592,18 +594,18 @@ namespace Catan10
             //
             //  TODO:  log GoodRoll, RollsWithResource and NoResourceCount
 
-           // await AddLogEntry(player, this.GameState, CatanAction.AddResourceCount, false, logType, -1, new LogResourceCount(oldValPlayer, oldValPlayer + count, resource));
+            // await AddLogEntry(player, this.GameState, CatanAction.AddResourceCount, false, logType, -1, new LogResourceCount(oldValPlayer, oldValPlayer + count, resource));
         }
 
         public async Task<IReadOnlyList<StorageFile>> GetSavedFilesInternal()
         {
-            var queryOptions = new QueryOptions(CommonFileQuery.DefaultQuery, new[] { $"{SAVED_GAME_EXTENSION}" })
+            QueryOptions queryOptions = new QueryOptions(CommonFileQuery.DefaultQuery, new[] { $"{SAVED_GAME_EXTENSION}" })
             {
                 FolderDepth = FolderDepth.Shallow
             };
-            var folder = await StaticHelpers.GetSaveFolder();
-            var query = folder.CreateFileQueryWithOptions(queryOptions);
-            var files = await query.GetFilesAsync();
+            StorageFolder folder = await StaticHelpers.GetSaveFolder();
+            StorageFileQueryResult query = folder.CreateFileQueryWithOptions(queryOptions);
+            IReadOnlyList<StorageFile> files = await query.GetFilesAsync();
 
             return files;
         }
@@ -617,9 +619,9 @@ namespace Catan10
             List<StorageFile> fList = new List<StorageFile>();
             fList.AddRange(files);
 
-            var sort = from s in files orderby s.DateCreated.Ticks descending select s;
+            IOrderedEnumerable<StorageFile> sort = from s in files orderby s.DateCreated.Ticks descending select s;
             SavedGames.Clear();
-            foreach (var f in sort)
+            foreach (StorageFile f in sort)
             {
                 Log log = new Log(f);
                 SavedGames.Add(log);
@@ -630,8 +632,8 @@ namespace Catan10
         public async static Task<bool> SavePlayers(IEnumerable<PlayerData> players, string fileName)
         {
 
-            var folder = await StaticHelpers.GetSaveFolder();
-            var file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+            StorageFolder folder = await StaticHelpers.GetSaveFolder();
+            StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             string toWrite = "";
             foreach (PlayerData p in players)
             {
@@ -677,7 +679,7 @@ namespace Catan10
         {
             int[] roals = RollCount(Rolls);
             double[] percent = RollPercents(Rolls, roals);
-           
+
 
             //String.Format("{0:0.#}%", percent * 100)
             TotalRolls = Rolls.Count();
@@ -713,7 +715,7 @@ namespace Catan10
             }
             //
             //  on next, reset the resources for the turn to 0
-            foreach (var player in PlayingPlayers)
+            foreach (PlayerData player in PlayingPlayers)
             {
                 player.GameData.PlayerResourceData.Reset();
             }
@@ -727,7 +729,7 @@ namespace Catan10
 
         private async Task HideAllPipEllipses()
         {
-            foreach (var s in _gameView.CurrentGame.HexPanel.Buildings)
+            foreach (BuildingCtrl s in _gameView.CurrentGame.HexPanel.Buildings)
             {
                 if (s.BuildingState == BuildingState.Pips)
                 {
@@ -744,7 +746,10 @@ namespace Catan10
         {
             value = -1;
             if (tokens.Length < index)
+            {
                 return false;
+            }
+
             return Int32.TryParse(tokens[index], out value);
         }
 
@@ -760,10 +765,12 @@ namespace Catan10
 
             bool ret = this.PushRoll(val); // only returns false on a number outside the range...
             if (!ret)
+            {
                 return;
+            }
 
             List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
-        
+
 
             List<Task> tasks = new List<Task>();
             foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
@@ -780,30 +787,35 @@ namespace Catan10
 
                     }
                     if (_settings.RotateTile)
+                    {
                         t.Rotate(180, tasks, true);
-
+                    }
                 }
                 else
                 {
                     if (_settings.AnimateFade)
+                    {
                         t.AnimateFade(0.25, tasks);
+                    }
                 }
             }
 
             if (tasks.Count > 0)
+            {
                 await Task.WhenAll(tasks.ToArray());
+            }
 
             //
             // now make sure we reverse the fade
             _timer.Start();
 
-            
+
 
             if (val == 7)
             {
                 CurrentPlayer.GameData.MovedBaronAfterRollingSeven = false;
                 await SetStateAsync(CurrentPlayer, GameState.MustMoveBaron, false);
-                foreach (var player in PlayingPlayers)
+                foreach (PlayerData player in PlayingPlayers)
                 {
                     player.GameData.NoResourceCount++;
                 }
@@ -823,7 +835,7 @@ namespace Catan10
 
         }
 
-        private void  CountResourcesForRoll(List<TileCtrl> tilesWithNumber, bool undo)
+        private void CountResourcesForRoll(List<TileCtrl> tilesWithNumber, bool undo)
         {
             //
             //  add one to the "no resources count for each player -- we will reset it if they get some
@@ -842,18 +854,18 @@ namespace Catan10
                     if (building.Owner == null)
                     {
                         System.Diagnostics.Debug.Assert(false);
-                        
+
                     }
 
                     int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
                     //
                     //  need to look up the control given the player and add it to the right one
-                     AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
+                    AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
 
                 }
             }
 
-            
+
 
         }
 
@@ -862,7 +874,7 @@ namespace Catan10
             _stopWatchForTurn.StopTimer();
             OpenGameDlg dlg = new OpenGameDlg();
             await dlg.LoadGames();
-            var ret = await dlg.ShowAsync();
+            ContentDialogResult ret = await dlg.ShowAsync();
 
             if (ret == ContentDialogResult.Primary)
             {
@@ -877,7 +889,9 @@ namespace Catan10
             get
             {
                 if (_log.Count == 0)
+                {
                     return null;
+                }
 
                 return _log.Last();
             }
@@ -893,7 +907,9 @@ namespace Catan10
                 }
 
                 if (_log.Count == 0)
+                {
                     return GameState.WaitingForNewGame;
+                }
 
                 return _log.Last().GameState;
             }
@@ -902,16 +918,29 @@ namespace Catan10
 
         public async Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
-            if (_log == null) return;
+            if (_log == null)
+            {
+                return;
+            }
+
             if (state == GameState.Unknown)
+            {
                 state = this.GameState;
+            }
+
             await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
         }
-        public void  PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
+        public void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
-            if (_log == null) return;
+            if (_log == null)
+            {
+                return;
+            }
+
             if (state == GameState.Unknown)
+            {
                 state = this.GameState;
+            }
 
             _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
         }
@@ -919,9 +948,10 @@ namespace Catan10
         private async Task SetStateAsync(PlayerData player, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null)
+            {
                 return;
+            }
 
-            
             string n = (player != null) ? player.PlayerName : "<no player>";
 
             LogStateTranstion lst = new LogStateTranstion(GameState, newState);
@@ -983,7 +1013,7 @@ namespace Catan10
                 //  this has to be two pass because the log needs to be replayed in order
                 //  marking records as undone means we don't have to replay and then undo them
                 //
-                
+
                 for (int i = log.LogEntries.Count - 1; i > 0; i--)
                 {
                     LogEntry logLine = log.LogEntries[i];
@@ -994,30 +1024,37 @@ namespace Catan10
                     }
 
                 }
-                
+
 
                 foreach (LogEntry logLine in log.LogEntries)
                 {
                     n++;
                     if (logLine.LogType == LogType.Undo)
                     {
-                       continue;
+                        continue;
                     }
 
                     if (logLine.Undone == true)
+                    {
                         continue;
+                    }
 
                     switch (logLine.Action)
                     {
                         case CatanAction.Rolled:
-                            PushRoll(logLine.Number);                            
+                            PushRoll(logLine.Number);
                             break;
                         case CatanAction.AddResourceCount:
                             LogResourceCount lrc = logLine.Tag as LogResourceCount;
                             if (logLine.PlayerData != null)
+                            {
                                 logLine.PlayerData.GameData.PlayerResourceData.AddResourceCount(lrc.ResourceType, logLine.Number);
+                            }
                             else
+                            {
                                 Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(lrc.ResourceType, logLine.Number);
+                            }
+
                             break;
                         case CatanAction.ChangedState:
                             break;
@@ -1040,7 +1077,11 @@ namespace Catan10
                         case CatanAction.DoneResourceAllocation:
                             break;
                         case CatanAction.SetFirstPlayer:
-                            if (logLine.Tag == null) continue;
+                            if (logLine.Tag == null)
+                            {
+                                continue;
+                            }
+
                             LogSetFirstPlayer lsfp = logLine.Tag as LogSetFirstPlayer;
                             await SetFirst(PlayingPlayers[lsfp.FirstPlayerIndex]);
                             break;
@@ -1053,9 +1094,13 @@ namespace Catan10
                         case CatanAction.UpdatedRoadState:
                             LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
                             if (roadUpdate.NewRoadState != RoadState.Unowned)
+                            {
                                 roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
+                            }
                             else
+                            {
                                 roadUpdate.Road.Color = Colors.Transparent;
+                            }
 
                             await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
                             break;
@@ -1113,7 +1158,7 @@ namespace Catan10
                 _progress.IsActive = false;
                 _progress.Visibility = Visibility.Collapsed;
                 log.State = LogState.Normal;
-                
+
             }
             return true;
 
@@ -1131,7 +1176,7 @@ namespace Catan10
 
         private void StartCallback()
         {
-           var ignored = Task.Run(async () =>
+            Task ignored = Task.Run(async () =>
             {
                 while (!concurrentBag.IsEmpty)
                 {
@@ -1142,7 +1187,9 @@ namespace Catan10
                         await Task.Delay(1000);
                     }
                     else
+                    {
                         return;
+                    }
                 }
 
             });
@@ -1177,7 +1224,10 @@ namespace Catan10
         {
             await _gameView.RandomizeCatanBoard(true);
             await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
-            if (CurrentPlayer != null) await ProcessEnter(CurrentPlayer, "");
+            if (CurrentPlayer != null)
+            {
+                await ProcessEnter(CurrentPlayer, "");
+            }
         }
 
         private const int SMALLEST_STATE_COUNT = 8; // can only undo to the first resource allocation
@@ -1186,7 +1236,7 @@ namespace Catan10
         private async Task OnWin()
         {
 
-            var ret = await StaticHelpers.AskUserYesNoQuestion(String.Format($"Did {CurrentPlayer.PlayerName} really win?"), "Yes", "No");
+            bool ret = await StaticHelpers.AskUserYesNoQuestion(String.Format($"Did {CurrentPlayer.PlayerName} really win?"), "Yes", "No");
             if (ret == true)
             {
                 try
@@ -1219,9 +1269,12 @@ namespace Catan10
             {
                 if (e.AddedItems.Count > 0)
                 {
-                    Log newLog =  e.AddedItems[0] as Log;
+                    Log newLog = e.AddedItems[0] as Log;
                     if (_log == newLog)
+                    {
                         return;
+                    }
+
                     if (await StaticHelpers.AskUserYesNoQuestion($"Switch to {newLog.File.DisplayName}?", "Yes", "No"))
                     {
                         _log = newLog;
@@ -1265,7 +1318,7 @@ namespace Catan10
 
             int pipCountToShow = buildingsOrderedByPips[0].Pips;
             bool shownOne = false;
-            foreach (var building in buildingsOrderedByPips)
+            foreach (BuildingCtrl building in buildingsOrderedByPips)
             {
                 //
                 //  keep going until the pip count changes - but we have to show at least one
@@ -1285,7 +1338,10 @@ namespace Catan10
                     continue;
                 }
 
-                if (building.BuildingState != BuildingState.None) continue;  // throw out the non-empty ones
+                if (building.BuildingState != BuildingState.None)
+                {
+                    continue;  // throw out the non-empty ones
+                }
 
                 //
                 //  if we've got here, we can build on this location and we need to show everythign tha thas this pipcount
@@ -1339,7 +1395,7 @@ namespace Catan10
             string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
             string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
 
-            return  String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
+            return String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
         }
     }
 }

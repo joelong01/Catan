@@ -30,12 +30,12 @@ namespace Catan10
         GamePicked,                         // 16
         MustMoveBaron,                       // 17
         Unknown,
-    };                                     
+    };
 
     //
     //  actions are things we can undo
     public enum CatanAction
-    {                                            
+    {
         Rolled,                                   // 0
         ChangedState,                             // 1 
         ChangedPlayer,                            // 2        
@@ -130,7 +130,7 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
 
-      
+
         Task BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState, LogType logType);
 
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
@@ -153,7 +153,7 @@ namespace Catan10
 
         Task SettingChanged();
 
-        Task NewGame();       
+        Task NewGame();
         Task OpenSavedGame();
         Task<bool> Reshuffle();
         Task Explorer();
@@ -197,7 +197,7 @@ namespace Catan10
         public bool ValidateBuilding { get; set; } = true;
         public List<GridPosition> GridPositions { get; set; } = new List<GridPosition>();
 
-        string[] _settings = new string[] { "FadeSeconds", "AnimateFade", "RotateTile", "Zoom", "ShowStopwatch", "UseClassicTiles", "AnimationSpeed", "ResourceTracking", "UseRandomNumbers", "ValidateBuilding", };
+        readonly string[] _settings = new string[] { "FadeSeconds", "AnimateFade", "RotateTile", "Zoom", "ShowStopwatch", "UseClassicTiles", "AnimationSpeed", "ResourceTracking", "UseRandomNumbers", "ValidateBuilding", };
 
         public Settings()
         {
@@ -214,7 +214,7 @@ namespace Catan10
         {
             string settings = StaticHelpers.SerializeObject<Settings>(this, _settings, "=", StaticHelpers.lineSeperator);
             string gridPositions = "";
-            foreach (var gp in GridPositions)
+            foreach (GridPosition gp in GridPositions)
             {
                 gridPositions += gp.Serialize() + "\r\n";
             }
@@ -228,7 +228,7 @@ namespace Catan10
             StaticHelpers.DeserializeObject<Settings>(this, sections["Settings"], "=", StaticHelpers.lineSeperator);
             string[] positions = sections["GridPositions"].Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             GridPositions.Clear();
-            foreach (var line in positions)
+            foreach (string line in positions)
             {
                 GridPosition gp = new GridPosition(line);
                 GridPositions.Add(gp);
@@ -241,8 +241,8 @@ namespace Catan10
         {
             try
             {
-                var folder = await StaticHelpers.GetSaveFolder();
-                var file = await folder.GetFileAsync(filename);
+                StorageFolder folder = await StaticHelpers.GetSaveFolder();
+                StorageFile file = await folder.GetFileAsync(filename);
                 string contents = await FileIO.ReadTextAsync(file);
                 Deserialize(contents);
             }
@@ -259,14 +259,13 @@ namespace Catan10
 
                 string saveString = Serialize();
                 if (saveString == "")
+                {
                     return;
+                }
 
-
-
-
-                var folder = await StaticHelpers.GetSaveFolder();
-                var option = CreationCollisionOption.ReplaceExisting;
-                var file = await folder.CreateFileAsync(filename, option);
+                StorageFolder folder = await StaticHelpers.GetSaveFolder();
+                CreationCollisionOption option = CreationCollisionOption.ReplaceExisting;
+                StorageFile file = await folder.CreateFileAsync(filename, option);
                 await FileIO.WriteTextAsync(file, saveString);
 
 

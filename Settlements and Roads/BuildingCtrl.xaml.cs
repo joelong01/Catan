@@ -35,7 +35,7 @@ namespace Catan10
         //  this the list of Tile/SettlmentLocations that are the same for this settlement
         public List<BuildingKey> Clones = new List<BuildingKey>();
         public Point LayoutPoint { get; set; }
-        public CompositeTransform Transform { get { return (CompositeTransform)this.RenderTransform; } }
+        public CompositeTransform Transform => (CompositeTransform)this.RenderTransform;
 
         public IGameCallback Callback { get; internal set; }
 
@@ -47,8 +47,8 @@ namespace Catan10
         public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
         public int Pips
         {
-            get { return (int)GetValue(PipsProperty); }
-            set { SetValue(PipsProperty, value); }
+            get => (int)GetValue(PipsProperty);
+            set => SetValue(PipsProperty, value);
         }
         private static void PipsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -68,9 +68,11 @@ namespace Catan10
         public async Task LoadUiElements()
         {
             if (loaded)
+            {
                 return;
+            }
 
-            var tcs = new TaskCompletionSource<object>();
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
 
             void finishedLoading(object sender, RoutedEventArgs e)
             {
@@ -79,7 +81,7 @@ namespace Catan10
 
             try
             {
-                ((Grid)FindName("LayoutRoot")).Loaded += finishedLoading;                
+                ((Grid)FindName("LayoutRoot")).Loaded += finishedLoading;
                 await tcs.Task;
                 loaded = true;
             }
@@ -87,15 +89,15 @@ namespace Catan10
             {
                 LayoutRoot.Loaded -= finishedLoading;
             }
-            
+
 
         }
 
-    
+
         public int PipGroup
         {
-            get { return (int)GetValue(PipGroupProperty); }
-            set { SetValue(PipGroupProperty, value); }
+            get => (int)GetValue(PipGroupProperty);
+            set => SetValue(PipGroupProperty, value);
         }
         private static void PipGroupChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -121,8 +123,8 @@ namespace Catan10
         }
         private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var depPropClass = d as BuildingCtrl;
-            var depPropValue = (PlayerData)e.NewValue;
+            BuildingCtrl depPropClass = d as BuildingCtrl;
+            PlayerData depPropValue = (PlayerData)e.NewValue;
             depPropClass?.SetCurrentPlayer(depPropValue);
         }
         private void SetCurrentPlayer(PlayerData value)
@@ -132,8 +134,8 @@ namespace Catan10
 
         public BuildingState BuildingState
         {
-            get { return (BuildingState)GetValue(BuildingStateProperty); }
-            private set { SetValue(BuildingStateProperty, value); } // call UpdateBuildingState instead
+            get => (BuildingState)GetValue(BuildingStateProperty);
+            private set => SetValue(BuildingStateProperty, value);  // call UpdateBuildingState instead
         }
         private static void BuildingStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -144,7 +146,7 @@ namespace Catan10
 
         private void SetBuildingState(BuildingCtrl ctrl, BuildingState value)
         {
-           // await ctrl.LoadUiElements();
+            // await ctrl.LoadUiElements();
         }
 
 
@@ -166,21 +168,9 @@ namespace Catan10
         }
 
 
-        public bool IsCity
-        {
-            get
-            {
-                return BuildingState == BuildingState.City;
-            }
-        }
+        public bool IsCity => BuildingState == BuildingState.City;
 
-        public bool IsSettlement
-        {
-            get
-            {
-                return BuildingState == BuildingState.Settlement;
-            }
-        }
+        public bool IsSettlement => BuildingState == BuildingState.Settlement;
 
         public BuildingCtrl()
         {
@@ -213,7 +203,7 @@ namespace Catan10
         private void OutputKeyInfo()
         {
             string s = "";
-            foreach (var key in Clones)
+            foreach (BuildingKey key in Clones)
             {
                 s += String.Format($"\n\tTile:{key.Tile} at {key.Location}");
             }
@@ -306,9 +296,9 @@ namespace Catan10
                 case BuildingState.None:
                 case BuildingState.Build:
                 case BuildingState.Error:
-                case BuildingState.Pips:                  
+                case BuildingState.Pips:
                     break;
-                case BuildingState.Settlement:                   
+                case BuildingState.Settlement:
                     ret = player.GameData.Settlements.Remove(this);
                     this.Assert(ret, "a settlement needs to be in the Settlements Collection");
                     break;
@@ -393,7 +383,7 @@ namespace Catan10
         public void AddKey(TileCtrl tile, BuildingLocation loc)
         {
             BuildingKey key = new BuildingKey(tile, loc);
-            foreach (var clone in Clones)
+            foreach (BuildingKey clone in Clones)
             {
                 //
                 //  need to do this by value because .Contains looks for the same pointer value

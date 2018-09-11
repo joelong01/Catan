@@ -132,7 +132,7 @@ namespace Catan10
         /// Returns the next pseudo-random <see cref="UInt32"/>.
         /// </summary>
         /// <returns>A pseudo-random <see cref="UInt32"/> value.</returns>
-     
+
         public virtual UInt32 NextUInt32()
         {
             return GenerateUInt32();
@@ -166,7 +166,7 @@ namespace Catan10
         /// <exception cref="ArgumentOutOfRangeException">
         /// If <c><paramref name="minValue"/> &gt;= <paramref name="maxValue"/></c>.
         /// </exception>
-        
+
         public virtual UInt32 NextUInt32(UInt32 minValue, UInt32 maxValue) /* throws ArgumentOutOfRangeException */
         {
             if (minValue >= maxValue)
@@ -373,7 +373,7 @@ namespace Catan10
         /// Generates a new pseudo-random <see cref="UInt32"/>.
         /// </summary>
         /// <returns>A pseudo-random <see cref="UInt32"/>.</returns>
-     
+
         protected UInt32 GenerateUInt32()
         {
             UInt32 y;
@@ -409,7 +409,7 @@ namespace Catan10
 
             return y;
         }
-        
+
         /* Period parameters */
         private const Int32 N = 624;
         private const Int32 M = 397;
@@ -477,7 +477,10 @@ namespace Catan10
                 _mt[i] &= 0xffffffffU; // for WORDSIZE > 32 machines
                 i++; j++;
                 if (i >= N) { _mt[0] = _mt[N - 1]; i = 1; }
-                if (j >= keyLength) j = 0;
+                if (j >= keyLength)
+                {
+                    j = 0;
+                }
             }
 
             for (k = N - 1; k > 0; k--)

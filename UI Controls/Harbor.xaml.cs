@@ -47,7 +47,7 @@ namespace Catan10
 
         public TileOrientation Orientation
         {
-            get { return _orientation; }
+            get => _orientation;
             set
             {
 
@@ -65,22 +65,14 @@ namespace Catan10
 
         public HarborType HarborType
         {
-            get { return myType; }
-            set
-            {                
+            get => myType;
+            set =>
                 // don't protect! - you set it twice to get the classic image
                 // myType set in SetHarborImage();                
-                SetHarborImage(value);             
-            }
+                SetHarborImage(value);
         }
 
-        public FrameworkElement AnimationObject
-        {
-            get
-            {
-                return _backGrid;
-            }
-        }
+        public FrameworkElement AnimationObject => _backGrid;
 
         public void SetHarborImage(HarborType value)
         {
@@ -172,14 +164,8 @@ namespace Catan10
 
         public double TextSize
         {
-            get
-            {
-                return _text.FontSize;
-            }
-            set
-            {
-                _text.FontSize = value;
-            }
+            get => _text.FontSize;
+            set => _text.FontSize = value;
         }
 
 
@@ -195,11 +181,14 @@ namespace Catan10
         public async Task SetOrientation(TileOrientation orientation, double animationDuration = Double.MaxValue, double startAfter = 0)
         {
             if (_orientation == orientation)
+            {
                 return;
-
+            }
 
             if (animationDuration == Double.MaxValue)
+            {
                 animationDuration = 1000;
+            }
 
             bool flipToFaceUp = (_orientation == TileOrientation.FaceDown) ? true : false;
             _orientation = orientation;
@@ -213,13 +202,18 @@ namespace Catan10
         public void SetOrientationAsync(TileOrientation orientation, double animationDuration = Double.MaxValue)
         {
             if (_orientation == orientation)
+            {
                 return;
-
+            }
 
             if (animationDuration == Double.MaxValue)
+            {
                 animationDuration = 0;
+            }
             else
+            {
                 animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            }
 
             bool flipToFaceUp = (_orientation == TileOrientation.FaceDown) ? true : false;
             _orientation = orientation;
@@ -231,10 +225,7 @@ namespace Catan10
 
         public double ImageRotation
         {
-            get
-            {
-                return _gridFrontTransform.Rotation;
-            }
+            get => _gridFrontTransform.Rotation;
             set
             {
                 _gridFrontTransform.Rotation = value;
@@ -244,10 +235,7 @@ namespace Catan10
 
         public double ImageZoom
         {
-            get
-            {
-                return _gridFrontTransform.ScaleX;
-            }
+            get => _gridFrontTransform.ScaleX;
             set
             {
                 _gridFrontTransform.ScaleX = value;
@@ -259,10 +247,7 @@ namespace Catan10
 
         public bool SmallHarbor
         {
-            get
-            {
-                return (_gridBackTransform.TranslateX == -15);
-            }
+            get => (_gridBackTransform.TranslateX == -15);
             set
             {
                 if (value)
@@ -293,10 +278,7 @@ namespace Catan10
 
         public bool UseClassic
         {
-            get
-            {
-                return _useClassic;
-            }
+            get => _useClassic;
 
             set
             {
@@ -324,53 +306,36 @@ namespace Catan10
             return _sbRotate.ToTask();
         }
 
-        public CompositeTransform Transform
-        {
-            get
-            {
-                return _gridTransform;
-            }
-        }
+        public CompositeTransform Transform => _gridTransform;
 
         public bool Flip
         {
-            get
-            {
-                return (_gridTransform.Rotation == 180);
-            }
+            get => (_gridTransform.Rotation == 180);
             set
             {
                 if (value)
+                {
                     _gridBackTransform.Rotation = 90;
+                }
                 else
+                {
                     _gridTransform.Rotation = 0;
+                }
             }
         }
 
         public double RotateImage
         {
-            get
-            {
-                return _gridFrontTransform.Rotation;
-            }
-            set
-            {
-                _gridFrontTransform.Rotation = value;
-            }
+            get => _gridFrontTransform.Rotation;
+            set => _gridFrontTransform.Rotation = value;
         }
         //
         //  for information purposes only - no side affects
         public HarborLocation HarborLocation
         {
-            get
-            {
-                return _location;
-            }
+            get => _location;
 
-            set
-            {
-                _location = value;
-            }
+            set => _location = value;
         }
 
         public int TileIndex { get; set; } = 0;

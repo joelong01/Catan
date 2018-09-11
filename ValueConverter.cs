@@ -53,7 +53,7 @@ namespace Catan10
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");           
+            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
         }
     }
 
@@ -137,14 +137,16 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if (value == null)
+            {
                 return Colors.Blue;
+            }
 
-            if (targetType == typeof(Color)  && value.GetType() == typeof(String))
+            if (targetType == typeof(Color) && value.GetType() == typeof(String))
             {
                 return StaticHelpers.StringToColorDictionary[(string)value];
             }
 
-            
+
             return ((ColorChoices)value).Background;
         }
     }
@@ -155,7 +157,7 @@ namespace Catan10
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            for (int idx =0; idx<PlayerData._availableColors.Count; idx++)            
+            for (int idx = 0; idx < PlayerData._availableColors.Count; idx++)
             {
                 ColorChoices choice = PlayerData._availableColors[idx];
                 if (choice.Background == (Color)value)
@@ -170,7 +172,9 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if ((int)value == -1)
+            {
                 return PlayerData._availableColors[4].Background;
+            }
 
             return PlayerData._availableColors[(int)value].Background;
         }
@@ -222,7 +226,7 @@ namespace Catan10
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             string s = "";
-            foreach (var val in (List<TileGroup>)value)
+            foreach (TileGroup val in (List<TileGroup>)value)
             {
                 s += val.ToString() + ";";
             }
@@ -279,9 +283,13 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if ((Visibility)value == Visibility.Visible)
+            {
                 return true;
+            }
             else
+            {
                 return false;
+            }
         }
     }
 
@@ -293,13 +301,18 @@ namespace Catan10
             {
                 return null;
             }
-            else return new BitmapImage(new Uri(value as string, UriKind.Absolute));
+            else
+            {
+                return new BitmapImage(new Uri(value as string, UriKind.Absolute));
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if (value == null)
+            {
                 return null;
+            }
 
             return ((BitmapImage)value).UriSource.ToString();
         }
@@ -332,7 +345,9 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if (value == null)
+            {
                 return null;
+            }
 
             return ((BitmapImage)value).UriSource.ToString();
         }
@@ -482,7 +497,10 @@ namespace Catan10
                               string language)
         {
             if (value == null)
+            {
                 return value;
+            }
+
             ObservableCollection<string> col = new ObservableCollection<string>();
             foreach (StorageFile f in value as ObservableCollection<StorageFile>)
             {
@@ -497,14 +515,18 @@ namespace Catan10
                                   object parameter, string language)
         {
             if (parameter.GetType() != typeof(ComboBox))
+            {
                 return null;
+            }
 
             ComboBox bx = parameter as ComboBox;
             ObservableCollection<StorageFile> list = bx.Tag as ObservableCollection<StorageFile>;
-            foreach (var f in list)
+            foreach (StorageFile f in list)
             {
                 if (f.DisplayName == (string)value)
+                {
                     return f;
+                }
             }
 
             return null;
@@ -539,7 +561,9 @@ namespace Catan10
         {
 
             if (value == null)
+            {
                 return false;
+            }
 
             return true;
 

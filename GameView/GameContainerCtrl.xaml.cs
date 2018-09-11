@@ -24,10 +24,10 @@ namespace Catan10
             ControlType = type;
             Description = s;
             Index = idx;
-            
+
         }
 
-        
+
 
 
         public UserControl Control { get; set; } = null;
@@ -55,60 +55,18 @@ namespace Catan10
                 return null;
             }
         }
-        public GameType GameType
-        {
-            get
-            {
-                return ChildControl.GameType;
-            }
-        }
+        public GameType GameType => ChildControl.GameType;
 
-        public int MaxCities
-        {
-            get
-            {
-                return ChildControl.MaxCities;
-            }
-        }
+        public int MaxCities => ChildControl.MaxCities;
 
-        public int MaxRoads
-        {
-            get
-            {
-                return ChildControl.MaxRoads;
-            }
-        }
+        public int MaxRoads => ChildControl.MaxRoads;
 
-        public int MaxSettlements
-        {
-            get
-            {
-                return ChildControl.MaxSettlements;
-            }
-        }
+        public int MaxSettlements => ChildControl.MaxSettlements;
 
-        public int MaxShips
-        {
-            get
-            {
-                return ChildControl.MaxShips;
-            }
-        }
-        public List<TileCtrl> Tiles
-        {
-            get
-            {
-                return ChildControl.Tiles;
-            }
-        }
+        public int MaxShips => ChildControl.MaxShips;
+        public List<TileCtrl> Tiles => ChildControl.Tiles;
 
-        public List<TileCtrl> DesertTiles
-        {
-            get
-            {
-                return ChildControl.DesertTiles;
-            }
-        }
+        public List<TileCtrl> DesertTiles => ChildControl.DesertTiles;
 
         #endregion
         public override string ToString()
@@ -137,7 +95,7 @@ namespace Catan10
             new CatanGame (typeof (Seafarers4PlayerCtrl), "Seafarers (4 Player)", 1),
             new CatanGame (typeof (ExpansionCtrl), "Expansion (5-6 Players)", 2),
             new CatanGame (typeof (FourIsland3Ctrl), "Four Islands (3 Player)", 3),
-            
+
         };
 
         IGameCallback _gameCallback = null;
@@ -156,7 +114,7 @@ namespace Catan10
                     //  as well as the count of the resource type
                     List<int> ProbabilityList = new List<int>();
                     Dictionary<ResourceType, List<int>> resourceToProbDict = new Dictionary<ResourceType, List<int>>();
-                    foreach (var tile in _currentHexPanel.Tiles)
+                    foreach (TileCtrl tile in _currentHexPanel.Tiles)
                     {
                         resourceToProbDict.TryGetValue(tile.ResourceType, out List<int> tempList);
                         if (tempList == null)
@@ -184,7 +142,7 @@ namespace Catan10
                             sum += i;
                         }
 
-                        _probabilities[resourceType] = (double)sum / (double)tempList.Count;
+                        _probabilities[resourceType] = sum / (double)tempList.Count;
                     }
                 }
 
@@ -204,7 +162,7 @@ namespace Catan10
         {
             for (int index = 0; index < _games.Count(); index++)
             {
-                var game = _games[index];
+                CatanGame game = _games[index];
                 if (game.Description.Equals(description))
                 {
                     return index;
@@ -265,50 +223,32 @@ namespace Catan10
 
         public TileCtrl PirateShipTile
         {
-            get
-            {
-                return _currentHexPanel.PirateShipTile;
-            }
-            set
-            {
-                _currentHexPanel.PirateShipTile = value;
-            }
+            get => _currentHexPanel.PirateShipTile;
+            set => _currentHexPanel.PirateShipTile = value;
         }
         public TileCtrl BaronTile
         {
-            get
-            {
-                return _currentHexPanel.BaronTile;
-            }
-            set
-            {
-
-                _currentHexPanel.BaronTile = value;
-
-            }
+            get => _currentHexPanel.BaronTile;
+            set => _currentHexPanel.BaronTile = value;
         }
         internal Task RotateTiles()
         {
             throw new NotImplementedException();
         }
 
-        public TileCtrl[] TilesInIndexOrder
-        {
-            get
-            {
-                return _currentHexPanel.TilesInIndexOrder;
-            }
-        }
+        public TileCtrl[] TilesInIndexOrder => _currentHexPanel.TilesInIndexOrder;
 
         internal void FlipAllAsync(TileOrientation orientation)
         {
             foreach (TileCtrl tile in _currentHexPanel.Tiles)
             {
                 if (tile.RandomTile)
+                {
                     tile.SetTileOrientationAsync(orientation, 0);
+                }
             }
 
-            foreach (var harbor in _currentHexPanel.Harbors)
+            foreach (Harbor harbor in _currentHexPanel.Harbors)
             {
                 harbor.SetOrientationAsync(orientation, 0);
             }
@@ -348,25 +288,13 @@ namespace Catan10
 
         public CatanGame CurrentGame
         {
-            get
-            {
-                return (CatanGame)GetValue(CurrentGameProperty);
-            }
-            set
-            {
-                SetValue(CurrentGameProperty, value);
-            }
+            get => (CatanGame)GetValue(CurrentGameProperty);
+            set => SetValue(CurrentGameProperty, value);
         }
         public List<CatanGame> Games
         {
-            get
-            {
-                return (List<CatanGame>)GetValue(GamesProperty);
-            }
-            set
-            {
-                SetValue(GamesProperty, value);
-            }
+            get => (List<CatanGame>)GetValue(GamesProperty);
+            set => SetValue(GamesProperty, value);
         }
 
         public async Task RandomizeCatanBoard(bool placeBaron)
@@ -376,8 +304,12 @@ namespace Catan10
 
             for (int index = 0; index < _currentHexPanel.TileSets.Count; index++)
             {
-                var tileGroup = _currentHexPanel.TileSets[index];
-                if (tileGroup.Randomize == false) continue;
+                TileGroup tileGroup = _currentHexPanel.TileSets[index];
+                if (tileGroup.Randomize == false)
+                {
+                    continue;
+                }
+
                 await AssignRandomTilesToTileGroup(index, null);
                 await AssignRandomNumbersToTileGroup(index, null);
 
@@ -393,10 +325,10 @@ namespace Catan10
                 await InitialPlaceBaron();
             }
 
-            foreach (var building in AllBuildings)
+            foreach (BuildingCtrl building in AllBuildings)
             {
                 int pips = 0;
-                foreach (var kvp in building.BuildingToTileDictionary)
+                foreach (KeyValuePair<BuildingLocation, TileCtrl> kvp in building.BuildingToTileDictionary)
                 {
                     pips += kvp.Value.Pips;
 
@@ -408,7 +340,7 @@ namespace Catan10
 
         public async Task AssignRandomTilesToTileGroup(int tileGroupIndex, List<int> randomTileList)
         {
-            var tileGroup = _currentHexPanel.TileSets[tileGroupIndex];
+            TileGroup tileGroup = _currentHexPanel.TileSets[tileGroupIndex];
 
             if (randomTileList == null)
             {
@@ -422,7 +354,7 @@ namespace Catan10
 
         public async Task AssignRandomNumbersToTileGroup(int tileGroupIndex, List<int> randomNumberList)
         {
-            var tileGroup = _currentHexPanel.TileSets[tileGroupIndex];
+            TileGroup tileGroup = _currentHexPanel.TileSets[tileGroupIndex];
             await AssignNumbers(tileGroup, randomNumberList);
         }
 
@@ -450,7 +382,7 @@ namespace Catan10
             }
             else
             {
-                foreach (var tile in _currentHexPanel.Tiles)
+                foreach (TileCtrl tile in _currentHexPanel.Tiles)
                 {
                     if (tile.Number == 12)
                     {
@@ -473,14 +405,22 @@ namespace Catan10
             foreach (TileGroup tileGroup in _currentHexPanel.TileSets)
             {
 
-                if (tileGroup.Randomize == false) continue;
-                int middleIndex = (int)(tileGroup.End - tileGroup.Start) / 2;
+                if (tileGroup.Randomize == false)
+                {
+                    continue;
+                }
+
+                int middleIndex = (tileGroup.End - tileGroup.Start) / 2;
                 TileCtrl centerTile = _currentHexPanel.TilesInIndexOrder[tileGroup.Start + middleIndex];
 
                 int index = 0;
                 foreach (TileCtrl t in tileGroup.RandomTiles)
                 {
-                    if (t == centerTile) continue;
+                    if (t == centerTile)
+                    {
+                        continue;
+                    }
+
                     GeneralTransform gt = centerTile.HexGrid.TransformToVisual(t.HexGrid);
                     Point pt = gt.TransformPoint(new Point(0, 0));
                     Task task = t.AnimateMoveTask(pt, ms, i++ * ms);
@@ -506,7 +446,11 @@ namespace Catan10
             Random r = new Random(DateTime.Now.Millisecond);
             foreach (TileGroup tileGroup in _currentHexPanel.TileSets)
             {
-                if (tileGroup.Randomize == false) continue;
+                if (tileGroup.Randomize == false)
+                {
+                    continue;
+                }
+
                 foreach (TileCtrl t in tileGroup.RandomTiles)
                 {
                     Task task = t.RotateTask(r.Next(1, 5) * 360, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
@@ -519,7 +463,11 @@ namespace Catan10
 
             foreach (TileGroup tileGroup in _currentHexPanel.TileSets)
             {
-                if (tileGroup.Randomize == false) continue;
+                if (tileGroup.Randomize == false)
+                {
+                    continue;
+                }
+
                 foreach (TileCtrl t in tileGroup.RandomTiles)
                 {
 
@@ -530,7 +478,11 @@ namespace Catan10
             i = 0;
             foreach (TileGroup tileGroup in _currentHexPanel.TileSets)
             {
-                if (tileGroup.Randomize == false) continue;
+                if (tileGroup.Randomize == false)
+                {
+                    continue;
+                }
+
                 foreach (TileCtrl t in tileGroup.RandomTiles)
                 {
                     Task task = t.AnimateMoveTask(new Point(0, 0), ms, i * ms);
@@ -543,7 +495,11 @@ namespace Catan10
             i = 0;
             foreach (TileCtrl t in _currentHexPanel.TilesInIndexOrder)
             {
-                if (t.ResourceType == ResourceType.Sea) continue;
+                if (t.ResourceType == ResourceType.Sea)
+                {
+                    continue;
+                }
+
                 TileOrientation orientation = TileOrientation.FaceUp;
                 Task task = t.SetTileOrientation(orientation, MainPage.GetAnimationSpeed(AnimationSpeed.Fast), i * MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
                 i++;
@@ -562,7 +518,7 @@ namespace Catan10
             List<Task> list = new List<Task>();
             double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
             int i = 0;
-            int middleIndex = (int)(_currentHexPanel.Tiles.Count / 2);
+            int middleIndex = _currentHexPanel.Tiles.Count / 2;
             TileCtrl animationMiddle = _currentHexPanel.TilesInIndexOrder[middleIndex];
             foreach (Harbor harbor in _currentHexPanel.Harbors)
             {
@@ -580,7 +536,7 @@ namespace Catan10
             Random r = new Random(DateTime.Now.Millisecond);
             ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
 
-            foreach (var h in _currentHexPanel.Harbors)
+            foreach (Harbor h in _currentHexPanel.Harbors)
             {
                 Task task = h.RotateTask(r.Next(1, 10) * 360, ms);
                 list.Add(task);
@@ -590,7 +546,7 @@ namespace Catan10
             list.Clear();
             i = 0;
             ms = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
-            foreach (var h in _currentHexPanel.Harbors)
+            foreach (Harbor h in _currentHexPanel.Harbors)
             {
                 Task task = h.AnimateMoveTask(new Point(0, 0), ms, i * ms);
                 i++;
@@ -602,7 +558,7 @@ namespace Catan10
             i = 0;
             ms = ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
 
-            foreach (var h in _currentHexPanel.Harbors)
+            foreach (Harbor h in _currentHexPanel.Harbors)
             {
                 Task task = h.SetOrientation(TileOrientation.FaceUp, ms, i * ms);
                 i++;
@@ -638,28 +594,10 @@ namespace Catan10
         }
         #region properties needed by MainPage
 
-        public List<TileCtrl> AllTiles
-        {
-            get
-            {
-                return _currentHexPanel.Tiles;
-            }
-        }
-        public List<RoadCtrl> AllRoads
-        {
-            get
-            {
-                return _currentHexPanel.Roads;
-            }
-        }
+        public List<TileCtrl> AllTiles => _currentHexPanel.Tiles;
+        public List<RoadCtrl> AllRoads => _currentHexPanel.Roads;
 
-        public List<BuildingCtrl> AllBuildings
-        {
-            get
-            {
-                return _currentHexPanel.Buildings;
-            }
-        }
+        public List<BuildingCtrl> AllBuildings => _currentHexPanel.Buildings;
 
         #endregion
 
@@ -667,8 +605,10 @@ namespace Catan10
 
         public async Task AssignNumbers(TileGroup tileGroup, List<int> randomList)
         {
-            if (tileGroup.Randomize == false) return;
-
+            if (tileGroup.Randomize == false)
+            {
+                return;
+            }
 
             bool valid = false;
             int iterations = 0;
@@ -702,8 +642,9 @@ namespace Catan10
                     {
                         t.Number = 7;
                         if (_currentHexPanel.DesertTiles.Contains(t) == false)
+                        {
                             _currentHexPanel.DesertTiles.Add(t);
-
+                        }
                     }
 
                 }
@@ -750,11 +691,14 @@ namespace Catan10
 
         private bool NextLowerRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
         {
-            if (col == visualTiles.Count - 1) return false; // last column has no Next column
+            if (col == visualTiles.Count - 1)
+            {
+                return false; // last column has no Next column
+            }
 
             bool ret = false;
 
-            bool beforeMiddle = (col < (int)(visualTiles.Count / 2));
+            bool beforeMiddle = (col < visualTiles.Count / 2);
 
 
             int number;
@@ -765,7 +709,10 @@ namespace Catan10
                 return ret;
             }
 
-            if (row > visualTiles.ElementAt(col + 1).Count - 1) return false;
+            if (row > visualTiles.ElementAt(col + 1).Count - 1)
+            {
+                return false;
+            }
             // we are at or past the middle
             number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;   // row + 1 is always valid after the middle
             ret = IsRed(number);
@@ -774,11 +721,14 @@ namespace Catan10
 
         private bool NextUpperRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
         {
-            if (col == visualTiles.Count - 1) return false; // last column has no Next column
+            if (col == visualTiles.Count - 1)
+            {
+                return false; // last column has no Next column
+            }
 
             bool ret = false;
 
-            bool beforeMiddle = (col < (int)(visualTiles.Count / 2));
+            bool beforeMiddle = (col < visualTiles.Count / 2);
 
 
             int number;
@@ -789,7 +739,10 @@ namespace Catan10
                 return ret;
             }
 
-            if (row == 0) return false;
+            if (row == 0)
+            {
+                return false;
+            }
 
             // we are at or past the middle
             number = visualTiles.ElementAt(col + 1).ElementAt(row - 1).Number;   // row + 1 is always valid after the middle
@@ -798,7 +751,10 @@ namespace Catan10
         }
         private bool AboveTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
         {
-            if (row == 0) return false;
+            if (row == 0)
+            {
+                return false;
+            }
 
             int number = visualTiles.ElementAt(col).ElementAt(row - 1).Number;
             return IsRed(number);
@@ -806,7 +762,10 @@ namespace Catan10
         }
         private bool BelowTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
         {
-            if (row == visualTiles.ElementAt(col).Count - 1) return false;
+            if (row == visualTiles.ElementAt(col).Count - 1)
+            {
+                return false;
+            }
 
             int number = visualTiles.ElementAt(col).ElementAt(row + 1).Number;
             return IsRed(number);
@@ -837,11 +796,19 @@ namespace Catan10
 
 
                         if (NextLowerRightIsRed(row, col, visualTiles))
+                        {
                             return false;
+                        }
+
                         if (NextUpperRightIsRed(row, col, visualTiles))
+                        {
                             return false;
+                        }
+
                         if (BelowTileIsRed(row, col, visualTiles))
+                        {
                             return false;
+                        }
 
                         // shouldn't need the below, as they are next to a tile that is above
                         //if (AboveTileIsRed(row, col, visualTiles))
@@ -861,7 +828,9 @@ namespace Catan10
         private bool IsRed(int i)
         {
             if (i == 6 || i == 8)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -871,7 +840,11 @@ namespace Catan10
 
         public RoadCtrl GetRoadAt(TileCtrl tile, RoadLocation roadLocation)
         {
-            if (tile == null) return null;
+            if (tile == null)
+            {
+                return null;
+            }
+
             RoadKey key = new RoadKey(tile, roadLocation);
             _currentHexPanel.RoadKeyToRoadDictionary.TryGetValue(key, out RoadCtrl road);
             return road;
@@ -888,19 +861,13 @@ namespace Catan10
             return _currentHexPanel.BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out control);
         }
 
-       
+
         internal void OnTest()
         {
-           
+
         }
 
-        public bool HasIslands
-        {
-            get
-            {
-                return _currentHexPanel.HasIslands;
-            }
-        }
+        public bool HasIslands => _currentHexPanel.HasIslands;
 
         public Island GetIsland(TileCtrl tile)
         {
