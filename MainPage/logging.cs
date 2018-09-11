@@ -34,8 +34,7 @@ namespace Catan10
 
 
         public LogState State { get; set; } = LogState.Normal;
-        private int _lastLogRecordWritten = 0;
-        private bool _didUndoSinceLastWrite = false;
+        private int _lastLogRecordWritten = 0;        
 
         public string DisplayName
         {
@@ -94,15 +93,11 @@ namespace Catan10
                 case LogState.Replay:
                     return;
                 case LogState.Undo:
-                    le.LogType = LogType.Undo;
-                    _didUndoSinceLastWrite = true;
+                    le.LogType = LogType.Undo;                    
                     break;
                 default:
                     break;
             }
-
-
-
 
             le.LogLineIndex = Count;
 
@@ -143,9 +138,7 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     go backwards through the log and persist all the records that haven't been persisted yet
-        ///     this will be called the first time a road or a building is changed, a roll happens, or 
-        ///     a GameState changed...it is not called if Properties are set
+        ///     write unwritten log lines to disk
         /// </summary>
         /// <returns></returns>
         public async Task WriteUnwrittenLinesToDisk()
@@ -156,28 +149,19 @@ namespace Catan10
 
                 if (this.Count == 0) return;
                 int count = this.Count; // this might change while we loop because of the await
-                CreationCollisionOption collisionOptions = CreationCollisionOption.OpenIfExists;
-                if (_didUndoSinceLastWrite)
-                {
-                    collisionOptions = CreationCollisionOption.ReplaceExisting;
-                    _lastLogRecordWritten = 0;                    
-                }
 
-                var file = await _folder.CreateFileAsync(_saveFileName, collisionOptions);
                 for (int i = _lastLogRecordWritten; i < count; i++)
                 {
                     LogEntry le = this[i];
-                    if (!le.Persisted || _didUndoSinceLastWrite)
-                    {                        
+                    if (!le.Persisted)
+                    {
                         string s = String.Format($"{le.Serialize()}\r\n");
-                        await FileIO.AppendTextAsync(file, s);
+                        await FileIO.AppendTextAsync(_file, s);
                         le.Persisted = true;
 
                     }
 
                 }
-
-                _didUndoSinceLastWrite = false;
                 _lastLogRecordWritten = count;
 
             }

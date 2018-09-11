@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -976,6 +977,23 @@ namespace Catan10
                 ResetDataForNewGame();
                 int n = 0;
                 log.State = LogState.Replay;
+
+                //
+                //  go through the first time and mark all entries that have been undone.
+                //  this has to be two pass because the log needs to be replayed in order
+                //  marking records as undone means we don't have to replay and then undo them
+                //
+                
+                for (int i = log.LogEntries.Count - 1; i > 0; i--)
+                {
+                    LogEntry logLine = log.LogEntries[i];
+                    if (logLine.LogType == LogType.Undo)
+                    {
+                        log.LogEntries[logLine.IndexOfUndoneAction].Undone = true;
+                        Debug.Assert(log.LogEntries[logLine.IndexOfUndoneAction].LogLineIndex == logLine.IndexOfUndoneAction);
+                    }
+
+                }
                 
 
                 foreach (LogEntry logLine in log.LogEntries)
