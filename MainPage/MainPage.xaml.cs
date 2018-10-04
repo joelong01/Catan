@@ -955,6 +955,7 @@ namespace Catan10
             string n = (player != null) ? player.PlayerName : "<no player>";
 
             LogStateTranstion lst = new LogStateTranstion(GameState, newState);
+           
 
             await _log.AppendLogLine(new LogEntry(player, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, n, lineNumber, filePath));
             UpdateUiForState(newState);
@@ -1222,6 +1223,12 @@ namespace Catan10
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
         {
+            bool ret = await StaticHelpers.AskUserYesNoQuestion(String.Format($"Are you sure?  This will likely offend some people and annoy others."), "Yes", "No");
+            if (!ret)
+            {
+                return;
+            }
+
             await _gameView.RandomizeCatanBoard(true);
             await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
             if (CurrentPlayer != null)

@@ -48,6 +48,7 @@ namespace Catan10
             {
                 case CatanAction.Rolled:
                     int roll = PopRoll();
+                    Debug.Assert(roll == logLine.Number, "the number logged must match the top of the roll stack.");
                     break;
                 case CatanAction.AddResourceCount:
                     LogResourceCount lrc = logLine.Tag as LogResourceCount;
@@ -162,22 +163,7 @@ namespace Catan10
                     bool ret = await UndoLogLine(_log[i]);
                     //
                     //  if you undo and land on one of these states, then stop processing undo
-                    bool stop = false;
-                    //switch (_log[i].GameState)
-                    //{
-                    //    case GameState.MustMoveBaron:
-                    //        stop = true;
-                    //        break;
-                    //    default:
-                    //        break;
-                    //}
-                    //if (stop)
-                    //{
-                    //    this.TraceMessage($"Stopping because of GameState. Action:{_log[i].Action} State:{_log[i].GameState} Stop Undo: {stop}");
-                    //    break;
-                    //}
-
-                    // if it was this action, we also stop the Unfo
+                    bool stop = false;                    
                     switch (_log[i].Action)
                     {
                         case CatanAction.Rolled:
@@ -189,20 +175,17 @@ namespace Catan10
                         case CatanAction.AssignedPirateShip:
                         case CatanAction.RolledSeven:
                             stop = true;
-                            break;
+                            break;                      
                         default:
                             break;
                     }
-
-                    //  this.TraceMessage($"Action:{_log[i].Action} State:{_log[i].GameState} Stop Undo: {stop}");
 
                     if (stop)
                     {
                         break;
                     }
 
-                    // if (_log[i - 1].StopProcessingUndo) break;
-                    //if (ret) break;
+                  
                 }
             }
             finally
