@@ -30,7 +30,7 @@ namespace Catan10
         private void OnResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
         {
             System.Diagnostics.Debug.Assert(player == null, "Player shoudl be null in the global reource tracker");
-            Log.PostLogEntry(player, GameState.WaitingForRoll,
+            Log.PostLogEntry(player, GameState.Unknown,
                                                             CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
                                                             new LogResourceCount(oldVal, newVal, resource));
         }

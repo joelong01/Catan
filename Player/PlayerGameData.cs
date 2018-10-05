@@ -66,7 +66,7 @@ namespace Catan10
         }
         private void OnPlayerResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
         {
-            _playerData.Log.PostLogEntry(player, GameState.WaitingForRoll,
+            _playerData.Log.PostLogEntry(player, GameState.Unknown,
                                                              CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
                                                              new LogResourceCount(oldVal, newVal, resource));
 

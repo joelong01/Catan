@@ -287,7 +287,7 @@ namespace Catan10
                 PlayerDataString = String.Format($"{PlayerData.PlayerName}");
             }
 
-            return $"Index:{this.LogLineIndex,-5}| Action:{Action,-25} | LogType:{LogType,-10} | Undone:{Undone,-6} | UndoneIndex:{IndexOfUndoneAction,5} | {PlayerDataString,-5} | #:{Number, -3} | {TagAsString,-20}";
+            return $"Index:{this.LogLineIndex,-5} | State:{GameState,-30} | Action:{Action,-25} | LogType:{LogType,-10} | Undone:{Undone,-6} | UndoneIndex:{IndexOfUndoneAction,5} | {PlayerDataString,-5} | #:{Number,-5} Tag:{TagAsString,-20}";
 
 
         }
