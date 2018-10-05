@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -35,7 +36,7 @@ namespace Catan10
 
         public string Serialize()
         {
-            return String.Format($"{Name}={TranslateX},{TranslateY}");
+            return string.Format($"{Name}={TranslateX},{TranslateY}");
         }
 
         public void Deserialize(string s)
@@ -52,7 +53,7 @@ namespace Catan10
 
     public sealed partial class MainPage : Page
     {
-        Dictionary<string, string> _defaultUsers = new Dictionary<string, string>()
+        private Dictionary<string, string> _defaultUsers = new Dictionary<string, string>()
         {
             {"Joe", "joe.jpg;Blue" },
             {"Dodgy", "Dodgy.jpg;Red" },
@@ -82,7 +83,7 @@ namespace Catan10
 
                 };
                 string[] tokens = kvp.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                string bitmapPath = String.Format($"ms-appx:Assets/DefaultPlayers/{tokens[0]}");
+                string bitmapPath = string.Format($"ms-appx:Assets/DefaultPlayers/{tokens[0]}");
                 p.ColorAsString = tokens[1];
                 p.ImageFileName = bitmapPath;
                 await p.LoadImage();
@@ -190,7 +191,7 @@ namespace Catan10
             CompositeTransform ct = border.RenderTransform as CompositeTransform;
 
 
-            pointerPressed = (Object s, PointerRoutedEventArgs eMove) =>
+            pointerPressed = (object s, PointerRoutedEventArgs eMove) =>
             {
                 this.TraceMessage("PointerPressed");
                 border.PointerReleased += pointerReleased;
@@ -208,7 +209,7 @@ namespace Catan10
                 }
             };
 
-            pointerReleased = (Object s, PointerRoutedEventArgs eMove) =>
+            pointerReleased = (object s, PointerRoutedEventArgs eMove) =>
             {
                 this.TraceMessage($"PointerReleased");
                 border.PointerPressed -= pointerPressed;
@@ -220,7 +221,7 @@ namespace Catan10
                 }
             };
 
-            pointerMoved = (Object s, PointerRoutedEventArgs eMove) =>
+            pointerMoved = (object s, PointerRoutedEventArgs eMove) =>
             {
 
                 position = eMove.GetCurrentPoint(border).Position;
@@ -547,7 +548,90 @@ namespace Catan10
 
         }
 
+        private void OnPickOptimalBaron(object sender, RoutedEventArgs e)
+        {
 
+        }
+        /// <summary>
+        ///     Picks a random place for the Baron that
+        ///     1. doesn't impact the current player
+        ///     2. does impact another player
+        /// </summary>
+        private async void OnPickRandomBaron(object sender, RoutedEventArgs e)
+        {
+            if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext && GameState != GameState.MustMoveBaron)
+            {
+                return;
+            }
+
+            PlayerGameData playerGameData = CurrentPlayer.GameData;
+            if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
+            {
+                return;
+            }
+
+
+
+            TileCtrl targetTile = null;
+            PlayerData targetPlayer = null;
+            var r = new Random((int)DateTime.Now.Ticks);
+            int tileCount = _gameView.TilesInIndexOrder.Length;
+            int count = 0;
+            for (; ; )
+            {
+                count++;
+                if (count == 1000)
+                {
+                    MessageDialog dlg = new MessageDialog("I can't seem to be able to find a good candidate.\nFigure it out yourself.");
+                    await dlg.ShowAsync();
+                    return;
+
+                }
+                int index = r.Next(tileCount);
+                targetTile = _gameView.TilesInIndexOrder[index];
+                if (targetTile.HasBaron)
+                {
+                    continue;
+                }
+
+                bool impactsCurrentPlayer = false;
+                for (int j = 0; j < targetTile.OwnedBuilding.Count; j++)
+                {
+                    //  got to go through all of them because you don't want
+                    //  to pick a tile that impacts the CurrentPlayer
+
+                    if (targetTile.OwnedBuilding[j].Owner == CurrentPlayer)
+                    {
+                        impactsCurrentPlayer = true;
+                        break;
+                    }
+                }
+
+                if (!impactsCurrentPlayer && targetTile.OwnedBuilding.Count > 0)
+                {
+                    index = r.Next(targetTile.OwnedBuilding.Count);
+                    targetPlayer = targetTile.OwnedBuilding[index].Owner;
+                    break;
+                }
+
+
+
+
+            }
+
+
+            CatanAction action = CatanAction.PlayedKnight;
+            TargetWeapon weapon = TargetWeapon.Baron;
+            if (GameState == GameState.MustMoveBaron)
+            {
+                action = CatanAction.AssignedBaron;
+            }
+
+            await AssignBaronOrKnight(targetPlayer, targetTile, weapon, action, LogType.Normal);
+
+
+
+        }
 
 
 

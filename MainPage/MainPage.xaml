@@ -128,8 +128,15 @@
                                             <MenuFlyoutItem x:Name="Menu_TestGame" Text ="Test Game" Click="OnTestGame" />
                                         </MenuFlyoutSubItem>
                                         <MenuFlyoutSeparator/>
-                                        <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
-                                        <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
+                                        <MenuFlyoutSubItem Text="Baron">
+                                            <MenuFlyoutItem Text="Optimal" Click="OnPickOptimalBaron" />
+                                            <MenuFlyoutItem Text="Random" Click="OnPickRandomBaron" />
+                                        </MenuFlyoutSubItem>
+                                        <MenuFlyoutSeparator />
+                                        <MenuFlyoutSubItem Text="Pips">
+                                            <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
+                                            <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
+                                        </MenuFlyoutSubItem>
                                         <MenuFlyoutSeparator/>
                                         <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
                                         <MenuFlyoutSeparator/>
