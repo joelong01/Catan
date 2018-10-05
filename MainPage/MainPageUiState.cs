@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -18,6 +19,8 @@ namespace Catan10
     {
         public List<int> Rolls { get; set; } = new List<int>();
         Stack<GameState> _stateStack = new Stack<GameState>();
+
+       
 
 
         //
@@ -56,6 +59,14 @@ namespace Catan10
 #endif
 
         }
+
+        public static readonly DependencyProperty LastRollProperty = DependencyProperty.Register("LastRoll", typeof(int), typeof(MainPage), new PropertyMetadata(0));
+        public int LastRoll
+        {
+            get => (int)GetValue(LastRollProperty);
+            set => SetValue(LastRollProperty, value);
+        }
+
         public bool PushRoll(int roll)
         {
 
@@ -65,7 +76,7 @@ namespace Catan10
             }
 
             Rolls.Push(roll);
-
+            LastRoll = roll;
             PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll);
             UpdateRollStats();
             return true;
@@ -81,6 +92,14 @@ namespace Catan10
             }
 
             int lastRoll = Rolls.Pop();
+            if (Rolls.Count > 0)
+            {
+                LastRoll = Rolls.First();
+            }
+            else
+            {
+                LastRoll = 0;
+            }
             PostLogEntry(CurrentPlayer, GameState, CatanAction.Rolled, true, LogType.Undo, lastRoll);
             UpdateRollStats();
             return lastRoll;

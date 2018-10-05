@@ -47,8 +47,7 @@ namespace Catan10
             switch (logLine.Action)
             {
                 case CatanAction.Rolled:
-                    int roll = PopRoll();
-                    Debug.Assert(roll == logLine.Number, "the number logged must match the top of the roll stack.");
+                    int roll = PopRoll();                    
                     break;
                 case CatanAction.AddResourceCount:
                     LogResourceCount lrc = logLine.Tag as LogResourceCount;
@@ -1203,7 +1202,7 @@ namespace Catan10
                 _btnWinner.IsEnabled = false;
 
 
-
+                SetValue(GameStateProperty, state); // update things bound to GameState
 
                 Menu_Undo.IsEnabled = false;
                 Menu_Winner.IsEnabled = false;

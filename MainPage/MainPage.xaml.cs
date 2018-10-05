@@ -156,7 +156,7 @@ namespace Catan10
                 _progress.Visibility = Visibility.Collapsed;
                 _progress.IsActive = false;
 
-
+                Ctrl_PlayerResourceCountCtrl.MainPage = this;
             }
 
 
@@ -929,6 +929,7 @@ namespace Catan10
             }
 
             await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
+            
         }
         public void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
@@ -943,6 +944,7 @@ namespace Catan10
             }
 
             _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
+            
         }
 
         private async Task SetStateAsync(PlayerData player, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
@@ -959,7 +961,7 @@ namespace Catan10
 
             await _log.AppendLogLine(new LogEntry(player, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, n, lineNumber, filePath));
             UpdateUiForState(newState);
-
+            
         }
 
 

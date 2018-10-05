@@ -57,6 +57,29 @@ namespace Catan10
         }
     }
 
+    /// <summary>
+    ///     used in the PlayerResourceCountCtrl
+    ///     allows you to bind Visibility to *one* gamestate.  if the GameState is the parameter value, then be visible.
+    ///     else be collapsed
+    /// </summary>
+    public class GameStateToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            GameState desiredState = StaticHelpers.ParseEnum<GameState>((string)parameter);
+            GameState actualState = (GameState)value;
+            if (actualState == desiredState)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
+        }
+    }
 
     /// <summary>
     ///     used in the road control.  this takes a parameter to indicate which state should be Visible and all others should be collapsed

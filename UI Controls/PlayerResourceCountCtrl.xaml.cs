@@ -23,6 +23,14 @@ namespace Catan10
             GameResourceData.OnPlayerResourceUpdate += OnResourceUpdate;
         }
 
+        public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayerResourceCountCtrl), new PropertyMetadata(null));
+        public MainPage MainPage
+        {
+            get => (MainPage)GetValue(MainPageProperty);
+            set => SetValue(MainPageProperty, value);
+        }
+
+        
         /// <summary>
         ///     Unlike the logging in PlayerGameData, there is no PlayerData so that whole path isn't set up
         ///     here PlayerData is always null - we need to special case that in the UndoLogLine
