@@ -115,6 +115,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CatanService\ServiceClient.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="NetworkService.cs" />

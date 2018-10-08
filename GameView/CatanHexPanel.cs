@@ -52,8 +52,8 @@ namespace Catan10
 
         //
         //  callbacks
-        IGameCallback _gameCallback = null;
-        ITileControlCallback _tileCallback = null;
+        private IGameCallback _gameCallback = null;
+        private ITileControlCallback _tileCallback = null;
 
 
         // book keeping
@@ -63,10 +63,10 @@ namespace Catan10
         private double _normalWidth = 110;
         private double _normalHeight = 96;
         private List<int> RowCounts = new List<int>(); // RowCounts[0] tells you how many rows there are in the 0th Column
-        Color _buildColor = Colors.Black;
-        TileCtrl _pirateTile = null;
-        TileCtrl _baronTile = null;
-
+        private Color _buildColor = Colors.Black;
+        private TileCtrl _pirateTile = null;
+        private TileCtrl _baronTile = null;
+        private Dictionary<int, int> BuildingIndexToHarborIndexDict = new Dictionary<int, int>();
 
         #region Properties
 
@@ -85,6 +85,43 @@ namespace Catan10
         public static readonly DependencyProperty BaronVisibilityProperty = DependencyProperty.Register("BaronVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, BaronVisibilityChanged));
         public static readonly DependencyProperty PirateVisibilityProperty = DependencyProperty.Register("PirateVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, PirateVisibilityChanged));
         public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
+        public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
+        public string BuildingIndexToHarborIndex
+        {
+            get => (string)GetValue(BuildingIndexToHarborIndexProperty);
+            set => SetValue(BuildingIndexToHarborIndexProperty, value);
+        }
+        private static void BuildingIndexToHarborIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as CatanHexPanel;
+            var depPropValue = (string)e.NewValue;
+            depPropClass?.SetBuildingIndexToHarborIndex(depPropValue);
+        }
+        private void SetBuildingIndexToHarborIndex(string value)
+        {
+            if (value == null)
+            {
+                return;
+            }
+
+            if (value == "")
+            {
+                return;
+            }
+
+            //
+            //  parse this into the map of building index => Harbor Index
+            //  form: "4=0,5=0,8=1,36=2,37=2,47=3,48=3,50=4,51=4,45=5,46=5,26=6,38=6,14=7,17=7,11=8,24=8"
+            //          buildingIndex=HarborIndex,
+
+            string[] tokens = value.Split(new char[] { ',', '=' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i=0; i<tokens.Length; i+=2)
+            {
+                BuildingIndexToHarborIndexDict[Int32.Parse(tokens[i])] = Int32.Parse(tokens[i+1]);
+            }
+            
+        }
+
         public string Islands
         {
             get => (string)GetValue(IslandsProperty);
@@ -109,8 +146,8 @@ namespace Catan10
 
                 Island island = new Island
                 {
-                    Start = Int32.Parse(tokens[i]),
-                    End = Int32.Parse(tokens[i + 1])
+                    Start = int.Parse(tokens[i]),
+                    End = int.Parse(tokens[i + 1])
                 };
                 island.BonusPoint = (island.Start != 0); // no points for the default map
                 for (int count = island.Start; count <= island.End; count++)
@@ -336,8 +373,8 @@ namespace Catan10
                         {
                             TileGroup tg = new TileGroup();
                             string[] tokens = val.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
-                            tg.Start = Int32.Parse(tokens[0]);
-                            tg.End = Int32.Parse(tokens[1]);
+                            tg.Start = int.Parse(tokens[0]);
+                            tg.End = int.Parse(tokens[1]);
                             tg.Randomize = bool.Parse(tokens[2]);
                             for (int i = tg.Start; i <= tg.End; i++)
                             {
@@ -432,7 +469,7 @@ namespace Catan10
                 string s = "";
                 foreach (int i in RowCounts)
                 {
-                    s += String.Format($"{i},");
+                    s += string.Format($"{i},");
                 }
 
                 return s;
@@ -453,7 +490,7 @@ namespace Catan10
                     string[] tokens = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string s in tokens)
                     {
-                        RowCounts.Add(Int32.Parse(s));
+                        RowCounts.Add(int.Parse(s));
                     }
 
                     _colCount = RowCounts.Count();
@@ -613,7 +650,7 @@ namespace Catan10
                 {
                     tile.SetTileOrientationAsync(TileOrientation.FaceDown);
                 }
-                tile.ShowIndex = false;
+
             }
             foreach (RoadCtrl road in Roads)
             {
@@ -822,8 +859,6 @@ namespace Catan10
                 // this.TraceMessage("returning from CreateBuildings because there are already Buildings here.");
                 return;
             }
-            //TopLayer.Children.Clear();
-            //Buildings.Clear();
 
             int count = 0;
             int middleCol = _colCount / 2;
@@ -837,6 +872,8 @@ namespace Catan10
             count += VisualTiles[middleCol].Count + 1;
             count *= 2;
 
+            Harbors.Sort((h1, h2) => h1.Index - h2.Index);
+
             for (int i = 0; i < count; i++)
             {
                 BuildingCtrl building = new BuildingCtrl();
@@ -847,6 +884,14 @@ namespace Catan10
                 building.Index = Buildings.Count;
                 Buildings.Add(building);
 
+                if (BuildingIndexToHarborIndexDict.TryGetValue(building.Index, out int harborIndex))
+                {
+                    //
+                    //  Note below the assumption that Harbors is in the same order as its index
+                    //  hence the .Sort above
+                    building.AdjacentHarbor = Harbors[harborIndex];
+                }
+
                 building.Callback = _gameCallback;
 
                 TopLayer.Children.Add(building);
@@ -854,7 +899,7 @@ namespace Catan10
             }
         }
 
-        int RoadCount()
+        private int RoadCount()
         {
             //
             //  first calculate the perimeter
@@ -1449,7 +1494,7 @@ namespace Catan10
             }
         }
 
-        TileCtrl GetTileAt(int col, int row)
+        private TileCtrl GetTileAt(int col, int row)
         {
             if (col < VisualTiles.Count && col >= 0)
             {
@@ -1657,7 +1702,7 @@ namespace Catan10
                         {
                             RoadCtrl road = new RoadCtrl
                             {
-                                Name = String.Format($"Road_{Roads.Count}"),
+                                Name = string.Format($"Road_{Roads.Count}"),
                                 Height = tile.HexThickness * 2 + TileGap,
                                 Width = tile.Height / 1.732, // the side of the Hexagon is the Height divided by the squareroot of 3                    
                                                              //
@@ -1842,7 +1887,8 @@ namespace Catan10
         public List<HarborType> HarborTypes { get; set; } = new List<HarborType>();
         public List<int> RandomResourceTypeList { get; set; } = new List<int>(); // the random list to shuffle the tile resources. used in save/load
         public List<int> RandomHarborTypeList { get; set; } = new List<int>(); // the random list to shuffle the harbor resources. used in save/load
-        int _tileCount = 0;
+
+        private int _tileCount = 0;
         public int TileCount
         {
             get => AllTiles.Count;
@@ -1861,7 +1907,7 @@ namespace Catan10
             s += nl;
             for (int i = 0; i < TileCount; i++)
             {
-                s += String.Format($"[Tile {i}.{groupIndex}]{nl}");
+                s += string.Format($"[Tile {i}.{groupIndex}]{nl}");
                 s += AllTiles[i].Serialize(false);
                 s += nl;
             }
@@ -1889,14 +1935,14 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"{Start}-{End}.{Randomize}");
+            return string.Format($"{Start}-{End}.{Randomize}");
         }
         public TileGroup() { }
         public TileGroup(string s)
         {
             string[] tokens = s.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
-            Start = Int32.Parse(tokens[0]);
-            End = Int32.Parse(tokens[1]);
+            Start = int.Parse(tokens[0]);
+            End = int.Parse(tokens[1]);
             Randomize = bool.Parse(tokens[2]);
         }
 

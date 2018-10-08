@@ -548,14 +548,123 @@ namespace Catan10
 
         }
 
-        private void OnPickOptimalBaron(object sender, RoutedEventArgs e)
+        /// <summary>
+        ///     tries to be smart about where to place the baron
+        ///     1. if Dodgy is playing (since he's always Red...) be sure and put it on him
+        ///     2. pick the one with the most resource generating potential
+        ///     3. if the highscore less than 5, try to block brick
+        ///     5. if the highscore >=5, try to block Ore
+        /// </summary>
+
+        private async void OnPickOptimalBaron(object sender, RoutedEventArgs e)
         {
 
+            if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext && GameState != GameState.MustMoveBaron)
+            {
+                return;
+            }
+
+            PlayerGameData playerGameData = CurrentPlayer.GameData;
+            if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
+            {
+                return;
+            }
+
+            PlayerData dodgy = null;
+            foreach (var player in PlayingPlayers)
+            {
+                if (player.ColorAsString == "Red")
+                {
+                    dodgy = player;
+                    break;
+                }
+            }
+
+            List<Target> targetList = PickBaronVictim(true);
+            if (targetList.Count == 0)
+            {
+                MessageDialog dlg = new MessageDialog("I can't seem to be able to find a good candidate.\nFigure it out yourself.");
+                await dlg.ShowAsync();
+                return;
+            }
+
+            //
+            //   pull all the options that aren't dodgy
+
+            for (int i = targetList.Count - 1; i >= 0; i--)
+            {
+                if (targetList[i].Player!= dodgy)
+                {
+                    targetList.RemoveAt(i);
+                }
+            }
+
+            //
+            //  sort by pips
+
+
+
+            targetList.Sort((s1, s2) => s2.ResourcePotential - s1.ResourcePotential);
+            Target target = null;
+            int most = targetList[0].ResourcePotential;
+            ResourceType[] orderedListOfResources = null;
+            if (dodgy.GameData.Score < 5)
+            {
+                orderedListOfResources = new ResourceType[] { ResourceType.Brick, ResourceType.Wood, ResourceType.Wheat, ResourceType.Sheep, ResourceType.Ore };
+            }
+            else
+            {
+                orderedListOfResources = new ResourceType[] { ResourceType.Ore, ResourceType.Wheat, ResourceType.Sheep, ResourceType.Brick, ResourceType.Wood };
+            }
+
+            foreach (var resource in orderedListOfResources)
+            {
+                target = FindTarget(targetList, resource, most - 2);
+                if (target != null)
+                {
+                    break;
+                }
+            }
+
+            if (target == null)
+            {
+                target = targetList[0];
+            }
+
+            CatanAction action = CatanAction.PlayedKnight;
+            TargetWeapon weapon = TargetWeapon.Baron;
+            if (GameState == GameState.MustMoveBaron)
+            {
+                action = CatanAction.AssignedBaron;
+            }
+
+            await AssignBaronOrKnight(target.Player, target.Tile, weapon, action, LogType.Normal);
         }
+
+        private Target FindTarget(List<Target> targetList, ResourceType resourceType, int minPips)
+        {
+            targetList.Sort((s1, s2) => s2.ResourcePotential - s1.ResourcePotential);
+            foreach (var option in targetList)
+            {
+                if (option.Tile.ResourceType == resourceType)
+                {
+                    if (option.ResourcePotential >= minPips)
+                    {
+                        return option;
+
+                    }
+                }
+            }
+
+            return null;
+
+        }
+
         /// <summary>
         ///     Picks a random place for the Baron that
         ///     1. doesn't impact the current player
         ///     2. does impact another player
+        ///     3. twice as likely to Block a City vs. Block a settlement
         /// </summary>
         private async void OnPickRandomBaron(object sender, RoutedEventArgs e)
         {
@@ -570,37 +679,56 @@ namespace Catan10
                 return;
             }
 
+            List<Target> targetList = PickBaronVictim(true);
+            if (targetList.Count == 0)
+            {
+                MessageDialog dlg = new MessageDialog("I can't seem to be able to find a good candidate.\nFigure it out yourself.");
+                await dlg.ShowAsync();
+                return;
+            }
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            int index = rand.Next(targetList.Count);
+            Target target = targetList[index];
+            CatanAction action = CatanAction.PlayedKnight;
+            TargetWeapon weapon = TargetWeapon.Baron;
+            if (GameState == GameState.MustMoveBaron)
+            {
+                action = CatanAction.AssignedBaron;
+            }
+
+            await AssignBaronOrKnight(target.Player, target.Tile, weapon, action, LogType.Normal);
 
 
-            TileCtrl targetTile = null;
-            PlayerData targetPlayer = null;
+        }
+
+        /// <summary>
+        ///     Go through all the tiles and decide if it is a potential baron victim.
+        ///     rules:
+        ///         1. can't have any of CurrentPlayer's building on it
+        ///         2. can't be empty
+        /// </summary>
+        /// <returns> a List that has the player/tile options</returns>
+        private List<Target> PickBaronVictim(bool weighCities)
+        {
             var r = new Random((int)DateTime.Now.Ticks);
             int tileCount = _gameView.TilesInIndexOrder.Length;
-            int count = 0;
-            for (; ; )
+            List<Target> targetList = new List<Target>();
+            foreach (var targetTile in _gameView.TilesInIndexOrder)
             {
-                count++;
-                if (count == 1000)
-                {
-                    MessageDialog dlg = new MessageDialog("I can't seem to be able to find a good candidate.\nFigure it out yourself.");
-                    await dlg.ShowAsync();
-                    return;
 
-                }
-                int index = r.Next(tileCount);
-                targetTile = _gameView.TilesInIndexOrder[index];
+
                 if (targetTile.HasBaron)
                 {
                     continue;
                 }
 
                 bool impactsCurrentPlayer = false;
-                for (int j = 0; j < targetTile.OwnedBuilding.Count; j++)
+                foreach (var building in targetTile.OwnedBuilding)
                 {
                     //  got to go through all of them because you don't want
                     //  to pick a tile that impacts the CurrentPlayer
 
-                    if (targetTile.OwnedBuilding[j].Owner == CurrentPlayer)
+                    if (building.Owner == CurrentPlayer)
                     {
                         impactsCurrentPlayer = true;
                         break;
@@ -609,31 +737,60 @@ namespace Catan10
 
                 if (!impactsCurrentPlayer && targetTile.OwnedBuilding.Count > 0)
                 {
-                    index = r.Next(targetTile.OwnedBuilding.Count);
-                    targetPlayer = targetTile.OwnedBuilding[index].Owner;
-                    break;
+                    //
+                    //  now go through and add them to the list
+                    foreach (var building in targetTile.OwnedBuilding)
+                    {
+                        targetList.Add(new Target(building.Owner, targetTile));
+                        if (weighCities && building.BuildingState == BuildingState.City)
+                        {
+                            //
+                            //  cities are worth twice as much, so put them in twice to make them more likely to be picked
+                            targetList.Add(new Target(building.Owner, targetTile));
+                        }
+                    }
+
                 }
 
-
-
-
             }
 
 
-            CatanAction action = CatanAction.PlayedKnight;
-            TargetWeapon weapon = TargetWeapon.Baron;
-            if (GameState == GameState.MustMoveBaron)
-            {
-                action = CatanAction.AssignedBaron;
-            }
-
-            await AssignBaronOrKnight(targetPlayer, targetTile, weapon, action, LogType.Normal);
-
-
-
+            return targetList;
         }
+    }
 
+    public class Target
+    {
+        public PlayerData Player { get; private set; } = null;
+        public TileCtrl Tile { get; private set; } = null;
+        public int ResourcePotential { get; private set; } = 0;
+        public override string ToString()
+        {
+            return $"{Player,-15} | {Tile,-15} | {ResourcePotential}";
+        }
+        public Target(PlayerData p, TileCtrl t)
+        {
+            Player = p;
+            Tile = t;
+            foreach (var building in Tile.OwnedBuilding)
+            {
+                if (building.BuildingState == BuildingState.Settlement)
+                {
+                    ResourcePotential++;
+                }
+                else if (building.BuildingState == BuildingState.City)
+                {
+                    ResourcePotential += 2;
+                }
+                else
+                {
+                    throw new Exception("This building shouldn't be owned");
+                }
 
+            }
+
+            ResourcePotential *= Tile.Pips;
+        }
 
     }
 }

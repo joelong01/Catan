@@ -24,7 +24,7 @@ namespace Catan10
 
         public int Number { get; set; } = 0;
         public ResourceType ResourceType { get; set; } = ResourceType.Sea;
-        public int zIndex { get; set; } = 0;
+        public int ZIndex { get; set; } = 0;
         public int Index { get; set; } = -1;
         public bool RandomTile { get; set; } = true;
         public bool ShowIndex { get; set; } = false;
@@ -51,19 +51,19 @@ namespace Catan10
     {
 
         private List<string> _savedProperties = new List<string> { "Number", "ResourceType", "HarborLocation", "HarborType", "TileOrientation", "zIndex", "Index", "HarborLocations", "RandomTile", "HexOrder", "UseClassic", "ShowIndex", "HasPirateShip", "HasBaron" };
-        SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
-        SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
-        TileOrientation _tileOrientation = TileOrientation.FaceDown;
-        public List<BuildingCtrl> Buildings { get; } = new List<BuildingCtrl>();
+        private SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
+        private SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
+        private TileOrientation _tileOrientation = TileOrientation.FaceDown;
         public bool HasBaron { get; set; } = false;
         public bool HasPirateShip { get; set; } = false;
 
         public List<BuildingCtrl> OwnedBuilding { get; } = new List<BuildingCtrl>(); // this are the settlements that pay if this tile's number is rolled
         public bool RandomTile { get; set; } = true;
-        bool _useClassic = true;
-        int _index = -1;
-        ITileControlCallback _tileControlCallback = null;
-        ResourceType _resourceType = ResourceType.Back;
+
+        private bool _useClassic = true;
+        private int _index = -1;
+        private ITileControlCallback _tileControlCallback = null;
+        private ResourceType _resourceType = ResourceType.Back;
         //
         //  the row and column this tile is in the CatanHexPanel
         public int Row { get; set; } = -1;
@@ -77,6 +77,15 @@ namespace Catan10
 
 
         }
+        //
+        //  keep track of harbors near this tile.  this is set in the XAML
+        public static readonly DependencyProperty AdjacentHarborProperty = DependencyProperty.Register("AdjacentHarbor", typeof(Harbor), typeof(TileCtrl), new PropertyMetadata(null));
+        public Harbor AdjacentHarbor
+        {
+            get => (Harbor)GetValue(AdjacentHarborProperty);
+            set => SetValue(AdjacentHarborProperty, value);
+        }
+
         public int Probability => _number.Probability;
         public UIElement Visual => this;
 
@@ -101,11 +110,6 @@ namespace Catan10
 
         internal void Reset()
         {
-            foreach (BuildingCtrl s in Buildings)
-            {
-                s.Reset();
-            }
-
             OwnedBuilding.Clear();
         }
 
@@ -120,7 +124,7 @@ namespace Catan10
             StaticHelpers.DeserializeObject<TileCtrl>(this, s, "=", "|");
             return true;
         }
-        public int zIndex
+        public int ZIndex
         {
             get => Canvas.GetZIndex(this);
             set =>
@@ -130,7 +134,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"{_resourceType}={Number};idx={Index}");
+            return string.Format($"{_resourceType}={Number};idx={Index}");
         }
         public TileOrientation TileOrientation
         {
@@ -258,14 +262,14 @@ namespace Catan10
             _daRotateTile.Duration = TimeSpan.FromMilliseconds(ms);
             return _sbRotate.ToTask();
         }
-        public async Task SetTileOrientation(TileOrientation orientation, double animationDuration = Double.MaxValue, double startAfter = 0)
+        public async Task SetTileOrientation(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
             if (_tileOrientation == orientation)
             {
                 return;
             }
 
-            if (animationDuration == Double.MaxValue)
+            if (animationDuration == double.MaxValue)
             {
                 animationDuration = 1000;
             }
@@ -286,14 +290,14 @@ namespace Catan10
 
 
         }
-        public void SetTileOrientationAsync(TileOrientation orientation, double animationDuration = Double.MaxValue, double startAfter = 0)
+        public void SetTileOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
             if (_tileOrientation == orientation)
             {
                 return;
             }
 
-            if (animationDuration == Double.MaxValue)
+            if (animationDuration == double.MaxValue)
             {
                 animationDuration = 0;
             }
@@ -314,7 +318,7 @@ namespace Catan10
 
         }
 
-        public void SetTileOrientation(TileOrientation orientation, List<Task> taskList, double animationDuration = Double.MaxValue)
+        public void SetTileOrientation(TileOrientation orientation, List<Task> taskList, double animationDuration = double.MaxValue)
         {
             if (orientation == _tileOrientation)
             {
@@ -332,7 +336,7 @@ namespace Catan10
 
         }
 
-        public void Rotate(double angle, List<Task> tasks, bool reletive, double duration = Double.MaxValue)
+        public void Rotate(double angle, List<Task> tasks, bool reletive, double duration = double.MaxValue)
         {
             if (duration == double.MaxValue)
             {
@@ -357,7 +361,7 @@ namespace Catan10
 
         }
 
-        bool _hideNumber = false;
+        private bool _hideNumber = false;
         public bool HideNumber
         {
             get => _hideNumber;
@@ -426,7 +430,7 @@ namespace Catan10
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

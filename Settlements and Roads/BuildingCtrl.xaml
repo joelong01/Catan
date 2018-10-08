@@ -38,6 +38,10 @@
                 <TextBlock Text="{x:Bind Pips, FallbackValue=52, Mode=TwoWay,Converter={StaticResource ResourceKey=IntToStringConverter}}" 
                                   Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
+
+                <!--<TextBlock Text="{x:Bind Index, FallbackValue=-1, Mode=TwoWay,Converter={StaticResource ResourceKey=IntToStringConverter}}" 
+                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                                   CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />-->
             </Viewbox>
             <!-- this is just here for debugging purposed -->
             <!--<Viewbox>

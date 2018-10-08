@@ -17,17 +17,22 @@ namespace Catan10
 
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
-
-        HarborType myType = HarborType.Brick;
-        SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
-        SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
-        TileOrientation _orientation = TileOrientation.FaceDown;
-        bool _useClassic = true;
-        HarborLocation _location = HarborLocation.None;
-
-        string[] _savePropName = new string[] { "HarborLocation" };
+        private HarborType myType = HarborType.Brick;
+        private SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
+        private SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
+        private TileOrientation _orientation = TileOrientation.FaceDown;
+        private bool _useClassic = true;
+        private HarborLocation _location = HarborLocation.None;
+        private string[] _savePropName = new string[] { "HarborLocation" };
 
         public double HarborScale { get; set; } = 1.0;
+
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
+        public int Index
+        {
+            get => (int)GetValue(IndexProperty);
+            set => SetValue(IndexProperty, value);
+        }
 
         public string Serialize()
         {
@@ -36,7 +41,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"HarborLocation={_location} Visibility={this.Visibility} Type={myType}");
+            return string.Format($"Index={Index} HarborLocation={_location} Type={myType}");
         }
 
         public void Deserialize(string s)
@@ -52,7 +57,7 @@ namespace Catan10
             {
 
 
-                SetOrientationAsync(value, Double.MaxValue);
+                SetOrientationAsync(value, double.MaxValue);
                 _orientation = value;
 
             }
@@ -169,7 +174,7 @@ namespace Catan10
         }
 
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -178,14 +183,14 @@ namespace Catan10
 
 
 
-        public async Task SetOrientation(TileOrientation orientation, double animationDuration = Double.MaxValue, double startAfter = 0)
+        public async Task SetOrientation(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
             if (_orientation == orientation)
             {
                 return;
             }
 
-            if (animationDuration == Double.MaxValue)
+            if (animationDuration == double.MaxValue)
             {
                 animationDuration = 1000;
             }
@@ -199,14 +204,14 @@ namespace Catan10
 
         }
 
-        public void SetOrientationAsync(TileOrientation orientation, double animationDuration = Double.MaxValue)
+        public void SetOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue)
         {
             if (_orientation == orientation)
             {
                 return;
             }
 
-            if (animationDuration == Double.MaxValue)
+            if (animationDuration == double.MaxValue)
             {
                 animationDuration = 0;
             }
@@ -301,6 +306,7 @@ namespace Catan10
 
         public Task RotateTask(double angle, double ms)
         {
+
             _daRotate.To += angle;
             _daRotate.Duration = TimeSpan.FromMilliseconds(ms);
             return _sbRotate.ToTask();

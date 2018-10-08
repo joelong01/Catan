@@ -21,8 +21,13 @@ namespace Catan10
 
     public sealed partial class BuildingCtrl : UserControl
     {
-        public int Index { get; set; } = -1; // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
-
+        // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
+        public int Index
+        {
+            get => (int)GetValue(IndexProperty);
+            set => SetValue(IndexProperty, value);
+        }
 
         SolidColorBrush _brush = new SolidColorBrush(Colors.Blue);
         public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
@@ -36,6 +41,9 @@ namespace Catan10
         public List<BuildingKey> Clones = new List<BuildingKey>();
         public Point LayoutPoint { get; set; }
         public CompositeTransform Transform => (CompositeTransform)this.RenderTransform;
+
+        // the harbor that is acquired when the user gets this building
+        public Harbor AdjacentHarbor { get; set; } = null;
 
         public IGameCallback Callback { get; internal set; }
 
@@ -276,7 +284,7 @@ namespace Catan10
                 default:
                     break;
             }
-
+            
             await UpdateBuildingState(oldState, newState);
 
 

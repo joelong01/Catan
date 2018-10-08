@@ -82,7 +82,7 @@
                             <CompositeTransform ScaleX="0.5" ScaleY="0.5"/>
                         </local:CatanNumber.RenderTransform>
                     </local:CatanNumber>
-                    <TextBlock Name="_txtIndex" Visibility="Collapsed" Text="{x:Bind Index, FallbackValue=27, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="20" Foreground="Red" Margin="0, 0 ,0 , 5" />
+                    <TextBlock Name="_txtIndex" Visibility="Visible" Text="{x:Bind Index, FallbackValue=27, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="20" Foreground="Red" Margin="0, 0 ,0 , 5" />
                 </Grid>
                 <Grid x:Name="_hexBackGrid" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <Grid.Projection>

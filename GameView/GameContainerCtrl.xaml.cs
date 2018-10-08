@@ -509,7 +509,7 @@ namespace Catan10
             await Task.WhenAll(list);
             foreach (TileCtrl tile in _currentHexPanel.Tiles)
             {
-                tile.zIndex = -1;
+                tile.ZIndex = -1;
             }
 
         }
