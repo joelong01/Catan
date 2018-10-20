@@ -25,6 +25,9 @@
             <local:CountToOrientationConverter x:Key="CountToOrientationConverter" />
             <local:BuildingStateToVisibilityConverter x:Key="BuildingStateToVisibilityConverter" />
             <local:GameStateToVisibilityConverter x:Key="GameStateToVisibilityConverter" />
+            <local:HarborTypeToHarborBrush x:Key="HarborTypeToHarborBrushConverter" />
+
+            
 
             <ImageBrush x:Key="bmWheat" ImageSource="Assets/Old Visuals/old wheat.png" Stretch="Fill" />
             <ImageBrush x:Key="bmSheep" ImageSource="Assets/Old Visuals/old sheep.png" Stretch="Fill" />

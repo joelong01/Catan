@@ -17,7 +17,7 @@ namespace Catan10
 
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
-        private HarborType myType = HarborType.Brick;
+
         private SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
         private SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
         private TileOrientation _orientation = TileOrientation.FaceDown;
@@ -28,6 +28,40 @@ namespace Catan10
         public double HarborScale { get; set; } = 1.0;
 
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
+        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerData), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
+        public PlayerData Owner
+        {
+            get => (PlayerData)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+        private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as Harbor;
+            var newOwner = (PlayerData)e.NewValue;
+            var oldOwner = (PlayerData)e.OldValue;
+            depPropClass?.SetOwner(oldOwner, newOwner);
+        }
+        //
+        //  update the Owner about who owns this harbor
+        private void SetOwner(PlayerData oldOwner, PlayerData newOwner)
+        {
+            if (oldOwner != null)
+            {
+                oldOwner.GameData.RemoveOwnedHarbor(this);
+            }
+
+            if (newOwner != null)
+            {
+                newOwner.GameData.AddOwnedHarbor(this);
+            }
+        }
+
+        public HarborType HarborType
+        {
+            get => (HarborType)GetValue(HarborTypeProperty);
+            set => SetValue(HarborTypeProperty, value);
+        }
         public int Index
         {
             get => (int)GetValue(IndexProperty);
@@ -41,7 +75,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return string.Format($"Index={Index} HarborLocation={_location} Type={myType}");
+            return string.Format($"Index={Index} HarborLocation={_location} Type={HarborType}");
         }
 
         public void Deserialize(string s)
@@ -68,20 +102,21 @@ namespace Catan10
             this.InitializeComponent();
         }
 
-        public HarborType HarborType
+        public void Reset()
         {
-            get => myType;
-            set =>
-                // don't protect! - you set it twice to get the classic image
-                // myType set in SetHarborImage();                
-                SetHarborImage(value);
+            if (Owner != null)
+            {
+                Owner.GameData.RemoveOwnedHarbor(this);
+                Owner = null;
+            }
+            
         }
 
         public FrameworkElement AnimationObject => _backGrid;
 
         public void SetHarborImage(HarborType value)
         {
-            myType = value;
+            
             string bitmapPath = "ms-appx:Assets/back.jpg";
 
             if (_useClassic)
@@ -119,7 +154,7 @@ namespace Catan10
                 _text.Visibility = Visibility.Visible;
                 string s = "2 : 1";
                 SolidColorBrush br = _whiteBrush;
-                switch (myType)
+                switch (HarborType)
                 {
                     case HarborType.ThreeForOne:
                         s = "3:1";
@@ -285,11 +320,7 @@ namespace Catan10
         {
             get => _useClassic;
 
-            set
-            {
-                _useClassic = value;
-                HarborType = myType;
-            }
+            set => _useClassic = value;
         }
 
         public Task AnimateMoveTask(Point to, double ms, double startAfter)

@@ -105,7 +105,7 @@ namespace Catan10
             }
 
             Add(le);
-            Debug.WriteLine(le);
+          //  Debug.WriteLine(le);
         }
 
         public async Task AppendLogLine(LogEntry le, bool save = true)

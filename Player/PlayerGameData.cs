@@ -20,10 +20,11 @@ namespace Catan10
 
         public CardsLostUpdatedHandler OnCardsLost;
 
-        public ObservableCollection<RoadCtrl> Roads { get; set; } = new ObservableCollection<RoadCtrl>();
-        public ObservableCollection<RoadCtrl> Ships { get; set; } = new ObservableCollection<RoadCtrl>();
-        public ObservableCollection<BuildingCtrl> Settlements { get; set; } = new ObservableCollection<BuildingCtrl>();
-        public ObservableCollection<BuildingCtrl> Cities { get; set; } = new ObservableCollection<BuildingCtrl>();
+        public ObservableCollection<RoadCtrl> Roads { get; } = new ObservableCollection<RoadCtrl>();
+        public ObservableCollection<RoadCtrl> Ships { get; } = new ObservableCollection<RoadCtrl>();
+        public ObservableCollection<BuildingCtrl> Settlements { get; } = new ObservableCollection<BuildingCtrl>();
+        public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
+        public ObservableCollection<Harbor> OwnedHarbors { get; } = new ObservableCollection<Harbor>();
         public PlayerResourceData PlayerResourceData { get; set; } = null;
         private readonly List<string> _savedGameProperties = new List<string> { "PlayerIdentified", "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
                                                                        "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
@@ -43,24 +44,34 @@ namespace Catan10
             PlayerResourceData.OnPlayerResourceUpdate += OnPlayerResourceUpdate;
         }
 
+        public void AddOwnedHarbor(Harbor harbor)
+        {
+            OwnedHarbors.Add(harbor);
+        }
 
-        private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
+        public void RemoveOwnedHarbor(Harbor harbor)
+        {
+            OwnedHarbors.Remove(harbor);
+        }
+
+
+        private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
         {
             _playerData.Log.PostLogEntry(_playerData, GameState.Unknown,
                                                              CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
                                                              new LogPropertyChanged(propertyName, oldVal, newVal));
         }
 
-        private void LogPropertyChanged(int oldVal, int newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
+        private void LogPropertyChanged(int oldVal, int newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
         {
             LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
         }
 
-        private void LogPropertyChanged(bool oldVal, bool newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
+        private void LogPropertyChanged(bool oldVal, bool newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
         {
             LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
         }
-        private void LogPropertyChanged(bool? oldVal, bool? newVal, bool stopUndo = false, [CallerMemberName] String propertyName = "")
+        private void LogPropertyChanged(bool? oldVal, bool? newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
         {
             LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
         }
@@ -154,6 +165,7 @@ namespace Catan10
             MaxCities = 0;
             PlayerResourceData.Reset();
             Pips = 0;
+        
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {
@@ -267,39 +279,38 @@ namespace Catan10
             return true;
         }
 
-        bool _goodRoll = false;
-        int _score = 0;
-        int _knightsPlayed = 0;
-        int _timesTargeted = 0;
-        int _noResourceCount = 0;
-        int _rollsWithResource = 0;
-        int _maxNoResourceRolls = 0;
-        int _cardsLost = 0;
-        int _CardsLostToSeven = 0;
-        int _ResourcesAcquired = 0;
-        bool _LargestArmy = false;
-        bool _HasLongestRoad = false;
-        int _LongestRoad = 0;
+        private bool _goodRoll = false;
+        private int _score = 0;
+        private int _knightsPlayed = 0;
+        private int _timesTargeted = 0;
+        private int _noResourceCount = 0;
+        private int _rollsWithResource = 0;
+        private int _maxNoResourceRolls = 0;
+        private int _cardsLost = 0;
+        private int _CardsLostToSeven = 0;
+        private int _ResourcesAcquired = 0;
+        private bool _LargestArmy = false;
+        private bool _HasLongestRoad = false;
+        private int _LongestRoad = 0;
+        private int _RoadsPlayed = 0;
+        private int _ShipsPlayed = 0;
+        private int _CitiesPlayed = 0;
+        private int _SettlementsPlayed = 0;
+        private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
+        private bool? _MovedBaronAfterRollingSeven = null;
+        private bool _PlayedKnightThisTurn = false;
+        private Guid _PlayerIdentifier = new Guid();
+        private int _CardsLostToBaron = 0;
+        private string _ColorAsString = "HotPink"; // a useful default to pick out visually - you should *NEVER* see this color in the UI
 
-        int _RoadsPlayed = 0;
-        int _ShipsPlayed = 0;
-        int _CitiesPlayed = 0;
-        int _SettlementsPlayed = 0;
-        TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
-        bool? _MovedBaronAfterRollingSeven = null;
-        bool _PlayedKnightThisTurn = false;
-        Guid _PlayerIdentifier = new Guid();
-        int _CardsLostToBaron = 0;
-        string _ColorAsString = "HotPink"; // a useful default to pick out visually - you should *NEVER* see this color in the UI
-
-        int _IslandsPlayed = 0;
-        bool _isCurrentPlayer = false;
-        int _MaxShips = 0;
-        int _MaxRoads = 0;
-        int _MaxCities = 0;
-        int _MaxSettlements = 0;
-
-        bool _useLightFile = true;
+        private int _IslandsPlayed = 0;
+        private bool _isCurrentPlayer = false;
+        private int _MaxShips = 0;
+        private int _MaxRoads = 0;
+        private int _MaxCities = 0;
+        private int _MaxSettlements = 0;
+        private bool _useLightFile = true;
+       
         public bool UseLightFile
         {
             get => _useLightFile;
@@ -371,8 +382,7 @@ namespace Catan10
             return null;
         }
 
-
-        int pips = 0;
+        private int pips = 0;
         public int Pips
         {
             get => pips;
@@ -662,7 +672,7 @@ namespace Catan10
             }
         }
 
-        int _CardsLostToMonopoly = 0;
+        private int _CardsLostToMonopoly = 0;
         public int CardsLostToMonopoly
         {
             get => _CardsLostToMonopoly;
@@ -779,15 +789,13 @@ namespace Catan10
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         }
 
-
-
-        Dictionary<ResourceType, ResourceCount> _dictResourceCount = new Dictionary<ResourceType, ResourceCount>();
+        private Dictionary<ResourceType, ResourceCount> _dictResourceCount = new Dictionary<ResourceType, ResourceCount>();
         // 
         /// <summary>
         ///     returns the number of resources the user actually got
@@ -864,12 +872,12 @@ namespace Catan10
             Wood = 0;
         }
 
-        int _Sheep = 0;
-        int _Wood = 0;
-        int _Ore = 0;
-        int _Brick = 0;
-        int _Wheat = 0;
-        int _Gold = 0;
+        private int _Sheep = 0;
+        private int _Wood = 0;
+        private int _Ore = 0;
+        private int _Brick = 0;
+        private int _Wheat = 0;
+        private int _Gold = 0;
         public int Gold
         {
             get => _Gold;
@@ -962,7 +970,7 @@ namespace Catan10
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

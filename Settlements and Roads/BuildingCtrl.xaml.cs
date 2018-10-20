@@ -324,8 +324,7 @@ namespace Catan10
             switch (newState)
             {
                 case BuildingState.Pips:
-                    //    Owner = player;
-                    break;
+                 break;
 
                 //
                 //  work done above                    
@@ -343,6 +342,10 @@ namespace Catan10
                     break;
                 default:
                     break;
+            }
+            if (AdjacentHarbor != null)
+            {
+                AdjacentHarbor.Owner = Owner;
             }
 
             await Callback?.BuildingStateChanged(this, oldState, logType);

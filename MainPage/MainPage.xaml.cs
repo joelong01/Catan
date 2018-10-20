@@ -287,6 +287,8 @@ namespace Catan10
 
             _raceTracking.Reset();
             _log?.Start();
+
+
         }
 
         /// <summary>
@@ -853,7 +855,8 @@ namespace Catan10
                 {
                     if (building.Owner == null)
                     {
-                        System.Diagnostics.Debug.Assert(false);
+                        continue;
+                        //System.Diagnostics.Debug.Assert(false);
 
                     }
 

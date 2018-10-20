@@ -664,6 +664,7 @@ namespace Catan10
 
             foreach (Harbor h in Harbors)
             {
+                h.Reset();
                 h.SetOrientationAsync(TileOrientation.FaceDown);
             }
 

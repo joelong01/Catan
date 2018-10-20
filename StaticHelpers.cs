@@ -95,7 +95,29 @@ namespace Catan10
 
         };
 
+        public static ResourceType HarborTypeToResourceType(HarborType ht)
+        {
+            switch (ht)
+            {
+                case HarborType.Sheep:
+                    return ResourceType.Sheep;
+                case HarborType.Wood:
+                    return ResourceType.Wood;
+                case HarborType.Ore:
+                    return ResourceType.Ore;
+                case HarborType.Wheat:
+                    return ResourceType.Wheat;
+                case HarborType.Brick:
+                    return ResourceType.Brick;
+                case HarborType.ThreeForOne:                   
+                case HarborType.Uninitialized:                   
+                case HarborType.None:
+                default:
+                    break;
+            }
 
+            return ResourceType.None;
+        }
 
         public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
 
@@ -221,7 +243,7 @@ namespace Catan10
         }
         public static void Assert(bool val, string message, [CallerFilePath] string file = "", [CallerMemberName] string memberName = "", [CallerLineNumber] int lineNumber = 0)
         {
-            string msg = String.Format($"File: {file}, Method: {memberName}, Line Number: {lineNumber}\n\n{message}");
+            string msg = string.Format($"File: {file}, Method: {memberName}, Line Number: {lineNumber}\n\n{message}");
             Debug.Assert(val, msg);
 
 
@@ -229,7 +251,7 @@ namespace Catan10
 
         public static string GetErrorMessage(string sErr, Exception e, [CallerFilePath] string file = "", [CallerMemberName] string memberName = "", [CallerLineNumber] int lineNumber = 0)
         {
-            return String.Format($"{sErr}\nFile: {file}\n{memberName}: {lineNumber}\n\n{e.ToString()}");
+            return string.Format($"{sErr}\nFile: {file}\n{memberName}: {lineNumber}\n\n{e.ToString()}");
         }
 
         public static bool IsNumber(VirtualKey key)
@@ -397,7 +419,7 @@ namespace Catan10
                 }
                 else
                 {
-                    s += String.Format($"{prop}{kvpSep}{propValue}{propSep}");
+                    s += string.Format($"{prop}{kvpSep}{propValue}{propSep}");
 
                 }
 
@@ -462,7 +484,7 @@ namespace Catan10
             PointerEventHandler pointerMovedHandler = null;
             PointerEventHandler pointerReleasedHandler = null;
 
-            pointerMovedHandler = (Object s, PointerRoutedEventArgs e) =>
+            pointerMovedHandler = (object s, PointerRoutedEventArgs e) =>
             {
 
                 Point pt = e.GetCurrentPoint(mousePositionWindow).Position;
@@ -489,7 +511,7 @@ namespace Catan10
 
             };
 
-            pointerReleasedHandler = (Object s, PointerRoutedEventArgs e) =>
+            pointerReleasedHandler = (object s, PointerRoutedEventArgs e) =>
             {
                 UIElement localControl = (UIElement)s;
                 localControl.PointerMoved -= pointerMovedHandler;
@@ -582,7 +604,7 @@ namespace Catan10
             }
             else
             {
-                string error = String.Format($"need to support {propInfo.PropertyType.ToString()} in the deserilizer to load {key} whose value is {value}");
+                string error = string.Format($"need to support {propInfo.PropertyType.ToString()} in the deserilizer to load {key} whose value is {value}");
                 t.TraceMessage(error);
                 throw new Exception(error);
 
@@ -659,7 +681,7 @@ namespace Catan10
 
         public static string SetValue(string name, object value)
         {
-            return String.Format($"{name}={value}{lineSeperator}");
+            return string.Format($"{name}={value}{lineSeperator}");
 
         }
 
@@ -721,7 +743,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                string content = String.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
+                string content = string.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
             }
@@ -762,7 +784,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                string content = String.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
+                string content = string.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
                 return returnDictionary;
@@ -770,7 +792,7 @@ namespace Catan10
 
             if (sectionsDict.Count == 0)
             {
-                string content = String.Format($"There appears to be no sections in {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.");
+                string content = string.Format($"There appears to be no sections in {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
                 return returnDictionary;
@@ -788,7 +810,7 @@ namespace Catan10
             }
             catch
             {
-                string content = String.Format($"Error parsing values {folder.Path}\\{filename}.\nSuggest deleting it.\n\nError in section '{currentKvp.Key}' and value '{currentKvp.Value}'");
+                string content = string.Format($"Error parsing values {folder.Path}\\{filename}.\nSuggest deleting it.\n\nError in section '{currentKvp.Key}' and value '{currentKvp.Value}'");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
 
@@ -810,7 +832,7 @@ namespace Catan10
 
             foreach (KeyValuePair<string, string> kvp in dictionary)
             {
-                ret += String.Format("{0}={1}{2}", kvp.Key, kvp.Value, seperator);
+                ret += string.Format("{0}={1}{2}", kvp.Key, kvp.Value, seperator);
 
             }
 
@@ -836,7 +858,7 @@ namespace Catan10
                 {
                     n++;
                     string propValue = methodInfo.Invoke(item, null).ToString();
-                    s += String.Format($"{prefix}-{n}{StaticHelpers.kvpSeperator}{propValue}{StaticHelpers.lineSeperator}");
+                    s += string.Format($"{prefix}-{n}{StaticHelpers.kvpSeperator}{propValue}{StaticHelpers.lineSeperator}");
                 }
             }
 
@@ -888,7 +910,7 @@ namespace Catan10
         public static bool TryParse<T>(this Enum theEnum, string valueToParse, out T returnValue)
         {
             returnValue = default;
-            if (Int32.TryParse(valueToParse, out int intEnumValue))
+            if (int.TryParse(valueToParse, out int intEnumValue))
             {
                 if (Enum.IsDefined(typeof(T), intEnumValue))
                 {
@@ -960,7 +982,7 @@ namespace Catan10
                 }
                 else
                 {
-                    Debug.Assert(false, String.Format($"Bad token count in DeserializeDictionary. Pairs.Count: {pairs.Count()} "));
+                    Debug.Assert(false, string.Format($"Bad token count in DeserializeDictionary. Pairs.Count: {pairs.Count()} "));
                 }
 
 

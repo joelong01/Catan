@@ -34,6 +34,57 @@ namespace Catan10
         }
     }
 
+   
+    /// <summary>
+    ///     given a HarborType return the proper image
+    /// </summary>
+    public class HarborTypeToHarborBrush : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            HarborType harbor = (HarborType)value;
+            string bitmapPath = "ms-appx:Assets/back.jpg";
+            switch (harbor)
+            {
+                case HarborType.ThreeForOne:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 3 for 1.png";
+                    break;
+                case HarborType.Brick:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 brick.png";
+                    break;
+                case HarborType.Ore:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 Ore.png";
+                    break;
+                case HarborType.Sheep:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 sheep.png";
+                    break;
+                case HarborType.Wood:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 wood.png";
+                    break;
+                case HarborType.Wheat:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 wheat.png";
+                    break;
+                default:
+                    break;
+            }
+            BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
+            ImageBrush brush = new ImageBrush
+            {
+                AlignmentX = AlignmentX.Left,
+                AlignmentY = AlignmentY.Top,
+                Stretch = Stretch.UniformToFill,
+                ImageSource = bitmapImage
+            };
+
+            return brush;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("HarborTypeToHarborBrush cannot be used in a TwoWay binding");
+        }
+    }
+
     /// <summary>
     ///     used in the building control.  this takes a parameter to indicate which state should be Visible and all others should be collapsed
     ///     parameter is a string
