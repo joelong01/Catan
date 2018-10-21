@@ -548,6 +548,17 @@ namespace Catan10
 
         }
 
+        private void ToggleShowTile(object sender, RoutedEventArgs e)
+        {
+            ToggleMenuFlyoutItem menu = sender as ToggleMenuFlyoutItem;
+         
+
+            foreach(var tile in _gameView.TilesInIndexOrder)
+            {
+                tile.ShowIndex = menu.IsChecked;
+            }
+        }
+
         /// <summary>
         ///     tries to be smart about where to place the baron
         ///     1. if Dodgy is playing (since he's always Red...) be sure and put it on him
@@ -570,15 +581,7 @@ namespace Catan10
                 return;
             }
 
-            PlayerData dodgy = null;
-            foreach (var player in PlayingPlayers)
-            {
-                if (player.ColorAsString == "Red")
-                {
-                    dodgy = player;
-                    break;
-                }
-            }
+           
 
             List<Target> targetList = PickBaronVictim(true);
             if (targetList.Count == 0)
@@ -589,18 +592,17 @@ namespace Catan10
             }
 
             //
-            //   pull all the options that aren't dodgy
+            //  Get the high score
+            //  we assume that if the high score is < 6 then we are in the expansion phase of the game
 
-            for (int i = targetList.Count - 1; i >= 0; i--)
+            int highScore = 0;
+            foreach (var p in AllPlayers)
             {
-                if (targetList[i].Player!= dodgy)
+                if (p.GameData.Score > highScore)
                 {
-                    targetList.RemoveAt(i);
+                    highScore = p.GameData.Score;
                 }
             }
-
-            //
-            //  sort by pips
 
 
 
@@ -608,7 +610,7 @@ namespace Catan10
             Target target = null;
             int most = targetList[0].ResourcePotential;
             ResourceType[] orderedListOfResources = null;
-            if (dodgy.GameData.Score < 5)
+            if (highScore < 6)
             {
                 orderedListOfResources = new ResourceType[] { ResourceType.Brick, ResourceType.Wood, ResourceType.Wheat, ResourceType.Sheep, ResourceType.Ore };
             }
@@ -617,20 +619,46 @@ namespace Catan10
                 orderedListOfResources = new ResourceType[] { ResourceType.Ore, ResourceType.Wheat, ResourceType.Sheep, ResourceType.Brick, ResourceType.Wood };
             }
 
-            foreach (var resource in orderedListOfResources)
+            //
+            //   if somebody has 9 points, remove all options with player score < 9
+
+            if (highScore == 9)
             {
-                target = FindTarget(targetList, resource, most - 2);
-                if (target != null)
+                for (int i=targetList.Count -1; i>=0; i--)
                 {
-                    break;
+                    if (targetList[i].Player.GameData.Score < 9)
+                    {
+                        targetList.RemoveAt(i);
+                    }
                 }
             }
 
-            if (target == null)
+            if (targetList.Count == 0)
             {
-                target = targetList[0];
+                MessageDialog dlg = new MessageDialog("I can't seem to be able to find a good candidate.\nFigure it out yourself.");
+                await dlg.ShowAsync();
+                return;
+            }
+            List<Target> topList = new List<Target>();
+            int mostPotential = targetList[0].ResourcePotential;
+            foreach (var t in targetList)
+            {
+                if (t.ResourcePotential  > mostPotential - .1)
+                {
+                    topList.Add(t);
+                }
+                else
+                {
+                    break; // it is an ordered list
+                }
             }
 
+            Random rand = new Random((int)DateTime.Now.Ticks);
+
+            target = topList[rand.Next(topList.Count)];
+
+            
+           
             CatanAction action = CatanAction.PlayedKnight;
             TargetWeapon weapon = TargetWeapon.Baron;
             if (GameState == GameState.MustMoveBaron)
@@ -790,6 +818,24 @@ namespace Catan10
             }
 
             ResourcePotential *= Tile.Pips;
+
+            if (ResourcePotential > 0)
+            {
+                //
+                //  check to see if this player has 2:1 in a resource from this tile
+               
+                foreach (var harbor in Player.GameData.OwnedHarbors)
+                {
+                    if (StaticHelpers.HarborTypeToResourceType(harbor.HarborType) == Tile.ResourceType)
+                    {
+                        ResourcePotential *= 2;
+                    }
+                }
+            }
+
+            
+
+            
         }
 
     }

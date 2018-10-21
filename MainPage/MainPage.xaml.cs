@@ -1410,7 +1410,7 @@ namespace Catan10
             return String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
         }
 
-       
+      
     }
 }
 

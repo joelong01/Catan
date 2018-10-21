@@ -126,6 +126,8 @@
                                             <MenuFlyoutItem x:Name="Menu_Test" Text ="Test" Click="OnTest" />
                                             <MenuFlyoutSeparator/>
                                             <MenuFlyoutItem x:Name="Menu_TestGame" Text ="Test Game" Click="OnTestGame" />
+                                            <MenuFlyoutSeparator/>
+                                            <ToggleMenuFlyoutItem x:Name="Menu_ToggleShowIndex" Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
                                         </MenuFlyoutSubItem>
                                         <MenuFlyoutSeparator/>
                                         <MenuFlyoutSubItem Text="Baron">
