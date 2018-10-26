@@ -24,14 +24,14 @@ namespace Catan10
 
         public int Number { get; set; } = 0;
         public ResourceType ResourceType { get; set; } = ResourceType.Sea;
-        public int zIndex { get; set; } = 0;
+        public int ZIndex { get; set; } = 0;
         public int Index { get; set; } = -1;
         public bool RandomTile { get; set; } = true;
         public bool ShowIndex { get; set; } = false;
-     
-     
 
-        private List<string> _savedProperties = new List<string> { "Number", "ResourceType", "TileOrientation", "zIndex", "Index", "RandomTile", "HexOrder", "ShowIndex" };
+
+
+        private readonly List<string> _savedProperties = new List<string> { "Number", "ResourceType", "TileOrientation", "zIndex", "Index", "RandomTile", "HexOrder", "ShowIndex" };
         public string Serialize(bool oneLine)
         {
             return StaticHelpers.SerializeObject<TileData>(this, _savedProperties, "=", "|");
@@ -51,19 +51,19 @@ namespace Catan10
     {
 
         private List<string> _savedProperties = new List<string> { "Number", "ResourceType", "HarborLocation", "HarborType", "TileOrientation", "zIndex", "Index", "HarborLocations", "RandomTile", "HexOrder", "UseClassic", "ShowIndex", "HasPirateShip", "HasBaron" };
-        SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
-        SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
-        TileOrientation _tileOrientation = TileOrientation.FaceDown;
-        public List<BuildingCtrl> Buildings { get; } = new List<BuildingCtrl>();
+        private SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
+        private SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
+        private TileOrientation _tileOrientation = TileOrientation.FaceDown;
         public bool HasBaron { get; set; } = false;
         public bool HasPirateShip { get; set; } = false;
 
         public List<BuildingCtrl> OwnedBuilding { get; } = new List<BuildingCtrl>(); // this are the settlements that pay if this tile's number is rolled
         public bool RandomTile { get; set; } = true;
-        bool _useClassic = true;
-        int _index = -1;
-        ITileControlCallback _tileControlCallback = null;
-        ResourceType _resourceType = ResourceType.Back;
+
+        private bool _useClassic = true;
+        private int _index = -1;
+        private ITileControlCallback _tileControlCallback = null;
+        private ResourceType _resourceType = ResourceType.Back;
         //
         //  the row and column this tile is in the CatanHexPanel
         public int Row { get; set; } = -1;
@@ -74,38 +74,29 @@ namespace Catan10
             this.InitializeComponent();
             _ppHexFront.RotationY = 90;
 
-     
+
 
         }
-        public int Probability
+        //
+        //  keep track of harbors near this tile.  this is set in the XAML
+        public static readonly DependencyProperty AdjacentHarborProperty = DependencyProperty.Register("AdjacentHarbor", typeof(Harbor), typeof(TileCtrl), new PropertyMetadata(null));
+        public Harbor AdjacentHarbor
         {
-            get
-            {
-                return _number.Probability;
-            }
+            get => (Harbor)GetValue(AdjacentHarborProperty);
+            set => SetValue(AdjacentHarborProperty, value);
         }
-        public UIElement Visual
-        {
-            get
-            {
-                return this;
-            }
-        }
+
+        public int Probability => _number.Probability;
+        public UIElement Visual => this;
 
         public NumberStyle NumberStyle
         {
-            get
-            {
-                return _number.NumberStyle;
-            }
-            set
-            {
-                _number.NumberStyle = value;
-            }
+            get => _number.NumberStyle;
+            set => _number.NumberStyle = value;
         }
-     
 
-      
+
+
 
 
         public void SetTileCallback(ITileControlCallback tileControlCallback)
@@ -119,11 +110,6 @@ namespace Catan10
 
         internal void Reset()
         {
-            foreach (var s in Buildings)
-            {
-                s.Reset();
-            }
-
             OwnedBuilding.Clear();
         }
 
@@ -138,38 +124,27 @@ namespace Catan10
             StaticHelpers.DeserializeObject<TileCtrl>(this, s, "=", "|");
             return true;
         }
-        public int zIndex
+        public int ZIndex
         {
-            get
-            {
-                return Canvas.GetZIndex(this);
-            }
-            set
-            {
+            get => Canvas.GetZIndex(this);
+            set =>
                 //this.TraceMessage($"Setting {this.ResourceType} of {this.Number} to zIndex of {value}");
                 Canvas.SetZIndex(this, value);
-            }
         }
 
         public override string ToString()
         {
-            return String.Format($"{_resourceType}={Number};idx={Index}");
+            return string.Format($"{_resourceType}={Number};idx={Index}");
         }
         public TileOrientation TileOrientation
         {
-            get { return _tileOrientation; }
-            set
-            {
-                SetTileOrientationAsync(value);
-            }
+            get => _tileOrientation;
+            set => SetTileOrientationAsync(value);
         }
 
         public int Index
         {
-            get
-            {
-                return _index;
-            }
+            get => _index;
             set
             {
                 _index = value;
@@ -183,10 +158,7 @@ namespace Catan10
 
         public ResourceType ResourceType
         {
-            get
-            {
-                return _resourceType;
-            }
+            get => _resourceType;
             set
             {
                 //
@@ -205,8 +177,9 @@ namespace Catan10
                     RandomTile = false;
                 }
                 else
+                {
                     RandomTile = true;
-
+                }
 
                 _number.ShowEyes = false;
 
@@ -252,10 +225,9 @@ namespace Catan10
 
                 }
                 else
+                {
                     _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
-
-
-
+                }
 
                 NotifyPropertyChanged();
 
@@ -290,23 +262,27 @@ namespace Catan10
             _daRotateTile.Duration = TimeSpan.FromMilliseconds(ms);
             return _sbRotate.ToTask();
         }
-        public async Task SetTileOrientation(TileOrientation orientation, double animationDuration = Double.MaxValue, double startAfter = 0)
+        public async Task SetTileOrientation(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
             if (_tileOrientation == orientation)
+            {
                 return;
+            }
 
-
-
-            if (animationDuration == Double.MaxValue)
+            if (animationDuration == double.MaxValue)
+            {
                 animationDuration = 1000;
+            }
 
             bool flipToFaceUp = (_tileOrientation == TileOrientation.FaceDown) ? true : false;
             _tileOrientation = orientation;
 
             StaticHelpers.SetupFlipAnimation(flipToFaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.Normal), 0);
 
-            List<Task> taskList = new List<Task>();
-            taskList.Add(_sbFlipTile.ToTask());
+            List<Task> taskList = new List<Task>
+            {
+                _sbFlipTile.ToTask()
+            };
 
 
             await Task.WhenAll(taskList);
@@ -314,17 +290,22 @@ namespace Catan10
 
 
         }
-        public void SetTileOrientationAsync(TileOrientation orientation, double animationDuration = Double.MaxValue, double startAfter = 0)
+        public void SetTileOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
             if (_tileOrientation == orientation)
+            {
                 return;
+            }
 
-
-
-            if (animationDuration == Double.MaxValue)
+            if (animationDuration == double.MaxValue)
+            {
                 animationDuration = 0;
+            }
             else
+            {
                 animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            }
+
             bool flipToFaceUp = (_tileOrientation == TileOrientation.FaceDown) ? true : false;
 
             _tileOrientation = orientation;
@@ -337,11 +318,12 @@ namespace Catan10
 
         }
 
-        public void SetTileOrientation(TileOrientation orientation, List<Task> taskList, double animationDuration = Double.MaxValue)
+        public void SetTileOrientation(TileOrientation orientation, List<Task> taskList, double animationDuration = double.MaxValue)
         {
             if (orientation == _tileOrientation)
+            {
                 return;
-
+            }
 
             bool flipToFaceUp = (_tileOrientation == TileOrientation.FaceDown) ? true : false;
             _tileOrientation = orientation;
@@ -354,18 +336,24 @@ namespace Catan10
 
         }
 
-        public void Rotate(double angle, List<Task> tasks, bool reletive, double duration = Double.MaxValue)
+        public void Rotate(double angle, List<Task> tasks, bool reletive, double duration = double.MaxValue)
         {
             if (duration == double.MaxValue)
+            {
                 duration = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
-
+            }
 
             if (reletive)
+            {
                 _daRotateTile.To += angle;
+            }
             else
             {
                 if (_daRotateTile.To / 360 == angle)
+                {
                     return;
+                }
+
                 _daRotateTile.To = angle;
             }
             _daRotateTile.Duration = TimeSpan.FromMilliseconds(duration);
@@ -373,13 +361,10 @@ namespace Catan10
 
         }
 
-        bool _hideNumber = false;
+        private bool _hideNumber = false;
         public bool HideNumber
         {
-            get
-            {
-                return _hideNumber;
-            }
+            get => _hideNumber;
             set
             {
                 _hideNumber = value;
@@ -389,10 +374,7 @@ namespace Catan10
 
         public int Number
         {
-            get
-            {
-                return _number.Number;
-            }
+            get => _number.Number;
             set
             {
                 _number.Number = value;
@@ -435,7 +417,7 @@ namespace Catan10
                         return 5;
                     default:
                         return 0; //7
-                }                
+                }
             }
         }
 
@@ -448,7 +430,7 @@ namespace Catan10
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -476,48 +458,23 @@ namespace Catan10
 
         //
         //  needed to make the fancy distribution animation work right
-        public Grid HexGrid
-        {
-            get
-            {
-                return ResourceTileGrid;
-            }
-        }
+        public Grid HexGrid => ResourceTileGrid;
 
         public bool Selected
         {
-            get
-            {
-                return _border.Visibility == Visibility.Visible;
-            }
-            set
-            {
-                _border.Visibility = (value == true) ? Visibility.Visible : Visibility.Collapsed;
-
-            }
+            get => _border.Visibility == Visibility.Visible;
+            set => _border.Visibility = (value == true) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public bool ShowIndex
         {
-            get
-            {
-                return _txtIndex.Visibility == Visibility.Visible;
-            }
-            set
-            {
-                _txtIndex.Visibility = (value) ? Visibility.Visible : Visibility.Collapsed;
-            }
+            get => _txtIndex.Visibility == Visibility.Visible;
+            set => _txtIndex.Visibility = (value) ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public double HexThickness
-        {
-            get
-            {
-                return _hexFront.StrokeThickness;
-            }
-        }
+        public double HexThickness => _hexFront.StrokeThickness;
 
-        
+
 
         private void OnTileLeftTapped(object sender, TappedRoutedEventArgs e)
         {
@@ -535,7 +492,9 @@ namespace Catan10
         public bool Equals(TileCtrl x, TileCtrl y)
         {
             if (x.ResourceType == y.ResourceType && x.Index == y.Index)
+            {
                 return true;
+            }
 
             return false;
         }

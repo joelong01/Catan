@@ -27,40 +27,40 @@ namespace Catan10
         public static readonly DependencyProperty ImageBrushProperty = DependencyProperty.Register("ImageBrush", typeof(ImageBrush), typeof(PlayerPickerItemCtrl), new PropertyMetadata(null));
         public ImageBrush ImageBrush
         {
-            get { return (ImageBrush)GetValue(ImageBrushProperty); }
-            set { SetValue(ImageBrushProperty, value); }
+            get => (ImageBrush)GetValue(ImageBrushProperty);
+            set => SetValue(ImageBrushProperty, value);
         }
 
 
         public string ImageFileName
         {
-            get { return (string)GetValue(ImageFileNameProperty); }
-            set { SetValue(ImageFileNameProperty, value); }
+            get => (string)GetValue(ImageFileNameProperty);
+            set => SetValue(ImageFileNameProperty, value);
         }
 
         public string PlayerName
         {
-            get { return (string)GetValue(PlayerNameProperty); }
-            set { SetValue(PlayerNameProperty, value); }
+            get => (string)GetValue(PlayerNameProperty);
+            set => SetValue(PlayerNameProperty, value);
         }
 
         public Color FillColor
         {
-            get { return (Color)GetValue(FillColorProperty); }
-            set { SetValue(FillColorProperty, value); }
+            get => (Color)GetValue(FillColorProperty);
+            set => SetValue(FillColorProperty, value);
         }
-       
+
 
         public Color ForegroundColor
         {
-            get { return (Color)GetValue(ForegroundColorProperty); }
-            set { SetValue(ForegroundColorProperty, value); }
+            get => (Color)GetValue(ForegroundColorProperty);
+            set => SetValue(ForegroundColorProperty, value);
         }
-        
+
         public bool? IsFirst
         {
-            get { return (bool)GetValue(IsFirstProperty); }
-            set { SetValue(IsFirstProperty, value); }
+            get => (bool)GetValue(IsFirstProperty);
+            set => SetValue(IsFirstProperty, value);
         }
         private static void IsFirstChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -72,7 +72,7 @@ namespace Catan10
         {
             FirstChanged?.Invoke(this, value == true);
         }
-        
+
 
         public PlayerPickerItemCtrl()
         {
@@ -80,7 +80,7 @@ namespace Catan10
         }
         public PlayerPickerItemCtrl(PlayerData data)
         {
-            this.InitializeComponent();            
+            this.InitializeComponent();
             ForegroundColor = data.GameData.Foreground.Color;
             FillColor = data.GameData.PlayerColor;
             PlayerName = data.PlayerName;
@@ -88,7 +88,7 @@ namespace Catan10
             PlayerData = data;
             ImageBrush = data.ImageBrush;
         }
-       
+
         private void OnFirstChecked(object sender, RoutedEventArgs e)
         {
             CheckBox chkBox = sender as CheckBox;

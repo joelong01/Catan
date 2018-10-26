@@ -22,36 +22,29 @@ namespace Catan10
         public static readonly DependencyProperty SaveFileNameProperty = DependencyProperty.Register("SaveFileName", typeof(string), typeof(NewGameDlg), new PropertyMetadata(""));
         public string SaveFileName
         {
-            get { return (string)GetValue(SaveFileNameProperty); }
-            set { SetValue(SaveFileNameProperty, value); }
+            get => (string)GetValue(SaveFileNameProperty);
+            set => SetValue(SaveFileNameProperty, value);
         }
 
         public ObservableCollection<PlayerData> SelectedPlayers
         {
-            get { return (ObservableCollection<PlayerData>)GetValue(SelectedPlayersProperty); }
-            set { SetValue(SelectedPlayersProperty, value); }
+            get => (ObservableCollection<PlayerData>)GetValue(SelectedPlayersProperty);
+            set => SetValue(SelectedPlayersProperty, value);
         }
 
         public CatanGame SelectedGame
         {
-            get { return (CatanGame)GetValue(SelectedGameProperty); }
-            set { SetValue(SelectedGameProperty, value); }
+            get => (CatanGame)GetValue(SelectedGameProperty);
+            set => SetValue(SelectedGameProperty, value);
         }
 
         public ObservableCollection<CatanGame> Games
         {
-            get { return (ObservableCollection<CatanGame>)GetValue(GamesProperty); }
-            set { SetValue(GamesProperty, value); }
+            get => (ObservableCollection<CatanGame>)GetValue(GamesProperty);
+            set => SetValue(GamesProperty, value);
         }
 
-        public int SelectedIndex
-        {
-
-            get
-            {
-                return Games.IndexOf(SelectedGame);
-            }
-        }
+        public int SelectedIndex => Games.IndexOf(SelectedGame);
 
         public ObservableCollection<PlayerPickerItemCtrl> Players { get; set; } = new ObservableCollection<PlayerPickerItemCtrl>();
         public List<PlayerPickerItemCtrl> GamePlayers { get; } = new List<PlayerPickerItemCtrl>();
@@ -67,7 +60,7 @@ namespace Catan10
             this.InitializeComponent();
             Players.Clear();
             GamePlayers.Clear();
-            foreach (var p in playerData)
+            foreach (PlayerData p in playerData)
             {
                 PlayerPickerItemCtrl ctrl = new PlayerPickerItemCtrl(p);
                 if (p.PlayerName == "Joe")
@@ -102,17 +95,17 @@ namespace Catan10
                 ctrl.FirstChanged += PlayerItemCtrl_FirstChanged;
             }
             Games.Clear();
-            foreach (var g in games)
+            foreach (CatanGame g in games)
             {
                 Games.Add(g);
                 if (g.Description.Contains("Sea"))
                 {
                     SelectedGame = g;
-                    
+
                 }
             }
 
-         
+
 
             //  
             // the positions of the grids are in their .Names
@@ -125,7 +118,7 @@ namespace Catan10
             PositionToGridDictionary[PlayerPosition.TopRight] = TopRight;
             PositionToGridDictionary[PlayerPosition.Right] = Right;
             PositionToGridDictionary[PlayerPosition.BottomRight] = BottomRight;
-            
+
 
 
 
@@ -134,19 +127,25 @@ namespace Catan10
         private void PlayerItemCtrl_FirstChanged(PlayerPickerItemCtrl sender, bool val)
         {
             if (!val)
+            {
                 return; // don't care if somebody turns OFF the first player
+            }
 
             // find the player who used to be first, and turn that off
 
-            foreach (var player in GamePlayers)
+            foreach (PlayerPickerItemCtrl player in GamePlayers)
             {
                 if (player != sender && (bool)player.IsFirst)
+                {
                     player.IsFirst = false;
+                }
             }
-            foreach (var player in Players)
+            foreach (PlayerPickerItemCtrl player in Players)
             {
                 if (player != sender && (bool)player.IsFirst)
+                {
                     player.IsFirst = false;
+                }
             }
 
         }
@@ -171,15 +170,15 @@ namespace Catan10
             //
             //  we have to sort playing players so that they are correct by position
             GamePlayers.Clear();
-            
+
             foreach (PlayerPosition pos in PositionToGridDictionary.Keys)
-            {                 
-                PlayerPickerItemCtrl item = ((PlayerPickerItemCtrl)PositionToGridDictionary[pos].Children[0]);                
-                if (item!=null)
-                {                    
+            {
+                PlayerPickerItemCtrl item = ((PlayerPickerItemCtrl)PositionToGridDictionary[pos].Children[0]);
+                if (item != null)
+                {
                     GamePlayers.Add(item);
-                    item.PlayerData.PlayerPosition = item.Position;               
-                }                
+                    item.PlayerData.PlayerPosition = item.Position;
+                }
             }
 
             int count = 0;
@@ -194,13 +193,13 @@ namespace Catan10
                 count++;
             }
 
-            
 
-            foreach (var player in GamePlayers)
+
+            foreach (PlayerPickerItemCtrl player in GamePlayers)
             {
                 PlayerDataList.Add(player.PlayerData);
             }
-            
+
 
         }
 
@@ -242,7 +241,9 @@ namespace Catan10
                 string tag = await e.DataView.GetTextAsync();
                 string[] tokens = tag.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
                 if (tokens.Count() != 2)
+                {
                     return;
+                }
 
                 if (target.GetType() == typeof(Grid))
                 {
@@ -264,7 +265,9 @@ namespace Catan10
                     if (position == PlayerPosition.None) // coming from the ListView and dropping in a Grid
                     {
                         if (index < 0 || index >= Players.Count)
+                        {
                             return;
+                        }
 
                         player = Players[index];
                         Players.RemoveAt(index);
@@ -280,7 +283,9 @@ namespace Catan10
 
                     // it is already in PlayingPlayers...the changes its parent and position...
                     if (player == null)
+                    {
                         return;
+                    }
                     //
                     //  the name of the grids are their positions... :P
                     position = (PlayerPosition)Enum.Parse(typeof(PlayerPosition), dropTarget.Name);
@@ -321,7 +326,10 @@ namespace Catan10
         private void OnGameChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SelectedGame == null)
+            {
                 return;
+            }
+
             DateTime dt = DateTime.Now;
 
             string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";

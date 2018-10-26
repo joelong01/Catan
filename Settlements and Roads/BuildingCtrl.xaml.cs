@@ -21,8 +21,13 @@ namespace Catan10
 
     public sealed partial class BuildingCtrl : UserControl
     {
-        public int Index { get; set; } = -1; // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
-
+        // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
+        public int Index
+        {
+            get => (int)GetValue(IndexProperty);
+            set => SetValue(IndexProperty, value);
+        }
 
         SolidColorBrush _brush = new SolidColorBrush(Colors.Blue);
         public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
@@ -35,7 +40,10 @@ namespace Catan10
         //  this the list of Tile/SettlmentLocations that are the same for this settlement
         public List<BuildingKey> Clones = new List<BuildingKey>();
         public Point LayoutPoint { get; set; }
-        public CompositeTransform Transform { get { return (CompositeTransform)this.RenderTransform; } }
+        public CompositeTransform Transform => (CompositeTransform)this.RenderTransform;
+
+        // the harbor that is acquired when the user gets this building
+        public Harbor AdjacentHarbor { get; set; } = null;
 
         public IGameCallback Callback { get; internal set; }
 
@@ -47,8 +55,8 @@ namespace Catan10
         public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
         public int Pips
         {
-            get { return (int)GetValue(PipsProperty); }
-            set { SetValue(PipsProperty, value); }
+            get => (int)GetValue(PipsProperty);
+            set => SetValue(PipsProperty, value);
         }
         private static void PipsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -68,9 +76,11 @@ namespace Catan10
         public async Task LoadUiElements()
         {
             if (loaded)
+            {
                 return;
+            }
 
-            var tcs = new TaskCompletionSource<object>();
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
 
             void finishedLoading(object sender, RoutedEventArgs e)
             {
@@ -79,7 +89,7 @@ namespace Catan10
 
             try
             {
-                ((Grid)FindName("LayoutRoot")).Loaded += finishedLoading;                
+                ((Grid)FindName("LayoutRoot")).Loaded += finishedLoading;
                 await tcs.Task;
                 loaded = true;
             }
@@ -87,15 +97,15 @@ namespace Catan10
             {
                 LayoutRoot.Loaded -= finishedLoading;
             }
-            
+
 
         }
 
-    
+
         public int PipGroup
         {
-            get { return (int)GetValue(PipGroupProperty); }
-            set { SetValue(PipGroupProperty, value); }
+            get => (int)GetValue(PipGroupProperty);
+            set => SetValue(PipGroupProperty, value);
         }
         private static void PipGroupChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -121,8 +131,8 @@ namespace Catan10
         }
         private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var depPropClass = d as BuildingCtrl;
-            var depPropValue = (PlayerData)e.NewValue;
+            BuildingCtrl depPropClass = d as BuildingCtrl;
+            PlayerData depPropValue = (PlayerData)e.NewValue;
             depPropClass?.SetCurrentPlayer(depPropValue);
         }
         private void SetCurrentPlayer(PlayerData value)
@@ -132,8 +142,8 @@ namespace Catan10
 
         public BuildingState BuildingState
         {
-            get { return (BuildingState)GetValue(BuildingStateProperty); }
-            private set { SetValue(BuildingStateProperty, value); } // call UpdateBuildingState instead
+            get => (BuildingState)GetValue(BuildingStateProperty);
+            private set => SetValue(BuildingStateProperty, value);  // call UpdateBuildingState instead
         }
         private static void BuildingStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -144,7 +154,7 @@ namespace Catan10
 
         private void SetBuildingState(BuildingCtrl ctrl, BuildingState value)
         {
-           // await ctrl.LoadUiElements();
+            // await ctrl.LoadUiElements();
         }
 
 
@@ -166,21 +176,9 @@ namespace Catan10
         }
 
 
-        public bool IsCity
-        {
-            get
-            {
-                return BuildingState == BuildingState.City;
-            }
-        }
+        public bool IsCity => BuildingState == BuildingState.City;
 
-        public bool IsSettlement
-        {
-            get
-            {
-                return BuildingState == BuildingState.Settlement;
-            }
-        }
+        public bool IsSettlement => BuildingState == BuildingState.Settlement;
 
         public BuildingCtrl()
         {
@@ -213,7 +211,7 @@ namespace Catan10
         private void OutputKeyInfo()
         {
             string s = "";
-            foreach (var key in Clones)
+            foreach (BuildingKey key in Clones)
             {
                 s += String.Format($"\n\tTile:{key.Tile} at {key.Location}");
             }
@@ -257,7 +255,7 @@ namespace Catan10
             //
             //  need to validate that the GameState is a valid state to change the state of a building
 
-            bool valid = (bool)Callback?.BuildingStateChangedOk(this);
+            bool valid = (bool)Callback?.BuildingStateChangeOk(this);
             if (!valid)
             {
                 return;
@@ -286,7 +284,7 @@ namespace Catan10
                 default:
                     break;
             }
-
+            
             await UpdateBuildingState(oldState, newState);
 
 
@@ -295,28 +293,38 @@ namespace Catan10
         /// <summary>
         ///     Sets the state of a building *directly* - eg. doesn't validate state transitions.
         ///     we need this functionality in Undo/Redo and ReplayLog
-        /// </summary>
-        /// <param name="building"></param>
-        /// <param name="oldState"></param>
-        /// <param name="newState"></param>
-        /// <param name="logType"></param>
+        /// </summary>      
         /// <returns></returns>
         public async Task UpdateBuildingState(BuildingState oldState, BuildingState newState, LogType logType = LogType.Normal)
         {
             PlayerData player = CurrentPlayer;
+            bool ret = false;
+            switch (oldState)
+            {
+                case BuildingState.None:
+                case BuildingState.Build:
+                case BuildingState.Error:
+                case BuildingState.Pips:
+                    break;
+                case BuildingState.Settlement:
+                    ret = player.GameData.Settlements.Remove(this);
+                    this.Assert(ret, "a settlement needs to be in the Settlements Collection");
+                    break;
+                case BuildingState.City:
+                    ret = player.GameData.Cities.Remove(this);
+                    this.Assert(ret, "a settlement needs to be in the Settlements Collection");
+                    break;
+                default:
+                    break;
+            }
 
-            //
-            //  remove everything -- we will add it back below
-            player.GameData.Cities.Remove(this);
-            player.GameData.Settlements.Remove(this);
             this.BuildingState = newState;
 
 
             switch (newState)
             {
                 case BuildingState.Pips:
-                    //    Owner = player;
-                    break;
+                 break;
 
                 //
                 //  work done above                    
@@ -334,6 +342,10 @@ namespace Catan10
                     break;
                 default:
                     break;
+            }
+            if (AdjacentHarbor != null)
+            {
+                AdjacentHarbor.Owner = Owner;
             }
 
             await Callback?.BuildingStateChanged(this, oldState, logType);
@@ -382,7 +394,7 @@ namespace Catan10
         public void AddKey(TileCtrl tile, BuildingLocation loc)
         {
             BuildingKey key = new BuildingKey(tile, loc);
-            foreach (var clone in Clones)
+            foreach (BuildingKey clone in Clones)
             {
                 //
                 //  need to do this by value because .Contains looks for the same pointer value

@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -35,7 +36,7 @@ namespace Catan10
 
         public string Serialize()
         {
-            return String.Format($"{Name}={TranslateX},{TranslateY}");
+            return string.Format($"{Name}={TranslateX},{TranslateY}");
         }
 
         public void Deserialize(string s)
@@ -52,7 +53,7 @@ namespace Catan10
 
     public sealed partial class MainPage : Page
     {
-        Dictionary<string, string> _defaultUsers = new Dictionary<string, string>()
+        private Dictionary<string, string> _defaultUsers = new Dictionary<string, string>()
         {
             {"Joe", "joe.jpg;Blue" },
             {"Dodgy", "Dodgy.jpg;Red" },
@@ -76,12 +77,13 @@ namespace Catan10
             List<PlayerData> list = new List<PlayerData>();
             foreach (KeyValuePair<string, string> kvp in _defaultUsers)
             {
-                PlayerData p = new PlayerData
+                PlayerData p = new PlayerData(this)
                 {
                     PlayerName = kvp.Key
+
                 };
                 string[] tokens = kvp.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                string bitmapPath = String.Format($"ms-appx:Assets/DefaultPlayers/{tokens[0]}");
+                string bitmapPath = string.Format($"ms-appx:Assets/DefaultPlayers/{tokens[0]}");
                 p.ColorAsString = tokens[1];
                 p.ImageFileName = bitmapPath;
                 await p.LoadImage();
@@ -114,15 +116,15 @@ namespace Catan10
                     await StaticHelpers.DragAsync(grid, e);
                 }
 
-               
-                
+
+
                 await SaveGridLocations();
                 Canvas.SetZIndex(uiElement, zIndex);
             }
 
         }
 
-        
+
 
         //
         //  save all the grids.  since I add/delete them frequently, this can throw if/when a grid is removed after it has been saved.
@@ -143,7 +145,7 @@ namespace Catan10
 
                 await _settings.SaveSettings(_settingsFileName);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.TraceMessage($"caught the exception: {e}");
             }
@@ -163,7 +165,7 @@ namespace Catan10
                     ct.TranslateY = pos.TranslateY;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.TraceMessage($"Exception: {e}");
             }
@@ -189,7 +191,7 @@ namespace Catan10
             CompositeTransform ct = border.RenderTransform as CompositeTransform;
 
 
-            pointerPressed = (Object s, PointerRoutedEventArgs eMove) =>
+            pointerPressed = (object s, PointerRoutedEventArgs eMove) =>
             {
                 this.TraceMessage("PointerPressed");
                 border.PointerReleased += pointerReleased;
@@ -207,7 +209,7 @@ namespace Catan10
                 }
             };
 
-            pointerReleased = (Object s, PointerRoutedEventArgs eMove) =>
+            pointerReleased = (object s, PointerRoutedEventArgs eMove) =>
             {
                 this.TraceMessage($"PointerReleased");
                 border.PointerPressed -= pointerPressed;
@@ -219,7 +221,7 @@ namespace Catan10
                 }
             };
 
-            pointerMoved = (Object s, PointerRoutedEventArgs eMove) =>
+            pointerMoved = (object s, PointerRoutedEventArgs eMove) =>
             {
 
                 position = eMove.GetCurrentPoint(border).Position;
@@ -237,13 +239,16 @@ namespace Catan10
                     if (sizeableX)
                     {
                         if (ratioX > .5)
+                        {
                             ct.ScaleX = ratioX;
-
+                        }
                     }
                     if (sizeableY)
                     {
                         if (ratioY > .5)
+                        {
                             ct.ScaleY = ratioY;
+                        }
                     }
 
                     return;
@@ -299,7 +304,11 @@ namespace Catan10
 
         private async void OnNextStep(object sender, RoutedEventArgs e)
         {
-            if (CurrentPlayer == null) return;
+            if (CurrentPlayer == null)
+            {
+                return;
+            }
+
             await ProcessEnter(CurrentPlayer, "");
 
         }
@@ -307,7 +316,9 @@ namespace Catan10
         private async void OnUndo(object sender, RoutedEventArgs e)
         {
             if (GameState == GameState.WaitingForNewGame)
+            {
                 return;
+            }
 
             Button button = sender as Button;
             button.IsEnabled = false;
@@ -380,7 +391,7 @@ namespace Catan10
         {
 
         }
-       
+
 
 
         private async void Menu_OnNewGame(object sender, RoutedEventArgs e)
@@ -455,19 +466,21 @@ namespace Catan10
         private void CreateMenuItems()
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
                 return;
+            }
 
             Menu_Games.Items.Clear();
 
 
-           
+
 
             //
             //  The Games Menu has the Description as the menu text ("Regular" should be checked)
             //  and the CatanGame object in the tag.  this is used to manipulate CurrentGame in the GameContainer
             //
-            var availableGames = _gameView.Games;
-            foreach (var game in availableGames)
+            List<CatanGame> availableGames = _gameView.Games;
+            foreach (CatanGame game in availableGames)
             {
 
                 ToggleMenuFlyoutItem item = new ToggleMenuFlyoutItem
@@ -487,7 +500,7 @@ namespace Catan10
             }
 
 
-            foreach (var kvp in StaticHelpers.StringToColorDictionary)
+            foreach (KeyValuePair<string, Windows.UI.Color> kvp in StaticHelpers.StringToColorDictionary)
             {
                 ToggleMenuFlyoutItem item = new ToggleMenuFlyoutItem
                 {
@@ -507,7 +520,11 @@ namespace Catan10
         /// <param name="e"></param>
         private void PlayerColor_Clicked(object sender, RoutedEventArgs e)
         {
-            if (CurrentPlayer == null) return;
+            if (CurrentPlayer == null)
+            {
+                return;
+            }
+
             ToggleMenuFlyoutItem item = sender as ToggleMenuFlyoutItem;
             foreach (ToggleMenuFlyoutItem subItem in Menu_Colors.Items)
             {
@@ -523,17 +540,303 @@ namespace Catan10
             //  this is only needed because Roads don't do proper data binding yet.
             CurrentPlayerColorChanged(CurrentPlayer);
         }
-       
+
         internal void AddPlayerMenu(PlayerData player)
         {
 
-           
+
 
         }
 
+        private void ToggleShowTile(object sender, RoutedEventArgs e)
+        {
+            ToggleMenuFlyoutItem menu = sender as ToggleMenuFlyoutItem;
+         
+
+            foreach(var tile in _gameView.TilesInIndexOrder)
+            {
+                tile.ShowIndex = menu.IsChecked;
+            }
+        }
+
+        /// <summary>
+        ///     tries to be smart about where to place the baron
+        ///     1. if Dodgy is playing (since he's always Red...) be sure and put it on him
+        ///     2. pick the one with the most resource generating potential
+        ///     3. if the highscore less than 5, try to block brick
+        ///     5. if the highscore >=5, try to block Ore
+        /// </summary>
+
+        private async void OnPickOptimalBaron(object sender, RoutedEventArgs e)
+        {
+
+            if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext && GameState != GameState.MustMoveBaron)
+            {
+                return;
+            }
+
+            PlayerGameData playerGameData = CurrentPlayer.GameData;
+            if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
+            {
+                return;
+            }
+
+           
+
+            List<Target> targetList = PickBaronVictim(true);
+            if (targetList.Count == 0)
+            {
+                MessageDialog dlg = new MessageDialog("I can't seem to be able to find a good candidate.\nFigure it out yourself.");
+                await dlg.ShowAsync();
+                return;
+            }
+
+            //
+            //  Get the high score
+            //  we assume that if the high score is < 6 then we are in the expansion phase of the game
+
+            int highScore = 0;
+            foreach (var p in AllPlayers)
+            {
+                if (p.GameData.Score > highScore)
+                {
+                    highScore = p.GameData.Score;
+                }
+            }
 
 
 
+            targetList.Sort((s1, s2) => s2.ResourcePotential - s1.ResourcePotential);
+            Target target = null;
+            int most = targetList[0].ResourcePotential;
+            ResourceType[] orderedListOfResources = null;
+            if (highScore < 6)
+            {
+                orderedListOfResources = new ResourceType[] { ResourceType.Brick, ResourceType.Wood, ResourceType.Wheat, ResourceType.Sheep, ResourceType.Ore };
+            }
+            else
+            {
+                orderedListOfResources = new ResourceType[] { ResourceType.Ore, ResourceType.Wheat, ResourceType.Sheep, ResourceType.Brick, ResourceType.Wood };
+            }
+
+            //
+            //   if somebody has 9 points, remove all options with player score < 9
+
+            if (highScore == 9)
+            {
+                for (int i=targetList.Count -1; i>=0; i--)
+                {
+                    if (targetList[i].Player.GameData.Score < 9)
+                    {
+                        targetList.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (targetList.Count == 0)
+            {
+                MessageDialog dlg = new MessageDialog("I can't seem to be able to find a good candidate.\nFigure it out yourself.");
+                await dlg.ShowAsync();
+                return;
+            }
+            List<Target> topList = new List<Target>();
+            int mostPotential = targetList[0].ResourcePotential;
+            foreach (var t in targetList)
+            {
+                if (t.ResourcePotential  > mostPotential - .1)
+                {
+                    topList.Add(t);
+                }
+                else
+                {
+                    break; // it is an ordered list
+                }
+            }
+
+            Random rand = new Random((int)DateTime.Now.Ticks);
+
+            target = topList[rand.Next(topList.Count)];
+
+            
+           
+            CatanAction action = CatanAction.PlayedKnight;
+            TargetWeapon weapon = TargetWeapon.Baron;
+            if (GameState == GameState.MustMoveBaron)
+            {
+                action = CatanAction.AssignedBaron;
+            }
+
+            await AssignBaronOrKnight(target.Player, target.Tile, weapon, action, LogType.Normal);
+        }
+
+        private Target FindTarget(List<Target> targetList, ResourceType resourceType, int minPips)
+        {
+            targetList.Sort((s1, s2) => s2.ResourcePotential - s1.ResourcePotential);
+            foreach (var option in targetList)
+            {
+                if (option.Tile.ResourceType == resourceType)
+                {
+                    if (option.ResourcePotential >= minPips)
+                    {
+                        return option;
+
+                    }
+                }
+            }
+
+            return null;
+
+        }
+
+        /// <summary>
+        ///     Picks a random place for the Baron that
+        ///     1. doesn't impact the current player
+        ///     2. does impact another player
+        ///     3. twice as likely to Block a City vs. Block a settlement
+        /// </summary>
+        private async void OnPickRandomBaron(object sender, RoutedEventArgs e)
+        {
+            if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext && GameState != GameState.MustMoveBaron)
+            {
+                return;
+            }
+
+            PlayerGameData playerGameData = CurrentPlayer.GameData;
+            if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
+            {
+                return;
+            }
+
+            List<Target> targetList = PickBaronVictim(true);
+            if (targetList.Count == 0)
+            {
+                MessageDialog dlg = new MessageDialog("I can't seem to be able to find a good candidate.\nFigure it out yourself.");
+                await dlg.ShowAsync();
+                return;
+            }
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            int index = rand.Next(targetList.Count);
+            Target target = targetList[index];
+            CatanAction action = CatanAction.PlayedKnight;
+            TargetWeapon weapon = TargetWeapon.Baron;
+            if (GameState == GameState.MustMoveBaron)
+            {
+                action = CatanAction.AssignedBaron;
+            }
+
+            await AssignBaronOrKnight(target.Player, target.Tile, weapon, action, LogType.Normal);
+
+
+        }
+
+        /// <summary>
+        ///     Go through all the tiles and decide if it is a potential baron victim.
+        ///     rules:
+        ///         1. can't have any of CurrentPlayer's building on it
+        ///         2. can't be empty
+        /// </summary>
+        /// <returns> a List that has the player/tile options</returns>
+        private List<Target> PickBaronVictim(bool weighCities)
+        {
+            var r = new Random((int)DateTime.Now.Ticks);
+            int tileCount = _gameView.TilesInIndexOrder.Length;
+            List<Target> targetList = new List<Target>();
+            foreach (var targetTile in _gameView.TilesInIndexOrder)
+            {
+
+
+                if (targetTile.HasBaron)
+                {
+                    continue;
+                }
+
+                bool impactsCurrentPlayer = false;
+                foreach (var building in targetTile.OwnedBuilding)
+                {
+                    //  got to go through all of them because you don't want
+                    //  to pick a tile that impacts the CurrentPlayer
+
+                    if (building.Owner == CurrentPlayer)
+                    {
+                        impactsCurrentPlayer = true;
+                        break;
+                    }
+                }
+
+                if (!impactsCurrentPlayer && targetTile.OwnedBuilding.Count > 0)
+                {
+                    //
+                    //  now go through and add them to the list
+                    foreach (var building in targetTile.OwnedBuilding)
+                    {
+                        targetList.Add(new Target(building.Owner, targetTile));
+                        if (weighCities && building.BuildingState == BuildingState.City)
+                        {
+                            //
+                            //  cities are worth twice as much, so put them in twice to make them more likely to be picked
+                            targetList.Add(new Target(building.Owner, targetTile));
+                        }
+                    }
+
+                }
+
+            }
+
+
+            return targetList;
+        }
+    }
+
+    public class Target
+    {
+        public PlayerData Player { get; private set; } = null;
+        public TileCtrl Tile { get; private set; } = null;
+        public int ResourcePotential { get; private set; } = 0;
+        public override string ToString()
+        {
+            return $"{Player,-15} | {Tile,-15} | {ResourcePotential}";
+        }
+        public Target(PlayerData p, TileCtrl t)
+        {
+            Player = p;
+            Tile = t;
+            foreach (var building in Tile.OwnedBuilding)
+            {
+                if (building.BuildingState == BuildingState.Settlement)
+                {
+                    ResourcePotential++;
+                }
+                else if (building.BuildingState == BuildingState.City)
+                {
+                    ResourcePotential += 2;
+                }
+                else
+                {
+                    throw new Exception("This building shouldn't be owned");
+                }
+
+            }
+
+            ResourcePotential *= Tile.Pips;
+
+            if (ResourcePotential > 0)
+            {
+                //
+                //  check to see if this player has 2:1 in a resource from this tile
+               
+                foreach (var harbor in Player.GameData.OwnedHarbors)
+                {
+                    if (StaticHelpers.HarborTypeToResourceType(harbor.HarborType) == Tile.ResourceType)
+                    {
+                        ResourcePotential *= 2;
+                    }
+                }
+            }
+
+            
+
+            
+        }
 
     }
 }

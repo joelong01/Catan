@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.UI.Popups;
 
 namespace Catan10
 {
@@ -30,64 +30,51 @@ namespace Catan10
         StorageFolder _folder = null;
         StorageFile _file = null;
 
-        
-        public LogState State { get; set; } = LogState.Normal;
 
-        public string DisplayName
-        {
-            get
-            {
-                return File.DisplayName;
-            }
-        }
+        public LogState State { get; set; } = LogState.Normal;
+        private int _lastLogRecordWritten = 0;
+
+        public string DisplayName => File.DisplayName;
 
         public async Task Init(string fileName)
         {
             _saveFileName = fileName + MainPage.SAVED_GAME_EXTENSION;
             _folder = await StaticHelpers.GetSaveFolder();
             _file = await _folder.CreateFileAsync(_saveFileName, CreationCollisionOption.OpenIfExists);
+            _lastLogRecordWritten = 0;
         }
 
         public Log(StorageFile file)
         {
             _file = file;
-            _saveFileName = _file.DisplayName;            
+            _saveFileName = _file.DisplayName;
+            _folder = StaticHelpers.GetSaveFolder().Result;
+            _lastLogRecordWritten = 0;
         }
 
         public Log()
         {
-            
+
         }
 
-        public StorageFile File
+        public StorageFile File => _file;
+
+        public List<LogEntry> LogEntries => this;
+
+        public void AppendLogLineNoDisk(LogEntry le)
         {
-            get
+            if (le.LogType == LogType.DoNotLog)
             {
-                return _file;
+                return;
             }
-        }
 
-        public List<LogEntry> LogEntries
-        {
-            get
-            {
-                return this;
-            }
-        }
-
-      
-        public async Task AppendLogLine(LogEntry le, bool save = true)
-        {
-            
-            if (le.LogType == LogType.DoNotLog) return;
-            
             switch (this.State)
             {
                 case LogState.Normal:
                     le.LogType = LogType.Normal;
                     break;
                 case LogState.Replay:
-                    return;                    
+                    return;
                 case LogState.Undo:
                     le.LogType = LogType.Undo;
                     break;
@@ -95,22 +82,22 @@ namespace Catan10
                     break;
             }
 
-           
-
-
             le.LogLineIndex = Count;
 
             if (le.LogType == LogType.Undo)
             {
-                for (int i=Count-1; i>=0; i--)
+                for (int i = Count - 1; i >= 0; i--)
                 {
                     if (this[i].LogType != LogType.Undo)
                     {
                         if (this[i].Undone == false)
                         {
-                            le.IndexOfUndoneAction = i;
-                            this[i].Undone = true;
-                            break;
+                            if (this[i].Action == le.Action)
+                            {
+                                le.IndexOfUndoneAction = i;
+                                this[i].Undone = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -118,59 +105,69 @@ namespace Catan10
             }
 
             Add(le);
-            if (save)
+          //  Debug.WriteLine(le);
+        }
+
+        public async Task AppendLogLine(LogEntry le, bool save = true)
+        {
+
+            AppendLogLineNoDisk(le);
+            if (save && this.State != LogState.Replay)
             {
-                await AppendPersistentLog(le);
+                await WriteUnwrittenLinesToDisk();
             }
 
             //Debug.WriteLine(le);
         }
 
-
-        public async Task AppendPersistentLog(LogEntry le, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
+        /// <summary>
+        ///     write unwritten log lines to disk
+        /// </summary>
+        /// <returns></returns>
+        public async Task WriteUnwrittenLinesToDisk()
         {
-
-            int count = 0;
-            
-            do
+            try
             {
-                if (this.State == LogState.Replay) return;
 
-                if (_file == null)
-                    return;
-                try
+
+                if (this.Count == 0)
                 {
-                    string s = String.Format($"{le}\r\n");
-                    await FileIO.AppendTextAsync(_file, s);
-                    break;
-
+                    return;
                 }
-                catch (Exception exception)
-                {                    
-                    count++;
-                    if (count == 2)
+
+                int count = this.Count; // this might change while we loop because of the await
+
+                for (int i = _lastLogRecordWritten; i < count; i++)
+                {
+                    LogEntry le = this[i];
+                    if (!le.Persisted)
                     {
-                        string s = StaticHelpers.GetErrorMessage($"Error saving to file {_saveFileName}", exception, cfp, cmb, cln);
-                        MessageDialog dlg = new MessageDialog(s);
-                        await dlg.ShowAsync();
-                        break;
+                        string s = String.Format($"{le.Serialize()}\r\n");
+                        await FileIO.AppendTextAsync(_file, s);
+                        le.Persisted = true;
 
                     }
-                    else
-                    {
-                        this.TraceMessage($"Error writing log file.  retrying. LogEntry: {le}", cmb, cln, cfp);
-                        await Task.Delay(500);
-                    }
-
 
                 }
-            } while (true);
+                _lastLogRecordWritten = count;
+
+            }
+            catch
+            {
+                //  this.TraceMessage($"Caught Exception when writing to disk: {e}");
+                //
+                //  just eat it.  we'll save it the next time 
+            }
+
+
         }
 
         public async Task<bool> Parse(ILogParserHelper helper)
         {
             if (this.Count != 0)
+            {
                 return true; // already parsed this
+            }
 
             string contents = await FileIO.ReadTextAsync(_file);
 
@@ -182,38 +179,30 @@ namespace Catan10
             }
             foreach (string line in tokens)
             {
-                LogEntry le = new LogEntry(line, helper);
-                await this.AppendLogLine(le, false);
+                LogEntry le = new LogEntry(line, helper)
+                {
+                    Persisted = true
+                };
 
+                Add(le);
+                Debug.WriteLine(le);
             }
 
             return true;
 
         }
 
+        internal void Reset()
+        {
+            //base.Clear();
+            //this.State = LogState.Normal;
+        }
 
-
-        //public async Task<bool> Parse(ILogParserHelper helper)
-        //{
-
-        //    string contents = await FileIO.ReadTextAsync(_file);
-
-        //    string[] tokens = contents.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        //    if (tokens.Count() < 5)
-        //    {
-        //        this.TraceMessage("Invalid Log -- too few log lines");
-        //        return false;
-        //    }
-        //    foreach (string line in tokens)
-        //    {
-        //        LogEntry le = new LogEntry(line, helper);
-        //        await log.AppendLogLine(le, false);
-
-        //    }
-
-        //    return log;
-        //}
-
+        internal void Start()
+        {
+            //base.Clear();
+            //this.State = LogState.Normal;
+        }
     }
 
     public interface ILogParserHelper
@@ -221,15 +210,16 @@ namespace Catan10
         TileCtrl GetTile(int tileIndex, int gameIndex);
         RoadCtrl GetRoad(int roadIndex, int gameIndex);
         BuildingCtrl GetBuilding(int buildingIndex, int gameIndex);
-        PlayerData GetPlayerData(int playerIndex);        
+        PlayerData GetPlayerData(int playerIndex);
     }
 
     public interface ILog
     {
         Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
+        void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
     }
 
-    public enum LogType {Normal, Undo, Replay, DoNotLog, DoNotUndo, Test };
+    public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo, Test };
 
 
     //   an object that encapsulates an action that has happned in the game
@@ -250,18 +240,22 @@ namespace Catan10
         public string MemberName { get; set; } = "";
         public int LineNumber { get; set; } = -1;
         public string Path { get; set; } = "";
+
+        public bool Persisted { get; set; } = false;
         public string PlayerName
         {
             get
             {
                 if (PlayerData == null)
+                {
                     return "<none>";
+                }
 
                 return PlayerData.PlayerName;
             }
         }
 
-        public LogEntry(PlayerData p, GameState s, CatanAction a, int n, bool stopUndo, LogType type = LogType.Normal,  object tag = null, [CallerMemberName] string cmn = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
+        public LogEntry(PlayerData p, GameState s, CatanAction a, int n, bool stopUndo, LogType type = LogType.Normal, object tag = null, [CallerMemberName] string cmn = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
             PlayerData = p;
             GameState = s;
@@ -273,10 +267,14 @@ namespace Catan10
             MemberName = cmn;
             LineNumber = cln;
             Path = cfp;
-            
+
         }
 
-        private string[] _serializeProperties = new string[] {"LogLineIndex", "LogType", "Undone", "PlayerDataString", "GameState", "Action", "Number", "IndexOfUndoneAction", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber", "Path" };
+        static readonly private string[] _serializeProperties = new string[] { "LogLineIndex", "Persisted", "LogType", "Undone", "PlayerDataString", "GameState", "Action", "Number", "IndexOfUndoneAction", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber" }; // "Path" removed
+        /// <summary>
+        ///     this is mostly used for Console and debugging
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             if (TagAsString == "" && Tag != null)
@@ -286,12 +284,30 @@ namespace Catan10
 
             if (PlayerData != null && PlayerDataString == "")
             {
+                PlayerDataString = String.Format($"{PlayerData.PlayerName}");
+            }
+
+            return $"Index:{this.LogLineIndex,-5} | State:{GameState,-30} | Action:{Action,-25} | LogType:{LogType,-10} | Undone:{Undone,-6} | UndoneIndex:{IndexOfUndoneAction,5} | {PlayerDataString,-5} | #:{Number,-5} Tag:{TagAsString,-20}";
+
+
+        }
+
+        /// <summary>
+        ///     this is what is put onto disk for the LogEntry
+        /// </summary>
+        public string Serialize()
+        {
+            if (TagAsString == "" && Tag != null)
+            {
+                TagAsString = Tag.ToString();
+            }
+
+            if (PlayerData != null)
+            {
                 PlayerDataString = String.Format($"{PlayerData.PlayerName}.{PlayerData.AllPlayerIndex}.{PlayerData.PlayerPosition}");
             }
 
             return StaticHelpers.SerializeObject<LogEntry>(this, _serializeProperties, "=", "|");
-
-
         }
 
         public LogEntry(string s, ILogParserHelper parseHelper)
@@ -326,7 +342,7 @@ namespace Catan10
                     break;
                 case CatanAction.AssignHarbors:
                 case CatanAction.AssignRandomTiles:
-                case CatanAction.AssignRandomNumbersToTileGroup:
+                case CatanAction.RandomizeTiles:
                     Tag = LogList<int>.CreateAndParse(val);
                     break;
                 case CatanAction.ChangedState:
@@ -340,6 +356,12 @@ namespace Catan10
                     break;
                 case CatanAction.RoadTrackingChanged:
                     Tag = new LogRoadTrackingChanged(val);
+                    break;
+                case CatanAction.ChangedPlayerProperty:
+                    Tag = new LogPropertyChanged(val);
+                    break;
+                case CatanAction.AddResourceCount:
+                    Tag = new LogResourceCount(val);
                     break;
                 default:
                     break;
@@ -360,7 +382,6 @@ namespace Catan10
                 // this is a normal occurance when there isn't a player, like the beginning of the game
                 return;
             }
-                
 
 
             if (Int32.TryParse(tokens[1], out int index))
@@ -383,13 +404,9 @@ namespace Catan10
 
 
 
-        public bool Undoable
-        {
-            get
-            {
-                return (Action != CatanAction.ChangedState);
-            }
-        }
+        public bool Undoable => (Action != CatanAction.ChangedState);
+
+
     }
 
     public class LogSetFirstPlayer
@@ -404,7 +421,7 @@ namespace Catan10
             Deserialize(saved);
         }
 
-        private string[] _serializedProperties = new string[] { "FirstPlayerIndex" };
+        private readonly string[] _serializedProperties = new string[] { "FirstPlayerIndex" };
 
         public override string ToString()
         {
@@ -422,12 +439,12 @@ namespace Catan10
     {
         public int From { get; set; } = -1;
         public int To { get; set; } = -1;
-        private string[] _serializedProperties = new string[] { "From", "To" };
+        private readonly string[] _serializedProperties = new string[] { "From", "To" };
         public LogChangePlayer(int old, int newIdx)
         {
             From = old;
             To = newIdx;
-         //   this.TraceMessage(this.ToString());
+            //   this.TraceMessage(this.ToString());
         }
         public LogChangePlayer(string saved)
         {
@@ -436,7 +453,7 @@ namespace Catan10
 
         public override string ToString()
         {
-           return StaticHelpers.SerializeObject<LogChangePlayer>(this, _serializedProperties, ":", ",");
+            return StaticHelpers.SerializeObject<LogChangePlayer>(this, _serializedProperties, ":", ",");
 
         }
 
@@ -450,14 +467,14 @@ namespace Catan10
     {
         public GameState OldState { get; set; } = GameState.Uninitialized;
         public GameState NewState { get; set; } = GameState.Uninitialized;
-        
-        private string[] _serializedProperties = new string[] { "OldState", "NewState" };
+
+        private readonly string[] _serializedProperties = new string[] { "OldState", "NewState" };
 
         public LogStateTranstion(GameState old, GameState newState)
         {
             OldState = old;
             NewState = newState;
-            
+
         }
 
         public LogStateTranstion(string saved)
@@ -482,15 +499,15 @@ namespace Catan10
     {
         public int OldVal { get; set; } = 0;
         public int NewVal { get; set; } = 0;
-        
 
-        private string[] _serializedProperties = new string[] { "oldVal", "newVal"};
+
+        private readonly string[] _serializedProperties = new string[] { "OldVal", "NewVal" };
 
         public LogCardsLost(int old, int newState)
         {
             OldVal = old;
             NewVal = newState;
-         
+
         }
 
         public LogCardsLost(string saved)
@@ -510,13 +527,88 @@ namespace Catan10
         }
 
     }
-    
+
+    public class LogResourceCount
+    {
+        public int OldVal { get; set; } = 0;
+        public int NewVal { get; set; } = 0;
+        public ResourceType ResourceType { get; set; } = ResourceType.None;
+
+
+        private readonly string[] _serializedProperties = new string[] { "OldVal", "NewVal", "ResourceType" };
+
+        public LogResourceCount(int oldVal, int newVal, ResourceType resType)
+        {
+            OldVal = oldVal;
+            NewVal = newVal;
+            ResourceType = resType;
+
+        }
+
+        public LogResourceCount(string saved)
+        {
+            Deserialize(saved);
+        }
+
+        public override string ToString()
+        {
+            return StaticHelpers.SerializeObject<LogResourceCount>(this, _serializedProperties, ":", ",");
+
+        }
+
+        public void Deserialize(string saved)
+        {
+            StaticHelpers.DeserializeObject<LogResourceCount>(this, saved, ":", ",");
+        }
+
+    }
+
+
+    /// <summary>
+    ///     this class can generically save an property name as a string
+    ///     use StaticHelpers.SetKeyValue<>() to set the property when 
+    ///     undoing or replaying the log
+    /// </summary>
+    public class LogPropertyChanged
+    {
+        public string OldVal { get; set; } = "";
+        public string NewVal { get; set; } = "";
+        public string PropertyName { get; set; } = "";
+
+        private readonly string[] _serializedProperties = new string[] { "PropertyName", "OldVal", "NewVal" };
+
+        public LogPropertyChanged(string name, string oldVal, string newVal)
+        {
+            OldVal = oldVal;
+            NewVal = newVal;
+            PropertyName = name;
+        }
+
+        public LogPropertyChanged(string saved)
+        {
+            Deserialize(saved);
+        }
+
+        public override string ToString()
+        {
+            return StaticHelpers.SerializeObject<LogPropertyChanged>(this, _serializedProperties, ":", ",");
+
+        }
+
+        public void Deserialize(string saved)
+        {
+            StaticHelpers.DeserializeObject<LogPropertyChanged>(this, saved, ":", ",");
+        }
+
+
+    }
+
     internal class LogRoadTrackingChanged
     {
         public string OldState { get; set; } = "";
         public string NewState { get; set; } = "";
 
-        private string[] _serializedProperties = new string[] { "OldState", "NewState" };
+        private readonly string[] _serializedProperties = new string[] { "OldState", "NewState" };
 
         public LogRoadTrackingChanged(string oldState, string newState)
         {
@@ -572,7 +664,7 @@ namespace Catan10
     {
 
         public TargetWeapon TargetWeapon { get; set; }          // how I targeted
-        public CatanAction  Action { get; set;}
+        public CatanAction Action { get; set; }
 
         public PlayerData SourcePlayer { get; set; } = null;
         public PlayerData TargetPlayer { get; set; } = null;
@@ -588,7 +680,7 @@ namespace Catan10
 
         public int GameIndex { get; set; } = -1;
 
-        private string[] _serializedProperties = new string[] { "TargetWeapon", "SourcePlayerIndex", "TargetPlayerIndex", "StartTileIndex","TargetTileIndex", "GameIndex", "Action" };
+        private readonly string[] _serializedProperties = new string[] { "TargetWeapon", "SourcePlayerIndex", "TargetPlayerIndex", "StartTileIndex", "TargetTileIndex", "GameIndex", "Action" };
 
         public LogBaronOrPirate(string serialized, ILogParserHelper parseHelper)
         {
@@ -650,7 +742,7 @@ namespace Catan10
         public int Index { get; set; } = -1;
         public RoadCtrl Road { get; set; } = null;
         public int GameIndex { get; set; } = -1;
-        private string[] _serializedProperties = new string[] { "OldRoadState", "Index", "NewRoadState", "GameIndex" };
+        private readonly string[] _serializedProperties = new string[] { "OldRoadState", "Index", "NewRoadState", "GameIndex" };
 
         public LogRoadUpdate(string s, ILogParserHelper parseHelper)
         {
@@ -693,7 +785,7 @@ namespace Catan10
         public int GameIndex { get; set; } = -1;
 
 
-        private string[] _serializedProperties = new string[] { "OldBuildingState", "NewBuildingState", "BuildingIndex", "TileIndex", "GameIndex" };
+        private readonly string[] _serializedProperties = new string[] { "OldBuildingState", "NewBuildingState", "BuildingIndex", "TileIndex", "GameIndex" };
 
         public LogBuildingUpdate(string s, ILogParserHelper parseHelper)
         {
@@ -714,7 +806,9 @@ namespace Catan10
             BuildingIndex = buildingCtrl.Index;
             NewBuildingState = newState;
             if (tileCtrl != null)
+            {
                 TileIndex = tileCtrl.Index;
+            }
         }
         public override string ToString()
         {

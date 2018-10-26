@@ -95,19 +95,35 @@ namespace Catan10
 
         };
 
-
-
-        public static bool IsInVisualStudioDesignMode
+        public static ResourceType HarborTypeToResourceType(HarborType ht)
         {
-            get
+            switch (ht)
             {
-                return !(Application.Current is App);
+                case HarborType.Sheep:
+                    return ResourceType.Sheep;
+                case HarborType.Wood:
+                    return ResourceType.Wood;
+                case HarborType.Ore:
+                    return ResourceType.Ore;
+                case HarborType.Wheat:
+                    return ResourceType.Wheat;
+                case HarborType.Brick:
+                    return ResourceType.Brick;
+                case HarborType.ThreeForOne:                   
+                case HarborType.Uninitialized:                   
+                case HarborType.None:
+                default:
+                    break;
             }
+
+            return ResourceType.None;
         }
+
+        public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
 
         public static async Task<StorageFolder> GetSaveFolder([CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
-            System.Diagnostics.Debug.WriteLine($"GetSaveFolder called.  File: {cfp}, Method: {cmb}, Line Number: {cln}");
+            // System.Diagnostics.Debug.WriteLine($"GetSaveFolder called.  File: {cfp}, Method: {cmb}, Line Number: {cln}");
 
             string token = "default";
             StorageFolder folder = null;
@@ -148,7 +164,7 @@ namespace Catan10
 
                 return folder;
             }
-            catch(Exception except)
+            catch (Exception except)
             {
                 Debug.WriteLine(except.ToString());
             }
@@ -227,7 +243,7 @@ namespace Catan10
         }
         public static void Assert(bool val, string message, [CallerFilePath] string file = "", [CallerMemberName] string memberName = "", [CallerLineNumber] int lineNumber = 0)
         {
-            string msg = String.Format($"File: {file}, Method: {memberName}, Line Number: {lineNumber}\n\n{message}");
+            string msg = string.Format($"File: {file}, Method: {memberName}, Line Number: {lineNumber}\n\n{message}");
             Debug.Assert(val, msg);
 
 
@@ -235,17 +251,21 @@ namespace Catan10
 
         public static string GetErrorMessage(string sErr, Exception e, [CallerFilePath] string file = "", [CallerMemberName] string memberName = "", [CallerLineNumber] int lineNumber = 0)
         {
-            return String.Format($"{sErr}\nFile: {file}\n{memberName}: {lineNumber}\n\n{e.ToString()}");
+            return string.Format($"{sErr}\nFile: {file}\n{memberName}: {lineNumber}\n\n{e.ToString()}");
         }
 
         public static bool IsNumber(VirtualKey key)
         {
 
             if ((int)key >= (int)VirtualKey.Number0 && (int)key <= (int)VirtualKey.Number9)
+            {
                 return true;
+            }
 
             if ((int)key >= (int)VirtualKey.NumberPad0 && (int)key <= (int)VirtualKey.NumberPad9)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -254,7 +274,9 @@ namespace Catan10
         {
 
             if (IsNumber(key))
+            {
                 return true;
+            }
 
             switch (key)
             {
@@ -345,7 +367,7 @@ namespace Catan10
             {
                 throw new ArgumentNullException("collection");
             }
-            foreach (var item in collection)
+            foreach (T item in collection)
             {
                 oc.Add(item);
             }
@@ -371,7 +393,7 @@ namespace Catan10
         {
             string s = "";
 
-            foreach (var prop in propNames)
+            foreach (string prop in propNames)
             {
                 PropertyInfo propInfo = t.GetType().GetTypeInfo().GetDeclaredProperty(prop);
 
@@ -397,7 +419,7 @@ namespace Catan10
                 }
                 else
                 {
-                    s += String.Format($"{prop}{kvpSep}{propValue}{propSep}");
+                    s += string.Format($"{prop}{kvpSep}{propValue}{propSep}");
 
                 }
 
@@ -409,12 +431,18 @@ namespace Catan10
         public static Type GetEnumeratedType(this Type type)
         {
             // provided by Array
-            var elType = type.GetElementType();
-            if (null != elType) return elType;
+            Type elType = type.GetElementType();
+            if (null != elType)
+            {
+                return elType;
+            }
 
             // otherwise provided by collection
-            var elTypes = type.GetGenericArguments();
-            if (elTypes.Length > 0) return elTypes[0];
+            Type[] elTypes = type.GetGenericArguments();
+            if (elTypes.Length > 0)
+            {
+                return elTypes[0];
+            }
 
             // otherwise is not an 'enumerated' type
             return null;
@@ -422,7 +450,11 @@ namespace Catan10
 
         public static Dictionary<string, object> DictionaryFromType(object atype)
         {
-            if (atype == null) return new Dictionary<string, object>();
+            if (atype == null)
+            {
+                return new Dictionary<string, object>();
+            }
+
             Type t = atype.GetType();
             PropertyInfo[] props = t.GetProperties();
             Dictionary<string, object> dict = new Dictionary<string, object>();
@@ -452,7 +484,7 @@ namespace Catan10
             PointerEventHandler pointerMovedHandler = null;
             PointerEventHandler pointerReleasedHandler = null;
 
-            pointerMovedHandler = (Object s, PointerRoutedEventArgs e) =>
+            pointerMovedHandler = (object s, PointerRoutedEventArgs e) =>
             {
 
                 Point pt = e.GetCurrentPoint(mousePositionWindow).Position;
@@ -463,8 +495,7 @@ namespace Catan10
                     Y = pt.Y - pointMouseDown.Y
                 };
 
-                CompositeTransform compositeTransform = control.RenderTransform as CompositeTransform;
-                if (compositeTransform == null)
+                if (!(control.RenderTransform is CompositeTransform compositeTransform))
                 {
                     compositeTransform = new CompositeTransform();
                     control.RenderTransform = compositeTransform;
@@ -480,7 +511,7 @@ namespace Catan10
 
             };
 
-            pointerReleasedHandler = (Object s, PointerRoutedEventArgs e) =>
+            pointerReleasedHandler = (object s, PointerRoutedEventArgs e) =>
             {
                 UIElement localControl = (UIElement)s;
                 localControl.PointerMoved -= pointerMovedHandler;
@@ -528,6 +559,18 @@ namespace Catan10
             {
                 propInfo.SetValue(t, value);
             }
+            else if (propInfo.PropertyType == typeof(bool?))
+            {
+                if (bool.TryParse(value, out bool res))
+                {
+                    propInfo.SetValue(t, res);
+                }
+                else
+                {
+                    propInfo.SetValue(t, null);
+                }
+
+            }
             else if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(List<>))
             {
                 Type elementType = typeInfo.GenericTypeArguments[0];
@@ -561,7 +604,7 @@ namespace Catan10
             }
             else
             {
-                string error = String.Format($"need to support {propInfo.PropertyType.ToString()} in the deserilizer to load {key} whose value is {value}");
+                string error = string.Format($"need to support {propInfo.PropertyType.ToString()} in the deserilizer to load {key} whose value is {value}");
                 t.TraceMessage(error);
                 throw new Exception(error);
 
@@ -581,7 +624,7 @@ namespace Catan10
             {
                 kvp = StaticHelpers.GetKeyValue(line, kvpSep[0]);
                 t.SetKeyValue(kvp.Key, kvp.Value);
-               
+
             }
 
         }
@@ -638,7 +681,7 @@ namespace Catan10
 
         public static string SetValue(string name, object value)
         {
-            return String.Format($"{name}={value}{lineSeperator}");
+            return string.Format($"{name}={value}{lineSeperator}");
 
         }
 
@@ -690,7 +733,7 @@ namespace Catan10
         public static async Task<Dictionary<string, string>> LoadSectionsFromFile(StorageFolder folder, string filename)
         {
 
-            var file = await folder.GetFileAsync(filename);
+            StorageFile file = await folder.GetFileAsync(filename);
             string contents = await FileIO.ReadTextAsync(file);
             contents = contents.Replace('\r', '\n');
             Dictionary<string, string> sectionsDict = null;
@@ -700,7 +743,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                string content = String.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
+                string content = string.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
             }
@@ -731,7 +774,7 @@ namespace Catan10
             Dictionary<string, Dictionary<string, string>> returnDictionary = new Dictionary<string, Dictionary<string, string>>();
 
 
-            var file = await folder.GetFileAsync(filename);
+            StorageFile file = await folder.GetFileAsync(filename);
             string contents = await FileIO.ReadTextAsync(file);
             contents = contents.Replace('\r', '\n');
             Dictionary<string, string> sectionsDict = null;
@@ -741,7 +784,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                string content = String.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
+                string content = string.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
                 return returnDictionary;
@@ -749,7 +792,7 @@ namespace Catan10
 
             if (sectionsDict.Count == 0)
             {
-                string content = String.Format($"There appears to be no sections in {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.");
+                string content = string.Format($"There appears to be no sections in {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
                 return returnDictionary;
@@ -757,17 +800,17 @@ namespace Catan10
 
             try
             {
-                foreach (var kvp in sectionsDict)
+                foreach (KeyValuePair<string, string> kvp in sectionsDict)
                 {
                     currentKvp = kvp;
-                    var dict = DeserializeDictionary(kvp.Value);
+                    Dictionary<string, string> dict = DeserializeDictionary(kvp.Value);
                     returnDictionary[kvp.Key] = dict;
                 }
 
             }
             catch
             {
-                string content = String.Format($"Error parsing values {folder.Path}\\{filename}.\nSuggest deleting it.\n\nError in section '{currentKvp.Key}' and value '{currentKvp.Value}'");
+                string content = string.Format($"Error parsing values {folder.Path}\\{filename}.\nSuggest deleting it.\n\nError in section '{currentKvp.Key}' and value '{currentKvp.Value}'");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
 
@@ -789,7 +832,7 @@ namespace Catan10
 
             foreach (KeyValuePair<string, string> kvp in dictionary)
             {
-                ret += String.Format("{0}={1}{2}", kvp.Key, kvp.Value, seperator);
+                ret += string.Format("{0}={1}{2}", kvp.Key, kvp.Value, seperator);
 
             }
 
@@ -815,7 +858,7 @@ namespace Catan10
                 {
                     n++;
                     string propValue = methodInfo.Invoke(item, null).ToString();
-                    s += String.Format($"{prefix}-{n}{StaticHelpers.kvpSeperator}{propValue}{StaticHelpers.lineSeperator}");
+                    s += string.Format($"{prefix}-{n}{StaticHelpers.kvpSeperator}{propValue}{StaticHelpers.lineSeperator}");
                 }
             }
 
@@ -867,7 +910,7 @@ namespace Catan10
         public static bool TryParse<T>(this Enum theEnum, string valueToParse, out T returnValue)
         {
             returnValue = default;
-            if (Int32.TryParse(valueToParse, out int intEnumValue))
+            if (int.TryParse(valueToParse, out int intEnumValue))
             {
                 if (Enum.IsDefined(typeof(T), intEnumValue))
                 {
@@ -888,7 +931,7 @@ namespace Catan10
             List<T> list = new List<T>();
             char[] charSep = sep.ToCharArray();
             string[] tokens = s.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var t in tokens)
+            foreach (string t in tokens)
             {
                 T value = (T)Convert.ChangeType(t, typeof(T));
                 list.Add(value);
@@ -901,7 +944,7 @@ namespace Catan10
             List<T> list = new List<T>();
             char[] charSep = sep.ToCharArray();
             string[] tokens = s.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var t in tokens)
+            foreach (string t in tokens)
             {
                 T value = default;
                 if (Enum.IsDefined(typeof(T), t))
@@ -939,7 +982,7 @@ namespace Catan10
                 }
                 else
                 {
-                    Debug.Assert(false, String.Format($"Bad token count in DeserializeDictionary. Pairs.Count: {pairs.Count()} "));
+                    Debug.Assert(false, string.Format($"Bad token count in DeserializeDictionary. Pairs.Count: {pairs.Count()} "));
                 }
 
 
@@ -953,7 +996,9 @@ namespace Catan10
         {
             Dictionary<string, string> sections = StaticHelpers.GetSections(file);
             if (sections == null)
+            {
                 return null;
+            }
 
             return StaticHelpers.DeserializeDictionary(sections[section]);
 
@@ -965,13 +1010,13 @@ namespace Catan10
         {
             if (setTimeout)
             {
-                foreach (var animations in sb.Children)
+                foreach (Timeline animations in sb.Children)
                 {
                     animations.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
                 }
             }
 
-            var tcs = new TaskCompletionSource<object>();
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
             void completed(object s, object e) => tcs.TrySetResult(null);
             try
             {
@@ -982,7 +1027,10 @@ namespace Catan10
             finally
             {
                 sb.Completed -= completed;
-                if (callStop) sb.Stop();
+                if (callStop)
+                {
+                    sb.Stop();
+                }
             }
 
         }
@@ -1020,7 +1068,9 @@ namespace Catan10
         public static T Peek<T>(this List<T> list)
         {
             if (list.Count > 0)
+            {
                 return list.Last();
+            }
 
             return default;
         }
@@ -1062,7 +1112,7 @@ namespace Catan10
         {
             if (setTimeout)
             {
-                foreach (var animations in sb.Children)
+                foreach (Timeline animations in sb.Children)
                 {
                     animations.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
                 }
@@ -1074,7 +1124,7 @@ namespace Catan10
         static public void SetFlipAnimationSpeed(Storyboard sb, double milliseconds)
         {
 
-            foreach (var animation in sb.Children)
+            foreach (Timeline animation in sb.Children)
             {
                 if (animation.Duration != TimeSpan.FromMilliseconds(0))
                 {
@@ -1153,7 +1203,10 @@ namespace Catan10
             try
             {
                 if (!(SettingExists(key, location)))
+                {
                     return otherwise;
+                }
+
                 switch (location)
                 {
                     case StorageStrategies.Local:
@@ -1225,9 +1278,12 @@ namespace Catan10
         /// <param name="location">Location storage strategy</param>
         public static async Task<bool> DeleteFileAsync(string key, StorageStrategies location = StorageStrategies.Local)
         {
-            var _File = await GetIfFileExistsAsync(key, location);
+            StorageFile _File = await GetIfFileExistsAsync(key, location);
             if (_File != null)
+            {
                 await _File.DeleteAsync();
+            }
+
             return !(await FileExistsAsync(key, location));
         }
 
@@ -1241,13 +1297,15 @@ namespace Catan10
             try
             {
                 // fetch file
-                var _File = await GetIfFileExistsAsync(key, location);
+                StorageFile _File = await GetIfFileExistsAsync(key, location);
                 if (_File == null)
+                {
                     return default;
+                }
                 // read content
-                var _String = await Windows.Storage.FileIO.ReadTextAsync(_File);
+                string _String = await Windows.Storage.FileIO.ReadTextAsync(_File);
                 // convert to obj
-                var _Result = Deserialize<T>(_String);
+                T _Result = Deserialize<T>(_String);
                 return _Result;
             }
             catch (Exception)
@@ -1264,9 +1322,9 @@ namespace Catan10
         public static async Task<bool> WriteFileAsync<T>(string key, T value, StorageStrategies location = StorageStrategies.Local)
         {
             // create file
-            var _File = await CreateFileAsync(key, location, Windows.Storage.CreationCollisionOption.ReplaceExisting);
+            StorageFile _File = await CreateFileAsync(key, location, Windows.Storage.CreationCollisionOption.ReplaceExisting);
             // convert to string
-            var _String = Serialize(value);
+            string _String = Serialize(value);
             // save string to file
             await Windows.Storage.FileIO.WriteTextAsync(_File, _String);
             // result
@@ -1351,7 +1409,7 @@ namespace Catan10
             {
                 try
                 {
-                    var _Serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(objectToSerialize.GetType());
+                    System.Runtime.Serialization.Json.DataContractJsonSerializer _Serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(objectToSerialize.GetType());
                     _Serializer.WriteObject(_Stream, objectToSerialize);
                     _Stream.Position = 0;
                     System.IO.StreamReader _Reader = new System.IO.StreamReader(_Stream);
@@ -1375,7 +1433,7 @@ namespace Catan10
             {
                 try
                 {
-                    var _Serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
+                    System.Runtime.Serialization.Json.DataContractJsonSerializer _Serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
                     return (T)_Serializer.ReadObject(_Stream);
                 }
                 catch (Exception) { throw; }
@@ -1406,7 +1464,7 @@ namespace Catan10
 
         public static async Task WhenClicked(this Button button)
         {
-            var tcs = new TaskCompletionSource<object>();
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
             void lambda(object s, RoutedEventArgs e) => tcs.TrySetResult(null);
 
             try

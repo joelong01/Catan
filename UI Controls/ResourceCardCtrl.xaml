@@ -42,7 +42,14 @@
                     <TextBlock x:Name="_txtCount" Foreground="Yellow" Text="0" CharacterSpacing="0"  />
                 </Viewbox>
             </Grid>
-            
+            <Grid Name="HarborGrid" Grid.RowSpan="2">
+                <Ellipse x:Name="HarborEllipse" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Top"   
+                         Fill="{x:Bind HarborType, Converter={StaticResource HarborTypeToHarborBrushConverter}, FallbackValue=Purple, Mode=OneWay}" 
+                         Stroke="Red"
+                         StrokeThickness="2"
+                         Visibility = "{x:Bind HarborVisibility, Mode=OneWay, FallbackValue=Collapsed}" >
+                </Ellipse>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

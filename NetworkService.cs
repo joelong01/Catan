@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ServiceModel;
 using Windows.Devices.WiFiDirect;
 using Windows.Networking.Sockets;
-using System.ServiceModel;
 
 namespace Catan10
 {
@@ -23,11 +23,11 @@ namespace Catan10
 
 
 
-    
+
     class CatanService : ICatanRemoteServer
     {
         private StreamSocketListener _tcpListener;
-     //   private StreamSocket _connectedSocket = null;
+        //   private StreamSocket _connectedSocket = null;
         private const string PORT_NUMBER = "1337";
 
         public CatanService() { }
@@ -35,13 +35,13 @@ namespace Catan10
         public void Init()
         {
             // Create an Advertisement Publisher
-            var publisher = new WiFiDirectAdvertisementPublisher();
+            WiFiDirectAdvertisementPublisher publisher = new WiFiDirectAdvertisementPublisher();
 
             // Turn on Listen state
             publisher.Advertisement.ListenStateDiscoverability = WiFiDirectAdvertisementListenStateDiscoverability.Normal;
 
             // Register for connection requests
-            var listener = new WiFiDirectConnectionListener();
+            WiFiDirectConnectionListener listener = new WiFiDirectConnectionListener();
             listener.ConnectionRequested += OnConnectionRequested;
 
             // Start the advertiser
@@ -51,7 +51,7 @@ namespace Catan10
 
         private async void OnConnectionRequested(WiFiDirectConnectionListener sender, WiFiDirectConnectionRequestedEventArgs args)
         {
-            var ConnectionRequest = args.GetConnectionRequest();
+            WiFiDirectConnectionRequest ConnectionRequest = args.GetConnectionRequest();
 
             // Prompt the user to accept/reject the connection request
             // If rejected, exit
@@ -60,7 +60,7 @@ namespace Catan10
             WiFiDirectDevice wfdDevice = await WiFiDirectDevice.FromIdAsync(ConnectionRequest.DeviceInformation.Id);
 
             // Get the local and remote IP addresses
-            var EndpointPairs = wfdDevice.GetConnectionEndpointPairs();
+            IReadOnlyList<Windows.Networking.EndpointPair> EndpointPairs = wfdDevice.GetConnectionEndpointPairs();
 
             // Establish standard WinRT socket with above IP addresses
         }

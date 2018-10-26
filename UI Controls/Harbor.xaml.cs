@@ -18,16 +18,55 @@ namespace Catan10
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
 
-        HarborType myType = HarborType.Brick;
-        SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
-        SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
-        TileOrientation _orientation = TileOrientation.FaceDown;
-        bool _useClassic = true;
-        HarborLocation _location = HarborLocation.None;
-
-        string[] _savePropName = new string[] { "HarborLocation" };
+        private SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
+        private SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
+        private TileOrientation _orientation = TileOrientation.FaceDown;
+        private bool _useClassic = true;
+        private HarborLocation _location = HarborLocation.None;
+        private string[] _savePropName = new string[] { "HarborLocation" };
 
         public double HarborScale { get; set; } = 1.0;
+
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
+        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerData), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
+        public PlayerData Owner
+        {
+            get => (PlayerData)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+        private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as Harbor;
+            var newOwner = (PlayerData)e.NewValue;
+            var oldOwner = (PlayerData)e.OldValue;
+            depPropClass?.SetOwner(oldOwner, newOwner);
+        }
+        //
+        //  update the Owner about who owns this harbor
+        private void SetOwner(PlayerData oldOwner, PlayerData newOwner)
+        {
+            if (oldOwner != null)
+            {
+                oldOwner.GameData.RemoveOwnedHarbor(this);
+            }
+
+            if (newOwner != null)
+            {
+                newOwner.GameData.AddOwnedHarbor(this);
+            }
+        }
+
+        public HarborType HarborType
+        {
+            get => (HarborType)GetValue(HarborTypeProperty);
+            set => SetValue(HarborTypeProperty, value);
+        }
+        public int Index
+        {
+            get => (int)GetValue(IndexProperty);
+            set => SetValue(IndexProperty, value);
+        }
 
         public string Serialize()
         {
@@ -36,7 +75,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"HarborLocation={_location} Visibility={this.Visibility} Type={myType}");
+            return string.Format($"Index={Index} HarborLocation={_location} Type={HarborType}");
         }
 
         public void Deserialize(string s)
@@ -47,12 +86,12 @@ namespace Catan10
 
         public TileOrientation Orientation
         {
-            get { return _orientation; }
+            get => _orientation;
             set
             {
 
 
-                SetOrientationAsync(value, Double.MaxValue);
+                SetOrientationAsync(value, double.MaxValue);
                 _orientation = value;
 
             }
@@ -63,28 +102,21 @@ namespace Catan10
             this.InitializeComponent();
         }
 
-        public HarborType HarborType
+        public void Reset()
         {
-            get { return myType; }
-            set
-            {                
-                // don't protect! - you set it twice to get the classic image
-                // myType set in SetHarborImage();                
-                SetHarborImage(value);             
+            if (Owner != null)
+            {
+                Owner.GameData.RemoveOwnedHarbor(this);
+                Owner = null;
             }
+            
         }
 
-        public FrameworkElement AnimationObject
-        {
-            get
-            {
-                return _backGrid;
-            }
-        }
+        public FrameworkElement AnimationObject => _backGrid;
 
         public void SetHarborImage(HarborType value)
         {
-            myType = value;
+            
             string bitmapPath = "ms-appx:Assets/back.jpg";
 
             if (_useClassic)
@@ -122,7 +154,7 @@ namespace Catan10
                 _text.Visibility = Visibility.Visible;
                 string s = "2 : 1";
                 SolidColorBrush br = _whiteBrush;
-                switch (myType)
+                switch (HarborType)
                 {
                     case HarborType.ThreeForOne:
                         s = "3:1";
@@ -172,18 +204,12 @@ namespace Catan10
 
         public double TextSize
         {
-            get
-            {
-                return _text.FontSize;
-            }
-            set
-            {
-                _text.FontSize = value;
-            }
+            get => _text.FontSize;
+            set => _text.FontSize = value;
         }
 
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -192,14 +218,17 @@ namespace Catan10
 
 
 
-        public async Task SetOrientation(TileOrientation orientation, double animationDuration = Double.MaxValue, double startAfter = 0)
+        public async Task SetOrientation(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
             if (_orientation == orientation)
+            {
                 return;
+            }
 
-
-            if (animationDuration == Double.MaxValue)
+            if (animationDuration == double.MaxValue)
+            {
                 animationDuration = 1000;
+            }
 
             bool flipToFaceUp = (_orientation == TileOrientation.FaceDown) ? true : false;
             _orientation = orientation;
@@ -210,16 +239,21 @@ namespace Catan10
 
         }
 
-        public void SetOrientationAsync(TileOrientation orientation, double animationDuration = Double.MaxValue)
+        public void SetOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue)
         {
             if (_orientation == orientation)
+            {
                 return;
+            }
 
-
-            if (animationDuration == Double.MaxValue)
+            if (animationDuration == double.MaxValue)
+            {
                 animationDuration = 0;
+            }
             else
+            {
                 animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            }
 
             bool flipToFaceUp = (_orientation == TileOrientation.FaceDown) ? true : false;
             _orientation = orientation;
@@ -231,10 +265,7 @@ namespace Catan10
 
         public double ImageRotation
         {
-            get
-            {
-                return _gridFrontTransform.Rotation;
-            }
+            get => _gridFrontTransform.Rotation;
             set
             {
                 _gridFrontTransform.Rotation = value;
@@ -244,10 +275,7 @@ namespace Catan10
 
         public double ImageZoom
         {
-            get
-            {
-                return _gridFrontTransform.ScaleX;
-            }
+            get => _gridFrontTransform.ScaleX;
             set
             {
                 _gridFrontTransform.ScaleX = value;
@@ -259,10 +287,7 @@ namespace Catan10
 
         public bool SmallHarbor
         {
-            get
-            {
-                return (_gridBackTransform.TranslateX == -15);
-            }
+            get => (_gridBackTransform.TranslateX == -15);
             set
             {
                 if (value)
@@ -293,16 +318,9 @@ namespace Catan10
 
         public bool UseClassic
         {
-            get
-            {
-                return _useClassic;
-            }
+            get => _useClassic;
 
-            set
-            {
-                _useClassic = value;
-                HarborType = myType;
-            }
+            set => _useClassic = value;
         }
 
         public Task AnimateMoveTask(Point to, double ms, double startAfter)
@@ -319,58 +337,42 @@ namespace Catan10
 
         public Task RotateTask(double angle, double ms)
         {
+
             _daRotate.To += angle;
             _daRotate.Duration = TimeSpan.FromMilliseconds(ms);
             return _sbRotate.ToTask();
         }
 
-        public CompositeTransform Transform
-        {
-            get
-            {
-                return _gridTransform;
-            }
-        }
+        public CompositeTransform Transform => _gridTransform;
 
         public bool Flip
         {
-            get
-            {
-                return (_gridTransform.Rotation == 180);
-            }
+            get => (_gridTransform.Rotation == 180);
             set
             {
                 if (value)
+                {
                     _gridBackTransform.Rotation = 90;
+                }
                 else
+                {
                     _gridTransform.Rotation = 0;
+                }
             }
         }
 
         public double RotateImage
         {
-            get
-            {
-                return _gridFrontTransform.Rotation;
-            }
-            set
-            {
-                _gridFrontTransform.Rotation = value;
-            }
+            get => _gridFrontTransform.Rotation;
+            set => _gridFrontTransform.Rotation = value;
         }
         //
         //  for information purposes only - no side affects
         public HarborLocation HarborLocation
         {
-            get
-            {
-                return _location;
-            }
+            get => _location;
 
-            set
-            {
-                _location = value;
-            }
+            set => _location = value;
         }
 
         public int TileIndex { get; set; } = 0;

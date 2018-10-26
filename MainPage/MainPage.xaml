@@ -47,7 +47,7 @@
 
 
 
-    <Grid x:Name="ContentRoot">
+    <Grid x:Name="ContentRoot" PointerWheelChanged="OnScrollMouseWheel" >
 
         <Rectangle Fill="{StaticResource bmCherry}" RadiusX="50" RadiusY="50"  Stroke="{StaticResource bmMaple}" StrokeThickness="4" Visibility="Visible"/>
 
@@ -122,12 +122,23 @@
                             <Button x:Name="_showMenu" Content="&#xE1EF;" Style="{StaticResource GameControllerStyle}" Click="OnShowMenu">
                                 <Button.Flyout>
                                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed" >
-                                        <MenuFlyoutItem x:Name="Menu_Test" Text ="Test" Click="OnTest" />
+                                        <MenuFlyoutSubItem Text="Development">
+                                            <MenuFlyoutItem x:Name="Menu_Test" Text ="Test" Click="OnTest" />
+                                            <MenuFlyoutSeparator/>
+                                            <MenuFlyoutItem x:Name="Menu_TestGame" Text ="Test Game" Click="OnTestGame" />
+                                            <MenuFlyoutSeparator/>
+                                            <ToggleMenuFlyoutItem x:Name="Menu_ToggleShowIndex" Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
+                                        </MenuFlyoutSubItem>
                                         <MenuFlyoutSeparator/>
-                                        <MenuFlyoutItem x:Name="Menu_TestGame" Text ="Test Game" Click="OnTestGame" />
-                                        <MenuFlyoutSeparator/>
-                                        <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
-                                        <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
+                                        <MenuFlyoutSubItem Text="Baron">
+                                            <MenuFlyoutItem Text="Optimal" Click="OnPickOptimalBaron" />
+                                            <MenuFlyoutItem Text="Random" Click="OnPickRandomBaron" />
+                                        </MenuFlyoutSubItem>
+                                        <!--<MenuFlyoutSeparator />
+                                        <MenuFlyoutSubItem Text="Pips">
+                                            <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
+                                            <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
+                                        </MenuFlyoutSubItem>-->
                                         <MenuFlyoutSeparator/>
                                         <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
                                         <MenuFlyoutSeparator/>
@@ -137,7 +148,7 @@
                                         </MenuFlyoutSubItem>
                                         
                                         <MenuFlyoutItem x:Name="Menu_Undo" Text="Undo" Click="OnUndoClicked"  />
-                                        <MenuFlyoutItem x:Name="Menu_AssignNumbers" Text="Assign Tile Numbers" Click="OnAssignNumbers"  />
+                                        <MenuFlyoutItem x:Name="Menu_AssignNumbers" Text="Randomize Board" Click="OnAssignNumbers"  />
                                         <MenuFlyoutItem x:Name="Menu_Winner" Text="Winner" Click="OnWinnerClicked" />
                                         <MenuFlyoutItem x:Name="Menu_NewGame" Text="New Game" Click="Menu_OnNewGame" />
                                         <MenuFlyoutItem x:Name="Menu_Open" Text="Show Saved Games" Click="Menu_ShowSavedGames" />

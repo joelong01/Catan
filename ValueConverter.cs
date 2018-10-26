@@ -34,6 +34,57 @@ namespace Catan10
         }
     }
 
+   
+    /// <summary>
+    ///     given a HarborType return the proper image
+    /// </summary>
+    public class HarborTypeToHarborBrush : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            HarborType harbor = (HarborType)value;
+            string bitmapPath = "ms-appx:Assets/back.jpg";
+            switch (harbor)
+            {
+                case HarborType.ThreeForOne:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 3 for 1.png";
+                    break;
+                case HarborType.Brick:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 brick.png";
+                    break;
+                case HarborType.Ore:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 Ore.png";
+                    break;
+                case HarborType.Sheep:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 sheep.png";
+                    break;
+                case HarborType.Wood:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 wood.png";
+                    break;
+                case HarborType.Wheat:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 wheat.png";
+                    break;
+                default:
+                    break;
+            }
+            BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
+            ImageBrush brush = new ImageBrush
+            {
+                AlignmentX = AlignmentX.Left,
+                AlignmentY = AlignmentY.Top,
+                Stretch = Stretch.UniformToFill,
+                ImageSource = bitmapImage
+            };
+
+            return brush;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("HarborTypeToHarborBrush cannot be used in a TwoWay binding");
+        }
+    }
+
     /// <summary>
     ///     used in the building control.  this takes a parameter to indicate which state should be Visible and all others should be collapsed
     ///     parameter is a string
@@ -53,10 +104,33 @@ namespace Catan10
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");           
+            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
         }
     }
 
+    /// <summary>
+    ///     used in the PlayerResourceCountCtrl
+    ///     allows you to bind Visibility to *one* gamestate.  if the GameState is the parameter value, then be visible.
+    ///     else be collapsed
+    /// </summary>
+    public class GameStateToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            GameState desiredState = StaticHelpers.ParseEnum<GameState>((string)parameter);
+            GameState actualState = (GameState)value;
+            if (actualState == desiredState)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
+        }
+    }
 
     /// <summary>
     ///     used in the road control.  this takes a parameter to indicate which state should be Visible and all others should be collapsed
@@ -137,14 +211,16 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if (value == null)
+            {
                 return Colors.Blue;
+            }
 
-            if (targetType == typeof(Color)  && value.GetType() == typeof(String))
+            if (targetType == typeof(Color) && value.GetType() == typeof(String))
             {
                 return StaticHelpers.StringToColorDictionary[(string)value];
             }
 
-            
+
             return ((ColorChoices)value).Background;
         }
     }
@@ -155,7 +231,7 @@ namespace Catan10
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            for (int idx =0; idx<PlayerData._availableColors.Count; idx++)            
+            for (int idx = 0; idx < PlayerData._availableColors.Count; idx++)
             {
                 ColorChoices choice = PlayerData._availableColors[idx];
                 if (choice.Background == (Color)value)
@@ -170,7 +246,9 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if ((int)value == -1)
+            {
                 return PlayerData._availableColors[4].Background;
+            }
 
             return PlayerData._availableColors[(int)value].Background;
         }
@@ -222,7 +300,7 @@ namespace Catan10
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             string s = "";
-            foreach (var val in (List<TileGroup>)value)
+            foreach (TileGroup val in (List<TileGroup>)value)
             {
                 s += val.ToString() + ";";
             }
@@ -279,9 +357,13 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if ((Visibility)value == Visibility.Visible)
+            {
                 return true;
+            }
             else
+            {
                 return false;
+            }
         }
     }
 
@@ -293,13 +375,18 @@ namespace Catan10
             {
                 return null;
             }
-            else return new BitmapImage(new Uri(value as string, UriKind.Absolute));
+            else
+            {
+                return new BitmapImage(new Uri(value as string, UriKind.Absolute));
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if (value == null)
+            {
                 return null;
+            }
 
             return ((BitmapImage)value).UriSource.ToString();
         }
@@ -332,7 +419,9 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if (value == null)
+            {
                 return null;
+            }
 
             return ((BitmapImage)value).UriSource.ToString();
         }
@@ -482,7 +571,10 @@ namespace Catan10
                               string language)
         {
             if (value == null)
+            {
                 return value;
+            }
+
             ObservableCollection<string> col = new ObservableCollection<string>();
             foreach (StorageFile f in value as ObservableCollection<StorageFile>)
             {
@@ -497,14 +589,18 @@ namespace Catan10
                                   object parameter, string language)
         {
             if (parameter.GetType() != typeof(ComboBox))
+            {
                 return null;
+            }
 
             ComboBox bx = parameter as ComboBox;
             ObservableCollection<StorageFile> list = bx.Tag as ObservableCollection<StorageFile>;
-            foreach (var f in list)
+            foreach (StorageFile f in list)
             {
                 if (f.DisplayName == (string)value)
+                {
                     return f;
+                }
             }
 
             return null;
@@ -539,7 +635,9 @@ namespace Catan10
         {
 
             if (value == null)
+            {
                 return false;
+            }
 
             return true;
 

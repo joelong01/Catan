@@ -9,33 +9,27 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, ICatanSettings
     {
-       
+
         public double Zoom
         {
-            get
-            {
-                return _transformGameView.ScaleX;
-            }
+            get => _transformGameView.ScaleX;
 
             set
             {
                 _settings.Zoom = value;
                 _transformGameView.ScaleX = value;
                 _transformGameView.ScaleY = value;
-                
+
             }
         }
-      
+
         public bool RotateTile
         {
-            get
-            {
-                return _settings.RotateTile;
-            }
+            get => _settings.RotateTile;
 
             set
             {
-               
+
                 _settings.RotateTile = value;
                 if (value == false)
                 {
@@ -47,60 +41,43 @@ namespace Catan10
                 }
             }
         }
-        
+
         public bool AnimateFade
         {
-            get
-            {
-               
-                return _settings.AnimateFade;
-            }
+            get => _settings.AnimateFade;
 
-            set
-            {
-                _settings.AnimateFade = value;                
-            }
+            set => _settings.AnimateFade = value;
         }
-        
+
         public int FadeSeconds
         {
-            get
-            {
-                return _settings.FadeSeconds;
-            }
+            get => _settings.FadeSeconds;
 
             set
             {
-                _settings.FadeSeconds= value;
+                _settings.FadeSeconds = value;
                 _timer.Interval = TimeSpan.FromSeconds(value);
                 if (value == 0)
-                    _timer.Interval = TimeSpan.FromMilliseconds(250);               
+                {
+                    _timer.Interval = TimeSpan.FromMilliseconds(250);
+                }
             }
         }
 
         public bool ShowStopwatch
         {
-            get
-            {
-                return _settings.ShowStopwatch;
-            }
+            get => _settings.ShowStopwatch;
 
-            set
-            {
-                _settings.ShowStopwatch = value;
-            }
+            set => _settings.ShowStopwatch = value;
         }
 
         public bool UseClassicTiles
         {
-            get
-            {
-                return true;
-            }
+            get => true;
 
             set
             {
-                
+
             }
         }
 
@@ -109,67 +86,62 @@ namespace Catan10
             get
             {
                 if (_settings.AnimationSpeed > 10)
+                {
                     return 4;
+                }
                 else
+                {
                     return _settings.AnimationSpeed;
+                }
             }
 
             set
             {
                 _settings.AnimationSpeed = value;
-                if (value >= 4) _settings.AnimationSpeed = 10;
+                if (value >= 4)
+                {
+                    _settings.AnimationSpeed = 10;
+                }
             }
         }
 
         public bool ResourceTracking
         {
-            get
-            {
-                return true;
-            }
+            get => true;
 
             set
             {
-                
+
             }
         }
 
         public bool UseRandomNumbers
         {
-            get
-            {
-                return true;
-            }
+            get => true;
 
             set
             {
-                
+
             }
         }
 
         public bool ValidateBuilding
         {
-            get
-            {
-                return _settings.ValidateBuilding;
-            }
+            get => _settings.ValidateBuilding;
 
-            set
-            {
-                _settings.ValidateBuilding = value;
-            }
+            set => _settings.ValidateBuilding = value;
         }
 
         public async Task Explorer()
         {
-          
+
             DataPackage dp = new DataPackage();
             dp.SetText(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
             Clipboard.SetContent(dp);
             await Launcher.LaunchFolderAsync(ApplicationData.Current.LocalFolder);
         }
 
-       
+
 
         public async Task NewGame()
         {
@@ -189,7 +161,7 @@ namespace Catan10
             await _sbRotatePlayerAndRolls.ToTask();
         }
 
-      
+
 
         public async Task Winner()
         {
@@ -218,7 +190,7 @@ namespace Catan10
 
 
 
-            var ret = await dlg.ShowAsync();
+            ContentDialogResult ret = await dlg.ShowAsync();
 
 
             return ret == ContentDialogResult.Primary;
@@ -226,27 +198,29 @@ namespace Catan10
 
         public void Close()
         {
-           
+
         }
 
         private bool _initializeSettings = true;
         public async Task SettingChanged()
         {
             if (_initializeSettings)
+            {
                 return;
+            }
 
             await _settings.SaveSettings(_settingsFileName);
         }
         public async Task ResetGridLayout()
         {
-            foreach (var pos in _settings.GridPositions)
+            foreach (GridPosition pos in _settings.GridPositions)
             {
                 pos.TranslateX = 0;
                 pos.TranslateY = 0;
             }
 
             UpdateGridLocations();
-           await SaveGridLocations();
+            await SaveGridLocations();
 
 
         }

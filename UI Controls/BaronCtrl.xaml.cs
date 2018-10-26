@@ -15,7 +15,7 @@ namespace Catan10
         public void MoveAsync(Point to)
         {
             _daX.To = to.X;
-            _daY.To = to.Y;            
+            _daY.To = to.Y;
             _sbMove.Begin();
         }
     }

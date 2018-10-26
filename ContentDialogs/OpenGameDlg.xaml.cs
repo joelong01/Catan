@@ -15,7 +15,7 @@ namespace Catan10
     public sealed partial class OpenGameDlg : ContentDialog
     {
         public ObservableCollection<string> SavedGames { get; set; } = new ObservableCollection<string>();
-        
+
 
         public OpenGameDlg()
         {
@@ -25,27 +25,21 @@ namespace Catan10
         public async Task LoadGames()
         {
 
-            var queryOptions = new QueryOptions(CommonFileQuery.DefaultQuery, new[] { MainPage.SAVED_GAME_EXTENSION })
+            QueryOptions queryOptions = new QueryOptions(CommonFileQuery.DefaultQuery, new[] { MainPage.SAVED_GAME_EXTENSION })
             {
                 FolderDepth = FolderDepth.Shallow
             };
-            var folder = await StaticHelpers.GetSaveFolder();
-            var query = folder.CreateFileQueryWithOptions(queryOptions);
-            var files = await query.GetFilesAsync();
-            foreach (var file in files)
+            Windows.Storage.StorageFolder folder = await StaticHelpers.GetSaveFolder();
+            StorageFileQueryResult query = folder.CreateFileQueryWithOptions(queryOptions);
+            System.Collections.Generic.IReadOnlyList<Windows.Storage.StorageFile> files = await query.GetFilesAsync();
+            foreach (Windows.Storage.StorageFile file in files)
             {
                 SavedGames.Add(file.Name);
             }
         }
 
-        public string SavedGame
-        {
-            get
-            {
-                return _lbGames.SelectedValue as String;
-            }
-        }
-   
+        public string SavedGame => _lbGames.SelectedValue as String;
+
         private void ContentDialog_OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
 
@@ -58,11 +52,11 @@ namespace Catan10
 
         private void Game_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+
         }
 
-    
+
     }
 
- 
+
 }

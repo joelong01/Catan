@@ -23,15 +23,15 @@ namespace Catan10
         public static readonly DependencyProperty ColorCodeTimerProperty = DependencyProperty.Register("ColorCodeTimer", typeof(bool), typeof(StopWatchCtrl), new PropertyMetadata(true));
         public bool ColorCodeTimer
         {
-            get { return (bool)GetValue(ColorCodeTimerProperty); }
-            set { SetValue(ColorCodeTimerProperty, value); }
+            get => (bool)GetValue(ColorCodeTimerProperty);
+            set => SetValue(ColorCodeTimerProperty, value);
         }
 
 
         new public Color Foreground
         {
-            get { return (Color)GetValue(ForegroundProperty); }
-            set { SetValue(ForegroundProperty, value); }
+            get => (Color)GetValue(ForegroundProperty);
+            set => SetValue(ForegroundProperty, value);
         }
         private static void ForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -46,8 +46,8 @@ namespace Catan10
 
         new public Color Background
         {
-            get { return (Color)GetValue(BackgroundProperty); }
-            set { SetValue(BackgroundProperty, value); }
+            get => (Color)GetValue(BackgroundProperty);
+            set => SetValue(BackgroundProperty, value);
         }
         private static void BackgroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -78,24 +78,27 @@ namespace Catan10
             if (ColorCodeTimer)
             {
                 if (_totalTime.TotalSeconds < 60)
+                {
                     _tbTime.Foreground = _green;
+                }
                 else if (_totalTime.TotalSeconds < 120)
+                {
                     _tbTime.Foreground = _yellow;
+                }
                 else if (_totalTime.TotalSeconds > 180)
+                {
                     _tbTime.Foreground = _red;
+                }
             }
 
         }
 
-        
+
 
 
         public TimeSpan TotalTime
         {
-            get
-            {
-                return _totalTime;
-            }
+            get => _totalTime;
             set
             {
                 _totalTime = value;
@@ -119,14 +122,8 @@ namespace Catan10
 
         public DateTime StartTime
         {
-            get
-            {
-                return _start;
-            }
-            set
-            {
-                _start = value;
-            }
+            get => _start;
+            set => _start = value;
         }
     }
 }

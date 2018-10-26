@@ -12,7 +12,7 @@ using Windows.UI.Xaml.Shapes;
 namespace Catan10
 {
     public enum NumberColorTheme { Light, Dark };
-    public enum NumberStyle { Default, ResoureCount};
+    public enum NumberStyle { Default, ResoureCount };
     public sealed partial class CatanNumber : UserControl, INotifyPropertyChanged
     {
         public int Probability { get; set; } = 0; // the number (divided by 36) that represents the probability of this number being rolled
@@ -24,7 +24,7 @@ namespace Catan10
         bool _showEyes = false;
         public NumberColorTheme Theme
         {
-            get { return myTheme; }
+            get => myTheme;
             set { myTheme = value; NotifyPropertyChanged(); }
         }
         public CatanNumber()
@@ -34,13 +34,13 @@ namespace Catan10
 
         public bool ShowEyes
         {
-            get { return _showEyes; }
+            get => _showEyes;
             set
             {
                 _showEyes = value;
                 _rectLeftEye.Visibility = Visibility.Collapsed;
                 _rectRightEye.Visibility = Visibility.Collapsed;
-                if ((Number == 3 || Number == 11 ) && _showEyes)
+                if ((Number == 3 || Number == 11) && _showEyes)
                 {
                     _rectLeftEye.Visibility = Visibility.Visible;
                     _rectRightEye.Visibility = Visibility.Visible;
@@ -54,15 +54,11 @@ namespace Catan10
         public int Number
         {
 
-            get
-            {
-                return Convert.ToInt32(_txtNumber.Text);
-
-            }
+            get => Convert.ToInt32(_txtNumber.Text);
             set
             {
-           
-              
+
+
 
                 bool notifyChange = _txtNumber.Text != value.ToString();
                 try
@@ -100,7 +96,7 @@ namespace Catan10
 
                     if (value == 6 || value == 8)
                     {
-                        Probability = 5; 
+                        Probability = 5;
                         UseOddGrid(true);               // this might look funny since 8 and 6 aren't odd -- but the odds of getting them (5) is odd!
                         _txtNumber.Foreground = _redBrush;
                         SetEllipseColor(_redBrush);
@@ -174,7 +170,7 @@ namespace Catan10
                     if (value == 7 && HideSeven)
                     {
                         Probability = 6;
-                        this.Visibility = Visibility.Collapsed;                        
+                        this.Visibility = Visibility.Collapsed;
                     }
                 }
                 catch (Exception)
@@ -184,9 +180,10 @@ namespace Catan10
 
                 finally
                 {
-                    if (notifyChange) NotifyPropertyChanged();
-
-
+                    if (notifyChange)
+                    {
+                        NotifyPropertyChanged();
+                    }
                 }
 
 
@@ -214,13 +211,17 @@ namespace Catan10
             foreach (UIElement el in _oddGrid.Children)
             {
                 if (el.GetType() == typeof(Ellipse))
+                {
                     ((Ellipse)el).Fill = brush;
+                }
             }
 
             foreach (UIElement el in _evenGrid.Children)
             {
                 if (el.GetType() == typeof(Ellipse))
+                {
                     ((Ellipse)el).Fill = brush;
+                }
             }
         }
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")

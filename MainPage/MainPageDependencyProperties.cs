@@ -1,24 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Graphics.Imaging;
-using Windows.Storage;
-using Windows.Storage.Search;
-using Windows.Storage.Streams;
-using Windows.UI;
-using Windows.UI.Popups;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -31,8 +13,8 @@ namespace Catan10
         public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("Hit Start"));
         public string StateDescription
         {
-            get{return (string)GetValue(StateDescriptionProperty);}
-            set{SetValue(StateDescriptionProperty, value);}
+            get => (string)GetValue(StateDescriptionProperty);
+            set => SetValue(StateDescriptionProperty, value);
         }
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerData), typeof(MainPage), new PropertyMetadata(null, CurrentPlayerChanged));
@@ -43,8 +25,8 @@ namespace Catan10
         }
         private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var depPropClass = d as MainPage;
-            var depPropValue = (PlayerData)e.NewValue;
+            MainPage depPropClass = d as MainPage;
+            PlayerData depPropValue = (PlayerData)e.NewValue;
             depPropClass?.SetCurrentPlayer(depPropValue);
         }
         private void SetCurrentPlayer(PlayerData player)
@@ -70,7 +52,7 @@ namespace Catan10
             }
 
             // tell all the Buildings that the CurrentPlayer has changed
-            foreach (var building in _gameView.AllBuildings)
+            foreach (BuildingCtrl building in _gameView.AllBuildings)
             {
                 building.CurrentPlayer = player;
             }
@@ -93,138 +75,66 @@ namespace Catan10
 
         public string TwelvePercent
         {
-            get
-            {
-                return (string)GetValue(TwelvePercentProperty);
-            }
-            set
-            {
-                SetValue(TwelvePercentProperty, value);
-            }
+            get => (string)GetValue(TwelvePercentProperty);
+            set => SetValue(TwelvePercentProperty, value);
         }
         public string ElevenPercent
         {
-            get
-            {
-                return (string)GetValue(ElevenPercentProperty);
-            }
-            set
-            {
-                SetValue(ElevenPercentProperty, value);
-            }
+            get => (string)GetValue(ElevenPercentProperty);
+            set => SetValue(ElevenPercentProperty, value);
         }
         public string TenPercent
         {
-            get
-            {
-                return (string)GetValue(TenPercentProperty);
-            }
-            set
-            {
-                SetValue(TenPercentProperty, value);
-            }
+            get => (string)GetValue(TenPercentProperty);
+            set => SetValue(TenPercentProperty, value);
         }
 
         public string NinePercent
         {
-            get
-            {
-                return (string)GetValue(NinePercentProperty);
-            }
-            set
-            {
-                SetValue(NinePercentProperty, value);
-            }
+            get => (string)GetValue(NinePercentProperty);
+            set => SetValue(NinePercentProperty, value);
         }
         public string EightPercent
         {
-            get
-            {
-                return (string)GetValue(EightPercentProperty);
-            }
-            set
-            {
-                SetValue(EightPercentProperty, value);
-            }
+            get => (string)GetValue(EightPercentProperty);
+            set => SetValue(EightPercentProperty, value);
         }
         public string SevenPercent
         {
-            get
-            {
-                return (string)GetValue(SevenPercentProperty);
-            }
-            set
-            {
-                SetValue(SevenPercentProperty, value);
-            }
+            get => (string)GetValue(SevenPercentProperty);
+            set => SetValue(SevenPercentProperty, value);
         }
         public string SixPercent
         {
-            get
-            {
-                return (string)GetValue(SixPercentProperty);
-            }
-            set
-            {
-                SetValue(SixPercentProperty, value);
-            }
+            get => (string)GetValue(SixPercentProperty);
+            set => SetValue(SixPercentProperty, value);
         }
         public string FivePercent
         {
-            get
-            {
-                return (string)GetValue(FivePercentProperty);
-            }
-            set
-            {
-                SetValue(FivePercentProperty, value);
-            }
+            get => (string)GetValue(FivePercentProperty);
+            set => SetValue(FivePercentProperty, value);
         }
         public string FourPercent
         {
-            get
-            {
-                return (string)GetValue(FourPercentProperty);
-            }
-            set
-            {
-                SetValue(FourPercentProperty, value);
-            }
+            get => (string)GetValue(FourPercentProperty);
+            set => SetValue(FourPercentProperty, value);
         }
         public string ThreePercent
         {
-            get
-            {
-                return (string)GetValue(ThreePercentProperty);
-            }
-            set
-            {
-                SetValue(ThreePercentProperty, value);
-            }
+            get => (string)GetValue(ThreePercentProperty);
+            set => SetValue(ThreePercentProperty, value);
         }
         public string TwoPercent
         {
-            get
-            {
-                return (string)GetValue(TwoPercentProperty);
-            }
-            set
-            {
-                SetValue(TwoPercentProperty, value);
-            }
+            get => (string)GetValue(TwoPercentProperty);
+            set => SetValue(TwoPercentProperty, value);
         }
         public int TotalRolls
         {
-            get
-            {
-                return (int)GetValue(TotalRollsProperty);
-            }
-            set
-            {
-                SetValue(TotalRollsProperty, value);
-            }
+            get => (int)GetValue(TotalRollsProperty);
+            set => SetValue(TotalRollsProperty, value);
         }
         #endregion
-       
+
     }
 }
