@@ -28,12 +28,9 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-
-
-
-        string _settingsFileName = "CatanSettings.ini";
-        Settings _settings = new Settings();
-        int _supplementalStartIndex = -1;
+        private string _settingsFileName = "CatanSettings.ini";
+        private Settings _settings = new Settings();
+        private int _supplementalStartIndex = -1;
 
         public static readonly string SAVED_GAME_EXTENSION = ".log";
         public const string PlayerDataFile = "players.data";
@@ -41,24 +38,20 @@ namespace Catan10
 
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
 
-
-
-        DispatcherTimer _timer = new DispatcherTimer();
-
-        bool _doDragDrop = false;
-        int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
+        private DispatcherTimer _timer = new DispatcherTimer();
+        private bool _doDragDrop = false;
+        private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
 
 
         public static MainPage Current;
-        UserControl _currentView = null;
-        Log _log = null;
+        private UserControl _currentView = null;
+        private Log _log = null;
 
 
         public ObservableCollection<PlayerData> PlayingPlayers { get; set; } = new ObservableCollection<PlayerData>();
         public ObservableCollection<PlayerData> AllPlayers { get; set; } = new ObservableCollection<PlayerData>();
 
-
-        RoadRaceTracking _raceTracking = null;
+        private RoadRaceTracking _raceTracking = null;
 
 
 
@@ -101,20 +94,21 @@ namespace Catan10
 
         }
 
-        void ShowNumberUi()
+        private void ShowNumberUi()
         {
             _daNumberOpacity.To = 1.0;
             _sbNumberOpacity.Begin();
             RollGrid.IsHitTestVisible = true;
         }
-        void HideNumberUi()
+
+        private void HideNumberUi()
         {
             _daNumberOpacity.To = 0;
             _sbNumberOpacity.Begin();
             RollGrid.IsHitTestVisible = false;
         }
 
-        void ToggleNumberUi()
+        private void ToggleNumberUi()
         {
             if (_daNumberOpacity.To == 1.0)
             {
@@ -345,7 +339,8 @@ namespace Catan10
 
 
         }
-        bool _undoingCardLostHack = false;
+
+        private bool _undoingCardLostHack = false;
         private async void OnPlayerLostCards(PlayerData player, int oldVal, int newVal)
         {
             if (_undoingCardLostHack)
@@ -639,7 +634,7 @@ namespace Catan10
             string toWrite = "";
             foreach (PlayerData p in players)
             {
-                toWrite += String.Format($"[{p.PlayerName}]{StaticHelpers.lineSeperator}{p.Serialize(false)}\n");
+                toWrite += string.Format($"[{p.PlayerName}]{StaticHelpers.lineSeperator}{p.Serialize(false)}\n");
             }
             try
             {
@@ -666,7 +661,7 @@ namespace Catan10
         private async Task<bool> ProcessRoll(string inputText)
         {
             int roll = -1;
-            if (Int32.TryParse(inputText, out roll))
+            if (int.TryParse(inputText, out roll))
             {
                 return await ProcessRoll(roll);
 
@@ -686,17 +681,17 @@ namespace Catan10
             //String.Format("{0:0.#}%", percent * 100)
             TotalRolls = Rolls.Count();
 
-            TwoPercent = String.Format($"{roals[0]} ({percent[0] * 100:0.#}%)");
-            ThreePercent = String.Format($"{roals[1]} ({percent[1] * 100:0.#}%)");
-            FourPercent = String.Format($"{roals[2]} ({percent[2] * 100:0.#}%)");
-            FivePercent = String.Format($"{roals[3]} ({percent[3] * 100:0.#}%)");
-            SixPercent = String.Format($"{roals[4]} ({percent[4] * 100:0.#}%)");
-            SevenPercent = String.Format($"{roals[5]} ({percent[5] * 100:0.#}%)");
-            EightPercent = String.Format($"{roals[6]} ({percent[6] * 100:0.#}%)");
-            NinePercent = String.Format($"{roals[7]} ({percent[7] * 100:0.#}%)");
-            TenPercent = String.Format($"{roals[8]} ({percent[8] * 100:0.#}%)");
-            ElevenPercent = String.Format($"{roals[9]} ({percent[9] * 100:0.#}%)");
-            TwelvePercent = String.Format($"{roals[10]} ({percent[10] * 100:0.#}%)");
+            TwoPercent = string.Format($"{roals[0]} ({percent[0] * 100:0.#}%)");
+            ThreePercent = string.Format($"{roals[1]} ({percent[1] * 100:0.#}%)");
+            FourPercent = string.Format($"{roals[2]} ({percent[2] * 100:0.#}%)");
+            FivePercent = string.Format($"{roals[3]} ({percent[3] * 100:0.#}%)");
+            SixPercent = string.Format($"{roals[4]} ({percent[4] * 100:0.#}%)");
+            SevenPercent = string.Format($"{roals[5]} ({percent[5] * 100:0.#}%)");
+            EightPercent = string.Format($"{roals[6]} ({percent[6] * 100:0.#}%)");
+            NinePercent = string.Format($"{roals[7]} ({percent[7] * 100:0.#}%)");
+            TenPercent = string.Format($"{roals[8]} ({percent[8] * 100:0.#}%)");
+            ElevenPercent = string.Format($"{roals[9]} ({percent[9] * 100:0.#}%)");
+            TwelvePercent = string.Format($"{roals[10]} ({percent[10] * 100:0.#}%)");
 
 
         }
@@ -752,7 +747,7 @@ namespace Catan10
                 return false;
             }
 
-            return Int32.TryParse(tokens[index], out value);
+            return int.TryParse(tokens[index], out value);
         }
 
 
@@ -932,7 +927,7 @@ namespace Catan10
             }
 
             await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
-            
+
         }
         public void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
@@ -947,7 +942,7 @@ namespace Catan10
             }
 
             _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
-            
+
         }
 
         private async Task SetStateAsync(PlayerData player, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
@@ -960,11 +955,11 @@ namespace Catan10
             string n = (player != null) ? player.PlayerName : "<no player>";
 
             LogStateTranstion lst = new LogStateTranstion(GameState, newState);
-           
+
 
             await _log.AppendLogLine(new LogEntry(player, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, n, lineNumber, filePath));
             UpdateUiForState(newState);
-            
+
         }
 
 
@@ -1170,7 +1165,8 @@ namespace Catan10
 
 
         }
-        ConcurrentBag<KeyValuePair<string, string>> concurrentBag = new ConcurrentBag<KeyValuePair<string, string>>();
+
+        private ConcurrentBag<KeyValuePair<string, string>> concurrentBag = new ConcurrentBag<KeyValuePair<string, string>>();
         private void OnTest(object sender, RoutedEventArgs rea)
         {
             //StaticHelpers.SetKeyValue<PlayerGameData>(PlayingPlayers[0].GameData, "TimesTargeted","10");
@@ -1228,7 +1224,7 @@ namespace Catan10
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
         {
-            bool ret = await StaticHelpers.AskUserYesNoQuestion(String.Format($"Are you sure?  This will likely offend some people and annoy others."), "Yes", "No");
+            bool ret = await StaticHelpers.AskUserYesNoQuestion(string.Format($"Are you sure?  This will likely offend some people and annoy others."), "Yes", "No");
             if (!ret)
             {
                 return;
@@ -1248,7 +1244,7 @@ namespace Catan10
         private async Task OnWin()
         {
 
-            bool ret = await StaticHelpers.AskUserYesNoQuestion(String.Format($"Did {CurrentPlayer.PlayerName} really win?"), "Yes", "No");
+            bool ret = await StaticHelpers.AskUserYesNoQuestion(string.Format($"Did {CurrentPlayer.PlayerName} really win?"), "Yes", "No");
             if (ret == true)
             {
                 try
@@ -1258,7 +1254,7 @@ namespace Catan10
                 }
                 catch (Exception e)
                 {
-                    MessageDialog dlg = new MessageDialog(String.Format($"Error in OnWin\n{e.Message}"));
+                    MessageDialog dlg = new MessageDialog(string.Format($"Error in OnWin\n{e.Message}"));
                     await dlg.ShowAsync();
                 }
             }
@@ -1324,49 +1320,7 @@ namespace Catan10
         private int _showPipGroupIndex = 0;
         private async void OnShowPips(object sender, RoutedEventArgs e)
         {
-            _showPipGroupIndex++;
-            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
-            buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
 
-            int pipCountToShow = buildingsOrderedByPips[0].Pips;
-            bool shownOne = false;
-            foreach (BuildingCtrl building in buildingsOrderedByPips)
-            {
-                //
-                //  keep going until the pip count changes - but we have to show at least one
-                if (pipCountToShow != building.Pips && shownOne)
-                {
-                    break;
-                }
-
-                if (building.Pips == 0)  // throw out the ones that have no pips
-                {
-                    building.PipGroup = -1;
-                    continue; // outside the main map or a desert next to nothing
-                }
-
-                if (ValidateBuildingLocation(building, out bool showerror) == false) // throw out the ones you can't build in
-                {
-                    continue;
-                }
-
-                if (building.BuildingState != BuildingState.None)
-                {
-                    continue;  // throw out the non-empty ones
-                }
-
-                //
-                //  if we've got here, we can build on this location and we need to show everythign tha thas this pipcount
-                if (!shownOne)
-                {
-                    pipCountToShow = building.Pips;
-                    shownOne = true;
-                }
-
-                building.PipGroup = _showPipGroupIndex;
-                await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.Normal);
-
-            }
 
 
 
@@ -1407,10 +1361,129 @@ namespace Catan10
             string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
             string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
 
-            return String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
+            return string.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
+        }
+        /// <summary>
+        ///     return a Dictionary of PipGroup to a List of Building that have that number of Pips
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<int, List<BuildingCtrl>> GetBuildingByPips()
+        {
+            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
+            buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+            Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = new Dictionary<int, List<BuildingCtrl>>();
+            //
+            //  first a map of Pips -> building that have that #of Pips
+            foreach (var building in buildingsOrderedByPips)
+            {
+                if (!dictPipsToBuildings.TryGetValue(building.Pips, out List<BuildingCtrl> list))
+                {
+
+                    list = new List<BuildingCtrl>();
+                    dictPipsToBuildings[building.Pips] = list;
+
+                }
+                list.Add(building);
+            }
+            //
+            //  we now have a map of Pips to Buildings, but we want PipGroup to building
+            Dictionary<int, List<BuildingCtrl>> pipGroupToBuildings = new Dictionary<int, List<BuildingCtrl>>();
+            int pipGroup = 0;
+            for (int i = 13; i > 0; i--) // can't have >13 pips in Catan
+            {
+                if (dictPipsToBuildings.TryGetValue(i, out List<BuildingCtrl> list))
+                {
+                    pipGroupToBuildings[pipGroup] = list;
+                    pipGroup++;
+                }
+            }
+
+            return pipGroupToBuildings;
+
         }
 
-      
+        private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
+        {
+
+            if (GameState != GameState.AllocateResourceForward && GameState != GameState.AllocateResourceReverse)
+            {
+                return;
+            }
+
+            int showPipGroupIndex = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
+
+            if (showPipGroupIndex >= 0)
+            {
+                showPipGroupIndex = 1;
+            }
+            else
+            {
+                showPipGroupIndex = -1;
+            }
+
+            _showPipGroupIndex += showPipGroupIndex;
+
+
+            if (_showPipGroupIndex <= 0)
+            {
+
+                _showPipGroupIndex = 0;
+
+            }
+            Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = GetBuildingByPips();
+            if (showPipGroupIndex < 0)
+            {
+                //
+                //  if we went "down" turn off Pips on the last group we showed
+                for (int hideIndex = _showPipGroupIndex; hideIndex < dictPipsToBuildings.Count; hideIndex++)
+                {
+                    List<BuildingCtrl> list = dictPipsToBuildings[hideIndex];
+
+                    foreach (var building in list)
+                    {
+                        if (building.BuildingState == BuildingState.Pips)
+                        {
+                            await building.UpdateBuildingState(building.BuildingState, BuildingState.None, LogType.DoNotLog);
+                        }
+                    }
+                }
+
+                return;
+            }
+
+            if (_showPipGroupIndex > dictPipsToBuildings.Count - 1)
+            {
+                _showPipGroupIndex = dictPipsToBuildings.Count - 1;
+            }
+
+            for (int i = 0; i < _showPipGroupIndex; i++)
+            {
+                List<BuildingCtrl> list = dictPipsToBuildings[i];
+
+                foreach (var building in list)
+                {
+
+                    if (building.Pips == 0)  // throw out the ones that have no pips
+                    {
+                        building.PipGroup = -1;
+                        continue; // outside the main map or a desert next to nothing
+                    }
+
+                    if (ValidateBuildingLocation(building, out bool showerror) == false) // throw out the ones you can't build in
+                    {
+                        continue;
+                    }
+
+                    if (building.BuildingState != BuildingState.None)
+                    {
+                        continue;  // throw out the non-empty ones
+                    }
+
+                    building.PipGroup = i;
+                    await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.Normal);
+                }
+            }
+        }
     }
 }
 

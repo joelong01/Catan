@@ -1496,11 +1496,13 @@ namespace Catan10
             //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
             if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
-                if (building.BuildingState != BuildingState.Pips) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
+                if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
                 {
 
                     await HideAllPipEllipses();
                     _showPipGroupIndex = 0;
+                    
+                
                 }
             }
 

@@ -47,7 +47,7 @@
 
 
 
-    <Grid x:Name="ContentRoot">
+    <Grid x:Name="ContentRoot" PointerWheelChanged="OnScrollMouseWheel" >
 
         <Rectangle Fill="{StaticResource bmCherry}" RadiusX="50" RadiusY="50"  Stroke="{StaticResource bmMaple}" StrokeThickness="4" Visibility="Visible"/>
 
@@ -134,11 +134,11 @@
                                             <MenuFlyoutItem Text="Optimal" Click="OnPickOptimalBaron" />
                                             <MenuFlyoutItem Text="Random" Click="OnPickRandomBaron" />
                                         </MenuFlyoutSubItem>
-                                        <MenuFlyoutSeparator />
+                                        <!--<MenuFlyoutSeparator />
                                         <MenuFlyoutSubItem Text="Pips">
                                             <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
                                             <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
-                                        </MenuFlyoutSubItem>
+                                        </MenuFlyoutSubItem>-->
                                         <MenuFlyoutSeparator/>
                                         <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
                                         <MenuFlyoutSeparator/>
