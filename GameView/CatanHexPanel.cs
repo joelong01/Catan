@@ -619,8 +619,10 @@ namespace Catan10
             {
                 Harbors[i].HarborType = _harborTypes[randomHarborTypeList[i]];
             }
+
+            
         }
-        public void RandomizeTiles(TileGroup tileGroup, List<int> randomResourceTypeList)
+        public List<int> RandomizeTiles(TileGroup tileGroup, List<int> randomResourceTypeList)
         {
 
             if (randomResourceTypeList == null)
@@ -628,13 +630,13 @@ namespace Catan10
                 randomResourceTypeList = GameContainerCtrl.GetRandomList(tileGroup.RandomTiles.Count - 1);
             }
 
-            tileGroup.RandomResourceTypeList = randomResourceTypeList;
             for (int i = 0; i < tileGroup.RandomTiles.Count; i++)
             {
 
                 tileGroup.RandomTiles[i].ResourceType = tileGroup.ResourceTypes[randomResourceTypeList[i]];
             }
 
+            return randomResourceTypeList;
 
         }
 
@@ -1886,8 +1888,9 @@ namespace Catan10
         public List<int> ValidNumbers { get; set; } = new List<int>();
         public List<Harbor> Harbors { get; set; } = new List<Harbor>();
         public List<HarborType> HarborTypes { get; set; } = new List<HarborType>();
-        public List<int> RandomResourceTypeList { get; set; } = new List<int>(); // the random list to shuffle the tile resources. used in save/load
-        public List<int> RandomHarborTypeList { get; set; } = new List<int>(); // the random list to shuffle the harbor resources. used in save/load
+        public List<int> RandomTileList { get; set; } = new List<int>(); // the random list to shuffle the tile resources. used in save/load
+        public List<int> RandomNumbersList { get; set; } = new List<int>(); // the random list of numbers associated with the tiles.
+        
 
         private int _tileCount = 0;
         public int TileCount

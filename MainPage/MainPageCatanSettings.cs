@@ -183,7 +183,7 @@ namespace Catan10
 
                 await _gameView.RandomizeCatanBoard(true);
                 await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
-                await ProcessEnter(CurrentPlayer, "");
+              //  await ProcessEnter(CurrentPlayer, "");
 
 
             };

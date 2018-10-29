@@ -74,6 +74,8 @@ namespace Catan10
                     break;
                 case CatanAction.ChangedState:
                     LogStateTranstion lst = logLine.Tag as LogStateTranstion;
+                    //
+                    //  don't go prior to WaitingForStart
                     if (lst.OldState == GameState.WaitingForStart)
                     {
                         break;
@@ -1175,7 +1177,7 @@ namespace Catan10
             "New Game",             // 1    WaitingForNewGame,                  
             "Starting...",          // 2    Starting,                           
             "Dealing",              // 3    Dealing,                            
-            "Wait",                 // 4    WaitingForStart,                    
+            "Start Game",           // 4    WaitingForStart,                    
             "Next When Done",       // 5    AllocResourceForward,            
             "Next When Done",       // 6    AllocateResourceReverse,            
             "",                     // 7    DoneResourceAllocation,             
@@ -1217,12 +1219,17 @@ namespace Catan10
                         _btnNextStep.IsEnabled = true;
                         break;
                     case GameState.WaitingForStart:
+                        Menu_Undo.IsEnabled = false;
+                        Menu_Winner.IsEnabled = false;
+                        _btnNextStep.IsEnabled = true;
+                        _btnUndo.IsEnabled = false;                        
+                        break;
                     case GameState.WaitingForNext:
                         Menu_Undo.IsEnabled = true;
                         Menu_Winner.IsEnabled = true;
                         _btnNextStep.IsEnabled = true;
                         _btnUndo.IsEnabled = true;
-                        Menu_Undo.IsEnabled = true;
+                        
                         break;
                     case GameState.DoneSupplemental:
                     case GameState.DoneResourceAllocation:
