@@ -261,6 +261,10 @@ namespace Catan10
         private async Task VisualShuffle()
         {
             await _gameView.VisualShuffle();
+            _randomBoardList.Clear();
+            _randomBoardList.Add(_gameView.RandomBoardSettings);
+            _randomBoardListIndex = 0;
+
         }
 
 
@@ -316,7 +320,7 @@ namespace Catan10
 
             //
             //  we used to wait until somebody clicked "Start" after starting a new game.  this was annoying. do it for them.
-            await ProcessEnter(CurrentPlayer, "");
+            //  await ProcessEnter(CurrentPlayer, "");
 
 
         }
@@ -429,6 +433,8 @@ namespace Catan10
                 case GameState.Dealing:
                     break;
                 case GameState.WaitingForStart:
+                    _btnNextStep.IsEnabled = true;
+                    break;
                 case GameState.AllocateResourceForward:
                 case GameState.AllocateResourceReverse:
                     _btnNextStep.IsEnabled = true;
@@ -1224,6 +1230,11 @@ namespace Catan10
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
         {
+            if (GameState != GameState.WaitingForStart)
+            {
+                return;
+            }
+
             bool ret = await StaticHelpers.AskUserYesNoQuestion(string.Format($"Are you sure?  This will likely offend some people and annoy others."), "Yes", "No");
             if (!ret)
             {
@@ -1231,11 +1242,8 @@ namespace Catan10
             }
 
             await _gameView.RandomizeCatanBoard(true);
-            await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
-            if (CurrentPlayer != null)
-            {
-                await ProcessEnter(CurrentPlayer, "");
-            }
+            _randomBoardList.Add(_gameView.RandomBoardSettings);
+
         }
 
         private const int SMALLEST_STATE_COUNT = 8; // can only undo to the first resource allocation
@@ -1318,7 +1326,7 @@ namespace Catan10
         ///      you have to do this every time because people might have built in locations that change the PipGroup
         /// </summary>
         private int _showPipGroupIndex = 0;
-        private async void OnShowPips(object sender, RoutedEventArgs e)
+        private void OnShowPips(object sender, RoutedEventArgs e)
         {
 
 
@@ -1374,7 +1382,7 @@ namespace Catan10
             Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = new Dictionary<int, List<BuildingCtrl>>();
             //
             //  first a map of Pips -> building that have that #of Pips
-            foreach (var building in buildingsOrderedByPips)
+            foreach (BuildingCtrl building in buildingsOrderedByPips)
             {
                 if (!dictPipsToBuildings.TryGetValue(building.Pips, out List<BuildingCtrl> list))
                 {
@@ -1402,8 +1410,48 @@ namespace Catan10
 
         }
 
+        private List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
+        int _randomBoardListIndex = 0;
+        private async void PickAGoodBoard(PointerRoutedEventArgs e)
+        {
+
+
+            if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
+            {
+                _randomBoardListIndex++;
+                if (_randomBoardListIndex == _randomBoardList.Count) // should never be >!!
+                {
+                    //
+                    //  get new ones
+                    await _gameView.RandomizeCatanBoard(true);
+
+                    //
+                    //  save the existing settings
+                    _randomBoardList.Add(_gameView.RandomBoardSettings);
+                  
+                }
+               
+            }
+            else
+            {
+                //wants to see what we had before
+                _randomBoardListIndex--;
+                if (_randomBoardListIndex < 0)
+                {
+                    _randomBoardListIndex = 0;
+                }                
+            }
+
+            await _gameView.RandomizeCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
+        }
+
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {
+            if (GameState == GameState.WaitingForStart)
+            {
+                PickAGoodBoard(e);
+                return;
+            }
 
             if (GameState != GameState.AllocateResourceForward && GameState != GameState.AllocateResourceReverse)
             {
@@ -1439,7 +1487,7 @@ namespace Catan10
                 {
                     List<BuildingCtrl> list = dictPipsToBuildings[hideIndex];
 
-                    foreach (var building in list)
+                    foreach (BuildingCtrl building in list)
                     {
                         if (building.BuildingState == BuildingState.Pips)
                         {
@@ -1460,7 +1508,7 @@ namespace Catan10
             {
                 List<BuildingCtrl> list = dictPipsToBuildings[i];
 
-                foreach (var building in list)
+                foreach (BuildingCtrl building in list)
                 {
 
                     if (building.Pips == 0)  // throw out the ones that have no pips

@@ -7,6 +7,96 @@ using Windows.UI.Xaml.Input;
 
 namespace Catan10
 {
+    public class RandomLists
+    {
+        public List<int> TileList { get; set; } = null;
+        public List<int> NumberList { get; set; } = null;
+
+        public RandomLists(){}
+        public RandomLists(string saved)
+        {
+            Deserialize(saved);
+        }
+    
+        public RandomLists(TileGroup tg)
+        {
+            TileList = tg.RandomTileList;
+            NumberList = tg.RandomNumbersList;
+        }
+
+
+        public string Serialize()
+        {
+            return StaticHelpers.SerializeObject<RandomLists>(this, _serializedProperties, ":", ",");
+        }
+
+        public void Deserialize(string saved)
+        {
+            StaticHelpers.DeserializeObject<RandomLists>(this, saved, ":", ",");
+        }
+
+        private readonly string[] _serializedProperties = new string[] { "TileList", "NumberList" };
+
+    }
+    public class RandomBoardSettings
+    {
+         //
+         // every TileGroup has a list that says where to put the tiles
+         // and another list that says what number to put on the tiles
+         //
+         // the int here is the TileGroup Index
+         //
+        public Dictionary<int, RandomLists> TileGroupToRandomListsDictionary { get; set; } = new Dictionary<int, RandomLists>();
+
+        //
+        //  every Board has a random list of harbors
+        public List<int> RandomHarborTypeList { get; set; } = null;
+        public RandomBoardSettings() { }
+
+        public override string ToString()
+        {
+            return Serialize();
+        }
+
+        public RandomBoardSettings(Dictionary<int, RandomLists> Tiles, List<int> Harbors)
+        {
+            RandomHarborTypeList = Harbors;
+            TileGroupToRandomListsDictionary = Tiles;
+        }
+
+        public string Serialize()
+        {
+            string s = "";
+            foreach (var kvp in TileGroupToRandomListsDictionary)
+            {
+                s += kvp.Key + "=" + kvp.Value.Serialize();
+                s += "~";
+            }
+            s += RandomHarborTypeList.SerializeList(",");
+            return s;
+        }
+
+        public void Deserialize(string saved)
+        {
+            
+
+            string[] tokens = saved.Split(new char[] { '~' }, StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length < 2) return;
+
+            for (int i=0; i<tokens.Length-1; i++) // the last one is the harbor list
+            {
+
+                var kvp = StaticHelpers.GetKeyValue(tokens[i]);
+                TileGroupToRandomListsDictionary[int.Parse(kvp.Key)] = new RandomLists(kvp.Value);
+            }
+            
+            RandomHarborTypeList = tokens[tokens.Length - 1].DeserializeList<int>(",");
+
+        }
+
+        private readonly string[] _serializedProperties = new string[] { "TileList", "NumberList" };
+
+    }
 
 
     public enum GameState
@@ -278,6 +368,7 @@ namespace Catan10
 
             }
         }
+
 
 
 
