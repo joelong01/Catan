@@ -109,8 +109,8 @@ namespace Catan10
                     return ResourceType.Wheat;
                 case HarborType.Brick:
                     return ResourceType.Brick;
-                case HarborType.ThreeForOne:                   
-                case HarborType.Uninitialized:                   
+                case HarborType.ThreeForOne:
+                case HarborType.Uninitialized:
                 case HarborType.None:
                 default:
                     break;
@@ -909,7 +909,7 @@ namespace Catan10
         }
         public static bool TryParse<T>(this Enum theEnum, string valueToParse, out T returnValue)
         {
-            returnValue = default;
+            returnValue = default(T);
             if (int.TryParse(valueToParse, out int intEnumValue))
             {
                 if (Enum.IsDefined(typeof(T), intEnumValue))
@@ -946,7 +946,7 @@ namespace Catan10
             string[] tokens = s.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
             foreach (string t in tokens)
             {
-                T value = default;
+                T value = default(T);
                 if (Enum.IsDefined(typeof(T), t))
                 {
                     value = (T)Enum.Parse(typeof(T), t);
@@ -1072,7 +1072,7 @@ namespace Catan10
                 return list.Last();
             }
 
-            return default;
+            return default(T);
         }
 
         public static Task<object> ToTask(this Storyboard storyboard, CancellationTokenSource cancellationTokenSource = null)
@@ -1198,7 +1198,7 @@ namespace Catan10
         /// <param name="otherwise">Return value if key is not found or convert fails</param>
         /// <param name="location">Location storage strategy</param>
         /// <returns>Specified type T</returns>
-        public static T GetSetting<T>(string key, T otherwise = default, StorageStrategies location = StorageStrategies.Local)
+        public static T GetSetting<T>(string key, T otherwise = default(T), StorageStrategies location = StorageStrategies.Local)
         {
             try
             {

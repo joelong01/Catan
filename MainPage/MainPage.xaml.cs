@@ -1444,9 +1444,18 @@ namespace Catan10
 
             await _gameView.RandomizeCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
         }
-
+        DateTime _dt = DateTime.Now;
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {
+            DateTime dt = DateTime.Now;
+            TimeSpan diff = DateTime.Now - _dt;
+            if (diff.TotalSeconds < 1)
+            {
+                Debug.WriteLine($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
+                return;
+            }
+
+            _dt = dt;
             if (GameState == GameState.WaitingForStart)
             {
                 PickAGoodBoard(e);
