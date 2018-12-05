@@ -1419,8 +1419,10 @@ namespace Catan10
             if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
             {
                 _randomBoardListIndex++;
-                if (_randomBoardListIndex == _randomBoardList.Count) // should never be >!!
+                if (_randomBoardListIndex >= _randomBoardList.Count) 
                 {
+
+                    
                     //
                     //  get new ones
                     await _gameView.RandomizeCatanBoard(true);
@@ -1428,7 +1430,9 @@ namespace Catan10
                     //
                     //  save the existing settings
                     _randomBoardList.Add(_gameView.RandomBoardSettings);
-                  
+                    _randomBoardListIndex = _randomBoardList.Count - 1;
+
+
                 }
                
             }
