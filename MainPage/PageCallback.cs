@@ -439,6 +439,22 @@ namespace Catan10
                 await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false, logType);
             }
 
+            if (GameState == GameState.WaitingForRoll)
+            {
+                if (logType == LogType.Undo)
+                {
+                    BaronButtonChecked = true;
+                }
+                else if (logType == LogType.Normal)
+                {
+                    //
+                    //  we assigned the baron before rolling -- 
+
+                    Debug.Assert(this.BaronButtonChecked, "To hit this condition, the Baron Button needed to be checked");
+                    BaronButtonChecked = false;
+                }
+            }
+
 
         }
 
@@ -460,6 +476,12 @@ namespace Catan10
             if (GameState != GameState.MustMoveBaron && GameState != GameState.WaitingForNext &&
                 GameState != GameState.WaitingForRoll)
             {
+                return;
+            }
+
+            if (GameState == GameState.WaitingForRoll && !this.BaronButtonChecked )
+            {
+                Debug.WriteLine("You need to check the baron button before assiging baron");
                 return;
             }
 
@@ -1201,8 +1223,7 @@ namespace Catan10
                 StateDescription = _StateMessages[(int)state];
                 _btnNextStep.IsEnabled = false;
                 _btnUndo.IsEnabled = true;
-                _btnWinner.IsEnabled = false;
-
+                btn_BaronToggle.IsEnabled = false;
 
                 SetValue(GameStateProperty, state); // update things bound to GameState
 
@@ -1244,6 +1265,7 @@ namespace Catan10
                         Menu_Undo.IsEnabled = true;
                         Menu_Winner.IsEnabled = true;
                         _btnNextStep.IsEnabled = false;
+                        btn_BaronToggle.IsEnabled = true;
                         ShowNumberUi();
                         break;
                     case GameState.Targeted:

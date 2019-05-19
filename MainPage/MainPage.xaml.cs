@@ -421,11 +421,11 @@ namespace Catan10
 
         private void UpdateGameCommands()
         {
-            _btnWinner.IsEnabled = false;
+           
             _btnNextStep.IsEnabled = false;
             _btnUndo.IsEnabled = false;
             _btnNewGame.IsEnabled = true;
-            _btnWinner.IsEnabled = false;
+           
             switch (State.GameState)
             {
                 case GameState.Uninitialized:
@@ -1545,6 +1545,12 @@ namespace Catan10
                 }
             }
         }
+        public bool BaronButtonChecked
+        {
+            get => (btn_BaronToggle.IsChecked == true);            
+            set => btn_BaronToggle.IsChecked = false;
+        }
+        
     }
 }
 
