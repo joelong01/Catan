@@ -3,16 +3,20 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
+using Windows.Networking.Sockets;
 using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -152,13 +156,19 @@ namespace Catan10
 
                 Ctrl_PlayerResourceCountCtrl.MainPage = this;
             }
-
-
+            try
+            {
+                _socket = new CatanWebSocket(this);
+                await _socket.Connect(new Uri("ws://localhost:8080/ws"));
+            }
+            catch(Exception wsEx)
+            {
+                Debug.WriteLine($"Exception caught trying to connect to WebSocket.  Message: {wsEx}");
+            }
 
 
         }
-
-
+        CatanWebSocket _socket = null;
 
         private async Task LoadPlayerData()
         {
@@ -421,11 +431,11 @@ namespace Catan10
 
         private void UpdateGameCommands()
         {
-           
+
             _btnNextStep.IsEnabled = false;
             _btnUndo.IsEnabled = false;
             _btnNewGame.IsEnabled = true;
-           
+
             switch (State.GameState)
             {
                 case GameState.Uninitialized:
@@ -664,7 +674,7 @@ namespace Catan10
             return false;
         }
 
-        private async Task<bool> ProcessRoll(string inputText)
+        public async Task<bool> ProcessRoll(string inputText)
         {
             int roll = -1;
             if (int.TryParse(inputText, out roll))
@@ -1172,35 +1182,73 @@ namespace Catan10
 
         }
 
-        private ConcurrentBag<KeyValuePair<string, string>> concurrentBag = new ConcurrentBag<KeyValuePair<string, string>>();
-        private void OnTest(object sender, RoutedEventArgs rea)
+        private async void OnTest(object sdr, RoutedEventArgs rea)
         {
-            //StaticHelpers.SetKeyValue<PlayerGameData>(PlayingPlayers[0].GameData, "TimesTargeted","10");
-            concurrentBag.Add(new KeyValuePair<string, string>("TimesTargeted", "10"));
-            concurrentBag.Add(new KeyValuePair<string, string>("UseLightFile", "True"));
-            concurrentBag.Add(new KeyValuePair<string, string>("ColorAsString", "Yellow"));
-            StartCallback();
-        }
-
-        private void StartCallback()
-        {
-            Task ignored = Task.Run(async () =>
+           /* using (var client = new HttpClient())
             {
-                while (!concurrentBag.IsEmpty)
+                client.BaseAddress = new Uri("http://localhost:8080/");
+                client.DefaultRequestHeaders.Accept.Clear();
+                //GET Method  
+                HttpResponseMessage response = await client.GetAsync("/roll/");
+                if (response.IsSuccessStatusCode)
                 {
-                    if (concurrentBag.TryTake(out KeyValuePair<string, string> kvp))
-                    {
+                    var resp = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine(resp);
+                }
+                else
+                {
+                    Debug.WriteLine("Internal server Error");
+                }
+            }
+*/
 
-                        this.TraceMessage($"{kvp.Key}={kvp.Value}");
-                        await Task.Delay(1000);
-                    }
-                    else
+
+            MessageWebSocket messageWebSocket = new MessageWebSocket(); 
+            Uri catanRelay = new Uri("ws://localhost/ws");
+
+
+            // In this example, we send/receive a string, so we need to set the MessageType to Utf8.
+            messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
+
+            messageWebSocket.MessageReceived += (sender, args) =>
+            {
+                try
+                {
+                    using (DataReader dataReader = args.GetDataReader())
                     {
-                        return;
+                        dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                        string message = dataReader.ReadString(dataReader.UnconsumedBufferLength);
+                        Debug.WriteLine("Message received from MessageWebSocket: " + message);
+                        messageWebSocket.Dispose();
                     }
                 }
+                catch (Exception ex)
+                {
+                    Windows.Web.WebErrorStatus webErrorStatus = Windows.Networking.Sockets.WebSocketError.GetStatus(ex.GetBaseException().HResult);
+                    // Add additional code here to handle exceptions.
+                }
+            };
+            messageWebSocket.Closed += (s, a) =>
+            {
+                Debug.WriteLine("Socket closed");
+            };
 
-            });
+            try
+            {
+                await messageWebSocket.ConnectAsync(catanRelay);
+                using (var dataWriter = new DataWriter(messageWebSocket.OutputStream))
+                {
+                    dataWriter.WriteString("This is the first fucking message!");
+                    await dataWriter.StoreAsync();
+                    dataWriter.DetachStream();
+                }
+            }
+            catch (Exception ex)
+            {
+                Windows.Web.WebErrorStatus webErrorStatus = Windows.Networking.Sockets.WebSocketError.GetStatus(ex.GetBaseException().HResult);
+                // Add additional code here to handle exceptions.
+            }
+
         }
 
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
@@ -1419,10 +1467,10 @@ namespace Catan10
             if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
             {
                 _randomBoardListIndex++;
-                if (_randomBoardListIndex >= _randomBoardList.Count) 
+                if (_randomBoardListIndex >= _randomBoardList.Count)
                 {
 
-                    
+
                     //
                     //  get new ones
                     await _gameView.RandomizeCatanBoard(true);
@@ -1434,7 +1482,7 @@ namespace Catan10
 
 
                 }
-               
+
             }
             else
             {
@@ -1443,7 +1491,7 @@ namespace Catan10
                 if (_randomBoardListIndex < 0)
                 {
                     _randomBoardListIndex = 0;
-                }                
+                }
             }
 
             await _gameView.RandomizeCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
@@ -1545,12 +1593,8 @@ namespace Catan10
                 }
             }
         }
-        public bool BaronButtonChecked
-        {
-            get => (btn_BaronToggle.IsChecked == true);            
-            set => btn_BaronToggle.IsChecked = false;
-        }
-        
+   
+
     }
 }
 

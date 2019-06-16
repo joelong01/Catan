@@ -41,7 +41,7 @@ namespace Catan10
 
         public void Deserialize(string s)
         {
-            KeyValuePair kvp = StaticHelpers.GetKeyValue(s);
+            var kvp = StaticHelpers.GetKeyValue(s);
             Name = kvp.Key;
             string[] tokens = kvp.Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             TranslateX = double.Parse(tokens[0]);
@@ -304,15 +304,22 @@ namespace Catan10
 
         private async void OnNextStep(object sender, RoutedEventArgs e)
         {
-            if (CurrentPlayer == null)
-            {
-                return;
-            }
-
-            await ProcessEnter(CurrentPlayer, "");
+            _ = await NextState();
 
         }
 
+        public async Task<bool> NextState()
+        {
+            if (CurrentPlayer == null)
+            {
+                return false;
+            }
+
+            await ProcessEnter(CurrentPlayer, "");
+            return true;
+        }
+
+        
         private async void OnUndo(object sender, RoutedEventArgs e)
         {
             if (GameState == GameState.WaitingForNewGame)

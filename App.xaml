@@ -5,7 +5,9 @@
     xmlns:local="using:Catan10"
     RequestedTheme="Dark">
     <Application.Resources>
-        <ResourceDictionary>
+        <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
+        <x:Double x:Key="ContentDialogMaxHeight">800</x:Double>
+        
 
             <local:AnimationSpeedValueConverter x:Key="AnimationSpeedValueConverter" />
             <local:TileOrientationToObjectConverter x:Key="TileOrientationToObjectConverter" />
@@ -417,6 +419,6 @@
 
 
 
-        </ResourceDictionary>
+        
     </Application.Resources>
 </Application>

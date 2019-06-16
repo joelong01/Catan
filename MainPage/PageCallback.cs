@@ -443,15 +443,15 @@ namespace Catan10
             {
                 if (logType == LogType.Undo)
                 {
-                    BaronButtonChecked = true;
+                    CanMoveBaronBeforeRoll = true;
                 }
                 else if (logType == LogType.Normal)
                 {
                     //
                     //  we assigned the baron before rolling -- 
 
-                    Debug.Assert(this.BaronButtonChecked, "To hit this condition, the Baron Button needed to be checked");
-                    BaronButtonChecked = false;
+                    Debug.Assert(this.CanMoveBaronBeforeRoll, "To hit this condition, the Baron Button needed to be checked");
+                    CanMoveBaronBeforeRoll = false;
                 }
             }
 
@@ -479,7 +479,7 @@ namespace Catan10
                 return;
             }
 
-            if (GameState == GameState.WaitingForRoll && !this.BaronButtonChecked )
+            if ((GameState == GameState.WaitingForRoll && !this.CanMoveBaronBeforeRoll) && GameState != GameState.MustMoveBaron)
             {
                 Debug.WriteLine("You need to check the baron button before assiging baron");
                 return;

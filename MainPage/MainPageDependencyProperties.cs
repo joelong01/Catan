@@ -10,6 +10,13 @@ namespace Catan10
     public sealed partial class MainPage : Page
     {
 
+        public static readonly DependencyProperty CanMoveBaronBeforeRollProperty = DependencyProperty.Register("CanMoveBaronBeforeRoll", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
+        public bool CanMoveBaronBeforeRoll
+        {
+            get => (bool)GetValue(CanMoveBaronBeforeRollProperty);
+            set => SetValue(CanMoveBaronBeforeRollProperty, value);
+        }
+
         public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("Hit Start"));
         public string StateDescription
         {

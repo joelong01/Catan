@@ -8,6 +8,8 @@
     mc:Ignorable="d"
     MinHeight="640"
     MinWidth="1110"
+    Width="1110"
+    Height="640"
     Title="New Game"
     PrimaryButtonText="Start"
     SecondaryButtonText="Cancel"

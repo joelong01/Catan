@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -366,7 +371,7 @@ namespace Catan10
             //  every tile group gets to keep track of the list of random numbers that determine the resource type
             //  of the tiles
             tileGroup.RandomTileList = _currentHexPanel.RandomizeTiles(tileGroup, randomTileList);
-            
+
 
         }
 
@@ -639,7 +644,7 @@ namespace Catan10
 
                 if (RandomNumberSequence == null)
                 {
-                    RandomNumberSequence = GetRandomList(tileGroup.RandomTiles.Count - 1);                    
+                    RandomNumberSequence = GetRandomList(tileGroup.RandomTiles.Count - 1);
                 }
 
                 for (int i = 0; i < tileGroup.RandomTiles.Count; i++)
@@ -890,6 +895,31 @@ namespace Catan10
 
         internal void OnTest()
         {
+            /*
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(TimeSpan.FromSeconds(30));
+
+            var httpClient = new HttpClient();
+            var resourceUri = new Uri("localhost:8080/roll/");
+
+            try
+            {
+                HttpResponseMessage response = await httpClient.GetAsync(resourceUri, cts.Token);
+            }
+            catch (TaskCanceledException ex)
+            {
+                // Handle request being canceled due to timeout.
+            }
+            catch (HttpRequestException ex)
+            {
+                // Handle other possible exceptions.
+            }
+            */
+
+
+
+
+
 
         }
 

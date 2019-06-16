@@ -285,7 +285,7 @@
                             <TextBlock Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=TwelvePercent}" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <ToggleButton x:Name="btn_BaronToggle" Background="Transparent">
+                            <ToggleButton x:Name="btn_BaronToggle" Background="Transparent" IsChecked="{x:Bind CanMoveBaronBeforeRoll, Mode=TwoWay }" >
                                 <local:BaronCtrl Width="75" Height="75" />
                             </ToggleButton>
                         </StackPanel>
