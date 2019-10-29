@@ -156,9 +156,11 @@ namespace Catan10
 
                 Ctrl_PlayerResourceCountCtrl.MainPage = this;
             }
+#if false
             try
             {
                 _socket = new CatanWebSocket(this);
+                 
                 await _socket.Connect(new Uri("ws://localhost:8080/ws"));
             }
             catch(Exception wsEx)
@@ -166,8 +168,9 @@ namespace Catan10
                 Debug.WriteLine($"Exception caught trying to connect to WebSocket.  Message: {wsEx}");
             }
 
-
+#endif
         }
+      
         CatanWebSocket _socket = null;
 
         private async Task LoadPlayerData()
@@ -1318,7 +1321,7 @@ namespace Catan10
 
         private async void OnManagePlayers(object sender, RoutedEventArgs e)
         {
-            PlayerManagementDlg dlg = new PlayerManagementDlg(AllPlayers);
+            PlayerManagementDlg dlg = new PlayerManagementDlg(AllPlayers, this);
             if (await dlg.ShowAsync() == ContentDialogResult.Primary)
             {
                 AllPlayers.Clear();

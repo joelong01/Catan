@@ -29,10 +29,10 @@ namespace Catan10
 
 
 
-        public PlayerManagementDlg(IList<PlayerData> playerData)
+        public PlayerManagementDlg(IList<PlayerData> playerData, ILog log)
         {
             this.InitializeComponent();
-
+            _log = log;
             PlayerDataList.AddRange(playerData);
 
         }

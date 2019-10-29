@@ -62,6 +62,7 @@ namespace Catan10
         }
 
         public PlayerData PlayerDataInstance => this;
+        private PlayerData() { } // no default ctor
 
         public async Task<StorageFile> CopyImage(StorageFile file)
         {

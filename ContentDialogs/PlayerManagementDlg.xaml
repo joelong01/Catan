@@ -18,8 +18,8 @@
 
         <DataTemplate x:Key="ColorListDataTemplate" x:DataType="local:ColorChoices">
             <Grid>
-                <Rectangle Fill="{x:Bind Background, Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Blue, Mode=OneWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                <TextBlock Text="{x:Bind Name}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{x:Bind Foreground, Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Blue, Mode=OneWay}" />
+                <Rectangle Fill="{x:Bind Background, Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Blue}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                <TextBlock Text="{x:Bind Name}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{x:Bind Foreground, Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Blue}" />
             </Grid>
             
         </DataTemplate>
