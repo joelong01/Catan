@@ -330,12 +330,7 @@ namespace Catan10
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
 
-
-            //
-            //  we used to wait until somebody clicked "Start" after starting a new game.  this was annoying. do it for them.
-            //  await ProcessEnter(CurrentPlayer, "");
-
-
+            
         }
 
 
@@ -526,6 +521,7 @@ namespace Catan10
                         {
                             await SetStateAsync(CurrentPlayer, GameState.DoneResourceAllocation, false); // I'm logging two states here because there used to be a "hit to start" UI state...
                             await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, true);
+                            await SetRandomTileToGold(this.RandomGold);
                         }
 
                         break;
@@ -714,6 +710,43 @@ namespace Catan10
 
 
         }
+        
+        private ResourceType OldResourceType = ResourceType.None;
+        private TileCtrl GoldTile = null;
+        private async Task SetRandomTileToGold(bool set)
+        {
+            
+
+            if (GoldTile != null)
+            {
+                await GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
+                GoldTile.ResourceType = OldResourceType;
+                await GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
+                GoldTile.SetOldResourceType(ResourceType.None);
+                GoldTile = null;
+                OldResourceType = ResourceType.None;
+            }
+
+            if (set && GameState != GameState.AllocateResourceForward && GameState != GameState.AllocateResourceReverse && GameState != GameState.DoneResourceAllocation && GameState != GameState.WaitingForStart)
+            {
+                // pick a tile
+                Random r = new Random(DateTime.Now.Millisecond);
+                do
+                {
+                    int idx = r.Next(_gameView.TilesInIndexOrder.Length);
+                    GoldTile = _gameView.TilesInIndexOrder[idx];
+                    OldResourceType = GoldTile.ResourceType;
+                    Debug.WriteLine($"random gold tile index={idx} (resourceType={OldResourceType}");
+
+
+                } while (OldResourceType == ResourceType.Desert);
+
+                await GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
+                GoldTile.ResourceType = ResourceType.GoldMine;
+                GoldTile.SetOldResourceType(OldResourceType);
+                await GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
+            }
+        }
 
         private async Task OnNext(int playersToMove = 1, LogType logType = LogType.Normal)
         {
@@ -736,7 +769,8 @@ namespace Catan10
                 player.GameData.PlayerResourceData.Reset();
             }
 
-
+            await SetRandomTileToGold(this.RandomGold);
+           
         }
 
         //

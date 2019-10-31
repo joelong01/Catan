@@ -74,9 +74,56 @@ namespace Catan10
             this.InitializeComponent();
             _ppHexFront.RotationY = 90;
 
-
+            
+            _oldResourceType.Visibility = Visibility.Collapsed;
 
         }
+
+        public void SetOldResourceType(ResourceType resourceType)
+        {
+            string imgKey = "";
+            switch (resourceType)
+            {
+                case ResourceType.Sheep:
+                    imgKey = "ms-appx:///Assets/SquareImages/sheep.png";
+                    break;
+                case ResourceType.Wood:
+                    imgKey = "ms-appx:///Assets/SquareImages/wood.png";
+                    break;
+                case ResourceType.Ore:
+                    imgKey = "ms-appx:///Assets/SquareImages/ore.png";
+                    break;
+                case ResourceType.Wheat:
+                    imgKey = "ms-appx:///Assets/SquareImages/wheat.png";
+                    break;
+                case ResourceType.Brick:
+                    imgKey = "ms-appx:///Assets/SquareImages/brick.png";
+                    break;
+                case ResourceType.Desert:               
+                case ResourceType.Back:               
+                case ResourceType.None:               
+                case ResourceType.Sea:               
+                case ResourceType.GoldMine:
+                    _oldResourceType.Visibility = Visibility.Collapsed;
+                    return;                    
+                default:
+                    break;
+            }
+
+            ImageSource img = new BitmapImage(new Uri(imgKey));
+            ImageBrush brush = new ImageBrush
+            {
+                AlignmentX = AlignmentX.Left,
+                AlignmentY = AlignmentY.Top,
+                Stretch = Stretch.UniformToFill,
+                ImageSource = img
+            };
+
+            _oldResourceType.Fill = brush;
+
+            _oldResourceType.Visibility = Visibility.Visible;
+        }
+
         //
         //  keep track of harbors near this tile.  this is set in the XAML
         public static readonly DependencyProperty AdjacentHarborProperty = DependencyProperty.Register("AdjacentHarbor", typeof(Harbor), typeof(TileCtrl), new PropertyMetadata(null));

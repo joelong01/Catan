@@ -64,6 +64,25 @@ namespace Catan10
                 building.CurrentPlayer = player;
             }
         }
+
+        public static readonly DependencyProperty RandomGoldProperty = DependencyProperty.Register("RandomGold", typeof(bool), typeof(MainPage), new PropertyMetadata(false, RandomGoldChanged));
+        public bool RandomGold
+        {
+            get => (bool)GetValue(RandomGoldProperty);
+            set => SetValue(RandomGoldProperty, value);
+        }
+        private static void RandomGoldChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as MainPage;
+            var depPropValue = (bool)e.NewValue;
+            depPropClass?.SetRandomGold(depPropValue);
+        }
+        private async void SetRandomGold(bool value)
+        {
+            await SetRandomTileToGold(value);
+        }
+
+
         #region RollProperties
         public static readonly DependencyProperty TotalRollsProperty = DependencyProperty.Register("TotalRolls", typeof(int), typeof(MainPage), new PropertyMetadata(0));
         public static readonly DependencyProperty TwoPercentProperty = DependencyProperty.Register("TwoPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
