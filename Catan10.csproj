@@ -116,6 +116,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CatanService\ServiceClient.cs" />
+    <Compile Include="Games\ExpansionCtrl.xaml.cs">
+      <DependentUpon>ExpansionCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\webSocket.cs" />
@@ -167,9 +170,6 @@
     </Compile>
     <Compile Include="Games\FourIsland3Ctrl.xaml.cs">
       <DependentUpon>FourIsland3Ctrl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Games\ExpansionCtrl.xaml.cs">
-      <DependentUpon>ExpansionCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GameView\GameContainerCtrl.xaml.cs">
       <DependentUpon>GameContainerCtrl.xaml</DependentUpon>
@@ -296,6 +296,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Games\ExpansionCtrl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI Controls\PlayerResourceCountCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -353,10 +357,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Games\FourIsland3Ctrl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Games\ExpansionCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

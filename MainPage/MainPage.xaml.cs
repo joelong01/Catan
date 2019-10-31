@@ -171,7 +171,7 @@ namespace Catan10
 #endif
         }
       
-        CatanWebSocket _socket = null;
+     //   CatanWebSocket _socket = null;
 
         private async Task LoadPlayerData()
         {
