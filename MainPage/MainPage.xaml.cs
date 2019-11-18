@@ -710,41 +710,65 @@ namespace Catan10
 
 
         }
-        
-        private ResourceType OldResourceType = ResourceType.None;
-        private TileCtrl GoldTile = null;
+        /**
+         *  this feature will take one tile and randomly turn it into the gold tile
+         *  it happens *before* the user rolls so that the player can decide to (say)
+         *  put a knight on the Gold tile, or move the knight off the gold tile.
+         *  
+         *  based on game play experience, it also makes sure that it doesn't pick the same tile
+         *  twice in a row
+         */
+        private ResourceType _OldResourceType = ResourceType.None;
+        private TileCtrl _GoldTile = null;
+        Random _randomForGold = new Random(DateTime.Now.Millisecond);
         private async Task SetRandomTileToGold(bool set)
         {
-            
+            //  
+            //  only do this under the correct state
+            if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext)
+                return;
 
-            if (GoldTile != null)
+            if (_GoldTile != null)
             {
-                await GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
-                GoldTile.ResourceType = OldResourceType;
-                await GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
-                GoldTile.SetOldResourceType(ResourceType.None);
-                GoldTile = null;
-                OldResourceType = ResourceType.None;
+                await _GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
+                _GoldTile.ResourceType = _OldResourceType;
+                await _GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
+                _GoldTile.SetOldResourceType(ResourceType.None);              
             }
 
-            if (set && GameState != GameState.AllocateResourceForward && GameState != GameState.AllocateResourceReverse && GameState != GameState.DoneResourceAllocation && GameState != GameState.WaitingForStart)
+            if (set)
             {
-                // pick a tile
-                Random r = new Random(DateTime.Now.Millisecond);
-                do
+                // pick a tile                
+                for(; ; )
                 {
-                    int idx = r.Next(_gameView.TilesInIndexOrder.Length);
-                    GoldTile = _gameView.TilesInIndexOrder[idx];
-                    OldResourceType = GoldTile.ResourceType;
-                    Debug.WriteLine($"random gold tile index={idx} (resourceType={OldResourceType}");
+                    int idx = _randomForGold.Next(_gameView.TilesInIndexOrder.Length);
+                    if (_gameView.TilesInIndexOrder[idx].ResourceType == ResourceType.Desert)
+                    {
+                        //don't pick the desert
+                        Debug.WriteLine("Desert picked for Gold...continuing");
+                        continue;
+                    }
 
+                    if (idx == _GoldTile?.Index)
+                    {
+                        //  don't pick the same tile twice in a row - makes people think 
+                        //  rand() is broken.
+                        //
+                        Debug.WriteLine("Threw away a consecutive gold tile");
+                        continue;
+                    }
+                   
 
-                } while (OldResourceType == ResourceType.Desert);
+                    _GoldTile = _gameView.TilesInIndexOrder[idx];
+                    _OldResourceType = _GoldTile.ResourceType;
+                    Debug.WriteLine($"random gold tile index={idx} (resourceType={_OldResourceType}");
+                    break;
+                }
 
-                await GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
-                GoldTile.ResourceType = ResourceType.GoldMine;
-                GoldTile.SetOldResourceType(OldResourceType);
-                await GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
+                await _GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
+                _GoldTile.ResourceType = ResourceType.GoldMine;
+                _GoldTile.SetOldResourceType(_OldResourceType);
+                await _GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
             }
         }
 
