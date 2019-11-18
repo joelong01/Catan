@@ -1562,7 +1562,7 @@ namespace Catan10
         {
             DateTime dt = DateTime.Now;
             TimeSpan diff = DateTime.Now - _dt;
-            if (diff.TotalSeconds < 1)
+            if (diff.TotalSeconds < 0.1)
             {
                 Debug.WriteLine($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
                 return;
@@ -1608,7 +1608,10 @@ namespace Catan10
                 for (int hideIndex = _showPipGroupIndex; hideIndex < dictPipsToBuildings.Count; hideIndex++)
                 {
                     List<BuildingCtrl> list = dictPipsToBuildings[hideIndex];
-
+                    if (list.Count == 0)
+                    {
+                        Debug.WriteLine($"{hideIndex} doesn't have any buildings");
+                    }
                     foreach (BuildingCtrl building in list)
                     {
                         if (building.BuildingState == BuildingState.Pips)
@@ -1629,12 +1632,16 @@ namespace Catan10
             for (int i = 0; i < _showPipGroupIndex; i++)
             {
                 List<BuildingCtrl> list = dictPipsToBuildings[i];
-
+                if (list.Count == 0)
+                {
+                    Debug.WriteLine($"going up and no buildigs for {i}");
+                }
                 foreach (BuildingCtrl building in list)
                 {
 
                     if (building.Pips == 0)  // throw out the ones that have no pips
                     {
+                        Debug.WriteLine("Buildings.pips == 0");
                         building.PipGroup = -1;
                         continue; // outside the main map or a desert next to nothing
                     }

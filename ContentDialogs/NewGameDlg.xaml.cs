@@ -98,7 +98,7 @@ namespace Catan10
             foreach (CatanGame g in games)
             {
                 Games.Add(g);
-                if (g.Description.Contains("Sea"))
+                if (g.Description.Contains("Regular"))
                 {
                     SelectedGame = g;
 

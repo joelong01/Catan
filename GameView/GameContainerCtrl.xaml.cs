@@ -97,8 +97,8 @@ namespace Catan10
         List<CatanGame> _games = new List<CatanGame>()
         {
             new CatanGame (typeof (RegularGameCtrl), "Regular", 0),
-            new CatanGame (typeof (Seafarers4PlayerCtrl), "Seafarers (4 Player)", 1),
-            new CatanGame (typeof (ExpansionCtrl), "Expansion (5-6 Players)", 2),
+            new CatanGame (typeof (ExpansionCtrl), "Expansion (5-6 Players)", 1),
+            new CatanGame (typeof (Seafarers4PlayerCtrl), "Seafarers (4 Player)",2),            
             new CatanGame (typeof (FourIsland3Ctrl), "Four Islands (3 Player)", 3),
 
         };
