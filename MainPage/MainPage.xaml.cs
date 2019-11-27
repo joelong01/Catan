@@ -170,8 +170,8 @@ namespace Catan10
 
 #endif
         }
-      
-     //   CatanWebSocket _socket = null;
+
+        //   CatanWebSocket _socket = null;
 
         private async Task LoadPlayerData()
         {
@@ -288,7 +288,7 @@ namespace Catan10
             _lbGames.SelectedValue = _log;
             await ResetTiles(true);
             PlayingPlayers.Clear();
-            Ctrl_PlayerResourceCountCtrl.GameResourceData.Reset();
+            Ctrl_PlayerResourceCountCtrl.GameResourceData.TurnReset();
             _stateStack.Clear();
 
             foreach (PlayerData player in AllPlayers)
@@ -330,7 +330,7 @@ namespace Catan10
             await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
 
-            
+
         }
 
 
@@ -718,9 +718,7 @@ namespace Catan10
          *  based on game play experience, it also makes sure that it doesn't pick the same tile
          *  twice in a row
          */
-        private ResourceType _OldResourceType = ResourceType.None;
-        private TileCtrl _GoldTile = null;
-        Random _randomForGold = new Random(DateTime.Now.Millisecond);
+
         private async Task SetRandomTileToGold(bool set)
         {
             //  
@@ -728,48 +726,8 @@ namespace Catan10
             if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext)
                 return;
 
-            if (_GoldTile != null)
-            {
-                await _GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
-                _GoldTile.ResourceType = _OldResourceType;
-                await _GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
-                _GoldTile.SetOldResourceType(ResourceType.None);              
-            }
+            await _gameView.SetRandomTileToGold(set);
 
-            if (set)
-            {
-                // pick a tile                
-                for(; ; )
-                {
-                    int idx = _randomForGold.Next(_gameView.TilesInIndexOrder.Length);
-                    if (_gameView.TilesInIndexOrder[idx].ResourceType == ResourceType.Desert)
-                    {
-                        //don't pick the desert
-                        Debug.WriteLine("Desert picked for Gold...continuing");
-                        continue;
-                    }
-
-                    if (idx == _GoldTile?.Index)
-                    {
-                        //  don't pick the same tile twice in a row - makes people think 
-                        //  rand() is broken.
-                        //
-                        Debug.WriteLine("Threw away a consecutive gold tile");
-                        continue;
-                    }
-                   
-
-                    _GoldTile = _gameView.TilesInIndexOrder[idx];
-                    _OldResourceType = _GoldTile.ResourceType;
-                    Debug.WriteLine($"random gold tile index={idx} (resourceType={_OldResourceType}");
-                    break;
-                }
-
-                await _GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
-                _GoldTile.ResourceType = ResourceType.GoldMine;
-                _GoldTile.SetOldResourceType(_OldResourceType);
-                await _GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
-            }
         }
 
         private async Task OnNext(int playersToMove = 1, LogType logType = LogType.Normal)
@@ -790,11 +748,11 @@ namespace Catan10
             //  on next, reset the resources for the turn to 0
             foreach (PlayerData player in PlayingPlayers)
             {
-                player.GameData.PlayerResourceData.Reset();
+                player.GameData.PlayerResourceData.TurnReset();
             }
 
             await SetRandomTileToGold(this.RandomGold);
-           
+
         }
 
         //
@@ -1245,26 +1203,26 @@ namespace Catan10
 
         private async void OnTest(object sdr, RoutedEventArgs rea)
         {
-           /* using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("http://localhost:8080/");
-                client.DefaultRequestHeaders.Accept.Clear();
-                //GET Method  
-                HttpResponseMessage response = await client.GetAsync("/roll/");
-                if (response.IsSuccessStatusCode)
-                {
-                    var resp = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine(resp);
-                }
-                else
-                {
-                    Debug.WriteLine("Internal server Error");
-                }
-            }
-*/
+            /* using (var client = new HttpClient())
+             {
+                 client.BaseAddress = new Uri("http://localhost:8080/");
+                 client.DefaultRequestHeaders.Accept.Clear();
+                 //GET Method  
+                 HttpResponseMessage response = await client.GetAsync("/roll/");
+                 if (response.IsSuccessStatusCode)
+                 {
+                     var resp = await response.Content.ReadAsStringAsync();
+                     Debug.WriteLine(resp);
+                 }
+                 else
+                 {
+                     Debug.WriteLine("Internal server Error");
+                 }
+             }
+ */
 
 
-            MessageWebSocket messageWebSocket = new MessageWebSocket(); 
+            MessageWebSocket messageWebSocket = new MessageWebSocket();
             Uri catanRelay = new Uri("ws://localhost/ws");
 
 
@@ -1450,6 +1408,7 @@ namespace Catan10
             _showPipGroupIndex = 0;
 
         }
+        Random testRandom = new Random();
 
         private async void OnTestGame(object sender, RoutedEventArgs e)
         {
@@ -1466,9 +1425,63 @@ namespace Catan10
             {
                 AllPlayers[0],
                 AllPlayers[1],
-                AllPlayers[2]
+                AllPlayers[2],
+                AllPlayers[3]
             };
             await StartGame(PlayerDataList);
+            await NextState(); // simluates pushing "Start"
+
+           
+            while (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            {
+                await SetBuildingAndRoad();
+                // move to next
+                GameState oldState = GameState;
+                await NextState();
+                //
+                //  we do it this way because the last player goes twice in the same state
+                //
+                if (oldState == GameState.AllocateResourceForward && GameState == GameState.AllocateResourceReverse)
+                {
+                    await SetBuildingAndRoad();                    
+                }
+            }
+
+
+
+
+        }
+
+        private async Task SetBuildingAndRoad()
+        {
+            // pick a tile with the highest pips and put a settlement on it
+            var building = GetHighestPipsBuilding();
+            await building.UpdateBuildingState(building.BuildingState, BuildingState.Settlement);
+
+            // pick a Random Road
+            var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
+            await UpdateRoadState(road, road.RoadState, RoadState.Road, LogType.Normal);
+        }
+
+        private BuildingCtrl GetHighestPipsBuilding()
+        {
+            Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = GetBuildingByPips();
+            for (int i = 0; i < 14; i++)
+            {
+                if (dictPipsToBuildings.TryGetValue(i, out var buildings) == true)
+                {
+                    foreach (var b in buildings)
+                    {
+                        if (b.BuildingState != BuildingState.Settlement && b.BuildingState != BuildingState.City)
+                        {
+                            if (ValidateBuildingLocation(b, out bool showError))
+                                return b;
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         public static string CreateSaveFileName(string Description)
@@ -1661,7 +1674,7 @@ namespace Catan10
                 }
             }
         }
-   
+
 
     }
 }

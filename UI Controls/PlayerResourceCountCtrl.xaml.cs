@@ -19,7 +19,7 @@ namespace Catan10
         public PlayerResourceCountCtrl()
         {
             this.InitializeComponent();
-            GameResourceData.Reset();
+            GameResourceData.TurnReset();
             GameResourceData.OnPlayerResourceUpdate += OnResourceUpdate;
         }
 

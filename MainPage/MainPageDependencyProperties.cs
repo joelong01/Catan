@@ -65,7 +65,7 @@ namespace Catan10
             }
         }
 
-        public static readonly DependencyProperty RandomGoldProperty = DependencyProperty.Register("RandomGold", typeof(bool), typeof(MainPage), new PropertyMetadata(false, RandomGoldChanged));
+        public static readonly DependencyProperty RandomGoldProperty = DependencyProperty.Register("RandomGold", typeof(bool), typeof(MainPage), new PropertyMetadata(true, RandomGoldChanged));
         public bool RandomGold
         {
             get => (bool)GetValue(RandomGoldProperty);

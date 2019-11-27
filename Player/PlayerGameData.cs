@@ -163,7 +163,7 @@ namespace Catan10
             MaxRoads = 0;
             MaxSettlements = 0;
             MaxCities = 0;
-            PlayerResourceData.Reset();
+            PlayerResourceData.GameReset();
             Pips = 0;
         
 
@@ -862,7 +862,7 @@ namespace Catan10
             _playerData = player;
         }
 
-        public void Reset()
+        public void TurnReset()
         {
             Gold = 0;
             Wheat = 0;
@@ -872,12 +872,34 @@ namespace Catan10
             Wood = 0;
         }
 
+        public void GameReset()
+        {
+            TurnReset();
+            _GoldTotal = 0;
+        }
+
         private int _Sheep = 0;
         private int _Wood = 0;
         private int _Ore = 0;
         private int _Brick = 0;
         private int _Wheat = 0;
         private int _Gold = 0;
+        int _GoldTotal = 0;
+        public int GoldTotal
+        {
+            get
+            {
+                return _GoldTotal;
+            }
+            set
+            {
+                if (_GoldTotal != value)
+                {
+                    _GoldTotal = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         public int Gold
         {
             get => _Gold;
@@ -1004,6 +1026,7 @@ namespace Catan10
                 case ResourceType.GoldMine:
                     oldVal = Gold;
                     Gold += count;
+                    GoldTotal += count;
                     break;
                 default:
                     break;

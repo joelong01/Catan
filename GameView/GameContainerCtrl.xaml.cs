@@ -716,6 +716,14 @@ namespace Catan10
             _currentHexPanel.Reset();
             _probabilities.Clear();
             RandomBoardSettings = new RandomBoardSettings();
+            if (_GoldTile != null)
+            {
+                _GoldTile.SetOldResourceType(ResourceType.None);
+                _GoldTile.ResourceType = _OldResourceType;
+                _GoldTile = null;
+                _OldResourceType = ResourceType.None;
+                
+            }
         }
 
 
@@ -929,6 +937,63 @@ namespace Catan10
         {
             _currentHexPanel.TileToIslandDictionary.TryGetValue(tile, out Island island);
             return island; // can be null;            
+        }
+
+        /**
+        *  this feature will take one tile and randomly turn it into the gold tile
+        *  it happens *before* the user rolls so that the player can decide to (say)
+        *  put a knight on the Gold tile, or move the knight off the gold tile.
+        *  
+        *  based on game play experience, it also makes sure that it doesn't pick the same tile
+        *  twice in a row
+        */
+        private ResourceType _OldResourceType = ResourceType.None;
+        private TileCtrl _GoldTile = null;
+        Random _randomForGold = new Random(DateTime.Now.Millisecond);
+        public async Task SetRandomTileToGold(bool set)
+        {
+            if (_GoldTile != null)
+            {
+                await _GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
+                _GoldTile.ResourceType = _OldResourceType;
+                await _GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
+                _GoldTile.SetOldResourceType(ResourceType.None);
+            }
+
+            if (set)
+            {
+                // pick a tile                
+                for (; ; )
+                {
+                    int idx = _randomForGold.Next(TilesInIndexOrder.Length);
+                    if (TilesInIndexOrder[idx].ResourceType == ResourceType.Desert)
+                    {
+                        //don't pick the desert
+                        Debug.WriteLine("Desert picked for Gold...continuing");
+                        continue;
+                    }
+
+                    if (idx == _GoldTile?.Index)
+                    {
+                        //  don't pick the same tile twice in a row - makes people think 
+                        //  rand() is broken.
+                        //
+                        Debug.WriteLine("Threw away a consecutive gold tile");
+                        continue;
+                    }
+
+
+                    _GoldTile = TilesInIndexOrder[idx];
+                    _OldResourceType = _GoldTile.ResourceType;
+                    Debug.WriteLine($"random gold tile index={idx} (resourceType={_OldResourceType}");
+                    break;
+                }
+
+                await _GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
+                _GoldTile.ResourceType = ResourceType.GoldMine;
+                _GoldTile.SetOldResourceType(_OldResourceType);
+                await _GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
+            }
         }
     }
 }
