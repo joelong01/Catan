@@ -7,107 +7,107 @@
     <Application.Resources>
         <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
         <x:Double x:Key="ContentDialogMaxHeight">800</x:Double>
-        
-
-            <local:AnimationSpeedValueConverter x:Key="AnimationSpeedValueConverter" />
-            <local:TileOrientationToObjectConverter x:Key="TileOrientationToObjectConverter" />
-            <local:ObjectToObjectValueConverter x:Key="ObjectToObjectValueConverter" />
-            <local:ScoreIntToStringConverter x:Key="ScoreIntToStringConverter" />
-            <local:IntToStringConverter x:Key="IntToStringConverter" />
-            <local:ColorToBrushConverter x:Key="ColorToBrushConverter" />
-            <local:GameStateValueConverter x:Key="GameStateValueConverter" />
-            <local:NullToBoolConverter x:Key="NullToBoolConverter" />
-            <local:StorageFileToString x:Key="StorageFileToString" />
-            <local:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
-            <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-            <local:StringToIntListConverter x:Key="StringToIntListConverter" />
-            <local:ColorToColorChoice x:Key="ColorToColorChoiceConverter" />
-            <local:ColorToColorChoiceIndex x:Key="ColorToColorChoiceIndexConverter" />
-            <local:StringToImageBrushConverter x:Key="StringToImageBrushConverter" />
-            <local:CountToOrientationConverter x:Key="CountToOrientationConverter" />
-            <local:BuildingStateToVisibilityConverter x:Key="BuildingStateToVisibilityConverter" />
-            <local:GameStateToVisibilityConverter x:Key="GameStateToVisibilityConverter" />
-            <local:HarborTypeToHarborBrush x:Key="HarborTypeToHarborBrushConverter" />
-
-            
-
-            <ImageBrush x:Key="bmWheat" ImageSource="Assets/Old Visuals/old wheat.png" Stretch="Fill" />
-            <ImageBrush x:Key="bmSheep" ImageSource="Assets/Old Visuals/old sheep.png" Stretch="Fill" />
-            <ImageBrush x:Key="bmOre" ImageSource="Assets/Old Visuals/old ore.png" Stretch="Fill" />
-            <ImageBrush x:Key="bmWood" ImageSource="Assets/Old Visuals/old wood.png" Stretch="Fill" />
-            <ImageBrush x:Key="bmBrick" ImageSource="Assets/Old Visuals/old brick.png" Stretch="Fill" />
-            <ImageBrush x:Key="bmBack" ImageSource="Assets/back.jpg" Stretch="Fill" />
-            <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="Fill" />
-            <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="Fill" />
-            <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="Fill" />
-            <ImageBrush x:Key="bmTwoForOneBrick" ImageSource="Assets/Old Visuals/old 2 for 1 brick.png" Stretch="Fill" />
 
 
-            <Style TargetType="Button" x:Key="GameControllerStyle">
-                <Setter Property="HorizontalAlignment" Value="Center" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="FontFamily" Value="Segoe UI Symbol" />
-                <Setter Property="FontSize" Value="48" />
-                <Setter Property="CharacterSpacing" Value="0" />
-                <Setter Property="Margin" Value="20, 0, 20, 0" />
+        <local:AnimationSpeedValueConverter x:Key="AnimationSpeedValueConverter" />
+        <local:TileOrientationToObjectConverter x:Key="TileOrientationToObjectConverter" />
+        <local:ObjectToObjectValueConverter x:Key="ObjectToObjectValueConverter" />
+        <local:ScoreIntToStringConverter x:Key="ScoreIntToStringConverter" />
+        <local:IntToStringConverter x:Key="IntToStringConverter" />
+        <local:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+        <local:GameStateValueConverter x:Key="GameStateValueConverter" />
+        <local:NullToBoolConverter x:Key="NullToBoolConverter" />
+        <local:StorageFileToString x:Key="StorageFileToString" />
+        <local:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <local:StringToIntListConverter x:Key="StringToIntListConverter" />
+        <local:ColorToColorChoice x:Key="ColorToColorChoiceConverter" />
+        <local:ColorToColorChoiceIndex x:Key="ColorToColorChoiceIndexConverter" />
+        <local:StringToImageBrushConverter x:Key="StringToImageBrushConverter" />
+        <local:CountToOrientationConverter x:Key="CountToOrientationConverter" />
+        <local:BuildingStateToVisibilityConverter x:Key="BuildingStateToVisibilityConverter" />
+        <local:GameStateToVisibilityConverter x:Key="GameStateToVisibilityConverter" />
+        <local:HarborTypeToHarborBrush x:Key="HarborTypeToHarborBrushConverter" />
+        <local:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
 
-            </Style>
-            <Style TargetType="StackPanel" x:Key="GameControllerStackPanelCommand">
-                <Setter Property="Orientation" Value="Horizontal" />
-                <Setter Property="Margin" Value="5,10, 0, 0" />
-            </Style>
+
+        <ImageBrush x:Key="bmWheat" ImageSource="Assets/Old Visuals/old wheat.png" Stretch="Fill" />
+        <ImageBrush x:Key="bmSheep" ImageSource="Assets/Old Visuals/old sheep.png" Stretch="Fill" />
+        <ImageBrush x:Key="bmOre" ImageSource="Assets/Old Visuals/old ore.png" Stretch="Fill" />
+        <ImageBrush x:Key="bmWood" ImageSource="Assets/Old Visuals/old wood.png" Stretch="Fill" />
+        <ImageBrush x:Key="bmBrick" ImageSource="Assets/Old Visuals/old brick.png" Stretch="Fill" />
+        <ImageBrush x:Key="bmBack" ImageSource="Assets/back.jpg" Stretch="Fill" />
+        <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="Fill" />
+        <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="Fill" />
+        <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="Fill" />
+        <ImageBrush x:Key="bmTwoForOneBrick" ImageSource="Assets/Old Visuals/old 2 for 1 brick.png" Stretch="Fill" />
+
+
+        <Style TargetType="Button" x:Key="GameControllerStyle">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+            <Setter Property="FontSize" Value="48" />
+            <Setter Property="CharacterSpacing" Value="0" />
+            <Setter Property="Margin" Value="20, 0, 20, 0" />
+
+        </Style>
+        <Style TargetType="StackPanel" x:Key="GameControllerStackPanelCommand">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="Margin" Value="5,10, 0, 0" />
+        </Style>
 
 
 
-            <Style TargetType="TextBlock" x:Key="DesignerTextBlockStyle">
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontSize" Value="20" />
-                <Setter Property="Margin" Value="0, 0, 0, 10" />
-                <Setter Property="HorizontalAlignment" Value="Right" />
-                <Setter Property="VerticalAlignment" Value="Center" />
+        <Style TargetType="TextBlock" x:Key="DesignerTextBlockStyle">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="0, 0, 0, 10" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
 
-            </Style>
-            <Style TargetType="TextBox" x:Key="DesignerTextBoxStyle">
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontSize" Value="20" />
-                <Setter Property="Margin" Value="10, 10 , 0,0" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBox" x:Key="DesignerTextBoxStyle">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="10, 10 , 0,0" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
 
-            </Style>
-            <Style TargetType="Button" x:Key="DesignerButtonStyle">
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontSize" Value="20" />
-                <Setter Property="Margin" Value="10, 10 , 0,10" />
-                <!--<Setter Property="Width" Value="100"/>
+        </Style>
+        <Style TargetType="Button" x:Key="DesignerButtonStyle">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="10, 10 , 0,10" />
+            <!--<Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="50"/>-->
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="VerticalAlignment" Value="Stretch"/>
-            </Style>
-            <Style TargetType="ComboBox" x:Key="DesignerComboBoxStyle">
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontSize" Value="20" />
-                <Setter Property="Margin" Value="10,10,10,0" />
-                <Setter Property="IsSynchronizedWithCurrentItem" Value="True" />
-            </Style>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+        </Style>
+        <Style TargetType="ComboBox" x:Key="DesignerComboBoxStyle">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="10,10,10,0" />
+            <Setter Property="IsSynchronizedWithCurrentItem" Value="True" />
+        </Style>
 
 
-            <Style x:Key="ContentDialogThatDoesNotSuck" TargetType="ContentDialog">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ContentDialog">
-                            <Border x:Name="Container">
-                                <Grid x:Name="LayoutRoot">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RenderTransform>
-                                        <CompositeTransform TranslateX="420" />
-                                    </Grid.RenderTransform>
-                                    <Border x:Name="BackgroundElement"
+        <Style x:Key="ContentDialogThatDoesNotSuck" TargetType="ContentDialog">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentDialog">
+                        <Border x:Name="Container">
+                            <Grid x:Name="LayoutRoot">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RenderTransform>
+                                    <CompositeTransform TranslateX="420" />
+                                </Grid.RenderTransform>
+                                <Border x:Name="BackgroundElement"
                                     Background="{TemplateBinding Background}"
                                     FlowDirection="{TemplateBinding FlowDirection}"
                                     BorderThickness="{ThemeResource ContentDialogBorderWidth}"
@@ -116,24 +116,24 @@
                                     MaxHeight="{TemplateBinding MaxHeight}"
                                     MinWidth="{TemplateBinding MinWidth}"
                                     MinHeight="{TemplateBinding MinHeight}" >
-                                        <Grid x:Name="DialogSpace" VerticalAlignment="Stretch">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="*" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <Grid x:Name="ContentScrollViewer"
+                                    <Grid x:Name="DialogSpace" VerticalAlignment="Stretch">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid x:Name="ContentScrollViewer"
                                             
                                             
                                             Margin="{ThemeResource ContentDialogContentScrollViewerMargin}"
                                             >
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto" />
-                                                        <!--Here, I delete 'Height="Auto"' of RowDefinition.-->
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    <ContentControl x:Name="Title"
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <!--Here, I delete 'Height="Auto"' of RowDefinition.-->
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <ContentControl x:Name="Title"
                                                 Margin="{ThemeResource ContentDialogTitleMargin}"
                                                 Content="{TemplateBinding Title}"
                                                 ContentTemplate="{TemplateBinding TitleTemplate}"
@@ -145,9 +145,9 @@
                                                 VerticalAlignment="Top"
                                                 IsTabStop="False"
                                                 MaxHeight="{ThemeResource ContentDialogTitleMaxHeight}" >
-                                                        <ContentControl.Template>
-                                                            <ControlTemplate TargetType="ContentControl">
-                                                                <ContentPresenter 
+                                                    <ContentControl.Template>
+                                                        <ControlTemplate TargetType="ContentControl">
+                                                            <ContentPresenter 
                                                             Content="{TemplateBinding Content}"
                                                             MaxLines="2"
                                                             TextWrapping="Wrap"
@@ -156,10 +156,10 @@
                                                             ContentTransitions="{TemplateBinding ContentTransitions}"
                                                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                                                            </ControlTemplate>
-                                                        </ContentControl.Template>
-                                                    </ContentControl>
-                                                    <ContentPresenter x:Name="Content"
+                                                        </ControlTemplate>
+                                                    </ContentControl.Template>
+                                                </ContentControl>
+                                                <ContentPresenter x:Name="Content"
                                                 ContentTemplate="{TemplateBinding ContentTemplate}"
                                                 Content="{TemplateBinding Content}"
                                                 FontSize="{ThemeResource ControlContentThemeFontSize}"
@@ -168,164 +168,164 @@
                                                 Foreground="{TemplateBinding Foreground}"
                                                 Grid.Row="1"
                                                 TextWrapping="Wrap" />
-                                                </Grid>
                                             </Grid>
-                                            <Grid x:Name="CommandSpace" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                </Grid.ColumnDefinitions>
-                                                <Border x:Name="Button1Host"
+                                        </Grid>
+                                        <Grid x:Name="CommandSpace" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border x:Name="Button1Host"
                                             Margin="{ThemeResource ContentDialogButton1HostMargin}"
                                             MinWidth="{ThemeResource ContentDialogButtonMinWidth}"
                                             MaxWidth="{ThemeResource ContentDialogButtonMaxWidth}"
                                             Height="{ThemeResource ContentDialogButtonHeight}"
                                             HorizontalAlignment="Stretch" />
-                                                <Border x:Name="Button2Host"
+                                            <Border x:Name="Button2Host"
                                             Margin="{ThemeResource ContentDialogButton2HostMargin}"
                                             MinWidth="{ThemeResource ContentDialogButtonMinWidth}"
                                             MaxWidth="{ThemeResource ContentDialogButtonMaxWidth}"
                                             Height="{ThemeResource ContentDialogButtonHeight}"
                                             Grid.Column="1"
                                             HorizontalAlignment="Stretch" />
-                                            </Grid>
                                         </Grid>
-                                    </Border>
-                                </Grid>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-
-            <Style x:Key="ChangeScoreButton" TargetType="RepeatButton">
-                <Setter Property="Background" Value="{ThemeResource ButtonBackgroundThemeBrush}"/>
-                <Setter Property="Foreground" Value="{ThemeResource RepeatButtonForegroundThemeBrush}"/>
-                <Setter Property="BorderBrush" Value="{ThemeResource RepeatButtonBorderThemeBrush}"/>
-                <Setter Property="BorderThickness" Value="{ThemeResource RepeatButtonBorderThemeThickness}"/>
-                <Setter Property="Padding" Value="12,4,12,5"/>
-                <Setter Property="HorizontalAlignment" Value="Center"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="RepeatButton">
-                            <Grid VerticalAlignment="Top">
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal"/>
-                                        <VisualState x:Name="PointerOver">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonPointerOverBackgroundThemeBrush}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonPointerOverForegroundThemeBrush}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Pressed">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonPressedBackgroundThemeBrush}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonPressedForegroundThemeBrush}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Disabled">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonDisabledBackgroundThemeBrush}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="Border">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonDisabledBorderThemeBrush}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonDisabledForegroundThemeBrush}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                    <VisualStateGroup x:Name="FocusStates">
-                                        <VisualState x:Name="Focused">
-                                            <Storyboard>
-                                                <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualWhite"/>
-                                                <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualBlack"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Unfocused"/>
-                                        <VisualState x:Name="PointerFocused"/>
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-                                <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Margin="0" BorderThickness="1" CornerRadius="3" VerticalAlignment="Top" Padding="0">
-                                    <ContentPresenter x:Name="ContentPresenter" AutomationProperties.AccessibilityView="Raw" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTransitions="{TemplateBinding ContentTransitions}" Content="{TemplateBinding Content}" Margin="0,2"/>
+                                    </Grid>
                                 </Border>
-                                <Rectangle x:Name="FocusVisualWhite" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="1.5" StrokeEndLineCap="Square" Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}" StrokeDashArray="1,1"/>
-                                <Rectangle x:Name="FocusVisualBlack" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="0.5" StrokeEndLineCap="Square" Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}" StrokeDashArray="1,1"/>
                             </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <Style x:Key="ChangeScoreButton" TargetType="RepeatButton">
+            <Setter Property="Background" Value="{ThemeResource ButtonBackgroundThemeBrush}"/>
+            <Setter Property="Foreground" Value="{ThemeResource RepeatButtonForegroundThemeBrush}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource RepeatButtonBorderThemeBrush}"/>
+            <Setter Property="BorderThickness" Value="{ThemeResource RepeatButtonBorderThemeThickness}"/>
+            <Setter Property="Padding" Value="12,4,12,5"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Grid VerticalAlignment="Top">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonPointerOverBackgroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonPointerOverForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonPressedBackgroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonPressedForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonDisabledBackgroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="Border">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonDisabledBorderThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RepeatButtonDisabledForegroundThemeBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="FocusStates">
+                                    <VisualState x:Name="Focused">
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualWhite"/>
+                                            <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualBlack"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Unfocused"/>
+                                    <VisualState x:Name="PointerFocused"/>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Border x:Name="Border" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Margin="0" BorderThickness="1" CornerRadius="3" VerticalAlignment="Top" Padding="0">
+                                <ContentPresenter x:Name="ContentPresenter" AutomationProperties.AccessibilityView="Raw" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTransitions="{TemplateBinding ContentTransitions}" Content="{TemplateBinding Content}" Margin="0,2"/>
+                            </Border>
+                            <Rectangle x:Name="FocusVisualWhite" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="1.5" StrokeEndLineCap="Square" Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}" StrokeDashArray="1,1"/>
+                            <Rectangle x:Name="FocusVisualBlack" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="0.5" StrokeEndLineCap="Square" Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}" StrokeDashArray="1,1"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
 
 
-            <Style x:Key="SettingCheckBoxStyle" TargetType="CheckBox">
-                <Setter Property="Foreground" Value="white" />
-                <Setter Property="IsChecked" Value="False" />
-                <Setter Property="HorizontalAlignment" Value="Left"/>
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontWeight" Value="SemiLight" />
-                <Setter Property="FontSize" Value="28" />
-                <Setter Property="Margin" Value="28,10,10,10" />
-            </Style>
+        <Style x:Key="SettingCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="white" />
+            <Setter Property="IsChecked" Value="False" />
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontWeight" Value="SemiLight" />
+            <Setter Property="FontSize" Value="28" />
+            <Setter Property="Margin" Value="28,10,10,10" />
+        </Style>
 
-            <Style x:Key="SettingRadioButtonStyle" TargetType="RadioButton">
-                <Setter Property="Foreground" Value="white" />
-                <Setter Property="IsChecked" Value="False" />
-                <Setter Property="HorizontalAlignment" Value="Left"/>
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontWeight" Value="SemiLight" />
-                <Setter Property="FontSize" Value="28" />
-                <Setter Property="Margin" Value="5" />
-            </Style>
+        <Style x:Key="SettingRadioButtonStyle" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="white" />
+            <Setter Property="IsChecked" Value="False" />
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontWeight" Value="SemiLight" />
+            <Setter Property="FontSize" Value="28" />
+            <Setter Property="Margin" Value="5" />
+        </Style>
 
-            <Style x:Key="SettingBorderStyle" TargetType="Border">
-                <Setter Property="BorderThickness" Value="2" />
-                <Setter Property="BorderBrush" Value="White" />
-                <Setter Property="Margin" Value="10,10,10,10" />
-            </Style>
+        <Style x:Key="SettingBorderStyle" TargetType="Border">
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="Margin" Value="10,10,10,10" />
+        </Style>
 
 
-            <!-- from https://msdn.microsoft.com/en-us/library/windows/apps/mt299120.aspx-->
-            <Style TargetType="ContentDialog" x:Key="CatanContentDialog">
+        <!-- from https://msdn.microsoft.com/en-us/library/windows/apps/mt299120.aspx-->
+        <Style TargetType="ContentDialog" x:Key="CatanContentDialog">
 
-                <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseHighBrush}" />
-                <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" />
-                <Setter Property="HorizontalAlignment" Value="Center" />
-                <Setter Property="VerticalAlignment" Value="Top" />
-                <Setter Property="IsTabStop" Value="False" />
-                <Setter Property="MaxHeight" Value="{ThemeResource ContentDialogMaxHeight}" />
-                <Setter Property="MinHeight" Value="{ThemeResource ContentDialogMinHeight}" />
-                <Setter Property="MaxWidth" Value="{ThemeResource ContentDialogMaxWidth}" />
-                <Setter Property="MinWidth" Value="{ThemeResource ContentDialogMinWidth}" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ContentDialog">
-                            <Border x:Name="Container">
-                                <Grid x:Name="LayoutRoot">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Border x:Name="BackgroundElement"
+            <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseHighBrush}" />
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="IsTabStop" Value="False" />
+            <Setter Property="MaxHeight" Value="{ThemeResource ContentDialogMaxHeight}" />
+            <Setter Property="MinHeight" Value="{ThemeResource ContentDialogMinHeight}" />
+            <Setter Property="MaxWidth" Value="{ThemeResource ContentDialogMaxWidth}" />
+            <Setter Property="MinWidth" Value="{ThemeResource ContentDialogMinWidth}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentDialog">
+                        <Border x:Name="Container">
+                            <Grid x:Name="LayoutRoot">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="BackgroundElement"
                     Background="{TemplateBinding Background}"
                     FlowDirection="{TemplateBinding FlowDirection}"
                     BorderThickness="{ThemeResource ContentDialogBorderWidth}"
@@ -334,25 +334,25 @@
                     MaxHeight="{TemplateBinding MaxHeight}"
                     MinWidth="{TemplateBinding MinWidth}"
                     MinHeight="{TemplateBinding MinHeight}" >
-                                        <Grid x:Name="DialogSpace" VerticalAlignment="Stretch">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <ScrollViewer x:Name="ContentScrollViewer"
+                                    <Grid x:Name="DialogSpace" VerticalAlignment="Stretch">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <ScrollViewer x:Name="ContentScrollViewer"
                         HorizontalScrollBarVisibility="Disabled"
                         VerticalScrollBarVisibility="Disabled"
                         ZoomMode="Disabled"
                         Margin="0"
                         Grid.Row="0"                                                         
                         IsTabStop="False">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto" />
-                                                        <RowDefinition Height="Auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <ContentControl x:Name="Title"
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <ContentControl x:Name="Title"
                         Margin="{ThemeResource ContentDialogTitleMargin}"
                         Content="{TemplateBinding Title}"
                         ContentTemplate="{TemplateBinding TitleTemplate}"
@@ -364,9 +364,9 @@
                         VerticalAlignment="Top"
                         IsTabStop="False"
                         MaxHeight="{ThemeResource ContentDialogTitleMaxHeight}" >
-                                                        <ContentControl.Template>
-                                                            <ControlTemplate TargetType="ContentControl">
-                                                                <ContentPresenter
+                                                    <ContentControl.Template>
+                                                        <ControlTemplate TargetType="ContentControl">
+                                                            <ContentPresenter
                               Content="{TemplateBinding Content}"
                               MaxLines="2"
                               TextWrapping="Wrap"
@@ -375,10 +375,10 @@
                               ContentTransitions="{TemplateBinding ContentTransitions}"
                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                                                            </ControlTemplate>
-                                                        </ContentControl.Template>
-                                                    </ContentControl>
-                                                    <ContentPresenter x:Name="Content"
+                                                        </ControlTemplate>
+                                                    </ContentControl.Template>
+                                                </ContentControl>
+                                                <ContentPresenter x:Name="Content"
                         ContentTemplate="{TemplateBinding ContentTemplate}"
                         Content="{TemplateBinding Content}"
                         FontSize="{ThemeResource ControlContentThemeFontSize}"
@@ -387,38 +387,38 @@
                         Foreground="{TemplateBinding Foreground}"
                         Grid.Row="1"
                         TextWrapping="Wrap" />
-                                                </Grid>
-                                            </ScrollViewer>
-                                            <Grid x:Name="CommandSpace" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                </Grid.ColumnDefinitions>
-                                                <Border x:Name="Button1Host"
+                                            </Grid>
+                                        </ScrollViewer>
+                                        <Grid x:Name="CommandSpace" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border x:Name="Button1Host"
                       Margin="{ThemeResource ContentDialogButton1HostMargin}"
                       MinWidth="{ThemeResource ContentDialogButtonMinWidth}"
                       MaxWidth="{ThemeResource ContentDialogButtonMaxWidth}"
                       Height="{ThemeResource ContentDialogButtonHeight}"
                       HorizontalAlignment="Stretch" />
-                                                <Border x:Name="Button2Host"
+                                            <Border x:Name="Button2Host"
                       Margin="{ThemeResource ContentDialogButton2HostMargin}"
                       MinWidth="{ThemeResource ContentDialogButtonMinWidth}"
                       MaxWidth="{ThemeResource ContentDialogButtonMaxWidth}"
                       Height="{ThemeResource ContentDialogButtonHeight}"
                       Grid.Column="1"
                       HorizontalAlignment="Stretch" />
-                                            </Grid>
                                         </Grid>
-                                    </Border>
-                                </Grid>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
 
 
-        
+
     </Application.Resources>
 </Application>

@@ -34,7 +34,23 @@ namespace Catan10
         }
     }
 
-   
+    public class IntToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if ((int)value > 0)
+                return Visibility.Visible;
+
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException("IntToVisibilityConverter can't convert back");    
+        }
+    }
+
+
     /// <summary>
     ///     given a HarborType return the proper image
     /// </summary>

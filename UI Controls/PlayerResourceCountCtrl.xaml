@@ -261,10 +261,12 @@
                                           Foreground="{x:Bind Path=GameData.Foreground, Mode=OneWay, FallbackValue=White}">
                         </TextBlock>
                     </Viewbox>
-                    <!--Gold Cards1-->
+                    <!--Gold Cards-->
 
                     <Viewbox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" HorizontalAlignment="Center" Margin="-10,0,0,0" >
-                        <local:ResourceCardCtrl ResourceType="GoldMine" Count="{x:Bind GameData.PlayerResourceData.GoldTotal, Mode=OneWay,FallbackValue=0}"  x:Name="ResourceCardControl_GoldMine" />
+                        <local:ResourceCardCtrl ResourceType="GoldMine" Count="{x:Bind GameData.PlayerResourceData.GoldTotal, Mode=OneWay,FallbackValue=0}"  x:Name="ResourceCardControl_GoldMine" 
+                                                Visibility="{x:Bind GameData.PlayerResourceData.GoldTotal, Converter={StaticResource ResourceKey=IntToVisibilityConverter}, Mode=OneWay}"
+                                                />
                     </Viewbox>
 
 

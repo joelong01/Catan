@@ -124,6 +124,9 @@
 
         <Viewbox StretchDirection="Both" Stretch="Uniform" Grid.Column="1">
             <Grid x:Name="PanelGrid">
+                <Grid.CacheMode>
+                    <BitmapCache/>
+                </Grid.CacheMode>
                 <local:Seafarers4PlayerCtrl x:Name="_game" HorizontalAlignment="Left" />
                 <!--<Canvas Background="Transparent" Width="110" Height="96" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50.156,193.452,0,0" Opacity="1" UseLayoutRounding="False">
                     <local:RoadCtrl RoadType="Single" Location="Top" Width="55" Height="12" Color="White"    />
