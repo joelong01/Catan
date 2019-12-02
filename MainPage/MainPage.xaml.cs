@@ -1460,6 +1460,7 @@ namespace Catan10
 
             // pick a Random Road
             var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
+            road.Color = CurrentPlayer.GameData.PlayerColor;
             await UpdateRoadState(road, road.RoadState, RoadState.Road, LogType.Normal);
         }
 

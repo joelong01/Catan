@@ -1352,7 +1352,7 @@ namespace Catan10
             //{
             //    r.Show(true);
             //}
-            //foreach (var s in road.AdjacentSettlements)
+            //foreach (var s in road.AdjacentBuildings)
             //{
             //    s.ShowBuildEllipse();
             //}
