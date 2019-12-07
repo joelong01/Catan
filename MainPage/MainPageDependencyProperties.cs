@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -77,9 +79,10 @@ namespace Catan10
             var depPropValue = (bool)e.NewValue;
             depPropClass?.SetRandomGold(depPropValue);
         }
-        private async void SetRandomGold(bool value)
-        {
-            await SetRandomTileToGold(value);
+        private void SetRandomGold(bool value)
+        {            
+            _ = SetRandomTileToGold(value);
+           
         }
 
 

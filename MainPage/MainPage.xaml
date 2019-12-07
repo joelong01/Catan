@@ -112,6 +112,8 @@
                                             <MenuFlyoutSeparator />
                                             <MenuFlyoutItem x:Name="Menu_TestGame" Text="Test Game" Click="OnTestGame" />
                                             <MenuFlyoutSeparator />
+                                            <MenuFlyoutItem x:Name="Menu_TestStartGame" Text="Pick Settlements and Road" Click="OnStartTestGame" />
+                                            <MenuFlyoutSeparator />
                                             <ToggleMenuFlyoutItem x:Name="Menu_ToggleShowIndex" Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
                                         </MenuFlyoutSubItem>
                                         <MenuFlyoutSeparator />

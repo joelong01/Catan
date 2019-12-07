@@ -1,8 +1,10 @@
 ﻿using System;
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -300,11 +302,40 @@ namespace Catan10
 
 
 
+        bool _insideNextFunction = false;
 
-
-        private async void OnNextStep(object sender, RoutedEventArgs e)
+        private void OnNextStep(object sender, RoutedEventArgs e)
         {
-            _ = await NextState();
+            if (_insideNextFunction)
+            {
+                Debug.WriteLine("rejecting call to OnNextStep");
+                return;
+            }
+            _insideNextFunction = true;
+            Debug.WriteLine("OnNext step start");
+            ((Button)sender).IsEnabled = false;
+            try
+            {
+                NextState().ContinueWith((b) =>
+                   {
+                       Debug.WriteLine("NextState().ContinueWith done ");
+                       _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                         {
+                             
+                             ((Button)sender).IsEnabled = true;
+                             Debug.WriteLine("Button Enabled");
+                             _insideNextFunction = false;
+                         });
+
+                   });
+
+            }
+            finally
+            {
+
+
+                Debug.WriteLine("OnNext step exit");
+            }
 
         }
 
@@ -319,7 +350,7 @@ namespace Catan10
             return true;
         }
 
-        
+
         private async void OnUndo(object sender, RoutedEventArgs e)
         {
             if (GameState == GameState.WaitingForNewGame)
@@ -558,9 +589,9 @@ namespace Catan10
         private void ToggleShowTile(object sender, RoutedEventArgs e)
         {
             ToggleMenuFlyoutItem menu = sender as ToggleMenuFlyoutItem;
-         
 
-            foreach(var tile in _gameView.TilesInIndexOrder)
+
+            foreach (var tile in _gameView.TilesInIndexOrder)
             {
                 tile.ShowIndex = menu.IsChecked;
             }
@@ -588,7 +619,7 @@ namespace Catan10
                 return;
             }
 
-           
+
 
             List<Target> targetList = PickBaronVictim(true);
             if (targetList.Count == 0)
@@ -631,7 +662,7 @@ namespace Catan10
 
             if (highScore == 9)
             {
-                for (int i=targetList.Count -1; i>=0; i--)
+                for (int i = targetList.Count - 1; i >= 0; i--)
                 {
                     if (targetList[i].Player.GameData.Score < 9)
                     {
@@ -650,7 +681,7 @@ namespace Catan10
             int mostPotential = targetList[0].ResourcePotential;
             foreach (var t in targetList)
             {
-                if (t.ResourcePotential  > mostPotential - .1)
+                if (t.ResourcePotential > mostPotential - .1)
                 {
                     topList.Add(t);
                 }
@@ -664,8 +695,8 @@ namespace Catan10
 
             target = topList[rand.Next(topList.Count)];
 
-            
-           
+
+
             CatanAction action = CatanAction.PlayedKnight;
             TargetWeapon weapon = TargetWeapon.Baron;
             if (GameState == GameState.MustMoveBaron)
@@ -830,7 +861,7 @@ namespace Catan10
             {
                 //
                 //  check to see if this player has 2:1 in a resource from this tile
-               
+
                 foreach (var harbor in Player.GameData.OwnedHarbors)
                 {
                     if (StaticHelpers.HarborTypeToResourceType(harbor.HarborType) == Tile.ResourceType)
@@ -840,9 +871,9 @@ namespace Catan10
                 }
             }
 
-            
 
-            
+
+
         }
 
     }

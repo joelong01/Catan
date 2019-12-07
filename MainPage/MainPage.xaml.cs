@@ -727,6 +727,7 @@ namespace Catan10
                 return;
 
             await _gameView.SetRandomTileToGold(set);
+            
 
         }
 
@@ -1431,7 +1432,18 @@ namespace Catan10
             await StartGame(PlayerDataList);
             await NextState(); // simluates pushing "Start"
 
+            await StartTestGame();
            
+
+        }
+
+        private async void OnStartTestGame(object sender, RoutedEventArgs e)
+        {
+            await StartTestGame();
+        }
+
+        private async Task StartTestGame()
+        {
             while (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
                 await SetBuildingAndRoad();
@@ -1443,13 +1455,9 @@ namespace Catan10
                 //
                 if (oldState == GameState.AllocateResourceForward && GameState == GameState.AllocateResourceReverse)
                 {
-                    await SetBuildingAndRoad();                    
+                    await SetBuildingAndRoad();
                 }
             }
-
-
-
-
         }
 
         private async Task SetBuildingAndRoad()
