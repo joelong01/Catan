@@ -152,9 +152,9 @@ namespace Catan10
                 _lastLogRecordWritten = count;
 
             }
-            catch
+            catch (Exception e)
             {
-                //  this.TraceMessage($"Caught Exception when writing to disk: {e}");
+                this.TraceMessage($"Caught Exception when writing to disk: {e}");
                 //
                 //  just eat it.  we'll save it the next time 
             }
@@ -467,8 +467,9 @@ namespace Catan10
     {
         public GameState OldState { get; set; } = GameState.Uninitialized;
         public GameState NewState { get; set; } = GameState.Uninitialized;
+        public List<int> RandomGoldTiles { get; set; } = new List<int>();
 
-        private readonly string[] _serializedProperties = new string[] { "OldState", "NewState" };
+        private readonly string[] _serializedProperties = new string[] { "OldState", "NewState", "RandomGoldTiles" };
 
         public LogStateTranstion(GameState old, GameState newState)
         {

@@ -82,6 +82,22 @@ namespace Catan10
                     }
 
                     await SetStateAsync(logLine.PlayerData, lst.OldState, logLine.StopProcessingUndo, LogType.Undo);
+                    if (lst.NewState == GameState.WaitingForRoll)
+                    {
+                        await _gameView.ResetRandomGoldTiles();
+                    }
+                    
+                    if (lst.NewState == GameState.WaitingForNext)
+                    {                                                
+                        if (lst.RandomGoldTiles.Count > 0)                            
+                        {
+                            await _gameView.ResetRandomGoldTiles();
+                            await _gameView.SetRandomTilesToGold(lst.RandomGoldTiles);
+                        }
+                    }
+                    break;
+                case CatanAction.SetRandomTileToGold:
+                    
                     break;
                 case CatanAction.ChangedPlayer:
                     LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
@@ -122,9 +138,8 @@ namespace Catan10
                 case CatanAction.ChangedPlayerProperty:
                     LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
                     logLine.PlayerData.GameData.SetKeyValue<PlayerGameData>(lpc.PropertyName, lpc.OldVal);
-
                     break;
-
+               
                 default:
                     break;
             }

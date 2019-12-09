@@ -165,12 +165,15 @@ namespace Catan10
             int from = PlayingPlayers.IndexOf(CurrentPlayer);
             _currentPlayerIndex = to;
 
-            // this is the one spot where the CurrentPlayer is changed.  it shoudl update all the bindings
+            // this is the one spot where the CurrentPlayer is changed.  it should update all the bindings
             // the setter will update all the associated state changes that happen when the CurrentPlayer
             // changes
 
             CurrentPlayer = PlayingPlayers[_currentPlayerIndex];
 
+            //
+            //  if we change player and they are going to roll, then they get random tile(s)
+            // await SetRandomTileToGold();
 
             if (_log != null)
             {

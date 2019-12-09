@@ -38,7 +38,7 @@ namespace Catan10
         public static readonly DependencyProperty RandomizeNumbersProperty = DependencyProperty.Register("RandomizeNumbers", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(true, RandomizeNumbersChanged));
         public static readonly DependencyProperty ValidateBuildingProperty = DependencyProperty.Register("ValidateBuilding", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(true, ValidateBuildingChanged));
         public static readonly DependencyProperty AnimateFadeTilesProperty = DependencyProperty.Register("AnimateFadeTiles", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(true, AnimateFadeTilesChanged));
-        public static readonly DependencyProperty FadeTimeProperty = DependencyProperty.Register("FadeTime", typeof(double), typeof(SettingsDlg), new PropertyMetadata(5, FadeTimeChanged));
+        public static readonly DependencyProperty FadeTimeProperty = DependencyProperty.Register("FadeTime", typeof(double), typeof(SettingsDlg), new PropertyMetadata(3, FadeTimeChanged));
         public double FadeTime
         {
             get => (double)GetValue(FadeTimeProperty);

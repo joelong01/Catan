@@ -298,12 +298,18 @@ namespace Catan10
 
         }
 
-
-
-
-
+        /// <summary>
+        ///     this function is executed when the user clicks on the Next button in the UI. there are some "challenges" here with the user clicking Next multiple times before
+        ///     the functions complete.  This is becuase the function returns void, so control is returned to the user before any Tasks are completed.  to guard against this,
+        ///     we do two things
+        ///     
+        ///     1. disable the button on entry, and when the top level Task oriented call is completed, we enable the button
+        ///     2. you'd think this would be enough, but I found through debugging that I could click fast enough to get two calls at the same time, so I also protect the function
+        ///        with a member variable (_insideNextFunction) and reject more than one call into the function.  As we are single threaded, this should be safe.
+        ///     
+        ///     
+        /// </summary>        
         bool _insideNextFunction = false;
-
         private void OnNextStep(object sender, RoutedEventArgs e)
         {
             if (_insideNextFunction)
@@ -319,12 +325,14 @@ namespace Catan10
                 NextState().ContinueWith((b) =>
                    {
                        Debug.WriteLine("NextState().ContinueWith done ");
+                       //
+                       //   need to switch back to the UI thread
                        _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                          {
                              
-                             ((Button)sender).IsEnabled = true;
-                             Debug.WriteLine("Button Enabled");
+                             ((Button)sender).IsEnabled = true;                             
                              _insideNextFunction = false;
+                             Debug.WriteLine("Button Enabled");
                          });
 
                    });
@@ -372,7 +380,6 @@ namespace Catan10
         private async void OnViewSettings(object sender, RoutedEventArgs e)
         {
             ((Button)sender).IsEnabled = false;
-            //await ShowSettings();
             _initializeSettings = true;
             SettingsDlg dlg = new SettingsDlg(this, _settings);
             _initializeSettings = false;
@@ -380,11 +387,9 @@ namespace Catan10
             ((Button)sender).IsEnabled = true;
         }
 
-        private void OnWinner(object sender, RoutedEventArgs e)
-        {
-
-        }
-
+        /// <summary>
+        ///     we stopped tracking Winner as that drove conflict when everybody forgot to set the winner...
+        /// </summary
         private async void OnWinnerClicked(object sender, RoutedEventArgs e)
         {
             await OnWin();
@@ -724,6 +729,15 @@ namespace Catan10
 
             return null;
 
+        }
+        private async void OnChangeRandomGoldTileCount(object sender, RoutedEventArgs e)
+        {
+            var goldTileCount = await StaticHelpers.GetUserString("How Many Gold Tiles?", RandomGoldTileCount.ToString());
+            if (Int32.TryParse(goldTileCount, out int newVal))
+            {
+                RandomGoldTileCount = newVal;
+                // not setting the gold tiles to be the new value for now becaues of Undo problems...instead hit Next and then Undo
+            }
         }
 
         /// <summary>

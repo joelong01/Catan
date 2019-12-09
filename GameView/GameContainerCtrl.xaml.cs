@@ -98,7 +98,7 @@ namespace Catan10
         {
             new CatanGame (typeof (RegularGameCtrl), "Regular", 0),
             new CatanGame (typeof (ExpansionCtrl), "Expansion (5-6 Players)", 1),
-            new CatanGame (typeof (Seafarers4PlayerCtrl), "Seafarers (4 Player)",2),            
+            new CatanGame (typeof (Seafarers4PlayerCtrl), "Seafarers (4 Player)",2),
             new CatanGame (typeof (FourIsland3Ctrl), "Four Islands (3 Player)", 3),
 
         };
@@ -716,14 +716,8 @@ namespace Catan10
             _currentHexPanel.Reset();
             _probabilities.Clear();
             RandomBoardSettings = new RandomBoardSettings();
-            if (_GoldTile != null)
-            {
-                _GoldTile.SetOldResourceType(ResourceType.None);
-                _GoldTile.ResourceType = _OldResourceType;
-                _GoldTile = null;
-                _OldResourceType = ResourceType.None;
-                
-            }
+            _ = ResetRandomGoldTiles();
+
         }
 
 
@@ -940,60 +934,116 @@ namespace Catan10
         }
 
         /**
-        *  this feature will take one tile and randomly turn it into the gold tile
-        *  it happens *before* the user rolls so that the player can decide to (say)
-        *  put a knight on the Gold tile, or move the knight off the gold tile.
+        *  flip tiles to facedown, change them to temp gold, and then flip them back up
         *  
-        *  based on game play experience, it also makes sure that it doesn't pick the same tile
-        *  twice in a row
         */
-        private ResourceType _OldResourceType = ResourceType.None;
-        private TileCtrl _GoldTile = null;
-        Random _randomForGold = new Random(DateTime.Now.Millisecond);
-        public async Task SetRandomTileToGold(bool set)
+
+        public async Task SetRandomTilesToGold(IEnumerable<int> indeces)
         {
-            if (_GoldTile != null)
+            if (indeces.Count() == 0) return;
+
+            List<Task> taskList = new List<Task>();
+            foreach (var idx in indeces)
             {
-                await _GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
-                _GoldTile.ResourceType = _OldResourceType;
-                await _GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
-                _GoldTile.SetOldResourceType(ResourceType.None);
+
+                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+
             }
 
-            if (set)
+
+            await Task.WhenAll(taskList);
+            taskList.Clear();
+            foreach (var idx in indeces)
             {
-                // pick a tile                
-                for (; ; )
+                TilesInIndexOrder[idx].TemporarilyGold = true;
+                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceUp, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Normal));
+            }
+
+            await Task.WhenAll(taskList);
+        }
+
+        /// <summary>
+        ///     This will go through all of the tiles and if they are temporarily gold
+        ///     1. flip them face down in parallel
+        ///     2. turn off the temp gold flag
+        ///     3. flip them factup in parallel
+        ///     
+        ///     this has to be done in two loops because turning temp gold off has visual impact you shouldn't see with the tile faceup
+        /// </summary>
+        /// <returns></returns>
+        public async Task ResetRandomGoldTiles()
+        {
+            List<Task> taskList = new List<Task>();
+            foreach (var tile in TilesInIndexOrder)
+            {
+                if (tile.TemporarilyGold)
                 {
-                    int idx = _randomForGold.Next(TilesInIndexOrder.Length);
-                    if (TilesInIndexOrder[idx].ResourceType == ResourceType.Desert)
-                    {
-                        //don't pick the desert
-                        Debug.WriteLine("Desert picked for Gold...continuing");
-                        continue;
-                    }
+                    tile.SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                }
+            }
 
-                    if (idx == _GoldTile?.Index)
-                    {
-                        //  don't pick the same tile twice in a row - makes people think 
-                        //  rand() is broken.
-                        //
-                        Debug.WriteLine("Threw away a consecutive gold tile");
-                        continue;
-                    }
+            if (taskList.Count == 0) return;
+            await Task.WhenAll(taskList);
+            taskList.Clear();
+            foreach (var tile in TilesInIndexOrder)
+            {
+                if (tile.TemporarilyGold)
+                {
+                    tile.TemporarilyGold = false;
+                    tile.SetTileOrientation(TileOrientation.FaceUp, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                }
+            }
 
+            await Task.WhenAll(taskList);
 
-                    _GoldTile = TilesInIndexOrder[idx];
-                    _OldResourceType = _GoldTile.ResourceType;
-                    Debug.WriteLine($"random gold tile index={idx} (resourceType={_OldResourceType}");
-                    break;
+        }
+        Random _randomForGold = new Random(DateTime.Now.Millisecond);
+        public List<int> PickRandomTilesToBeGold(int count, List<int> exclude = null)
+        {
+            TileCtrl tile;
+            List<int> randomTileIndices = new List<int>();
+            for (; ; )
+            {
+                tile = TilesInIndexOrder[_randomForGold.Next(TilesInIndexOrder.Length)];
+                if (tile.ResourceType == ResourceType.Desert)
+                {
+                    continue;
                 }
 
-                await _GoldTile.SetTileOrientation(TileOrientation.FaceDown, 1000);
-                _GoldTile.ResourceType = ResourceType.GoldMine;
-                _GoldTile.SetOldResourceType(_OldResourceType);
-                await _GoldTile.SetTileOrientation(TileOrientation.FaceUp, 1000);
+                if (tile.TemporarilyGold)
+                {
+                    //  don't pick one that is already gold                    
+                    //
+                    continue;
+                }
+
+                if (exclude != null && count < 5 && exclude.Contains(tile.Index))
+                {
+                    //
+                    //  don't pick anything that is excluded -- this lets us not pick the same gold tile twice in a row
+                    continue;
+                }
+
+                randomTileIndices.Add(tile.Index);
+                if (randomTileIndices.Count == count)
+                {
+                    return randomTileIndices;
+                }
+
             }
+
+        }
+        public List<int> GetCurrentRandomGoldTiles()
+        {
+            List<int> ret = new List<int>();
+            foreach (var tile in TilesInIndexOrder)
+            {
+                if (tile.TemporarilyGold)
+                {
+                    ret.Add(tile.Index);
+                }
+            }
+            return ret;
         }
     }
 }

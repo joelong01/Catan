@@ -105,7 +105,10 @@
                             <Button x:Name="_showMenu" Content="&#xE1EF;" Style="{StaticResource GameControllerStyle}" Click="OnShowMenu">
                                 <Button.Flyout>
                                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
-                                        <ToggleMenuFlyoutItem Text="Random Gold Tile" IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}" />
+                                        <MenuFlyoutSubItem Text="Ramdon Gold Tiles">
+                                            <ToggleMenuFlyoutItem Text="Random Gold Tile" IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}" />
+                                            <ToggleMenuFlyoutItem Text="Change Count" Click="OnChangeRandomGoldTileCount" IsChecked="False"/>
+                                        </MenuFlyoutSubItem>
                                         <MenuFlyoutSeparator />
                                         <MenuFlyoutSubItem Text="Development">
                                             <MenuFlyoutItem x:Name="Menu_Test" Text="Test" Click="OnTest" />

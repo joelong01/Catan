@@ -46,6 +46,7 @@ namespace Catan10
     }
 
 
+    public enum TileDisplay { Normal, Gold };
 
     public sealed partial class TileCtrl : UserControl, INotifyPropertyChanged, IEqualityComparer<TileCtrl>
     {
@@ -63,7 +64,8 @@ namespace Catan10
         private bool _useClassic = true;
         private int _index = -1;
         private ITileControlCallback _tileControlCallback = null;
-        private ResourceType _resourceType = ResourceType.Back;
+        private ResourceType _actingResourceType = ResourceType.Back;
+        private ResourceType _normalResourceType = ResourceType.None; // a tile can temporarily be gold
         //
         //  the row and column this tile is in the CatanHexPanel
         public int Row { get; set; } = -1;
@@ -74,12 +76,58 @@ namespace Catan10
             this.InitializeComponent();
             _ppHexFront.RotationY = 90;
 
-            
-            _oldResourceType.Visibility = Visibility.Collapsed;
+
+            _rectPermResourceType.Visibility = Visibility.Collapsed;
 
         }
 
-        public void SetOldResourceType(ResourceType resourceType)
+        public void Show(TileDisplay toShow)
+        {
+            switch (toShow)
+            {
+                case TileDisplay.Normal:
+                    ShowMainResourceType(_normalResourceType);
+                    _actingResourceType = _normalResourceType;
+                    _rectPermResourceType.Visibility = Visibility.Collapsed;
+                    break;
+                case TileDisplay.Gold:
+                    _rectPermResourceType.Visibility = Visibility.Visible;
+                    _actingResourceType = ResourceType.GoldMine;
+                    ShowMainResourceType(ResourceType.GoldMine);
+                    ShowSmallResourceType(_normalResourceType);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public bool TemporarilyGold
+        {
+            get
+            {
+                return _rectPermResourceType.Visibility == Visibility.Visible;
+            }
+            set
+            {
+                //
+                //  update only if it changes
+                if (value != TemporarilyGold)
+                {
+                    if (value)
+                    {
+                        Show(TileDisplay.Gold);
+                    }
+                    else
+                    {
+                        Show(TileDisplay.Normal);
+                    }
+                }
+            }
+        }
+
+
+
+        public void ShowSmallResourceType(ResourceType resourceType)
         {
             string imgKey = "";
             switch (resourceType)
@@ -99,13 +147,13 @@ namespace Catan10
                 case ResourceType.Brick:
                     imgKey = "ms-appx:///Assets/SquareImages/brick.png";
                     break;
-                case ResourceType.Desert:               
-                case ResourceType.Back:               
-                case ResourceType.None:               
-                case ResourceType.Sea:               
+                case ResourceType.Desert:
+                case ResourceType.Back:
+                case ResourceType.None:
+                case ResourceType.Sea:
                 case ResourceType.GoldMine:
-                    _oldResourceType.Visibility = Visibility.Collapsed;
-                    return;                    
+                    _rectPermResourceType.Visibility = Visibility.Collapsed;
+                    return;
                 default:
                     break;
             }
@@ -119,9 +167,9 @@ namespace Catan10
                 ImageSource = img
             };
 
-            _oldResourceType.Fill = brush;
+            _rectPermResourceType.Fill = brush;
 
-            _oldResourceType.Visibility = Visibility.Visible;
+            _rectPermResourceType.Visibility = Visibility.Visible;
         }
 
         //
@@ -158,6 +206,7 @@ namespace Catan10
         internal void Reset()
         {
             OwnedBuilding.Clear();
+            _rectPermResourceType.Visibility = Visibility.Collapsed;
         }
 
 
@@ -181,7 +230,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return string.Format($"{_resourceType}={Number};idx={Index}");
+            return string.Format($"{_actingResourceType}={Number};idx={Index}");
         }
         public TileOrientation TileOrientation
         {
@@ -200,84 +249,88 @@ namespace Catan10
             }
         }
 
+        private void ShowMainResourceType(ResourceType resourceType)
+        {
 
+
+            if (!HideNumber)
+            {
+                _number.Visibility = Visibility.Visible;
+            }
+            _number.Theme = NumberColorTheme.Dark;
+
+            if (_actingResourceType == ResourceType.Sea)
+            {
+                Number = 0;
+                RandomTile = false;
+            }
+            else
+            {
+                RandomTile = true;
+            }
+
+            _number.ShowEyes = false;
+
+            string bitmapPath = "ms-appx:Assets/back.jpg";
+
+            switch (resourceType)
+            {
+                case ResourceType.Sheep:
+                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old sheep.png" : "ms-appx:Assets/sheep.jpg";
+                    break;
+                case ResourceType.Wood:
+                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old wood.png" : "ms-appx:Assets/wood.jpg";
+                    break;
+                case ResourceType.Ore:
+                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old ore.png" : "ms-appx:Assets/ore.jpg";
+                    break;
+                case ResourceType.Wheat:
+                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old wheat.png" : "ms-appx:Assets/wheat.jpg";
+                    break;
+                case ResourceType.Brick:
+                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old brick.png" : "ms-appx:Assets/brick.jpg";
+                    break;
+                case ResourceType.None:
+                    bitmapPath = "ms-appx:Assets/back.jpg";
+                    break;
+                case ResourceType.Desert:
+                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old desert.png" : "ms-appx:Assets/desert.jpg";
+                    break;
+                case ResourceType.GoldMine:
+                    bitmapPath = "ms-appx:Assets/Old Visuals/gold mine 2.png";
+                    break;
+
+                default:
+                    break;
+
+            }
+            BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
+            _hexFrontBrush.ImageSource = bitmapImage;
+            _hexFrontBrush.Stretch = Stretch.UniformToFill;
+            if (resourceType == ResourceType.Sea)
+            {
+                _hexFront.Stroke = _hexFrontBrush;
+
+            }
+            else
+            {
+                _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
+            }
+        }
 
 
         public ResourceType ResourceType
         {
-            get => _resourceType;
+            get => _actingResourceType;
             set
             {
                 //
                 //    don't protect _resourceType == value because we use that 
                 //    when we change the type of tiles we are using
-                _resourceType = value;
-                if (!HideNumber)
-                {
-                    _number.Visibility = Visibility.Visible;
-                }
-                _number.Theme = NumberColorTheme.Dark;
-
-                if (_resourceType == ResourceType.Sea)
-                {
-                    Number = 0;
-                    RandomTile = false;
-                }
-                else
-                {
-                    RandomTile = true;
-                }
-
-                _number.ShowEyes = false;
-
-                string bitmapPath = "ms-appx:Assets/back.jpg";
-
-                switch (value)
-                {
-                    case ResourceType.Sheep:
-                        bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old sheep.png" : "ms-appx:Assets/sheep.jpg";
-                        break;
-                    case ResourceType.Wood:
-                        bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old wood.png" : "ms-appx:Assets/wood.jpg";
-                        break;
-                    case ResourceType.Ore:
-                        bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old ore.png" : "ms-appx:Assets/ore.jpg";
-                        break;
-                    case ResourceType.Wheat:
-                        bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old wheat.png" : "ms-appx:Assets/wheat.jpg";
-                        break;
-                    case ResourceType.Brick:
-                        bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old brick.png" : "ms-appx:Assets/brick.jpg";
-                        break;
-                    case ResourceType.None:
-                        bitmapPath = "ms-appx:Assets/back.jpg";
-                        break;
-                    case ResourceType.Desert:
-                        bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old desert.png" : "ms-appx:Assets/desert.jpg";
-                        break;
-                    case ResourceType.GoldMine:
-                        bitmapPath = "ms-appx:Assets/Old Visuals/gold mine 2.png";
-                        break;
-
-                    default:
-                        break;
-
-                }
-                BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
-                _hexFrontBrush.ImageSource = bitmapImage;
-                _hexFrontBrush.Stretch = Stretch.UniformToFill;
-                if (value == ResourceType.Sea)
-                {
-                    _hexFront.Stroke = _hexFrontBrush;
-
-                }
-                else
-                {
-                    _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
-                }
-
+                _actingResourceType = value;
+                _normalResourceType = value;
+                ShowMainResourceType(_normalResourceType);
                 NotifyPropertyChanged();
-
 
             }
 
@@ -500,6 +553,7 @@ namespace Catan10
         {
             _daAnimateOpacity.To = 1.0;
             ResourceTileGrid.Opacity = 1.0;
+            _sbAnimateOpacity.SkipToFill();
         }
 
 

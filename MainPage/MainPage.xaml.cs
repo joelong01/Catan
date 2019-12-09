@@ -520,16 +520,13 @@ namespace Catan10
                         else
                         {
                             await SetStateAsync(CurrentPlayer, GameState.DoneResourceAllocation, false); // I'm logging two states here because there used to be a "hit to start" UI state...
-                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, true);
-                            await SetRandomTileToGold(this.RandomGold);
+                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, true);                           
                         }
 
                         break;
                     case GameState.WaitingForRoll:
                         {
                             await ProcessRoll(inputText); // this will either succeed and change state to Waiting for Next, or fail and leave it in the current state...
-
-
                         }
                         break;
                     case GameState.MustMoveBaron:
@@ -717,17 +714,20 @@ namespace Catan10
          *  
          *  based on game play experience, it also makes sure that it doesn't pick the same tile
          *  twice in a row
+         *  
          */
 
-        private async Task SetRandomTileToGold(bool set)
+        private async Task<List<int>> SetRandomTileToGold(int index = -1, LogType logType = LogType.Normal)
         {
-            //  
-            //  only do this under the correct state
-            if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext)
-                return;
+            if (!this.RandomGold) return null;
+            if (this.RandomGoldTileCount < 1) return null;
 
-            await _gameView.SetRandomTileToGold(set);
-            
+           var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+            await _gameView.ResetRandomGoldTiles();
+            var newRandomGoldTiles = _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
+            await _gameView.SetRandomTilesToGold(newRandomGoldTiles);
+            return newRandomGoldTiles;
+
 
         }
 
@@ -752,7 +752,7 @@ namespace Catan10
                 player.GameData.PlayerResourceData.TurnReset();
             }
 
-            await SetRandomTileToGold(this.RandomGold);
+
 
         }
 
@@ -981,20 +981,32 @@ namespace Catan10
 
         }
 
-        private async Task SetStateAsync(PlayerData player, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
+        private async Task SetStateAsync(PlayerData playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null)
             {
                 return;
             }
 
-            string n = (player != null) ? player.PlayerName : "<no player>";
-
             LogStateTranstion lst = new LogStateTranstion(GameState, newState);
 
+            if (newState == GameState.WaitingForRoll && logType != LogType.Undo)
+            {
+                lst.RandomGoldTiles = await SetRandomTileToGold(); // we are storing them in the log record, but we won't set them except on the undo for WaitingForNext             
+            }
 
-            await _log.AppendLogLine(new LogEntry(player, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, n, lineNumber, filePath));
+            if (newState == GameState.WaitingForNext && logType != LogType.Undo)
+            {
+                // for a better undo experience, make it so that we remember the gold tiles and then when Undo is picked, it will be in the state of "Hit Next to Continue" and the 
+                // random tiles that were used are set correctly
+                // 
+                lst.RandomGoldTiles = _gameView.GetCurrentRandomGoldTiles(); 
+            }
+
+            await _log.AppendLogLine(new LogEntry(playerData, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, cmn, lineNumber, filePath));
             UpdateUiForState(newState);
+
+           
 
         }
 
@@ -1433,7 +1445,7 @@ namespace Catan10
             await NextState(); // simluates pushing "Start"
 
             await StartTestGame();
-           
+
 
         }
 
@@ -1683,8 +1695,7 @@ namespace Catan10
                 }
             }
         }
-
-
+      
     }
 }
 

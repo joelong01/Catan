@@ -151,7 +151,8 @@ namespace Catan10
         SetFirstPlayer,                            // 22
         RoadTrackingChanged,                         // 23
         AddResourceCount,
-        ChangedPlayerProperty
+        ChangedPlayerProperty,
+        SetRandomTileToGold
     };
     public enum AnimationSpeed { Ultra = 50, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 }; // typical animation speeds in ms
     public enum UndoOrder { PreviousThenUndo, UndoNoPrevious, None };
@@ -277,7 +278,7 @@ namespace Catan10
     {
         public bool RotateTile { get; set; } = false;
         public bool AnimateFade { get; set; } = true;
-        public int FadeSeconds { get; set; } = 6;
+        public int FadeSeconds { get; set; } = 3;
         public double Zoom { get; set; } = 1.0;
         public bool ShowStopwatch { get; set; } = true;
         public bool UseClassicTiles { get; set; } = true;

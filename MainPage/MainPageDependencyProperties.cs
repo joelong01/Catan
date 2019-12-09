@@ -76,14 +76,31 @@ namespace Catan10
         private static void RandomGoldChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as MainPage;
-            var depPropValue = (bool)e.NewValue;
-            depPropClass?.SetRandomGold(depPropValue);
+            depPropClass?.SetRandomGold();
         }
-        private void SetRandomGold(bool value)
+        private void SetRandomGold()
         {            
-            _ = SetRandomTileToGold(value);
+            _ = SetRandomTileToGold();
            
         }
+
+        public static readonly DependencyProperty RandomGoldTileCountProperty = DependencyProperty.Register("RandomGoldTileCount", typeof(int), typeof(MainPage), new PropertyMetadata(1, RandomGoldTileCountChanged));
+        public int RandomGoldTileCount
+        {
+            get => (int)GetValue(RandomGoldTileCountProperty);
+            set => SetValue(RandomGoldTileCountProperty, value);
+        }
+        private static void RandomGoldTileCountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as MainPage;
+            var depPropValue = (int)e.NewValue;
+            depPropClass?.SetRandomGoldTileCount(depPropValue);
+        }
+        private void SetRandomGoldTileCount(int value)
+        {
+
+        }
+
 
 
         #region RollProperties
