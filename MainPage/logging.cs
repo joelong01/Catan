@@ -142,9 +142,19 @@ namespace Catan10
                     LogEntry le = this[i];
                     if (!le.Persisted)
                     {
+                        
                         string s = String.Format($"{le.Serialize()}\r\n");
-                        await FileIO.AppendTextAsync(_file, s);
-                        le.Persisted = true;
+                        try
+                        {
+                            await FileIO.AppendTextAsync(_file, s);
+                            le.Persisted = true;
+                        }
+                        catch (Exception e)
+                        {
+                            this.TraceMessage($"Caught Exception when writing to disk: {e}");
+                            this.TraceMessage($"\t log entry: {s}");
+                            throw (e);
+                        }
 
                     }
 
@@ -154,7 +164,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                this.TraceMessage($"Caught Exception when writing to disk: {e}");
+                
                 //
                 //  just eat it.  we'll save it the next time 
             }

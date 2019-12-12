@@ -318,33 +318,20 @@ namespace Catan10
                 return;
             }
             _insideNextFunction = true;
-            Debug.WriteLine("OnNext step start");
             ((Button)sender).IsEnabled = false;
-            try
-            {
-                NextState().ContinueWith((b) =>
-                   {
-                       Debug.WriteLine("NextState().ContinueWith done ");
+            NextState().ContinueWith((b) =>
+               {                   
                        //
                        //   need to switch back to the UI thread
                        _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                         {
-                             
-                             ((Button)sender).IsEnabled = true;                             
-                             _insideNextFunction = false;
-                             Debug.WriteLine("Button Enabled");
-                         });
+                     {
 
-                   });
+                         ((Button)sender).IsEnabled = true;
+                         _insideNextFunction = false;
 
-            }
-            finally
-            {
+                     });
 
-
-                Debug.WriteLine("OnNext step exit");
-            }
-
+               });
         }
 
         public async Task<bool> NextState()
