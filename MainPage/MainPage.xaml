@@ -46,7 +46,7 @@
 
 
 
-        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0,5,0,5">
+        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="-200,5,0,5">
             <local:GameContainerCtrl x:Name="_gameView" DoubleTapped="GameViewControlDoubleTapped" Canvas.ZIndex="-1" RenderTransformOrigin="0.5,0.5" IsEnabled="True" PointerPressed="GameViewControlPointerPressed">
                 <local:GameContainerCtrl.RenderTransform>
                     <CompositeTransform x:Name="_transformGameView" TranslateX="0" Rotation="0" />

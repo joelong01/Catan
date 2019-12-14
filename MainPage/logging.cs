@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace Catan10
 {
@@ -27,9 +28,12 @@ namespace Catan10
     public class Log : List<LogEntry>
     {
         private string _saveFileName = "";
-        StorageFolder _folder = null;
-        StorageFile _file = null;
-
+        private StorageFolder _folder = null;
+        private DataWriter _logWriter = null;
+        private StorageFile _file = null;
+        private IRandomAccessStream _randomAccessStream = null;
+        private IOutputStream _outputStream = null;
+        
 
         public LogState State { get; set; } = LogState.Normal;
         private int _lastLogRecordWritten = 0;
@@ -41,7 +45,24 @@ namespace Catan10
             _saveFileName = fileName + MainPage.SAVED_GAME_EXTENSION;
             _folder = await StaticHelpers.GetSaveFolder();
             _file = await _folder.CreateFileAsync(_saveFileName, CreationCollisionOption.OpenIfExists);
+            _randomAccessStream = await _file.OpenAsync(FileAccessMode.ReadWrite);
+            _outputStream = _randomAccessStream.GetOutputStreamAt(0);
+            _logWriter = new DataWriter(_outputStream);
             _lastLogRecordWritten = 0;
+        }
+
+        public async Task DisposeAll()
+        {
+            await _logWriter.StoreAsync();
+            await _outputStream.FlushAsync();
+            _logWriter.Dispose();   
+            
+            _outputStream.Dispose();
+            
+            _randomAccessStream.Dispose();
+            
+
+
         }
 
         public Log(StorageFile file)
@@ -105,7 +126,7 @@ namespace Catan10
             }
 
             Add(le);
-          //  Debug.WriteLine(le);
+            //  Debug.WriteLine(le);
         }
 
         public async Task AppendLogLine(LogEntry le, bool save = true)
@@ -142,11 +163,14 @@ namespace Catan10
                     LogEntry le = this[i];
                     if (!le.Persisted)
                     {
-                        
+
                         string s = String.Format($"{le.Serialize()}\r\n");
                         try
                         {
-                            await FileIO.AppendTextAsync(_file, s);
+                            // await FileIO.AppendTextAsync(_file, s);
+                            _logWriter.WriteString(s);
+                            await _logWriter.StoreAsync();
+                            await _outputStream.FlushAsync();
                             le.Persisted = true;
                         }
                         catch (Exception e)
@@ -162,9 +186,9 @@ namespace Catan10
                 _lastLogRecordWritten = count;
 
             }
-            catch (Exception e)
+            catch
             {
-                
+
                 //
                 //  just eat it.  we'll save it the next time 
             }

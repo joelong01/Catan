@@ -47,7 +47,7 @@ namespace Catan10
             switch (logLine.Action)
             {
                 case CatanAction.Rolled:
-                    int roll = PopRoll();                    
+                    int roll = PopRoll();
                     break;
                 case CatanAction.AddResourceCount:
                     LogResourceCount lrc = logLine.Tag as LogResourceCount;
@@ -86,10 +86,10 @@ namespace Catan10
                     {
                         await _gameView.ResetRandomGoldTiles();
                     }
-                    
+
                     if (lst.NewState == GameState.WaitingForNext)
-                    {                                                
-                        if (lst.RandomGoldTiles.Count > 0)                            
+                    {
+                        if (lst.RandomGoldTiles.Count > 0)
                         {
                             await _gameView.ResetRandomGoldTiles();
                             await _gameView.SetRandomTilesToGold(lst.RandomGoldTiles);
@@ -97,7 +97,7 @@ namespace Catan10
                     }
                     break;
                 case CatanAction.SetRandomTileToGold:
-                    
+
                     break;
                 case CatanAction.ChangedPlayer:
                     LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
@@ -139,7 +139,7 @@ namespace Catan10
                     LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
                     logLine.PlayerData.GameData.SetKeyValue<PlayerGameData>(lpc.PropertyName, lpc.OldVal);
                     break;
-               
+
                 default:
                     break;
             }
@@ -149,7 +149,7 @@ namespace Catan10
 
         }
 
-        public async Task OnUndo()
+        public async Task OnUndo(bool saveToDisk = true)
         {
             if (_log.Count < SMALLEST_STATE_COUNT) // the games starts with 5 states that can't be undone
             {
@@ -179,7 +179,7 @@ namespace Catan10
                     bool ret = await UndoLogLine(_log[i]);
                     //
                     //  if you undo and land on one of these states, then stop processing undo
-                    bool stop = false;                    
+                    bool stop = false;
                     switch (_log[i].Action)
                     {
                         case CatanAction.Rolled:
@@ -191,7 +191,7 @@ namespace Catan10
                         case CatanAction.AssignedPirateShip:
                         case CatanAction.RolledSeven:
                             stop = true;
-                            break;                      
+                            break;
                         default:
                             break;
                     }
@@ -201,7 +201,7 @@ namespace Catan10
                         break;
                     }
 
-                  
+
                 }
             }
             finally
@@ -210,7 +210,10 @@ namespace Catan10
                 UpdateUiForState(_log.Last().GameState);
             }
 
-            await _log.WriteUnwrittenLinesToDisk();
+            if (saveToDisk)
+            {
+                await _log.WriteUnwrittenLinesToDisk();
+            }
         }
 
 
@@ -272,6 +275,10 @@ namespace Catan10
                     await this.Reset();
                     await SetStateAsync(null, GameState.WaitingForNewGame, true);
                     _gameView.CurrentGame = dlg.SelectedGame;
+                    if (_log != null)
+                    {
+                       await _log.DisposeAll();
+                    }
 
                     _log = new Log();
                     await _log.Init(dlg.SaveFileName);
@@ -1258,14 +1265,14 @@ namespace Catan10
                         Menu_Undo.IsEnabled = false;
                         Menu_Winner.IsEnabled = false;
                         _btnNextStep.IsEnabled = true;
-                        _btnUndo.IsEnabled = false;                        
+                        _btnUndo.IsEnabled = false;
                         break;
                     case GameState.WaitingForNext:
                         Menu_Undo.IsEnabled = true;
                         Menu_Winner.IsEnabled = true;
                         _btnNextStep.IsEnabled = true;
                         _btnUndo.IsEnabled = true;
-                        
+
                         break;
                     case GameState.DoneSupplemental:
                     case GameState.DoneResourceAllocation:
@@ -1545,8 +1552,8 @@ namespace Catan10
 
                     await HideAllPipEllipses();
                     _showPipGroupIndex = 0;
-                    
-                
+
+
                 }
             }
 

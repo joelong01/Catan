@@ -79,8 +79,14 @@ namespace Catan10
             depPropClass?.SetRandomGold();
         }
         private void SetRandomGold()
-        {            
-            _ = SetRandomTileToGold();
+        {
+            //
+            //  TODO:  what should we do if the option is set while the game is running?
+
+            if (GameState != GameState.WaitingForStart)
+                return;
+
+           // _ = SetRandomTileToGold();
            
         }
 

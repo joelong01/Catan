@@ -345,18 +345,28 @@ namespace Catan10
             return true;
         }
 
-
-        private async void OnUndo(object sender, RoutedEventArgs e)
+        private bool _insideUndo = false;
+        private void OnUndo(object sender, RoutedEventArgs e)
         {
-            if (GameState == GameState.WaitingForNewGame)
+           if (GameState == GameState.WaitingForNewGame || _insideUndo)
             {
                 return;
             }
-
+            _insideUndo = true;
             Button button = sender as Button;
             button.IsEnabled = false;
-            await OnUndo();
-            button.IsEnabled = true;
+            
+            OnUndo(true).ContinueWith( (b) =>
+            {
+                _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+
+                    button.IsEnabled = true;
+                    _insideUndo = false;
+
+                });
+            });
+            
         }
 
         private async void OnNewGame(object sender, RoutedEventArgs e)

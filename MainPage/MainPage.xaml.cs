@@ -520,7 +520,7 @@ namespace Catan10
                         else
                         {
                             await SetStateAsync(CurrentPlayer, GameState.DoneResourceAllocation, false); // I'm logging two states here because there used to be a "hit to start" UI state...
-                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, true);                           
+                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, true);
                         }
 
                         break;
@@ -672,8 +672,7 @@ namespace Catan10
 
         public async Task<bool> ProcessRoll(string inputText)
         {
-            int roll = -1;
-            if (int.TryParse(inputText, out roll))
+            if (int.TryParse(inputText, out int roll))
             {
                 return await ProcessRoll(roll);
 
@@ -707,6 +706,9 @@ namespace Catan10
 
 
         }
+
+
+
         /**
          *  this feature will take one tile and randomly turn it into the gold tile
          *  it happens *before* the user rolls so that the player can decide to (say)
@@ -717,17 +719,20 @@ namespace Catan10
          *  
          */
 
-        private async Task<List<int>> SetRandomTileToGold(int index = -1, LogType logType = LogType.Normal)
+        private List<int> GetRandomGoldTiles()
         {
-            if (!this.RandomGold) return null;
-            if (this.RandomGoldTileCount < 1) return null;
+            if (!this.RandomGold || this.RandomGoldTileCount < 1) return new List<int>();
+            var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+            return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
+        }
 
-           var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+        private async Task SetRandomTileToGold(List<int> goldTilesIndices)
+        {
             await _gameView.ResetRandomGoldTiles();
-            var newRandomGoldTiles = _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
-            await _gameView.SetRandomTilesToGold(newRandomGoldTiles);
-            return newRandomGoldTiles;
-
+            if (this.RandomGold && this.RandomGoldTileCount > 0)
+            {
+                await _gameView.SetRandomTilesToGold(goldTilesIndices);
+            }
 
         }
 
@@ -980,6 +985,7 @@ namespace Catan10
             _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
 
         }
+        private List<List<int>> _goldTilesChosen = new List<List<int>>();
 
         private async Task SetStateAsync(PlayerData playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
         {
@@ -990,9 +996,27 @@ namespace Catan10
 
             LogStateTranstion lst = new LogStateTranstion(GameState, newState);
 
+            //
+            // when we hit Next and we need a roll, we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
+            // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
+            // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
+            // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
             if (newState == GameState.WaitingForRoll && logType != LogType.Undo)
             {
-                lst.RandomGoldTiles = await SetRandomTileToGold(); // we are storing them in the log record, but we won't set them except on the undo for WaitingForNext             
+                if (TotalRolls == _goldTilesChosen.Count)
+                {                    
+                    lst.RandomGoldTiles = GetRandomGoldTiles();
+                    _goldTilesChosen.Add(lst.RandomGoldTiles);
+                }
+                else
+                {
+                    Debug.Assert(_goldTilesChosen.Count > TotalRolls);
+                    //
+                    //  we've already picked the tiles for this roll -- use them
+                    lst.RandomGoldTiles = _goldTilesChosen[TotalRolls];
+                }
+                Debug.WriteLine($"[Role={TotalRolls}] [GoldTiles={StaticHelpers.SerializeList<int>(lst.RandomGoldTiles)}]");
+                await SetRandomTileToGold(lst.RandomGoldTiles);
             }
 
             if (newState == GameState.WaitingForNext && logType != LogType.Undo)
@@ -1000,13 +1024,14 @@ namespace Catan10
                 // for a better undo experience, make it so that we remember the gold tiles and then when Undo is picked, it will be in the state of "Hit Next to Continue" and the 
                 // random tiles that were used are set correctly
                 // 
-                lst.RandomGoldTiles = _gameView.GetCurrentRandomGoldTiles(); 
+                lst.RandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+
             }
 
             await _log.AppendLogLine(new LogEntry(playerData, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, cmn, lineNumber, filePath));
             UpdateUiForState(newState);
 
-           
+
 
         }
 
@@ -1449,6 +1474,8 @@ namespace Catan10
 
         }
 
+       
+
         private async void OnStartTestGame(object sender, RoutedEventArgs e)
         {
             await StartTestGame();
@@ -1695,7 +1722,7 @@ namespace Catan10
                 }
             }
         }
-      
+
     }
 }
 
