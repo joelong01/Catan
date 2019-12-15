@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -18,11 +20,12 @@ namespace Catan10
     ///     The states that a building can be in
     /// </summary>
     public enum BuildingState { None, Build, Error, Pips, Settlement, City };
-
+    [JsonObject(MemberSerialization.OptIn)]
     public sealed partial class BuildingCtrl : UserControl
     {
         // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
+        [JsonProperty]
         public int Index
         {
             get => (int)GetValue(IndexProperty);
@@ -139,7 +142,8 @@ namespace Catan10
         {
 
         }
-
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
         public BuildingState BuildingState
         {
             get => (BuildingState)GetValue(BuildingStateProperty);

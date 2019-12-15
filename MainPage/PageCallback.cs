@@ -82,19 +82,7 @@ namespace Catan10
                     }
 
                     await SetStateAsync(logLine.PlayerData, lst.OldState, logLine.StopProcessingUndo, LogType.Undo);
-                    if (lst.NewState == GameState.WaitingForRoll)
-                    {
-                        await _gameView.ResetRandomGoldTiles();
-                    }
 
-                    if (lst.NewState == GameState.WaitingForNext)
-                    {
-                        if (lst.RandomGoldTiles.Count > 0)
-                        {
-                            await _gameView.ResetRandomGoldTiles();
-                            await _gameView.SetRandomTilesToGold(lst.RandomGoldTiles);
-                        }
-                    }
                     break;
                 case CatanAction.SetRandomTileToGold:
 
@@ -102,6 +90,8 @@ namespace Catan10
                 case CatanAction.ChangedPlayer:
                     LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
                     await AnimateToPlayerIndex(lcp.From, LogType.Undo);
+                    await _gameView.ResetRandomGoldTiles();
+                    await _gameView.SetRandomTilesToGold(lcp.OldRandomGoldTiles);
                     break;
                 case CatanAction.DoneSupplemental:
                     _supplementalStartIndex = logLine.Number; // we don't stop undoing on this one -- just set the number we need to terminate the loop and continue on
@@ -277,7 +267,7 @@ namespace Catan10
                     _gameView.CurrentGame = dlg.SelectedGame;
                     if (_log != null)
                     {
-                       await _log.DisposeAll();
+                        await _log.DisposeAll();
                     }
 
                     _log = new Log();

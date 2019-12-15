@@ -473,12 +473,15 @@ namespace Catan10
     {
         public int From { get; set; } = -1;
         public int To { get; set; } = -1;
-        private readonly string[] _serializedProperties = new string[] { "From", "To" };
-        public LogChangePlayer(int old, int newIdx)
+        public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
+        public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
+        private readonly string[] _serializedProperties = new string[] { "From", "To", "OldRandomGoldTiles", "NewRandomGoldTiles" };
+        public LogChangePlayer(int old, int newIdx, List<int> rgtOld, List<int> rgtNew)
         {
             From = old;
             To = newIdx;
-            //   this.TraceMessage(this.ToString());
+            OldRandomGoldTiles = rgtOld;
+            NewRandomGoldTiles = rgtNew;
         }
         public LogChangePlayer(string saved)
         {

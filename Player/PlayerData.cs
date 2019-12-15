@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI;
@@ -25,6 +28,7 @@ namespace Catan10
     //  Only data that is stored on disk should be stored here
     //  
     //  
+    [JsonObject(MemberSerialization.OptIn)]
     public class PlayerData : INotifyPropertyChanged
     {
         string _playerName = "Nameless";
@@ -169,6 +173,7 @@ namespace Catan10
 
         }
 
+        [JsonProperty]
         public Guid PlayerIdentifier
         {
             get => _PlayerIdentifier;
@@ -181,6 +186,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public PlayerGameData GameData
         {
             get => _playerGameData;
@@ -193,6 +199,7 @@ namespace Catan10
                 }
             }
         }
+       [JsonProperty]
         public PlayerPosition PlayerPosition
         {
             get => _PlayerPosition;
@@ -230,6 +237,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public string ImageFileName
         {
             get => _ImageFileName;
@@ -242,6 +250,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public string PlayerName
         {
             get => _playerName;
@@ -256,6 +265,7 @@ namespace Catan10
         }
         //
         //  the color that is saved
+        [JsonProperty]
         public string ColorAsString
         {
             get => _colorAsString;
@@ -307,7 +317,21 @@ namespace Catan10
 
         }
 
+        /// <summary>
+        ///     when I serialize, I assume
+        ///     1. the board is set the same    
+        ///         => so I can store the index of roads, settlements, etc. and just set them
+        ///     2. we don't replay rolls, so all resource data is saved/loaded
+        /// </summary>
+        /// <returns></returns>
+        internal string Serialize()
+        {
+           
+            var s =  JsonConvert.SerializeObject(this);
+            Debug.WriteLine(s);
+            return s;
 
+        }
     }
 
     class ResourceCount

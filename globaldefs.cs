@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -93,7 +94,7 @@ namespace Catan10
             RandomHarborTypeList = tokens[tokens.Length - 1].DeserializeList<int>(",");
 
         }
-
+        [JsonIgnore]
         private readonly string[] _serializedProperties = new string[] { "TileList", "NumberList" };
 
     }

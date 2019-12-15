@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -20,7 +21,7 @@ namespace Catan10
         public List<int> Rolls { get; set; } = new List<int>();
         Stack<GameState> _stateStack = new Stack<GameState>();
 
-       
+
 
 
         //
@@ -77,7 +78,7 @@ namespace Catan10
 
             Rolls.Push(roll);
             LastRoll = roll;
-            PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll);
+            PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll, StaticHelpers.SerializeList<int>(_gameView.GetCurrentRandomGoldTiles()));
             UpdateRollStats();
             return true;
         }
@@ -160,7 +161,8 @@ namespace Catan10
                     // player.Close();
                 }
             }
-
+            var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+            List<int> newRandomGoldTiles = null;
 
             int from = PlayingPlayers.IndexOf(CurrentPlayer);
             _currentPlayerIndex = to;
@@ -172,12 +174,42 @@ namespace Catan10
             CurrentPlayer = PlayingPlayers[_currentPlayerIndex];
 
             //
-            //  if we change player and they are going to roll, then they get random tile(s)
-            // await SetRandomTileToGold();
+            //  we need to log what is the current state
+
+
+
+            //
+            // when we change player we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
+            // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
+            // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
+            // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
+            if (logType != LogType.Undo && (GameState == GameState.WaitingForNext || GameState == GameState.Starting))
+            {
+                int playerRoll = TotalRolls / PlayingPlayers.Count;  // integer divide - drops remainder
+                if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
+                {
+                    newRandomGoldTiles = GetRandomGoldTiles();
+                    CurrentPlayer.GameData.GoldRolls.Add(newRandomGoldTiles);
+                }
+                else
+                {
+                    Debug.Assert(CurrentPlayer.GameData.GoldRolls.Count > playerRoll);
+                    //
+                    //  we've already picked the tiles for this roll -- use them
+                    newRandomGoldTiles = CurrentPlayer.GameData.GoldRolls[playerRoll];
+                }
+                Debug.WriteLine($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
+                await SetRandomTileToGold(newRandomGoldTiles);
+            }
+            else // undoing
+            {
+
+            }
+
 
             if (_log != null)
             {
-                await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to));
+                await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, currentRandomGoldTiles, newRandomGoldTiles));
             }
 
         }

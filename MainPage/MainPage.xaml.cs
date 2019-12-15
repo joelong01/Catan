@@ -24,12 +24,15 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Text.Json;
+using Newtonsoft.Json;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
 
+    [JsonObject(MemberSerialization.OptIn)]
     public sealed partial class MainPage : Page, ILog
     {
         private string _settingsFileName = "CatanSettings.ini";
@@ -48,10 +51,12 @@ namespace Catan10
 
 
         public static MainPage Current;
+        [JsonProperty]
         private UserControl _currentView = null;
         private Log _log = null;
 
 
+        [JsonProperty]
         public ObservableCollection<PlayerData> PlayingPlayers { get; set; } = new ObservableCollection<PlayerData>();
         public ObservableCollection<PlayerData> AllPlayers { get; set; } = new ObservableCollection<PlayerData>();
 
@@ -985,8 +990,7 @@ namespace Catan10
             _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
 
         }
-        private List<List<int>> _goldTilesChosen = new List<List<int>>();
-
+        
         private async Task SetStateAsync(PlayerData playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null)
@@ -995,39 +999,6 @@ namespace Catan10
             }
 
             LogStateTranstion lst = new LogStateTranstion(GameState, newState);
-
-            //
-            // when we hit Next and we need a roll, we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
-            // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
-            // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
-            // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
-            if (newState == GameState.WaitingForRoll && logType != LogType.Undo)
-            {
-                if (TotalRolls == _goldTilesChosen.Count)
-                {                    
-                    lst.RandomGoldTiles = GetRandomGoldTiles();
-                    _goldTilesChosen.Add(lst.RandomGoldTiles);
-                }
-                else
-                {
-                    Debug.Assert(_goldTilesChosen.Count > TotalRolls);
-                    //
-                    //  we've already picked the tiles for this roll -- use them
-                    lst.RandomGoldTiles = _goldTilesChosen[TotalRolls];
-                }
-                Debug.WriteLine($"[Role={TotalRolls}] [GoldTiles={StaticHelpers.SerializeList<int>(lst.RandomGoldTiles)}]");
-                await SetRandomTileToGold(lst.RandomGoldTiles);
-            }
-
-            if (newState == GameState.WaitingForNext && logType != LogType.Undo)
-            {
-                // for a better undo experience, make it so that we remember the gold tiles and then when Undo is picked, it will be in the state of "Hit Next to Continue" and the 
-                // random tiles that were used are set correctly
-                // 
-                lst.RandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
-
-            }
-
             await _log.AppendLogLine(new LogEntry(playerData, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, cmn, lineNumber, filePath));
             UpdateUiForState(newState);
 
@@ -1238,8 +1209,12 @@ namespace Catan10
 
 
         }
-
-        private async void OnTest(object sdr, RoutedEventArgs rea)
+        private void OnTest(object sdr, RoutedEventArgs rea)
+        {
+            var s = JsonConvert.SerializeObject(this, Formatting.Indented);
+            Debug.WriteLine(s);
+        }
+        private async void OnWebSocketTest(object sdr, RoutedEventArgs rea)
         {
             /* using (var client = new HttpClient())
              {
@@ -1456,7 +1431,8 @@ namespace Catan10
             _gameView.CurrentGame = _gameView.Games[0];
 
             _log = new Log();
-            await _log.Init(CreateSaveFileName("Test"));
+            
+            await _log.Init(CreateSaveFileName("Test Game"));
             SavedGames.Insert(0, _log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
             List<PlayerData> PlayerDataList = new List<PlayerData>
@@ -1474,7 +1450,7 @@ namespace Catan10
 
         }
 
-       
+
 
         private async void OnStartTestGame(object sender, RoutedEventArgs e)
         {

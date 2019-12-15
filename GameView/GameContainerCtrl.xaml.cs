@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -18,10 +19,12 @@ using Windows.UI.Xaml.Media;
 namespace Catan10
 {
 
+    
     public class CatanGame : ICatanGameData
     {
 
         public Type ControlType { get; set; } = typeof(RegularGameCtrl);
+        
         public string Description { get; set; } = "Regular";
         public int Index { get; set; } = -1;
         public CatanGame(Type type, string s, int idx)
@@ -88,6 +91,8 @@ namespace Catan10
     ///     This class is the "container" of games.  its job is to keep track of the various user controls we have that have board layout
     ///     It is called by the Page, and the Page shouldn't have to know anything about the underlying HexControl
     /// </summary>
+    /// 
+    [JsonObject(MemberSerialization.OptIn)]
     public sealed partial class GameContainerCtrl : UserControl
     {
 
@@ -106,6 +111,7 @@ namespace Catan10
         IGameCallback _gameCallback = null;
         ITileControlCallback _tileCallback = null;
 
+        [JsonProperty]
         public RandomBoardSettings RandomBoardSettings { get; private set; } = new RandomBoardSettings();
         private Dictionary<ResourceType, double> _probabilities = new Dictionary<ResourceType, double>();
         public Dictionary<ResourceType, double> Probabilities
@@ -214,6 +220,7 @@ namespace Catan10
             _currentHexPanel.TileCallback = _tileCallback;
         }
 
+        
         private CatanHexPanel _currentHexPanel = null;
 
 
