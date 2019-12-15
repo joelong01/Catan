@@ -152,15 +152,7 @@ namespace Catan10
 
         public async Task AnimateToPlayerIndex(int to, LogType logType = LogType.Normal)
         {
-            if (_menuHidePlayersOnNext.IsChecked)
-            {
-                foreach (PlayerData player in PlayingPlayers)
-                {
-                    // TODO: do you want this functionality?  if so, you need to get an event fired that 
-                    //       goes off when the CurrentPlayer changes so that the view can show/hide itself
-                    // player.Close();
-                }
-            }
+           
             var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
             List<int> newRandomGoldTiles = null;
 
@@ -183,7 +175,7 @@ namespace Catan10
             // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
             // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
-            if (logType != LogType.Undo && (GameState == GameState.WaitingForNext || GameState == GameState.Starting))
+            if (logType != LogType.Undo && (GameState == GameState.WaitingForNext || GameState == GameState.WaitingForRoll))
             {
                 int playerRoll = TotalRolls / PlayingPlayers.Count;  // integer divide - drops remainder
                 if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
@@ -198,7 +190,7 @@ namespace Catan10
                     //  we've already picked the tiles for this roll -- use them
                     newRandomGoldTiles = CurrentPlayer.GameData.GoldRolls[playerRoll];
                 }
-                Debug.WriteLine($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
+                // this.TraceMessage($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
                 await SetRandomTileToGold(newRandomGoldTiles);
             }
             else // undoing

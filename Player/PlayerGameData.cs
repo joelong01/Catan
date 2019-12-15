@@ -49,7 +49,10 @@ namespace Catan10
             _playerData = pData;
             PlayerResourceData = new PlayerResourceData(pData);
             PlayerResourceData.OnPlayerResourceUpdate += OnPlayerResourceUpdate;
+            PlayerResourceData.OnPlayerGoldTotalUpdate += OnPlayerGoldTotalUpdate;
         }
+
+
 
         public void AddOwnedHarbor(Harbor harbor)
         {
@@ -84,10 +87,13 @@ namespace Catan10
         }
         private void OnPlayerResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
         {
-            _playerData.Log.PostLogEntry(player, GameState.Unknown,
-                                                             CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
-                                                             new LogResourceCount(oldVal, newVal, resource));
+            _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
 
+        }
+
+        private void OnPlayerGoldTotalUpdate(PlayerData player, int oldVal, int newVal)
+        {
+            _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.TotalGoldChanged, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, ResourceType.GoldMine));
         }
 
         private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -172,7 +178,7 @@ namespace Catan10
             MaxCities = 0;
             PlayerResourceData.GameReset();
             Pips = 0;
-            
+
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {
@@ -414,7 +420,11 @@ namespace Catan10
             {
                 if (pips != value)
                 {
-                    LogPropertyChanged(pips, value); // this needs to be here so that the Pips are set when the log is replayed.  it'd be unfortunate if this was Undone...
+                    //    12/14/2019: this line is causingt problems because this log gets added *before* the log for the settlment update,
+                    //    which means Undo is broken because we stop undoing on a settlement changed event.  Undo always changes the collections,
+                    //    so this gets updated anyway.  going to comment out to see if there are issues...
+
+                    //LogPropertyChanged(pips, value); // this needs to be here so that the Pips are set when the log is replayed.  it'd be unfortunate if this was Undone...
                     pips = value;
                     NotifyPropertyChanged();
                 }
@@ -528,7 +538,7 @@ namespace Catan10
                 }
             }
         }
-        
+
         [JsonProperty]
         public bool PlayedKnightThisTurn
         {
@@ -569,7 +579,7 @@ namespace Catan10
                 }
             }
         }
-        
+
         public int SettlementsPlayed
         {
             get => _SettlementsPlayed;
@@ -802,7 +812,7 @@ namespace Catan10
                 }
             }
         }
-        
+
         public int Score
         {
             get => _score;
@@ -885,7 +895,8 @@ namespace Catan10
         private readonly PlayerData _playerData = null;
         [JsonIgnore]
         public PlayerResourceUpdateHandler OnPlayerResourceUpdate;
-
+        [JsonIgnore]
+        public PlayerGoldTotalUpdateHandler OnPlayerGoldTotalUpdate;
 
         public PlayerResourceData(PlayerData player)
         {
@@ -915,6 +926,8 @@ namespace Catan10
         private int _Wheat = 0;
         private int _Gold = 0;
         int _GoldTotal = 0;
+
+
         public int GoldTotal
         {
             get
@@ -925,6 +938,7 @@ namespace Catan10
             {
                 if (_GoldTotal != value)
                 {
+                    OnPlayerGoldTotalUpdate?.Invoke(_playerData, _GoldTotal, value);
                     _GoldTotal = value;
                     NotifyPropertyChanged();
                 }
@@ -942,6 +956,7 @@ namespace Catan10
                     _Gold = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
+
                 }
             }
         }

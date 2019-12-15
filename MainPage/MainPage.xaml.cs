@@ -331,11 +331,9 @@ namespace Catan10
             }
 
 
-            await VisualShuffle();
-            await AnimateToPlayerIndex(_currentPlayerIndex);
+            await VisualShuffle();            
             await SetStateAsync(null, GameState.WaitingForStart, true);
-
-
+            await AnimateToPlayerIndex(_currentPlayerIndex);
         }
 
 
@@ -437,7 +435,7 @@ namespace Catan10
 
             _btnNextStep.IsEnabled = false;
             _btnUndo.IsEnabled = false;
-            _btnNewGame.IsEnabled = true;
+            
 
             switch (State.GameState)
             {
@@ -526,6 +524,7 @@ namespace Catan10
                         {
                             await SetStateAsync(CurrentPlayer, GameState.DoneResourceAllocation, false); // I'm logging two states here because there used to be a "hit to start" UI state...
                             await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, true);
+                            await AnimateToPlayerIndex(_currentPlayerIndex); // a bit hacky -- but forces the random gold tile(s)
                         }
 
                         break;
@@ -932,7 +931,7 @@ namespace Catan10
         {
             get
             {
-                if (_log.Count == 0)
+                if (_log.ActionCount == 0)
                 {
                     return null;
                 }
@@ -950,7 +949,7 @@ namespace Catan10
                     return GameState.WaitingForNewGame;
                 }
 
-                if (_log.Count == 0)
+                if (_log.ActionCount == 0)
                 {
                     return GameState.WaitingForNewGame;
                 }
@@ -972,7 +971,7 @@ namespace Catan10
                 state = this.GameState;
             }
 
-            await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
+            await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
 
         }
         public void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
@@ -987,7 +986,7 @@ namespace Catan10
                 state = this.GameState;
             }
 
-            _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
+            _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
 
         }
         
@@ -1059,19 +1058,9 @@ namespace Catan10
                 //  marking records as undone means we don't have to replay and then undo them
                 //
 
-                for (int i = log.LogEntries.Count - 1; i > 0; i--)
-                {
-                    LogEntry logLine = log.LogEntries[i];
-                    if (logLine.LogType == LogType.Undo)
-                    {
-                        log.LogEntries[logLine.IndexOfUndoneAction].Undone = true;
-                        Debug.Assert(log.LogEntries[logLine.IndexOfUndoneAction].LogLineIndex == logLine.IndexOfUndoneAction);
-                    }
+                
 
-                }
-
-
-                foreach (LogEntry logLine in log.LogEntries)
+                foreach (LogEntry logLine in log.Actions)
                 {
                     n++;
                     if (logLine.LogType == LogType.Undo)
@@ -1079,15 +1068,16 @@ namespace Catan10
                         continue;
                     }
 
-                    if (logLine.Undone == true)
-                    {
-                        continue;
-                    }
+                   
 
                     switch (logLine.Action)
                     {
                         case CatanAction.Rolled:
                             PushRoll(logLine.Number);
+                            break;
+                        case CatanAction.TotalGoldChanged:
+                            //
+                            //  TODO: set this value...
                             break;
                         case CatanAction.AddResourceCount:
                             LogResourceCount lrc = logLine.Tag as LogResourceCount;
@@ -1374,7 +1364,8 @@ namespace Catan10
                     if (await StaticHelpers.AskUserYesNoQuestion($"Switch to {newLog.File.DisplayName}?", "Yes", "No"))
                     {
                         _log = newLog;
-                        await newLog.Parse(this);
+                     //   await newLog.Parse(this);
+                     // TODO:...
                         await ReplayLog(newLog);
                         UpdateUiForState(_log.Last().GameState);
                     }
@@ -1429,8 +1420,13 @@ namespace Catan10
             await this.Reset();
             await SetStateAsync(null, GameState.WaitingForNewGame, true);
             _gameView.CurrentGame = _gameView.Games[0];
-
+            if (_log != null)
+            {
+                _log.Dispose();
+                _log.OnRedoPossible -= OnRedoPossible;
+            }
             _log = new Log();
+            _log.OnRedoPossible += OnRedoPossible;
             
             await _log.Init(CreateSaveFileName("Test Game"));
             SavedGames.Insert(0, _log);
@@ -1450,7 +1446,10 @@ namespace Catan10
 
         }
 
-
+        private void OnRedoPossible(bool redo)
+        {
+            EnableRedo = redo;
+        }
 
         private async void OnStartTestGame(object sender, RoutedEventArgs e)
         {
@@ -1601,7 +1600,7 @@ namespace Catan10
             TimeSpan diff = DateTime.Now - _dt;
             if (diff.TotalSeconds < 0.1)
             {
-                Debug.WriteLine($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
+                this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
                 return;
             }
 
@@ -1694,11 +1693,12 @@ namespace Catan10
                     }
 
                     building.PipGroup = i;
-                    await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.Normal);
+                    await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.DoNotLog);
                 }
             }
         }
 
+       
     }
 }
 

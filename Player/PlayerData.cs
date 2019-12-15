@@ -18,6 +18,7 @@ namespace Catan10
 {
     public delegate void CardsLostUpdatedHandler(PlayerData player, int oldVal, int newVal);
     public delegate void PlayerResourceUpdateHandler(PlayerData player, ResourceType resource, int oldVal, int newVal);
+    public delegate void PlayerGoldTotalUpdateHandler(PlayerData player, int oldVal, int newVal);
 
 
 

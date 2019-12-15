@@ -409,13 +409,17 @@ namespace Catan10
                 {
 
                     IList listInstance = (IList)propValue;
-                    s += prop + kvpSep;
-                    foreach (object o in listInstance)
+                    if (listInstance != null)
                     {
-                        s += o.ToString() + listSeperator;
+                        s += prop + kvpSep;
+                        foreach (object o in listInstance)
+                        {
+                            s += o.ToString() + listSeperator;
 
+                        }
                     }
                     s += propSep;
+
                 }
                 else
                 {
@@ -1173,7 +1177,7 @@ namespace Catan10
             (inputTextBox as FrameworkElement).VerticalAlignment = VerticalAlignment.Bottom;
             var dialog = new ContentDialog
             {
-                Content = inputTextBox,                
+                Content = inputTextBox,
                 Title = title,
                 IsSecondaryButtonEnabled = true,
                 PrimaryButtonText = "Ok",
@@ -1187,7 +1191,7 @@ namespace Catan10
 
     }
 
-  
+
 
     public static class StorageHelper
     {

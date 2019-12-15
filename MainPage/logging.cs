@@ -25,18 +25,25 @@ namespace Catan10
         Undo
     }
 
-    public class Log : List<LogEntry>
+    public delegate void RedoPossibleHandler(bool redo);
+
+    /// <summary>
+    ///     A log has two stacks:  an action stack and an undo stack.
+    ///     1. when an Undo command happens, it is popped from the Action stack, the action is Undone, and it is pushed to the Undo Stack
+    ///     2. when a Redo is done, it is popped from the Undone stack, played forward, and then pushed on the Action stack
+    ///     3. when something is added to the Action stack and it is *not* part of a Replay, the Undo stack is cleared.
+    /// </summary>
+
+    public class Log : IDisposable
     {
+        public RedoPossibleHandler OnRedoPossible;
         private string _saveFileName = "";
         private StorageFolder _folder = null;
-        private DataWriter _logWriter = null;
+        IRandomAccessStream _randomAccessStream = default;
+
         private StorageFile _file = null;
-        private IRandomAccessStream _randomAccessStream = null;
-        private IOutputStream _outputStream = null;
-        
 
         public LogState State { get; set; } = LogState.Normal;
-        private int _lastLogRecordWritten = 0;
 
         public string DisplayName => File.DisplayName;
 
@@ -46,31 +53,23 @@ namespace Catan10
             _folder = await StaticHelpers.GetSaveFolder();
             _file = await _folder.CreateFileAsync(_saveFileName, CreationCollisionOption.OpenIfExists);
             _randomAccessStream = await _file.OpenAsync(FileAccessMode.ReadWrite);
-            _outputStream = _randomAccessStream.GetOutputStreamAt(0);
-            _logWriter = new DataWriter(_outputStream);
-            _lastLogRecordWritten = 0;
+
         }
 
-        public async Task DisposeAll()
+        public void Dispose()
         {
-            await _logWriter.StoreAsync();
-            await _outputStream.FlushAsync();
-            _logWriter.Dispose();   
-            
-            _outputStream.Dispose();
-            
-            _randomAccessStream.Dispose();
-            
-
-
+            _randomAccessStream?.Dispose();
         }
+
+
+
 
         public Log(StorageFile file)
         {
             _file = file;
             _saveFileName = _file.DisplayName;
             _folder = StaticHelpers.GetSaveFolder().Result;
-            _lastLogRecordWritten = 0;
+
         }
 
         public Log()
@@ -80,11 +79,64 @@ namespace Catan10
 
         public StorageFile File => _file;
 
-        public List<LogEntry> LogEntries => this;
+        private readonly List<LogEntry> ActionStack  = new List<LogEntry>();
+        private readonly List<LogEntry> UndoStack  = new List<LogEntry>();
+
+        public IReadOnlyCollection<LogEntry> Actions => ActionStack;
+
+        public LogEntry PopAction()
+        {
+            if (ActionStack.Count == 0) return null;
+            LogEntry le = ActionStack.Last();
+            ActionStack.Remove(le);
+            return le;
+        }
+
+        public void PushAction(LogEntry le)
+        {
+            UndoStack.Clear();
+            ActionStack.Add(le);
+            NotifyRedoPossible();
+        }
+
+        public void PushUndo(LogEntry le)
+        {
+            UndoStack.Add(le);
+            NotifyRedoPossible();
+        }
+        private void NotifyRedoPossible()
+        {
+          OnRedoPossible?.Invoke(UndoStack.Count > 0);
+        }
+        public LogEntry PopUndo()
+        {
+            if (UndoStack.Count == 0) return null;
+            LogEntry le = UndoStack.Last();
+            UndoStack.Remove(le);
+            NotifyRedoPossible();
+            return le;
+        }
+
+        public LogEntry Last()
+        {
+            if (ActionStack.Count > 0)
+            {
+                return ActionStack.Last();
+            }
+
+            return null;
+        }
+
+        public int ActionCount => ActionStack.Count;
+        public int UndoCount => UndoStack.Count;
+
+        public GameState GameState => ActionStack.Last().GameState;
+
+
 
         public void AppendLogLineNoDisk(LogEntry le)
         {
-            if (le.LogType == LogType.DoNotLog)
+            if (le.LogType == LogType.DoNotLog || le.LogType == LogType.Undo)
             {
                 return;
             }
@@ -93,40 +145,23 @@ namespace Catan10
             {
                 case LogState.Normal:
                     le.LogType = LogType.Normal;
+                    UndoStack.Clear();
+                    NotifyRedoPossible();
                     break;
                 case LogState.Replay:
-                    return;
-                case LogState.Undo:
-                    le.LogType = LogType.Undo;
+                    le.LogType = LogType.Replay;
                     break;
+                case LogState.Undo:
+                    //
+                    //  don't log anything on Undo -- push to the undo stack
+                    return;
                 default:
                     break;
             }
 
-            le.LogLineIndex = Count;
 
-            if (le.LogType == LogType.Undo)
-            {
-                for (int i = Count - 1; i >= 0; i--)
-                {
-                    if (this[i].LogType != LogType.Undo)
-                    {
-                        if (this[i].Undone == false)
-                        {
-                            if (this[i].Action == le.Action)
-                            {
-                                le.IndexOfUndoneAction = i;
-                                this[i].Undone = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+            ActionStack.Add(le);
 
-            }
-
-            Add(le);
-            //  Debug.WriteLine(le);
         }
 
         public async Task AppendLogLine(LogEntry le, bool save = true)
@@ -135,96 +170,74 @@ namespace Catan10
             AppendLogLineNoDisk(le);
             if (save && this.State != LogState.Replay)
             {
-                await WriteUnwrittenLinesToDisk();
+                await WriteLogToDisk();
             }
 
             //Debug.WriteLine(le);
         }
 
-        /// <summary>
-        ///     write unwritten log lines to disk
-        /// </summary>
-        /// <returns></returns>
-        public async Task WriteUnwrittenLinesToDisk()
+        //
+        //  we have to write the whole thing because we might have undo some records and so they 
+        //  need to be thrown away.
+        public async Task WriteLogToDisk()
         {
-            try
+            if (ActionStack.Count == 0) return;
+
+
+
+
+            _randomAccessStream.Size = 0;
+            using (var outputStream = _randomAccessStream.GetOutputStreamAt(0))
             {
-
-
-                if (this.Count == 0)
+                using (var dataWriter = new DataWriter(outputStream))
                 {
-                    return;
-                }
-
-                int count = this.Count; // this might change while we loop because of the await
-
-                for (int i = _lastLogRecordWritten; i < count; i++)
-                {
-                    LogEntry le = this[i];
-                    if (!le.Persisted)
+                    foreach (var le in ActionStack)
                     {
-
                         string s = String.Format($"{le.Serialize()}\r\n");
-                        try
-                        {
-                            // await FileIO.AppendTextAsync(_file, s);
-                            _logWriter.WriteString(s);
-                            await _logWriter.StoreAsync();
-                            await _outputStream.FlushAsync();
-                            le.Persisted = true;
-                        }
-                        catch (Exception e)
-                        {
-                            this.TraceMessage($"Caught Exception when writing to disk: {e}");
-                            this.TraceMessage($"\t log entry: {s}");
-                            throw (e);
-                        }
+                        dataWriter.WriteString(s);
 
                     }
 
+                    await dataWriter.StoreAsync();
+                    await outputStream.FlushAsync();
                 }
-                _lastLogRecordWritten = count;
-
-            }
-            catch
-            {
-
-                //
-                //  just eat it.  we'll save it the next time 
             }
 
 
         }
 
-        public async Task<bool> Parse(ILogParserHelper helper)
-        {
-            if (this.Count != 0)
-            {
-                return true; // already parsed this
-            }
 
-            string contents = await FileIO.ReadTextAsync(_file);
 
-            string[] tokens = contents.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Count() < 5)
-            {
-                this.TraceMessage("Invalid Log -- too few log lines");
-                return false;
-            }
-            foreach (string line in tokens)
-            {
-                LogEntry le = new LogEntry(line, helper)
-                {
-                    Persisted = true
-                };
 
-                Add(le);
-                Debug.WriteLine(le);
-            }
+        //public async Task<bool> Parse(ILogParserHelper helper)
+        //{
+        //    if (this.Count != 0)
+        //    {
+        //        return true; // already parsed this
+        //    }
 
-            return true;
+        //    string contents = await FileIO.ReadTextAsync(_file);
 
-        }
+        //    string[] tokens = contents.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        //    if (tokens.Count() < 5)
+        //    {
+        //        this.TraceMessage("Invalid Log -- too few log lines");
+        //        return false;
+        //    }
+        //    foreach (string line in tokens)
+        //    {
+        //        LogEntry le = new LogEntry(line, helper)
+        //        {
+        //            Persisted = true
+        //        };
+
+        //        Add(le);
+        //        Debug.WriteLine(le);
+        //    }
+
+        //    return true;
+
+        //}
 
         internal void Reset()
         {
@@ -237,6 +250,8 @@ namespace Catan10
             //base.Clear();
             //this.State = LogState.Normal;
         }
+
+
     }
 
     public interface ILogParserHelper
@@ -253,16 +268,14 @@ namespace Catan10
         void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
     }
 
-    public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo, Test };
+    public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo };
 
 
     //   an object that encapsulates an action that has happned in the game
     public class LogEntry
     {
-        public int LogLineIndex { get; set; } = -1;
         public LogType LogType { get; set; } = LogType.Normal;
-        public bool Undone { get; set; } = false;   // this flag says that the user has undone this log record - on disc it is always false since we are append only and don't update rows
-        public int IndexOfUndoneAction { get; set; } = -1; // if this is a LogType == LogType.Undo then this is the index of the LogEntry that was undone
+
         public GameState GameState { get; set; }
         public PlayerData PlayerData { get; set; }
         public string PlayerDataString { get; set; } = "";
@@ -275,7 +288,7 @@ namespace Catan10
         public int LineNumber { get; set; } = -1;
         public string Path { get; set; } = "";
 
-        public bool Persisted { get; set; } = false;
+
         public string PlayerName
         {
             get
@@ -304,7 +317,7 @@ namespace Catan10
 
         }
 
-        static readonly private string[] _serializeProperties = new string[] { "LogLineIndex", "Persisted", "LogType", "Undone", "PlayerDataString", "GameState", "Action", "Number", "IndexOfUndoneAction", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber" }; // "Path" removed
+        static readonly private string[] _serializeProperties = new string[] { "PlayerDataString", "GameState", "Action", "Number", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber" }; // "Path" removed
         /// <summary>
         ///     this is mostly used for Console and debugging
         /// </summary>
@@ -321,7 +334,7 @@ namespace Catan10
                 PlayerDataString = String.Format($"{PlayerData.PlayerName}");
             }
 
-            return $"Index:{this.LogLineIndex,-5} | State:{GameState,-30} | Action:{Action,-25} | LogType:{LogType,-10} | Undone:{Undone,-6} | UndoneIndex:{IndexOfUndoneAction,5} | {PlayerDataString,-5} | #:{Number,-5} Tag:{TagAsString,-20}";
+            return $" State:{GameState,-30} | Action:{Action,-25} | LogType:{LogType,-10}  | {PlayerDataString,-5} | #:{Number,-5} Tag:{TagAsString,-20}";
 
 
         }
@@ -394,6 +407,7 @@ namespace Catan10
                 case CatanAction.ChangedPlayerProperty:
                     Tag = new LogPropertyChanged(val);
                     break;
+                case CatanAction.TotalGoldChanged:
                 case CatanAction.AddResourceCount:
                     Tag = new LogResourceCount(val);
                     break;
