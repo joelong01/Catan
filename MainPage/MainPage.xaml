@@ -43,7 +43,61 @@
             </Button.Flyout>
         </Button>
 
+        <Button VerticalAlignment="Top" FontSize="22" Margin="29,20,0,0" Background="Transparent" Canvas.ZIndex="9999">
+            <Button.Content>
+                <TextBlock Text="&#xE700;" FontFamily="Segoe MDL2 Assets" FontSize="42" />
+            </Button.Content>
+            <Button.Flyout>
+                <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
+                    <MenuFlyoutItem  Text="New Game" Click="Menu_OnNewGame" />
+                    <MenuFlyoutItem  Text="Show Roll UI" Click="OnShowRolls" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutSubItem Text="Ramdon Gold Tiles">
+                        <ToggleMenuFlyoutItem Text="Random Gold Tile" IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}" />
+                        <MenuFlyoutItem Text="Change Count" Click="OnChangeRandomGoldTileCount"/>
+                    </MenuFlyoutSubItem>
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutSubItem Text="Development">
+                        <MenuFlyoutItem Text="Test" Click="OnTest" />
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem  Text="Test Game (Regular)" Click="OnTestRegularGame" />
+                        <MenuFlyoutItem  Text="Test Game (Expansion)" Click="OnTestExpansionGame" />
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem  Text="Pick Settlements and Road" Click="PickSettlementsAndRoads" />
+                        <MenuFlyoutSeparator />
+                        <ToggleMenuFlyoutItem Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
+                    </MenuFlyoutSubItem>
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutSubItem Text="Baron">
+                        <MenuFlyoutItem Text="Optimal" Click="OnPickOptimalBaron" />
+                        <MenuFlyoutItem Text="Random" Click="OnPickRandomBaron" />
+                    </MenuFlyoutSubItem>
+                    <!--<MenuFlyoutSeparator />
+                                        <MenuFlyoutSubItem Text="Pips">
+                                            <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
+                                            <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
+                                        </MenuFlyoutSubItem>-->
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutSubItem Text="Options">
+                        <ToggleMenuFlyoutItem Text="Hide Players On Next" IsChecked="False" />
+                        <MenuFlyoutItem Text="Add Default Users" Click="OnAddDefaultUsers" />
+                    </MenuFlyoutSubItem>
 
+                    <MenuFlyoutItem  Text="Randomize Board" Click="OnAssignNumbers" />
+                    <MenuFlyoutItem  Text="Settings" Click="OnViewSettings" />
+
+                    <MenuFlyoutItem  Text="Show Saved Games" Click="Menu_ShowSavedGames" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutSubItem x:Name="Menu_Games" Text="Games" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutSubItem x:Name="Menu_Colors" Text="Color" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Text="Cancel" Click="OnCancelClicked" />
+                </MenuFlyout>
+            </Button.Flyout>
+        </Button>
 
 
         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="-200,5,0,5">
@@ -79,109 +133,55 @@
 
             <Border Grid.Row="1" BorderBrush="White" BorderThickness="1">
 
-                <StackPanel Orientation="Vertical" Background="Black" Margin="0, 0, 0,0">
-                    <Grid HorizontalAlignment="Center">
+                <StackPanel Orientation="Vertical" Background="Black" Margin="0">
+
+
+                    <Grid HorizontalAlignment="Center" Margin="0,20,0,0">
                         <Button x:Name="_btnNextStep" Content="&#xE101;" Style="{StaticResource GameControllerStyle}" Click="OnNextStep" HorizontalAlignment="Center" Margin="33,0,32,29" />
                         <TextBlock Text="{x:Bind StateDescription, FallbackValue=Next When Done blah blah, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Margin="0,76,0,-1" />
                     </Grid>
+
+
                     <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
                         <StackPanel Orientation="Vertical">
                             <Button x:Name="_btnUndo" Content="&#xE10E;" Style="{StaticResource GameControllerStyle}" Click="OnUndo" />
-                            <TextBlock Text="Undo" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
+                            <TextBlock Text="Undo" FontSize="22" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
                         </StackPanel>
-                        <StackPanel x:Name="stackPanel" Orientation="Vertical">
-                            <Button x:Name="_btnNewGame" Content="&#xE109;" Style="{StaticResource GameControllerStyle}" Click="OnNewGame" />
-                            <TextBlock Text="New Game" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
-                        </StackPanel>
-
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
-                        <StackPanel Width="80" Height="85"  Margin="20,0,20,0">
-                            <local:CatanNumber Width="60" Number="4" Height="60" VerticalAlignment="top" />
-                            <TextBlock Text="{x:Bind FallbackValue=20, Mode=OneWay, Path=TotalRolls}" FontSize="18" CharacterSpacing="0" HorizontalAlignment="Center"/>
-                        </StackPanel>
-
-                        <StackPanel>
-                            <Button x:Name="_showMenu" Content="&#xE1EF;" Style="{StaticResource GameControllerStyle}" Click="OnShowMenu">
-                                <Button.Flyout>
-                                    <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
-                                        <MenuFlyoutSubItem Text="Ramdon Gold Tiles">
-                                            <ToggleMenuFlyoutItem Text="Random Gold Tile" IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}" />
-                                            <ToggleMenuFlyoutItem Text="Change Count" Click="OnChangeRandomGoldTileCount" IsChecked="False"/>
-                                        </MenuFlyoutSubItem>
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutSubItem Text="Development">
-                                            <MenuFlyoutItem x:Name="Menu_Test" Text="Test" Click="OnTest" />
-                                            <MenuFlyoutSeparator />
-                                            <MenuFlyoutItem x:Name="Menu_TestGame" Text="Test Game" Click="OnTestGame" />
-                                            <MenuFlyoutSeparator />
-                                            <MenuFlyoutItem x:Name="Menu_TestStartGame" Text="Pick Settlements and Road" Click="OnStartTestGame" />
-                                            <MenuFlyoutSeparator />
-                                            <ToggleMenuFlyoutItem x:Name="Menu_ToggleShowIndex" Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
-                                        </MenuFlyoutSubItem>
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutSubItem Text="Baron">
-                                            <MenuFlyoutItem Text="Optimal" Click="OnPickOptimalBaron" />
-                                            <MenuFlyoutItem Text="Random" Click="OnPickRandomBaron" />
-                                        </MenuFlyoutSubItem>
-                                        <!--<MenuFlyoutSeparator />
-                                        <MenuFlyoutSubItem Text="Pips">
-                                            <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
-                                            <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
-                                        </MenuFlyoutSubItem>-->
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutSubItem Text="Options">
-                                            <ToggleMenuFlyoutItem Text="Hide Players On Next" IsChecked="False" x:Name="_menuHidePlayersOnNext" />
-                                            <MenuFlyoutItem Text="Add Default Users" Click="OnAddDefaultUsers" />
-                                        </MenuFlyoutSubItem>
-
-                                        <MenuFlyoutItem x:Name="Menu_Undo" Text="Undo" Click="OnUndoClicked" />
-                                        <MenuFlyoutItem x:Name="Menu_AssignNumbers" Text="Randomize Board" Click="OnAssignNumbers" />
-                                        <MenuFlyoutItem x:Name="Menu_Winner" Text="Winner" Click="OnWinnerClicked" />
-                                        <MenuFlyoutItem x:Name="Menu_NewGame" Text="New Game" Click="Menu_OnNewGame" />
-                                        <MenuFlyoutItem x:Name="Menu_Open" Text="Show Saved Games" Click="Menu_ShowSavedGames" />
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutSubItem x:Name="Menu_Games" Text="Games" />
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutSubItem x:Name="Menu_Colors" Text="Color" />
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutItem Text="Cancel" Click="OnCancelClicked" />
-                                    </MenuFlyout>
-                                </Button.Flyout>
-                            </Button>
-                            <TextBlock Text="Menu" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
-                        </StackPanel>
-
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
                         <StackPanel Orientation="Vertical">
-                            <Button x:Name="_btnShowSettings" Content="&#xE115;" Style="{StaticResource GameControllerStyle}" Click="OnViewSettings" FontSize="54" />
-                            <TextBlock Text="Settings" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
+                            <Button Content="&#xE10D;" Style="{StaticResource GameControllerStyle}" Click="OnRedo" IsEnabled="{x:Bind EnableRedo, Mode=OneWay}" />
+                            <TextBlock Text="Redo" FontSize="22" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
                         </StackPanel>
-                        <StackPanel>
-                            <Button Width="80" Height="77" Margin="20,0,0,0" Tapped="OnShowRolls">
-                                <Grid Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="⚃" FontFamily="Segoe UI Symbol" FontSize="44" CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="⚂" FontFamily="Segoe UI Symbol" FontSize="44" CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
-                                </Grid>
 
-                                <!--Name="_btnViewSettings" Content="&#x2685;" Style="{StaticResource GameControllerStyle}" Click="OnViewSettings" FontSize="54"/>-->
-                            </Button>
-                            <TextBlock Text="Roll UI" Grid.Row="3" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="20,0,0,0" />
-
-                        </StackPanel>
                     </StackPanel>
+                    <StackPanel Style="{StaticResource GameControllerStackPanelCommand}" HorizontalAlignment="Center" >
+                        <StackPanel  HorizontalAlignment="Stretch" Margin="0,10,0,10">
+                            <Button Width="80" Height="80" Margin="5,0,0,0">
+                                <Button.Content>
+                                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  >
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" FontSize="50" Text="⚃" FontFamily="Segoe UI Symbol"  CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="50" Text="⚂" FontFamily="Segoe UI Symbol"  CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button.Content>
+                            </Button>
+                            <StackPanel Orientation="Horizontal" >
+                                <TextBlock Text="Total Rolls: " FontSize="18" CharacterSpacing="0" HorizontalAlignment="Left"/>
+                                <TextBlock Text="{x:Bind FallbackValue=20, Mode=OneWay, Path=TotalRolls}" FontSize="18" CharacterSpacing="0" HorizontalAlignment="Right" Margin="5, 0,0,0"/>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                    </StackPanel>
+
 
                     <Grid Height="40" Background="Black" HorizontalAlignment="Center" Margin="0,5,0,0">
                         <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" ColorCodeTimer="True" />

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Shapes;
@@ -21,7 +22,10 @@ namespace Catan10
             this.InitializeComponent();
             GameResourceData.TurnReset();
             GameResourceData.OnPlayerResourceUpdate += OnResourceUpdate;
+            
         }
+
+
 
         public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayerResourceCountCtrl), new PropertyMetadata(null));
         public MainPage MainPage
@@ -30,7 +34,7 @@ namespace Catan10
             set => SetValue(MainPageProperty, value);
         }
 
-        
+
         /// <summary>
         ///     Unlike the logging in PlayerGameData, there is no PlayerData so that whole path isn't set up
         ///     here PlayerData is always null - we need to special case that in the UndoLogLine
@@ -38,11 +42,10 @@ namespace Catan10
         private void OnResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
         {
             System.Diagnostics.Debug.Assert(player == null, "Player shoudl be null in the global reource tracker");
-            Log.PostLogEntry(player, GameState.Unknown,
-                                                            CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
+            Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
                                                             new LogResourceCount(oldVal, newVal, resource));
         }
-
+      
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerData>), typeof(PlayerResourceCountCtrl), new PropertyMetadata(new ObservableCollection<PlayerData>(), PlayingPlayersChanged));
         public ObservableCollection<PlayerData> PlayingPlayers
         {

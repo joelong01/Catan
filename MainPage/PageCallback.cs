@@ -38,6 +38,44 @@ namespace Catan10
             }
         }
 
+        private async Task<bool> RedoLogLine(LogEntry logLine)
+        {
+
+            switch (logLine.Action)
+            {
+                case CatanAction.Rolled:
+                    await ProcessRoll(logLine.Number);
+                    return true;
+                case CatanAction.ChangedPlayer:
+                    LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
+                    await AnimateToPlayerIndex(lcp.To);
+                    break;
+                case CatanAction.PlayedKnight:
+                case CatanAction.AssignedBaron:
+                case CatanAction.AssignedPirateShip:
+                case CatanAction.RolledSeven:
+                    LogBaronOrPirate redoObject = logLine.Tag as LogBaronOrPirate;
+                    await AssignBaronOrKnight(redoObject.TargetPlayer, redoObject.TargetTile, redoObject.TargetWeapon, logLine.Action, LogType.Normal);
+                    break;
+                case CatanAction.UpdatedRoadState:
+                    LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
+                    await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Normal);
+                    break;
+                case CatanAction.UpdateBuildingState:
+                    LogBuildingUpdate buildingUpdate = logLine.Tag as LogBuildingUpdate;
+                    await buildingUpdate.Building.UpdateBuildingState(buildingUpdate.OldBuildingState, buildingUpdate.NewBuildingState);
+                    break;
+                case CatanAction.ChangePlayerAndSetState:
+                    LogChangePlayer lcpSS = logLine.Tag as LogChangePlayer;
+                    await ChangePlayerAndSetState(lcpSS.To - lcpSS.From, logLine.GameState, LogType.Replay);
+                    break;
+                default:
+                    break;
+            }
+
+            return false;
+        }
+
 
         //
         //  returns True if it undid something, false if the undo action has no UI affect (e.g. true if the user would think undo happened)
@@ -48,6 +86,9 @@ namespace Catan10
             {
                 case CatanAction.Rolled:
                     int roll = PopRoll();
+                  //    I don't remember why -- but instead of having "actions" and "consequeces" where only "actions" are logged, I log both and undo both.
+                  //    in particular Rolls generate stats and the stats are logged (and then undone below).  this shoudl probably be fixed.  someday.
+                  //  CountResourcesForRoll(_gameView.GetTilesWithNumber(roll), true); 
                     break;
                 case CatanAction.AddResourceCount:
                     LogResourceCount lrc = logLine.Tag as LogResourceCount;
@@ -60,6 +101,13 @@ namespace Catan10
                         Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(lrc.ResourceType, -logLine.Number);
                     }
 
+                    break;
+                case CatanAction.TotalGoldChanged:
+                    LogResourceCount totalGoldState = logLine.Tag as LogResourceCount;
+                    if (logLine.PlayerData != null)
+                    {
+                        logLine.PlayerData.GameData.PlayerResourceData.GoldTotal = totalGoldState.OldVal;
+                    }
                     break;
                 case CatanAction.CardsLost:
                     LogCardsLost lcl = logLine.Tag as LogCardsLost;
@@ -82,19 +130,7 @@ namespace Catan10
                     }
 
                     await SetStateAsync(logLine.PlayerData, lst.OldState, logLine.StopProcessingUndo, LogType.Undo);
-                    if (lst.NewState == GameState.WaitingForRoll)
-                    {
-                        await _gameView.ResetRandomGoldTiles();
-                    }
 
-                    if (lst.NewState == GameState.WaitingForNext)
-                    {
-                        if (lst.RandomGoldTiles.Count > 0)
-                        {
-                            await _gameView.ResetRandomGoldTiles();
-                            await _gameView.SetRandomTilesToGold(lst.RandomGoldTiles);
-                        }
-                    }
                     break;
                 case CatanAction.SetRandomTileToGold:
 
@@ -102,7 +138,18 @@ namespace Catan10
                 case CatanAction.ChangedPlayer:
                     LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
                     await AnimateToPlayerIndex(lcp.From, LogType.Undo);
+                    if (lcp.OldGameState == GameState.WaitingForNext) 
+                    {
+                        //
+                        //  if we are in supplemental, do not mess with the gold tile(s)                                                
+                        await _gameView.SetRandomTilesToGold(lcp.OldRandomGoldTiles);
+                    }                    
                     break;
+                case CatanAction.ChangePlayerAndSetState:
+                    LogChangePlayer lcpSS = logLine.Tag as LogChangePlayer;
+                    await ChangePlayerAndSetState(lcpSS.From - lcpSS.To , lcpSS.OldGameState, LogType.Undo);
+                    break;
+
                 case CatanAction.DoneSupplemental:
                     _supplementalStartIndex = logLine.Number; // we don't stop undoing on this one -- just set the number we need to terminate the loop and continue on
                     await AddLogEntry(CurrentPlayer, GameState, CatanAction.DoneSupplemental, false, LogType.Undo);
@@ -148,39 +195,22 @@ namespace Catan10
 
 
         }
-
-        public async Task OnUndo(bool saveToDisk = true)
+        public async Task OnRedo(bool saveToDisk = true)
         {
-            if (_log.Count < SMALLEST_STATE_COUNT) // the games starts with 5 states that can't be undone
-            {
-                return;
-            }
-
+            if (_log.UndoCount == 0) return;
             try
             {
-                _log.State = LogState.Undo;
-                for (int i = _log.Count - 1; i >= SMALLEST_STATE_COUNT - 1; i--)
+                _log.State = LogState.Replay; // this is literally like doing the action from the UI
+                for (; ; )
                 {
-                    if (_log[i].LogType == LogType.Undo)
-                    {
-                        continue; // if we have an undo action, skip it
-                    }
+                    if (_log.GameState == GameState.WaitingForStart) break;
 
-                    if (_log[i].Undone == true)
-                    {
-                        continue;   // we already undid this one
-                    }
-
-                    if (_log[i].LogType == LogType.DoNotUndo)
-                    {
-                        continue;
-                    }
-
-                    bool ret = await UndoLogLine(_log[i]);
-                    //
-                    //  if you undo and land on one of these states, then stop processing undo
+                    var le = _log.PopUndo();
+                    if (le == null) break;
+                    bool ret = await RedoLogLine(le);
+                    // you don't push action because RedoLogLine will cause the logs to be updated
                     bool stop = false;
-                    switch (_log[i].Action)
+                    switch (le.Action)
                     {
                         case CatanAction.Rolled:
                         case CatanAction.ChangedPlayer:
@@ -190,6 +220,7 @@ namespace Catan10
                         case CatanAction.UpdateBuildingState:
                         case CatanAction.AssignedPirateShip:
                         case CatanAction.RolledSeven:
+                        case CatanAction.ChangePlayerAndSetState:
                             stop = true;
                             break;
                         default:
@@ -200,19 +231,71 @@ namespace Catan10
                     {
                         break;
                     }
-
-
                 }
             }
             finally
             {
                 _log.State = LogState.Normal;
-                UpdateUiForState(_log.Last().GameState);
+                UpdateUiForState(_log.GameState);
             }
 
             if (saveToDisk)
             {
-                await _log.WriteUnwrittenLinesToDisk();
+                await _log.WriteFullLogToDisk();
+            }
+        }
+
+
+        public async Task OnUndo(bool saveToDisk = true)
+        {
+            if (_log.ActionCount < SMALLEST_STATE_COUNT) // the games starts with 5 states that can't be undone
+            {
+                return;
+            }
+
+            try
+            {
+                _log.State = LogState.Undo;
+                for (; ; )
+                {
+                    if (_log.GameState == GameState.WaitingForStart) break;
+
+                    var le = _log.PopAction();
+                    await UndoLogLine(le);
+                    bool stop = false;
+                    switch (le.Action)
+                    {
+                        case CatanAction.Rolled:
+                        case CatanAction.ChangedPlayer:
+                        case CatanAction.PlayedKnight:
+                        case CatanAction.AssignedBaron:
+                        case CatanAction.UpdatedRoadState:
+                        case CatanAction.UpdateBuildingState:
+                        case CatanAction.AssignedPirateShip:
+                        case CatanAction.ChangePlayerAndSetState:
+                        case CatanAction.RolledSeven:                        
+                            _log.PushUndo(le); // we only need the top level UI changes -- all other log lines generated by the act of applying the change
+                            stop = true;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (stop)
+                    {
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+                _log.State = LogState.Normal;
+                UpdateUiForState(_log.GameState);
+            }
+
+            if (saveToDisk)
+            {
+                await _log.WriteFullLogToDisk();
             }
         }
 
@@ -229,12 +312,13 @@ namespace Catan10
 
         public async Task OnNewGame()
         {
-            if (_log != null && _log.Count != 0)
+            if (_log != null && _log.ActionCount != 0)
             {
                 if (State.GameState != GameState.WaitingForNewGame)
                 {
                     if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
                     {
+
                         return;
                     }
                 }
@@ -243,7 +327,7 @@ namespace Catan10
             try
             {
 
-                _gameView.Reset();
+
 
 
                 if (AllPlayers.Count == 0)
@@ -272,20 +356,25 @@ namespace Catan10
 
                 if (result != ContentDialogResult.Secondary)
                 {
+                    _gameView.Reset();
                     await this.Reset();
                     await SetStateAsync(null, GameState.WaitingForNewGame, true);
                     _gameView.CurrentGame = dlg.SelectedGame;
+
                     if (_log != null)
                     {
-                       await _log.DisposeAll();
+                        _log.Dispose();
+                        _log.OnRedoPossible -= OnRedoPossible;
                     }
 
                     _log = new Log();
+                    _log.OnRedoPossible += OnRedoPossible;
                     await _log.Init(dlg.SaveFileName);
                     SavedGames.Insert(0, _log);
                     await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
                     await StartGame(dlg.PlayerDataList);
                 }
+
             }
             finally
             {
@@ -384,7 +473,7 @@ namespace Catan10
                 return false;
             }
 
-            if (_log.Count == 0)
+            if (_log.ActionCount == 0)
             {
                 return false;
             }
@@ -1249,8 +1338,7 @@ namespace Catan10
 
                 SetValue(GameStateProperty, state); // update things bound to GameState
 
-                Menu_Undo.IsEnabled = false;
-                Menu_Winner.IsEnabled = false;
+               
 
                 switch (state)
                 {
@@ -1262,14 +1350,12 @@ namespace Catan10
                         _btnNextStep.IsEnabled = true;
                         break;
                     case GameState.WaitingForStart:
-                        Menu_Undo.IsEnabled = false;
-                        Menu_Winner.IsEnabled = false;
+                      
                         _btnNextStep.IsEnabled = true;
                         _btnUndo.IsEnabled = false;
                         break;
                     case GameState.WaitingForNext:
-                        Menu_Undo.IsEnabled = true;
-                        Menu_Winner.IsEnabled = true;
+                      
                         _btnNextStep.IsEnabled = true;
                         _btnUndo.IsEnabled = true;
 
@@ -1281,11 +1367,10 @@ namespace Catan10
                     case GameState.Supplemental:
                         _btnNextStep.IsEnabled = true;
                         _btnUndo.IsEnabled = true;
-                        Menu_Undo.IsEnabled = true;
+                     
                         break;
                     case GameState.WaitingForRoll:
-                        Menu_Undo.IsEnabled = true;
-                        Menu_Winner.IsEnabled = true;
+                       
                         _btnNextStep.IsEnabled = false;
                         btn_BaronToggle.IsEnabled = true;
                         ShowNumberUi();

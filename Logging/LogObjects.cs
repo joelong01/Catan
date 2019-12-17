@@ -3,266 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
 
 namespace Catan10
 {
-
-    /// <summary>
-    ///     I've moved to having a state machine for the log from having a Type on each logline
-    ///     this means we can set the state on the log, do a bunch of actions, and then change
-    ///     the log state and we don't have to flow the logType through the whole system. This is possible
-    ///     because we Undo and Replay in specific places so we can set the right state there.
-    ///     
-    ///     the only LogType that is special then is an "override" that is LogType.DoNotLog
-    /// </summary>
-    public enum LogState
-    {
-        Normal,
-        Replay,
-        Undo
-    }
-
-    public class Log : List<LogEntry>
-    {
-        private string _saveFileName = "";
-        private StorageFolder _folder = null;
-        private DataWriter _logWriter = null;
-        private StorageFile _file = null;
-        private IRandomAccessStream _randomAccessStream = null;
-        private IOutputStream _outputStream = null;
-        
-
-        public LogState State { get; set; } = LogState.Normal;
-        private int _lastLogRecordWritten = 0;
-
-        public string DisplayName => File.DisplayName;
-
-        public async Task Init(string fileName)
-        {
-            _saveFileName = fileName + MainPage.SAVED_GAME_EXTENSION;
-            _folder = await StaticHelpers.GetSaveFolder();
-            _file = await _folder.CreateFileAsync(_saveFileName, CreationCollisionOption.OpenIfExists);
-            _randomAccessStream = await _file.OpenAsync(FileAccessMode.ReadWrite);
-            _outputStream = _randomAccessStream.GetOutputStreamAt(0);
-            _logWriter = new DataWriter(_outputStream);
-            _lastLogRecordWritten = 0;
-        }
-
-        public async Task DisposeAll()
-        {
-            await _logWriter.StoreAsync();
-            await _outputStream.FlushAsync();
-            _logWriter.Dispose();   
-            
-            _outputStream.Dispose();
-            
-            _randomAccessStream.Dispose();
-            
-
-
-        }
-
-        public Log(StorageFile file)
-        {
-            _file = file;
-            _saveFileName = _file.DisplayName;
-            _folder = StaticHelpers.GetSaveFolder().Result;
-            _lastLogRecordWritten = 0;
-        }
-
-        public Log()
-        {
-
-        }
-
-        public StorageFile File => _file;
-
-        public List<LogEntry> LogEntries => this;
-
-        public void AppendLogLineNoDisk(LogEntry le)
-        {
-            if (le.LogType == LogType.DoNotLog)
-            {
-                return;
-            }
-
-            switch (this.State)
-            {
-                case LogState.Normal:
-                    le.LogType = LogType.Normal;
-                    break;
-                case LogState.Replay:
-                    return;
-                case LogState.Undo:
-                    le.LogType = LogType.Undo;
-                    break;
-                default:
-                    break;
-            }
-
-            le.LogLineIndex = Count;
-
-            if (le.LogType == LogType.Undo)
-            {
-                for (int i = Count - 1; i >= 0; i--)
-                {
-                    if (this[i].LogType != LogType.Undo)
-                    {
-                        if (this[i].Undone == false)
-                        {
-                            if (this[i].Action == le.Action)
-                            {
-                                le.IndexOfUndoneAction = i;
-                                this[i].Undone = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-            }
-
-            Add(le);
-            //  Debug.WriteLine(le);
-        }
-
-        public async Task AppendLogLine(LogEntry le, bool save = true)
-        {
-
-            AppendLogLineNoDisk(le);
-            if (save && this.State != LogState.Replay)
-            {
-                await WriteUnwrittenLinesToDisk();
-            }
-
-            //Debug.WriteLine(le);
-        }
-
-        /// <summary>
-        ///     write unwritten log lines to disk
-        /// </summary>
-        /// <returns></returns>
-        public async Task WriteUnwrittenLinesToDisk()
-        {
-            try
-            {
-
-
-                if (this.Count == 0)
-                {
-                    return;
-                }
-
-                int count = this.Count; // this might change while we loop because of the await
-
-                for (int i = _lastLogRecordWritten; i < count; i++)
-                {
-                    LogEntry le = this[i];
-                    if (!le.Persisted)
-                    {
-
-                        string s = String.Format($"{le.Serialize()}\r\n");
-                        try
-                        {
-                            // await FileIO.AppendTextAsync(_file, s);
-                            _logWriter.WriteString(s);
-                            await _logWriter.StoreAsync();
-                            await _outputStream.FlushAsync();
-                            le.Persisted = true;
-                        }
-                        catch (Exception e)
-                        {
-                            this.TraceMessage($"Caught Exception when writing to disk: {e}");
-                            this.TraceMessage($"\t log entry: {s}");
-                            throw (e);
-                        }
-
-                    }
-
-                }
-                _lastLogRecordWritten = count;
-
-            }
-            catch
-            {
-
-                //
-                //  just eat it.  we'll save it the next time 
-            }
-
-
-        }
-
-        public async Task<bool> Parse(ILogParserHelper helper)
-        {
-            if (this.Count != 0)
-            {
-                return true; // already parsed this
-            }
-
-            string contents = await FileIO.ReadTextAsync(_file);
-
-            string[] tokens = contents.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Count() < 5)
-            {
-                this.TraceMessage("Invalid Log -- too few log lines");
-                return false;
-            }
-            foreach (string line in tokens)
-            {
-                LogEntry le = new LogEntry(line, helper)
-                {
-                    Persisted = true
-                };
-
-                Add(le);
-                Debug.WriteLine(le);
-            }
-
-            return true;
-
-        }
-
-        internal void Reset()
-        {
-            //base.Clear();
-            //this.State = LogState.Normal;
-        }
-
-        internal void Start()
-        {
-            //base.Clear();
-            //this.State = LogState.Normal;
-        }
-    }
-
-    public interface ILogParserHelper
-    {
-        TileCtrl GetTile(int tileIndex, int gameIndex);
-        RoadCtrl GetRoad(int roadIndex, int gameIndex);
-        BuildingCtrl GetBuilding(int buildingIndex, int gameIndex);
-        PlayerData GetPlayerData(int playerIndex);
-    }
-
-    public interface ILog
-    {
-        Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
-        void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
-    }
-
-    public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo, Test };
-
-
     //   an object that encapsulates an action that has happned in the game
     public class LogEntry
     {
-        public int LogLineIndex { get; set; } = -1;
         public LogType LogType { get; set; } = LogType.Normal;
-        public bool Undone { get; set; } = false;   // this flag says that the user has undone this log record - on disc it is always false since we are append only and don't update rows
-        public int IndexOfUndoneAction { get; set; } = -1; // if this is a LogType == LogType.Undo then this is the index of the LogEntry that was undone
+
         public GameState GameState { get; set; }
         public PlayerData PlayerData { get; set; }
         public string PlayerDataString { get; set; } = "";
@@ -275,7 +27,7 @@ namespace Catan10
         public int LineNumber { get; set; } = -1;
         public string Path { get; set; } = "";
 
-        public bool Persisted { get; set; } = false;
+
         public string PlayerName
         {
             get
@@ -304,7 +56,7 @@ namespace Catan10
 
         }
 
-        static readonly private string[] _serializeProperties = new string[] { "LogLineIndex", "Persisted", "LogType", "Undone", "PlayerDataString", "GameState", "Action", "Number", "IndexOfUndoneAction", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber" }; // "Path" removed
+        static readonly private string[] _serializeProperties = new string[] { "PlayerDataString", "GameState", "Action", "Number", "StopProcessingUndo", "TagAsString", "MemberName", "LineNumber" }; // "Path" removed
         /// <summary>
         ///     this is mostly used for Console and debugging
         /// </summary>
@@ -321,7 +73,7 @@ namespace Catan10
                 PlayerDataString = String.Format($"{PlayerData.PlayerName}");
             }
 
-            return $"Index:{this.LogLineIndex,-5} | State:{GameState,-30} | Action:{Action,-25} | LogType:{LogType,-10} | Undone:{Undone,-6} | UndoneIndex:{IndexOfUndoneAction,5} | {PlayerDataString,-5} | #:{Number,-5} Tag:{TagAsString,-20}";
+            return $" State:{GameState,-30} | Action:{Action,-25} | LogType:{LogType,-10}  | {PlayerDataString,-5} | #:{Number,-5} Tag:{TagAsString,-20}";
 
 
         }
@@ -394,6 +146,7 @@ namespace Catan10
                 case CatanAction.ChangedPlayerProperty:
                     Tag = new LogPropertyChanged(val);
                     break;
+                case CatanAction.TotalGoldChanged:
                 case CatanAction.AddResourceCount:
                     Tag = new LogResourceCount(val);
                     break;
@@ -473,12 +226,17 @@ namespace Catan10
     {
         public int From { get; set; } = -1;
         public int To { get; set; } = -1;
-        private readonly string[] _serializedProperties = new string[] { "From", "To" };
-        public LogChangePlayer(int old, int newIdx)
+        public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
+        public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
+        public GameState OldGameState { get; set; }
+        private readonly string[] _serializedProperties = new string[] { "From", "To", "NewRandomGoldTiles", "OldRandomGoldTiles", "OldGameState" };
+        public LogChangePlayer(int oldIdx, int newIdx, GameState oldState, List<int> rgtOld, List<int> rgtNew)
         {
-            From = old;
+            From = oldIdx;
             To = newIdx;
-            //   this.TraceMessage(this.ToString());
+            OldGameState = oldState; // new game state kept in LogEntry
+            OldRandomGoldTiles = rgtOld;
+            NewRandomGoldTiles = rgtNew;
         }
         public LogChangePlayer(string saved)
         {

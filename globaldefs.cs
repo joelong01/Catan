@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -93,7 +94,7 @@ namespace Catan10
             RandomHarborTypeList = tokens[tokens.Length - 1].DeserializeList<int>(",");
 
         }
-
+        [JsonIgnore]
         private readonly string[] _serializedProperties = new string[] { "TileList", "NumberList" };
 
     }
@@ -152,7 +153,9 @@ namespace Catan10
         RoadTrackingChanged,                         // 23
         AddResourceCount,
         ChangedPlayerProperty,
-        SetRandomTileToGold
+        SetRandomTileToGold,
+        TotalGoldChanged,
+        ChangePlayerAndSetState
     };
     public enum AnimationSpeed { Ultra = 50, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 }; // typical animation speeds in ms
     public enum UndoOrder { PreviousThenUndo, UndoNoPrevious, None };

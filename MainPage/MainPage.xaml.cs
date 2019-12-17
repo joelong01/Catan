@@ -24,12 +24,15 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Text.Json;
+using Newtonsoft.Json;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
 
+    [JsonObject(MemberSerialization.OptIn)]
     public sealed partial class MainPage : Page, ILog
     {
         private string _settingsFileName = "CatanSettings.ini";
@@ -48,10 +51,12 @@ namespace Catan10
 
 
         public static MainPage Current;
+        [JsonProperty]
         private UserControl _currentView = null;
         private Log _log = null;
 
 
+        [JsonProperty]
         public ObservableCollection<PlayerData> PlayingPlayers { get; set; } = new ObservableCollection<PlayerData>();
         public ObservableCollection<PlayerData> AllPlayers { get; set; } = new ObservableCollection<PlayerData>();
 
@@ -327,10 +332,8 @@ namespace Catan10
 
 
             await VisualShuffle();
-            await AnimateToPlayerIndex(_currentPlayerIndex);
             await SetStateAsync(null, GameState.WaitingForStart, true);
-
-
+            await AnimateToPlayerIndex(_currentPlayerIndex);
         }
 
 
@@ -432,7 +435,7 @@ namespace Catan10
 
             _btnNextStep.IsEnabled = false;
             _btnUndo.IsEnabled = false;
-            _btnNewGame.IsEnabled = true;
+
 
             switch (State.GameState)
             {
@@ -505,6 +508,7 @@ namespace Catan10
 
                         await OnNext();
                         await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, false);
+
                         if (CurrentPlayer == PlayingPlayers.Last())
                         {
                             await SetStateAsync(CurrentPlayer, GameState.AllocateResourceReverse, false);
@@ -519,8 +523,7 @@ namespace Catan10
                         }
                         else
                         {
-                            await SetStateAsync(CurrentPlayer, GameState.DoneResourceAllocation, false); // I'm logging two states here because there used to be a "hit to start" UI state...
-                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, true);
+                            await ChangePlayerAndSetState(0, GameState.WaitingForRoll);
                         }
 
                         break;
@@ -536,14 +539,13 @@ namespace Catan10
                         if (HasSupplementalBuild)
                         {
                             _supplementalStartIndex = _currentPlayerIndex;
-                            await OnNext();
-                            await SetStateAsync(CurrentPlayer, GameState.Supplemental, false);
+                            await ChangePlayerAndSetState(1, GameState.Supplemental);
 
                         }
                         else
                         {
-                            await OnNext();
-                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, false);
+                            await ChangePlayerAndSetState(1, GameState.WaitingForRoll);
+
                         }
                         break;
                     case GameState.Supplemental:
@@ -552,24 +554,24 @@ namespace Catan10
                         int tempPos = GetNextPlayerPosition(1);
                         if (tempPos == _supplementalStartIndex)
                         {
-                            //
-                            //  next spot is where we started -- skip over it 
-                            await OnNext(2);
-                            //
-                            //  log that we finished supplemental
-                            await AddLogEntry(CurrentPlayer, GameState, CatanAction.DoneSupplemental, false, LogType.Normal, _supplementalStartIndex);
-                            _supplementalStartIndex = -1;
+                            await ChangePlayerAndSetState(2, GameState.WaitingForRoll);
 
-                            //
-                            //  make the UI want to get a rolll
-                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, false);
+
+                            ////
+                            ////  next spot is where we started -- skip over it 
+                            //await OnNext(2);
+                            ////
+                            ////  log that we finished supplemental
+                            //await AddLogEntry(CurrentPlayer, GameState, CatanAction.DoneSupplemental, false, LogType.Normal, _supplementalStartIndex);
+                            //_supplementalStartIndex = -1;
+
+                            ////
+                            ////  make the UI want to get a rolll
+                            //await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, false);
                         }
                         else
                         {
                             await OnNext();
-                            //
-                            //   stay in Supplemental, but set this in case 
-                            UpdateUiForState(GameState);
                         }
                         break;
                     default:
@@ -760,6 +762,72 @@ namespace Catan10
 
 
         }
+        //
+        //  these need to be combined together because we need to know what the state is both before and *after* we move -- and 
+        //  it used to be that we'd move and then set state.  this way we can do the Gold tile(s) correctly when moving to the next
+        //  player only gets gold when it is their turn to roll (e.g. not when it is supplemental)
+        //
+        private async Task ChangePlayerAndSetState(int numberofPositions, GameState newState, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
+        {
+            int from = PlayingPlayers.IndexOf(CurrentPlayer);
+            int to = GetNextPlayerPosition(numberofPositions);
+            _currentPlayerIndex = to;
+            GameState oldState = GameState;
+
+            var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+            List<int> newRandomGoldTiles = null;
+
+
+
+
+            // this is the one spot where the CurrentPlayer is changed.  it should update all the bindings
+            // the setter will update all the associated state changes that happen when the CurrentPlayer
+            // changes
+
+            CurrentPlayer = PlayingPlayers[_currentPlayerIndex];
+
+            //
+            //  in supplemental, we don't show random gold tiles
+            if (newState == GameState.Supplemental)
+            {
+                await _gameView.ResetRandomGoldTiles();
+            }
+
+
+            //
+            // when we change player we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
+            // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
+            // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
+            // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
+            if ((newState == GameState.WaitingForRoll && logType == LogType.Normal) || (newState == GameState.WaitingForNext && logType == LogType.Undo))
+            {
+                int playerRoll = TotalRolls / PlayingPlayers.Count;  // integer divide - drops remainder
+                if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
+                {
+                    newRandomGoldTiles = GetRandomGoldTiles();
+                    CurrentPlayer.GameData.GoldRolls.Add(newRandomGoldTiles);
+                }
+                else
+                {
+                    Debug.Assert(CurrentPlayer.GameData.GoldRolls.Count > playerRoll);
+                    //
+                    //  we've already picked the tiles for this roll -- use them
+                    newRandomGoldTiles = CurrentPlayer.GameData.GoldRolls[playerRoll];
+                }
+                // this.TraceMessage($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
+                await SetRandomTileToGold(newRandomGoldTiles);
+            }
+
+            //
+            //  we are on the right person, now set the state
+
+            UpdateUiForState(newState);
+            if (logType == LogType.Normal || logType == LogType.Replay)
+            {
+                await AddLogEntry(CurrentPlayer, newState, CatanAction.ChangePlayerAndSetState, true, logType, -1, new LogChangePlayer(from, to, oldState, currentRandomGoldTiles, newRandomGoldTiles));
+            }
+
+        }
 
         //
         //  we use the build ellipses during the allocation phase to see what settlements have the most pips
@@ -873,15 +941,24 @@ namespace Catan10
 
         }
 
-        private void CountResourcesForRoll(List<TileCtrl> tilesWithNumber, bool undo)
+        private void CountResourcesForRoll(IReadOnlyCollection<TileCtrl> tilesWithNumber, bool undo)
         {
             //
             //  add one to the "no resources count for each player -- we will reset it if they get some
             //  also set the flag that says we haven't counted this as a good roll for the player yet
             foreach (PlayerData player in PlayingPlayers)
             {
-                player.GameData.NoResourceCount++;
-                player.GameData.GoodRoll = false;
+                if (undo)
+                {
+                    player.GameData.NoResourceCount--;
+                    player.GameData.GoodRoll = false;
+                }
+                else
+                {
+                    player.GameData.NoResourceCount++;
+                    player.GameData.GoodRoll = false;
+                }
+
 
             }
 
@@ -927,7 +1004,7 @@ namespace Catan10
         {
             get
             {
-                if (_log.Count == 0)
+                if (_log.ActionCount == 0)
                 {
                     return null;
                 }
@@ -945,7 +1022,7 @@ namespace Catan10
                     return GameState.WaitingForNewGame;
                 }
 
-                if (_log.Count == 0)
+                if (_log.ActionCount == 0)
                 {
                     return GameState.WaitingForNewGame;
                 }
@@ -967,7 +1044,7 @@ namespace Catan10
                 state = this.GameState;
             }
 
-            await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
+            await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
 
         }
         public void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
@@ -982,10 +1059,9 @@ namespace Catan10
                 state = this.GameState;
             }
 
-            _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType == LogType.DoNotLog ? logType : LogType.Test, tag, name, lineNumber, filePath));
+            _log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
 
         }
-        private List<List<int>> _goldTilesChosen = new List<List<int>>();
 
         private async Task SetStateAsync(PlayerData playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
         {
@@ -995,39 +1071,6 @@ namespace Catan10
             }
 
             LogStateTranstion lst = new LogStateTranstion(GameState, newState);
-
-            //
-            // when we hit Next and we need a roll, we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
-            // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
-            // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
-            // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
-            if (newState == GameState.WaitingForRoll && logType != LogType.Undo)
-            {
-                if (TotalRolls == _goldTilesChosen.Count)
-                {                    
-                    lst.RandomGoldTiles = GetRandomGoldTiles();
-                    _goldTilesChosen.Add(lst.RandomGoldTiles);
-                }
-                else
-                {
-                    Debug.Assert(_goldTilesChosen.Count > TotalRolls);
-                    //
-                    //  we've already picked the tiles for this roll -- use them
-                    lst.RandomGoldTiles = _goldTilesChosen[TotalRolls];
-                }
-                Debug.WriteLine($"[Role={TotalRolls}] [GoldTiles={StaticHelpers.SerializeList<int>(lst.RandomGoldTiles)}]");
-                await SetRandomTileToGold(lst.RandomGoldTiles);
-            }
-
-            if (newState == GameState.WaitingForNext && logType != LogType.Undo)
-            {
-                // for a better undo experience, make it so that we remember the gold tiles and then when Undo is picked, it will be in the state of "Hit Next to Continue" and the 
-                // random tiles that were used are set correctly
-                // 
-                lst.RandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
-
-            }
-
             await _log.AppendLogLine(new LogEntry(playerData, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, cmn, lineNumber, filePath));
             UpdateUiForState(newState);
 
@@ -1088,19 +1131,9 @@ namespace Catan10
                 //  marking records as undone means we don't have to replay and then undo them
                 //
 
-                for (int i = log.LogEntries.Count - 1; i > 0; i--)
-                {
-                    LogEntry logLine = log.LogEntries[i];
-                    if (logLine.LogType == LogType.Undo)
-                    {
-                        log.LogEntries[logLine.IndexOfUndoneAction].Undone = true;
-                        Debug.Assert(log.LogEntries[logLine.IndexOfUndoneAction].LogLineIndex == logLine.IndexOfUndoneAction);
-                    }
-
-                }
 
 
-                foreach (LogEntry logLine in log.LogEntries)
+                foreach (LogEntry logLine in log.Actions)
                 {
                     n++;
                     if (logLine.LogType == LogType.Undo)
@@ -1108,15 +1141,16 @@ namespace Catan10
                         continue;
                     }
 
-                    if (logLine.Undone == true)
-                    {
-                        continue;
-                    }
+
 
                     switch (logLine.Action)
                     {
                         case CatanAction.Rolled:
                             PushRoll(logLine.Number);
+                            break;
+                        case CatanAction.TotalGoldChanged:
+                            //
+                            //  TODO: set this value...
                             break;
                         case CatanAction.AddResourceCount:
                             LogResourceCount lrc = logLine.Tag as LogResourceCount;
@@ -1238,8 +1272,12 @@ namespace Catan10
 
 
         }
-
-        private async void OnTest(object sdr, RoutedEventArgs rea)
+        private void OnTest(object sdr, RoutedEventArgs rea)
+        {
+            var s = JsonConvert.SerializeObject(this, Formatting.Indented);
+            Debug.WriteLine(s);
+        }
+        private async void OnWebSocketTest(object sdr, RoutedEventArgs rea)
         {
             /* using (var client = new HttpClient())
              {
@@ -1399,7 +1437,8 @@ namespace Catan10
                     if (await StaticHelpers.AskUserYesNoQuestion($"Switch to {newLog.File.DisplayName}?", "Yes", "No"))
                     {
                         _log = newLog;
-                        await newLog.Parse(this);
+                        //   await newLog.Parse(this);
+                        // TODO:...
                         await ReplayLog(newLog);
                         UpdateUiForState(_log.Last().GameState);
                     }
@@ -1448,15 +1487,21 @@ namespace Catan10
         }
         Random testRandom = new Random();
 
-        private async void OnTestGame(object sender, RoutedEventArgs e)
+        private async void OnTestRegularGame(object sender, RoutedEventArgs e)
         {
-            AnimationSpeedBase = 4; // speed up the animations
+            AnimationSpeedBase = 10; // speed up the animations
             await this.Reset();
             await SetStateAsync(null, GameState.WaitingForNewGame, true);
             _gameView.CurrentGame = _gameView.Games[0];
-
+            if (_log != null)
+            {
+                _log.Dispose();
+                _log.OnRedoPossible -= OnRedoPossible;
+            }
             _log = new Log();
-            await _log.Init(CreateSaveFileName("Test"));
+            _log.OnRedoPossible += OnRedoPossible;
+
+            await _log.Init(CreateSaveFileName("Test Game"));
             SavedGames.Insert(0, _log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
             List<PlayerData> PlayerDataList = new List<PlayerData>
@@ -1468,20 +1513,51 @@ namespace Catan10
             };
             await StartGame(PlayerDataList);
             await NextState(); // simluates pushing "Start"
-
-            await StartTestGame();
+            CurrentPlayer = PlayingPlayers[0];
+            await PickSettlementsAndRoads();
 
 
         }
-
-       
-
-        private async void OnStartTestGame(object sender, RoutedEventArgs e)
+        private async void OnTestExpansionGame(object sender, RoutedEventArgs e)
         {
-            await StartTestGame();
+            AnimationSpeedBase = 10; // speed up the animations
+            RandomGoldTileCount = 3;
+            await this.Reset();
+            await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            _gameView.CurrentGame = _gameView.Games[1];
+            if (_log != null)
+            {
+                _log.Dispose();
+                _log.OnRedoPossible -= OnRedoPossible;
+            }
+            _log = new Log();
+            _log.OnRedoPossible += OnRedoPossible;
+
+            await _log.Init(CreateSaveFileName("Expansion Game"));
+            SavedGames.Insert(0, _log);
+            await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
+            List<PlayerData> PlayerDataList = new List<PlayerData>
+            {
+                AllPlayers[0],
+                AllPlayers[1],
+                AllPlayers[2],
+                AllPlayers[3],
+                AllPlayers[4],
+            };
+            await StartGame(PlayerDataList);
+            await NextState(); // simluates pushing "Start"
+            CurrentPlayer = PlayingPlayers[0];
+            await PickSettlementsAndRoads();
+
+
         }
 
-        private async Task StartTestGame()
+        private void OnRedoPossible(bool redo)
+        {
+            EnableRedo = redo;
+        }
+
+        private async Task PickSettlementsAndRoads()
         {
             while (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
@@ -1625,7 +1701,7 @@ namespace Catan10
             TimeSpan diff = DateTime.Now - _dt;
             if (diff.TotalSeconds < 0.1)
             {
-                Debug.WriteLine($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
+                this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
                 return;
             }
 
@@ -1718,11 +1794,16 @@ namespace Catan10
                     }
 
                     building.PipGroup = i;
-                    await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.Normal);
+                    await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.DoNotLog);
                 }
             }
         }
 
+        private async void PickSettlementsAndRoads(object sender, RoutedEventArgs e)
+        {
+
+            await PickSettlementsAndRoads();
+        }
     }
 }
 

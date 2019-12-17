@@ -314,7 +314,7 @@ namespace Catan10
         {
             if (_insideNextFunction)
             {
-                Debug.WriteLine("rejecting call to OnNextStep");
+                this.TraceMessage("rejecting call to OnNextStep");
                 return;
             }
             _insideNextFunction = true;
@@ -338,6 +338,7 @@ namespace Catan10
         {
             if (CurrentPlayer == null)
             {
+                await OnNewGame();
                 return false;
             }
 
@@ -345,14 +346,14 @@ namespace Catan10
             return true;
         }
 
-        private bool _insideUndo = false;
+        private bool _insideButtonHandler = false;
         private void OnUndo(object sender, RoutedEventArgs e)
         {
-           if (GameState == GameState.WaitingForNewGame || _insideUndo)
+           if (GameState == GameState.WaitingForNewGame || _insideButtonHandler)
             {
                 return;
             }
-            _insideUndo = true;
+            _insideButtonHandler = true;
             Button button = sender as Button;
             button.IsEnabled = false;
             
@@ -362,11 +363,32 @@ namespace Catan10
                 {
 
                     button.IsEnabled = true;
-                    _insideUndo = false;
+                    _insideButtonHandler = false;
 
                 });
             });
             
+        }
+        private void OnRedo(object sender, RoutedEventArgs e)
+        {
+            if (GameState == GameState.WaitingForNewGame || _insideButtonHandler)
+            {
+                return;
+            }
+            _insideButtonHandler = true;
+           
+            OnRedo(true).ContinueWith((o) =>
+            {
+                _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    // DO NOT call button.IsEnabled = true; -- this is set
+                    // via notification from the log on the undo stack depth
+
+                    _insideButtonHandler = false;
+
+                });
+            });
+
         }
 
         private async void OnNewGame(object sender, RoutedEventArgs e)
@@ -408,10 +430,6 @@ namespace Catan10
 
         }
 
-        private void OnShowRolls(object sender, TappedRoutedEventArgs e)
-        {
-            ToggleNumberUi();
-        }
 
         private void OnShowMenu(object sender, RoutedEventArgs e)
         {
@@ -736,6 +754,10 @@ namespace Catan10
                 // not setting the gold tiles to be the new value for now becaues of Undo problems...instead hit Next and then Undo
             }
         }
+        private void OnShowRolls(object sender, RoutedEventArgs e)
+        {
+            ToggleNumberUi();
+        }
 
         /// <summary>
         ///     Picks a random place for the Baron that
@@ -886,6 +908,7 @@ namespace Catan10
 
 
         }
+
 
     }
 }

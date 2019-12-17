@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -14,19 +15,25 @@ using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class PlayerGameData : INotifyPropertyChanged
     {
         private bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
 
         public CardsLostUpdatedHandler OnCardsLost;
 
-        public ObservableCollection<RoadCtrl> Roads { get; } = new ObservableCollection<RoadCtrl>();
+        [JsonProperty]
+        public ObservableCollection<RoadCtrl> Roads { get; private set; } = new ObservableCollection<RoadCtrl>();
+        [JsonProperty]
         public ObservableCollection<RoadCtrl> Ships { get; } = new ObservableCollection<RoadCtrl>();
+        [JsonProperty]
         public ObservableCollection<BuildingCtrl> Settlements { get; } = new ObservableCollection<BuildingCtrl>();
+        [JsonProperty]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
         public ObservableCollection<Harbor> OwnedHarbors { get; } = new ObservableCollection<Harbor>();
+        [JsonProperty]
         public PlayerResourceData PlayerResourceData { get; set; } = null;
-        private readonly List<string> _savedGameProperties = new List<string> { "PlayerIdentified", "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
+        private readonly List<string> _savedGameProperties = new List<string> { "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
                                                                        "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
                                                                         "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
@@ -42,7 +49,10 @@ namespace Catan10
             _playerData = pData;
             PlayerResourceData = new PlayerResourceData(pData);
             PlayerResourceData.OnPlayerResourceUpdate += OnPlayerResourceUpdate;
+            PlayerResourceData.OnPlayerGoldTotalUpdate += OnPlayerGoldTotalUpdate;
         }
+
+
 
         public void AddOwnedHarbor(Harbor harbor)
         {
@@ -77,10 +87,13 @@ namespace Catan10
         }
         private void OnPlayerResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
         {
-            _playerData.Log.PostLogEntry(player, GameState.Unknown,
-                                                             CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
-                                                             new LogResourceCount(oldVal, newVal, resource));
+            _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
 
+        }
+
+        private void OnPlayerGoldTotalUpdate(PlayerData player, int oldVal, int newVal)
+        {
+            _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.TotalGoldChanged, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, ResourceType.GoldMine));
         }
 
         private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -165,7 +178,7 @@ namespace Catan10
             MaxCities = 0;
             PlayerResourceData.GameReset();
             Pips = 0;
-        
+
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {
@@ -262,7 +275,7 @@ namespace Catan10
 
         public static string[] NonDisplayData()
         {
-            return new string[] { "PlayerIdentifier", "Roads", "Ships", "Buildings", "Rolls" };
+            return new string[] { "Roads", "Ships", "Buildings", "Rolls" };
         }
 
         public string Serialize(bool oneLine)
@@ -299,7 +312,6 @@ namespace Catan10
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         private bool? _MovedBaronAfterRollingSeven = null;
         private bool _PlayedKnightThisTurn = false;
-        private Guid _PlayerIdentifier = new Guid();
         private int _CardsLostToBaron = 0;
         private string _ColorAsString = "HotPink"; // a useful default to pick out visually - you should *NEVER* see this color in the UI
 
@@ -310,7 +322,24 @@ namespace Catan10
         private int _MaxCities = 0;
         private int _MaxSettlements = 0;
         private bool _useLightFile = true;
-       
+        List<List<int>> _GoldRolls = new List<List<int>>();
+        [JsonProperty]
+        public List<List<int>> GoldRolls
+        {
+            get
+            {
+                return _GoldRolls;
+            }
+            set
+            {
+                if (_GoldRolls != value)
+                {
+                    _GoldRolls = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public bool UseLightFile
         {
             get => _useLightFile;
@@ -338,6 +367,7 @@ namespace Catan10
         //
         //  there should be no other brushes uses for players colors than these two.
         //  
+        [JsonProperty]
         public string ColorAsString
         {
             get => _ColorAsString;
@@ -390,7 +420,11 @@ namespace Catan10
             {
                 if (pips != value)
                 {
-                    LogPropertyChanged(pips, value); // this needs to be here so that the Pips are set when the log is replayed.  it'd be unfortunate if this was Undone...
+                    //    12/14/2019: this line is causingt problems because this log gets added *before* the log for the settlment update,
+                    //    which means Undo is broken because we stop undoing on a settlement changed event.  Undo always changes the collections,
+                    //    so this gets updated anyway.  going to comment out to see if there are issues...
+
+                    //LogPropertyChanged(pips, value); // this needs to be here so that the Pips are set when the log is replayed.  it'd be unfortunate if this was Undone...
                     pips = value;
                     NotifyPropertyChanged();
                 }
@@ -490,7 +524,7 @@ namespace Catan10
         }
 
 
-
+        [JsonProperty]
         public int CardsLostToBaron
         {
             get => _CardsLostToBaron;
@@ -504,18 +538,8 @@ namespace Catan10
                 }
             }
         }
-        public Guid PlayerIdentifier
-        {
-            get => _PlayerIdentifier;
-            set
-            {
-                if (_PlayerIdentifier != value)
-                {
-                    _PlayerIdentifier = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+
+        [JsonProperty]
         public bool PlayedKnightThisTurn
         {
             get => _PlayedKnightThisTurn;
@@ -528,6 +552,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public bool? MovedBaronAfterRollingSeven
         {
             get => _MovedBaronAfterRollingSeven;
@@ -541,6 +566,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public TimeSpan TotalTime
         {
             get => _TotalTime;
@@ -553,6 +579,7 @@ namespace Catan10
                 }
             }
         }
+
         public int SettlementsPlayed
         {
             get => _SettlementsPlayed;
@@ -619,6 +646,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public bool HasLongestRoad
         {
             get => _HasLongestRoad;
@@ -632,6 +660,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public bool LargestArmy
         {
             get => _LargestArmy;
@@ -645,6 +674,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public int ResourcesAcquired
         {
             get => _ResourcesAcquired;
@@ -658,6 +688,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public int CardsLostToSeven
         {
             get => _CardsLostToSeven;
@@ -673,6 +704,7 @@ namespace Catan10
         }
 
         private int _CardsLostToMonopoly = 0;
+        [JsonProperty]
         public int CardsLostToMonopoly
         {
             get => _CardsLostToMonopoly;
@@ -687,6 +719,7 @@ namespace Catan10
             }
         }
 
+        [JsonProperty]
         public int CardsLost
         {
             get => _cardsLost;
@@ -701,6 +734,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public int TimesTargeted
         {
             get => _timesTargeted;
@@ -716,7 +750,7 @@ namespace Catan10
         }
 
 
-
+        [JsonProperty]
         public int NoResourceCount
         {
             get => _noResourceCount;
@@ -735,6 +769,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public int RollsWithResource
         {
             get => _rollsWithResource;
@@ -748,6 +783,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
         public int MaxNoResourceRolls
         {
             get => _maxNoResourceRolls;
@@ -761,6 +797,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonProperty]
 
         public int KnightsPlayed
         {
@@ -775,6 +812,7 @@ namespace Catan10
                 }
             }
         }
+
         public int Score
         {
             get => _score;
@@ -853,9 +891,12 @@ namespace Catan10
 
     public class PlayerResourceData : INotifyPropertyChanged
     {
+        [JsonIgnore]
         private readonly PlayerData _playerData = null;
+        [JsonIgnore]
         public PlayerResourceUpdateHandler OnPlayerResourceUpdate;
-
+        [JsonIgnore]
+        public PlayerGoldTotalUpdateHandler OnPlayerGoldTotalUpdate;
 
         public PlayerResourceData(PlayerData player)
         {
@@ -885,6 +926,8 @@ namespace Catan10
         private int _Wheat = 0;
         private int _Gold = 0;
         int _GoldTotal = 0;
+
+
         public int GoldTotal
         {
             get
@@ -895,6 +938,7 @@ namespace Catan10
             {
                 if (_GoldTotal != value)
                 {
+                    OnPlayerGoldTotalUpdate?.Invoke(_playerData, _GoldTotal, value);
                     _GoldTotal = value;
                     NotifyPropertyChanged();
                 }
@@ -912,6 +956,7 @@ namespace Catan10
                     _Gold = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
+
                 }
             }
         }

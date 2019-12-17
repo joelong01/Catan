@@ -11,6 +11,12 @@ namespace Catan10
 
     public sealed partial class MainPage : Page
     {
+        public static readonly DependencyProperty EnableRedoProperty = DependencyProperty.Register("EnableRedo", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
+        public bool EnableRedo
+        {
+            get => (bool)GetValue(EnableRedoProperty);
+            set => SetValue(EnableRedoProperty, value);
+        }
 
         public static readonly DependencyProperty CanMoveBaronBeforeRollProperty = DependencyProperty.Register("CanMoveBaronBeforeRoll", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
         public bool CanMoveBaronBeforeRoll
@@ -19,7 +25,7 @@ namespace Catan10
             set => SetValue(CanMoveBaronBeforeRollProperty, value);
         }
 
-        public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("Hit Start"));
+        public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("New Game"));
         public string StateDescription
         {
             get => (string)GetValue(StateDescriptionProperty);
