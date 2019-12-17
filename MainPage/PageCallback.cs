@@ -86,6 +86,9 @@ namespace Catan10
             {
                 case CatanAction.Rolled:
                     int roll = PopRoll();
+                  //    I don't remember why -- but instead of having "actions" and "consequeces" where only "actions" are logged, I log both and undo both.
+                  //    in particular Rolls generate stats and the stats are logged (and then undone below).  this shoudl probably be fixed.  someday.
+                  //  CountResourcesForRoll(_gameView.GetTilesWithNumber(roll), true); 
                     break;
                 case CatanAction.AddResourceCount:
                     LogResourceCount lrc = logLine.Tag as LogResourceCount;
@@ -238,7 +241,7 @@ namespace Catan10
 
             if (saveToDisk)
             {
-                await _log.AppendLogToDisk();
+                await _log.WriteFullLogToDisk();
             }
         }
 
@@ -292,7 +295,7 @@ namespace Catan10
 
             if (saveToDisk)
             {
-                await _log.AppendLogToDisk();
+                await _log.WriteFullLogToDisk();
             }
         }
 

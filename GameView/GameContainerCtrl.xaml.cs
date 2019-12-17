@@ -19,12 +19,12 @@ using Windows.UI.Xaml.Media;
 namespace Catan10
 {
 
-    
+
     public class CatanGame : ICatanGameData
     {
 
         public Type ControlType { get; set; } = typeof(RegularGameCtrl);
-        
+
         public string Description { get; set; } = "Regular";
         public int Index { get; set; } = -1;
         public CatanGame(Type type, string s, int idx)
@@ -220,7 +220,7 @@ namespace Catan10
             _currentHexPanel.TileCallback = _tileCallback;
         }
 
-        
+
         private CatanHexPanel _currentHexPanel = null;
 
 
@@ -938,6 +938,31 @@ namespace Catan10
         {
             _currentHexPanel.TileToIslandDictionary.TryGetValue(tile, out Island island);
             return island; // can be null;            
+        }
+
+        /// <summary>
+        ///     given a number (say 6) rutn the List of tiles that have that number
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        List<TileCtrl>[] _TilesWithNumbers = new List<TileCtrl>[13];
+        internal IReadOnlyCollection<TileCtrl> GetTilesWithNumber(int val)
+        {
+            if (_TilesWithNumbers[val] == null)
+            {
+                _TilesWithNumbers[val] = new List<TileCtrl>();
+                foreach (TileCtrl t in CurrentGame.Tiles)
+                {
+
+                    if (t.Number == val)
+
+                    {
+                        _TilesWithNumbers[val].Add(t);
+
+                    }
+                }
+            }
+            return _TilesWithNumbers[val];
         }
 
         /**
