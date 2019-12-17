@@ -201,7 +201,7 @@ namespace Catan10
 
             if (_log != null)
             {
-                await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, currentRandomGoldTiles, newRandomGoldTiles));
+                await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, GameState.Unknown, currentRandomGoldTiles, newRandomGoldTiles));
             }
 
         }

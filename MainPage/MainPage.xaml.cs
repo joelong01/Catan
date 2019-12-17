@@ -505,9 +505,10 @@ namespace Catan10
                         await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, true);
                         break;
                     case GameState.AllocateResourceForward:
-
+                        
                         await OnNext();
                         await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, false);
+                                     
                         if (CurrentPlayer == PlayingPlayers.Last())
                         {
                             await SetStateAsync(CurrentPlayer, GameState.AllocateResourceReverse, false);
@@ -540,14 +541,13 @@ namespace Catan10
                         if (HasSupplementalBuild)
                         {
                             _supplementalStartIndex = _currentPlayerIndex;
-                            await OnNext();
-                            await SetStateAsync(CurrentPlayer, GameState.Supplemental, false);
+                            await ChangePlayerAndSetState(1, GameState.Supplemental);                            
 
                         }
                         else
                         {
-                            await OnNext();
-                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, false);
+                            await ChangePlayerAndSetState(1, GameState.WaitingForRoll);
+                            
                         }
                         break;
                     case GameState.Supplemental:
@@ -556,24 +556,24 @@ namespace Catan10
                         int tempPos = GetNextPlayerPosition(1);
                         if (tempPos == _supplementalStartIndex)
                         {
-                            //
-                            //  next spot is where we started -- skip over it 
-                            await OnNext(2);
-                            //
-                            //  log that we finished supplemental
-                            await AddLogEntry(CurrentPlayer, GameState, CatanAction.DoneSupplemental, false, LogType.Normal, _supplementalStartIndex);
-                            _supplementalStartIndex = -1;
+                            await ChangePlayerAndSetState(2, GameState.WaitingForRoll);
+                            
 
-                            //
-                            //  make the UI want to get a rolll
-                            await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, false);
+                            ////
+                            ////  next spot is where we started -- skip over it 
+                            //await OnNext(2);
+                            ////
+                            ////  log that we finished supplemental
+                            //await AddLogEntry(CurrentPlayer, GameState, CatanAction.DoneSupplemental, false, LogType.Normal, _supplementalStartIndex);
+                            //_supplementalStartIndex = -1;
+
+                            ////
+                            ////  make the UI want to get a rolll
+                            //await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, false);
                         }
                         else
                         {
-                            await OnNext();
-                            //
-                            //   stay in Supplemental, but set this in case 
-                            UpdateUiForState(GameState);
+                            await OnNext();                           
                         }
                         break;
                     default:
@@ -764,12 +764,78 @@ namespace Catan10
 
 
         }
-
         //
-        //  we use the build ellipses during the allocation phase to see what settlements have the most pips
-        //  when we move to the next player, hide the build ellipses
+        //  these need to be combined together because we need to know what the state is both before and *after* we move -- and 
+        //  it used to be that we'd move and then set state.  this way we can do the Gold tile(s) correctly when moving to the next
+        //  player only gets gold when it is their turn to roll (e.g. not when it is supplemental)
+        //
+        private async Task ChangePlayerAndSetState(int numberofPositions, GameState newState,  LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
+        {
+            int from = PlayingPlayers.IndexOf(CurrentPlayer);
+            int to = GetNextPlayerPosition(numberofPositions);
+            _currentPlayerIndex = to;
+            GameState oldState = GameState;
+            
+            var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+            List<int> newRandomGoldTiles = null;
 
-        private async Task HideAllPipEllipses()
+            
+           
+
+            // this is the one spot where the CurrentPlayer is changed.  it should update all the bindings
+            // the setter will update all the associated state changes that happen when the CurrentPlayer
+            // changes
+
+            CurrentPlayer = PlayingPlayers[_currentPlayerIndex];
+
+            //
+            //  in supplemental, we don't show random gold tiles
+            if (newState == GameState.Supplemental)
+            {
+                await _gameView.ResetRandomGoldTiles();
+            }
+
+
+            //
+            // when we change player we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
+            // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
+            // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
+            // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
+            if ( (newState == GameState.WaitingForRoll && logType == LogType.Normal) || (newState == GameState.WaitingForNext && logType == LogType.Undo))
+            {
+                int playerRoll = TotalRolls / PlayingPlayers.Count;  // integer divide - drops remainder
+                if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
+                {
+                    newRandomGoldTiles = GetRandomGoldTiles();
+                    CurrentPlayer.GameData.GoldRolls.Add(newRandomGoldTiles);
+                }
+                else
+                {
+                    Debug.Assert(CurrentPlayer.GameData.GoldRolls.Count > playerRoll);
+                    //
+                    //  we've already picked the tiles for this roll -- use them
+                    newRandomGoldTiles = CurrentPlayer.GameData.GoldRolls[playerRoll];
+                }
+                // this.TraceMessage($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
+                await SetRandomTileToGold(newRandomGoldTiles);
+            }
+
+            //
+            //  we are on the right person, now set the state
+            
+            UpdateUiForState(newState);
+            if (logType == LogType.Normal || logType == LogType.Replay )
+            {
+                await AddLogEntry(CurrentPlayer, newState, CatanAction.ChangePlayerAndSetState, true, logType, -1, new LogChangePlayer(from, to, oldState, currentRandomGoldTiles, newRandomGoldTiles));
+            }
+            
+        }
+
+            //
+            //  we use the build ellipses during the allocation phase to see what settlements have the most pips
+            //  when we move to the next player, hide the build ellipses
+
+            private async Task HideAllPipEllipses()
         {
             foreach (BuildingCtrl s in _gameView.CurrentGame.HexPanel.Buildings)
             {
@@ -1414,9 +1480,9 @@ namespace Catan10
         }
         Random testRandom = new Random();
 
-        private async void OnTestGame(object sender, RoutedEventArgs e)
+        private async void OnTestRegularGame(object sender, RoutedEventArgs e)
         {
-            AnimationSpeedBase = 4; // speed up the animations
+            AnimationSpeedBase = 10; // speed up the animations
             await this.Reset();
             await SetStateAsync(null, GameState.WaitingForNewGame, true);
             _gameView.CurrentGame = _gameView.Games[0];
@@ -1440,8 +1506,41 @@ namespace Catan10
             };
             await StartGame(PlayerDataList);
             await NextState(); // simluates pushing "Start"
+            CurrentPlayer = PlayingPlayers[0];
+            await PickSettlementsAndRoads();
 
-            await StartTestGame();
+
+        }
+        private async void OnTestExpansionGame(object sender, RoutedEventArgs e)
+        {
+            AnimationSpeedBase = 10; // speed up the animations
+            RandomGoldTileCount = 3;
+            await this.Reset();
+            await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            _gameView.CurrentGame = _gameView.Games[1];
+            if (_log != null)
+            {
+                _log.Dispose();
+                _log.OnRedoPossible -= OnRedoPossible;
+            }
+            _log = new Log();
+            _log.OnRedoPossible += OnRedoPossible;
+
+            await _log.Init(CreateSaveFileName("Expansion Game"));
+            SavedGames.Insert(0, _log);
+            await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
+            List<PlayerData> PlayerDataList = new List<PlayerData>
+            {
+                AllPlayers[0],
+                AllPlayers[1],
+                AllPlayers[2],
+                AllPlayers[3],
+                AllPlayers[4],
+            };
+            await StartGame(PlayerDataList);
+            await NextState(); // simluates pushing "Start"
+            CurrentPlayer = PlayingPlayers[0];
+            await PickSettlementsAndRoads();
 
 
         }
@@ -1451,12 +1550,7 @@ namespace Catan10
             EnableRedo = redo;
         }
 
-        private async void OnStartTestGame(object sender, RoutedEventArgs e)
-        {
-            await StartTestGame();
-        }
-
-        private async Task StartTestGame()
+        private async Task PickSettlementsAndRoads()
         {
             while (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
             {
@@ -1698,7 +1792,11 @@ namespace Catan10
             }
         }
 
-       
+        private async void PickSettlementsAndRoads(object sender, RoutedEventArgs e)
+        {
+            
+            await PickSettlementsAndRoads();
+        }
     }
 }
 

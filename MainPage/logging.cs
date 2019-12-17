@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -40,7 +41,7 @@ namespace Catan10
         private string _saveFileName = "";
         private StorageFolder _folder = null;
         IRandomAccessStream _randomAccessStream = default;
-
+        
         private StorageFile _file = null;
 
         public LogState State { get; set; } = LogState.Normal;
@@ -79,8 +80,8 @@ namespace Catan10
 
         public StorageFile File => _file;
 
-        private readonly List<LogEntry> ActionStack  = new List<LogEntry>();
-        private readonly List<LogEntry> UndoStack  = new List<LogEntry>();
+        private readonly List<LogEntry> ActionStack = new List<LogEntry>();
+        private readonly List<LogEntry> UndoStack = new List<LogEntry>();
 
         public IReadOnlyCollection<LogEntry> Actions => ActionStack;
 
@@ -106,7 +107,7 @@ namespace Catan10
         }
         private void NotifyRedoPossible()
         {
-          OnRedoPossible?.Invoke(UndoStack.Count > 0);
+            OnRedoPossible?.Invoke(UndoStack.Count > 0);
         }
         public LogEntry PopUndo()
         {
@@ -170,7 +171,7 @@ namespace Catan10
             AppendLogLineNoDisk(le);
             if (save && this.State != LogState.Replay)
             {
-                await WriteLogToDisk();
+                await AppendLogToDisk();
             }
 
             //Debug.WriteLine(le);
@@ -179,11 +180,15 @@ namespace Catan10
         //
         //  we have to write the whole thing because we might have undo some records and so they 
         //  need to be thrown away.
-        public async Task WriteLogToDisk()
+        public async Task AppendLogToDisk()
         {
             if (ActionStack.Count == 0) return;
 
-
+            StringBuilder sb = new StringBuilder();
+            foreach (var le in ActionStack)
+            {
+                sb.Append($"{le.Serialize()}\r\n");
+            }
 
 
             _randomAccessStream.Size = 0;
@@ -191,13 +196,7 @@ namespace Catan10
             {
                 using (var dataWriter = new DataWriter(outputStream))
                 {
-                    foreach (var le in ActionStack)
-                    {
-                        string s = String.Format($"{le.Serialize()}\r\n");
-                        dataWriter.WriteString(s);
-
-                    }
-
+                    dataWriter.WriteString(sb.ToString());
                     await dataWriter.StoreAsync();
                     await outputStream.FlushAsync();
                 }
@@ -489,11 +488,13 @@ namespace Catan10
         public int To { get; set; } = -1;
         public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
         public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
-        private readonly string[] _serializedProperties = new string[] { "From", "To", "OldRandomGoldTiles", "NewRandomGoldTiles" };
-        public LogChangePlayer(int old, int newIdx, List<int> rgtOld, List<int> rgtNew)
+        public GameState OldGameState { get; set; }
+        private readonly string[] _serializedProperties = new string[] { "From", "To", "NewGameState", "OldRandomGoldTiles", "OldGameState" };
+        public LogChangePlayer(int oldIdx, int newIdx, GameState oldState,  List<int> rgtOld, List<int> rgtNew)
         {
-            From = old;
+            From = oldIdx;
             To = newIdx;
+            OldGameState = oldState; // new game state kept in LogEntry
             OldRandomGoldTiles = rgtOld;
             NewRandomGoldTiles = rgtNew;
         }

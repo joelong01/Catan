@@ -43,7 +43,7 @@
             </Button.Flyout>
         </Button>
 
-        <Button VerticalAlignment="Top" FontSize="22" Margin="29,20,0,0" Background="Transparent">
+        <Button VerticalAlignment="Top" FontSize="22" Margin="29,20,0,0" Background="Transparent" Canvas.ZIndex="9999">
             <Button.Content>
                 <TextBlock Text="&#xE700;" FontFamily="Segoe MDL2 Assets" FontSize="42" />
             </Button.Content>
@@ -54,15 +54,16 @@
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Ramdon Gold Tiles">
                         <ToggleMenuFlyoutItem Text="Random Gold Tile" IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}" />
-                        <ToggleMenuFlyoutItem Text="Change Count" Click="OnChangeRandomGoldTileCount" IsChecked="False"/>
+                        <MenuFlyoutItem Text="Change Count" Click="OnChangeRandomGoldTileCount"/>
                     </MenuFlyoutSubItem>
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Development">
                         <MenuFlyoutItem Text="Test" Click="OnTest" />
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem  Text="Test Game" Click="OnTestGame" />
+                        <MenuFlyoutItem  Text="Test Game (Regular)" Click="OnTestRegularGame" />
+                        <MenuFlyoutItem  Text="Test Game (Expansion)" Click="OnTestExpansionGame" />
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem  Text="Pick Settlements and Road" Click="OnStartTestGame" />
+                        <MenuFlyoutItem  Text="Pick Settlements and Road" Click="PickSettlementsAndRoads" />
                         <MenuFlyoutSeparator />
                         <ToggleMenuFlyoutItem Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
                     </MenuFlyoutSubItem>
