@@ -16,7 +16,7 @@ namespace Catan10
         //  given a road count, get the ordered list of players that have that many roads
         //  First() will be the one that got their first.
         //
-        private readonly Dictionary<int, List<PlayerData>> raceDictionary = new Dictionary<int, List<PlayerData>>();
+        private readonly Dictionary<int, List<PlayerModel>> raceDictionary = new Dictionary<int, List<PlayerModel>>();
 
         //
         //  i'm trying to have the class take care of its own logging when state changes
@@ -29,12 +29,12 @@ namespace Catan10
             _log = log;
         }
 
-        public void AddPlayer(PlayerData player, int roadCount)
+        public void AddPlayer(PlayerModel player, int roadCount)
         {
 
-            if (!raceDictionary.TryGetValue(roadCount, out List<PlayerData> list))
+            if (!raceDictionary.TryGetValue(roadCount, out List<PlayerModel> list))
             {
-                list = new List<PlayerData>();
+                list = new List<PlayerModel>();
                 raceDictionary[roadCount] = list;
 
             }
@@ -48,7 +48,7 @@ namespace Catan10
 
         }
 
-        public void Undo(string oldVal, string newVal, PlayerData player, ILogParserHelper logHelper, GameState state)
+        public void Undo(string oldVal, string newVal, PlayerModel player, ILogParserHelper logHelper, GameState state)
         {
             //  this.TraceMessage($"RoadRace Undo - setting To: {oldVal} from: {newVal}");
             this.Deserialize(oldVal, logHelper);
@@ -58,11 +58,11 @@ namespace Catan10
         //
         //  Removes the player from the list and returns the old value it had
         //  -1 if it wasn't there.
-        public int RemovePlayer(PlayerData player, int roadCount)
+        public int RemovePlayer(PlayerModel player, int roadCount)
         {
             int oldIndex = -1;
 
-            if (raceDictionary.TryGetValue(roadCount, out List<PlayerData> list))
+            if (raceDictionary.TryGetValue(roadCount, out List<PlayerModel> list))
             {
 
                 if (list != null)
@@ -82,9 +82,9 @@ namespace Catan10
         }
 
 
-        public PlayerData GetRaceWinner(int roadCount)
+        public PlayerModel GetRaceWinner(int roadCount)
         {
-            if (raceDictionary.TryGetValue(roadCount, out List<PlayerData> list))
+            if (raceDictionary.TryGetValue(roadCount, out List<PlayerModel> list))
             {
                 Debug.Assert(list != null, "we shouldn't have added a null list");
                 return list.First();
@@ -100,7 +100,7 @@ namespace Catan10
         public string Serialize(bool useNames = false, string keySep = "/", string listSep = ",")
         {
             string s = "";
-            foreach (KeyValuePair<int, List<PlayerData>> kvp in raceDictionary)
+            foreach (KeyValuePair<int, List<PlayerModel>> kvp in raceDictionary)
             {
                 if (kvp.Value == null)
                 {
@@ -108,7 +108,7 @@ namespace Catan10
                 }
 
                 s += kvp.Key + "=";
-                foreach (PlayerData v in kvp.Value)
+                foreach (PlayerModel v in kvp.Value)
                 {
 
                     s += useNames ? v.PlayerName : v.AllPlayerIndex.ToString();
@@ -146,11 +146,11 @@ namespace Catan10
 
                 string[] ts = token.Split(new char[] { '=', listSep.ToCharArray()[0] }, StringSplitOptions.RemoveEmptyEntries);
                 int roadCount = Int32.Parse(ts[0]);
-                List<PlayerData> list = new List<PlayerData>();
+                List<PlayerModel> list = new List<PlayerModel>();
                 for (int i = 1; i < ts.Count(); i++) // yes 1, ts[0] is the roadCount
                 {
                     int playerIndex = Int32.Parse(ts[i]);
-                    PlayerData player = logParser.GetPlayerData(playerIndex);
+                    PlayerModel player = logParser.GetPlayerData(playerIndex);
                     list.Add(player);
                 }
 
@@ -166,7 +166,7 @@ namespace Catan10
             _beginState = this.Serialize();
         }
 
-        internal void EndChanges(PlayerData player, GameState gameState, LogType logType = LogType.Normal)
+        internal void EndChanges(PlayerModel player, GameState gameState, LogType logType = LogType.Normal)
         {
             //
             //  we put things back the way they were in the Undo function - this is only called because we are recalculating who we think should 

@@ -22,7 +22,7 @@ namespace Catan10
         public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count", typeof(int), typeof(ResourceCardCtrl), new PropertyMetadata(0, CountChanged));
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(ResourceCardCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
         public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(ResourceCardCtrl), new PropertyMetadata(HarborType.None, HarborTypeChanged));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerData), typeof(ResourceCardCtrl), new PropertyMetadata(null, OwnerChanged));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(ResourceCardCtrl), new PropertyMetadata(null, OwnerChanged));
         public static readonly DependencyProperty HarborVisibilityProperty = DependencyProperty.Register("HarborVisibility", typeof(Visibility), typeof(ResourceCardCtrl), new PropertyMetadata(Visibility.Collapsed, HarborVisibilityChanged));
         public Visibility HarborVisibility
         {
@@ -40,19 +40,19 @@ namespace Catan10
           //  Debug.WriteLine($"{Owner.ColorAsString}: ResourceType: {ResourceType} HarborType: {HarborType} Visibility: {value}");
         }
 
-        public PlayerData Owner
+        public PlayerModel Owner
         {
-            get => (PlayerData)GetValue(OwnerProperty);
+            get => (PlayerModel)GetValue(OwnerProperty);
             set => SetValue(OwnerProperty, value);
         }
         private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as ResourceCardCtrl;
-            var newOwner = (PlayerData)e.NewValue;
-            var oldOwner = (PlayerData)e.OldValue;
+            var newOwner = (PlayerModel)e.NewValue;
+            var oldOwner = (PlayerModel)e.OldValue;
             depPropClass?.SetOwner(oldOwner, newOwner);
         }
-        private void SetOwner(PlayerData oldOwner, PlayerData newOwner)
+        private void SetOwner(PlayerModel oldOwner, PlayerModel newOwner)
         {
             if (oldOwner != null)
             {

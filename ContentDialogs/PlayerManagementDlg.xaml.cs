@@ -25,11 +25,11 @@ namespace Catan10
 
 
 
-        public ObservableCollection<PlayerData> PlayerDataList { get; } = new ObservableCollection<PlayerData>();
+        public ObservableCollection<PlayerModel> PlayerDataList { get; } = new ObservableCollection<PlayerModel>();
 
 
 
-        public PlayerManagementDlg(IList<PlayerData> playerData, ILog log)
+        public PlayerManagementDlg(IList<PlayerModel> playerData, ILog log)
         {
             this.InitializeComponent();
             _log = log;
@@ -41,7 +41,7 @@ namespace Catan10
 
         private async void OnAddPlayer(object sender, RoutedEventArgs e)
         {
-            PlayerData pd = new PlayerData(_log);
+            PlayerModel pd = new PlayerModel(_log);
             await pd.LoadImage();
             PlayerDataList.Add(pd);
             _gvPlayers.ScrollIntoView(pd);
@@ -81,7 +81,7 @@ namespace Catan10
                 return;
             }
 
-            PlayerData player = e.AddedItems[0] as PlayerData; // single select only
+            PlayerModel player = e.AddedItems[0] as PlayerModel; // single select only
             if (_selectedPlayer != null)
             {
                 _selectedPlayer.IsCurrentPlayer = false;
@@ -93,7 +93,7 @@ namespace Catan10
 
         }
 
-        PlayerData _selectedPlayer = null;
+        PlayerModel _selectedPlayer = null;
 
         private void OnSavePlayer(object sender, RoutedEventArgs e)
         {
@@ -102,12 +102,12 @@ namespace Catan10
 
         private async void OnImageDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            PlayerData data = ((Grid)sender).Tag as PlayerData;
+            PlayerModel data = ((Grid)sender).Tag as PlayerModel;
             await LoadNewImage(data);
 
         }
 
-        private async System.Threading.Tasks.Task LoadNewImage(PlayerData player)
+        private async System.Threading.Tasks.Task LoadNewImage(PlayerModel player)
         {
             _gvPlayers.IsEnabled = false;
             _gvPlayers.SelectedItem = player;
@@ -153,7 +153,7 @@ namespace Catan10
 
         private async void OnImageRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            PlayerData data = ((Grid)sender).Tag as PlayerData;
+            PlayerModel data = ((Grid)sender).Tag as PlayerModel;
             await LoadNewImage(data);
         }
     }

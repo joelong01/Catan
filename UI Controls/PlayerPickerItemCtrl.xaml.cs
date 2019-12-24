@@ -18,7 +18,7 @@ namespace Catan10
         {
             return String.Format($"{PlayerName}:{IsFirst}");
         }
-        public PlayerData PlayerData { get; set; } = null;
+        public PlayerModel Player { get; set; } = null;
         public static readonly DependencyProperty IsFirstProperty = DependencyProperty.Register("To", typeof(bool?), typeof(PlayerPickerItemCtrl), new PropertyMetadata(false, IsFirstChanged));
         public static readonly DependencyProperty ForegroundColorProperty = DependencyProperty.Register("Foreground", typeof(Color), typeof(PlayerPickerItemCtrl), new PropertyMetadata(Colors.HotPink, null));
         public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("Background", typeof(Color), typeof(PlayerPickerItemCtrl), new PropertyMetadata(Colors.HotPink, null));
@@ -78,14 +78,14 @@ namespace Catan10
         {
             this.InitializeComponent();
         }
-        public PlayerPickerItemCtrl(PlayerData data)
+        public PlayerPickerItemCtrl(PlayerModel data)
         {
             this.InitializeComponent();
             ForegroundColor = data.GameData.Foreground.Color;
             FillColor = data.GameData.PlayerColor;
             PlayerName = data.PlayerName;
             ImageFileName = data.ImageFileName;
-            PlayerData = data;
+            Player = data;
             ImageBrush = data.ImageBrush;
         }
 

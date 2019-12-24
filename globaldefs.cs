@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -94,7 +93,7 @@ namespace Catan10
             RandomHarborTypeList = tokens[tokens.Length - 1].DeserializeList<int>(",");
 
         }
-        [JsonIgnore]
+        
         private readonly string[] _serializedProperties = new string[] { "TileList", "NumberList" };
 
     }
@@ -154,7 +153,6 @@ namespace Catan10
         AddResourceCount,
         ChangedPlayerProperty,
         SetRandomTileToGold,
-        TotalGoldChanged,
         ChangePlayerAndSetState
     };
     public enum AnimationSpeed { Ultra = 50, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 }; // typical animation speeds in ms
@@ -227,7 +225,7 @@ namespace Catan10
 
         Task BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState, LogType logType);
 
-        Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
+        Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
         Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl sender);
         bool BuildingStateChangeOk(BuildingCtrl building);
     }

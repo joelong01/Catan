@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,6 @@ using Windows.UI.Xaml.Shapes;
 
 namespace Catan10
 {
-    [JsonObject(MemberSerialization.OptIn)]
     public sealed partial class RoadCtrl : UserControl
     {
         Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
@@ -29,8 +28,8 @@ namespace Catan10
         Ship _ship = null;
 
 
-        public PlayerData Owner { get; set; } = null;
-        [JsonProperty] 
+        public PlayerModel Owner { get; set; } = null;
+
         public int Index { get; set; } = -1;
 
         public RoadCtrl()

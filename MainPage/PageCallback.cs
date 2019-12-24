@@ -86,30 +86,23 @@ namespace Catan10
             {
                 case CatanAction.Rolled:
                     int roll = PopRoll();
-                  //    I don't remember why -- but instead of having "actions" and "consequeces" where only "actions" are logged, I log both and undo both.
-                  //    in particular Rolls generate stats and the stats are logged (and then undone below).  this shoudl probably be fixed.  someday.
-                  //  CountResourcesForRoll(_gameView.GetTilesWithNumber(roll), true); 
+                    //    I don't remember why -- but instead of having "actions" and "consequeces" where only "actions" are logged, I log both and undo both.
+                    //    in particular Rolls generate stats and the stats are logged (and then undone below).  this shoudl probably be fixed.  someday.
+                    //  CountResourcesForRoll(_gameView.GetTilesWithNumber(roll), true); 
                     break;
                 case CatanAction.AddResourceCount:
                     LogResourceCount lrc = logLine.Tag as LogResourceCount;
                     if (logLine.PlayerData != null)
                     {
-                        logLine.PlayerData.GameData.PlayerResourceData.AddResourceCount(lrc.ResourceType, -logLine.Number);
+                        logLine.PlayerData.GameData.PlayerTurnResourceCount.AddResourceCount(lrc.ResourceType, -logLine.Number);
                     }
                     else
                     {
-                        Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(lrc.ResourceType, -logLine.Number);
+                        Ctrl_PlayerResourceCountCtrl.ResourceCountModel.AddResourceCount(lrc.ResourceType, -logLine.Number);
                     }
 
                     break;
-                case CatanAction.TotalGoldChanged:
-                    LogResourceCount totalGoldState = logLine.Tag as LogResourceCount;
-                    if (logLine.PlayerData != null)
-                    {
-                        logLine.PlayerData.GameData.PlayerResourceData.GoldTotal = totalGoldState.OldVal;
-                    }
-                    break;
-                case CatanAction.CardsLost:
+               case CatanAction.CardsLost:
                     LogCardsLost lcl = logLine.Tag as LogCardsLost;
                     _undoingCardLostHack = true;
                     logLine.PlayerData.GameData.CardsLost = lcl.OldVal;
@@ -138,16 +131,16 @@ namespace Catan10
                 case CatanAction.ChangedPlayer:
                     LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
                     await AnimateToPlayerIndex(lcp.From, LogType.Undo);
-                    if (lcp.OldGameState == GameState.WaitingForNext) 
+                    if (lcp.OldGameState == GameState.WaitingForNext)
                     {
                         //
                         //  if we are in supplemental, do not mess with the gold tile(s)                                                
                         await _gameView.SetRandomTilesToGold(lcp.OldRandomGoldTiles);
-                    }                    
+                    }
                     break;
                 case CatanAction.ChangePlayerAndSetState:
                     LogChangePlayer lcpSS = logLine.Tag as LogChangePlayer;
-                    await ChangePlayerAndSetState(lcpSS.From - lcpSS.To , lcpSS.OldGameState, LogType.Undo);
+                    await ChangePlayerAndSetState(lcpSS.From - lcpSS.To, lcpSS.OldGameState, LogType.Undo);
                     break;
 
                 case CatanAction.DoneSupplemental:
@@ -184,7 +177,7 @@ namespace Catan10
                     break;
                 case CatanAction.ChangedPlayerProperty:
                     LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
-                    logLine.PlayerData.GameData.SetKeyValue<PlayerGameData>(lpc.PropertyName, lpc.OldVal);
+                    logLine.PlayerData.GameData.SetKeyValue<PlayerGameModel>(lpc.PropertyName, lpc.OldVal);
                     break;
 
                 default:
@@ -195,6 +188,17 @@ namespace Catan10
 
 
         }
+
+        internal PlayerModel PlayerNameToPlayer(string name)
+        {
+            foreach (var player in PlayingPlayers)
+            {
+                if (player.PlayerName == name)
+                    return player;
+            }
+            throw new Exception("bad name passed PlayerNameToPlayer");
+        }
+
         public async Task OnRedo(bool saveToDisk = true)
         {
             if (_log.UndoCount == 0) return;
@@ -273,7 +277,7 @@ namespace Catan10
                         case CatanAction.UpdateBuildingState:
                         case CatanAction.AssignedPirateShip:
                         case CatanAction.ChangePlayerAndSetState:
-                        case CatanAction.RolledSeven:                        
+                        case CatanAction.RolledSeven:
                             _log.PushUndo(le); // we only need the top level UI changes -- all other log lines generated by the act of applying the change
                             stop = true;
                             break;
@@ -382,7 +386,7 @@ namespace Catan10
             }
         }
 
-        private async Task PromptForLostCards(PlayerData targetedPlayer, CatanAction action)
+        private async Task PromptForLostCards(PlayerModel targetedPlayer, CatanAction action)
         {
             await Task.Delay(0);
             throw new NotImplementedException();
@@ -446,7 +450,7 @@ namespace Catan10
         ///     Somebody picked a menu item to change the color
         /// </summary>
         /// <param name="player"></param>
-        public void CurrentPlayerColorChanged(PlayerData player)
+        public void CurrentPlayerColorChanged(PlayerModel player)
         {
             foreach (RoadCtrl road in player.GameData.Roads)
             {
@@ -499,7 +503,7 @@ namespace Catan10
         //      4. If Knight Played Increment the source player (which is always the current player) Knights played
         //      5. Log that it happened.
         //      6. check to see if we should update the Largest Army
-        private async Task AssignBaronOrKnight(PlayerData targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
+        private async Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
         {
 
             bool flagState = true;
@@ -600,7 +604,7 @@ namespace Catan10
             //    GameState != GameState.WaitingForRoll)
             //    return;
 
-            PlayerGameData playerGameData = CurrentPlayer.GameData;
+            PlayerGameModel playerGameData = CurrentPlayer.GameData;
 
 
             CatanAction action = CatanAction.None;
@@ -613,7 +617,7 @@ namespace Catan10
 
             async void Baron_MenuClicked(object s, RoutedEventArgs e)
             {
-                PlayerData player = (PlayerData)((MenuFlyoutItem)s).Tag;
+                PlayerModel player = (PlayerModel)((MenuFlyoutItem)s).Tag;
 
                 await AssignBaronOrKnight(player, targetTile, weapon, action, LogType.Normal);
 
@@ -794,8 +798,8 @@ namespace Catan10
                 //
                 //  loop through and find who has largest army, and how many knights they've played
                 int knightCount = 0;
-                PlayerData largestArmyPlayer = null;
-                foreach (PlayerData p in PlayingPlayers)
+                PlayerModel largestArmyPlayer = null;
+                foreach (PlayerModel p in PlayingPlayers)
                 {
                     if (p.GameData.LargestArmy)
                     {
@@ -927,11 +931,11 @@ namespace Catan10
 
         }
 
-        private PlayerData MaxRoadPlayer
+        private PlayerModel MaxRoadPlayer
         {
             get
             {
-                foreach (PlayerData player in PlayingPlayers)
+                foreach (PlayerModel player in PlayingPlayers)
                 {
                     if (player.GameData.HasLongestRoad)
                     {
@@ -940,6 +944,14 @@ namespace Catan10
                 }
 
                 return null;
+            }
+        }
+
+        public GameContainerCtrl CurrentGame 
+        { 
+            get
+            {
+                return _gameView;
             }
         }
 
@@ -958,9 +970,9 @@ namespace Catan10
             //  make the compiler error go away
             // await Task.Delay(0);
 
-            PlayerData longestRoadPlayer = null;
+            PlayerModel longestRoadPlayer = null;
             int maxRoads = -1;
-            List<PlayerData> tiedPlayers = new List<PlayerData>();
+            List<PlayerModel> tiedPlayers = new List<PlayerModel>();
 
             try
             {
@@ -969,7 +981,7 @@ namespace Catan10
                 //
                 //  first loop over the players and find the set of players that have the longest road
                 //
-                foreach (PlayerData p in PlayingPlayers)
+                foreach (PlayerModel p in PlayingPlayers)
                 {
                     if (p.GameData.HasLongestRoad)
                     {
@@ -1040,7 +1052,7 @@ namespace Catan10
                 //  first turn it off for everybody...this is needed because somebody might
                 //  be tied, but second in the race. they get the next number of roads and then undo it.
                 //  we need to give the longest road back to the first player to get to the road count
-                foreach (PlayerData p in tiedPlayers)
+                foreach (PlayerModel p in tiedPlayers)
                 {
                     p.GameData.HasLongestRoad = false;
 
@@ -1114,7 +1126,7 @@ namespace Catan10
         }
 
 
-        private void UpdateTileBuildingOwner(PlayerData player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
+        private void UpdateTileBuildingOwner(PlayerModel player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
 
             foreach (BuildingKey key in building.Clones)
@@ -1168,7 +1180,7 @@ namespace Catan10
         int _roadSkipped = 0;
         //
         //  loop through all the players roads calculating the longest road from that point and then return the max found
-        private int CalculateLongestRoad(PlayerData player, ObservableCollection<RoadCtrl> roads)
+        private int CalculateLongestRoad(PlayerModel player, ObservableCollection<RoadCtrl> roads)
         {
             int max = 0;
             RoadCtrl maxRoadStartedAt = null;
@@ -1338,7 +1350,7 @@ namespace Catan10
 
                 SetValue(GameStateProperty, state); // update things bound to GameState
 
-               
+
 
                 switch (state)
                 {
@@ -1350,12 +1362,12 @@ namespace Catan10
                         _btnNextStep.IsEnabled = true;
                         break;
                     case GameState.WaitingForStart:
-                      
+
                         _btnNextStep.IsEnabled = true;
                         _btnUndo.IsEnabled = false;
                         break;
                     case GameState.WaitingForNext:
-                      
+
                         _btnNextStep.IsEnabled = true;
                         _btnUndo.IsEnabled = true;
 
@@ -1367,10 +1379,10 @@ namespace Catan10
                     case GameState.Supplemental:
                         _btnNextStep.IsEnabled = true;
                         _btnUndo.IsEnabled = true;
-                     
+
                         break;
                     case GameState.WaitingForRoll:
-                       
+
                         _btnNextStep.IsEnabled = false;
                         btn_BaronToggle.IsEnabled = true;
                         ShowNumberUi();
@@ -1424,7 +1436,7 @@ namespace Catan10
 
         private void UpdateTurnFlag()
         {
-            foreach (PlayerData pd in PlayingPlayers)
+            foreach (PlayerModel pd in PlayingPlayers)
             {
                 pd.GameData.IsCurrentPlayer = false; // views with Timers should turn off
             }
@@ -1626,7 +1638,7 @@ namespace Catan10
         /// </summary>
         public async Task BuildingStateChanged(BuildingCtrl building, BuildingState oldState, LogType logType)
         {
-            PlayerData player = CurrentPlayer;
+            PlayerModel player = CurrentPlayer;
 
             //
             //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
@@ -1687,7 +1699,7 @@ namespace Catan10
             return _gameView.GetSettlement(settlementIndex, gameIndex);
         }
 
-        public PlayerData GetPlayerData(int playerIndex)
+        public PlayerModel GetPlayerData(int playerIndex)
         {
             return AllPlayers[playerIndex];
         }

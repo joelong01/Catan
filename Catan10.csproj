@@ -12,7 +12,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -125,7 +125,9 @@
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\webSocket.cs" />
     <Compile Include="NetworkService.cs" />
-    <Compile Include="Player\PlayerGameData.cs" />
+    <Compile Include="Player\PlayerGameModel.cs" />
+    <Compile Include="State\newLog.cs" />
+    <Compile Include="State\Rolled.cs" />
     <Compile Include="UI Controls\PlayerResourceCountCtrl.xaml.cs">
       <DependentUpon>PlayerResourceCountCtrl.xaml</DependentUpon>
     </Compile>
@@ -194,7 +196,7 @@
     </Compile>
     <Compile Include="MainPage\PageCallback.cs" />
     <Compile Include="MersenneTwister.cs" />
-    <Compile Include="Player\PlayerData.cs" />
+    <Compile Include="Player\PlayerModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Games\Seafarers4PlayerCtrl.xaml.cs">
       <DependentUpon>Seafarers4PlayerCtrl.xaml</DependentUpon>
@@ -412,9 +414,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.9</Version>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>12.0.3</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
       <Version>4.7.0</Version>

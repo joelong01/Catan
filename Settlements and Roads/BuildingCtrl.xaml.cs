@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -20,12 +18,11 @@ namespace Catan10
     ///     The states that a building can be in
     /// </summary>
     public enum BuildingState { None, Build, Error, Pips, Settlement, City };
-    [JsonObject(MemberSerialization.OptIn)]
     public sealed partial class BuildingCtrl : UserControl
     {
         // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
-        [JsonProperty]
+
         public int Index
         {
             get => (int)GetValue(IndexProperty);
@@ -52,8 +49,8 @@ namespace Catan10
 
 
         public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerData), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerData), typeof(BuildingCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
         public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
         public int Pips
@@ -122,28 +119,27 @@ namespace Catan10
         }
 
 
-        public PlayerData Owner
+        public PlayerModel Owner
         {
-            get => (PlayerData)GetValue(OwnerProperty);
+            get => (PlayerModel)GetValue(OwnerProperty);
             set => SetValue(OwnerProperty, value);
         }
-        public PlayerData CurrentPlayer
+        public PlayerModel CurrentPlayer
         {
-            get => (PlayerData)GetValue(CurrentPlayerProperty);
+            get => (PlayerModel)GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
         }
         private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             BuildingCtrl depPropClass = d as BuildingCtrl;
-            PlayerData depPropValue = (PlayerData)e.NewValue;
+            PlayerModel depPropValue = (PlayerModel)e.NewValue;
             depPropClass?.SetCurrentPlayer(depPropValue);
         }
-        private void SetCurrentPlayer(PlayerData value)
+        private void SetCurrentPlayer(PlayerModel value)
         {
 
         }
-        [JsonProperty]
-        [JsonConverter(typeof(StringEnumConverter))]
+
         public BuildingState BuildingState
         {
             get => (BuildingState)GetValue(BuildingStateProperty);
@@ -288,7 +284,7 @@ namespace Catan10
                 default:
                     break;
             }
-            
+
             await UpdateBuildingState(oldState, newState);
 
 
@@ -301,7 +297,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task UpdateBuildingState(BuildingState oldState, BuildingState newState, LogType logType = LogType.Normal)
         {
-            PlayerData player = CurrentPlayer;
+            PlayerModel player = CurrentPlayer;
             bool ret = false;
             switch (oldState)
             {
@@ -328,7 +324,7 @@ namespace Catan10
             switch (newState)
             {
                 case BuildingState.Pips:
-                 break;
+                    break;
 
                 //
                 //  work done above                    

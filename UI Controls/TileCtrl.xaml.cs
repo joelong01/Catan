@@ -318,6 +318,27 @@ namespace Catan10
             }
         }
 
+        public void HighlightTile(bool highlight)
+        {
+            if (highlight)
+            {
+                _hexFront.Stroke = new SolidColorBrush(Colors.Black);
+            }
+            else
+            {
+                if (this.ResourceType == ResourceType.Sea)
+                {
+                    _hexFront.Stroke = _hexFrontBrush;
+
+                }
+                else
+                {
+                    _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
+                }
+            }
+            
+
+        }
 
         public ResourceType ResourceType
         {

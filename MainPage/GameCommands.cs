@@ -76,10 +76,10 @@ namespace Catan10
         //  this just creates our saved file
         private async Task AddDefaultUsers()
         {
-            List<PlayerData> list = new List<PlayerData>();
+            List<PlayerModel> list = new List<PlayerModel>();
             foreach (KeyValuePair<string, string> kvp in _defaultUsers)
             {
-                PlayerData p = new PlayerData(this)
+                PlayerModel p = new PlayerModel(this)
                 {
                     PlayerName = kvp.Key
 
@@ -599,7 +599,7 @@ namespace Catan10
             CurrentPlayerColorChanged(CurrentPlayer);
         }
 
-        internal void AddPlayerMenu(PlayerData player)
+        internal void AddPlayerMenu(PlayerModel player)
         {
 
 
@@ -633,7 +633,7 @@ namespace Catan10
                 return;
             }
 
-            PlayerGameData playerGameData = CurrentPlayer.GameData;
+            PlayerGameModel playerGameData = CurrentPlayer.GameData;
             if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
             {
                 return;
@@ -772,7 +772,7 @@ namespace Catan10
                 return;
             }
 
-            PlayerGameData playerGameData = CurrentPlayer.GameData;
+            PlayerGameModel playerGameData = CurrentPlayer.GameData;
             if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
             {
                 return;
@@ -860,14 +860,14 @@ namespace Catan10
 
     public class Target
     {
-        public PlayerData Player { get; private set; } = null;
+        public PlayerModel Player { get; private set; } = null;
         public TileCtrl Tile { get; private set; } = null;
         public int ResourcePotential { get; private set; } = 0;
         public override string ToString()
         {
             return $"{Player,-15} | {Tile,-15} | {ResourcePotential}";
         }
-        public Target(PlayerData p, TileCtrl t)
+        public Target(PlayerModel p, TileCtrl t)
         {
             Player = p;
             Tile = t;

@@ -32,19 +32,19 @@ namespace Catan10
             set => SetValue(StateDescriptionProperty, value);
         }
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerData), typeof(MainPage), new PropertyMetadata(null, CurrentPlayerChanged));
-        public PlayerData CurrentPlayer
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null, CurrentPlayerChanged));
+        public PlayerModel CurrentPlayer
         {
-            get => (PlayerData)GetValue(CurrentPlayerProperty);
+            get => (PlayerModel)GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
         }
         private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             MainPage depPropClass = d as MainPage;
-            PlayerData depPropValue = (PlayerData)e.NewValue;
+            PlayerModel depPropValue = (PlayerModel)e.NewValue;
             depPropClass?.SetCurrentPlayer(depPropValue);
         }
-        private void SetCurrentPlayer(PlayerData player)
+        private void SetCurrentPlayer(PlayerModel player)
         {
             //
             //  the next player can always play a baron once

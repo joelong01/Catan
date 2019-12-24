@@ -52,7 +52,7 @@
                     <MenuFlyoutItem  Text="New Game" Click="Menu_OnNewGame" />
                     <MenuFlyoutItem  Text="Show Roll UI" Click="OnShowRolls" />
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutSubItem Text="Ramdon Gold Tiles">
+                    <MenuFlyoutSubItem Text="Random Gold Tiles">
                         <ToggleMenuFlyoutItem Text="Random Gold Tile" IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}" />
                         <MenuFlyoutItem Text="Change Count" Click="OnChangeRandomGoldTileCount"/>
                     </MenuFlyoutSubItem>

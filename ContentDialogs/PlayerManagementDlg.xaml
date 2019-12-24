@@ -23,8 +23,8 @@
             </Grid>
             
         </DataTemplate>
-        
-        <DataTemplate x:Key="EditPlayerDataTemplate" x:DataType="local:PlayerData">
+
+        <DataTemplate x:Key="EditPlayerDataTemplate" x:DataType="local:PlayerModel">
             <Grid Background="Transparent" Height="212" Width="125"  IsHitTestVisible="True" IsDoubleTapEnabled="True" IsRightTapEnabled="True" DoubleTapped="OnImageDoubleTapped" RightTapped="OnImageRightTapped"  Tag="{x:Bind This}" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="125"/>

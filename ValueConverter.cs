@@ -208,7 +208,7 @@ namespace Catan10
         public object Convert(object value, Type targetType, object parameter, string language)
         {
 
-            foreach (ColorChoices choice in PlayerData._availableColors)
+            foreach (ColorChoices choice in PlayerModel._availableColors)
             {
                 if (choice.Background == (Color)value)
                 {
@@ -247,9 +247,9 @@ namespace Catan10
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            for (int idx = 0; idx < PlayerData._availableColors.Count; idx++)
+            for (int idx = 0; idx < PlayerModel._availableColors.Count; idx++)
             {
-                ColorChoices choice = PlayerData._availableColors[idx];
+                ColorChoices choice = PlayerModel._availableColors[idx];
                 if (choice.Background == (Color)value)
                 {
                     return idx;
@@ -263,10 +263,10 @@ namespace Catan10
         {
             if ((int)value == -1)
             {
-                return PlayerData._availableColors[4].Background;
+                return PlayerModel._availableColors[4].Background;
             }
 
-            return PlayerData._availableColors[(int)value].Background;
+            return PlayerModel._availableColors[(int)value].Background;
         }
     }
 

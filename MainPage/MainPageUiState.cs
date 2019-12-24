@@ -79,7 +79,7 @@ namespace Catan10
             Rolls.Push(roll);
             LastRoll = roll;
             PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll, StaticHelpers.SerializeList<int>(_gameView.GetCurrentRandomGoldTiles()));
-            UpdateRollStats();
+            UpdateGlobalRollStats();
             return true;
         }
 
@@ -102,7 +102,7 @@ namespace Catan10
                 LastRoll = 0;
             }
             PostLogEntry(CurrentPlayer, GameState, CatanAction.Rolled, true, LogType.Undo, lastRoll);
-            UpdateRollStats();
+            UpdateGlobalRollStats();
             return lastRoll;
         }
 
@@ -129,14 +129,14 @@ namespace Catan10
             return index;
         }
 
-        public async Task SetFirst(PlayerData player, LogType logType = LogType.Normal)
+        public async Task SetFirst(PlayerModel player, LogType logType = LogType.Normal)
         {
             int idx = PlayingPlayers.IndexOf(player);
             if (idx != -1)
             {
                 for (int i = 0; i < idx; i++)
                 {
-                    PlayerData pd = PlayingPlayers[0];
+                    PlayerModel pd = PlayingPlayers[0];
                     PlayingPlayers.RemoveAt(0);
                     PlayingPlayers.Add(pd);
                 }
@@ -263,9 +263,9 @@ namespace Catan10
         public StorageFile File { get; set; }
         public IList<MenuFlyoutItemBase> PeerMenuItemList { get; set; }
 
-        public PlayerData Player { get; set; }
+        public PlayerModel Player { get; set; }
         public bool SetKeyUpHandler { get; set; } = false;
-        public MenuTag(PlayerData p)
+        public MenuTag(PlayerModel p)
         {
             Player = p;
         }

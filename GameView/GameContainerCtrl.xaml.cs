@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -92,7 +92,7 @@ namespace Catan10
     ///     It is called by the Page, and the Page shouldn't have to know anything about the underlying HexControl
     /// </summary>
     /// 
-    [JsonObject(MemberSerialization.OptIn)]
+    
     public sealed partial class GameContainerCtrl : UserControl
     {
 
@@ -111,7 +111,7 @@ namespace Catan10
         IGameCallback _gameCallback = null;
         ITileControlCallback _tileCallback = null;
 
-        [JsonProperty]
+    
         public RandomBoardSettings RandomBoardSettings { get; private set; } = new RandomBoardSettings();
         private Dictionary<ResourceType, double> _probabilities = new Dictionary<ResourceType, double>();
         public Dictionary<ResourceType, double> Probabilities

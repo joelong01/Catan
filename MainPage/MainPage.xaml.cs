@@ -25,14 +25,15 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Text.Json;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
+
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
 
-    [JsonObject(MemberSerialization.OptIn)]
+
     public sealed partial class MainPage : Page, ILog
     {
         private string _settingsFileName = "CatanSettings.ini";
@@ -50,15 +51,11 @@ namespace Catan10
         private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
 
 
-        public static MainPage Current;
-        [JsonProperty]
+        public static MainPage Current;        
         private UserControl _currentView = null;
         private Log _log = null;
-
-
-        [JsonProperty]
-        public ObservableCollection<PlayerData> PlayingPlayers { get; set; } = new ObservableCollection<PlayerData>();
-        public ObservableCollection<PlayerData> AllPlayers { get; set; } = new ObservableCollection<PlayerData>();
+        public ObservableCollection<PlayerModel> PlayingPlayers { get; set; } = new ObservableCollection<PlayerModel>();
+        public ObservableCollection<PlayerModel> AllPlayers { get; set; } = new ObservableCollection<PlayerModel>();
 
         private RoadRaceTracking _raceTracking = null;
 
@@ -191,7 +188,7 @@ namespace Catan10
                 foreach (KeyValuePair<string, string> kvp in playersDictionary)
                 {
 
-                    PlayerData p = new PlayerData(this);
+                    PlayerModel p = new PlayerModel(this);
 
                     p.Deserialize(kvp.Value, false);
                     await p.LoadImage();
@@ -293,10 +290,10 @@ namespace Catan10
             _lbGames.SelectedValue = _log;
             await ResetTiles(true);
             PlayingPlayers.Clear();
-            Ctrl_PlayerResourceCountCtrl.GameResourceData.TurnReset();
+            Ctrl_PlayerResourceCountCtrl.ResourceCountModel.TurnReset();
             _stateStack.Clear();
 
-            foreach (PlayerData player in AllPlayers)
+            foreach (PlayerModel player in AllPlayers)
             {
                 player.Reset();
             }
@@ -315,14 +312,14 @@ namespace Catan10
         /// <param name="players"></param>
         /// <returns></returns>
 
-        private async Task StartGame(List<PlayerData> players)
+        private async Task StartGame(List<PlayerModel> players)
         {
 
 
 
             ResetDataForNewGame();
 
-            foreach (PlayerData pData in players)
+            foreach (PlayerModel pData in players)
             {
                 //
                 //  add it to the collection that all the views bind to
@@ -343,7 +340,7 @@ namespace Catan10
             _gameView.Reset();
             _gameView.SetCallbacks(this, this);
 
-            foreach (PlayerData p in PlayingPlayers)
+            foreach (PlayerModel p in PlayingPlayers)
             {
                 p.GameData.OnCardsLost -= OnPlayerLostCards;
             }
@@ -356,7 +353,7 @@ namespace Catan10
         }
 
         private bool _undoingCardLostHack = false;
-        private async void OnPlayerLostCards(PlayerData player, int oldVal, int newVal)
+        private async void OnPlayerLostCards(PlayerModel player, int oldVal, int newVal)
         {
             if (_undoingCardLostHack)
             {
@@ -366,13 +363,13 @@ namespace Catan10
             await LogPlayerLostCards(player, oldVal, newVal, LogType.Normal);
         }
 
-        private async Task LogPlayerLostCards(PlayerData player, int oldVal, int newVal, LogType logType)
+        private async Task LogPlayerLostCards(PlayerModel player, int oldVal, int newVal, LogType logType)
         {
             await AddLogEntry(player, GameState, CatanAction.CardsLost, true, logType, -1, new LogCardsLost(oldVal, newVal));
         }
 
 
-        private async Task AddPlayer(PlayerData pData, LogType logType)
+        private async Task AddPlayer(PlayerModel pData, LogType logType)
         {
 
             PlayingPlayers.Add(pData);
@@ -485,7 +482,7 @@ namespace Catan10
         }
 
 
-        private async Task ProcessEnter(PlayerData player, string inputText)
+        private async Task ProcessEnter(PlayerModel player, string inputText)
         {
 
 
@@ -587,10 +584,10 @@ namespace Catan10
 
         //
         //  this needs to be called *after* the log for the Roll because we need to undo all of these prior to undoing the Roll
-        private void AddResourceCountForPlayer(PlayerData player, ResourceType resource, int count, LogType logType = LogType.Normal)
+        private void AddResourceCountForPlayer(PlayerModel player, ResourceType resource, int count, LogType logType = LogType.Normal)
         {
-            int oldValPlayer = player.GameData.PlayerResourceData.AddResourceCount(resource, count); // update the player
-            int oldValGlobal = Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(resource, count); // update for the game
+            int oldValPlayer = player.GameData.PlayerTurnResourceCount.AddResourceCount(resource, count); // update the player
+            int oldValGlobal = Ctrl_PlayerResourceCountCtrl.ResourceCountModel.AddResourceCount(resource, count); // update for the game
             if (player.GameData.GoodRoll == false)
             {
                 player.GameData.GoodRoll = true;
@@ -640,13 +637,13 @@ namespace Catan10
 
         }
 
-        public async static Task<bool> SavePlayers(IEnumerable<PlayerData> players, string fileName)
+        public async static Task<bool> SavePlayers(IEnumerable<PlayerModel> players, string fileName)
         {
 
             StorageFolder folder = await StaticHelpers.GetSaveFolder();
             StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             string toWrite = "";
-            foreach (PlayerData p in players)
+            foreach (PlayerModel p in players)
             {
                 toWrite += string.Format($"[{p.PlayerName}]{StaticHelpers.lineSeperator}{p.Serialize(false)}\n");
             }
@@ -685,7 +682,7 @@ namespace Catan10
 
 
 
-        private void UpdateRollStats()
+        public void UpdateGlobalRollStats()
         {
             int[] roals = RollCount(Rolls);
             double[] percent = RollPercents(Rolls, roals);
@@ -745,7 +742,7 @@ namespace Catan10
             await AnimatePlayers(playersToMove, logType);
 
 
-            UpdateRollStats();
+            UpdateGlobalRollStats();
             foreach (TileCtrl t in _gameView.AllTiles)
             {
                 t.ResetOpacity();
@@ -754,9 +751,9 @@ namespace Catan10
             }
             //
             //  on next, reset the resources for the turn to 0
-            foreach (PlayerData player in PlayingPlayers)
+            foreach (PlayerModel player in PlayingPlayers)
             {
-                player.GameData.PlayerResourceData.TurnReset();
+                player.GameData.PlayerTurnResourceCount.TurnReset();
             }
 
 
@@ -921,7 +918,7 @@ namespace Catan10
             {
                 CurrentPlayer.GameData.MovedBaronAfterRollingSeven = false;
                 await SetStateAsync(CurrentPlayer, GameState.MustMoveBaron, false);
-                foreach (PlayerData player in PlayingPlayers)
+                foreach (PlayerModel player in PlayingPlayers)
                 {
                     player.GameData.NoResourceCount++;
                 }
@@ -941,12 +938,12 @@ namespace Catan10
 
         }
 
-        private void CountResourcesForRoll(IReadOnlyCollection<TileCtrl> tilesWithNumber, bool undo)
+        public void CountResourcesForRoll(IReadOnlyCollection<TileCtrl> tilesWithNumber, bool undo)
         {
             //
             //  add one to the "no resources count for each player -- we will reset it if they get some
             //  also set the flag that says we haven't counted this as a good roll for the player yet
-            foreach (PlayerData player in PlayingPlayers)
+            foreach (PlayerModel player in PlayingPlayers)
             {
                 if (undo)
                 {
@@ -1032,7 +1029,7 @@ namespace Catan10
 
         }
 
-        public async Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
+        public async Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null)
             {
@@ -1047,7 +1044,7 @@ namespace Catan10
             await _log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
 
         }
-        public void PostLogEntry(PlayerData player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
+        public void PostLogEntry(PlayerModel player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null)
             {
@@ -1063,7 +1060,7 @@ namespace Catan10
 
         }
 
-        private async Task SetStateAsync(PlayerData playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
+        public async Task SetStateAsync(PlayerModel playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (_log == null)
             {
@@ -1148,19 +1145,15 @@ namespace Catan10
                         case CatanAction.Rolled:
                             PushRoll(logLine.Number);
                             break;
-                        case CatanAction.TotalGoldChanged:
-                            //
-                            //  TODO: set this value...
-                            break;
-                        case CatanAction.AddResourceCount:
+                      case CatanAction.AddResourceCount:
                             LogResourceCount lrc = logLine.Tag as LogResourceCount;
                             if (logLine.PlayerData != null)
                             {
-                                logLine.PlayerData.GameData.PlayerResourceData.AddResourceCount(lrc.ResourceType, logLine.Number);
+                                logLine.PlayerData.GameData.PlayerTurnResourceCount.AddResourceCount(lrc.ResourceType, logLine.Number);
                             }
                             else
                             {
-                                Ctrl_PlayerResourceCountCtrl.GameResourceData.AddResourceCount(lrc.ResourceType, logLine.Number);
+                                Ctrl_PlayerResourceCountCtrl.ResourceCountModel.AddResourceCount(lrc.ResourceType, logLine.Number);
                             }
 
                             break;
@@ -1248,7 +1241,7 @@ namespace Catan10
                             break;
                         case CatanAction.ChangedPlayerProperty:
                             LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
-                            logLine.PlayerData.GameData.SetKeyValue<PlayerGameData>(lpc.PropertyName, lpc.NewVal);
+                            logLine.PlayerData.GameData.SetKeyValue<PlayerGameModel>(lpc.PropertyName, lpc.NewVal);
                             break;
                         default:
                             break;
@@ -1272,11 +1265,82 @@ namespace Catan10
 
 
         }
-        private void OnTest(object sdr, RoutedEventArgs rea)
+        private async void OnTest(object sdr, RoutedEventArgs rea)
         {
-            var s = JsonConvert.SerializeObject(this, Formatting.Indented);
-            Debug.WriteLine(s);
+
+            var rollController = new RolledController(this, 10);
+            var logModel = rollController.Do();
+            string json = JsonSerializer.Serialize<RolledModel>(logModel as RolledModel);
+            this.TraceMessage(json);
+            RolledModel newModel = JsonSerializer.Deserialize<RolledModel>(json);
+            await rollController.Undo(newModel);
+
+            /*
+             * 
+             *   public string Serialize()
+        {
+
+            var jsonString = JsonSerializer.Serialize<LogModel<T>>(this, _jsonOptions);
+            return jsonString;
         }
+
+        public static LogModel<T> Deserialize(MainPage page, string jsonSting)
+        {
+            var ld = JsonSerializer.Deserialize<LogModel<T>>(jsonSting, _jsonOptions);
+            ld.Page = page;
+            ld.Player = page.AllPlayers[ld.PlayerIndex];
+            return ld;
+        }
+             */
+
+
+
+
+        }
+
+        public async Task<List<TileCtrl>> PlayRollAnimation(int rolledNumber)
+        {
+            List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
+            List<Task> tasks = new List<Task>();
+            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
+            {
+
+                if (t.Number == rolledNumber)
+
+                {
+                    tilesWithNumber.Add(t);
+                    if (_settings.AnimateFade)
+                    {
+
+                        t.AnimateFade(1.0, tasks);
+
+                    }
+                    if (_settings.RotateTile)
+                    {
+                        t.Rotate(180, tasks, true);
+                    }
+                }
+                else
+                {
+                    if (_settings.AnimateFade)
+                    {
+                        t.AnimateFade(0.25, tasks);
+                    }
+                }
+            }
+
+            if (tasks.Count > 0)
+            {
+                await Task.WhenAll(tasks.ToArray());
+            }
+
+            //
+            // now make sure we reverse the fade
+            _timer.Start();
+
+            return tilesWithNumber;
+        }
+
         private async void OnWebSocketTest(object sdr, RoutedEventArgs rea)
         {
             /* using (var client = new HttpClient())
@@ -1504,7 +1568,7 @@ namespace Catan10
             await _log.Init(CreateSaveFileName("Test Game"));
             SavedGames.Insert(0, _log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
-            List<PlayerData> PlayerDataList = new List<PlayerData>
+            List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
                 AllPlayers[0],
                 AllPlayers[1],
@@ -1536,7 +1600,7 @@ namespace Catan10
             await _log.Init(CreateSaveFileName("Expansion Game"));
             SavedGames.Insert(0, _log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
-            List<PlayerData> PlayerDataList = new List<PlayerData>
+            List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
                 AllPlayers[0],
                 AllPlayers[1],
