@@ -22,7 +22,7 @@ namespace Catan10
         public int MaxRoads => _HexPanel.MaxRoads;
         public int MaxSettlements => _HexPanel.MaxSettlements;
         public int MaxShips => _HexPanel.MaxShips;
-
+        public int Index { get; set; } = -1;
         public List<TileCtrl> Tiles => _HexPanel.Tiles;
 
         public List<TileCtrl> DesertTiles => _HexPanel.DesertTiles;

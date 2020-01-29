@@ -1,110 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Catan10
 {
-    public interface ILogController
-    {
-        // executes the task and returns the serialized log string
-        LogHeader Do();
-        // given a log string, undo the action
-        Task<bool> Undo(string logLineJson);
-        Task<bool> Undo(LogHeader header);
-        // given a log string, redo the action
-        Task Redo(string logLineJson);
-        void Redo(LogHeader t);
+   
 
-    }
-
-    public interface ILogHeader
-    {
-        int PlayerIndex { get; set; }
-        string PlayerName { get; set; }
-        GameState OldState { get; set; }
-        GameState NewState { get; set; }
-        CatanAction Action { get; set; }
-    }
-
-
-
-    public class LogHeader : ILogHeader
-    {
-        public int PlayerIndex { get; set; }
-        public string PlayerName { get; set; }
-        public GameState OldState { get; set; }
-        public GameState NewState { get; set; }
-        public CatanAction Action { get; set; }
-
-
-        [JsonIgnore]
-        public MainPage Page { get; internal set; } = null;
-        [JsonIgnore]
-        public PlayerModel Player { get; internal set; } = null;
-
-        public LogHeader()
-        {
-
-        }
-        public LogHeader(MainPage page, PlayerModel playerData, GameState newState, CatanAction a)
-        {
-            PlayerIndex = playerData.AllPlayerIndex;
-            PlayerName = playerData.PlayerName;
-            Player = playerData;
-            Page = page;
-            NewState = newState;
-            OldState = Page.GameState;
-            Action = a;
-            Page = page;
-
-        }
-
-
-    }
-
+    /// <summary>
+    ///     This class has all the data associated with a roll -- when a roll happens, we adjust both player stats and global stats.
+    /// </summary>
     public class RolledModel : LogHeader
     {
 
         public int Rolled { get; set; } = -1;
         //
         //  there is a limitation in the system.text.json serializer in 3.0 where it will only serialize Dictionary<string, TValue>
-        public Dictionary<string, List<RollResourcesModel>> PlayerToResources { get; set; }
+        public Dictionary<string, PlayerRollData> PlayerToResources { get; set; }
         public RolledModel() { }
         public RolledModel(int n)
         {
             Rolled = n;
         }
-        public RolledModel(int n, Dictionary<string, List<RollResourcesModel>> playerResourceDictionary)
+        //
+        //  compares 2 RolledModel objects for identity.  used for testing Redo.
+        public bool Equals(RolledModel rolledModel)
         {
-            Rolled = n;
-            PlayerToResources = playerResourceDictionary;
-        }
+            if (PlayerIndex != rolledModel.PlayerIndex || PlayerName != rolledModel.PlayerName || OldState != rolledModel.OldState ||
+                Action != rolledModel.Action || Rolled != rolledModel.Rolled || PlayerToResources.Count != rolledModel.PlayerToResources.Count)
+            {
+                return false;
+            }
 
-        public RolledModel(MainPage page, PlayerModel playerData, CatanAction action, int roll)
-        {
-            PlayerIndex = playerData.AllPlayerIndex;
-            PlayerName = playerData.PlayerName;
-            Player = playerData;
-            Page = page;
-            OldState = Page.GameState;
-            Action = action;
-            Rolled = roll;
+            foreach (KeyValuePair<string, PlayerRollData> kvp in PlayerToResources)
+            {
+                bool exists = rolledModel.PlayerToResources.TryGetValue(kvp.Key, out PlayerRollData rollData);
+                if (!exists) return false;
+                if (kvp.Value.MaxRollNoResources != rolledModel.PlayerToResources[kvp.Key].MaxRollNoResources) return false;
+                if (kvp.Value.ResourceList.Count != rollData.ResourceList.Count) return false;
+                for (int i = 0; i < rollData.ResourceList.Count; i++)
+                {
+                    if (kvp.Value.ResourceList[i].Value != rollData.ResourceList[i].Value || kvp.Value.ResourceList[i].ResourceType != rollData.ResourceList[i].ResourceType ||
+                        kvp.Value.ResourceList[i].BlockedByBaron != rollData.ResourceList[i].BlockedByBaron)
+                    {
+                        return false;
+                    }
+                }
 
+            }
+
+            return true;
         }
     }
 
+    /// <summary>
+    ///     this keeps track of the resources that are acquired because of the roll. there is a list of these in the PlayerRollData
+    /// </summary>
     public class RollResourcesModel
     {
         public ResourceType ResourceType { get; set; }
         public int Value { get; set; }
         public bool BlockedByBaron { get; set; }
-        public RollResourcesModel() { }
+        public RollResourcesModel() { } // needed for deserialization
         public RollResourcesModel(ResourceType type, int value, bool blocked)
         {
             ResourceType = type;
@@ -113,28 +70,23 @@ namespace Catan10
         }
     }
 
-    public class RolledController
+    //
+    //  this is the data about the player that we collect because a roll happened.
+    //  in particular, there was no way to infer what the max roll with no resources should be without logging it 
+    //  because we might have a tie (e.g. if the value for MaxRollsNoResources was 10 and we got an Undo where the current value was 10, 
+    //  they might previously have had 10)
+    public class PlayerRollData
     {
-        private RolledModel Model { get; set; }
-        private MainPage Page { get; set; } = null;
-        public RolledController(MainPage p, int roll)
-        {
-            Model = new RolledModel(p, p.CurrentPlayer, CatanAction.Rolled, roll);
-            Page = p;
-        }
+        public int MaxRollNoResources { get; set; } = 0;
+        public List<RollResourcesModel> ResourceList { get; set; } = new List<RollResourcesModel>();
+    }
 
-        public RolledController(MainPage p)
-        {
-            Page = p;
-        }
-
-        //
-        //  used by Undo / redo
-        public RolledController(MainPage p, RolledModel model)
-        {
-            Page = p;
-            Model = model;
-        }
+    
+    /// <summary>
+    ///     Exposes a set of APIs that handle a roll (Do, Redo, Undo)
+    /// </summary>
+    public static class RolledController
+    {
 
         /// <summary>
         /// 
@@ -147,45 +99,75 @@ namespace Catan10
         ///     5. set state to WaitingForNext (always comes after Roll)
         /// </summary>
         /// <returns></returns>
-        public LogHeader Do()
+        public static RolledModel Do(MainPage page, int roll)
         {
-
-
-            GameState newState;
-
-            Page.Rolls.Push(Model.Rolled); // all the rolls...
-            Page.LastRoll = Model.Rolled;
-            Page.UpdateGlobalRollStats(); // just math
-
-            Model.PlayerToResources = GetResourceModelForRoll(Model.Rolled);
-
-            if (Model.Rolled != 7)
+            var currentPlayer = page.CurrentPlayer;
+            RolledModel rolledModel = new RolledModel()
             {
-                Page.CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null;
-                newState = GameState.WaitingForNext;
+                Page = page,
+                Rolled = roll,
+                Player = currentPlayer,
+                PlayerIndex = currentPlayer.AllPlayerIndex,
+                PlayerName = currentPlayer.PlayerName,
+                OldState = page.NewGameState,               
+                Action = (roll == 7) ? CatanAction.RolledSeven : CatanAction.Rolled                
+            };
+
+            page.Rolls.Push(rolledModel.Rolled); // all the rolls...
+            page.LastRoll = rolledModel.Rolled;
+            page.UpdateGlobalRollStats(); // just math
+
+
+            rolledModel.PlayerToResources = RolledController.GetResourceModelForRoll(page, rolledModel.Rolled);
+
+            if (rolledModel.Rolled != 7)
+            {
+                currentPlayer.GameData.MovedBaronAfterRollingSeven = null;
+                rolledModel.NewState = GameState.WaitingForNext;
             }
             else
             {
-                Page.CurrentPlayer.GameData.MovedBaronAfterRollingSeven = false;
-                newState = GameState.MustMoveBaron;
+                currentPlayer.GameData.MovedBaronAfterRollingSeven = false;
+                rolledModel.NewState = GameState.MustMoveBaron;
             }
+
+           
+            return rolledModel;
+
             
-            Model.NewState = newState;
-            return Model;
 
         }
 
         //
-        //  given a roll and a multiplier (which should be 1 or -1), do a bunch of calculations
-        private Dictionary<string, List<RollResourcesModel>> GetResourceModelForRoll(int roll)
+        //  given a roll and a multiplier (which should be 1 or -1), do a bunch of calculations.  this is the main "worker" function of the class
+        //
+        private static Dictionary<string, PlayerRollData> GetResourceModelForRoll(MainPage mainPage, int roll)
         {
-            Dictionary<string, List<RollResourcesModel>> dict = new Dictionary<string, List<RollResourcesModel>>();
+            Dictionary<string, PlayerRollData> dict = new Dictionary<string, PlayerRollData>();
+            // 
+            // set up the dictionary and record MaxRollsNoResources
+
+            foreach (var player in mainPage.MainPageModel.PlayingPlayers)
+            {
+                PlayerRollData rollData = new PlayerRollData()
+                {
+                    MaxRollNoResources = player.GameData.MaxNoResourceRolls,
+                };
+                dict[player.PlayerName] = rollData;
+            }
             //
             //  get all information about the resources
             //
-            foreach (TileCtrl tile in Page.CurrentGame.AllTiles)
+            foreach (TileCtrl tile in mainPage.GameContainer.AllTiles)
             {
-                tile.HighlightTile(tile.Number == roll); // shows what was rolled
+                if (tile.Number == roll)
+                {
+                    tile.HighlightTile(mainPage.CurrentPlayer.GameData.PlayerColor); // shows what was rolled
+                }
+                else
+                {
+                    tile.StopHighlightingTile();
+                }
                 if (tile.Number != roll) continue;
 
                 //
@@ -207,15 +189,9 @@ namespace Catan10
                     //  get its value and add it to the dictionary that maps players to resources acquired
                     int value = building.BuildingState == BuildingState.Settlement ? 1 : 2;
                     var rrModel = new RollResourcesModel(tile.ResourceType, value, tile.HasBaron);
-                    if (dict.TryGetValue(building.Owner.PlayerName, out List<RollResourcesModel> list) == true)
-                    {
-                        list.Add(rrModel);
-                    }
-                    else
-                    {
-                        var lst = new List<RollResourcesModel>{rrModel};
-                        dict[building.Owner.PlayerName] = lst;
-                    }
+                    //
+                    //  we added all the players above, so they need to be here.
+                    dict[building.Owner.PlayerName].ResourceList.Add(rrModel);
 
                     /*
                         this updates 
@@ -229,8 +205,8 @@ namespace Catan10
             }
 
             //
-            //  go through players
-            foreach (var player in Page.PlayingPlayers)
+            //  go through players and update the good/bad roll count
+            foreach (var player in mainPage.MainPageModel.PlayingPlayers)
             {
                 if (player.GameData.PlayerTurnResourceCount.Total == 0)
                 {
@@ -249,62 +225,71 @@ namespace Catan10
         }
 
 
-
-        public Task Redo(string jsonString)
+        public static bool Undo(MainPage page, RolledModel rollModel)
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task<bool> Undo(string logLineJson)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Redo(LogHeader t)
-        {
-            throw new NotImplementedException();
-        }
-
-        private PlayerModel LookupPlayerByName(string playerName)
-        {
-            foreach (PlayerModel p in Page.PlayingPlayers)
-            {
-                if (p.PlayerName == playerName)
-                    return p;
-            }
-
-            throw new Exception("Log contained a playername that was not in the PlayingPlayers collection!");
-        }
-
-        public async Task<bool> Undo(LogHeader logModel)
-        {
-            int roll = Page.PopRoll();
-            RolledModel rollModel = logModel as RolledModel;
+            int roll = page.PopRoll();
             Debug.Assert(roll == rollModel.Rolled);
-            Page.UpdateGlobalRollStats();
+            page.UpdateGlobalRollStats();
+            //
+            //  we will go through each of the playing players to see if they are in the roll dictionary.  if they are, we'll undo 
+            //  the resource allocation.  if they are not, we know they had a bad roll and will deal with it.
+            //
 
-            foreach (KeyValuePair<string, List<RollResourcesModel>> kvp in rollModel.PlayerToResources)
+            foreach (var player in page.MainPageModel.PlayingPlayers)
             {
-                var player = LookupPlayerByName(kvp.Key);
-                foreach (RollResourcesModel resourceModel in kvp.Value)
+                if (rollModel.PlayerToResources.TryGetValue(player.PlayerName, out PlayerRollData playerRollData) == true)
                 {
-                    player.GameData.UpdateResourceCount(resourceModel, LogState.Undo);
+                    if (playerRollData.ResourceList.Count > 0)
+                    {
+                        player.GameData.RollsWithResource--;
+                        foreach (RollResourcesModel resourceModel in playerRollData.ResourceList)
+                        {
+                            player.GameData.UpdateResourceCount(resourceModel, LogState.Undo);
+                        }                     
+                    }
+                    else
+                    {
+                        player.GameData.NoResourceCount--;
+                    }
+
+                    player.GameData.MaxNoResourceRolls = playerRollData.MaxRollNoResources;
+                }
+                else
+                {
+                    throw new Exception("We should have *all* players in the rollModel!");
                 }
             }
 
-
-            if (Model.Rolled != 7)
+            //
+            //  reset the flag that says they need to move the baron
+            if (rollModel.Rolled != 7)
             {
-                Page.CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null;
+                page.CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null;
             }
             else
             {
-                Page.CurrentPlayer.GameData.MovedBaronAfterRollingSeven = false;
+                page.CurrentPlayer.GameData.MovedBaronAfterRollingSeven = false;
 
             }
+
+           //
+            //  get rid of any highlighting
+            foreach (TileCtrl tile in page.GameContainer.AllTiles)
+            {
+                
+                tile.StopHighlightingTile(); 
+            }
+
             return true;
         }
 
-
+        internal static void Redo(MainPage page, RolledModel model)
+        {
+            var newModel = RolledController.Do(page, model.Rolled);
+            if (newModel.Equals(model) == false)
+            {
+                throw new Exception("new and old Roll models must match on Redo!");
+            }
+        }
     }
 }

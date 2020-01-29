@@ -328,12 +328,12 @@ namespace Catan10
                     continue;
                 }
 
-                await AssignRandomTilesToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index].TileList);
-                await AssignRandomNumbersToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index].NumberList);
+                await AssignRandomTilesToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index.ToString()].TileList);
+                await AssignRandomNumbersToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index.ToString()].NumberList);
                 if (randomBoard == null)
                 {
                     RandomBoardSettings = new RandomBoardSettings();
-                    RandomBoardSettings.TileGroupToRandomListsDictionary[index] = new RandomLists(tileGroup);
+                    RandomBoardSettings.TileGroupToRandomListsDictionary[index.ToString()] = new RandomLists(tileGroup);
                 }
                 else
                 {
@@ -934,6 +934,7 @@ namespace Catan10
 
         public bool HasIslands => _currentHexPanel.HasIslands;
 
+        
         public Island GetIsland(TileCtrl tile)
         {
             _currentHexPanel.TileToIslandDictionary.TryGetValue(tile, out Island island);

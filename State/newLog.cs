@@ -14,7 +14,7 @@ namespace Catan10
     {
         void PushAction(ILogHeader entry);
         Task Undo(); // this is a Pop from Action push to Undo
-        void Redo();  // pop from Undo push to Action
+        Task Redo();  // pop from Undo push to Action
     }
 
     public class NewLog : INewLog
@@ -22,7 +22,21 @@ namespace Catan10
         private readonly List<ILogHeader> ActionStack = new List<ILogHeader>();
         private readonly List<ILogHeader> UndoStack = new List<ILogHeader>();
         public MainPage Page { get; internal set; }
+        public GameState GameState 
+        { 
+            get
+            {
+                
+                if (ActionStack.Count == 0)
+                {
+                    return GameState.WaitingForNewGame;
+                }
 
+                return ActionStack.Last().NewState;
+                
+            }
+            
+        }
 
         public NewLog(MainPage p)
         {
@@ -34,7 +48,7 @@ namespace Catan10
             ActionStack.Add(entry);
         }
 
-        public void Redo()
+        public async Task Redo()
         {
             var logEntry = UndoStack.Last();
             UndoStack.RemoveAt(UndoStack.Count - 1);
@@ -43,15 +57,12 @@ namespace Catan10
             switch (logEntry.Action)
             {
                 case CatanAction.Rolled:
-                    {
-                        RolledModel model = logEntry as RolledModel;
-                        RolledController controller = new RolledController(Page, model);
-                        controller.Redo(model);
-                    }
+                    RolledController.Redo(Page, (RolledModel)logEntry);
                     break;
                 case CatanAction.ChangedState:
                     break;
                 case CatanAction.ChangedPlayer:
+                    await ChangedPlayerController.Redo(Page, logEntry as ChangedPlayerModel);
                     break;
                 case CatanAction.Dealt:
                     break;
@@ -110,22 +121,26 @@ namespace Catan10
 
         public async Task Undo()
         {
-            var logEntry = UndoStack.Last();
-            UndoStack.RemoveAt(UndoStack.Count - 1);
+            var logEntry = ActionStack.Last();
+            if (logEntry.Action == CatanAction.Started)
+            {
+                // you can't undo at this point -- just start a new game!
+                return;
+            }
+            ActionStack.RemoveAt(ActionStack.Count - 1);
+            UndoStack.Push(logEntry);
             //
             //  now get the controller for this particular Action
             switch (logEntry.Action)
             {
                 case CatanAction.Rolled:
-                    {
-                        RolledModel model = logEntry as RolledModel;
-                        RolledController controller = new RolledController(Page, model);
-                        await controller.Undo(model);
-                    }
+                    RolledController.Undo(Page, logEntry as RolledModel);
                     break;
                 case CatanAction.ChangedState:
                     break;
                 case CatanAction.ChangedPlayer:
+                case CatanAction.ChangePlayerAndSetState:
+                    await ChangedPlayerController.Undo(Page, logEntry as ChangedPlayerModel);
                     break;
                 case CatanAction.Dealt:
                     break;
@@ -174,9 +189,7 @@ namespace Catan10
                 case CatanAction.ChangedPlayerProperty:
                     break;
                 case CatanAction.SetRandomTileToGold:
-                    break;
-                case CatanAction.ChangePlayerAndSetState:
-                    break;
+                    break;                                
                 default:
                     break;
             }

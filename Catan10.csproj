@@ -121,13 +121,19 @@
     </Compile>
     <Compile Include="Logging\LogDefinitions.cs" />
     <Compile Include="Logging\LogObjects.cs" />
+    <Compile Include="MainPage\MainPageModel.cs" />
+    <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\webSocket.cs" />
     <Compile Include="NetworkService.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
+    <Compile Include="State\ChangedPlayer.cs" />
+    <Compile Include="State\LogHeader.cs" />
     <Compile Include="State\newLog.cs" />
     <Compile Include="State\Rolled.cs" />
+    <Compile Include="State\StartGame.cs" />
+    <Compile Include="State\UpdateRoadState.cs" />
     <Compile Include="UI Controls\PlayerResourceCountCtrl.xaml.cs">
       <DependentUpon>PlayerResourceCountCtrl.xaml</DependentUpon>
     </Compile>

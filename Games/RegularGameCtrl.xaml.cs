@@ -18,6 +18,7 @@ namespace Catan10
         public CatanHexPanel HexPanel => _HexPanel;
 
         #region ICatanGameData
+        public int Index { get; set; } = -1;
         public string Description => _HexPanel.Description;
         public GameType GameType => _HexPanel.GameType;
         public int MaxCities => _HexPanel.MaxCities;

@@ -111,19 +111,19 @@ namespace Catan10
 
         //
         //   find the next position in the _playerViewDictionary (where "next" is defined in PLAY_ORDER) that is set
-        int GetNextPlayerPosition(int count)
+        public int GetNextPlayerPosition(int count)
         {
 
             int index = _currentPlayerIndex + count;
 
-            if (index >= PlayingPlayers.Count)
+            if (index >= MainPageModel.PlayingPlayers.Count)
             {
-                index = index - PlayingPlayers.Count;
+                index = index - MainPageModel.PlayingPlayers.Count;
             }
 
             if (index < 0)
             {
-                index = index + PlayingPlayers.Count;
+                index = index + MainPageModel.PlayingPlayers.Count;
             }
 
             return index;
@@ -131,19 +131,19 @@ namespace Catan10
 
         public async Task SetFirst(PlayerModel player, LogType logType = LogType.Normal)
         {
-            int idx = PlayingPlayers.IndexOf(player);
+            int idx = MainPageModel.PlayingPlayers.IndexOf(player);
             if (idx != -1)
             {
                 for (int i = 0; i < idx; i++)
                 {
-                    PlayerModel pd = PlayingPlayers[0];
-                    PlayingPlayers.RemoveAt(0);
-                    PlayingPlayers.Add(pd);
+                    PlayerModel pd = MainPageModel.PlayingPlayers[0];
+                    MainPageModel.PlayingPlayers.RemoveAt(0);
+                    MainPageModel.PlayingPlayers.Add(pd);
                 }
 
-                if (_log != null)
+                if (MainPageModel.Log != null)
                 {
-                    await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.SetFirstPlayer, true, logType, -1, new LogSetFirstPlayer(idx));
+                    await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.SetFirstPlayer, true, logType, -1, new LogSetFirstPlayer(idx));
                 }
             }
 
@@ -156,14 +156,14 @@ namespace Catan10
             var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
             List<int> newRandomGoldTiles = null;
 
-            int from = PlayingPlayers.IndexOf(CurrentPlayer);
+            int from = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer);
             _currentPlayerIndex = to;
 
             // this is the one spot where the CurrentPlayer is changed.  it should update all the bindings
             // the setter will update all the associated state changes that happen when the CurrentPlayer
             // changes
 
-            CurrentPlayer = PlayingPlayers[_currentPlayerIndex];
+            CurrentPlayer = MainPageModel.PlayingPlayers[_currentPlayerIndex];
 
             //
             //  we need to log what is the current state
@@ -177,7 +177,7 @@ namespace Catan10
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
             if (logType != LogType.Undo && (GameState == GameState.WaitingForNext || GameState == GameState.WaitingForRoll))
             {
-                int playerRoll = TotalRolls / PlayingPlayers.Count;  // integer divide - drops remainder
+                int playerRoll = TotalRolls / MainPageModel.PlayingPlayers.Count;  // integer divide - drops remainder
                 if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
                 {
                     newRandomGoldTiles = GetRandomGoldTiles();
@@ -199,9 +199,9 @@ namespace Catan10
             }
 
 
-            if (_log != null)
+            if (MainPageModel.Log != null)
             {
-                await AddLogEntry(CurrentPlayer, _log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, GameState.Unknown, currentRandomGoldTiles, newRandomGoldTiles));
+                await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, GameState.Unknown, currentRandomGoldTiles, newRandomGoldTiles));
             }
 
         }

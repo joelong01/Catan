@@ -20,6 +20,7 @@
 
         <Style TargetType="Button" x:Key="NumberButtonKey">
             <Setter Property="Background" Value="Black" />
+            <Setter Property="IsEnabled" Value="{x:Bind MainPageModel.Log.GameState, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToBooleanConverter}, FallbackValue=true, ConverterParameter=WaitingForRoll}" />
         </Style>
 
 
@@ -58,7 +59,9 @@
                     </MenuFlyoutSubItem>
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Development">
-                        <MenuFlyoutItem Text="Test" Click="OnTest" />
+                        <MenuFlyoutItem Text="Test 1" Click="OnTest1" />
+                        <MenuFlyoutItem Text="Test 2" Click="OnTest2" />
+                        <MenuFlyoutItem Text="Test 3" Click="OnTest3" />
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem  Text="Test Game (Regular)" Click="OnTestRegularGame" />
                         <MenuFlyoutItem  Text="Test Game (Expansion)" Click="OnTestExpansionGame" />
@@ -108,7 +111,7 @@
             </local:GameContainerCtrl>
         </Viewbox>
 
-        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" HorizontalAlignment="Right" Width="615" Margin="20" />
+        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" HorizontalAlignment="Right" Width="615" Margin="20" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"/>
 
         <Grid x:Name="ControlGrid" PointerPressed="OnPointerPressed" Width="250" Height="500" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center">
             <Grid.RenderTransform>
@@ -137,18 +140,18 @@
 
 
                     <Grid HorizontalAlignment="Center" Margin="0,20,0,0">
-                        <Button x:Name="_btnNextStep" Content="&#xE101;" Style="{StaticResource GameControllerStyle}" Click="OnNextStep" HorizontalAlignment="Center" Margin="33,0,32,29" />
+                        <Button x:Name="_btnNextStep" Content="&#xE101;" Style="{StaticResource GameControllerStyle}" Click="OnNextStep" HorizontalAlignment="Center" Margin="33,0,32,29" IsEnabled="{x:Bind MainPageModel.EnableNextButton, Mode=OneWay}"/>
                         <TextBlock Text="{x:Bind StateDescription, FallbackValue=Next When Done blah blah, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Margin="0,76,0,-1" />
                     </Grid>
 
 
                     <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
                         <StackPanel Orientation="Vertical">
-                            <Button x:Name="_btnUndo" Content="&#xE10E;" Style="{StaticResource GameControllerStyle}" Click="OnUndo" />
+                            <Button x:Name="_btnUndo" Content="&#xE10E;" Style="{StaticResource GameControllerStyle}" Click="OnUndo" IsEnabled="{x:Bind MainPageModel.EnableUiInteraction, Mode=OneWay}"/>
                             <TextBlock Text="Undo" FontSize="22" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
                         </StackPanel>
                         <StackPanel Orientation="Vertical">
-                            <Button Content="&#xE10D;" Style="{StaticResource GameControllerStyle}" Click="OnRedo" IsEnabled="{x:Bind EnableRedo, Mode=OneWay}" />
+                            <Button Content="&#xE10D;" Style="{StaticResource GameControllerStyle}" Click="OnRedo" IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}" />
                             <TextBlock Text="Redo" FontSize="22" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
                         </StackPanel>
 
@@ -214,7 +217,7 @@
                 <StackPanel>
                     <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
                         <StackPanel Orientation="Vertical">
-                            <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
+                            <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}" >
                                 <local:CatanNumber Number="2" Width="75" Height="75" Margin="2,-2" />
                             </Button>
                             <TextBlock Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=TwoPercent}" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,2" />
@@ -222,7 +225,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Vertical">
                             <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                <local:CatanNumber Number="3" Width="75" Height="75" Margin="2,-2" />
+                                <local:CatanNumber Number="3" Width="75" Height="75" Margin="2,-2"/>
                             </Button>
                             <TextBlock Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=ThreePercent}" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
 
@@ -292,8 +295,9 @@
                             <TextBlock Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=TwelvePercent}" FontSize="12" CharacterSpacing="0" HorizontalAlignment="Center" Margin="2,-2" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <ToggleButton x:Name="btn_BaronToggle" Background="Transparent" IsChecked="{x:Bind CanMoveBaronBeforeRoll, Mode=TwoWay }" >
-                                <local:BaronCtrl Width="75" Height="75" />
+                            <ToggleButton x:Name="btn_BaronToggle" Background="Transparent" IsChecked="{x:Bind CanMoveBaronBeforeRoll, Mode=TwoWay }" Margin="0,-13,0,0"
+                                          IsEnabled="{x:Bind MainPageModel.Log.GameState, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToBooleanConverter}, FallbackValue=true, ConverterParameter=WaitingForRoll}" >
+                                <local:BaronCtrl Width="85" Height="71" />
                             </ToggleButton>
                         </StackPanel>
                     </StackPanel>

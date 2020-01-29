@@ -149,6 +149,35 @@ namespace Catan10
     }
 
     /// <summary>
+    ///     used in the MainPage.xaml
+    ///     allows you to bind IsEnabled to one or more gamestates. seperate the GameStates with a "|"
+    /// </summary>
+    public class GameStateToBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            var tokens = (parameter as string).Split('|', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var e in tokens)
+            {
+                GameState desiredState = StaticHelpers.ParseEnum<GameState>(e);
+                GameState actualState = (GameState)value;
+                if (actualState == desiredState)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("GameStateToBooleanConverter cannot be used in a TwoWay binding");
+        }
+    }
+
+    /// <summary>
     ///     used in the road control.  this takes a parameter to indicate which state should be Visible and all others should be collapsed
     ///     parameter is a string
     /// </summary>

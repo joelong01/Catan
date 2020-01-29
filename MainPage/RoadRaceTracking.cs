@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Catan10
 {
@@ -16,10 +17,11 @@ namespace Catan10
         //  given a road count, get the ordered list of players that have that many roads
         //  First() will be the one that got their first.
         //
-        private readonly Dictionary<int, List<PlayerModel>> raceDictionary = new Dictionary<int, List<PlayerModel>>();
+        private readonly Dictionary<string, List<PlayerModel>> raceDictionary = new Dictionary<string, List<PlayerModel>>();
 
         //
         //  i'm trying to have the class take care of its own logging when state changes
+        
         ILog _log = null;
         // we can make lots of little changes - instead of logging all of them, we log at the end of them
         private string _beginState = "";
@@ -28,14 +30,15 @@ namespace Catan10
         {
             _log = log;
         }
+        public RoadRaceTracking() { }
 
         public void AddPlayer(PlayerModel player, int roadCount)
         {
 
-            if (!raceDictionary.TryGetValue(roadCount, out List<PlayerModel> list))
+            if (!raceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
             {
                 list = new List<PlayerModel>();
-                raceDictionary[roadCount] = list;
+                raceDictionary[roadCount.ToString()] = list;
 
             }
 
@@ -62,7 +65,7 @@ namespace Catan10
         {
             int oldIndex = -1;
 
-            if (raceDictionary.TryGetValue(roadCount, out List<PlayerModel> list))
+            if (raceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
             {
 
                 if (list != null)
@@ -73,7 +76,7 @@ namespace Catan10
 
                     if (list.Count == 0)
                     {
-                        raceDictionary.Remove(roadCount);
+                        raceDictionary.Remove(roadCount.ToString());
 
                     }
                 }
@@ -84,7 +87,7 @@ namespace Catan10
 
         public PlayerModel GetRaceWinner(int roadCount)
         {
-            if (raceDictionary.TryGetValue(roadCount, out List<PlayerModel> list))
+            if (raceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
             {
                 Debug.Assert(list != null, "we shouldn't have added a null list");
                 return list.First();
@@ -100,7 +103,7 @@ namespace Catan10
         public string Serialize(bool useNames = false, string keySep = "/", string listSep = ",")
         {
             string s = "";
-            foreach (KeyValuePair<int, List<PlayerModel>> kvp in raceDictionary)
+            foreach (KeyValuePair<string, List<PlayerModel>> kvp in raceDictionary)
             {
                 if (kvp.Value == null)
                 {
@@ -154,7 +157,7 @@ namespace Catan10
                     list.Add(player);
                 }
 
-                raceDictionary[roadCount] = list;
+                raceDictionary[roadCount.ToString()] = list;
 
 
             }
@@ -182,7 +185,10 @@ namespace Catan10
                 return;
             }
 
-            _log.PostLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
+            if (_log != null)
+            {
+                _log.PostLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
+            }
         }
     }
 

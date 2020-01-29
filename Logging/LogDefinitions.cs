@@ -36,4 +36,5 @@ namespace Catan10
 
 
     public delegate void RedoPossibleHandler(bool redo);
+    public delegate void StateChangedHandler(GameState oldState, GameState newState);
 }

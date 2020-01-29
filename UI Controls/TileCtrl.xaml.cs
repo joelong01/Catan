@@ -318,25 +318,26 @@ namespace Catan10
             }
         }
 
-        public void HighlightTile(bool highlight)
+        public bool Highlighted { get; private set; } = false;
+
+        public void HighlightTile(Color playerColor) // you should never see Hotpink!
         {
-            if (highlight)
+            _hexFront.Stroke = new SolidColorBrush(playerColor);
+            Highlighted = true;
+        }
+
+        public void StopHighlightingTile() // you should never see Hotpink!
+        {
+            if (this.ResourceType == ResourceType.Sea)
             {
-                _hexFront.Stroke = new SolidColorBrush(Colors.Black);
+                _hexFront.Stroke = _hexFrontBrush;
+
             }
             else
             {
-                if (this.ResourceType == ResourceType.Sea)
-                {
-                    _hexFront.Stroke = _hexFrontBrush;
-
-                }
-                else
-                {
-                    _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
-                }
+                _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
             }
-            
+            Highlighted = false;
 
         }
 
