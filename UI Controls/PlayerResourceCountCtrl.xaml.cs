@@ -15,14 +15,14 @@ namespace Catan10
         /// <summary>
         ///     this has the *global* resource count
         /// </summary>
-        public PlayerResourceModel ResourceCountModel { get; } = new PlayerResourceModel(null);
+        public PlayerResourceModel GlobalResourceCount { get; } = new PlayerResourceModel(null);
         public ILog Log { get; set; } = null;
 
         public PlayerResourceCountCtrl()
         {
             this.InitializeComponent();
-            ResourceCountModel.TurnReset();            
-            
+            GlobalResourceCount.TurnReset();
+
         }
 
 
@@ -37,14 +37,19 @@ namespace Catan10
 
         /// <summary>
         ///    we subscribe to changes made for each player so we can update for the global
+        ///    
+        ///    in the global count we can't use newVal - oldVal to get the change because in TurnReset
+        ///    newVal is 0.  So instead we go to the object to see what the value is.
         /// </summary>
-        private void OnResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
+        private void OnResourceUpdate(PlayerModel player, ResourceType resource, int currentValue, int newVal)
         {
-            ResourceCountModel.AddResourceCount(resource, newVal - oldVal);
-            Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
-                                                            new LogResourceCount(oldVal, newVal, resource));
+
+
+            GlobalResourceCount.AddResourceCount(resource, newVal - currentValue);
+            //
+            //  logged by PlayerGameModel.OnPlayerResourceUpdate
         }
-      
+
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayerResourceCountCtrl), new PropertyMetadata(new ObservableCollection<PlayerModel>(), PlayingPlayersChanged));
         public ObservableCollection<PlayerModel> PlayingPlayers
         {
@@ -73,7 +78,7 @@ namespace Catan10
 
         private void PlayersChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:

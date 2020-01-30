@@ -103,6 +103,13 @@ namespace Catan10
             }
             PostLogEntry(CurrentPlayer, GameState, CatanAction.Rolled, true, LogType.Undo, lastRoll);
             UpdateGlobalRollStats();
+            foreach (TileCtrl t in _gameView.AllTiles)
+            {
+                t.ResetOpacity();
+                t.ResetTileRotation();
+                t.StopHighlightingTile();
+
+            }
             return lastRoll;
         }
 

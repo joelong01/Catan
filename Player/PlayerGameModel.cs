@@ -936,7 +936,7 @@ namespace Catan10
 
         public void TurnReset()
         {
-            Gold = 0;
+            GoldMine = 0;
             Wheat = 0;
             Ore = 0;
             Sheep = 0;
@@ -957,15 +957,14 @@ namespace Catan10
         private int _Wheat = 0;
         private int _Gold = 0;
 
-        public int Gold
+        public int GoldMine
         {
             get => _Gold;
-            set
+            private set
             {
 
                 if (_Gold != value)
-                {
-                    OnPlayerResourceUpdate?.Invoke(_player, ResourceType.GoldMine, _Gold, value);
+                {                    
                     _Gold = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -976,12 +975,11 @@ namespace Catan10
         public int Wheat
         {
             get => _Wheat;
-            set
+            private set
             {
 
                 if (_Wheat != value)
                 {
-                    OnPlayerResourceUpdate?.Invoke(_player, ResourceType.Wheat, _Wheat, value);
                     _Wheat = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -991,12 +989,12 @@ namespace Catan10
         public int Brick
         {
             get => _Brick;
-            set
+            private set
             {
 
                 if (_Brick != value)
                 {
-                    OnPlayerResourceUpdate?.Invoke(_player, ResourceType.Brick, _Brick, value);
+                    
                     _Brick = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1006,12 +1004,12 @@ namespace Catan10
         public int Ore
         {
             get => _Ore;
-            set
+            private set
             {
 
                 if (_Ore != value)
                 {
-                    OnPlayerResourceUpdate?.Invoke(_player, ResourceType.Ore, _Ore, value);
+                    
                     _Ore = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1021,12 +1019,11 @@ namespace Catan10
         public int Wood
         {
             get => _Wood;
-            set
+            private set
             {
 
                 if (_Wood != value)
                 {
-                    OnPlayerResourceUpdate?.Invoke(_player, ResourceType.Wood, _Wood, value);
                     _Wood = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1036,12 +1033,12 @@ namespace Catan10
         public int Sheep
         {
             get => _Sheep;
-            set
+            private set
             {
 
                 if (_Sheep != value)
                 {
-                    OnPlayerResourceUpdate?.Invoke(_player, ResourceType.Sheep, _Sheep, value);
+                    
                     _Sheep = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1082,18 +1079,19 @@ namespace Catan10
                     Brick += count;
                     break;
                 case ResourceType.GoldMine:
-                    oldVal = Gold;
-                    Gold += count;
-                    if (_player != null) _player.GameData.GoldTotal += count; // is null in the global resource tracker
+                    oldVal = GoldMine;
+                    GoldMine += count;                    
                     break;
                 default:
                     break;
             }
 
+            OnPlayerResourceUpdate?.Invoke(_player,resource, oldVal, oldVal + count);
+
             return oldVal;
         }
 
-        public int Total => Sheep + Wood + Ore + Wheat + Brick + Gold;
+        public int Total => Sheep + Wood + Ore + Wheat + Brick + GoldMine;
 
 
     }

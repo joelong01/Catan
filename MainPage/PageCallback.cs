@@ -98,7 +98,7 @@ namespace Catan10
                     }
                     else
                     {
-                        Ctrl_PlayerResourceCountCtrl.ResourceCountModel.AddResourceCount(lrc.ResourceType, -logLine.Number);
+                        Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(lrc.ResourceType, -logLine.Number);
                     }
 
                     break;

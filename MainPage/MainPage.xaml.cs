@@ -50,9 +50,9 @@ namespace Catan10
 
 
         public static MainPage Current;
-        
-        
-        
+
+
+
         public ObservableCollection<PlayerModel> AllPlayers { get; set; } = new ObservableCollection<PlayerModel>();
 
         private RoadRaceTracking _raceTracking = null;
@@ -122,7 +122,7 @@ namespace Catan10
                 ShowNumberUi();
             }
         }
-        
+
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -143,7 +143,7 @@ namespace Catan10
             {
                 _progress.IsActive = true;
                 _progress.Visibility = Visibility.Visible;
-                
+
                 _gameView.Init(this, this);
                 CreateMenuItems();
                 await _settings.LoadSettings(_settingsFileName);
@@ -290,12 +290,12 @@ namespace Catan10
                 MainPageModel.Log.Dispose();
             }
             MainPageModel = new MainPageModel();
-            
 
-            
+
+
             _lbGames.SelectedValue = MainPageModel.Log;
             await ResetTiles(true);
-            Ctrl_PlayerResourceCountCtrl.ResourceCountModel.TurnReset();
+            Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.TurnReset();
             _stateStack.Clear();
 
             foreach (PlayerModel player in AllPlayers)
@@ -337,7 +337,7 @@ namespace Catan10
             await SetStateAsync(null, GameState.WaitingForStart, true);
             await AnimateToPlayerIndex(_currentPlayerIndex);
 
-            var model = StartGameController.StartGame(this, selectedIndex, GameContainer.RandomBoardSettings,  MainPageModel.PlayingPlayers);
+            var model = StartGameController.StartGame(this, selectedIndex, GameContainer.RandomBoardSettings, MainPageModel.PlayingPlayers);
             VerifyRoundTrip<StartGameModel>(model);
             NewLog.PushAction(model);
         }
@@ -596,7 +596,7 @@ namespace Catan10
         private void AddResourceCountForPlayer(PlayerModel player, ResourceType resource, int count, LogType logType = LogType.Normal)
         {
             int oldValPlayer = player.GameData.PlayerTurnResourceCount.AddResourceCount(resource, count); // update the player
-            int oldValGlobal = Ctrl_PlayerResourceCountCtrl.ResourceCountModel.AddResourceCount(resource, count); // update for the game
+            // int oldValGlobal = Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(resource, count); // update for the game
             if (player.GameData.GoodRoll == false)
             {
                 player.GameData.GoodRoll = true;
@@ -744,6 +744,12 @@ namespace Catan10
 
         }
 
+        /// <summary>
+        ///     this is called when you change players and you aren't in a state that rolls -- e.g. supplemenatl, the choosing, etc.
+        /// </summary>
+        /// <param name="playersToMove"></param>
+        /// <param name="logType"></param>
+        /// <returns></returns>
         private async Task OnNext(int playersToMove = 1, LogType logType = LogType.Normal)
         {
 
@@ -833,6 +839,20 @@ namespace Catan10
                 await AddLogEntry(CurrentPlayer, newState, CatanAction.ChangePlayerAndSetState, true, logType, -1, new LogChangePlayer(from, to, oldState, currentRandomGoldTiles, newRandomGoldTiles));
             }
 
+            foreach (TileCtrl t in _gameView.AllTiles)
+            {
+                t.ResetOpacity();
+                t.ResetTileRotation();
+                t.StopHighlightingTile();
+
+            }
+            //
+            //  on next, reset the resources for the turn to 0
+            foreach (PlayerModel player in MainPageModel.PlayingPlayers)
+            {
+                player.GameData.PlayerTurnResourceCount.TurnReset();
+            }
+
         }
 
         //
@@ -870,20 +890,24 @@ namespace Catan10
         //
         //  n is verified by the caller
         //  this adds a number to the list we use to keep track of what is rolled and updates all the statistics
-        private async Task HandleNumber(int val)
+        private async Task HandleNumber(int roll)
         {
 
 
 
-            bool ret = this.PushRoll(val); // only returns false on a number outside the range...
+            bool ret = this.PushRoll(roll); // only returns false on a number outside the range...
             if (!ret)
             {
                 return;
             }
 
-            List<TileCtrl> tilesWithNumber = await HighlightRolledTiles(val);
+            List<TileCtrl> tilesWithNumber = await HighlightRolledTiles(roll);
+            foreach (TileCtrl tile in tilesWithNumber)
+            {
+                tile.HighlightTile(CurrentPlayer.GameData.PlayerColor); // shows what was rolled                                
+            }
 
-            if (val == 7)
+            if (roll == 7)
             {
                 CurrentPlayer.GameData.MovedBaronAfterRollingSeven = false;
                 await SetStateAsync(CurrentPlayer, GameState.MustMoveBaron, false);
@@ -1174,7 +1198,7 @@ namespace Catan10
                             }
                             else
                             {
-                                Ctrl_PlayerResourceCountCtrl.ResourceCountModel.AddResourceCount(lrc.ResourceType, logLine.Number);
+                                Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(lrc.ResourceType, logLine.Number);
                             }
 
                             break;
@@ -1287,7 +1311,7 @@ namespace Catan10
 
         }
 
-        
+
         public async Task<List<TileCtrl>> PlayRollAnimation(int rolledNumber)
         {
             List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
@@ -1539,7 +1563,7 @@ namespace Catan10
             _showPipGroupIndex = 0;
 
         }
-        
+
 
         private void OnRedoPossible(bool redo)
         {
@@ -1794,7 +1818,7 @@ namespace Catan10
             await PickSettlementsAndRoads();
         }
 
-        
+
     }
 }
 
