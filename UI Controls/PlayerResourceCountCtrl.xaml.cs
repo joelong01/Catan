@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Shapes;
@@ -14,15 +15,14 @@ namespace Catan10
         /// <summary>
         ///     this has the *global* resource count
         /// </summary>
-        public PlayerResourceData GameResourceData { get; } = new PlayerResourceData(null);
+        public PlayerResourceModel GlobalResourceCount { get; } = new PlayerResourceModel(null);
         public ILog Log { get; set; } = null;
 
         public PlayerResourceCountCtrl()
         {
             this.InitializeComponent();
-            GameResourceData.TurnReset();
-            GameResourceData.OnPlayerResourceUpdate += OnResourceUpdate;
-            
+            GlobalResourceCount.TurnReset();
+
         }
 
 
@@ -36,33 +36,78 @@ namespace Catan10
 
 
         /// <summary>
-        ///     Unlike the logging in PlayerGameData, there is no PlayerData so that whole path isn't set up
-        ///     here PlayerData is always null - we need to special case that in the UndoLogLine
+        ///    we subscribe to changes made for each player so we can update for the global
+        ///    
+        ///    in the global count we can't use newVal - oldVal to get the change because in TurnReset
+        ///    newVal is 0.  So instead we go to the object to see what the value is.
         /// </summary>
-        private void OnResourceUpdate(PlayerData player, ResourceType resource, int oldVal, int newVal)
+        private void OnResourceUpdate(PlayerModel player, ResourceType resource, int currentValue, int newVal)
         {
-            System.Diagnostics.Debug.Assert(player == null, "Player shoudl be null in the global reource tracker");
-            Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal,
-                                                            new LogResourceCount(oldVal, newVal, resource));
+
+
+            GlobalResourceCount.AddResourceCount(resource, newVal - currentValue);
+            //
+            //  logged by PlayerGameModel.OnPlayerResourceUpdate
         }
-      
-        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerData>), typeof(PlayerResourceCountCtrl), new PropertyMetadata(new ObservableCollection<PlayerData>(), PlayingPlayersChanged));
-        public ObservableCollection<PlayerData> PlayingPlayers
+
+        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayerResourceCountCtrl), new PropertyMetadata(new ObservableCollection<PlayerModel>(), PlayingPlayersChanged));
+        public ObservableCollection<PlayerModel> PlayingPlayers
         {
-            get => (ObservableCollection<PlayerData>)GetValue(PlayingPlayersProperty);
+            get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
             set => SetValue(PlayingPlayersProperty, value);
         }
         private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PlayerResourceCountCtrl depPropClass = d as PlayerResourceCountCtrl;
-            ObservableCollection<PlayerData> depPropValue = (ObservableCollection<PlayerData>)e.NewValue;
+            ObservableCollection<PlayerModel> depPropValue = (ObservableCollection<PlayerModel>)e.NewValue;
             depPropClass?.SetPlayingPlayers(depPropValue);
         }
-        private void SetPlayingPlayers(ObservableCollection<PlayerData> newList)
+        private void SetPlayingPlayers(ObservableCollection<PlayerModel> newList)
         {
             ListBox_PlayerResourceCountList.ItemsSource = null;
             ListBox_PlayerResourceCountList.ItemsSource = newList;
+            newList.CollectionChanged += PlayersChanged; // to track add/remove/clear players
+            //
+            //  this happens when somebody sets the PlayingPlayers to a new List
+            foreach (var player in newList)
+            {
+                player.GameData.PlayerTurnResourceCount.OnPlayerResourceUpdate += OnResourceUpdate;
+            }
 
+        }
+
+        private void PlayersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (PlayerModel player in e.NewItems)
+                    {
+                        player.GameData.PlayerTurnResourceCount.OnPlayerResourceUpdate += OnResourceUpdate;
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (PlayerModel removedPlayer in e.OldItems)
+                    {
+                        removedPlayer.GameData.PlayerTurnResourceCount.OnPlayerResourceUpdate -= OnResourceUpdate;
+                    }
+
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    if (e.OldItems == null) break;
+                    foreach (PlayerModel removedPlayer in e.OldItems)
+                    {
+                        removedPlayer.GameData.PlayerTurnResourceCount.OnPlayerResourceUpdate -= OnResourceUpdate;
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
@@ -83,7 +128,7 @@ namespace Catan10
             try
             {
 
-                PlayerData player = ((Ellipse)sender).Tag as PlayerData;
+                PlayerModel player = ((Ellipse)sender).Tag as PlayerModel;
 
                 if (await StaticHelpers.AskUserYesNoQuestion($"Let {player.PlayerName} go first?", "Yes", "No"))
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -25,13 +26,13 @@ namespace Catan10
     ///     3. when something is added to the Action stack and it is *not* part of a Replay, the Undo stack is cleared.
     /// </summary>
 
-    public class Log : IDisposable
+    public class Log : IDisposable,  INotifyPropertyChanged
     {
-        public RedoPossibleHandler OnRedoPossible;
+        
         private string _saveFileName = "";
         private StorageFolder _folder = null;
         IRandomAccessStream _randomAccessStream = default;
-        
+
         private StorageFile _file = null;
 
         public LogState State { get; set; } = LogState.Normal;
@@ -73,13 +74,17 @@ namespace Catan10
         private readonly List<LogEntry> ActionStack = new List<LogEntry>();
         private readonly List<LogEntry> UndoStack = new List<LogEntry>();
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public IReadOnlyCollection<LogEntry> Actions => ActionStack;
 
         public LogEntry PopAction()
         {
             if (ActionStack.Count == 0) return null;
+
             LogEntry le = ActionStack.Last();
             ActionStack.Remove(le);
+            NotifyPropertyChanged("GameState");
             return le;
         }
 
@@ -89,25 +94,34 @@ namespace Catan10
             {
                 UndoStack.Clear();
             }
+          
+             
             ActionStack.Add(le);            
-            NotifyRedoPossible();
+            NotifyPropertyChanged("GameState");
+            NotifyPropertyChanged("RedoPossible");
         }
 
         public void PushUndo(LogEntry le)
         {
             UndoStack.Add(le);
-            NotifyRedoPossible();
+            NotifyPropertyChanged("RedoPossible");
+
         }
-        private void NotifyRedoPossible()
+  
+        public bool RedoPossible
         {
-            OnRedoPossible?.Invoke(UndoStack.Count > 0);
+            get
+            {
+                return UndoStack.Count > 0;
+            }
+         
         }
         public LogEntry PopUndo()
         {
             if (UndoStack.Count == 0) return null;
             LogEntry le = UndoStack.Last();
             UndoStack.Remove(le);
-            NotifyRedoPossible();
+            NotifyPropertyChanged("RedoPossible");
             return le;
         }
 
@@ -124,7 +138,15 @@ namespace Catan10
         public int ActionCount => ActionStack.Count;
         public int UndoCount => UndoStack.Count;
 
-        public GameState GameState => ActionStack.Last().GameState;
+        public GameState GameState
+        {
+            get
+            {
+                if (ActionStack.Count == 0) return GameState.WaitingForNewGame;
+
+                return ActionStack.Last().GameState;
+            }
+        }
 
 
 
@@ -140,7 +162,7 @@ namespace Catan10
                 case LogState.Normal:
                     le.LogType = LogType.Normal;
                     UndoStack.Clear();
-                    NotifyRedoPossible();
+                    NotifyPropertyChanged("RedoPossible");
                     break;
                 case LogState.Replay:
                     le.LogType = LogType.Replay;
@@ -254,7 +276,10 @@ namespace Catan10
             //this.State = LogState.Normal;
         }
 
-        
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
 

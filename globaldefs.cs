@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -45,9 +44,9 @@ namespace Catan10
          // every TileGroup has a list that says where to put the tiles
          // and another list that says what number to put on the tiles
          //
-         // the int here is the TileGroup Index
+         // the int here is the TileGroup Index - System.Text.Json currently only Deserializes Dictionaries keyed by strings.
          //
-        public Dictionary<int, RandomLists> TileGroupToRandomListsDictionary { get; set; } = new Dictionary<int, RandomLists>();
+        public Dictionary<string, RandomLists> TileGroupToRandomListsDictionary { get; set; } = new Dictionary<string, RandomLists>();
 
         //
         //  every Board has a random list of harbors
@@ -59,7 +58,7 @@ namespace Catan10
             return Serialize();
         }
 
-        public RandomBoardSettings(Dictionary<int, RandomLists> Tiles, List<int> Harbors)
+        public RandomBoardSettings(Dictionary<string, RandomLists> Tiles, List<int> Harbors)
         {
             RandomHarborTypeList = Harbors;
             TileGroupToRandomListsDictionary = Tiles;
@@ -88,13 +87,13 @@ namespace Catan10
             {
 
                 var kvp = StaticHelpers.GetKeyValue(tokens[i]);
-                TileGroupToRandomListsDictionary[int.Parse(kvp.Key)] = new RandomLists(kvp.Value);
+                TileGroupToRandomListsDictionary[kvp.Key] = new RandomLists(kvp.Value);
             }
             
             RandomHarborTypeList = tokens[tokens.Length - 1].DeserializeList<int>(",");
 
         }
-        [JsonIgnore]
+        
         private readonly string[] _serializedProperties = new string[] { "TileList", "NumberList" };
 
     }
@@ -154,8 +153,8 @@ namespace Catan10
         AddResourceCount,
         ChangedPlayerProperty,
         SetRandomTileToGold,
-        TotalGoldChanged,
-        ChangePlayerAndSetState
+        ChangePlayerAndSetState,
+        Started
     };
     public enum AnimationSpeed { Ultra = 50, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 }; // typical animation speeds in ms
     public enum UndoOrder { PreviousThenUndo, UndoNoPrevious, None };
@@ -205,6 +204,7 @@ namespace Catan10
         List<TileCtrl> Tiles { get; }
         List<TileCtrl> DesertTiles { get; }
         CatanHexPanel HexPanel { get; }
+        int Index { get; }
     }
 
     public interface ITileControlCallback
@@ -227,7 +227,7 @@ namespace Catan10
 
         Task BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState, LogType logType);
 
-        Task AddLogEntry(PlayerData player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
+        Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
         Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl sender);
         bool BuildingStateChangeOk(BuildingCtrl building);
     }

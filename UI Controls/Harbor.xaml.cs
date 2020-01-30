@@ -29,22 +29,22 @@ namespace Catan10
 
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
         public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerData), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
-        public PlayerData Owner
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
+        public PlayerModel Owner
         {
-            get => (PlayerData)GetValue(OwnerProperty);
+            get => (PlayerModel)GetValue(OwnerProperty);
             set => SetValue(OwnerProperty, value);
         }
         private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as Harbor;
-            var newOwner = (PlayerData)e.NewValue;
-            var oldOwner = (PlayerData)e.OldValue;
+            var newOwner = (PlayerModel)e.NewValue;
+            var oldOwner = (PlayerModel)e.OldValue;
             depPropClass?.SetOwner(oldOwner, newOwner);
         }
         //
         //  update the Owner about who owns this harbor
-        private void SetOwner(PlayerData oldOwner, PlayerData newOwner)
+        private void SetOwner(PlayerModel oldOwner, PlayerModel newOwner)
         {
             if (oldOwner != null)
             {

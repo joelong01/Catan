@@ -16,7 +16,7 @@ namespace Catan10
         public LogType LogType { get; set; } = LogType.Normal;
 
         public GameState GameState { get; set; }
-        public PlayerData PlayerData { get; set; }
+        public PlayerModel PlayerData { get; set; }
         public string PlayerDataString { get; set; } = "";
         public CatanAction Action { get; set; }
         public int Number { get; set; } = -1;
@@ -41,7 +41,7 @@ namespace Catan10
             }
         }
 
-        public LogEntry(PlayerData p, GameState s, CatanAction a, int n, bool stopUndo, LogType type = LogType.Normal, object tag = null, [CallerMemberName] string cmn = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
+        public LogEntry(PlayerModel p, GameState s, CatanAction a, int n, bool stopUndo, LogType type = LogType.Normal, object tag = null, [CallerMemberName] string cmn = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
             PlayerData = p;
             GameState = s;
@@ -146,7 +146,6 @@ namespace Catan10
                 case CatanAction.ChangedPlayerProperty:
                     Tag = new LogPropertyChanged(val);
                     break;
-                case CatanAction.TotalGoldChanged:
                 case CatanAction.AddResourceCount:
                     Tag = new LogResourceCount(val);
                     break;
@@ -459,8 +458,8 @@ namespace Catan10
         public TargetWeapon TargetWeapon { get; set; }          // how I targeted
         public CatanAction Action { get; set; }
 
-        public PlayerData SourcePlayer { get; set; } = null;
-        public PlayerData TargetPlayer { get; set; } = null;
+        public PlayerModel SourcePlayer { get; set; } = null;
+        public PlayerModel TargetPlayer { get; set; } = null;
         public int SourcePlayerIndex { get; set; } = -1;
         public int TargetPlayerIndex { get; set; } = -1;
 
@@ -487,7 +486,7 @@ namespace Catan10
             }
 
         }
-        public LogBaronOrPirate(int gameIndex, PlayerData targetPlayer, PlayerData sourcePlayer, TileCtrl startTile, TileCtrl targetTile, TargetWeapon weapon, CatanAction action)
+        public LogBaronOrPirate(int gameIndex, PlayerModel targetPlayer, PlayerModel sourcePlayer, TileCtrl startTile, TileCtrl targetTile, TargetWeapon weapon, CatanAction action)
         {
             GameIndex = gameIndex;
             StartTile = startTile;

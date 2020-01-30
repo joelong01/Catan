@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -92,7 +92,7 @@ namespace Catan10
     ///     It is called by the Page, and the Page shouldn't have to know anything about the underlying HexControl
     /// </summary>
     /// 
-    [JsonObject(MemberSerialization.OptIn)]
+    
     public sealed partial class GameContainerCtrl : UserControl
     {
 
@@ -111,7 +111,7 @@ namespace Catan10
         IGameCallback _gameCallback = null;
         ITileControlCallback _tileCallback = null;
 
-        [JsonProperty]
+    
         public RandomBoardSettings RandomBoardSettings { get; private set; } = new RandomBoardSettings();
         private Dictionary<ResourceType, double> _probabilities = new Dictionary<ResourceType, double>();
         public Dictionary<ResourceType, double> Probabilities
@@ -328,12 +328,12 @@ namespace Catan10
                     continue;
                 }
 
-                await AssignRandomTilesToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index].TileList);
-                await AssignRandomNumbersToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index].NumberList);
+                await AssignRandomTilesToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index.ToString()].TileList);
+                await AssignRandomNumbersToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index.ToString()].NumberList);
                 if (randomBoard == null)
                 {
                     RandomBoardSettings = new RandomBoardSettings();
-                    RandomBoardSettings.TileGroupToRandomListsDictionary[index] = new RandomLists(tileGroup);
+                    RandomBoardSettings.TileGroupToRandomListsDictionary[index.ToString()] = new RandomLists(tileGroup);
                 }
                 else
                 {
@@ -934,6 +934,7 @@ namespace Catan10
 
         public bool HasIslands => _currentHexPanel.HasIslands;
 
+        
         public Island GetIsland(TileCtrl tile)
         {
             _currentHexPanel.TileToIslandDictionary.TryGetValue(tile, out Island island);

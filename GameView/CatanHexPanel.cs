@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
@@ -17,7 +16,7 @@ namespace Catan10
         public bool BonusPoint = false;
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
+   
     public partial class CatanHexPanel : Canvas
     {
         //
@@ -26,7 +25,7 @@ namespace Catan10
         public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
         public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
         private List<TileCtrl> _desertTiles = new List<TileCtrl>();
-        [JsonProperty]
+        
         private List<TileGroup> _tileSets = new List<TileGroup>();
         private List<List<TileCtrl>> _tilesInVisualLayout = new List<List<TileCtrl>>();
         public Dictionary<TileCtrl, Island> TileToIslandDictionary { get; set; } = new Dictionary<TileCtrl, Island>(); // given a tile, tell me what Island it is in
@@ -1874,14 +1873,13 @@ namespace Catan10
 
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
     public class TileGroup
     {
-        [JsonProperty]
+        
         public int Start { get; set; }
-        [JsonProperty]
+        
         public int End { get; set; }
-        [JsonProperty]
+        
         public bool Randomize { get; set; }
 
         //
@@ -1892,20 +1890,20 @@ namespace Catan10
         //
         //  the set of Tiles that particpate in Randomization and Shuffling
         public List<TileCtrl> RandomTiles { get; set; } = new List<TileCtrl>();
-        [JsonProperty]
+        
         public List<ResourceType> ResourceTypes { get; set; } = new List<ResourceType>();
         public List<int> ValidNumbers { get; set; } = new List<int>();
         public List<Harbor> Harbors { get; set; } = new List<Harbor>();
-        [JsonProperty]
+        
         public List<HarborType> HarborTypes { get; set; } = new List<HarborType>();
-        [JsonProperty]
+        
         public List<int> RandomTileList { get; set; } = new List<int>(); // the random list to shuffle the tile resources. used in save/load
-        [JsonProperty]
+        
         public List<int> RandomNumbersList { get; set; } = new List<int>(); // the random list of numbers associated with the tiles.
 
 
         private int _tileCount = 0;
-        [JsonProperty]
+        
         public int TileCount
         {
             get => AllTiles.Count;

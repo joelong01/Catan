@@ -13,12 +13,12 @@ namespace Catan10
     public sealed partial class NewGameDlg : ContentDialog
     {
         Dictionary<PlayerPosition, Grid> PositionToGridDictionary = new Dictionary<PlayerPosition, Grid>();
-        Dictionary<PlayerPosition, PlayerData> PositionToPlayerDataDictionary = new Dictionary<PlayerPosition, PlayerData>();
+        Dictionary<PlayerPosition, PlayerModel> PositionToPlayerDataDictionary = new Dictionary<PlayerPosition, PlayerModel>();
 
-        public static readonly DependencyProperty PlayerDataProperty = DependencyProperty.Register("PlayerData", typeof(ObservableCollection<PlayerData>), typeof(NewGameDlg), new PropertyMetadata(new ObservableCollection<PlayerData>()));
+        public static readonly DependencyProperty PlayerDataProperty = DependencyProperty.Register("PlayerData", typeof(ObservableCollection<PlayerModel>), typeof(NewGameDlg), new PropertyMetadata(new ObservableCollection<PlayerModel>()));
         public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(ObservableCollection<CatanGame>), typeof(NewGameDlg), new PropertyMetadata(new ObservableCollection<CatanGame>()));
         public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(CatanGame), typeof(NewGameDlg), new PropertyMetadata(null));
-        public static readonly DependencyProperty SelectedPlayersProperty = DependencyProperty.Register("SelectedPlayers", typeof(ObservableCollection<PlayerData>), typeof(NewGameDlg), new PropertyMetadata(new ObservableCollection<PlayerData>()));
+        public static readonly DependencyProperty SelectedPlayersProperty = DependencyProperty.Register("SelectedPlayers", typeof(ObservableCollection<PlayerModel>), typeof(NewGameDlg), new PropertyMetadata(new ObservableCollection<PlayerModel>()));
         public static readonly DependencyProperty SaveFileNameProperty = DependencyProperty.Register("SaveFileName", typeof(string), typeof(NewGameDlg), new PropertyMetadata(""));
         public string SaveFileName
         {
@@ -26,9 +26,9 @@ namespace Catan10
             set => SetValue(SaveFileNameProperty, value);
         }
 
-        public ObservableCollection<PlayerData> SelectedPlayers
+        public ObservableCollection<PlayerModel> SelectedPlayers
         {
-            get => (ObservableCollection<PlayerData>)GetValue(SelectedPlayersProperty);
+            get => (ObservableCollection<PlayerModel>)GetValue(SelectedPlayersProperty);
             set => SetValue(SelectedPlayersProperty, value);
         }
 
@@ -48,19 +48,19 @@ namespace Catan10
 
         public ObservableCollection<PlayerPickerItemCtrl> Players { get; set; } = new ObservableCollection<PlayerPickerItemCtrl>();
         public List<PlayerPickerItemCtrl> GamePlayers { get; } = new List<PlayerPickerItemCtrl>();
-        public List<PlayerData> PlayerDataList { get; } = new List<PlayerData>();
+        public List<PlayerModel> PlayerDataList { get; } = new List<PlayerModel>();
 
 
         public NewGameDlg()
         {
             this.InitializeComponent();
         }
-        public NewGameDlg(IList<PlayerData> playerData, IList<CatanGame> games)
+        public NewGameDlg(IList<PlayerModel> playerData, IList<CatanGame> games)
         {
             this.InitializeComponent();
             Players.Clear();
             GamePlayers.Clear();
-            foreach (PlayerData p in playerData)
+            foreach (PlayerModel p in playerData)
             {
                 PlayerPickerItemCtrl ctrl = new PlayerPickerItemCtrl(p);
                 if (p.PlayerName == "Joe")
@@ -177,7 +177,7 @@ namespace Catan10
                 if (item != null)
                 {
                     GamePlayers.Add(item);
-                    item.PlayerData.PlayerPosition = item.Position;
+                    item.Player.PlayerPosition = item.Position;
                 }
             }
 
@@ -197,7 +197,7 @@ namespace Catan10
 
             foreach (PlayerPickerItemCtrl player in GamePlayers)
             {
-                PlayerDataList.Add(player.PlayerData);
+                PlayerDataList.Add(player.Player);
             }
 
 

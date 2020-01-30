@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -16,10 +15,9 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
-    public delegate void CardsLostUpdatedHandler(PlayerData player, int oldVal, int newVal);
-    public delegate void PlayerResourceUpdateHandler(PlayerData player, ResourceType resource, int oldVal, int newVal);
-    public delegate void PlayerGoldTotalUpdateHandler(PlayerData player, int oldVal, int newVal);
-
+    public delegate void CardsLostUpdatedHandler(PlayerModel player, int oldVal, int newVal);
+    public delegate void PlayerResourceUpdateHandler(PlayerModel player, ResourceType resource, int oldVal, int newVal);
+    
 
 
 
@@ -29,8 +27,7 @@ namespace Catan10
     //  Only data that is stored on disk should be stored here
     //  
     //  
-    [JsonObject(MemberSerialization.OptIn)]
-    public class PlayerData : INotifyPropertyChanged
+    public class PlayerModel : INotifyPropertyChanged
     {
         string _playerName = "Nameless";
         string _ImageFileName = "ms-appx:///Assets/guest.jpg";
@@ -38,7 +35,7 @@ namespace Catan10
         int _GamesPlayed = 0;
         int _gamesWon = 0;
         PlayerPosition _PlayerPosition = PlayerPosition.Right;
-        PlayerGameData _playerGameData = null;
+        PlayerGameModel _playerGameData = null;
         Guid _PlayerIdentifier = new Guid();
         ImageBrush _imageBrush = null;
         public int AllPlayerIndex { get; set; } = -1;
@@ -66,8 +63,8 @@ namespace Catan10
             }
         }
 
-        public PlayerData PlayerDataInstance => this;
-        private PlayerData() { } // no default ctor
+        public PlayerModel PlayerDataInstance => this;
+        private PlayerModel() { } // no default ctor
 
         public async Task<StorageFile> CopyImage(StorageFile file)
         {
@@ -128,7 +125,7 @@ namespace Catan10
 
         }
 
-        public PlayerData This => this;
+        public PlayerModel This => this;
 
         public ImageBrush ImageBrush
         {
@@ -155,12 +152,12 @@ namespace Catan10
                 }
             }
         }
-        public ObservableCollection<ColorChoices> AvailableColors => PlayerData._availableColors;
+        public ObservableCollection<ColorChoices> AvailableColors => PlayerModel._availableColors;
 
 
-        public PlayerData(ILog log)
+        public PlayerModel(ILog log)
         {
-            _playerGameData = new PlayerGameData(this);
+            _playerGameData = new PlayerGameModel(this);
             Log = log;
 
             if (_availableColors.Count == 0)
@@ -174,7 +171,7 @@ namespace Catan10
 
         }
 
-        [JsonProperty]
+        
         public Guid PlayerIdentifier
         {
             get => _PlayerIdentifier;
@@ -187,8 +184,8 @@ namespace Catan10
                 }
             }
         }
-        [JsonProperty]
-        public PlayerGameData GameData
+        
+        public PlayerGameModel GameData
         {
             get => _playerGameData;
             set
@@ -200,7 +197,7 @@ namespace Catan10
                 }
             }
         }
-       [JsonProperty]
+        
         public PlayerPosition PlayerPosition
         {
             get => _PlayerPosition;
@@ -238,7 +235,7 @@ namespace Catan10
                 }
             }
         }
-        [JsonProperty]
+        
         public string ImageFileName
         {
             get => _ImageFileName;
@@ -251,7 +248,7 @@ namespace Catan10
                 }
             }
         }
-        [JsonProperty]
+        
         public string PlayerName
         {
             get => _playerName;
@@ -266,7 +263,7 @@ namespace Catan10
         }
         //
         //  the color that is saved
-        [JsonProperty]
+        
         public string ColorAsString
         {
             get => _colorAsString;
@@ -291,14 +288,14 @@ namespace Catan10
         public string Serialize(bool oneLine)
         {
 
-            return StaticHelpers.SerializeObject<PlayerData>(this, _savedProperties, "=", StaticHelpers.lineSeperator);
+            return StaticHelpers.SerializeObject<PlayerModel>(this, _savedProperties, "=", StaticHelpers.lineSeperator);
         }
 
 
         public bool Deserialize(string s, bool oneLine)
         {
 
-            StaticHelpers.DeserializeObject<PlayerData>(this, s, "=", StaticHelpers.lineSeperator);
+            StaticHelpers.DeserializeObject<PlayerModel>(this, s, "=", StaticHelpers.lineSeperator);
             return true;
         }
 
@@ -327,10 +324,11 @@ namespace Catan10
         /// <returns></returns>
         internal string Serialize()
         {
-           
-            var s =  JsonConvert.SerializeObject(this);
-            Debug.WriteLine(s);
-            return s;
+
+            //  var s = JsonConvert.SerializeObject(this);
+            //  Debug.WriteLine(s);
+            // return s;
+            throw new NotImplementedException();
 
         }
     }

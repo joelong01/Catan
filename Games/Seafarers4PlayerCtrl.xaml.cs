@@ -25,6 +25,7 @@ namespace Catan10
         public List<TileCtrl> Tiles => _HexPanel.Tiles;
 
         public List<TileCtrl> DesertTiles => _HexPanel.DesertTiles;
+        public int Index { get; set; } = -1;
         #endregion
     }
 }

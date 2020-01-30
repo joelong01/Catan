@@ -9,6 +9,7 @@
         <x:Double x:Key="ContentDialogMaxHeight">800</x:Double>
 
 
+        <local:GameStateToBooleanConverter x:Key="GameStateToBooleanConverter" />
         <local:AnimationSpeedValueConverter x:Key="AnimationSpeedValueConverter" />
         <local:TileOrientationToObjectConverter x:Key="TileOrientationToObjectConverter" />
         <local:ObjectToObjectValueConverter x:Key="ObjectToObjectValueConverter" />

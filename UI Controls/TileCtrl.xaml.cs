@@ -318,6 +318,28 @@ namespace Catan10
             }
         }
 
+        public bool Highlighted { get; private set; } = false;
+
+        public void HighlightTile(Color playerColor) // you should never see Hotpink!
+        {
+            _hexFront.Stroke = new SolidColorBrush(playerColor);
+            Highlighted = true;
+        }
+
+        public void StopHighlightingTile() // you should never see Hotpink!
+        {
+            if (this.ResourceType == ResourceType.Sea)
+            {
+                _hexFront.Stroke = _hexFrontBrush;
+
+            }
+            else
+            {
+                _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
+            }
+            Highlighted = false;
+
+        }
 
         public ResourceType ResourceType
         {
