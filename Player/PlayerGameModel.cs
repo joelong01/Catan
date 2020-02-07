@@ -46,7 +46,7 @@ namespace Catan10
             Ships.CollectionChanged += Ships_CollectionChanged;
             _playerData = pData;
             PlayerTurnResourceCount = new PlayerResourceModel(pData);
-            PlayerTurnResourceCount.OnPlayerResourceUpdate += OnPlayerResourceUpdate;
+            PlayerTurnResourceCount.OnPlayerResourceUpdate += OnGameModelResourceUpdate; // currently only logs that a resource was allocated
         }
 
 
@@ -82,7 +82,7 @@ namespace Catan10
         {
             LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
         }
-        private void OnPlayerResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
+        private void OnGameModelResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
         {
             _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
 
@@ -169,9 +169,10 @@ namespace Catan10
             MaxRoads = 0;
             MaxSettlements = 0;
             MaxCities = 0;
+            PlayerTurnResourceCount.OnPlayerResourceUpdate -= OnGameModelResourceUpdate;
             PlayerTurnResourceCount.GameReset();
             Pips = 0;
-
+            
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {

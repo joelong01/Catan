@@ -289,6 +289,11 @@ namespace Catan10
             {
                 MainPageModel.Log.Dispose();
             }
+            while (MainPageModel.PlayingPlayers.Count > 0)
+            {
+                MainPageModel.PlayingPlayers.RemoveAt(0); // the clear doesn't trigger the unsubscribe because the NewItems and the OldItems are both null
+            }
+                       
             MainPageModel = new MainPageModel();
 
 
@@ -1007,6 +1012,8 @@ namespace Catan10
 
                     }
 
+                    //
+                    //  this updates the *count* of resources and returns the value the user gets for the number being rolled
                     int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
                     //
                     //  need to look up the control given the player and add it to the right one

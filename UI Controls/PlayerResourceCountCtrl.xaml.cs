@@ -64,6 +64,10 @@ namespace Catan10
         }
         private void SetPlayingPlayers(ObservableCollection<PlayerModel> newList)
         {
+           
+
+            GlobalResourceCount.GameReset();
+
             ListBox_PlayerResourceCountList.ItemsSource = null;
             ListBox_PlayerResourceCountList.ItemsSource = newList;
             newList.CollectionChanged += PlayersChanged; // to track add/remove/clear players
