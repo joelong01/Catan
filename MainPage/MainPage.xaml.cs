@@ -293,7 +293,7 @@ namespace Catan10
             {
                 MainPageModel.PlayingPlayers.RemoveAt(0); // the clear doesn't trigger the unsubscribe because the NewItems and the OldItems are both null
             }
-                       
+
             MainPageModel = new MainPageModel();
 
 
@@ -602,17 +602,7 @@ namespace Catan10
         {
             int oldValPlayer = player.GameData.PlayerTurnResourceCount.AddResourceCount(resource, count); // update the player
             // int oldValGlobal = Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(resource, count); // update for the game
-            if (player.GameData.GoodRoll == false)
-            {
-                player.GameData.GoodRoll = true;
-                player.GameData.RollsWithResource++;
-
-            }
-            if (count > 0)
-            {
-                player.GameData.NoResourceCount = 0;
-            }
-
+           
             //
             //  TODO:  log GoodRoll, RollsWithResource and NoResourceCount
 
@@ -831,7 +821,7 @@ namespace Catan10
                     //  we've already picked the tiles for this roll -- use them
                     newRandomGoldTiles = CurrentPlayer.GameData.GoldRolls[playerRoll];
                 }
-                // this.TraceMessage($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
+                this.TraceMessage($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
                 await SetRandomTileToGold(newRandomGoldTiles);
             }
 
@@ -936,6 +926,22 @@ namespace Catan10
 
         }
 
+        private List<TileCtrl> GetTilesWithNumber(int number)
+        {
+            List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
+            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
+            {
+
+                if (t.Number == number)
+
+                {
+                    tilesWithNumber.Add(t);
+                }
+
+            }
+            return tilesWithNumber;
+        }
+
         public async Task<List<TileCtrl>> HighlightRolledTiles(int rolledNumber)
         {
             List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
@@ -982,25 +988,8 @@ namespace Catan10
 
         public void CountResourcesForRoll(IReadOnlyCollection<TileCtrl> tilesWithNumber, bool undo)
         {
-            //
-            //  add one to the "no resources count for each player -- we will reset it if they get some
-            //  also set the flag that says we haven't counted this as a good roll for the player yet
-            foreach (PlayerModel player in MainPageModel.PlayingPlayers)
-            {
-                if (undo)
-                {
-                    player.GameData.NoResourceCount--;
-                    player.GameData.GoodRoll = false;
-                }
-                else
-                {
-                    player.GameData.NoResourceCount++;
-                    player.GameData.GoodRoll = false;
-                }
-
-
-            }
-
+           
+           
             foreach (TileCtrl tile in tilesWithNumber)
             {
                 foreach (BuildingCtrl building in tile.OwnedBuilding)
@@ -1018,10 +1007,29 @@ namespace Catan10
                     //
                     //  need to look up the control given the player and add it to the right one
                     AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
+                   
 
                 }
             }
-
+            if (!undo)
+            {
+                //
+                //  go through players and update the good/bad roll count
+                foreach (var player in MainPageModel.PlayingPlayers)
+                {
+                    if (player.GameData.PlayerTurnResourceCount.Total == 0)
+                    {
+                        player.GameData.NoResourceCount++;
+                        player.GameData.GoodRoll = false;
+                    }
+                    else
+                    {
+                        player.GameData.RollsWithResource++;
+                        player.GameData.NoResourceCount = 0;
+                        player.GameData.GoodRoll = true;
+                    }
+                }
+            }
 
 
         }

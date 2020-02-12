@@ -85,7 +85,8 @@ namespace Catan10
             switch (logLine.Action)
             {
                 case CatanAction.Rolled:
-                    int roll = PopRoll();
+                    UndoRoll();
+                    
                     //    I don't remember why -- but instead of having "actions" and "consequeces" where only "actions" are logged, I log both and undo both.
                     //    in particular Rolls generate stats and the stats are logged (and then undone below).  this shoudl probably be fixed.  someday.
                     //  CountResourcesForRoll(_gameView.GetTilesWithNumber(roll), true); 

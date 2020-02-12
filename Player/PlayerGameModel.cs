@@ -905,7 +905,7 @@ namespace Catan10
                 CardsLostToBaron += value;
                 value = 0; //didn't actually get any resources
             }
-            else
+            else if (!undo) // these are logged and undone seperately -- I really, really need to go through and seperate action from data
             {
                 resCount.Acquired += value;
                 ResourcesAcquired += value;

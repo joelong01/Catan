@@ -113,7 +113,17 @@ namespace Catan10
             return lastRoll;
         }
 
+        private void UndoRoll()
+        {
+            int roll = PopRoll();
+            List<TileCtrl> tilesWithNumber = GetTilesWithNumber(roll);
+            CountResourcesForRoll(tilesWithNumber, true);
+            foreach (PlayerModel player in MainPageModel.PlayingPlayers)
+            {
+                player.GameData.PlayerTurnResourceCount.TurnReset();
+            }
 
+        }
 
 
         //
@@ -159,7 +169,7 @@ namespace Catan10
 
         public async Task AnimateToPlayerIndex(int to, LogType logType = LogType.Normal)
         {
-           
+
             var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
             List<int> newRandomGoldTiles = null;
 
