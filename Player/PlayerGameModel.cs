@@ -172,7 +172,7 @@ namespace Catan10
             PlayerTurnResourceCount.OnPlayerResourceUpdate -= OnGameModelResourceUpdate;
             PlayerTurnResourceCount.GameReset();
             Pips = 0;
-            
+            _GoldRolls = new List<List<int>>();
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {

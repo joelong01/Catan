@@ -1031,6 +1031,12 @@ namespace Catan10
 
         }
         Random _randomForGold = new Random(DateTime.Now.Millisecond);
+        /// <summary>
+        ///     the "count < 5" clause is becuase I test with a lot of gold mines to see if the algo works.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="exclude"></param>
+        /// <returns></returns>
         public List<int> PickRandomTilesToBeGold(int count, List<int> exclude = null)
         {
             TileCtrl tile;
@@ -1042,14 +1048,22 @@ namespace Catan10
                 {
                     continue;
                 }
-
+                if (tile.ResourceType == ResourceType.GoldMine && count < 5)
+                {
+                    continue;
+                }
                 if (tile.TemporarilyGold)
                 {
                     //  don't pick one that is already gold                    
                     //
                     continue;
                 }
-
+                if (randomTileIndices.Contains(tile.Index) && count < 5)
+                {
+                    //  don't pick the same one twice
+                    //
+                    continue;
+                }
                 if (exclude != null && count < 5 && exclude.Contains(tile.Index))
                 {
                     //

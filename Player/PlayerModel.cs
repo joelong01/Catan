@@ -300,9 +300,15 @@ namespace Catan10
         }
 
 
+        /// <summary>
+        ///     I've run into a bunch of problems where I add data (such as the GoldTiles list) but forget to clear it when Reset
+        ///     is called.  this means state moves from one game to the next and we get funny results.  so instead i'm going to try
+        ///     to just create a new game model when this is reset and see how it goes.
+        /// </summary>
         public void Reset()
         {
-            GameData.Reset();
+            // GameData.Reset();
+            _playerGameData = new PlayerGameModel(this);
         }
 
         public override string ToString()

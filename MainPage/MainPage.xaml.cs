@@ -812,6 +812,13 @@ namespace Catan10
                 if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
                 {
                     newRandomGoldTiles = GetRandomGoldTiles();
+                    foreach (int i in newRandomGoldTiles)
+                    {
+                        if (_gameView.AllTiles[i].ResourceType == ResourceType.Desert)
+                        {                            
+                            this.TraceMessage($"Desert got added to Random Gold tiles! [Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
+                        }
+                    }
                     CurrentPlayer.GameData.GoldRolls.Add(newRandomGoldTiles);
                 }
                 else
