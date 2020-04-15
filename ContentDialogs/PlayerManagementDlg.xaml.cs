@@ -29,11 +29,15 @@ namespace Catan10
 
 
 
-        public PlayerManagementDlg(IList<PlayerModel> playerData, ILog log)
+        public PlayerManagementDlg(ICollection<PlayerModel> playerData, ILog log)
         {
             this.InitializeComponent();
             _log = log;
-            PlayerDataList.AddRange(playerData);
+            foreach(var p in playerData)
+            {
+                PlayerDataList.Add(p);
+            }
+            
 
         }
 
@@ -144,9 +148,9 @@ namespace Catan10
             }
         }
 
-        private async void OnSaveAndclose(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private void OnSaveAndclose(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            await MainPage.SavePlayers(PlayerDataList, "players.data");
+           
             args.Cancel = false; // continue to close
 
         }

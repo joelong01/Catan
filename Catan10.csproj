@@ -125,6 +125,7 @@
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
     <Compile Include="MainPage\RoadRaceTracking.cs" />
+    <Compile Include="MainPage\SavedState.cs" />
     <Compile Include="MainPage\webSocket.cs" />
     <Compile Include="NetworkService.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
@@ -432,11 +433,17 @@
       <Version>1.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.9</Version>
+      <Version>6.2.10</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
-      <Version>4.7.0</Version>
+      <Version>4.7.1</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="CatanProxy\CatanProxy.csproj">
+      <Project>{dfde3ee9-555b-49f7-a16e-faf48ddfdaab}</Project>
+      <Name>CatanProxy</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

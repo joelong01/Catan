@@ -72,9 +72,9 @@ namespace Catan10
         //  this is the name of the grids in MainPage.xaml that we want to store and retrieve locations
         private string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView" };
 
-        //
-        //  this just creates our saved file
-        private async Task AddDefaultUsers()
+        
+
+        private async Task<List<PlayerModel>> GetDefaultUsers()
         {
             List<PlayerModel> list = new List<PlayerModel>();
             foreach (KeyValuePair<string, string> kvp in _defaultUsers)
@@ -93,16 +93,10 @@ namespace Catan10
 
 
             }
-            await MainPage.SavePlayers(list, MainPage.PlayerDataFile);
-
+            return list;
         }
 
-        private async void OnAddDefaultUsers(object sender, RoutedEventArgs e)
-        {
-            await AddDefaultUsers();
-        }
-
-        private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
+       private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
 
 
@@ -136,30 +130,31 @@ namespace Catan10
         {
             try
             {
-                _settings.GridPositions.Clear();
+                SavedAppState.Settings.GridPositions.Clear();
                 foreach (string name in GridPositionName)
                 {
                     UIElement el = (UIElement)this.FindName(name);
                     CompositeTransform ct = (CompositeTransform)el.RenderTransform;
                     GridPosition pos = new GridPosition(name, ct.TranslateX, ct.TranslateY);
-                    _settings.GridPositions.Add(pos);
+                    SavedAppState.Settings.GridPositions.Add(pos);
                 }
 
-                await _settings.SaveSettings(_settingsFileName);
+                
+                await SaveSettings();
             }
             catch (Exception e)
             {
                 this.TraceMessage($"caught the exception: {e}");
             }
         }
-
+        
         private void UpdateGridLocations()
         {
             try
             {
 
 
-                foreach (GridPosition pos in _settings.GridPositions)
+                foreach (GridPosition pos in SavedAppState.Settings.GridPositions)
                 {
                     UIElement el = (UIElement)this.FindName(pos.Name);
                     CompositeTransform ct = (CompositeTransform)el.RenderTransform;
@@ -395,7 +390,7 @@ namespace Catan10
         {
             ((Button)sender).IsEnabled = false;
             _initializeSettings = true;
-            SettingsDlg dlg = new SettingsDlg(this, _settings);
+            SettingsDlg dlg = new SettingsDlg(this, SavedAppState.Settings);
             _initializeSettings = false;
             await dlg.ShowAsync();
             ((Button)sender).IsEnabled = true;
@@ -593,7 +588,7 @@ namespace Catan10
             //  this is only needed because Roads don't do proper data binding yet.
             CurrentPlayerColorChanged(CurrentPlayer);
 
-            await SavePlayers(AllPlayers, PlayerDataFile); 
+            await SaveSettings();
         }
 
         internal void AddPlayerMenu(PlayerModel player)
@@ -651,7 +646,7 @@ namespace Catan10
             //  we assume that if the high score is < 6 then we are in the expansion phase of the game
 
             int highScore = 0;
-            foreach (var p in AllPlayers)
+            foreach (var p in SavedAppState.Players)
             {
                 if (p.GameData.Score > highScore)
                 {

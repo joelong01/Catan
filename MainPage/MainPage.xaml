@@ -85,7 +85,6 @@
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Options">
                         <ToggleMenuFlyoutItem Text="Hide Players On Next" IsChecked="False" />
-                        <MenuFlyoutItem Text="Add Default Users" Click="OnAddDefaultUsers" />
                     </MenuFlyoutSubItem>
 
                     <MenuFlyoutItem  Text="Randomize Board" Click="OnAssignNumbers" />

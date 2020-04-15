@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Concurrent;
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -16,7 +14,6 @@ using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.Storage.Streams;
 using Windows.UI;
-using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -36,28 +33,20 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-        private string _settingsFileName = "CatanSettings.ini";
-        private Settings _settings = new Settings();
+
+        public SavedState SavedAppState { get; set; } = null;        
         private int _supplementalStartIndex = -1;
         public static readonly string SAVED_GAME_EXTENSION = ".log";
-        public const string PlayerDataFile = "players.data";
+        public const string PlayerDataFile = "catansettings.json";
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
-        private DispatcherTimer _timer = new DispatcherTimer();
-
+        private DispatcherTimer _timer = new DispatcherTimer();  // flips tiles back to Opacaticy = 0
         private bool _doDragDrop = false;   // this lets you double tap a map and then move it around
-
         private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
-
-
-        public static MainPage Current;
-
-
-
-        public ObservableCollection<PlayerModel> AllPlayers { get; set; } = new ObservableCollection<PlayerModel>();
-
-        private RoadRaceTracking _raceTracking = null;
-
+        public static MainPage Current; // a global for the game
+        private RoadRaceTracking _raceTracking = null; // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
+        //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel()));
+
         public MainPageModel MainPageModel
         {
             get => (MainPageModel)GetValue(MainPageModelProperty);
@@ -72,9 +61,7 @@ namespace Catan10
 
             Current = this;
             this.DataContext = this;
-            _timer.Interval = TimeSpan.FromSeconds(FadeSeconds);
             _timer.Tick += AsyncReverseFade;
-
             _raceTracking = new RoadRaceTracking(this);
             Ctrl_PlayerResourceCountCtrl.Log = this;
         }
@@ -146,10 +133,9 @@ namespace Catan10
 
                 _gameView.Init(this, this);
                 CreateMenuItems();
-                await _settings.LoadSettings(_settingsFileName);
 
+                await LoadGameData();
                 UpdateGridLocations();
-                await LoadPlayerData();
                 _progress.Visibility = Visibility.Collapsed;
                 _progress.IsActive = false;
 
@@ -157,40 +143,88 @@ namespace Catan10
             }
 
             InitTest();
-#if false
-            try
-            {
-                _socket = new CatanWebSocket(this);
-                 
-                await _socket.Connect(new Uri("ws://localhost:8080/ws"));
-            }
-            catch(Exception wsEx)
-            {
-                Debug.WriteLine($"Exception caught trying to connect to WebSocket.  Message: {wsEx}");
-            }
 
-#endif
         }
 
-        //   CatanWebSocket _socket = null;
-
-        private async Task LoadPlayerData()
+        private Task SaveSettings()
         {
+            return SaveGameState(SavedAppState);
+        }
 
+        private async Task SaveGameState(SavedState state)
+        {
+            StorageFolder folder = await StaticHelpers.GetSaveFolder();
+
+
+            var content = JsonSerializer.Serialize<SavedState>(state);
+
+            StorageFile file = await folder.CreateFileAsync(PlayerDataFile, CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(file, content);
+        }
+
+        private async Task<SavedState> LoadGameState()
+        {
             StorageFolder folder = await StaticHelpers.GetSaveFolder();
             string content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
+            SavedState state;
+
             if (String.IsNullOrEmpty(content))
             {
-                await AddDefaultUsers();
-                content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
+                return null;
             }
-            JsonSerializerOptions options = new JsonSerializerOptions()
+            try
             {
-                WriteIndented = true
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            List<PlayerModel> players = JsonSerializer.Deserialize<List<PlayerModel>>(content);
-            foreach (var player in players)
+                JsonSerializerOptions options = new JsonSerializerOptions()
+                {
+                    WriteIndented = true
+                };
+                options.Converters.Add(new JsonStringEnumConverter());
+                state = JsonSerializer.Deserialize<SavedState>(content);
+
+                _timer.Interval = TimeSpan.FromSeconds(state.Settings.FadeSeconds);
+                
+                
+
+                return state;
+            }
+            catch (JsonException j)
+            {
+                this.TraceMessage($"JSON error: {j}");
+            }
+
+            return null;
+
+        }
+
+        /// <summary>
+        ///     Load Data that is global to the game 
+        ///     1. Players
+        ///     2. Settings
+        ///     3. Service settings
+        /// </summary>
+        /// <returns></returns>
+        private async Task LoadGameData()
+        {
+
+
+            SavedAppState = await LoadGameState();
+            if (SavedAppState == null)
+            {
+                var list = await GetDefaultUsers();
+                SavedAppState = new SavedState()
+                {
+                    Players = list,
+                    Settings = new Settings(),
+                    ServiceState = new ServiceState() { HostName = "localhost:5000" }
+
+                };
+                await SaveGameState(SavedAppState);
+                SavedAppState = await LoadGameState(); // just verifying round trip...
+                Debug.Assert(SavedAppState != null);
+            }
+
+
+            foreach (var player in SavedAppState.Players)
             {
                 if (player.PlayerIdentifier == Guid.Empty)
                 {
@@ -198,16 +232,13 @@ namespace Catan10
                 }
                 player.Log = this;
                 await player.LoadImage();
-                player.AllPlayerIndex = AllPlayers.Count;
-                AllPlayers.Add(player);
+                player.AllPlayerIndex = SavedAppState.Players.Count;
                
             }
 
-           
-
 
         }
-       
+
 
 
         public GameType GameType
@@ -301,14 +332,14 @@ namespace Catan10
             Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.TurnReset();
             _stateStack.Clear();
 
-            foreach (PlayerModel player in AllPlayers)
+            foreach (PlayerModel player in SavedAppState.Players)
             {
-               player.Reset();
+                player.Reset();
             }
 
             _raceTracking.Reset();
             MainPageModel.Log?.Start();
-          //  await LoadPlayerData();
+            //  await LoadPlayerData();
 
         }
 
@@ -511,6 +542,11 @@ namespace Catan10
                         break;
                     case GameState.WaitingForStart:
                         await CopyScreenShotToClipboard(_gameView);
+                        //
+                        //  TODO: This is where you call the service to tell it what state to start the game in
+                        //        Only the starting player should be able to hit "Start"  
+                        string boardSettings = _gameView.RandomBoardSettings.Serialize();
+                        this.TraceMessage(boardSettings);
                         await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, true);
                         break;
                     case GameState.AllocateResourceForward:
@@ -637,34 +673,6 @@ namespace Catan10
                 SavedGames.Add(log);
             }
 
-        }
-
-        public async static Task<bool> SavePlayers(IEnumerable<PlayerModel> players, string fileName)
-        {
-
-            StorageFolder folder = await StaticHelpers.GetSaveFolder();
-            StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            JsonSerializerOptions options = new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            string toWrite = JsonSerializer.Serialize<IEnumerable<PlayerModel>>(players, options);
-            await FileIO.WriteTextAsync(file, toWrite);
-
-            //foreach (PlayerModel p in players)
-            //{
-            //    toWrite += string.Format($"[{p.PlayerName}]{StaticHelpers.lineSeperator}{p.Serialize(false)}\n");
-            //}
-            //try
-            //{
-            //    await FileIO.WriteTextAsync(file, toWrite);
-            //}
-            //catch (Exception e)
-            //{
-            //    folder.TraceMessage($"Exception: {e.ToString()}");
-            //}
-            return true;
         }
 
         private async Task<bool> ProcessRoll(int roll)
@@ -833,7 +841,7 @@ namespace Catan10
                     //  we've already picked the tiles for this roll -- use them
                     newRandomGoldTiles = CurrentPlayer.GameData.GoldRolls[playerRoll];
                 }
-                this.TraceMessage($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
+                // this.TraceMessage($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
                 await SetRandomTileToGold(newRandomGoldTiles);
             }
 
@@ -967,20 +975,20 @@ namespace Catan10
 
                 {
                     tilesWithNumber.Add(t);
-                    if (_settings.AnimateFade)
+                    if (SavedAppState.Settings.AnimateFade)
                     {
 
                         t.AnimateFade(1.0, tasks);
 
                     }
-                    if (_settings.RotateTile)
+                    if (SavedAppState.Settings.RotateTile)
                     {
                         t.Rotate(180, tasks, true);
                     }
                 }
                 else
                 {
-                    if (_settings.AnimateFade)
+                    if (SavedAppState.Settings.AnimateFade)
                     {
                         t.AnimateFade(0.25, tasks);
                     }
@@ -1350,20 +1358,20 @@ namespace Catan10
 
                 {
                     tilesWithNumber.Add(t);
-                    if (_settings.AnimateFade)
+                    if (SavedAppState.Settings.AnimateFade)
                     {
 
                         t.AnimateFade(1.0, tasks);
 
                     }
-                    if (_settings.RotateTile)
+                    if (SavedAppState.Settings.RotateTile)
                     {
                         t.Rotate(180, tasks, true);
                     }
                 }
                 else
                 {
-                    if (_settings.AnimateFade)
+                    if (SavedAppState.Settings.AnimateFade)
                     {
                         t.AnimateFade(0.25, tasks);
                     }
@@ -1518,12 +1526,12 @@ namespace Catan10
 
         private async void OnManagePlayers(object sender, RoutedEventArgs e)
         {
-            PlayerManagementDlg dlg = new PlayerManagementDlg(AllPlayers, this);
+            PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.Players, this);
             if (await dlg.ShowAsync() == ContentDialogResult.Primary)
             {
-                AllPlayers.Clear();
-                AllPlayers.AddRange(dlg.PlayerDataList);
-
+                SavedAppState.Players.Clear();                
+                SavedAppState.Players.AddRange(dlg.PlayerDataList);
+                await SaveGameState(SavedAppState);
             }
         }
 

@@ -24,37 +24,10 @@ namespace Catan10
             NewLog = new NewLog(this);
         }
 
-        private async void OnTest1(object sdr, RoutedEventArgs rea)
+        private void OnTest1(object sdr, RoutedEventArgs rea)
         {
             
 
-
-            StorageFolder folder = await StaticHelpers.GetSaveFolder();
-            string content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
-            if (String.IsNullOrEmpty(content))
-            {
-                await AddDefaultUsers();
-                content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
-            }
-            JsonSerializerOptions options = new JsonSerializerOptions()
-            {
-                WriteIndented = true
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            List<PlayerModel> players = JsonSerializer.Deserialize<List<PlayerModel>>(content);
-            foreach (var player in players)
-            {
-                if (player.PlayerIdentifier == Guid.Empty)
-                {
-                    player.PlayerIdentifier = Guid.NewGuid();
-                }
-                player.Log = this;
-                await player.LoadImage();
-                player.AllPlayerIndex = AllPlayers.Count;
-                AllPlayers.Add(player);
-            }
-
-            await SavePlayers(AllPlayers, PlayerDataFile);
         }
         private async void OnTest2(object sdr, RoutedEventArgs rea)
         {
@@ -100,10 +73,10 @@ namespace Catan10
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
-                AllPlayers[0],
-                AllPlayers[1],
-                AllPlayers[2],
-                AllPlayers[3]
+                SavedAppState.Players[0],
+                SavedAppState.Players[1],
+                SavedAppState.Players[2],
+                SavedAppState.Players[3]
             };
             await StartGame(PlayerDataList, 0);
             await NextState(); // simluates pushing "Start"
@@ -125,11 +98,11 @@ namespace Catan10
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
-                AllPlayers[0],
-                AllPlayers[1],
-                AllPlayers[2],
-                AllPlayers[3],
-                AllPlayers[4],
+                SavedAppState.Players[0],
+                SavedAppState.Players[1],
+                SavedAppState.Players[2],
+                SavedAppState.Players[3],
+                SavedAppState.Players[4],
             };
             await StartGame(PlayerDataList, 1);
             await NextState(); // simluates pushing "Start"

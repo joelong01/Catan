@@ -26,7 +26,17 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace Catan10
 {
-
+    public static class ICollectionExtensions
+    {
+        public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> that)
+        {
+            if (that == null) return;
+            foreach (T t in that)
+            {
+                collection.Add(t);
+            }
+        }        
+    }
     public static class StaticHelpers
     {
 

@@ -104,41 +104,7 @@ namespace Catan10
 
 
 
-        private string SaveFileName = "CatanSettings.ini";
-        public async Task SaveSettings()
-        {
-            try
-            {
-
-                string saveString = _settings.Serialize(); ;
-                if (saveString == "")
-                {
-                    return;
-                }
-
-                Dictionary<string, string> dict = new Dictionary<string, string>
-                {
-                    ["Settings"] = saveString
-                };
-
-
-                StorageFolder folder = await StaticHelpers.GetSaveFolder();
-                CreationCollisionOption option = CreationCollisionOption.ReplaceExisting;
-                StorageFile file = await folder.CreateFileAsync(SaveFileName, option);
-                await FileIO.WriteTextAsync(file, StaticHelpers.SerializeDictionary(dict));
-
-
-            }
-            catch (Exception exception)
-            {
-
-                string s = StaticHelpers.GetErrorMessage($"Error saving to file {SaveFileName}", exception);
-                await StaticHelpers.ShowErrorText(s);
-
-            }
-        }
-
-        private async void RotateTile_Checked(object sender, RoutedEventArgs e)
+        private void RotateTile_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
             {
@@ -146,7 +112,7 @@ namespace Catan10
             }
 
             _settings.RotateTile = (((CheckBox)sender).IsChecked == true);
-            await SaveSettings();
+            
             CatanSettingsCallback.RotateTile = _settings.RotateTile;
 
 
@@ -154,7 +120,7 @@ namespace Catan10
 
 
 
-        private async void AnimateFadeTile_Checked(object sender, RoutedEventArgs e)
+        private void AnimateFadeTile_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
             {
@@ -162,12 +128,12 @@ namespace Catan10
             }
 
             _settings.AnimateFade = (((CheckBox)sender).IsChecked == true);
-            await SaveSettings();
+            
             CatanSettingsCallback.AnimateFade = _settings.AnimateFade;
 
         }
 
-        private async void FadeValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        private void FadeValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             if (_initializing)
             {
@@ -175,12 +141,12 @@ namespace Catan10
             }
 
             _settings.FadeSeconds = (int)((Slider)sender).Value;
-            await SaveSettings();
+            
             CatanSettingsCallback.FadeSeconds = _settings.FadeSeconds;
 
         }
 
-        private async void ZoomValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        private void ZoomValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             if (_initializing)
             {
@@ -188,14 +154,14 @@ namespace Catan10
             }
 
             _settings.Zoom = ((Slider)sender).Value;
-            await SaveSettings();
+            
             CatanSettingsCallback.Zoom = _settings.Zoom;
 
         }
 
 
 
-        private async void ShowStopwatch_Checked(object sender, RoutedEventArgs e)
+        private void ShowStopwatch_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
             {
@@ -203,7 +169,7 @@ namespace Catan10
             }
 
             _settings.ShowStopwatch = (((CheckBox)sender).IsChecked == true);
-            await SaveSettings();
+            
             CatanSettingsCallback.ShowStopwatch = _settings.ShowStopwatch;
         }
 
@@ -220,7 +186,7 @@ namespace Catan10
             CatanSettingsCallback.OpenSavedGame();
         }
 
-        private async void AnimationSpeedChanged(object sender, RangeBaseValueChangedEventArgs e)
+        private void AnimationSpeedChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             if (_initializing)
             {
@@ -228,7 +194,7 @@ namespace Catan10
             }
 
             _settings.AnimationSpeed = (int)_sliderAnimationSpeed.Value;
-            await SaveSettings();
+            
             CatanSettingsCallback.AnimationSpeedBase = _settings.AnimationSpeed;
         }
 
@@ -263,7 +229,7 @@ namespace Catan10
             await Show();
         }
 
-        private async void ResourceTracking_Click(object sender, RoutedEventArgs e)
+        private void ResourceTracking_Click(object sender, RoutedEventArgs e)
         {
             if (_initializing)
             {
@@ -271,13 +237,13 @@ namespace Catan10
             }
 
             _settings.ResourceTracking = (((CheckBox)sender).IsChecked == true);
-            await SaveSettings();
+            
             CatanSettingsCallback.ResourceTracking = _settings.ResourceTracking;
         }
 
 
 
-        private async void UseRandomNumbers_Checked(object sender, RoutedEventArgs e)
+        private void UseRandomNumbers_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
             {
@@ -285,11 +251,11 @@ namespace Catan10
             }
 
             _settings.UseRandomNumbers = (((CheckBox)sender).IsChecked == true);
-            await SaveSettings();
+            
             CatanSettingsCallback.UseRandomNumbers = _settings.UseRandomNumbers;
         }
 
-        private async void ValidateBuilding_Checked(object sender, RoutedEventArgs e)
+        private void ValidateBuilding_Checked(object sender, RoutedEventArgs e)
         {
             if (_initializing)
             {
@@ -297,7 +263,7 @@ namespace Catan10
             }
 
             _settings.ValidateBuilding = (((CheckBox)sender).IsChecked == true);
-            await SaveSettings();
+            
             CatanSettingsCallback.ValidateBuilding = _settings.ValidateBuilding;
         }
     }

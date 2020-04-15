@@ -335,12 +335,14 @@ namespace Catan10
 
 
 
-                if (AllPlayers.Count == 0)
+                if (SavedAppState.Players.Count == 0)
                 {
-                    await AddDefaultUsers();
-                    await LoadPlayerData();
+                   await LoadGameData();
                 }
-                NewGameDlg dlg = new NewGameDlg(AllPlayers, _gameView.Games);
+
+                Debug.Assert(SavedAppState.Players.Count > 0);
+
+                NewGameDlg dlg = new NewGameDlg(SavedAppState.Players, _gameView.Games);
 
                 ContentDialogResult result = await dlg.ShowAsync();
                 if ((dlg.GamePlayers.Count < 3 || dlg.GamePlayers.Count > 6) && result == ContentDialogResult.Primary)
@@ -1692,7 +1694,7 @@ namespace Catan10
 
         public PlayerModel GetPlayerData(int playerIndex)
         {
-            return AllPlayers[playerIndex];
+            return SavedAppState.Players[playerIndex];
         }
 
 
