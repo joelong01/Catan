@@ -134,6 +134,9 @@
     <Compile Include="State\Rolled.cs" />
     <Compile Include="State\StartGame.cs" />
     <Compile Include="State\UpdateRoadState.cs" />
+    <Compile Include="UI Controls\PlayerGameViewCtrl.xaml.cs">
+      <DependentUpon>PlayerGameViewCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\PlayerResourceCountCtrl.xaml.cs">
       <DependentUpon>PlayerResourceCountCtrl.xaml</DependentUpon>
     </Compile>
@@ -243,6 +246,12 @@
     <Content Include="Assets\DefaultPlayers\john.jpg" />
     <Content Include="Assets\DefaultPlayers\robert.jpg" />
     <Content Include="Assets\desert.jpg" />
+    <Content Include="Assets\DevCards\back.jpg" />
+    <Content Include="Assets\DevCards\knight.jpg" />
+    <Content Include="Assets\DevCards\Monopoly.jpg" />
+    <Content Include="Assets\DevCards\RoadBuilding.jpg" />
+    <Content Include="Assets\DevCards\VictoryPoint.jpg" />
+    <Content Include="Assets\DevCards\YearOfPlenty.jpg" />
     <Content Include="Assets\dice_dark.svg" />
     <Content Include="Assets\dice_light.svg" />
     <Content Include="Assets\guest.jpg" />
@@ -309,6 +318,10 @@
     <Page Include="Games\ExpansionCtrl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI Controls\PlayerGameViewCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\PlayerResourceCountCtrl.xaml">
       <SubType>Designer</SubType>

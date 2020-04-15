@@ -177,39 +177,37 @@ namespace Catan10
         private async Task LoadPlayerData()
         {
 
-            try
+            StorageFolder folder = await StaticHelpers.GetSaveFolder();
+            string content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
+            if (String.IsNullOrEmpty(content))
             {
-
-                StorageFolder folder = await StaticHelpers.GetSaveFolder();
-                Dictionary<string, string> playersDictionary = await StaticHelpers.LoadSectionsFromFile(folder, PlayerDataFile);
-
-
-                foreach (KeyValuePair<string, string> kvp in playersDictionary)
+                await AddDefaultUsers();
+                content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
+            }
+            JsonSerializerOptions options = new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            List<PlayerModel> players = JsonSerializer.Deserialize<List<PlayerModel>>(content);
+            foreach (var player in players)
+            {
+                if (player.PlayerIdentifier == Guid.Empty)
                 {
-
-                    PlayerModel p = new PlayerModel(this);
-
-                    p.Deserialize(kvp.Value, false);
-                    await p.LoadImage();
-                    if (p.PlayerIdentifier == Guid.Empty)
-                    {
-                        p.PlayerIdentifier = Guid.NewGuid();
-                    }
-
-                    p.AllPlayerIndex = AllPlayers.Count;
-                    AllPlayers.Add(p);
-
+                    player.PlayerIdentifier = Guid.NewGuid();
                 }
-
-
+                player.Log = this;
+                await player.LoadImage();
+                player.AllPlayerIndex = AllPlayers.Count;
+                AllPlayers.Add(player);
+               
             }
-            catch
-            {
 
-            }
+           
+
 
         }
-
+       
 
 
         public GameType GameType
@@ -305,12 +303,12 @@ namespace Catan10
 
             foreach (PlayerModel player in AllPlayers)
             {
-                player.Reset();
+               player.Reset();
             }
 
             _raceTracking.Reset();
             MainPageModel.Log?.Start();
-
+          //  await LoadPlayerData();
 
         }
 
@@ -601,8 +599,8 @@ namespace Catan10
         private void AddResourceCountForPlayer(PlayerModel player, ResourceType resource, int count, LogType logType = LogType.Normal)
         {
             int oldValPlayer = player.GameData.PlayerTurnResourceCount.AddResourceCount(resource, count); // update the player
-            // int oldValGlobal = Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(resource, count); // update for the game
-           
+                                                                                                          // int oldValGlobal = Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(resource, count); // update for the game
+
             //
             //  TODO:  log GoodRoll, RollsWithResource and NoResourceCount
 
@@ -646,19 +644,26 @@ namespace Catan10
 
             StorageFolder folder = await StaticHelpers.GetSaveFolder();
             StorageFile file = await folder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            string toWrite = "";
-            foreach (PlayerModel p in players)
+            JsonSerializerOptions options = new JsonSerializerOptions()
             {
-                toWrite += string.Format($"[{p.PlayerName}]{StaticHelpers.lineSeperator}{p.Serialize(false)}\n");
-            }
-            try
-            {
-                await FileIO.WriteTextAsync(file, toWrite);
-            }
-            catch (Exception e)
-            {
-                folder.TraceMessage($"Exception: {e.ToString()}");
-            }
+                WriteIndented = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            string toWrite = JsonSerializer.Serialize<IEnumerable<PlayerModel>>(players, options);
+            await FileIO.WriteTextAsync(file, toWrite);
+
+            //foreach (PlayerModel p in players)
+            //{
+            //    toWrite += string.Format($"[{p.PlayerName}]{StaticHelpers.lineSeperator}{p.Serialize(false)}\n");
+            //}
+            //try
+            //{
+            //    await FileIO.WriteTextAsync(file, toWrite);
+            //}
+            //catch (Exception e)
+            //{
+            //    folder.TraceMessage($"Exception: {e.ToString()}");
+            //}
             return true;
         }
 
@@ -815,7 +820,7 @@ namespace Catan10
                     foreach (int i in newRandomGoldTiles)
                     {
                         if (_gameView.AllTiles[i].ResourceType == ResourceType.Desert)
-                        {                            
+                        {
                             this.TraceMessage($"Desert got added to Random Gold tiles! [Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
                         }
                     }
@@ -995,8 +1000,8 @@ namespace Catan10
 
         public void CountResourcesForRoll(IReadOnlyCollection<TileCtrl> tilesWithNumber, bool undo)
         {
-           
-           
+
+
             foreach (TileCtrl tile in tilesWithNumber)
             {
                 foreach (BuildingCtrl building in tile.OwnedBuilding)
@@ -1014,7 +1019,7 @@ namespace Catan10
                     //
                     //  need to look up the control given the player and add it to the right one
                     AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
-                   
+
 
                 }
             }

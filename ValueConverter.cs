@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -13,7 +14,23 @@ namespace Catan10
 {
     //
     //  DON'T FORGET: add your converter class to app.xaml as a resource...
+    public class StringToIntConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is Int32)
+                return value.ToString();
 
+            return 0;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            return Int32.TryParse((string)value, out int result) ? result : 0;
+
+        }
+    }
     public class IntToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
@@ -384,7 +401,7 @@ namespace Catan10
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (value.GetType() == typeof(bool))
+            if (value is bool)
             {
                 if (parameter is string)
                 {
@@ -474,76 +491,36 @@ namespace Catan10
 
     public class ColorToBrushConverter : IValueConverter
     {
+       
+        private static Color Parse(string color)
+        {
+            var offset = color.StartsWith("#") ? 1 : 0;
+
+            var a = Byte.Parse(color.Substring(0 + offset, 2), NumberStyles.HexNumber);
+            var r = Byte.Parse(color.Substring(2 + offset, 2), NumberStyles.HexNumber);
+            var g = Byte.Parse(color.Substring(4 + offset, 2), NumberStyles.HexNumber);
+            var b = Byte.Parse(color.Substring(6 + offset, 2), NumberStyles.HexNumber);
+
+            return Color.FromArgb(a, r, g, b);
+        }
+
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            if (value == null)
+                return new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
 
-            try
-            {
-                if (value.GetType() == typeof(string))
-                {
+            if (value is Color)
+                return new SolidColorBrush((Color)value);
 
-                    if (targetType == typeof(Brush))
-                    {
-                        Color c = Colors.HotPink;
-                        if (StaticHelpers.StringToColorDictionary.TryGetValue((string)value, out c))
-                        {
-                            return new SolidColorBrush(c);
-                        }
-                    }
+            if (value is string)
+                return new SolidColorBrush(Parse((string)value));
 
-                }
-
-                if (value.GetType() == typeof(Color))
-                {
-                    if (targetType == typeof(Brush))
-                    {
-
-                        return new SolidColorBrush((Color)value);
-                    }
-                }
-
-
-
-            }
-            catch
-            {
-                this.TraceMessage($"Exception thrown in ColorToBrushConvert: {value.ToString()}");
-                return new SolidColorBrush(Colors.HotPink);
-            }
-
-            return new SolidColorBrush(Colors.HotPink);
+            throw new NotSupportedException("ColorToBurshConverter only supports converting from Color and String");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            try
-            {
-
-                if (value.GetType() == typeof(SolidColorBrush))
-                {
-                    SolidColorBrush br = (SolidColorBrush)value;
-                    if (targetType == typeof(string))
-                    {
-                        return StaticHelpers.ColorToStringDictionary[br.Color];
-                    }
-                    if (targetType == typeof(Color))
-                    {
-                        return br.Color;
-                    }
-
-                    return null;
-                }
-
-
-
-            }
-            catch
-            {
-                return "HotPink";
-
-            }
-
-            return null;
+            throw new NotImplementedException();
         }
     }
 

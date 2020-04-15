@@ -14,7 +14,7 @@ namespace Catan10
         {
             this.InitializeComponent();
         }
-        public static readonly DependencyProperty CircleColorProperty = DependencyProperty.Register("CircleColor", typeof(Color), typeof(SailboatCtrl), new PropertyMetadata("White", CircleColorChanged));
+        public static readonly DependencyProperty CircleColorProperty = DependencyProperty.Register("CircleColor", typeof(Color), typeof(SailboatCtrl), new PropertyMetadata(Colors.White, CircleColorChanged));
         public Color CircleColor
         {
             get => (Color)GetValue(CircleColorProperty);

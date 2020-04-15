@@ -8,12 +8,15 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Windows.UI;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Catan10
 {
+  
     public class PlayerGameModel : INotifyPropertyChanged
     {
         private bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
@@ -31,12 +34,28 @@ namespace Catan10
         public ObservableCollection<Harbor> OwnedHarbors { get; } = new ObservableCollection<Harbor>();
 
         public PlayerResourceModel PlayerTurnResourceCount { get; set; } = null;
-        private readonly List<string> _savedGameProperties = new List<string> { "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
-                                                                       "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
-                                                                        "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
+        private readonly List<string> _savedGameProperties = new List<string> { "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", 
+                                                                                "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
+                                                                                "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
+                                                                                "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
 
+        public PlayerGameModel() { }
+
         private PlayerModel _playerData = null; // back pointer
+
+        public PlayerModel PlayerModel
+        {
+            get
+            {
+                return _playerData;
+            }
+            set
+            {
+                _playerData = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public PlayerGameModel(PlayerModel pData)
         {
@@ -44,9 +63,10 @@ namespace Catan10
             Settlements.CollectionChanged += Settlements_CollectionChanged;
             Cities.CollectionChanged += Cities_CollectionChanged;
             Ships.CollectionChanged += Ships_CollectionChanged;
-            _playerData = pData;
+            PlayerModel = pData;
             PlayerTurnResourceCount = new PlayerResourceModel(pData);
             PlayerTurnResourceCount.OnPlayerResourceUpdate += OnGameModelResourceUpdate; // currently only logs that a resource was allocated
+            ColorAsString = pData.ColorAsString;
         }
 
 
@@ -64,7 +84,8 @@ namespace Catan10
 
         private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
         {
-            _playerData.Log.PostLogEntry(_playerData, GameState.Unknown,
+
+            _playerData.Log?.PostLogEntry(_playerData, GameState.Unknown,
                                                              CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
                                                              new LogPropertyChanged(propertyName, oldVal, newVal));
         }
@@ -364,6 +385,7 @@ namespace Catan10
 
                     _useLightFile = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("BadRollImageSource");
                 }
             }
         }
@@ -425,6 +447,8 @@ namespace Catan10
 
             return null;
         }
+
+
 
         private int pips = 0;
         public int Pips
@@ -496,6 +520,27 @@ namespace Catan10
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("ShipsLeft");
                 }
+            }
+        }
+        public Visibility ShipsVisible
+        {
+            get
+            {
+                return (MaxShips > 0 ? Visibility.Visible : Visibility.Collapsed);
+            }
+        }
+        public ImageSource BadRollImageSource
+        {
+            get
+            {
+                string bitmapPath = "ms-appx:///Assets/dice_dark.svg"; 
+                if (UseLightFile)
+                {
+                    bitmapPath = "ms-appx:///Assets/dice_light.svg";
+                }
+                BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
+                return bitmapImage;                
+
             }
         }
         public bool IsCurrentPlayer
@@ -675,6 +720,18 @@ namespace Catan10
             }
         }
 
+        public Visibility LongestRoadVisible
+        {
+            get
+            {
+                return HasLongestRoad ? Visibility.Visible : Visibility.Collapsed;
+            }
+            set
+            {
+                HasLongestRoad = (value == Visibility.Visible) ? true : false;
+            }
+        }
+
         public bool LargestArmy
         {
             get => _LargestArmy;
@@ -684,6 +741,7 @@ namespace Catan10
                 {
                     _LargestArmy = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("LongestRoadVisible");
                     UpdateScore();
                 }
             }
@@ -965,7 +1023,7 @@ namespace Catan10
             {
 
                 if (_Gold != value)
-                {                    
+                {
                     _Gold = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -995,7 +1053,7 @@ namespace Catan10
 
                 if (_Brick != value)
                 {
-                    
+
                     _Brick = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1010,7 +1068,7 @@ namespace Catan10
 
                 if (_Ore != value)
                 {
-                    
+
                     _Ore = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1039,7 +1097,7 @@ namespace Catan10
 
                 if (_Sheep != value)
                 {
-                    
+
                     _Sheep = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Total");
@@ -1081,13 +1139,13 @@ namespace Catan10
                     break;
                 case ResourceType.GoldMine:
                     oldVal = GoldMine;
-                    GoldMine += count;                    
+                    GoldMine += count;
                     break;
                 default:
                     break;
             }
 
-            OnPlayerResourceUpdate?.Invoke(_player,resource, oldVal, oldVal + count);
+            OnPlayerResourceUpdate?.Invoke(_player, resource, oldVal, oldVal + count);
 
             return oldVal;
         }

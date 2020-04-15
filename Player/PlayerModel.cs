@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI;
@@ -17,7 +18,7 @@ namespace Catan10
 {
     public delegate void CardsLostUpdatedHandler(PlayerModel player, int oldVal, int newVal);
     public delegate void PlayerResourceUpdateHandler(PlayerModel player, ResourceType resource, int oldVal, int newVal);
-    
+
 
 
 
@@ -29,27 +30,27 @@ namespace Catan10
     //  
     public class PlayerModel : INotifyPropertyChanged
     {
-        string _playerName = "Nameless";
-        string _ImageFileName = "ms-appx:///Assets/guest.jpg";
 
-        int _GamesPlayed = 0;
-        int _gamesWon = 0;
-        PlayerPosition _PlayerPosition = PlayerPosition.Right;
-        PlayerGameModel _playerGameData = null;
-        Guid _PlayerIdentifier = new Guid();
-        ImageBrush _imageBrush = null;
-        public int AllPlayerIndex { get; set; } = -1;
-        string _colorAsString = "HotPink";
-
-        public ILog Log { get; private set; } = null;
-
-
+        private string _playerName = "Nameless";
+        private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
+        private int _GamesPlayed = 0;
+        private int _gamesWon = 0;
+        private PlayerPosition _PlayerPosition = PlayerPosition.Right;
+        private PlayerGameModel _playerGameData = null;
+        private Guid _PlayerIdentifier = new Guid();
+        private ImageBrush _imageBrush = null;
+        private string _colorAsString = "HotPink";
+        private readonly List<string> _savedProperties = new List<string> { "PlayerIdentifier", "GamesWon", "GamesPlayed", "PlayerName", "ImageFileName", "ColorAsString" };
+        private bool _isCurrentPlayer = false;
         public static ObservableCollection<ColorChoices> _availableColors = new ObservableCollection<ColorChoices>();
         public event PropertyChangedEventHandler PropertyChanged;
-        private readonly List<string> _savedProperties = new List<string> { "PlayerIdentifier", "GamesWon", "GamesPlayed", "PlayerName", "ImageFileName", "ColorAsString" };
-        bool _isCurrentPlayer = false;
 
+        public int AllPlayerIndex { get; set; } = -1;
 
+        [JsonIgnore]
+        public ILog Log { get; set; } = null;
+
+        [JsonIgnore]
         public bool IsCurrentPlayer
         {
             get => _isCurrentPlayer;
@@ -63,8 +64,15 @@ namespace Catan10
             }
         }
 
+        [JsonIgnore]
         public PlayerModel PlayerDataInstance => this;
-        private PlayerModel() { } // no default ctor
+        public PlayerModel() 
+        {
+            //_playerGameData = new PlayerGameModel(this);
+            //_playerGameData.ColorAsString = "Blue";
+
+        } // needed for serialization
+
 
         public async Task<StorageFile> CopyImage(StorageFile file)
         {
@@ -125,8 +133,12 @@ namespace Catan10
 
         }
 
+        [JsonIgnore]
         public PlayerModel This => this;
+      
 
+
+        [JsonIgnore]
         public ImageBrush ImageBrush
         {
             get => _imageBrush;
@@ -140,6 +152,7 @@ namespace Catan10
             }
         }
 
+        [JsonIgnore]
         public ImageSource PlayerImageSource
         {
             get => _imageBrush.ImageSource;
@@ -152,12 +165,13 @@ namespace Catan10
                 }
             }
         }
+        [JsonIgnore]
         public ObservableCollection<ColorChoices> AvailableColors => PlayerModel._availableColors;
-
+       
 
         public PlayerModel(ILog log)
         {
-            _playerGameData = new PlayerGameModel(this);
+            GameData = new PlayerGameModel(this);
             Log = log;
 
             if (_availableColors.Count == 0)
@@ -171,7 +185,7 @@ namespace Catan10
 
         }
 
-        
+
         public Guid PlayerIdentifier
         {
             get => _PlayerIdentifier;
@@ -184,7 +198,8 @@ namespace Catan10
                 }
             }
         }
-        
+
+        [JsonIgnore]
         public PlayerGameModel GameData
         {
             get => _playerGameData;
@@ -197,7 +212,8 @@ namespace Catan10
                 }
             }
         }
-        
+
+        [JsonIgnore]
         public PlayerPosition PlayerPosition
         {
             get => _PlayerPosition;
@@ -210,6 +226,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonIgnore]
         public int GamesWon
         {
             get => _gamesWon;
@@ -222,7 +239,7 @@ namespace Catan10
                 }
             }
         }
-
+        [JsonIgnore]
         public int GamesPlayed
         {
             get => _GamesPlayed;
@@ -235,7 +252,7 @@ namespace Catan10
                 }
             }
         }
-        
+
         public string ImageFileName
         {
             get => _ImageFileName;
@@ -248,7 +265,7 @@ namespace Catan10
                 }
             }
         }
-        
+
         public string PlayerName
         {
             get => _playerName;
@@ -263,20 +280,23 @@ namespace Catan10
         }
         //
         //  the color that is saved
-        
+
         public string ColorAsString
         {
             get => _colorAsString;
             set
             {
-                if (value != _colorAsString)
+               // if (value != _colorAsString)
                 {
                     //
                     //  we need to tell the GameData what the new color is because
                     //  everything binds to the GameData -- NOTHING should bind to 
                     //  PlayerData.ColorAsString, except for managment UI that wants
                     //  to change the color
-
+                    if (GameData == null) // this happens when we deserialize
+                    {
+                        GameData = new PlayerGameModel(this);
+                    }
                     GameData.ColorAsString = value;
                     _colorAsString = value;
                     NotifyPropertyChanged();
@@ -287,16 +307,16 @@ namespace Catan10
 
         public string Serialize(bool oneLine)
         {
-
-            return StaticHelpers.SerializeObject<PlayerModel>(this, _savedProperties, "=", StaticHelpers.lineSeperator);
+            return JsonSerializer.Serialize<PlayerModel>(this);
+            // return StaticHelpers.SerializeObject<PlayerModel>(this, _savedProperties, "=", StaticHelpers.lineSeperator);
         }
 
 
-        public bool Deserialize(string s, bool oneLine)
+        
+        public static PlayerModel Deserialize(string s, bool oneLine)
         {
+            return JsonSerializer.Deserialize<PlayerModel>(s);
 
-            StaticHelpers.DeserializeObject<PlayerModel>(this, s, "=", StaticHelpers.lineSeperator);
-            return true;
         }
 
 
@@ -304,11 +324,16 @@ namespace Catan10
         ///     I've run into a bunch of problems where I add data (such as the GoldTiles list) but forget to clear it when Reset
         ///     is called.  this means state moves from one game to the next and we get funny results.  so instead i'm going to try
         ///     to just create a new game model when this is reset and see how it goes.
+        ///     
+        ///    4/13/2020 - Nasty bug here.  by wiping  GameData() we broke all bindings.  4 hours to debug. The change was to start
+        ///                a new game by loading the PlayerData from disk in MainPage.LoadPlayerData();
         /// </summary>
         public void Reset()
         {
-            // GameData.Reset();
-            _playerGameData = new PlayerGameModel(this);
+            
+            GameData = new PlayerGameModel(this);
+            
+            
         }
 
         public override string ToString()

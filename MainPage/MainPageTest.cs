@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Diagnostics;
 using System.Collections.Generic;
+using Windows.Storage;
 
 
 
@@ -23,24 +24,37 @@ namespace Catan10
             NewLog = new NewLog(this);
         }
 
-        private void OnTest1(object sdr, RoutedEventArgs rea)
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            // this will do a roll
+            
 
-            if (CurrentPlayer == null) return;
-            //
-            //  on next, reset the resources for the turn to 0
-            foreach (PlayerModel player in MainPageModel.PlayingPlayers)
+
+            StorageFolder folder = await StaticHelpers.GetSaveFolder();
+            string content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
+            if (String.IsNullOrEmpty(content))
             {
-                player.GameData.PlayerTurnResourceCount.TurnReset();
+                await AddDefaultUsers();
+                content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
+            }
+            JsonSerializerOptions options = new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            List<PlayerModel> players = JsonSerializer.Deserialize<List<PlayerModel>>(content);
+            foreach (var player in players)
+            {
+                if (player.PlayerIdentifier == Guid.Empty)
+                {
+                    player.PlayerIdentifier = Guid.NewGuid();
+                }
+                player.Log = this;
+                await player.LoadImage();
+                player.AllPlayerIndex = AllPlayers.Count;
+                AllPlayers.Add(player);
             }
 
-
-            RolledModel logRoll = RolledController.Do(this, 6);
-            VerifyRoundTrip<RolledModel>(logRoll);
-            
-            NewLog.PushAction(logRoll);
-
+            await SavePlayers(AllPlayers, PlayerDataFile);
         }
         private async void OnTest2(object sdr, RoutedEventArgs rea)
         {

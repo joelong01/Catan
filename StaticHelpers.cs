@@ -734,20 +734,40 @@ namespace Catan10
             return sections;
         }
 
+        public static async Task<string> ReadWholeFile(StorageFolder folder, string filename)
+        {
+            try
+            {
+                StorageFile file = await folder.GetFileAsync(filename);
+                string contents = await FileIO.ReadTextAsync(file);
+                return contents;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         public static async Task<Dictionary<string, string>> LoadSectionsFromFile(StorageFolder folder, string filename)
         {
 
-            StorageFile file = await folder.GetFileAsync(filename);
-            string contents = await FileIO.ReadTextAsync(file);
+
+            string contents = await ReadWholeFile(folder, filename);
             contents = contents.Replace('\r', '\n');
             Dictionary<string, string> sectionsDict = null;
+            bool exceptionThrown = false;
             try
             {
                 sectionsDict = StaticHelpers.GetSections(contents);
             }
             catch (Exception e)
             {
-                string content = string.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.\nException info: {e.ToString()}");
+                exceptionThrown = true;
+                filename.TraceMessage($"Exception caught: {e.Message}");
+            }
+            if (exceptionThrown)
+            {
+                string content = string.Format($"Error parsing file {filename}.\nIn File: {folder.Path}\n\nSuggest deleting it.\n\nError parsing sections.");
                 MessageDialog dlg = new MessageDialog(content);
                 await dlg.ShowAsync();
             }

@@ -571,7 +571,7 @@ namespace Catan10
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PlayerColor_Clicked(object sender, RoutedEventArgs e)
+        private async void PlayerColor_Clicked(object sender, RoutedEventArgs e)
         {
             if (CurrentPlayer == null)
             {
@@ -592,6 +592,8 @@ namespace Catan10
             //
             //  this is only needed because Roads don't do proper data binding yet.
             CurrentPlayerColorChanged(CurrentPlayer);
+
+            await SavePlayers(AllPlayers, PlayerDataFile); 
         }
 
         internal void AddPlayerMenu(PlayerModel player)

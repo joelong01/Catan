@@ -14,6 +14,8 @@
             <DoubleAnimation x:Name="_daFlipFrontCard" Duration="0:0:2" To="0"   Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" Storyboard.TargetName="_gridFront"/>
         </Storyboard>
     </Control.Resources>
+
+
     <Grid Name="LayoutRoot" Width="70" Height="100">
         <Grid Name="_gridBack" CornerRadius="10" BorderBrush="White" BorderThickness="1">
             <Grid.Background>
@@ -27,7 +29,7 @@
 
         <Grid Name="_gridFront" CornerRadius="10" BorderBrush="Black" BorderThickness="1" Visibility="Visible">
             <Grid.RowDefinitions>
-                <RowDefinition Height="10*"/>
+                <RowDefinition Height="15*"/>
                 <RowDefinition Height="10*"/>
             </Grid.RowDefinitions>
             <Grid.Projection>
@@ -36,10 +38,12 @@
             <Grid.Background>
                 <ImageBrush x:Name="_imgFront" Stretch="Fill" ImageSource="ms-appx:Assets/SquareImages/brick.png"/>
             </Grid.Background>
-            <Grid Grid.Row="1" Width="30" VerticalAlignment="Stretch" Margin="0,1,0,0"  >
-                <Rectangle Width="30" Height="30" VerticalAlignment="Center" HorizontalAlignment="Center" Fill="Black" Opacity=".5" RadiusX="5" RadiusY="5" />
-                <Viewbox Margin="1,0,0,3" >
-                    <TextBlock x:Name="_txtCount" Foreground="Yellow" Text="0" CharacterSpacing="0"  />
+            <Grid Grid.Row="1" Width="40" VerticalAlignment="Stretch" Margin="0,1,0,0" Background="Green" Visibility="{x:Bind CountVisible, Mode=OneWay}" >
+                <Rectangle  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Fill="Black" Opacity="0.75" RadiusX="5" RadiusY="5" />
+                <Viewbox>
+                    <TextBox Margin="4" x:Name="_txtCount" Foreground="Yellow" Text="{x:Bind Count, Mode=TwoWay, FallbackValue=0, Converter={StaticResource StringToIntConverter}}" 
+                         CharacterSpacing="0"  FontSize="40" Background="Transparent" BorderBrush="Transparent" GotFocus="Text_GotFocus"
+                         TextAlignment="Center" Visibility="Visible"  RequestedTheme="Dark" />
                 </Viewbox>
             </Grid>
             <Grid Name="HarborGrid" Grid.RowSpan="2">
@@ -51,5 +55,7 @@
                 </Ellipse>
             </Grid>
         </Grid>
+
     </Grid>
+
 </UserControl>

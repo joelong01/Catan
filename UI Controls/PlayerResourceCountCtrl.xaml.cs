@@ -50,6 +50,8 @@ namespace Catan10
             //  logged by PlayerGameModel.OnPlayerResourceUpdate
         }
 
+        public ObservableCollection<PlayerModel> TestPlayers { get; set; } = new ObservableCollection<PlayerModel>();
+
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayerResourceCountCtrl), new PropertyMetadata(new ObservableCollection<PlayerModel>(), PlayingPlayersChanged));
         public ObservableCollection<PlayerModel> PlayingPlayers
         {
@@ -78,6 +80,7 @@ namespace Catan10
                 player.GameData.PlayerTurnResourceCount.OnPlayerResourceUpdate += OnResourceUpdate;
             }
 
+            TestPlayers = newList;
         }
 
         private void PlayersChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -114,36 +117,6 @@ namespace Catan10
             }
         }
 
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!(sender is TextBox tb))
-            {
-                return;
-            }
-
-            tb.SelectAll();
-        }
-
-
-        private async void Picture_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            Ellipse ellipse = sender as Ellipse;
-            ellipse.IsTapEnabled = false;
-            try
-            {
-
-                PlayerModel player = ((Ellipse)sender).Tag as PlayerModel;
-
-                if (await StaticHelpers.AskUserYesNoQuestion($"Let {player.PlayerName} go first?", "Yes", "No"))
-                {
-                    await MainPage.Current.SetFirst(player); //manipulates the shared PlayingPlayers list, but also does logging and other book keeping.
-                }
-            }
-            finally
-            {
-                ellipse.IsTapEnabled = true;
-            }
-
-        }
+        
     }
 }

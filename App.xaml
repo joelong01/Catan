@@ -30,6 +30,7 @@
         <local:GameStateToVisibilityConverter x:Key="GameStateToVisibilityConverter" />
         <local:HarborTypeToHarborBrush x:Key="HarborTypeToHarborBrushConverter" />
         <local:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
+        <local:StringToIntConverter x:Key="StringToIntConverter" />
 
 
         <ImageBrush x:Key="bmWheat" ImageSource="Assets/Old Visuals/old wheat.png" Stretch="Fill" />
