@@ -28,6 +28,12 @@ namespace Catan10
 
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
+            var picker = new PlayerPickerDlg(SavedAppState.Players);
+            var result = await picker.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                this.TraceMessage($"Selected {picker.Player?.PlayerName}");
+            }
             var proxy = new CatanProxy()
             {
                 HostName = "http://localhost:5000"

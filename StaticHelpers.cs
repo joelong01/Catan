@@ -35,7 +35,7 @@ namespace Catan10
             {
                 collection.Add(t);
             }
-        }        
+        }
     }
     public static class StaticHelpers
     {
@@ -49,7 +49,8 @@ namespace Catan10
             {"Green", Colors.Green },
             {"Brown", Colors.Brown },
             {"DarkGray", Colors.DarkGray },
-            {"Black", Colors.Black }
+            {"Black", Colors.Black },
+            {"Purple", Colors.Purple }
         };
         public static Dictionary<Color, string> ColorToStringDictionary { get; } = new Dictionary<Color, string>()
         {
@@ -60,7 +61,8 @@ namespace Catan10
             { Colors.Green    ,  "Green"    },
             { Colors.Brown    ,  "Brown"    },
             { Colors.DarkGray ,  "DarkGray" },
-            { Colors.Black    ,  "Black"    }
+            { Colors.Black    ,  "Black"    },
+            {Colors.Purple, "Purple" }
         };
 
         public static Dictionary<string, string> BackgroundToForegroundDictionary { get; } = new Dictionary<string, string>()
@@ -72,7 +74,8 @@ namespace Catan10
             { "Green"    , "Black" },
             { "Brown"    , "White" },
             { "DarkGray" , "White" },
-            { "Black"    , "White" }
+            { "Black"    , "White" },
+            { "Purple"   , "White" }
 
         };
 
@@ -85,7 +88,8 @@ namespace Catan10
             { "Green"    },
             { "Brown"    },
             { "DarkGray" },
-            { "Black"    }
+            { "Black"    },
+            {"Purple"    }
 
         };
 
@@ -101,6 +105,7 @@ namespace Catan10
             { Colors.DarkGray , Colors.White},
             { Colors.Black   , Colors.White },
             { Colors.HotPink   , Colors.Purple},
+            {Colors.Purple, Colors.White }
 
 
         };

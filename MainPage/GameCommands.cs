@@ -58,8 +58,9 @@ namespace Catan10
         private Dictionary<string, string> _defaultUsers = new Dictionary<string, string>()
         {
             {"Joe", "joe.jpg;Blue" },
-            {"Dodgy", "Dodgy.jpg;Red" },
+            {"Dodgy", "quark.jpg;Red" },
             {"Doug", "doug.jpg;White" },
+            {"Adrian", "Adrian.jpg;Purple" },
             {"Robert", "robert.jpg;Black" },
             {"Chris", "chris.jpg;Yellow" },
             {"Cort", "cort.jpg;Green" },

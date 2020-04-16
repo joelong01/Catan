@@ -18,13 +18,42 @@ namespace Catan10
         {
             return String.Format($"{PlayerName}:{IsFirst}");
         }
-        public PlayerModel Player { get; set; } = null;
+
         public static readonly DependencyProperty IsFirstProperty = DependencyProperty.Register("To", typeof(bool?), typeof(PlayerPickerItemCtrl), new PropertyMetadata(false, IsFirstChanged));
         public static readonly DependencyProperty ForegroundColorProperty = DependencyProperty.Register("Foreground", typeof(Color), typeof(PlayerPickerItemCtrl), new PropertyMetadata(Colors.HotPink, null));
         public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("Background", typeof(Color), typeof(PlayerPickerItemCtrl), new PropertyMetadata(Colors.HotPink, null));
         public static readonly DependencyProperty PlayerNameProperty = DependencyProperty.Register("PlayerName", typeof(string), typeof(PlayerPickerItemCtrl), new PropertyMetadata("Nameless"));
         public static readonly DependencyProperty ImageFileNameProperty = DependencyProperty.Register("ImageFileName", typeof(string), typeof(PlayerPickerItemCtrl), new PropertyMetadata("ms-appx:///Assets/guest.jpg"));
         public static readonly DependencyProperty ImageBrushProperty = DependencyProperty.Register("ImageBrush", typeof(ImageBrush), typeof(PlayerPickerItemCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PlayerPickerItemCtrl), new PropertyMetadata(null, PlayerChanged));
+        public static readonly DependencyProperty ShowCheckBoxProperty = DependencyProperty.Register("ShowCheckBox", typeof(bool), typeof(PlayerPickerItemCtrl), new PropertyMetadata(true));
+       
+        public bool ShowCheckBox
+        {
+            get => (bool)GetValue(ShowCheckBoxProperty);
+            set => SetValue(ShowCheckBoxProperty, value);
+        }
+        public PlayerModel Player
+        {
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
+        }
+        private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as PlayerPickerItemCtrl;
+            var depPropValue = (PlayerModel)e.NewValue;
+            depPropClass?.SetPlayer(depPropValue);
+        }
+        private void SetPlayer(PlayerModel data)
+        {
+            ForegroundColor = data.GameData.Foreground.Color;
+            FillColor = data.GameData.PlayerColor;
+            PlayerName = data.PlayerName;
+            ImageFileName = data.ImageFileName;
+            Player = data;
+            ImageBrush = data.ImageBrush;
+        }
+
         public ImageBrush ImageBrush
         {
             get => (ImageBrush)GetValue(ImageBrushProperty);

@@ -175,13 +175,14 @@ namespace Catan10
                 using (var proxy = new CatanProxy() { HostName = HostName })
                 {
                     var resources = await proxy.JoinGame(SelectedGame, Players[PlayerSelectedIndex].PlayerName);
-                    if (resources == null)
+                    if (resources != null)
                     {
-                        msg = proxy.LastError.Description;
-                        this.Hide();
-                        await StaticHelpers.ShowErrorText(msg);
+                        await GetPlayersInGame();
+                        return;
+                                               
                     }
-                    await GetPlayersInGame();
+
+                    msg = proxy.LastError.Description;
 
                 }
             }
@@ -191,16 +192,14 @@ namespace Catan10
             }
             finally
             {
-                if (!String.IsNullOrEmpty(msg))
+                if (!string.IsNullOrEmpty(msg))
                 {
+                    this.Hide();
+                    await StaticHelpers.ShowErrorText(msg);
                     await this.ShowAsync();
                 }
             }
-            if (!string.IsNullOrEmpty(msg))
-            {
-                this.Hide();
-                await StaticHelpers.ShowErrorText(msg);
-            }
+            
         }
 
         private void OnPlayerChanged(object sender, SelectionChangedEventArgs e)
@@ -239,15 +238,12 @@ namespace Catan10
             }
             finally
             {
-                if (!String.IsNullOrEmpty(msg))
+                if (!string.IsNullOrEmpty(msg))
                 {
+                    this.Hide();
+                    await StaticHelpers.ShowErrorText(msg);
                     await this.ShowAsync();
                 }
-            }
-            if (!string.IsNullOrEmpty(msg))
-            {
-                this.Hide();
-                await StaticHelpers.ShowErrorText(msg);
             }
         }
 
@@ -264,7 +260,11 @@ namespace Catan10
                 using (var proxy = new CatanProxy() { HostName = this.HostName })
                 {
 
-                    await proxy.DeleteGame(SelectedGame);
+                    var result = await proxy.DeleteGame(SelectedGame);
+                    if (result == null)
+                    {
+                        msg = proxy.LastError?.Description;
+                    }
                     PlayersInGame.Clear();
                     await GetGames();
                 }
@@ -274,16 +274,12 @@ namespace Catan10
                 msg = e.Message;
             }
             finally
-            {               
-                //
-                //  this one always shows a dialog so always has to do a show
-                await this.ShowAsync();               
-            }
-
-            if (!string.IsNullOrEmpty(msg))
             {
-                this.Hide();
-                await StaticHelpers.ShowErrorText(msg);
+                if (!string.IsNullOrEmpty(msg))
+                {                    
+                    await StaticHelpers.ShowErrorText(msg);                   
+                }
+                await this.ShowAsync();
             }
         }
     }
