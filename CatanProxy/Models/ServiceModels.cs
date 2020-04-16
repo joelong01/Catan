@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace CatanSharedModels
+namespace Catan.Proxy
 {
     /// <summary>
     ///     This enum tells us what the data shape is 

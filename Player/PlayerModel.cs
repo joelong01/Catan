@@ -40,7 +40,6 @@ namespace Catan10
         private Guid _PlayerIdentifier = new Guid();
         private ImageBrush _imageBrush = null;
         private string _colorAsString = "HotPink";
-        private readonly List<string> _savedProperties = new List<string> { "PlayerIdentifier", "GamesWon", "GamesPlayed", "PlayerName", "ImageFileName", "ColorAsString" };
         private bool _isCurrentPlayer = false;
         public static ObservableCollection<ColorChoices> _availableColors = new ObservableCollection<ColorChoices>();
         public event PropertyChangedEventHandler PropertyChanged;

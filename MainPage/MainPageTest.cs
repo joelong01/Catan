@@ -6,6 +6,8 @@ using System.Text.Json.Serialization;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Windows.Storage;
+using Catan.Proxy;
+
 
 
 
@@ -24,9 +26,41 @@ namespace Catan10
             NewLog = new NewLog(this);
         }
 
-        private void OnTest1(object sdr, RoutedEventArgs rea)
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
+            var proxy = new CatanProxy()
+            {
+                HostName = "http://localhost:5000"
+            };
+            var gameInfo = new GameInfo();
+            string[] gameNames = new string[] { "Game - 1", "Game - 2" };
+            List<string> games = null;
+            foreach (var game in gameNames)
+            {
+                await proxy.DeleteGame(game);
+                games = await proxy.CreateGame(game, gameInfo);
+
+                for (int i=0; i<4; i++) 
+                {
+                    var player = SavedAppState.Players[i];
+                    if (player.PlayerName == "Dodgy") continue;
+                    var resources = await proxy.JoinGame(game, player.PlayerName);
+
+                    Debug.Assert(resources != null);
+                }
+            }
             
+            
+            
+            
+
+
+            ServiceGameDlg dlg = new ServiceGameDlg(this.SavedAppState)
+            {
+                HostName = proxy.HostName
+            };
+            await dlg.ShowAsync();
+            this.TraceMessage($"{JsonSerializer.Serialize<PlayerModel>(dlg?.SelectedPlayer)}");
 
         }
         private async void OnTest2(object sdr, RoutedEventArgs rea)

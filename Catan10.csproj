@@ -116,6 +116,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CatanService\ServiceClient.cs" />
+    <Compile Include="ContentDialogs\ServiceGameDlg.xaml.cs">
+      <DependentUpon>ServiceGameDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Games\ExpansionCtrl.xaml.cs">
       <DependentUpon>ExpansionCtrl.xaml</DependentUpon>
     </Compile>
@@ -316,6 +319,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="ContentDialogs\ServiceGameDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Games\ExpansionCtrl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

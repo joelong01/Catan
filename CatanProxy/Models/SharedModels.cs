@@ -2,16 +2,15 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using System.Text.Json;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
-namespace CatanSharedModels
+
+namespace Catan.Proxy
 {
     public enum TileOrientation { FaceDown, FaceUp, None };
     public enum HarborType { Sheep, Wood, Ore, Wheat, Brick, ThreeForOne, Uninitialized, None };
-
-    public enum Entitlement { Undefined, DevCard, Settlement, City, Road }
+    public enum CatanGameNames { Regular,Expansion,Seafarers, FourIslands};
+public enum Entitlement { Undefined, DevCard, Settlement, City, Road }
 
     public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea };
     public enum DevCardType { Knight, VictoryPoint, YearOfPlenty, RoadBuilding, Monopoly, Unknown };
@@ -47,6 +46,7 @@ namespace CatanSharedModels
         public int YearOfPlenty { get; set; } = 2;
         public int RoadBuilding { get; set; } = 2;
         public int Monopoly { get; set; } = 2;
+        public CatanGameNames GameName { get; set; } = CatanGameNames.Regular;
         public GameInfo() { }
         public GameInfo(GameInfo info)
         {
@@ -70,7 +70,14 @@ namespace CatanSharedModels
                 {
                     return true;
                 }
+                else
+                {
+                    return false;
+                }
+            }
 
+            if (b is null) // a is not null!
+            {
                 return false;
             }
 

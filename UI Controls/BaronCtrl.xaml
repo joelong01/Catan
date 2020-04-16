@@ -1,22 +1,19 @@
-﻿<UserControl
-    x:Class="Catan10.BaronCtrl"
+﻿<UserControl x:Class="Catan10.BaronCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
     x:Name="userControl"
     HorizontalAlignment="Left"
     VerticalAlignment="Top"
     d:DesignWidth="82"
     d:DesignHeight="95"
-    
-    >
+    mc:Ignorable="d">
     <UserControl.Resources>
         <Storyboard x:Name="_sbMove">
-            <DoubleAnimation x:Name="_daX" Duration="0:0:1.00" To="110" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="userControl"/>
-            <DoubleAnimation x:Name="_daY" Duration="0:0:1.00" To="110" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" Storyboard.TargetName="userControl"/>
+            <DoubleAnimation x:Name="_daX" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="userControl" To="110" Duration="0:0:1.00" />
+            <DoubleAnimation x:Name="_daY" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" Storyboard.TargetName="userControl" To="110" Duration="0:0:1.00" />
         </Storyboard>
     </UserControl.Resources>
 
@@ -24,12 +21,11 @@
         <CompositeTransform />
     </Control.RenderTransform>
 
-    <Grid Name="_baron" Background="Transparent" Canvas.ZIndex="200" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0"  
-          Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}" Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}">
-        <Viewbox  Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}" Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}">
+    <Grid Name="_baron" Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}" Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" Canvas.ZIndex="200">
+        <Viewbox Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}" Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}">
             <Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" RenderTransformOrigin="0.5,0.5">
                 <Grid.RenderTransform>
-                    <CompositeTransform Rotation="180"/>
+                    <CompositeTransform Rotation="180" />
                 </Grid.RenderTransform>
                 <Path Data="M2868.39,54.4219L2761.97,0 2655.54,54.4219C2059.57,368.691 1567.73,973.57 1218.29,1534.77 771.969,2251.57 439.488,3075.89 230.973,3892.99 124.145,4311.6 47.1719,4739.65 7.71094,5169.98L0,5254.05 61.8008,5311.57C1166.2,6339.41,4359.56,6342.8,5462.45,5311.28L5523.91,5253.79 5516.23,5169.98C5476.76,4739.65 5399.79,4311.6 5292.96,3892.99 5084.45,3075.89 4751.97,2251.57 4305.64,1534.77 3956.21,973.57 3464.36,368.691 2868.39,54.4219" Fill="#FF231F20" Opacity="1" />
                 <Path Data="M2761.93,182.84L2761.96,182.871 2761.99,182.84C4012.34,819.172 5152.06,3071.99 5344.97,5175.56 4308.47,6144.99 1215.43,6140.2 178.941,5175.56 371.855,3071.99 1511.58,819.172 2761.93,182.84" Fill="#FF231F20" Opacity="1" />

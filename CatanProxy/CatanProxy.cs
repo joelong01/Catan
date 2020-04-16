@@ -1,5 +1,4 @@
-﻿using CatanSharedModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
@@ -47,22 +46,38 @@ namespace Catan.Proxy
 
             return Post<PlayerResources>(url, null);
         }
+
+        public Task<List<string>> CreateGame(string gameName, GameInfo gameInfo)
+        {
+            if (String.IsNullOrEmpty(gameName))
+            {
+                throw new Exception("names can't be null or empty");
+            }
+            if (gameInfo == null)
+            {
+                throw new Exception("gameInfo can't be null");
+            }
+            string url = $"{HostName}/api/catan/game/create/{gameName}";
+
+            return Post<List<string>>(url, CatanProxy.Serialize<GameInfo>(gameInfo));
+        }
+
         public string LastErrorString { get; set; } = "";
         public CatanProxy()
         {
             Client.Timeout = TimeSpan.FromHours(5);
         }
 
-        public Task<PlayerResources> Register(GameInfo info, string gameName, string playerName)
+        public Task<PlayerResources> JoinGame(string gameName, string playerName)
         {
 
             if (String.IsNullOrEmpty(gameName) || String.IsNullOrEmpty(playerName))
             {
                 throw new Exception("names can't be null or empty");
             }
-            string url = $"{HostName}/api/catan/game/register/{gameName}/{playerName}";
+            string url = $"{HostName}/api/catan/game/joingame/{gameName}/{playerName}";
 
-            return Post<PlayerResources>(url, CatanProxy.Serialize<GameInfo>(info));
+            return Post<PlayerResources>(url, null);
 
         }
 
