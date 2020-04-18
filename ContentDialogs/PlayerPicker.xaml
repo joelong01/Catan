@@ -21,8 +21,7 @@
             CanDragItems="True" CanReorderItems="False" CanDrag="False"
             CornerRadius="10,10,10,10" DataFetchSize="4"
             IsMultiSelectCheckBoxEnabled="False" SelectionChanged="OnSelectionChanged"
-            IsHitTestVisible="True"
-            SingleSelectionFollowsFocus="True">
+            IsHitTestVisible="True" SingleSelectionFollowsFocus="True">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
                     <local:PlayerPickerItemCtrl Player="{x:Bind This}" ShowCheckBox="False" ForegroundColor="#FFFC0000" FocusVisualPrimaryBrush="HotPink" />

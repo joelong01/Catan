@@ -33,57 +33,76 @@ namespace Catan10
     }
     public sealed partial class ServiceGameDlg : ContentDialog
     {
-        private CatanProxy Proxy { get; } = new CatanProxy();
         #region properties
-        public string SelectedGame { get; set; } = "";
+        private CatanProxy Proxy { get; } = new CatanProxy();
+        private PlayerModel CurrentPlayer { get; set; } = null;
+        private List<PlayerModel> AllPlayers { get; set; } = null;
+
+
         public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<string> PlayersInGame = new ObservableCollection<string>();
+        public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
         public ObservableCollection<string> Games = new ObservableCollection<string>();
-        public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(ObservableCollection<PlayerModel>), typeof(ServiceGameDlg), new PropertyMetadata("https://localhost:5000"));
-        public static readonly DependencyProperty SelectedPlayerProperty = DependencyProperty.Register("SelectedPlayer", typeof(PlayerModel), typeof(ServiceGameDlg), new PropertyMetadata(null));
-        public static readonly DependencyProperty PlayerSelectedIndexProperty = DependencyProperty.Register("PlayerSelectedIndex", typeof(int), typeof(ServiceGameDlg), new PropertyMetadata(0));
-        public static readonly DependencyProperty NewPlayerProperty = DependencyProperty.Register("NewPlayer", typeof(string), typeof(ServiceGameDlgModel), new PropertyMetadata(""));
-        public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlgModel), new PropertyMetadata(""));
-        public string NewGameName
-        {
-            get => (string)GetValue(NewGameNameProperty);
-            set => SetValue(NewGameNameProperty, value);
-        }
-        public string NewPlayer
-        {
-            get => (string)GetValue(NewPlayerProperty);
-            set => SetValue(NewPlayerProperty, value);
-        }
-        public int PlayerSelectedIndex
-        {
-            get => (int)GetValue(PlayerSelectedIndexProperty);
-            set => SetValue(PlayerSelectedIndexProperty, value);
-        }
 
-        public PlayerModel SelectedPlayer
-        {
-            get => (PlayerModel)GetValue(SelectedPlayerProperty);
-            set => SetValue(SelectedPlayerProperty, value);
-        }
-
-
-
+        public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", SelectedGameChanged));
+        public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", HostNameChanged));
         public string HostName
         {
             get => (string)GetValue(HostNameProperty);
             set => SetValue(HostNameProperty, value);
         }
+        private static void HostNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as ServiceGameDlg;
+            var depPropValue = (string)e.NewValue;
+            depPropClass?.SetHostName(depPropValue);
+        }
+        private void SetHostName(string value)
+        {
+            Proxy.HostName = value;
+        }
+        public string SelectedGame
+        {
+            get => (string)GetValue(SelectedGameProperty);
+            set => SetValue(SelectedGameProperty, value);
+        }
+        private static void SelectedGameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as ServiceGameDlg;
+            var depPropValue = (string)e.NewValue;
+            depPropClass?.SetSelectedGame(depPropValue);
+        }
+        private void SetSelectedGame(string value)
+        {
+            this.TraceMessage($"Selected Game: {value}");
+        }
+
+
+
+        public string NewGameName
+        {
+            get => (string)GetValue(NewGameNameProperty);
+            set => SetValue(NewGameNameProperty, value);
+        }
+
+
         #endregion
         public ServiceGameDlg()
         {
             this.InitializeComponent();
         }
 
-        public ServiceGameDlg(SavedState savedAppState)
+        public ServiceGameDlg(PlayerModel currentPlayer, List<PlayerModel> players, List<string> games)
         {
             this.InitializeComponent();
-            Players.AddRange(savedAppState.Players); // extension function
-            HostName = savedAppState.ServiceState.HostName;
+            CurrentPlayer = currentPlayer;
+            AllPlayers = players;
+            Games.AddRange(games);
+            if (games.Count > 0)
+            {
+                SelectedGame = games[0];
+            }
+
         }
 
         private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -141,7 +160,6 @@ namespace Catan10
             {
                 using (var proxy = new CatanProxy() { HostName = HostName })
                 {
-
                     List<string> games = await proxy.CreateGame(NewGameName, new GameInfo());
                     Games.Clear();
                     PlayersInGame.Clear();
@@ -156,33 +174,37 @@ namespace Catan10
             {
                 if (!String.IsNullOrEmpty(msg))
                 {
+                    this.Hide();
+                    await StaticHelpers.ShowErrorText(msg);
                     await this.ShowAsync();
                 }
             }
-            if (!string.IsNullOrEmpty(msg))
-            {
-                this.Hide();
-                await StaticHelpers.ShowErrorText(msg);
-            }
+
         }
 
         private async void OnJoin(object sender, RoutedEventArgs re)
         {
             string msg = "";
-            if (PlayerSelectedIndex == -1) return;
+
             try
             {
                 using (var proxy = new CatanProxy() { HostName = HostName })
                 {
-                    var resources = await proxy.JoinGame(SelectedGame, Players[PlayerSelectedIndex].PlayerName);
+                    var resources = await proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
                     if (resources != null)
                     {
                         await GetPlayersInGame();
                         return;
-                                               
-                    }
 
-                    msg = proxy.LastError.Description;
+                    }
+                    if (proxy.LastError != null)
+                    {
+                        msg = proxy.LastError.Description;
+                    }
+                    else
+                    {
+                        msg = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
+                    }
 
                 }
             }
@@ -199,15 +221,10 @@ namespace Catan10
                     await this.ShowAsync();
                 }
             }
-            
+
         }
 
-        private void OnPlayerChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems == null) return;
-            if (e.AddedItems.Count == 0) return;
-            NewPlayer = ((PlayerModel)e.AddedItems[0]).PlayerName;
-        }
+
 
         private async void List_GameChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -222,13 +239,25 @@ namespace Catan10
             if (String.IsNullOrEmpty(SelectedGame)) return;
             try
             {
-                
+
                 using (var proxy = new CatanProxy() { HostName = this.HostName })
                 {
 
                     List<string> users = await proxy.GetUsers(SelectedGame);
                     PlayersInGame.Clear();
-                    PlayersInGame.AddRange(users);
+                    foreach (var p in users)
+                    {
+                        foreach (var pm in AllPlayers)
+                        {
+                            if (pm.PlayerName.ToLower().Trim() == p)
+                            {
+                                PlayersInGame.Add(pm);
+                                break;
+                            }
+                        }
+
+                    }
+
                 }
             }
             catch (Exception e)
@@ -276,8 +305,8 @@ namespace Catan10
             finally
             {
                 if (!string.IsNullOrEmpty(msg))
-                {                    
-                    await StaticHelpers.ShowErrorText(msg);                   
+                {
+                    await StaticHelpers.ShowErrorText(msg);
                 }
                 await this.ShowAsync();
             }

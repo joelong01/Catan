@@ -163,14 +163,14 @@
     <Compile Include="UI Controls\SailboatCtrl.xaml.cs">
       <DependentUpon>SailboatCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settlements and Roads\CityCtrl.xaml.cs">
+    <Compile Include="MainPage\Settlements and Roads\CityCtrl.xaml.cs">
       <DependentUpon>CityCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GameView\TileParsing.cs" />
-    <Compile Include="Settlements and Roads\RoadCtrl.xaml.cs">
+    <Compile Include="MainPage\Settlements and Roads\RoadCtrl.xaml.cs">
       <DependentUpon>RoadCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settlements and Roads\SettlementCtrl.xaml.cs">
+    <Compile Include="MainPage\Settlements and Roads\SettlementCtrl.xaml.cs">
       <DependentUpon>SettlementCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ContentDialogs\SetttingsDlg.xaml.cs">
@@ -225,7 +225,7 @@
     <Compile Include="UI Controls\StopWatchCtrl.xaml.cs">
       <DependentUpon>StopWatchCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settlements and Roads\BuildingCtrl.xaml.cs">
+    <Compile Include="MainPage\Settlements and Roads\BuildingCtrl.xaml.cs">
       <DependentUpon>BuildingCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\TileCtrl.xaml.cs">
@@ -364,15 +364,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settlements and Roads\CityCtrl.xaml">
+    <Page Include="MainPage\Settlements and Roads\CityCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settlements and Roads\RoadCtrl.xaml">
+    <Page Include="MainPage\Settlements and Roads\RoadCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settlements and Roads\SettlementCtrl.xaml">
+    <Page Include="MainPage\Settlements and Roads\SettlementCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -432,7 +432,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Settlements and Roads\BuildingCtrl.xaml">
+    <Page Include="MainPage\Settlements and Roads\BuildingCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -446,7 +446,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>1.0.0</Version>
+      <Version>1.0.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>

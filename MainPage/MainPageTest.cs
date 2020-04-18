@@ -30,14 +30,27 @@ namespace Catan10
         {
             var picker = new PlayerPickerDlg(SavedAppState.Players);
             var result = await picker.ShowAsync();
-            if (result == ContentDialogResult.Primary)
+            if (result != ContentDialogResult.Primary || picker.Player == null)
             {
-                this.TraceMessage($"Selected {picker.Player?.PlayerName}");
+                await StaticHelpers.ShowErrorText("You have to pick a player!  Stop messing around Dodgy!");
+                return;
             }
+            var playingPlayer = picker.Player;
             var proxy = new CatanProxy()
             {
-                HostName = "http://localhost:5000"
+               // HostName = "http://localhost:5000"
+                HostName = "http://jdlgameservice.azurewebsites.net"
             };
+            var existingGames = await proxy.GetGames();
+            foreach (var game in existingGames)
+            {
+                CatanResult r = await proxy.DeleteGame(game);
+                if (r == null)
+                {
+                    this.TraceMessage(proxy.LastErrorString);
+                }
+
+            }
             var gameInfo = new GameInfo();
             string[] gameNames = new string[] { "Game - 1", "Game - 2" };
             List<string> games = null;
@@ -55,18 +68,15 @@ namespace Catan10
                     Debug.Assert(resources != null);
                 }
             }
-            
-            
-            
-            
 
+            var gamesFromService = await proxy.GetGames();
 
-            ServiceGameDlg dlg = new ServiceGameDlg(this.SavedAppState)
+            ServiceGameDlg dlg = new ServiceGameDlg(playingPlayer, SavedAppState.Players, gamesFromService)
             {
                 HostName = proxy.HostName
             };
             await dlg.ShowAsync();
-            this.TraceMessage($"{JsonSerializer.Serialize<PlayerModel>(dlg?.SelectedPlayer)}");
+            this.TraceMessage($"Game: {dlg.SelectedGame}");
 
         }
         private async void OnTest2(object sdr, RoutedEventArgs rea)
