@@ -17,8 +17,7 @@ namespace Catan10
     public sealed partial class RoadCtrl : UserControl
     {
         Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
-        SolidColorBrush _brush = new SolidColorBrush(Colors.Black);
-        SolidColorBrush _hightlightColor = new SolidColorBrush(Colors.Blue);
+        
         public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
 
         public List<RoadKey> Keys { get; set; } = new List<RoadKey>();

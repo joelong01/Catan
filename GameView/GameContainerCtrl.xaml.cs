@@ -249,11 +249,11 @@ namespace Catan10
 
         public TileCtrl[] TilesInIndexOrder => _currentHexPanel.TilesInIndexOrder;
 
-        internal void FlipAllAsync(TileOrientation orientation)
+        public void FlipAllAsync(TileOrientation orientation)
         {
             foreach (TileCtrl tile in _currentHexPanel.Tiles)
             {
-                if (tile.RandomTile)
+                if (tile.RandomGoldEligible)
                 {
                     tile.SetTileOrientationAsync(orientation, 0);
                 }

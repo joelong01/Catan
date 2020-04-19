@@ -1939,7 +1939,7 @@ namespace Catan10
                 TileCtrl tile = new TileCtrl();
                 tile.Deserialize(serilizedTile, false);
                 AllTiles.Add(tile);
-                if (tile.RandomTile == false)
+                if (tile.RandomGoldEligible == false)
                 {
                     tile.SetTileOrientationAsync(TileOrientation.FaceUp);
                 }

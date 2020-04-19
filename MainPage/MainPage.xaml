@@ -76,7 +76,8 @@
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Network Game">
                         <MenuFlyoutItem Text="Set User" Click="OnSetUser" />
-                        <MenuFlyoutItem Text="Join Game" Click="OnJoinGame" />
+                        <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
+                        <!--<MenuFlyoutItem Text="Join Game" Click="OnJoinGame" />-->
                     </MenuFlyoutSubItem>
 
                     <MenuFlyoutSeparator />

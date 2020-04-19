@@ -163,7 +163,7 @@ namespace Catan10
                 }
                 foreach (int idx in changedPlayerModel.HighlightedTiles)
                 {
-                    page.GameContainer.AllTiles[idx].HighlightTile(page.CurrentPlayer.GameData.PlayerColor);
+                    page.GameContainer.AllTiles[idx].HighlightTile(page.CurrentPlayer.GameData.Background);
 
                 }
             }

@@ -4,11 +4,8 @@
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="75"
-    d:DesignWidth="75"
-    IsTabStop="False"
-    RenderTransformOrigin="0.5,0.5"
-    mc:Ignorable="d">
+    d:DesignHeight="75" d:DesignWidth="75" IsTabStop="False"
+    RenderTransformOrigin="0.5,0.5" mc:Ignorable="d">
     <UserControl.Resources />
     <UserControl.RenderTransform>
         <CompositeTransform />
@@ -36,19 +33,15 @@
             <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
 
-        <Ellipse Name="_e0" Grid.RowSpan="5" Grid.ColumnSpan="3" Stroke="White" StrokeThickness="2" Fill="#FF2F6999" Opacity="0.5" />
-        <TextBlock Name="_txtNumber"
-            Grid.RowSpan="1"
-            Grid.Column="1"
-            Margin="7,6"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="12"
-            FontSize="32"
-            FontWeight="Bold"
-            Foreground="#FFF90505" />
+        <Ellipse Name="_e0" Grid.RowSpan="5" Grid.ColumnSpan="3" Stroke="White"
+            StrokeThickness="2" Fill="#FF2F6999" Opacity="0.5" />
+        <TextBlock Name="_txtNumber" Grid.RowSpan="1" Grid.Column="1" Margin="7,6"
+            HorizontalAlignment="Center" VerticalAlignment="Center" Text="12" FontSize="32"
+            FontWeight="Bold" Foreground="#FFF90505" />
 
-        <Grid Name="_oddGrid" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="1" Margin="0" HorizontalAlignment="Center" Visibility="Collapsed">
+        <Grid Name="_oddGrid" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"
+            Grid.ColumnSpan="1" Margin="0" HorizontalAlignment="Center"
+            Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="10" />
@@ -62,7 +55,8 @@
             <Ellipse Grid.Column="3" Margin="1" Fill="White" />
             <Ellipse Grid.Column="4" Margin="1" Fill="White" />
         </Grid>
-        <Grid Name="_evenGrid" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="1" Margin="6,0,5,0" HorizontalAlignment="Center">
+        <Grid Name="_evenGrid" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"
+            Grid.ColumnSpan="1" Margin="6,0,5,0" HorizontalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*" />
                 <RowDefinition />
@@ -79,10 +73,13 @@
                 <ColumnDefinition Width="10" />
             </Grid.ColumnDefinitions>
             <Ellipse Grid.RowSpan="3" Grid.Column="0" Margin="1" Fill="White" />
-            <Ellipse Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="3" Margin="1" Fill="White" />
-            <Ellipse Grid.RowSpan="3" Grid.Column="4" Grid.ColumnSpan="3" Margin="1" Fill="White" />
+            <Ellipse Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="3" Margin="1"
+                Fill="White" />
+            <Ellipse Grid.RowSpan="3" Grid.Column="4" Grid.ColumnSpan="3" Margin="1"
+                Fill="White" />
             <Ellipse Grid.RowSpan="3" Grid.Column="7" Margin="1" Fill="White" />
-            <Rectangle Name="_rectLeftEye" Grid.Row="1" Grid.RowSpan="1" Grid.Column="2" Grid.ColumnSpan="1" Opacity=".8" Stroke="Violet" StrokeThickness="1.0">
+            <Rectangle Name="_rectLeftEye" Grid.Row="1" Grid.RowSpan="1" Grid.Column="2"
+                Grid.ColumnSpan="1" Opacity=".8" Stroke="Violet" StrokeThickness="1.0">
                 <Rectangle.Fill>
                     <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                         <GradientStop Offset="0" Color="Black" />
@@ -90,8 +87,10 @@
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
-            <Ellipse Grid.Row="1" Grid.RowSpan="1" Grid.Column="2" Grid.ColumnSpan="1" Width="2" Height="2" Opacity=".8" Fill="Black" />
-            <Rectangle Name="_rectRightEye" Grid.Row="1" Grid.RowSpan="1" Grid.Column="5" Grid.ColumnSpan="1" Opacity=".8" Stroke="Violet" StrokeThickness="1.0">
+            <Ellipse Grid.Row="1" Grid.RowSpan="1" Grid.Column="2" Grid.ColumnSpan="1"
+                Width="2" Height="2" Opacity=".8" Fill="Black" />
+            <Rectangle Name="_rectRightEye" Grid.Row="1" Grid.RowSpan="1" Grid.Column="5"
+                Grid.ColumnSpan="1" Opacity=".8" Stroke="Violet" StrokeThickness="1.0">
                 <Rectangle.Fill>
                     <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                         <GradientStop Offset="0" Color="Black" />
@@ -99,7 +98,8 @@
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
-            <Ellipse Grid.Row="1" Grid.RowSpan="1" Grid.Column="5" Grid.ColumnSpan="1" Width="2" Height="2" Opacity=".8" Fill="Black" />
+            <Ellipse Grid.Row="1" Grid.RowSpan="1" Grid.Column="5" Grid.ColumnSpan="1"
+                Width="2" Height="2" Opacity=".8" Fill="Black" />
         </Grid>
 
     </Grid>

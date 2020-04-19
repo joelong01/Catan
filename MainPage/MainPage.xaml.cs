@@ -920,7 +920,7 @@ namespace Catan10
             List<TileCtrl> tilesWithNumber = await HighlightRolledTiles(roll);
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                tile.HighlightTile(CurrentPlayer.GameData.PlayerColor); // shows what was rolled                                
+                tile.HighlightTile(CurrentPlayer.GameData.Background); // shows what was rolled                                
             }
 
             if (roll == 7)
@@ -1858,7 +1858,7 @@ namespace Catan10
             await PickSettlementsAndRoads();
         }
 
-      
+       
     }
 }
 

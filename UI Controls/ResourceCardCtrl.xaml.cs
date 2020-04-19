@@ -22,10 +22,16 @@ namespace Catan10
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(ResourceCardCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
         public static readonly DependencyProperty ReadOnlyProperty = DependencyProperty.Register("ReadOnly", typeof(bool), typeof(ResourceCardCtrl), new PropertyMetadata(false, ReadOnlyChanged));
         public static readonly DependencyProperty DevCardTypeProperty = DependencyProperty.Register("DevCardType", typeof(DevCardType), typeof(ResourceCardCtrl), new PropertyMetadata(DevCardType.Unknown, DevCardTypeChanged));
-        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(ResourceCardCtrl), new PropertyMetadata(HarborType.None, HarborTypeChanged));
+        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(ResourceCardCtrl), new PropertyMetadata(HarborType.Sheep, HarborTypeChanged));
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(ResourceCardCtrl), new PropertyMetadata(null, OwnerChanged));
         public static readonly DependencyProperty HarborVisibilityProperty = DependencyProperty.Register("HarborVisibility", typeof(Visibility), typeof(ResourceCardCtrl), new PropertyMetadata(Visibility.Collapsed, HarborVisibilityChanged));
         public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(Visibility), typeof(ResourceCardCtrl), new PropertyMetadata(Visibility.Visible));
+        public static readonly DependencyProperty ShownImageProperty = DependencyProperty.Register("ShownImage", typeof(ImageBrush), typeof(ResourceCardCtrl), new PropertyMetadata(App.Current.Resources["bmResourceCardBack"]));
+        public ImageBrush ShownImage
+        {
+            get => (ImageBrush)GetValue(ShownImageProperty);
+            set => SetValue(ShownImageProperty, value);
+        }
         public Visibility CountVisible
         {
             get => (Visibility)GetValue(CountVisibleProperty);
@@ -86,36 +92,33 @@ namespace Catan10
         private void SetDevCardType(DevCardType value)
         {
             if (value == DevCardType.Unknown) return;
-            string bitmapPath = "ms-appx:Assets/back.jpg";
-            // VictoryPoint, Knight, YearOfPlenty, RoadBuilding, Monopoly
+
             switch (value)
             {
 
                 case DevCardType.VictoryPoint:
-                    bitmapPath = "ms-appx:Assets/DevCards/VictoryPoint.jpg";
+                    ShownImage = (ImageBrush)App.Current.Resources["bmVictoryPoint"];
                     break;
                 case DevCardType.Knight:
-                    bitmapPath = "ms-appx:Assets/DevCards/knight.jpg";
+                    ShownImage = (ImageBrush)App.Current.Resources["bmKnigh"];
                     break;
                 case DevCardType.YearOfPlenty:
-                    bitmapPath = "ms-appx:Assets/DevCards/YearOfPlenty.jpg";
+                    ShownImage = (ImageBrush)App.Current.Resources["bmYearOfPlenty"];
                     break;
                 case DevCardType.RoadBuilding:
-                    bitmapPath = "ms-appx:Assets/DevCards/RoadBuilding.jpg";
+                    ShownImage = (ImageBrush)App.Current.Resources["bmRoadBuilding"];
                     break;
                 case DevCardType.Monopoly:
-                    bitmapPath = "ms-appx:Assets/DevCards/Monopoly.jpg";
+                    ShownImage = (ImageBrush)App.Current.Resources["bmMonopoly"];
                     break;
                 case DevCardType.Back:
-                    bitmapPath = "ms-appx:Assets/DevCards/back.jpg";
+                    ShownImage = (ImageBrush)App.Current.Resources["bmDevCardBack"];
                     break;
                 default:
                     break;
 
             }
-            BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
-            _imgFront.ImageSource = bitmapImage;
-            _imgFront.Stretch = Stretch.UniformToFill;
+
         }
 
 
@@ -221,40 +224,37 @@ namespace Catan10
         }
         private void SetResourceType(ResourceType value)
         {
-            if (value == ResourceType.None) return;
-            string bitmapPath = "ms-appx:Assets/back.jpg";
-            switch (value)
-            {
-                case ResourceType.Sheep:
-                    bitmapPath = "ms-appx:Assets/SquareImages/sheep.png";
-                    break;
-                case ResourceType.Wood:
-                    bitmapPath = "ms-appx:Assets/SquareImages/wood.png";
-                    break;
-                case ResourceType.Ore:
-                    bitmapPath = "ms-appx:Assets/SquareImages/ore.png";
-                    break;
-                case ResourceType.Wheat:
-                    bitmapPath = "ms-appx:Assets/SquareImages/wheat.png";
-                    break;
-                case ResourceType.Brick:
-                    bitmapPath = "ms-appx:Assets/SquareImages/brick.png";
-                    break;
-                case ResourceType.Desert:
-                case ResourceType.None:
-                    bitmapPath = "ms-appx:Assets/SquareImages/back.png";
-                    break;
-                case ResourceType.GoldMine:
-                    bitmapPath = "ms-appx:Assets/SquareImages/gold.png";
-                    break;
-                default:
-                    break;
+            ShownImage = LoadResourceCardImage(value);
+          
+        }
 
-            }
-            BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
-            _imgFront.ImageSource = bitmapImage;
-            _imgFront.Stretch = Stretch.UniformToFill;
+        public static ImageBrush LoadResourceCardImage(ResourceType resource)
+        {
+            
+               
+                switch (resource)
+                {
+                    case ResourceType.Sheep:
+                        return (ImageBrush)App.Current.Resources["bmResourceCardSheep"];
+                    case ResourceType.Wood:
+                        return (ImageBrush)App.Current.Resources["bmResourceCardWood"];
+                    case ResourceType.Ore:
+                        return (ImageBrush)App.Current.Resources["bmResourceCardOre"];
+                    case ResourceType.Wheat:
+                        return (ImageBrush)App.Current.Resources["bmResourceCardWheat"];
+                    case ResourceType.Brick:
+                        return (ImageBrush)App.Current.Resources["bmResourceCardBrick"];
+                    case ResourceType.Back:
+                    case ResourceType.Desert:
+                    case ResourceType.None:
+                        return (ImageBrush)App.Current.Resources["bmResourceCardBack"];
+                    case ResourceType.GoldMine:
+                        return (ImageBrush)App.Current.Resources["bmResourceCardGoldMine"];
+                    default:
+                        throw new Exception($"Unexpected ResourceType {resource} in SetResourceType ");
 
+                }
+            
         }
 
         public void SetOrientationAsync(TileOrientation orientation, double startAfter = 0)

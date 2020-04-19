@@ -16,7 +16,6 @@ using Windows.Storage;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using Windows.System;
-using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -24,6 +23,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Catan.Proxy;
+using Windows.UI;
 
 namespace Catan10
 {
@@ -38,9 +38,10 @@ namespace Catan10
             }
         }
     }
+   
     public static class StaticHelpers
     {
-
+       
         public static Dictionary<string, Color> StringToColorDictionary { get; } = new Dictionary<string, Color>()
         {
             {"Blue", Colors.Blue },
@@ -484,6 +485,28 @@ namespace Catan10
                 dict.Add(prp.Name, value);
             }
             return dict;
+        }
+
+        internal static SolidColorBrush GetResourceBrush(string color)
+        {
+            try
+            {
+                return (SolidColorBrush)App.Current.Resources[$"{color}Brush"];
+            }
+            catch
+            {
+                App.Current.TraceMessage($"Unexpected Color {color} in CreateBrushFromResource ");
+                return (SolidColorBrush)App.Current.Resources["HotPinkBrush"];
+            }
+        }
+
+        public static string GetKnownColorName(string hexString)
+        {
+            var color = (System.Drawing.Color)new System.Drawing.ColorConverter().ConvertFromString(hexString);
+            System.Drawing.KnownColor knownColor = color.ToKnownColor();
+
+            string name = knownColor.ToString();
+            return name.Equals("0") ? "" : name;
         }
 
         //

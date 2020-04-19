@@ -17,7 +17,7 @@ using Catan.Proxy;
 
 namespace Catan10
 {
-  
+
     public class PlayerGameModel : INotifyPropertyChanged
     {
         private bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
@@ -35,7 +35,7 @@ namespace Catan10
         public ObservableCollection<Harbor> OwnedHarbors { get; } = new ObservableCollection<Harbor>();
 
         public PlayerResourceModel PlayerTurnResourceCount { get; set; } = null;
-        private readonly List<string> _savedGameProperties = new List<string> { "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource", 
+        private readonly List<string> _savedGameProperties = new List<string> { "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource",
                                                                                 "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
                                                                                 "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
                                                                                 "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
@@ -434,19 +434,14 @@ namespace Catan10
                 }
             }
         }
-        public SolidColorBrush Foreground { get; private set; } = new SolidColorBrush(Colors.White);  // this is what CastleColor and the like should bind to
-        public SolidColorBrush Background { get; private set; } = new SolidColorBrush(Colors.Green); // this is what "Fill" and the like should bind to
+        public SolidColorBrush Foreground { get; private set; } = (SolidColorBrush)App.Current.Resources["WhiteBrush"];  // this is what CastleColor and the like should bind to
+        public SolidColorBrush Background { get; private set; } = (SolidColorBrush)App.Current.Resources["GreenBrush"]; // this is what "Fill" and the like should bind to
         public Color PlayerColor { get; private set; } = Colors.Green;
 
         private SolidColorBrush CreateBrushFromResource(string color)
         {
-            Color c = Colors.HotPink;
-            if (StaticHelpers.StringToColorDictionary.TryGetValue(color, out c))
-            {
-                return new SolidColorBrush(c);
-            }
+            return StaticHelpers.GetResourceBrush(color);
 
-            return null;
         }
 
 
@@ -534,13 +529,13 @@ namespace Catan10
         {
             get
             {
-                string bitmapPath = "ms-appx:///Assets/dice_dark.svg"; 
+                string bitmapPath = "ms-appx:///Assets/dice_dark.svg";
                 if (UseLightFile)
                 {
                     bitmapPath = "ms-appx:///Assets/dice_light.svg";
                 }
                 BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
-                return bitmapImage;                
+                return bitmapImage;
 
             }
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Catan.Proxy;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -17,9 +18,9 @@ namespace Catan10
 
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
-
-        private SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
-        private SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
+        
+        readonly SolidColorBrush _blackBrush = StaticHelpers.GetResourceBrush("Black");
+        readonly SolidColorBrush _whiteBrush = StaticHelpers.GetResourceBrush("White");
         private TileOrientation _orientation = TileOrientation.FaceDown;
         private bool _useClassic = true;
         private HarborLocation _location = HarborLocation.None;

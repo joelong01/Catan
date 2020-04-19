@@ -28,56 +28,7 @@ namespace Catan10
 
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            var picker = new PlayerPickerDlg(SavedAppState.Players);
-            var result = await picker.ShowAsync();
-            if (picker.Player == null)
-            {
-                await StaticHelpers.ShowErrorText("You have to pick a player!  Stop messing around Dodgy!");
-                return;
-            }
-            var playingPlayer = picker.Player;
-            var proxy = new CatanProxy()
-            {
-               // HostName = "http://localhost:5000"
-                HostName = "http://jdlgameservice.azurewebsites.net"
-            };
-            var existingGames = await proxy.GetGames();
-            foreach (var game in existingGames)
-            {
-                CatanResult r = await proxy.DeleteGame(game);
-                if (r == null)
-                {
-                    this.TraceMessage(proxy.LastErrorString);
-                }
-
-            }
-            var gameInfo = new GameInfo();
-            string[] gameNames = new string[] { "Game - 1", "Game - 2" };
-            List<string> games = null;
-            foreach (var game in gameNames)
-            {
-                await proxy.DeleteGame(game);
-                games = await proxy.CreateGame(game, gameInfo);
-
-                for (int i=0; i<4; i++) 
-                {
-                    var player = SavedAppState.Players[i];
-                    if (player.PlayerName == "Dodgy") continue;
-                    var resources = await proxy.JoinGame(game, player.PlayerName);
-
-                    Debug.Assert(resources != null);
-                }
-            }
-
-            var gamesFromService = await proxy.GetGames();
-
-            ServiceGameDlg dlg = new ServiceGameDlg(playingPlayer, SavedAppState.Players, gamesFromService)
-            {
-                HostName = proxy.HostName
-            };
-            await dlg.ShowAsync();
-            this.TraceMessage($"Game: {dlg.SelectedGame}");
-
+            _gameView.FlipAllAsync(TileOrientation.FaceDown);
         }
         private async void OnTest2(object sdr, RoutedEventArgs rea)
         {

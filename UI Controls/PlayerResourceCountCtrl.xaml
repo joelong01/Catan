@@ -1,61 +1,60 @@
-﻿<UserControl
-    x:Class="Catan10.PlayerResourceCountCtrl"
+﻿<UserControl x:Class="Catan10.PlayerResourceCountCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="SlateBlue"
-    d:DesignHeight="600"
-    d:DesignWidth="615">
+    d:DesignHeight="600" d:DesignWidth="615" Background="SlateBlue" mc:Ignorable="d">
 
-    <Control.Resources>
+    <Control.Resources />
 
-    </Control.Resources>
-
-    <Grid Name="Grid_PlayerResourceCount" >
+    <Grid Name="Grid_PlayerResourceCount">
         <Grid.RowDefinitions>
-            <RowDefinition Height="110"/>
-            <RowDefinition Height="2"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="110" />
+            <RowDefinition Height="2" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="80" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <local:CatanNumber x:Name="_lastRolled" Height="80" NumberStyle="ResoureCount" Number="{x:Bind MainPage.LastRoll, Mode=OneWay}" 
-                           Visibility="{x:Bind MainPage.GameState, FallbackValue=Collapsed, ConverterParameter=WaitingForNext, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToVisibilityConverter}}"
-                           />
+        <local:CatanNumber x:Name="_lastRolled" Height="80" NumberStyle="ResoureCount"
+            Number="{x:Bind MainPage.LastRoll, Mode=OneWay}"
+            Visibility="{x:Bind MainPage.GameState, FallbackValue=Collapsed, ConverterParameter=WaitingForNext, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToVisibilityConverter}}" />
 
-        <StackPanel Name="StackPanel_TotalResourceCount" Orientation="Horizontal" HorizontalAlignment="Center" Grid.RowSpan="1" Grid.Row="0" Grid.Column="1" Margin="0,5,0,0"  VerticalAlignment="Top" 
-                        BorderBrush="{StaticResource bmMaple}" BorderThickness="1" CornerRadius="10">
+        <StackPanel Name="StackPanel_TotalResourceCount" Grid.Row="0" Grid.RowSpan="1"
+            Grid.Column="1" Margin="0,5,0,0" HorizontalAlignment="Center"
+            VerticalAlignment="Top" Orientation="Horizontal"
+            BorderBrush="{StaticResource bmMaple}"
+            BorderThickness="1" CornerRadius="10">
 
-            <local:ResourceCardCtrl ResourceType="Wood"     Count="{x:Bind GlobalResourceCount.Wood, Mode=OneWay,FallbackValue=0}"  x:Name="ResourceCardControl_Wood"     />
-            <local:ResourceCardCtrl ResourceType="Brick"    Count="{x:Bind GlobalResourceCount.Brick, Mode=OneWay,FallbackValue=0}" x:Name="ResourceCardControl_Brick"    />
-            <local:ResourceCardCtrl ResourceType="Sheep"    Count="{x:Bind GlobalResourceCount.Sheep, Mode=OneWay,FallbackValue=0}" x:Name="ResourceCardControl_Sheep"    />
-            <local:ResourceCardCtrl ResourceType="Wheat"    Count="{x:Bind GlobalResourceCount.Wheat, Mode=OneWay,FallbackValue=0}" x:Name="ResourceCardControl_Wheat"    />
-            <local:ResourceCardCtrl ResourceType="Ore"      Count="{x:Bind GlobalResourceCount.Ore, Mode=OneWay,FallbackValue=0}"   x:Name="ResourceCardControl_Ore"      />
-            <local:ResourceCardCtrl ResourceType="GoldMine" Count="{x:Bind GlobalResourceCount.GoldMine, Mode=OneWay,FallbackValue=0}"  x:Name="ResourceCardControl_GoldMine" />
+            <local:ResourceCardCtrl x:Name="ResourceCardControl_Wood" ResourceType="Wood" Count="{x:Bind GlobalResourceCount.Wood, Mode=OneWay, FallbackValue=0}" />
+            <local:ResourceCardCtrl x:Name="ResourceCardControl_Brick" ResourceType="Brick" Count="{x:Bind GlobalResourceCount.Brick, Mode=OneWay, FallbackValue=0}" />
+            <local:ResourceCardCtrl x:Name="ResourceCardControl_Sheep" ResourceType="Sheep" Count="{x:Bind GlobalResourceCount.Sheep, Mode=OneWay, FallbackValue=0}" />
+            <local:ResourceCardCtrl x:Name="ResourceCardControl_Wheat" ResourceType="Wheat" Count="{x:Bind GlobalResourceCount.Wheat, Mode=OneWay, FallbackValue=0}" />
+            <local:ResourceCardCtrl x:Name="ResourceCardControl_Ore" ResourceType="Ore" Count="{x:Bind GlobalResourceCount.Ore, Mode=OneWay, FallbackValue=0}" />
+            <local:ResourceCardCtrl x:Name="ResourceCardControl_GoldMine" ResourceType="GoldMine" Count="{x:Bind GlobalResourceCount.GoldMine, Mode=OneWay, FallbackValue=0}" />
         </StackPanel>
-        <Rectangle Fill="{StaticResource bmMaple}" Grid.Row="1" Margin="5,0,5,0" Grid.ColumnSpan="2"/>
-        <ListBox x:Name="ListBox_PlayerResourceCountList" Grid.Row="2"  ItemsSource="{x:Bind TestPlayers, Mode=OneWay}" 
-                     Background="Transparent" Grid.ColumnSpan="2"
-                     UseSystemFocusVisuals="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" Margin="0,0,0,0" >
+        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Margin="5,0,5,0" Fill="{StaticResource bmMaple}" />
+        <ListBox x:Name="ListBox_PlayerResourceCountList" Grid.Row="2" Grid.ColumnSpan="2"
+            Margin="0,0,0,0"
+            ItemsSource="{x:Bind TestPlayers, Mode=OneWay}"
+            Background="Transparent" UseSystemFocusVisuals="True"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
-                    <Setter Property="Margin" Value="8,10,0,0"/>
+                    <Setter Property="Margin" Value="8,10,0,0" />
                     <Setter Property="Padding" Value="0" />
                 </Style>
             </ListBox.ItemContainerStyle>
-                        
+
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PlayerGameViewCtrl PlayerData ="{x:Bind PlayerDataInstance, Mode=OneWay}" />
+                    <local:PlayerGameViewCtrl PlayerData="{x:Bind PlayerDataInstance, Mode=OneWay}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
-           
+
         </ListBox>
     </Grid>
 </UserControl>

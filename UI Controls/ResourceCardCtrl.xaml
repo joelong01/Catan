@@ -18,10 +18,8 @@
 
 
     <Grid Name="LayoutRoot" Width="70" Height="100">
-        <Grid Name="_gridBack" CornerRadius="10" BorderBrush="White" BorderThickness="1">
-            <Grid.Background>
-                <ImageBrush x:Name="_imgBack" Stretch="Fill" ImageSource="ms-appx:Assets/SquareImages/back.png" />
-            </Grid.Background>
+        <Grid Name="_gridBack" CornerRadius="10" BorderBrush="White" BorderThickness="1"
+            Background="{StaticResource bmResourceCardBack}">
             <Grid.Projection>
                 <PlaneProjection x:Name="_ppBack" RotationY="90" />
             </Grid.Projection>
@@ -29,6 +27,7 @@
         </Grid>
 
         <Grid Name="_gridFront" CornerRadius="10" BorderBrush="Black" BorderThickness="1"
+            Background="{x:Bind ShownImage, Mode=OneWay}"
             Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="15*" />
@@ -37,9 +36,7 @@
             <Grid.Projection>
                 <PlaneProjection x:Name="_ppFront" RotationY="0" />
             </Grid.Projection>
-            <Grid.Background>
-                <ImageBrush x:Name="_imgFront" Stretch="Fill" ImageSource="ms-appx:Assets/SquareImages/brick.png" />
-            </Grid.Background>
+
             <Grid Grid.Row="1" Width="40" Margin="0,1,0,0" VerticalAlignment="Stretch"
                 Background="Green"
                 Visibility="{x:Bind CountVisible, Mode=OneWay}">

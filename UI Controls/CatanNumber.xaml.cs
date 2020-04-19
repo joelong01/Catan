@@ -16,9 +16,10 @@ namespace Catan10
     public sealed partial class CatanNumber : UserControl, INotifyPropertyChanged
     {
         public int Probability { get; set; } = 0; // the number (divided by 36) that represents the probability of this number being rolled
-        SolidColorBrush _redBrush = new SolidColorBrush(Colors.Red);
-        SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
-        SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
+
+        readonly SolidColorBrush _redBrush = StaticHelpers.GetResourceBrush("Red");
+        readonly SolidColorBrush _blackBrush = StaticHelpers.GetResourceBrush("Black");
+        readonly SolidColorBrush _whiteBrush = StaticHelpers.GetResourceBrush("White");
         NumberColorTheme myTheme = NumberColorTheme.Dark;
         public NumberStyle NumberStyle { get; set; } = NumberStyle.Default;
         bool _showEyes = false;

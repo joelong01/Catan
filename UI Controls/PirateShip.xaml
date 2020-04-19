@@ -4,18 +4,16 @@
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="userControl"
-    Width="60"
-    Height="52"
-    HorizontalAlignment="Left"
-    VerticalAlignment="Top"
-    d:DesignHeight="52"
-    d:DesignWidth="60"
-    mc:Ignorable="d">
+    x:Name="userControl" Width="60" Height="52" HorizontalAlignment="Left"
+    VerticalAlignment="Top" d:DesignHeight="52" d:DesignWidth="60" mc:Ignorable="d">
     <UserControl.Resources>
         <Storyboard x:Name="_sbMove">
-            <DoubleAnimation x:Name="_daX" d:IsOptimized="True" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="userControl" To="0" Duration="0:0:1.00" />
-            <DoubleAnimation x:Name="_daY" d:IsOptimized="True" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" Storyboard.TargetName="userControl" To="0" Duration="0:0:1.00" />
+            <DoubleAnimation x:Name="_daX" d:IsOptimized="True"
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
+                Storyboard.TargetName="userControl" To="0" Duration="0:0:1.00" />
+            <DoubleAnimation x:Name="_daY" d:IsOptimized="True"
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
+                Storyboard.TargetName="userControl" To="0" Duration="0:0:1.00" />
         </Storyboard>
     </UserControl.Resources>
 
@@ -23,7 +21,9 @@
         <CompositeTransform />
     </Control.RenderTransform>
 
-    <Grid Name="_pirateShip" Grid.Column="1" Width="60" Height="52" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent">
+    <Grid Name="_pirateShip" Grid.Column="1" Width="60" Height="52"
+        Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top"
+        Background="Transparent">
 
         <Viewbox Width="60" Height="52" Margin="0">
             <Grid HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">

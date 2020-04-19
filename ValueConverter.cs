@@ -72,45 +72,45 @@ namespace Catan10
     /// <summary>
     ///     given a HarborType return the proper image
     /// </summary>
-    public class HarborTypeToHarborBrush : IValueConverter
+    public class HarborTypeToHarborBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             HarborType harbor = (HarborType)value;
-            string bitmapPath = "ms-appx:Assets/back.jpg";
+            
             switch (harbor)
             {
                 case HarborType.ThreeForOne:
-                    bitmapPath = "ms-appx:Assets/Old Visuals/old 3 for 1.png";
-                    break;
-                case HarborType.Brick:
-                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 brick.png";
-                    break;
+                    return App.Current.Resources["bmThreeForOne"];
+               case HarborType.Brick:
+                    return App.Current.Resources["bmTwoForOneBrick"];                    
                 case HarborType.Ore:
-                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 Ore.png";
-                    break;
+                    return App.Current.Resources["bmTwoForOneOre"];
                 case HarborType.Sheep:
-                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 sheep.png";
-                    break;
+                    return App.Current.Resources["bmTwoForOneSheep"];
                 case HarborType.Wood:
-                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 wood.png";
-                    break;
+                    return App.Current.Resources["bmTwoForOneWood"];
                 case HarborType.Wheat:
-                    bitmapPath = "ms-appx:Assets/Old Visuals/old 2 for 1 wheat.png";
-                    break;
+                    return App.Current.Resources["bmTwoForOneWheat"];
                 default:
-                    break;
-            }
-            BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
-            ImageBrush brush = new ImageBrush
-            {
-                AlignmentX = AlignmentX.Left,
-                AlignmentY = AlignmentY.Top,
-                Stretch = Stretch.UniformToFill,
-                ImageSource = bitmapImage
-            };
+                    throw new Exception($"Unexpected Harbor Type {harbor} in value HarborTypeToHarborBrushConverter");                    
+            }          
+        }
 
-            return brush;
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("HarborTypeToHarborBrush cannot be used in a TwoWay binding");
+        }
+    }
+
+
+    public class ResourceTypeToTileBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            ResourceType resource = (ResourceType)value;
+            return TileCtrl.LoadTileImage(resource);
+            
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -205,6 +205,29 @@ namespace Catan10
         {
             RoadState desiredState = StaticHelpers.ParseEnum<RoadState>((string)parameter);
             RoadState actualState = (RoadState)value;
+            if (actualState == desiredState)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
+        }
+    }
+
+    /// <summary>
+    ///     used in the Tile Control for the "small resource type".  this takes a parameter to indicate which state should be Visible and all others should be collapsed
+    ///     parameter is a string
+    /// </summary>
+    public class ResourceTypeToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            ResourceType desiredState = StaticHelpers.ParseEnum<ResourceType>((string)parameter);
+            ResourceType actualState = (ResourceType)value;
             if (actualState == desiredState)
             {
                 return Visibility.Visible;
@@ -507,11 +530,21 @@ namespace Catan10
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+
             if (value == null)
-                return new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+                return StaticHelpers.GetResourceBrush("Transparent");
+
+            string c = StaticHelpers.GetKnownColorName(value.ToString());
+            if (c != "")
+            {
+                return StaticHelpers.GetResourceBrush(c);
+            }
 
             if (value is Color)
+            {
                 return new SolidColorBrush((Color)value);
+            }
+                
 
             if (value is string)
                 return new SolidColorBrush(Parse((string)value));
@@ -523,7 +556,11 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
+
+        
     }
+
+   
 
 
 

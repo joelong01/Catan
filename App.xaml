@@ -7,6 +7,19 @@
         <x:Double x:Key="ContentDialogMaxHeight">800</x:Double>
 
 
+
+        <SolidColorBrush x:Key="BlueBrush" Color="Blue" />
+        <SolidColorBrush x:Key="RedBrush" Color="Red" />
+        <SolidColorBrush x:Key="WhiteBrush" Color="White" />
+        <SolidColorBrush x:Key="YellowBrush" Color="Yellow" />
+        <SolidColorBrush x:Key="GreenBrush" Color="Green" />
+        <SolidColorBrush x:Key="BrownBrush" Color="Brown" />
+        <SolidColorBrush x:Key="DarkGrayBrush" Color="DarkGray" />
+        <SolidColorBrush x:Key="BlackBrush" Color="Black" />
+        <SolidColorBrush x:Key="PurpleBrush" Color="Purple" />
+        <SolidColorBrush x:Key="HotPinkBrush" Color="HotPink" />
+        <SolidColorBrush x:Key="TransparentBrush" Color="Transparent" />
+
         <local:GameStateToBooleanConverter x:Key="GameStateToBooleanConverter" />
         <local:AnimationSpeedValueConverter x:Key="AnimationSpeedValueConverter" />
         <local:TileOrientationToObjectConverter x:Key="TileOrientationToObjectConverter" />
@@ -26,20 +39,49 @@
         <local:CountToOrientationConverter x:Key="CountToOrientationConverter" />
         <local:BuildingStateToVisibilityConverter x:Key="BuildingStateToVisibilityConverter" />
         <local:GameStateToVisibilityConverter x:Key="GameStateToVisibilityConverter" />
-        <local:HarborTypeToHarborBrush x:Key="HarborTypeToHarborBrushConverter" />
+        <local:HarborTypeToHarborBrushConverter x:Key="HarborTypeToHarborBrushConverter" />
+        <local:ResourceTypeToTileBrushConverter x:Key="ResourceTypeToTileBrushConverter" />
         <local:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
         <local:StringToIntConverter x:Key="StringToIntConverter" />
+        <local:ResourceTypeToVisibilityConverter x:Key="ResourceTypeToVisibilityConverter" />
 
-        <ImageBrush x:Key="bmWheat" ImageSource="Assets/Old Visuals/old wheat.png" Stretch="Fill" />
-        <ImageBrush x:Key="bmSheep" ImageSource="Assets/Old Visuals/old sheep.png" Stretch="Fill" />
-        <ImageBrush x:Key="bmOre" ImageSource="Assets/Old Visuals/old ore.png" Stretch="Fill" />
-        <ImageBrush x:Key="bmWood" ImageSource="Assets/Old Visuals/old wood.png" Stretch="Fill" />
-        <ImageBrush x:Key="bmBrick" ImageSource="Assets/Old Visuals/old brick.png" Stretch="Fill" />
-        <ImageBrush x:Key="bmBack" ImageSource="Assets/back.jpg" Stretch="Fill" />
-        <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="Fill" />
-        <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="Fill" />
-        <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="Fill" />
-        <ImageBrush x:Key="bmTwoForOneBrick" ImageSource="Assets/Old Visuals/old 2 for 1 brick.png" Stretch="Fill" />
+
+        <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="UniformToFill" />
+
+
+        <ImageBrush x:Key="bmTileBack" ImageSource="Assets/Tiles/back.jpg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTileBrick" ImageSource="Assets/Tiles/brick.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTileDesert" ImageSource="Assets/Tiles/desert.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTileGoldMine" ImageSource="Assets/Tiles/goldMine.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTileOre" ImageSource="Assets/Tiles/ore.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTileSheep" ImageSource="Assets/Tiles/sheep.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTileWheat" ImageSource="Assets/Tiles/wheat.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTileWood" ImageSource="Assets/Tiles/wood.png" Stretch="UniformToFill" />
+
+        <ImageBrush x:Key="bmTwoForOneBrick" ImageSource="Assets/Harbors/2 for 1 brick.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTwoForOneOre" ImageSource="Assets/Harbors/2 for 1 ore.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTwoForOneSheep" ImageSource="Assets/Harbors/2 for 1 sheep.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTwoForOneWheat" ImageSource="Assets/Harbors/2 for 1 wheat.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmTwoForOneWood" ImageSource="Assets/Harbors/2 for 1 wood.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmThreeForOne" ImageSource="Assets/Harbors/3 for 1.png" Stretch="UniformToFill" />
+
+        <ImageBrush x:Key="bmDevCardBack" ImageSource="Assets/DevCards/back.jpg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmKnight" ImageSource="Assets/DevCards/knight.jpg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmMonopoly" ImageSource="Assets/DevCards/Monopoly.jpg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmRoadBuilding" ImageSource="Assets/DevCards/RoadBuilding.jpg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmVictoryPoint" ImageSource="Assets/DevCards/VictoryPoint.jpg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmYearOfPlenty" ImageSource="Assets/DevCards/YearOfPlenty.jpg" Stretch="UniformToFill" />
+
+        <ImageBrush x:Key="bmResourceCardBack" ImageSource="Assets/ResourceCards/back.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmResourceCardBrick" ImageSource="Assets/ResourceCards/brick.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmResourceCardGoldMine" ImageSource="Assets/ResourceCards/goldMine.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmResourceCardOre" ImageSource="Assets/ResourceCards/ore.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmResourceCardSheep" ImageSource="Assets/ResourceCards/sheep.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmResourceCardWheat" ImageSource="Assets/ResourceCards/wheat.png" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmResourceCardWood" ImageSource="Assets/ResourceCards/wood.png" Stretch="UniformToFill" />
+
 
 
         <Style x:Key="GameControllerStyle" TargetType="Button">

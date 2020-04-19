@@ -15,11 +15,9 @@ using static Catan10.StaticHelpers;
 
 namespace Catan10
 {
-
+   
     public class GridPosition
     {
-        private CompositeTransform ct;
-
         public string Name { get; set; } = "";
         public double TranslateX { get; set; } = 0.0;
         public double TranslateY { get; set; } = 0.0;
@@ -38,11 +36,11 @@ namespace Catan10
 
         public GridPosition() { }
 
-        public GridPosition(string s, CompositeTransform ct) 
+        public GridPosition(string s, CompositeTransform ct)
         {
             Name = s;
             ScaleX = ct.ScaleX;
-            ScaleY = ct.ScaleY;            
+            ScaleY = ct.ScaleY;
             TranslateX = ct.TranslateX;
             TranslateY = ct.TranslateY;
         }
@@ -89,7 +87,7 @@ namespace Catan10
         //  this is the name of the grids in MainPage.xaml that we want to store and retrieve locations
         private string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView" };
 
-        
+
 
         private async Task<List<PlayerModel>> GetDefaultUsers()
         {
@@ -113,7 +111,7 @@ namespace Catan10
             return list;
         }
 
-       private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
 
 
@@ -166,7 +164,7 @@ namespace Catan10
                 HostName = proxy.HostName
             };
             proxy.Dispose();
-            
+
             while (true)
             {
                 await dlg.ShowAsync();
@@ -175,8 +173,8 @@ namespace Catan10
                     dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
                 }
                 if (dlg.ErrorMessage == "") break;
-                
-                await StaticHelpers.ShowErrorText(dlg.ErrorMessage);                               
+
+                await StaticHelpers.ShowErrorText(dlg.ErrorMessage);
             };
             this.TraceMessage($"Game: {dlg.SelectedGame}");
         }
@@ -196,11 +194,11 @@ namespace Catan10
                     UIElement el = (UIElement)this.FindName(name);
                     CompositeTransform ct = (CompositeTransform)el.RenderTransform;
                     GridPosition pos = new GridPosition(name, ct);
-                   
+
                     SavedAppState.Settings.GridPositions.Add(pos);
                 }
 
-                
+
                 await SaveSettings();
             }
             catch (Exception e)
@@ -208,7 +206,7 @@ namespace Catan10
                 this.TraceMessage($"caught the exception: {e}");
             }
         }
-        
+
         private void UpdateGridLocations()
         {
             try
@@ -369,24 +367,24 @@ namespace Catan10
         /// </summary>        
         private void OnNextStep(object sender, RoutedEventArgs e)
         {
-            
+
             if (!MainPageModel.EnableUiInteraction)
             {
                 this.TraceMessage("rejecting call to OnNextStep");
                 return;
             }
-            MainPageModel.EnableUiInteraction = false;            
+            MainPageModel.EnableUiInteraction = false;
             NextState().ContinueWith((b) =>
-               {                   
-                       //
-                       //   need to switch back to the UI thread
-                       _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                     {
+               {
+                   //
+                   //   need to switch back to the UI thread
+                   _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                 {
 
 
-                         MainPageModel.EnableUiInteraction = true;
+                     MainPageModel.EnableUiInteraction = true;
 
-                     });
+                 });
 
                });
         }
@@ -403,24 +401,24 @@ namespace Catan10
             return true;
         }
 
-        
+
         private void OnUndo(object sender, RoutedEventArgs e)
         {
-           if (GameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
+            if (GameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
             {
                 return;
             }
             MainPageModel.EnableUiInteraction = false;
-            
-            OnUndo(true).ContinueWith( (b) =>
-            {
-                _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    MainPageModel.EnableUiInteraction = true;
 
-                });
-            });
-            
+            OnUndo(true).ContinueWith((b) =>
+           {
+               _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+               {
+                   MainPageModel.EnableUiInteraction = true;
+
+               });
+           });
+
         }
         private void OnRedo(object sender, RoutedEventArgs e)
         {
@@ -429,7 +427,7 @@ namespace Catan10
                 return;
             }
             MainPageModel.EnableUiInteraction = false;
-           
+
             OnRedo(true).ContinueWith((o) =>
             {
                 _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -911,61 +909,11 @@ namespace Catan10
 
             return targetList;
         }
-    }
-
-    public class Target
-    {
-        public PlayerModel Player { get; private set; } = null;
-        public TileCtrl Tile { get; private set; } = null;
-        public int ResourcePotential { get; private set; } = 0;
-        public override string ToString()
+        private void OnNewNetworkGame(object sender, RoutedEventArgs e)
         {
-            return $"{Player,-15} | {Tile,-15} | {ResourcePotential}";
-        }
-        public Target(PlayerModel p, TileCtrl t)
-        {
-            Player = p;
-            Tile = t;
-            foreach (var building in Tile.OwnedBuilding)
-            {
-                if (building.BuildingState == BuildingState.Settlement)
-                {
-                    ResourcePotential++;
-                }
-                else if (building.BuildingState == BuildingState.City)
-                {
-                    ResourcePotential += 2;
-                }
-                else
-                {
-                    throw new Exception("This building shouldn't be owned");
-                }
-
-            }
-
-            ResourcePotential *= Tile.Pips;
-
-            if (ResourcePotential > 0)
-            {
-                //
-                //  check to see if this player has 2:1 in a resource from this tile
-
-                foreach (var harbor in Player.GameData.OwnedHarbors)
-                {
-                    if (StaticHelpers.HarborTypeToResourceType(harbor.HarborType) == Tile.ResourceType)
-                    {
-                        ResourcePotential *= 2;
-                    }
-                }
-            }
-
-
-
 
         }
-
-       
-
-
     }
+
+
 }

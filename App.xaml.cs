@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Catan.Proxy;
+using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
@@ -27,6 +29,8 @@ namespace Catan10
 
 
         }
+
+        
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points

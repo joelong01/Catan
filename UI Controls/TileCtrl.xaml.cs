@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
+
     public class TileData
     {
         public TileOrientation TileOrientation { get; set; } = TileOrientation.FaceDown;
@@ -25,23 +26,26 @@ namespace Catan10
 
         public int Number { get; set; } = 0;
         public ResourceType ResourceType { get; set; } = ResourceType.Sea;
-        public int ZIndex { get; set; } = 0;
+        public int zIndex { get; set; } = 0;
         public int Index { get; set; } = -1;
         public bool RandomTile { get; set; } = true;
         public bool ShowIndex { get; set; } = false;
+        public HarborLocation HarborLocation { get; set; } = HarborLocation.None;
+        public HarborType HarborType { get; set; } = HarborType.None;
+        public bool UseClassic { get; set; } = true;
+
+        public int Row { get; set; } = -1;
+        public int Col { get; set; } = -1;
 
 
-
-        private readonly List<string> _savedProperties = new List<string> { "Number", "ResourceType", "TileOrientation", "zIndex", "Index", "RandomTile", "HexOrder", "ShowIndex" };
         public string Serialize(bool oneLine)
         {
-            return StaticHelpers.SerializeObject<TileData>(this, _savedProperties, "=", "|");
+            return CatanProxy.Serialize(this, !oneLine);
         }
-        public bool Deserialize(string s, bool oneLine)
+        public static TileData Deserialize(string json)
         {
 
-            StaticHelpers.DeserializeObject<TileData>(this, s, "=", "|");
-            return true;
+            return CatanProxy.Deserialize<TileData>(json);
         }
 
     }
@@ -52,17 +56,15 @@ namespace Catan10
     public sealed partial class TileCtrl : UserControl, INotifyPropertyChanged, IEqualityComparer<TileCtrl>
     {
 
-        private List<string> _savedProperties = new List<string> { "Number", "ResourceType", "HarborLocation", "HarborType", "TileOrientation", "zIndex", "Index", "HarborLocations", "RandomTile", "HexOrder", "UseClassic", "ShowIndex", "HasPirateShip", "HasBaron" };
-        private SolidColorBrush _blackBrush = new SolidColorBrush(Colors.Black);
-        private SolidColorBrush _whiteBrush = new SolidColorBrush(Colors.White);
-        private TileOrientation _tileOrientation = TileOrientation.FaceDown;
+        private List<string> _savedProperties = new List<string> { "Number", "ResourceType", "HarborLocation", "HarborType", "TileOrientation", "zIndex", "Index", "HarborLocation", "RandomTile", "HexOrder", "UseClassic", "ShowIndex", "HasPirateShip", "HasBaron" };
+
+        
         public bool HasBaron { get; set; } = false;
         public bool HasPirateShip { get; set; } = false;
 
         public List<BuildingCtrl> OwnedBuilding { get; } = new List<BuildingCtrl>(); // this are the settlements that pay if this tile's number is rolled
-        public bool RandomTile { get; set; } = true;
+        public bool RandomGoldEligible { get; set; } = true;  // you don't want the RandomGold to land on a sea tile
 
-        private bool _useClassic = true;
         private int _index = -1;
         private ITileControlCallback _tileControlCallback = null;
         private ResourceType _actingResourceType = ResourceType.Back;
@@ -72,13 +74,77 @@ namespace Catan10
         public int Row { get; set; } = -1;
         public int Col { get; set; } = -1;
 
+        public static readonly DependencyProperty ShownResourceTypeProperty = DependencyProperty.Register("ShownResourceType", typeof(ResourceType), typeof(TileCtrl), new PropertyMetadata(ResourceType.Sheep, ShownResourceTypeChanged));
+        public static readonly DependencyProperty ResourceTypeProperty = DependencyProperty.Register("ResourceType", typeof(ResourceType), typeof(TileCtrl), new PropertyMetadata(ResourceType.None, ResourceTypeChanged));
+        public static readonly DependencyProperty TileOrientationProperty = DependencyProperty.Register("TileOrientation", typeof(TileOrientation), typeof(TileCtrl), new PropertyMetadata(TileOrientation.FaceUp, TileOrientationChanged));
+        public TileOrientation TileOrientation
+        {
+            get => (TileOrientation)GetValue(TileOrientationProperty);
+            set => SetValue(TileOrientationProperty, value);
+        }
+        private static void TileOrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as TileCtrl;
+            var depPropValue = (TileOrientation)e.NewValue;
+            depPropClass?.SetTileOrientation(depPropValue);
+        }
+        private void SetTileOrientation(TileOrientation value)
+        {
+           
+            SetTileOrientationAsync(value);
+        }
+
+        public ResourceType ResourceType
+        {
+            get
+            {
+                if (TemporarilyGold)
+                {
+                    return ResourceType.GoldMine;
+                }
+
+                return (ResourceType)GetValue(ResourceTypeProperty);
+            }
+            set => SetValue(ResourceTypeProperty, value);
+        }
+        private static void ResourceTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as TileCtrl;
+            var depPropValue = (ResourceType)e.NewValue;
+            depPropClass?.SetResourceType(depPropValue);
+        }
+        private void SetResourceType(ResourceType value)
+        {
+            //
+            //    don't protect _resourceType == value because we use that 
+            //    when we change the type of tiles we are using
+            _actingResourceType = value;
+            _normalResourceType = value;
+            ShowMainResourceType(_normalResourceType);
+        }
+
+
+        public ResourceType ShownResourceType
+        {
+            get => (ResourceType)GetValue(ShownResourceTypeProperty);
+            set => SetValue(ShownResourceTypeProperty, value);
+        }
+        private static void ShownResourceTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as TileCtrl;
+            var depPropValue = (ResourceType)e.NewValue;
+            depPropClass?.SetShownResourceType(depPropValue);
+        }
+        private void SetShownResourceType(ResourceType value)
+        {
+
+        }
+
+
         public TileCtrl()
         {
             this.InitializeComponent();
             _ppHexFront.RotationY = 90;
-
-
-            _rectPermResourceType.Visibility = Visibility.Collapsed;
 
         }
 
@@ -88,14 +154,11 @@ namespace Catan10
             {
                 case TileDisplay.Normal:
                     ShowMainResourceType(_normalResourceType);
-                    _actingResourceType = _normalResourceType;
-                    _rectPermResourceType.Visibility = Visibility.Collapsed;
+
                     break;
                 case TileDisplay.Gold:
-                    _rectPermResourceType.Visibility = Visibility.Visible;
-                    _actingResourceType = ResourceType.GoldMine;
+
                     ShowMainResourceType(ResourceType.GoldMine);
-                    ShowSmallResourceType(_normalResourceType);
                     break;
                 default:
                     break;
@@ -106,7 +169,7 @@ namespace Catan10
         {
             get
             {
-                return _rectPermResourceType.Visibility == Visibility.Visible;
+                return ShownResourceType == ResourceType.GoldMine;
             }
             set
             {
@@ -114,63 +177,41 @@ namespace Catan10
                 //  update only if it changes
                 if (value != TemporarilyGold)
                 {
-                    if (value)
-                    {
-                        Show(TileDisplay.Gold);
-                    }
-                    else
-                    {
-                        Show(TileDisplay.Normal);
-                    }
+                    ShownResourceType = (value) ? ResourceType.GoldMine : _normalResourceType;
+
                 }
             }
         }
 
 
 
-        public void ShowSmallResourceType(ResourceType resourceType)
+        public static Brush LoadTileImage(ResourceType resource)
         {
-            string imgKey = "";
-            switch (resourceType)
+            switch (resource)
             {
                 case ResourceType.Sheep:
-                    imgKey = "ms-appx:///Assets/SquareImages/sheep.png";
-                    break;
+                    return (ImageBrush)App.Current.Resources["bmTileSheep"];
                 case ResourceType.Wood:
-                    imgKey = "ms-appx:///Assets/SquareImages/wood.png";
-                    break;
+                    return (ImageBrush)App.Current.Resources["bmTileWood"];
                 case ResourceType.Ore:
-                    imgKey = "ms-appx:///Assets/SquareImages/ore.png";
-                    break;
+                    return (ImageBrush)App.Current.Resources["bmTileOre"];
                 case ResourceType.Wheat:
-                    imgKey = "ms-appx:///Assets/SquareImages/wheat.png";
-                    break;
+                    return (ImageBrush)App.Current.Resources["bmTileWheat"];
                 case ResourceType.Brick:
-                    imgKey = "ms-appx:///Assets/SquareImages/brick.png";
-                    break;
-                case ResourceType.Desert:
-                case ResourceType.Back:
-                case ResourceType.None:
-                case ResourceType.Sea:
+                    return (ImageBrush)App.Current.Resources["bmTileBrick"];
                 case ResourceType.GoldMine:
-                    _rectPermResourceType.Visibility = Visibility.Collapsed;
-                    return;
+                    return (ImageBrush)App.Current.Resources["bmTileGoldMine"];
+                case ResourceType.Desert:
+                    return (ImageBrush)App.Current.Resources["bmTileDesert"];
+                case ResourceType.Back:
+                    return (ImageBrush)App.Current.Resources["bmTileBack"];
+                case ResourceType.Sea:
+                    return (ImageBrush)App.Current.Resources["bmTileSheep"];
+                case ResourceType.None:
+                    return (ImageBrush)App.Current.Resources["TransparentBrush"];
                 default:
-                    break;
+                    throw new Exception($"Unexpected value type in ResourceType {resource} in LoadTileImage");
             }
-
-            ImageSource img = new BitmapImage(new Uri(imgKey));
-            ImageBrush brush = new ImageBrush
-            {
-                AlignmentX = AlignmentX.Left,
-                AlignmentY = AlignmentY.Top,
-                Stretch = Stretch.UniformToFill,
-                ImageSource = img
-            };
-
-            _rectPermResourceType.Fill = brush;
-
-            _rectPermResourceType.Visibility = Visibility.Visible;
         }
 
         //
@@ -207,7 +248,7 @@ namespace Catan10
         internal void Reset()
         {
             OwnedBuilding.Clear();
-            _rectPermResourceType.Visibility = Visibility.Collapsed;
+
         }
 
 
@@ -233,11 +274,7 @@ namespace Catan10
         {
             return string.Format($"{_actingResourceType}={Number};idx={Index}");
         }
-        public TileOrientation TileOrientation
-        {
-            get => _tileOrientation;
-            set => SetTileOrientationAsync(value);
-        }
+        
 
         public int Index
         {
@@ -263,67 +300,23 @@ namespace Catan10
             if (_actingResourceType == ResourceType.Sea)
             {
                 Number = 0;
-                RandomTile = false;
+                RandomGoldEligible = false;
             }
             else
             {
-                RandomTile = true;
+                RandomGoldEligible = true;
             }
 
             _number.ShowEyes = false;
+            ShownResourceType = resourceType;
 
-            string bitmapPath = "ms-appx:Assets/back.jpg";
-
-            switch (resourceType)
-            {
-                case ResourceType.Sheep:
-                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old sheep.png" : "ms-appx:Assets/sheep.jpg";
-                    break;
-                case ResourceType.Wood:
-                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old wood.png" : "ms-appx:Assets/wood.jpg";
-                    break;
-                case ResourceType.Ore:
-                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old ore.png" : "ms-appx:Assets/ore.jpg";
-                    break;
-                case ResourceType.Wheat:
-                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old wheat.png" : "ms-appx:Assets/wheat.jpg";
-                    break;
-                case ResourceType.Brick:
-                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old brick.png" : "ms-appx:Assets/brick.jpg";
-                    break;
-                case ResourceType.None:
-                    bitmapPath = "ms-appx:Assets/back.jpg";
-                    break;
-                case ResourceType.Desert:
-                    bitmapPath = _useClassic ? "ms-appx:Assets/Old Visuals/old desert.png" : "ms-appx:Assets/desert.jpg";
-                    break;
-                case ResourceType.GoldMine:
-                    bitmapPath = "ms-appx:Assets/Old Visuals/gold mine 2.png";
-                    break;
-
-                default:
-                    break;
-
-            }
-            BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
-            _hexFrontBrush.ImageSource = bitmapImage;
-            _hexFrontBrush.Stretch = Stretch.UniformToFill;
-            if (resourceType == ResourceType.Sea)
-            {
-                _hexFront.Stroke = _hexFrontBrush;
-
-            }
-            else
-            {
-                _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
-            }
         }
 
         public bool Highlighted { get; private set; } = false;
 
-        public void HighlightTile(Color playerColor) // you should never see Hotpink!
+        public void HighlightTile(Brush playerBackground) // you should never see Hotpink!
         {
-            _hexFront.Stroke = new SolidColorBrush(playerColor);
+            _hexFront.Stroke = playerBackground;
             Highlighted = true;
         }
 
@@ -331,33 +324,18 @@ namespace Catan10
         {
             if (this.ResourceType == ResourceType.Sea)
             {
-                _hexFront.Stroke = _hexFrontBrush;
+                _hexFront.Stroke = (Brush)App.Current.Resources["bmWater"];
 
             }
             else
             {
-                _hexFront.Stroke = new SolidColorBrush(Colors.BurlyWood);
+                _hexFront.Stroke = (Brush)App.Current.Resources["bmMaple"];
             }
             Highlighted = false;
 
         }
 
-        public ResourceType ResourceType
-        {
-            get => _actingResourceType;
-            set
-            {
-                //
-                //    don't protect _resourceType == value because we use that 
-                //    when we change the type of tiles we are using
-                _actingResourceType = value;
-                _normalResourceType = value;
-                ShowMainResourceType(_normalResourceType);
-                NotifyPropertyChanged();
 
-            }
-
-        }
 
         public void AnimateFade(double opacity, List<Task> tasks)
         {
@@ -387,20 +365,18 @@ namespace Catan10
         }
         public async Task SetTileOrientation(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
-            if (_tileOrientation == orientation)
-            {
-                return;
-            }
+            if (ActualOrientTation == orientation) return;
 
             if (animationDuration == double.MaxValue)
             {
-                animationDuration = 1000;
+                animationDuration = 0;
+            }
+            else
+            {
+                animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
             }
 
-            bool flipToFaceUp = (_tileOrientation == TileOrientation.FaceDown) ? true : false;
-            _tileOrientation = orientation;
-
-            StaticHelpers.SetupFlipAnimation(flipToFaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.Normal), 0);
+            StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, animationDuration, 0);
 
             List<Task> taskList = new List<Task>
             {
@@ -413,12 +389,16 @@ namespace Catan10
 
 
         }
+        private TileOrientation ActualOrientTation
+        {
+            get
+            {
+                return (_ppHexFront.RotationY != 0) ? TileOrientation.FaceDown : TileOrientation.FaceUp;
+            }
+        }
         public void SetTileOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
-            if (_tileOrientation == orientation)
-            {
-                return;
-            }
+            if (ActualOrientTation == orientation) return;
 
             if (animationDuration == double.MaxValue)
             {
@@ -429,11 +409,7 @@ namespace Catan10
                 animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
             }
 
-            bool flipToFaceUp = (_tileOrientation == TileOrientation.FaceDown) ? true : false;
-
-            _tileOrientation = orientation;
-
-            StaticHelpers.SetupFlipAnimation(flipToFaceUp, _daFlipBackTile, _daFlipFrontTile, animationDuration, 0);
+            StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, animationDuration, 0);
 
             _sbFlipTile.Begin();
 
@@ -443,15 +419,10 @@ namespace Catan10
 
         public void SetTileOrientation(TileOrientation orientation, List<Task> taskList, double animationDuration = double.MaxValue)
         {
-            if (orientation == _tileOrientation)
-            {
-                return;
-            }
 
-            bool flipToFaceUp = (_tileOrientation == TileOrientation.FaceDown) ? true : false;
-            _tileOrientation = orientation;
-
-            StaticHelpers.SetupFlipAnimation(flipToFaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.Normal), 0);
+            if (ActualOrientTation == orientation) return;
+            
+            StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.Normal), 0);
 
             taskList.Add(_sbFlipTile.ToTask());
 
