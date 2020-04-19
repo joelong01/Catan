@@ -116,8 +116,8 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CatanService\ServiceClient.cs" />
-    <Compile Include="ContentDialogs\PlayerPicker.xaml.cs">
-      <DependentUpon>PlayerPicker.xaml</DependentUpon>
+    <Compile Include="ContentDialogs\PlayerPickerDlg.xaml.cs">
+      <DependentUpon>PlayerPickerDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="ContentDialogs\ServiceGameDlg.xaml.cs">
       <DependentUpon>ServiceGameDlg.xaml</DependentUpon>
@@ -133,7 +133,6 @@
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\SavedState.cs" />
     <Compile Include="MainPage\webSocket.cs" />
-    <Compile Include="NetworkService.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
     <Compile Include="State\ChangedPlayer.cs" />
     <Compile Include="State\LogHeader.cs" />
@@ -146,6 +145,9 @@
     </Compile>
     <Compile Include="UI Controls\PlayerResourceCountCtrl.xaml.cs">
       <DependentUpon>PlayerResourceCountCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\PrivateDataCtrl.xaml.cs">
+      <DependentUpon>PrivateDataCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\ResourceCardCtrl.xaml.cs">
       <DependentUpon>ResourceCardCtrl.xaml</DependentUpon>
@@ -197,7 +199,7 @@
     <Compile Include="Games\RegularGameCtrl.xaml.cs">
       <DependentUpon>RegularGameCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainPage\GameCommands.cs" />
+    <Compile Include="MainPage\MainPageGameCommands.cs" />
     <Compile Include="MainPage\MainPageUiState.cs" />
     <Compile Include="globaldefs.cs" />
     <Compile Include="UI Controls\Harbor.xaml.cs">
@@ -324,7 +326,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="ContentDialogs\PlayerPicker.xaml">
+    <Page Include="ContentDialogs\PlayerPickerDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -341,6 +343,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\PlayerResourceCountCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\PrivateDataCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -446,7 +452,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>1.0.3</Version>
+      <Version>2020.4.18.212927</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>

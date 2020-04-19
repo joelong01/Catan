@@ -7,8 +7,7 @@
     Width="120" Margin="0" mc:Ignorable="d">
     <Grid Margin="0" Background="{x:Bind Player.GameData.Background, FallbackValue=Blue, Mode=OneWay}" CornerRadius="2">
         <StackPanel Width="120">
-            <Rectangle Grid.Row="1" Height="100" Margin="5"
-                Fill="{x:Bind Player.ImageBrush, Mode=OneWay}"/>
+            <Rectangle Grid.Row="1" Height="100" Margin="5" Fill="{x:Bind Player.ImageBrush, Mode=OneWay}" />
             <TextBlock Margin="0,0,0,5" HorizontalAlignment="Center" FontSize="22"
                 Text="{x:Bind Player.PlayerName, FallbackValue=Nameless, Mode=OneWay}"
                 Foreground="{x:Bind Player.GameData.Foreground, Mode=OneWay}" />

@@ -51,5 +51,11 @@ namespace Catan10
         {
             this.TraceMessage($"{((PlayerModel)e.AddedItems[0])?.PlayerName}");
         }
+
+        private void OnPlayerPicDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+          
+            this.Hide();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Catan.Proxy;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -247,8 +248,8 @@ namespace Catan10
 
 
 
-    public enum DevCardType { Knight, VictoryPoint, YearOfPlenty, RoadBuilding, Monopoly, Unknown, Back };
-    public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, Desert, Back, None, Sea, GoldMine };
+    
+    
     public enum TileOrientation { FaceDown, FaceUp, None };
     public enum HarborType { Sheep, Wood, Ore, Wheat, Brick, ThreeForOne, Uninitialized, None };
     public enum HarborLocation { None = 0x00000000, TopRight = 0x00100000, TopLeft = 0x00010000, BottomRight = 0x00001000, BottomLeft = 0x00000100, Top = 0x00000010, Bottom = 0x00000001 };
@@ -275,91 +276,22 @@ namespace Catan10
         public List<GridPosition> GridPositions { get; set; } = new List<GridPosition>();
 
         
-        readonly string[] _settings = new string[] { "FadeSeconds", "AnimateFade", "RotateTile", "Zoom", "ShowStopwatch", "UseClassicTiles", "AnimationSpeed", "ResourceTracking", "UseRandomNumbers", "ValidateBuilding", };
+       
 
         public Settings()
         {
-            //RotateTile = false;
-            //AnimateFade = true;
-            //FadeSeconds = 5;
-            //Zoom = 1.0;
-            //UseClassicTiles = true;
-            //AnimationSpeed = 3;
-            //ShowStopwatch = true;
-            //ResourceTracking = true;
+       
         }
         public string Serialize()
         {
-            string settings = StaticHelpers.SerializeObject<Settings>(this, _settings, "=", StaticHelpers.lineSeperator);
-            string gridPositions = "";
-            foreach (GridPosition gp in GridPositions)
-            {
-                gridPositions += gp.Serialize() + "\r\n";
-            }
-            string toSave = string.Format($"[Settings]\r\n{settings}\n[GridPositions]\r\n{gridPositions}");
-            return toSave;
+            return CatanProxy.Serialize(this);
         }
 
-        public bool Deserialize(string s)
+        public static Settings Deserialize(string s)
         {
-            Dictionary<string, string> sections = StaticHelpers.GetSections(s);
-            StaticHelpers.DeserializeObject<Settings>(this, sections["Settings"], "=", StaticHelpers.lineSeperator);
-            string[] positions = sections["GridPositions"].Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            GridPositions.Clear();
-            foreach (string line in positions)
-            {
-                GridPosition gp = new GridPosition(line);
-                GridPositions.Add(gp);
 
-            }
-            return true;
+            return CatanProxy.Deserialize<Settings>(s);
         }
-
-        public async Task LoadSettings(string filename)
-        {
-            try
-            {
-                StorageFolder folder = await StaticHelpers.GetSaveFolder();
-                StorageFile file = await folder.GetFileAsync(filename);
-                string contents = await FileIO.ReadTextAsync(file);
-                Deserialize(contents);
-            }
-            catch
-            {
-
-            }
-        }
-
-        public async Task SaveSettings(string filename)
-        {
-            try
-            {
-
-                string saveString = Serialize();
-                if (saveString == "")
-                {
-                    return;
-                }
-
-                StorageFolder folder = await StaticHelpers.GetSaveFolder();
-                CreationCollisionOption option = CreationCollisionOption.ReplaceExisting;
-                StorageFile file = await folder.CreateFileAsync(filename, option);
-                await FileIO.WriteTextAsync(file, saveString);
-
-
-            }
-            catch (Exception exception)
-            {
-
-                string s = StaticHelpers.GetErrorMessage($"Error saving to file {filename}", exception);
-                await StaticHelpers.ShowErrorText(s);
-
-            }
-        }
-
-
-
-
 
     }
 

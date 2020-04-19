@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="Catan10.PrivateDataCtrl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10" xmlns:proxy="using:Catan.Proxy"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="300" d:DesignWidth="600" mc:Ignorable="d">
+   
+   
+    <Grid Width="600" Height="300" Background="{StaticResource bmCherry}" CornerRadius="10"  PointerPressed="OnPointerPressed">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40*" />
+            <ColumnDefinition Width="10*" />
+        </Grid.ColumnDefinitions>
+        <Rectangle Fill="Black" Grid.ColumnSpan="2" StrokeThickness="0" Stroke="Black" />
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="1" Margin="5,5,0,0">
+            <StackPanel Orientation="Horizontal">
+                <local:ResourceCardCtrl Margin="0" ResourceType="Wood" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.Wood, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Brick" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.Brick, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Wheat" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.Wheat, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Sheep" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.Sheep, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Ore" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.Ore, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="49,0,0,0" ResourceType="GoldMine" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.GoldMine, Mode=OneWay}" />
+            </StackPanel>
+            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                <local:ResourceCardCtrl DevCardType="VictoryPoint" Orientation="FaceUp" ReadOnly="True" Count="{x:Bind PlayerResources.VictoryPoints, Mode=OneWay}" />
+                <local:ResourceCardCtrl DevCardType="Knight" Orientation="FaceUp" ReadOnly="True" />
+                <local:ResourceCardCtrl DevCardType="YearOfPlenty" Orientation="FaceUp" ReadOnly="True" />
+                <local:ResourceCardCtrl DevCardType="Monopoly" Orientation="FaceUp" ReadOnly="True" />
+                <local:ResourceCardCtrl DevCardType="RoadBuilding" Orientation="FaceUp" ReadOnly="True" />
+            </StackPanel>
+        </StackPanel>
+        <ListBox Grid.Column="1" Grid.Row="1" Background="{StaticResource bmMaple}" ItemsSource="{x:Bind PlayedDevCards}">
+            <DataTemplate x:DataType="proxy:DevCardType">
+                <local:ResourceCardCtrl DevCardType="{x:Bind}" Orientation="FaceUp" ReadOnly="True" CountVisible="Collapsed" />
+            </DataTemplate>   
+             <ListBox.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="5" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            
+        </ListBox>
+    </Grid>
+</UserControl>

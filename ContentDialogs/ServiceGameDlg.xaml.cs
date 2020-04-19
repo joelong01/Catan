@@ -34,6 +34,7 @@ namespace Catan10
     public sealed partial class ServiceGameDlg : ContentDialog
     {
         #region properties
+        public string ErrorMessage { get; set; }
         private CatanProxy Proxy { get; } = new CatanProxy();
         private PlayerModel CurrentPlayer { get; set; } = null;
         private List<PlayerModel> AllPlayers { get; set; } = null;
@@ -84,6 +85,7 @@ namespace Catan10
             get => (string)GetValue(NewGameNameProperty);
             set => SetValue(NewGameNameProperty, value);
         }
+        
 
 
         #endregion
@@ -122,7 +124,7 @@ namespace Catan10
 
         private async Task GetGames()
         {
-            string msg = "";
+            ErrorMessage = "";
             try
             {
                 using (var proxy = new CatanProxy() { HostName = HostName })
@@ -136,26 +138,14 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                msg = e.Message;
+                ErrorMessage = e.Message;
             }
-
-            finally
-            {
-                if (!String.IsNullOrEmpty(msg))
-                {
-                    await this.ShowAsync();
-                }
-            }
-            if (!string.IsNullOrEmpty(msg))
-            {
-                this.Hide();
-                await StaticHelpers.ShowErrorText(msg);
-            }
+           
         }
 
         private async void OnNew(object sender, RoutedEventArgs re)
         {
-            string msg = "";
+            ErrorMessage = "";
             try
             {
                 using (var proxy = new CatanProxy() { HostName = HostName })
@@ -168,24 +158,14 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                msg = e.Message;
-            }
-            finally
-            {
-                if (!String.IsNullOrEmpty(msg))
-                {
-                    this.Hide();
-                    await StaticHelpers.ShowErrorText(msg);
-                    await this.ShowAsync();
-                }
+                ErrorMessage = e.Message;
             }
 
         }
 
         private async void OnJoin(object sender, RoutedEventArgs re)
         {
-            string msg = "";
-
+            ErrorMessage = "";
             try
             {
                 using (var proxy = new CatanProxy() { HostName = HostName })
@@ -199,28 +179,20 @@ namespace Catan10
                     }
                     if (proxy.LastError != null)
                     {
-                        msg = proxy.LastError.Description;
+                        ErrorMessage = proxy.LastError.Description;
                     }
                     else
                     {
-                        msg = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
+                        ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
                     }
 
                 }
             }
             catch (Exception e)
             {
-                msg = e.Message;
+                ErrorMessage = e.Message;
             }
-            finally
-            {
-                if (!string.IsNullOrEmpty(msg))
-                {
-                    this.Hide();
-                    await StaticHelpers.ShowErrorText(msg);
-                    await this.ShowAsync();
-                }
-            }
+
 
         }
 
@@ -235,7 +207,7 @@ namespace Catan10
 
         private async Task GetPlayersInGame()
         {
-            string msg = "";
+            ErrorMessage = "";
             if (String.IsNullOrEmpty(SelectedGame)) return;
             try
             {
@@ -262,23 +234,13 @@ namespace Catan10
             }
             catch (Exception e)
             {
-
-                msg = e.Message;
-            }
-            finally
-            {
-                if (!string.IsNullOrEmpty(msg))
-                {
-                    this.Hide();
-                    await StaticHelpers.ShowErrorText(msg);
-                    await this.ShowAsync();
-                }
+                ErrorMessage = e.Message;
             }
         }
 
         private async void OnDelete(object sender, RoutedEventArgs re)
         {
-            string msg = "";
+            ErrorMessage = "";
             if (String.IsNullOrEmpty(SelectedGame)) return;
             try
             {
@@ -292,7 +254,7 @@ namespace Catan10
                     var result = await proxy.DeleteGame(SelectedGame);
                     if (result == null)
                     {
-                        msg = proxy.LastError?.Description;
+                        ErrorMessage = proxy.LastError?.Description;
                     }
                     PlayersInGame.Clear();
                     await GetGames();
@@ -300,15 +262,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                msg = e.Message;
-            }
-            finally
-            {
-                if (!string.IsNullOrEmpty(msg))
-                {
-                    await StaticHelpers.ShowErrorText(msg);
-                }
-                await this.ShowAsync();
+                ErrorMessage = e.Message;
             }
         }
     }

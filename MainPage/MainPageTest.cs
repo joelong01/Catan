@@ -30,7 +30,7 @@ namespace Catan10
         {
             var picker = new PlayerPickerDlg(SavedAppState.Players);
             var result = await picker.ShowAsync();
-            if (result != ContentDialogResult.Primary || picker.Player == null)
+            if (picker.Player == null)
             {
                 await StaticHelpers.ShowErrorText("You have to pick a player!  Stop messing around Dodgy!");
                 return;

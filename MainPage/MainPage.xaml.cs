@@ -23,6 +23,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Catan.Proxy;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -33,7 +34,7 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-
+        public PlayerModel TheHuman { get; set; } = null;
         public SavedState SavedAppState { get; set; } = null;        
         private int _supplementalStartIndex = -1;
         public static readonly string SAVED_GAME_EXTENSION = ".log";
@@ -1459,13 +1460,15 @@ namespace Catan10
 
         }
 
-        private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
+        private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
-            GrowOrShrink(ControlGrid);
+            await GrowOrShrink(ControlGrid);
+            
         }
 
-        private void GrowOrShrink(UIElement el)
+        private async Task GrowOrShrink(UIElement el)
         {
+            
             CompositeTransform ct = el.RenderTransform as CompositeTransform;
             if (ct.ScaleX == .5)
             {
@@ -1477,11 +1480,13 @@ namespace Catan10
                 ct.ScaleX = .5;
                 ct.ScaleY = .5;
             }
+
+            await SaveGridLocations();
         }
 
-        private void OnGrowOrShrinkRolls(object sender, RoutedEventArgs e)
+        private async void OnGrowOrShrinkRolls(object sender, RoutedEventArgs e)
         {
-            GrowOrShrink(RollGrid);
+           await GrowOrShrink(RollGrid);
         }
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
@@ -1853,7 +1858,7 @@ namespace Catan10
             await PickSettlementsAndRoads();
         }
 
-
+      
     }
 }
 

@@ -11,6 +11,7 @@ namespace Catan10
     {
         public string HostName { get; set; } = "https://localhost:5000";
         public string DefaultUser { get; set; } = "";
+        public ServiceState(){}
     }
 
 
@@ -23,7 +24,7 @@ namespace Catan10
         
         public ServiceState ServiceState { get; set; } = new ServiceState();
         #endregion
-
+        public SavedState() { }
 
     }
 

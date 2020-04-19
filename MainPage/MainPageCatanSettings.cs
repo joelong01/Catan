@@ -217,6 +217,8 @@ namespace Catan10
             {
                 pos.TranslateX = 0;
                 pos.TranslateY = 0;
+                pos.ScaleX = 1.0;
+                pos.ScaleY = 1.0;
             }
 
             UpdateGridLocations();

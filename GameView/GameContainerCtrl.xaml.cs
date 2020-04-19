@@ -1,15 +1,13 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading;
+
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Networking.Sockets;
-using Windows.Storage.Streams;
+using Catan.Proxy;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;

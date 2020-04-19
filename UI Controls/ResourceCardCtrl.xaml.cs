@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+using Catan.Proxy;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;

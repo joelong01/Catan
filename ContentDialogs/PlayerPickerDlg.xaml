@@ -24,7 +24,9 @@
             IsHitTestVisible="True" SingleSelectionFollowsFocus="True">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PlayerPickerItemCtrl Player="{x:Bind This}" ShowCheckBox="False" ForegroundColor="#FFFC0000" FocusVisualPrimaryBrush="HotPink" />
+                    <local:PlayerPickerItemCtrl Player="{x:Bind This}"
+                        ShowCheckBox="False" ForegroundColor="#FFFC0000"
+                        FocusVisualPrimaryBrush="HotPink" DoubleTapped="OnPlayerPicDoubleTapped" />
                 </DataTemplate>
             </GridView.ItemTemplate>
             <GridView.ItemContainerStyle>

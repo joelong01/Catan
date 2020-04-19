@@ -4,9 +4,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Catan10"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Service Game" Width="1110" Height="750" MinWidth="1110" 
+    Title="Service Game" Width="1110" Height="750" MinWidth="1110"
     MinHeight="750" PrimaryButtonClick="OnOk" PrimaryButtonText="Close"
-    SecondaryButtonClick="OnCancel" SecondaryButtonText="Cancel" mc:Ignorable="d">
+    mc:Ignorable="d">
     <ContentDialog.Resources>
         <Style x:Key="BtnStyle" TargetType="Button">
             <Setter Property="Margin" Value="10,0,0,10" />
@@ -35,7 +35,7 @@
             <ColumnDefinition Width="100*" />
             <ColumnDefinition Width="35*" />
         </Grid.ColumnDefinitions>
-        <Rectangle Grid.RowSpan="6" Grid.ColumnSpan="4"  HorizontalAlignment="Stretch"
+        <Rectangle Grid.RowSpan="6" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
             Fill="{StaticResource bmCherry}"
             RadiusX="168.5" RadiusY="168.5"
             Stroke="{StaticResource bmMaple}"
@@ -43,18 +43,19 @@
         <Rectangle Grid.Row="0" Grid.RowSpan="6" Grid.Column="1" Grid.ColumnSpan="2"
             Margin="0,10,0,10"
             Fill="{StaticResource bmMaple}" />
-        <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Margin="0,10,0,10"
+        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,10,0,10" HorizontalAlignment="Center"
             VerticalAlignment="Center" Text="Games" FontFamily="Segoe UI" FontSize="32"
             Foreground="Black" />
         <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"
             VerticalAlignment="Center" Text="Players" FontFamily="Segoe UI" FontSize="32"
             Foreground="Black" />
-        <Viewbox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="0,0,0,0">
+        <Viewbox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,0"
+            HorizontalAlignment="Stretch">
             <StackPanel Margin="0,0,0,0" Orientation="Horizontal" BorderBrush="Black" BorderThickness="0">
                 <TextBlock Margin="5,0,15,0" VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="36"
                     Text="Game Name: " Foreground="Black" />
-                <TextBox Width="250"  HorizontalAlignment="Stretch" FontFamily="Segoe UI"
-                    FontSize="52" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"
+                <TextBox Width="250" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="52"
                     Text="{x:Bind NewGameName, Mode=TwoWay}"
                     Foreground="Black" BorderBrush="Black" />
                 <Button Margin="0,0,0,0" HorizontalAlignment="Left" Click="OnNew">
@@ -69,8 +70,8 @@
                 </Button>
             </StackPanel>
         </Viewbox>
-        <StackPanel Grid.Row="2" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="1" HorizontalAlignment="Center"
-            Margin="15,0,10,0">
+        <StackPanel Grid.Row="2" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="1"
+            Margin="15,0,10,0" HorizontalAlignment="Center">
             <Button Style="{StaticResource BtnStyle}" Click="OnRefresh">
                 <Button.Content>
                     <StackPanel Style="{StaticResource StkPnlStyle}">
@@ -107,8 +108,8 @@
             Orientation="Horizontal" Canvas.ZIndex="99">
             <TextBlock Margin="5,0,15,0" VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="32"
                 Text="Host: " Foreground="Black" />
-            <TextBox Width="500" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,15,0,10"
-                FontFamily="Segoe UI" FontSize="22"
+            <TextBox Width="500" Margin="0,15,0,10" HorizontalAlignment="Right"
+                VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="22"
                 Text="{x:Bind HostName, Mode=TwoWay}" />
         </StackPanel>
         <ListBox Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="5"
