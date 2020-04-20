@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Catan.Proxy;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -225,36 +226,88 @@ namespace Catan10
         private void SetResourceType(ResourceType value)
         {
             ShownImage = LoadResourceCardImage(value);
-          
+
         }
 
-        public static ImageBrush LoadResourceCardImage(ResourceType resource)
-        {
-            
-               
-                switch (resource)
-                {
-                    case ResourceType.Sheep:
-                        return (ImageBrush)App.Current.Resources["bmResourceCardSheep"];
-                    case ResourceType.Wood:
-                        return (ImageBrush)App.Current.Resources["bmResourceCardWood"];
-                    case ResourceType.Ore:
-                        return (ImageBrush)App.Current.Resources["bmResourceCardOre"];
-                    case ResourceType.Wheat:
-                        return (ImageBrush)App.Current.Resources["bmResourceCardWheat"];
-                    case ResourceType.Brick:
-                        return (ImageBrush)App.Current.Resources["bmResourceCardBrick"];
-                    case ResourceType.Back:
-                    case ResourceType.Desert:
-                    case ResourceType.None:
-                        return (ImageBrush)App.Current.Resources["bmResourceCardBack"];
-                    case ResourceType.GoldMine:
-                        return (ImageBrush)App.Current.Resources["bmResourceCardGoldMine"];
-                    default:
-                        throw new Exception($"Unexpected ResourceType {resource} in SetResourceType ");
 
-                }
-            
+        //private Dictionary<ResourceType, ImageBrush> _imageCache = new Dictionary<ResourceType, ImageBrush>();
+        //public ImageBrush LoadCachedResourceCardImage(ResourceType resourceType)
+        //{
+        //    if (_imageCache.TryGetValue(resourceType, out ImageBrush cachedBrush))
+        //    {
+        //        return cachedBrush;
+        //    }
+        //    string bitmapPath;
+        //    switch (resourceType)
+        //    {
+
+        //        case ResourceType.Sheep:
+        //            bitmapPath = "ms-appx:Assets/SquareImages/sheep.png";
+        //            break;
+        //        case ResourceType.Wood:
+        //            bitmapPath = "ms-appx:Assets/SquareImages/wood.png";
+        //            break;
+        //        case ResourceType.Ore:
+        //            bitmapPath = "ms-appx:Assets/SquareImages/ore.png";
+        //            break;
+        //        case ResourceType.Wheat:
+        //            bitmapPath = "ms-appx:Assets/SquareImages/wheat.png";
+        //            break;
+        //        case ResourceType.Brick:
+        //            bitmapPath = "ms-appx:Assets/SquareImages/brick.png";
+        //            break;
+        //        case ResourceType.GoldMine:
+        //            bitmapPath = "ms-appx:Assets/SquareImages/gold.png";
+        //            break;
+        //        case ResourceType.Desert:
+        //        case ResourceType.None:
+        //        default:
+        //            bitmapPath = "ms-appx:Assets/SquareImages/back.png";
+        //            break;
+
+        //    }
+        //    BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
+
+        //    var brush = new ImageBrush()
+        //    {
+        //        ImageSource = bitmapImage
+        //    };
+
+        //    _imageCache[resourceType] = brush;
+        //    return brush;
+
+        //}
+
+        public ImageBrush LoadResourceCardImage(ResourceType resource)
+        {
+            //if (StaticHelpers.IsInVisualStudioDesignMode)
+            //{
+            //    return LoadCachedResourceCardImage(resource);
+            //}
+
+            switch (resource)
+            {
+                case ResourceType.Sheep:
+                    return (ImageBrush)App.Current.Resources["bmResourceCardSheep"];
+                case ResourceType.Wood:
+                    return (ImageBrush)App.Current.Resources["bmResourceCardWood"];
+                case ResourceType.Ore:
+                    return (ImageBrush)App.Current.Resources["bmResourceCardOre"];
+                case ResourceType.Wheat:
+                    return (ImageBrush)App.Current.Resources["bmResourceCardWheat"];
+                case ResourceType.Brick:
+                    return (ImageBrush)App.Current.Resources["bmResourceCardBrick"];
+                case ResourceType.Back:
+                case ResourceType.Desert:
+                case ResourceType.None:
+                    return (ImageBrush)App.Current.Resources["bmResourceCardBack"];
+                case ResourceType.GoldMine:
+                    return (ImageBrush)App.Current.Resources["bmResourceCardGoldMine"];
+                default:
+                    throw new Exception($"Unexpected ResourceType {resource} in SetResourceType ");
+
+            }
+
         }
 
         public void SetOrientationAsync(TileOrientation orientation, double startAfter = 0)

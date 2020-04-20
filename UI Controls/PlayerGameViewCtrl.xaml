@@ -6,10 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="userControl" d:DesignHeight="242.333" d:DesignWidth="605"
     mc:Ignorable="d">
-    <Border CornerRadius="30,10,10,10" BorderThickness="1">
-        <Border.BorderBrush>
-            <ImageBrush Stretch="Fill" ImageSource="ms-appx:///Assets/maple.jpg" />
-        </Border.BorderBrush>
+    <Border Margin="-2" CornerRadius="30,15,15,10" BorderThickness="4" BorderBrush="{StaticResource bmMaple}">
+
         <Grid Width="605" Background="{x:Bind PlayerData.GameData.Background, Mode=OneWay}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="60" />
@@ -25,9 +23,10 @@
             </Grid.ColumnDefinitions>
 
 
-
+            <!--  Player Picture:  Picture doesn't show up in the designer  -->
             <Ellipse Grid.RowSpan="2" Grid.ColumnSpan="2" Width="55" Height="55"
-                HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.ZIndex="999"
+                Margin="1,1,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                Canvas.ZIndex="999"
                 Tag="{x:Bind PlayerData, Mode=OneTime}"
                 IsTapEnabled="True"
                 Ellipse.Fill="{x:Bind PlayerData.ImageBrush, FallbackValue=HotPink, Mode=OneWay}"
@@ -35,10 +34,10 @@
 
             <!--  Top Row with resource tracking  -->
             <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Height="44"
-                Margin="1,1,3,0" VerticalAlignment="Stretch" Orientation="Horizontal"
+                Margin="3,0,5,0" VerticalAlignment="Stretch" Orientation="Horizontal"
                 BorderBrush="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
-                BorderThickness="1" CornerRadius="5">
-                <!--  Player Picture:  Picture doesn't show up in the designer  -->
+                BorderThickness="1" CornerRadius="6">
+
 
                 <Viewbox>
                     <Button Margin="0,-5,0,-5">
@@ -347,7 +346,7 @@
 
 
                 <!--  Card Stats  -->
-                <StackPanel Grid.RowSpan="5" Grid.Column="2" Margin="2" Background="Transparent"
+                <StackPanel Grid.RowSpan="5" Grid.Column="2" Margin="2,2,6,-3" Background="Transparent"
                     BorderBrush="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
                     BorderThickness="1" CornerRadius="11">
 

@@ -50,12 +50,11 @@
 
 
 
-    <Grid x:Name="ContentRoot" PointerWheelChanged="OnScrollMouseWheel">
-
-        <Rectangle Fill="{StaticResource bmCherry}"
-            RadiusX="50" RadiusY="50"
-            Stroke="{StaticResource bmMaple}"
-            StrokeThickness="4" Visibility="Visible" />
+    <Grid x:Name="ContentRoot" PointerWheelChanged="OnScrollMouseWheel"
+        Background="{StaticResource bmCherry}"
+        CornerRadius="50"
+        BorderBrush="{StaticResource bmMaple}"
+        BorderThickness="6">
 
 
         <Button Visibility="Collapsed">
@@ -157,7 +156,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Rectangle Grid.Row="0" Fill="{x:Bind FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.GameData.Background}" Stroke="White" StrokeThickness="1" />
+            <Rectangle Grid.Row="0" Fill="{x:Bind FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.GameData.Background}" Stroke="{StaticResource WhiteBrush}" StrokeThickness="1" />
             <Viewbox HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Button Background="Transparent" Click="OnGrowOrShrinkControls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" />
             </Viewbox>
@@ -167,7 +166,7 @@
 
             </Viewbox>
 
-            <Border Grid.Row="1" BorderBrush="White" BorderThickness="1">
+            <Border Grid.Row="1" BorderBrush="{StaticResource WhiteBrush}" BorderThickness="1">
 
                 <StackPanel Margin="0" Orientation="Vertical" Background="Black">
 
@@ -247,7 +246,9 @@
         </Grid>
 
         <Grid Name="RollGrid" Width="300" Height="450" Margin="0"
-            HorizontalAlignment="Left" VerticalAlignment="Bottom" BorderBrush="White"
+            HorizontalAlignment="Left" VerticalAlignment="Bottom"
+            Background="{StaticResource BlackBrush}"
+            BorderBrush="{StaticResource WhiteBrush}"
             PointerPressed="OnPointerPressed" BorderThickness="1" IsHitTestVisible="True">
             <Grid.RenderTransform>
                 <CompositeTransform TranslateX="-0" ScaleX="1" ScaleY="1" />
@@ -264,7 +265,7 @@
             <Viewbox Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Button Click="OnGrowOrShrinkRolls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" />
             </Viewbox>
-            <Rectangle Grid.Row="1" Stroke="White" StrokeThickness="1" Fill="Black" />
+
             <Viewbox Grid.Row="1" Height="400" Margin="0" HorizontalAlignment="Stretch">
 
                 <StackPanel>
@@ -387,7 +388,7 @@
         </Grid>
 
         <Grid Name="_savedGameGrid" Grid.Row="1" Width="383" Height="280"
-            Margin="0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+            Margin="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" x:Load="False"
             PointerPressed="OnPointerPressed" Visibility="Collapsed"
             Background="{StaticResource bmCherry}"
             BorderBrush="{StaticResource bmMaple}"
@@ -416,10 +417,9 @@
             <ListBox x:Name="_lbGames" Grid.Row="1" Grid.RowSpan="1" Grid.ColumnSpan="2"
                 Margin="4"
                 ItemsSource="{x:Bind SavedGames}"
+                Background="{StaticResource bmMaple}"
                 SelectionChanged="SavedGame_SelectionChanged" Foreground="Black">
-                <ListBox.Background>
-                    <ImageBrush Stretch="Fill" ImageSource="ms-appx:///Assets/maple.jpg" />
-                </ListBox.Background>
+
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:Log">
                         <TextBlock Text="{x:Bind DisplayName}" Foreground="White" FontSize="20" />

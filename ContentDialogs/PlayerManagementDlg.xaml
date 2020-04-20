@@ -4,7 +4,7 @@
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    MinWidth="1080" MinHeight="640" PrimaryButtonText="Save and Close"
+    Width="1000" Height="601" PrimaryButtonText="Save and Close"
     SecondaryButtonText="Cancel" PrimaryButtonClick="OnSaveAndclose"
     Background="{StaticResource bmWater}"
     mc:Ignorable="d">
@@ -53,7 +53,8 @@
                         <ColumnDefinition Width="100*" />
                         <ColumnDefinition Width="20" />
                     </Grid.ColumnDefinitions>
-                    <Rectangle Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="1" Fill="Transparent"
+                    <Rectangle Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="1"
+                        Fill="{StaticResource TransparentBrush}"
                         Stroke="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.Background}"
                         StrokeDashArray="1" StrokeThickness="4" IsHitTestVisible="False" />
                     <Rectangle Grid.Column="1" Width="20" Height="20" Margin="-10,7,0,0"
