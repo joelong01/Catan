@@ -1,8 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using Catan.Proxy;
+
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Catan.Proxy;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -65,7 +67,7 @@ namespace Catan10
         }
         private void SetPlayingPlayers(ObservableCollection<PlayerModel> newList)
         {
-           
+
 
             GlobalResourceCount.GameReset();
 
@@ -116,6 +118,6 @@ namespace Catan10
             }
         }
 
-        
+
     }
 }

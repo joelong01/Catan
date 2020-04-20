@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Catan.Proxy;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Catan.Proxy;
 
 namespace Catan10
 {
-   
+
 
     /// <summary>
     ///     This class has all the data associated with a roll -- when a roll happens, we adjust both player stats and global stats.
@@ -81,7 +82,7 @@ namespace Catan10
         public List<RollResourcesModel> ResourceList { get; set; } = new List<RollResourcesModel>();
     }
 
-    
+
     /// <summary>
     ///     Exposes a set of APIs that handle a roll (Do, Redo, Undo)
     /// </summary>
@@ -109,8 +110,8 @@ namespace Catan10
                 Player = currentPlayer,
                 PlayerIndex = currentPlayer.AllPlayerIndex,
                 PlayerName = currentPlayer.PlayerName,
-                OldState = page.NewGameState,               
-                Action = (roll == 7) ? CatanAction.RolledSeven : CatanAction.Rolled                
+                OldState = page.NewGameState,
+                Action = (roll == 7) ? CatanAction.RolledSeven : CatanAction.Rolled
             };
 
             page.Rolls.Push(rolledModel.Rolled); // all the rolls...
@@ -131,10 +132,10 @@ namespace Catan10
                 rolledModel.NewState = GameState.MustMoveBaron;
             }
 
-           
+
             return rolledModel;
 
-            
+
 
         }
 
@@ -245,7 +246,7 @@ namespace Catan10
                         foreach (RollResourcesModel resourceModel in playerRollData.ResourceList)
                         {
                             player.GameData.UpdateResourceCount(resourceModel, LogState.Undo);
-                        }                     
+                        }
                     }
                     else
                     {
@@ -272,12 +273,12 @@ namespace Catan10
 
             }
 
-           //
+            //
             //  get rid of any highlighting
             foreach (TileCtrl tile in page.GameContainer.AllTiles)
             {
-                
-                tile.StopHighlightingTile(); 
+
+                tile.StopHighlightingTile();
             }
 
             return true;

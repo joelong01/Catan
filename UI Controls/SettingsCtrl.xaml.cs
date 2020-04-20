@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Windows.Storage;
+﻿using System.Threading.Tasks;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -112,7 +110,7 @@ namespace Catan10
             }
 
             _settings.RotateTile = (((CheckBox)sender).IsChecked == true);
-            
+
             CatanSettingsCallback.RotateTile = _settings.RotateTile;
 
 
@@ -128,7 +126,7 @@ namespace Catan10
             }
 
             _settings.AnimateFade = (((CheckBox)sender).IsChecked == true);
-            
+
             CatanSettingsCallback.AnimateFade = _settings.AnimateFade;
 
         }
@@ -141,7 +139,7 @@ namespace Catan10
             }
 
             _settings.FadeSeconds = (int)((Slider)sender).Value;
-            
+
             CatanSettingsCallback.FadeSeconds = _settings.FadeSeconds;
 
         }
@@ -154,7 +152,7 @@ namespace Catan10
             }
 
             _settings.Zoom = ((Slider)sender).Value;
-            
+
             CatanSettingsCallback.Zoom = _settings.Zoom;
 
         }
@@ -169,7 +167,7 @@ namespace Catan10
             }
 
             _settings.ShowStopwatch = (((CheckBox)sender).IsChecked == true);
-            
+
             CatanSettingsCallback.ShowStopwatch = _settings.ShowStopwatch;
         }
 
@@ -194,7 +192,7 @@ namespace Catan10
             }
 
             _settings.AnimationSpeed = (int)_sliderAnimationSpeed.Value;
-            
+
             CatanSettingsCallback.AnimationSpeedBase = _settings.AnimationSpeed;
         }
 
@@ -237,7 +235,7 @@ namespace Catan10
             }
 
             _settings.ResourceTracking = (((CheckBox)sender).IsChecked == true);
-            
+
             CatanSettingsCallback.ResourceTracking = _settings.ResourceTracking;
         }
 
@@ -251,7 +249,7 @@ namespace Catan10
             }
 
             _settings.UseRandomNumbers = (((CheckBox)sender).IsChecked == true);
-            
+
             CatanSettingsCallback.UseRandomNumbers = _settings.UseRandomNumbers;
         }
 
@@ -263,7 +261,7 @@ namespace Catan10
             }
 
             _settings.ValidateBuilding = (((CheckBox)sender).IsChecked == true);
-            
+
             CatanSettingsCallback.ValidateBuilding = _settings.ValidateBuilding;
         }
     }

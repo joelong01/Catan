@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Catan10
@@ -22,20 +17,20 @@ namespace Catan10
         private readonly List<ILogHeader> ActionStack = new List<ILogHeader>();
         private readonly List<ILogHeader> UndoStack = new List<ILogHeader>();
         public MainPage Page { get; internal set; }
-        public GameState GameState 
-        { 
+        public GameState GameState
+        {
             get
             {
-                
+
                 if (ActionStack.Count == 0)
                 {
                     return GameState.WaitingForNewGame;
                 }
 
                 return ActionStack.Last().NewState;
-                
+
             }
-            
+
         }
 
         public NewLog(MainPage p)
@@ -189,7 +184,7 @@ namespace Catan10
                 case CatanAction.ChangedPlayerProperty:
                     break;
                 case CatanAction.SetRandomTileToGold:
-                    break;                                
+                    break;
                 default:
                     break;
             }

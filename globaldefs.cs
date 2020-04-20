@@ -1,10 +1,11 @@
 ﻿using Catan.Proxy;
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
 using Windows.Storage;
 using Windows.UI.Xaml.Input;
 
@@ -15,12 +16,12 @@ namespace Catan10
         public List<int> TileList { get; set; } = null;
         public List<int> NumberList { get; set; } = null;
 
-        public RandomLists(){}
+        public RandomLists() { }
         public RandomLists(string saved)
         {
             Deserialize(saved);
         }
-    
+
         public RandomLists(TileGroup tg)
         {
             TileList = tg.RandomTileList;
@@ -43,12 +44,12 @@ namespace Catan10
     }
     public class RandomBoardSettings
     {
-         //
-         // every TileGroup has a list that says where to put the tiles
-         // and another list that says what number to put on the tiles
-         //
-         // the int here is the TileGroup Index - System.Text.Json currently only Deserializes Dictionaries keyed by strings.
-         //
+        //
+        // every TileGroup has a list that says where to put the tiles
+        // and another list that says what number to put on the tiles
+        //
+        // the int here is the TileGroup Index - System.Text.Json currently only Deserializes Dictionaries keyed by strings.
+        //
         public Dictionary<string, RandomLists> TileGroupToRandomListsDictionary { get; set; } = new Dictionary<string, RandomLists>();
 
         //
@@ -69,7 +70,7 @@ namespace Catan10
 
         public string Serialize()
         {
-            return JsonSerializer.Serialize<RandomBoardSettings>(this);           
+            return JsonSerializer.Serialize<RandomBoardSettings>(this);
         }
 
         public static RandomBoardSettings Deserialize(string saved)
@@ -77,8 +78,8 @@ namespace Catan10
             return JsonSerializer.Deserialize<RandomBoardSettings>(saved);
 
         }
-        
-        
+
+
 
     }
 
@@ -248,8 +249,8 @@ namespace Catan10
 
 
 
-    
-    
+
+
     public enum HarborLocation { None = 0x00000000, TopRight = 0x00100000, TopLeft = 0x00010000, BottomRight = 0x00001000, BottomLeft = 0x00000100, Top = 0x00000010, Bottom = 0x00000001 };
     public enum RoadLocation { None = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
     public enum TileLocation { Self = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
@@ -273,12 +274,12 @@ namespace Catan10
         public bool ValidateBuilding { get; set; } = true;
         public List<GridPosition> GridPositions { get; set; } = new List<GridPosition>();
 
-        
-       
+
+
 
         public Settings()
         {
-       
+
         }
         public string Serialize()
         {

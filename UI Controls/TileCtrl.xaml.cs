@@ -1,16 +1,16 @@
 ﻿using Catan.Proxy;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
 using Windows.Foundation;
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -56,9 +56,9 @@ namespace Catan10
     public sealed partial class TileCtrl : UserControl, INotifyPropertyChanged, IEqualityComparer<TileCtrl>
     {
 
-        private List<string> _savedProperties = new List<string> { "Number", "ResourceType", "HarborLocation", "HarborType", "TileOrientation", "zIndex", "Index", "HarborLocation", "RandomTile", "HexOrder", "UseClassic", "ShowIndex", "HasPirateShip", "HasBaron" };
+        private readonly List<string> _savedProperties = new List<string> { "Number", "ResourceType", "HarborLocation", "HarborType", "TileOrientation", "zIndex", "Index", "HarborLocation", "RandomTile", "HexOrder", "UseClassic", "ShowIndex", "HasPirateShip", "HasBaron" };
 
-        
+
         public bool HasBaron { get; set; } = false;
         public bool HasPirateShip { get; set; } = false;
 
@@ -90,7 +90,7 @@ namespace Catan10
         }
         private void SetTileOrientation(TileOrientation value)
         {
-           
+
             SetTileOrientationAsync(value);
         }
 
@@ -274,7 +274,7 @@ namespace Catan10
         {
             return string.Format($"{_actingResourceType}={Number};idx={Index}");
         }
-        
+
 
         public int Index
         {
@@ -421,7 +421,7 @@ namespace Catan10
         {
 
             if (ActualOrientTation == orientation) return;
-            
+
             StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.Normal), 0);
 
             taskList.Add(_sbFlipTile.ToTask());

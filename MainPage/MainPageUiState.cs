@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -19,7 +20,8 @@ namespace Catan10
     public sealed partial class MainPage : Page
     {
         public List<int> Rolls { get; set; } = new List<int>();
-        Stack<GameState> _stateStack = new Stack<GameState>();
+
+        readonly Stack<GameState> _stateStack = new Stack<GameState>();
 
 
 
@@ -28,7 +30,7 @@ namespace Catan10
         //  the problem is that the GameTracker works off a list and used to not care about the physical position of the players.
         //  the rule was whoever was "on top" in the UI went.  Now we care about the physical position of the board and have to translate 
         //  so that the List we pass to the game tracker is in the right order.  we should fix this...
-        private PlayerPosition[] PLAY_ORDER = new PlayerPosition[] { PlayerPosition.BottomLeft, PlayerPosition.Left, PlayerPosition.TopLeft, PlayerPosition.TopRight, PlayerPosition.Right, PlayerPosition.BottomRight };
+        private readonly PlayerPosition[] PLAY_ORDER = new PlayerPosition[] { PlayerPosition.BottomLeft, PlayerPosition.Left, PlayerPosition.TopLeft, PlayerPosition.TopRight, PlayerPosition.Right, PlayerPosition.BottomRight };
 
 
 

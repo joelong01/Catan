@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Catan.Proxy;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-using Catan.Proxy;
 
 namespace Catan10
 {
@@ -17,7 +19,7 @@ namespace Catan10
         public bool BonusPoint = false;
     }
 
-   
+
     public partial class CatanHexPanel : Canvas
     {
         //
@@ -25,10 +27,10 @@ namespace Catan10
         public Dictionary<RoadKey, RoadCtrl> RoadKeyToRoadDictionary { get; } = new Dictionary<RoadKey, RoadCtrl>(new RoadKeyComparer());
         public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
         public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
-        private List<TileCtrl> _desertTiles = new List<TileCtrl>();
-        
-        private List<TileGroup> _tileSets = new List<TileGroup>();
-        private List<List<TileCtrl>> _tilesInVisualLayout = new List<List<TileCtrl>>();
+        private readonly List<TileCtrl> _desertTiles = new List<TileCtrl>();
+
+        private readonly List<TileGroup> _tileSets = new List<TileGroup>();
+        private readonly List<List<TileCtrl>> _tilesInVisualLayout = new List<List<TileCtrl>>();
         public Dictionary<TileCtrl, Island> TileToIslandDictionary { get; set; } = new Dictionary<TileCtrl, Island>(); // given a tile, tell me what Island it is in
 
 
@@ -50,8 +52,8 @@ namespace Catan10
         private ResourceType[] _resourceTypes = null;
         private int[] _tileNumbers = null;
         private HarborType[] _harborTypes = null;
-        private PirateShip _pirateShip = new PirateShip();
-        private BaronCtrl _baron = new BaronCtrl();
+        private readonly PirateShip _pirateShip = new PirateShip();
+        private readonly BaronCtrl _baron = new BaronCtrl();
 
 
         //
@@ -66,11 +68,11 @@ namespace Catan10
         private int _colCount = 0;
         private double _normalWidth = 110;
         private double _normalHeight = 96;
-        private List<int> RowCounts = new List<int>(); // RowCounts[0] tells you how many rows there are in the 0th Column
+        private readonly List<int> RowCounts = new List<int>(); // RowCounts[0] tells you how many rows there are in the 0th Column
         private Color _buildColor = Colors.Black;
         private TileCtrl _pirateTile = null;
         private TileCtrl _baronTile = null;
-        private Dictionary<int, int> BuildingIndexToHarborIndexDict = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> BuildingIndexToHarborIndexDict = new Dictionary<int, int>();
 
         #region Properties
 
@@ -1876,11 +1878,11 @@ namespace Catan10
 
     public class TileGroup
     {
-        
+
         public int Start { get; set; }
-        
+
         public int End { get; set; }
-        
+
         public bool Randomize { get; set; }
 
         //
@@ -1891,20 +1893,20 @@ namespace Catan10
         //
         //  the set of Tiles that particpate in Randomization and Shuffling
         public List<TileCtrl> RandomTiles { get; set; } = new List<TileCtrl>();
-        
+
         public List<ResourceType> ResourceTypes { get; set; } = new List<ResourceType>();
         public List<int> ValidNumbers { get; set; } = new List<int>();
         public List<Harbor> Harbors { get; set; } = new List<Harbor>();
-        
+
         public List<HarborType> HarborTypes { get; set; } = new List<HarborType>();
-        
+
         public List<int> RandomTileList { get; set; } = new List<int>(); // the random list to shuffle the tile resources. used in save/load
-        
+
         public List<int> RandomNumbersList { get; set; } = new List<int>(); // the random list of numbers associated with the tiles.
 
 
         private int _tileCount = 0;
-        
+
         public int TileCount
         {
             get => AllTiles.Count;

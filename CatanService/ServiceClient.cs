@@ -7,7 +7,7 @@ namespace Catan10.CatanServiceTest
 {
     class ServiceClient
     {
-        HttpClient _client = new HttpClient();
+        readonly HttpClient _client = new HttpClient();
         readonly string _serverUri = "http://localhost:54362/";
         public async Task<int> CreateGame()
         {

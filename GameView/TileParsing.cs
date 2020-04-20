@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using Windows.UI.Xaml.Controls;
 
 namespace Catan10
@@ -8,7 +9,7 @@ namespace Catan10
 
     public partial class CatanHexPanel : Canvas
     {
-        
+
         public TileCtrl GetAdjacentTile(TileCtrl tile, TileLocation adjacentLocation)
         {
             return GetAdjacentTile(tile.Row, tile.Col, adjacentLocation);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;
@@ -183,7 +184,7 @@ namespace Catan10
 
                 await _gameView.RandomizeCatanBoard(true);
                 await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
-              //  await ProcessEnter(CurrentPlayer, "");
+                //  await ProcessEnter(CurrentPlayer, "");
 
 
             };

@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -16,8 +16,8 @@ namespace Catan10
 {
     public sealed partial class RoadCtrl : UserControl
     {
-        Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
-        
+        readonly Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
+
         public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
 
         public List<RoadKey> Keys { get; set; } = new List<RoadKey>();

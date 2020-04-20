@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -20,9 +11,9 @@ namespace Catan10
 {
     public sealed partial class PlayerPickerDlg : ContentDialog
     {
-        private ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
+        private readonly ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PlayerPickerDlg), new PropertyMetadata(null));
-        
+
         public PlayerModel Player
         {
             get => (PlayerModel)GetValue(PlayerProperty);
@@ -39,7 +30,7 @@ namespace Catan10
             Players.AddRange(players);
         }
 
-      
+
 
         private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
@@ -54,7 +45,7 @@ namespace Catan10
 
         private void OnPlayerPicDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-          
+
             this.Hide();
         }
     }

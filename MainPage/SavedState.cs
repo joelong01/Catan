@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.UI.Xaml.Controls;
+﻿using System.Collections.Generic;
 
 namespace Catan10
 {
@@ -11,7 +6,7 @@ namespace Catan10
     {
         public string HostName { get; set; } = "https://localhost:5000";
         public string DefaultUser { get; set; } = "";
-        public ServiceState(){}
+        public ServiceState() { }
     }
 
 
@@ -21,7 +16,7 @@ namespace Catan10
         public List<PlayerModel> Players { get; set; } = new List<PlayerModel>();
 
         public Settings Settings { get; set; } = new Settings();
-        
+
         public ServiceState ServiceState { get; set; } = new ServiceState();
         #endregion
         public SavedState() { }

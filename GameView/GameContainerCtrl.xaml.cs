@@ -1,13 +1,13 @@
 ﻿
+using Catan.Proxy;
+
 using System;
 using System.Collections.Generic;
-
 using System.IO;
 using System.Linq;
-
 using System.Threading.Tasks;
+
 using Windows.Foundation;
-using Catan.Proxy;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -90,14 +90,14 @@ namespace Catan10
     ///     It is called by the Page, and the Page shouldn't have to know anything about the underlying HexControl
     /// </summary>
     /// 
-    
+
     public sealed partial class GameContainerCtrl : UserControl
     {
 
         //
         //  when you build a new Game control, add it to this list
         //
-        List<CatanGame> _games = new List<CatanGame>()
+        readonly List<CatanGame> _games = new List<CatanGame>()
         {
             new CatanGame (typeof (RegularGameCtrl), "Regular", 0),
             new CatanGame (typeof (ExpansionCtrl), "Expansion (5-6 Players)", 1),
@@ -109,7 +109,7 @@ namespace Catan10
         IGameCallback _gameCallback = null;
         ITileControlCallback _tileCallback = null;
 
-    
+
         public RandomBoardSettings RandomBoardSettings { get; private set; } = new RandomBoardSettings();
         private Dictionary<ResourceType, double> _probabilities = new Dictionary<ResourceType, double>();
         public Dictionary<ResourceType, double> Probabilities
@@ -932,7 +932,7 @@ namespace Catan10
 
         public bool HasIslands => _currentHexPanel.HasIslands;
 
-        
+
         public Island GetIsland(TileCtrl tile)
         {
             _currentHexPanel.TileToIslandDictionary.TryGetValue(tile, out Island island);
@@ -944,7 +944,7 @@ namespace Catan10
         /// </summary>
         /// <param name="val"></param>
         /// <returns></returns>
-        List<TileCtrl>[] _TilesWithNumbers = new List<TileCtrl>[13];
+        readonly List<TileCtrl>[] _TilesWithNumbers = new List<TileCtrl>[13];
         internal IReadOnlyCollection<TileCtrl> GetTilesWithNumber(int val)
         {
             if (_TilesWithNumbers[val] == null)
@@ -1028,7 +1028,8 @@ namespace Catan10
             await Task.WhenAll(taskList);
 
         }
-        Random _randomForGold = new Random(DateTime.Now.Millisecond);
+
+        readonly Random _randomForGold = new Random(DateTime.Now.Millisecond);
         /// <summary>
         ///     the "count < 5" clause is becuase I test with a lot of gold mines to see if the algo works.
         /// </summary>

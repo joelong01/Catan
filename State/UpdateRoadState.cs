@@ -1,10 +1,8 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Catan10
 {
@@ -209,12 +207,12 @@ namespace Catan10
                 //
                 //  this pattern makes it so we can change race tracking multiple times but only end up with 
                 //  one log write
-                raceTracking.EndChanges(page.CurrentPlayer, page.GameState,  LogType.Normal);
+                raceTracking.EndChanges(page.CurrentPlayer, page.GameState, LogType.Normal);
             }
 
         }
 
     }
 
-  
+
 }

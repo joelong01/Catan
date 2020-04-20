@@ -17,8 +17,8 @@ namespace Catan10
         public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black));
         public Color CastleColor
         {
-           get => (Color)GetValue(CastleColorProperty);
-           private set => SetValue(CastleColorProperty, value);
+            get => (Color)GetValue(CastleColorProperty);
+            private set => SetValue(CastleColorProperty, value);
         }
 
 

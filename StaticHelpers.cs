@@ -1,4 +1,6 @@
 ﻿
+using Catan.Proxy;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,19 +13,19 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using Windows.System;
+using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-using Catan.Proxy;
-using Windows.UI;
 
 namespace Catan10
 {
@@ -38,10 +40,10 @@ namespace Catan10
             }
         }
     }
-   
+
     public static class StaticHelpers
     {
-       
+
         public static Dictionary<string, Color> StringToColorDictionary { get; } = new Dictionary<string, Color>()
         {
             {"Blue", Colors.Blue },

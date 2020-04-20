@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+
 using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -12,8 +13,8 @@ namespace Catan10
 {
     public sealed partial class NewGameDlg : ContentDialog
     {
-        Dictionary<PlayerPosition, Grid> PositionToGridDictionary = new Dictionary<PlayerPosition, Grid>();
-        Dictionary<PlayerPosition, PlayerModel> PositionToPlayerDataDictionary = new Dictionary<PlayerPosition, PlayerModel>();
+        readonly Dictionary<PlayerPosition, Grid> PositionToGridDictionary = new Dictionary<PlayerPosition, Grid>();
+        readonly Dictionary<PlayerPosition, PlayerModel> PositionToPlayerDataDictionary = new Dictionary<PlayerPosition, PlayerModel>();
 
         public static readonly DependencyProperty PlayerDataProperty = DependencyProperty.Register("PlayerData", typeof(ObservableCollection<PlayerModel>), typeof(NewGameDlg), new PropertyMetadata(new ObservableCollection<PlayerModel>()));
         public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(ObservableCollection<CatanGame>), typeof(NewGameDlg), new PropertyMetadata(new ObservableCollection<CatanGame>()));

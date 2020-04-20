@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -10,7 +11,7 @@ namespace Catan10
 {
     public sealed partial class StopWatchCtrl : UserControl
     {
-        DispatcherTimer _timer = new DispatcherTimer();
+        readonly DispatcherTimer _timer = new DispatcherTimer();
         DateTime _start;
         TimeSpan _totalTime;
 

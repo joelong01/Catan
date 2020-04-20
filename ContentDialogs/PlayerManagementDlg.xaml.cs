@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+
 using Windows.Storage.Pickers;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -14,7 +15,7 @@ namespace Catan10
 {
     public sealed partial class PlayerManagementDlg : ContentDialog
     {
-        private ILog _log = null;
+        private readonly ILog _log = null;
 
         public PlayerManagementDlg(ILog log)
         {
@@ -33,11 +34,11 @@ namespace Catan10
         {
             this.InitializeComponent();
             _log = log;
-            foreach(var p in playerData)
+            foreach (var p in playerData)
             {
                 PlayerDataList.Add(p);
             }
-            
+
 
         }
 
@@ -150,7 +151,7 @@ namespace Catan10
 
         private void OnSaveAndclose(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-           
+
             args.Cancel = false; // continue to close
 
         }

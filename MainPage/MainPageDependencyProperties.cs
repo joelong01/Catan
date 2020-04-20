@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -90,8 +89,8 @@ namespace Catan10
             if (GameState != GameState.WaitingForStart)
                 return;
 
-           // _ = SetRandomTileToGold();
-           
+            // _ = SetRandomTileToGold();
+
         }
 
         public static readonly DependencyProperty RandomGoldTileCountProperty = DependencyProperty.Register("RandomGoldTileCount", typeof(int), typeof(MainPage), new PropertyMetadata(1, RandomGoldTileCountChanged));

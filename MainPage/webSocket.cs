@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Networking.Sockets;
-using Windows.Storage.Streams;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
-using Windows.Web;
-
-namespace Catan10
+﻿namespace Catan10
 {
     public enum MessageType
     {
@@ -118,9 +106,9 @@ namespace Catan10
         //            await _mainPage.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
         //            {
         //                _mainPage.CanMoveBaronBeforeRoll = true;
-                        
+
         //            });
-                    
+
         //            break;
         //        case MessageType.CardsLostToMonopoly:
         //            await _mainPage.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>

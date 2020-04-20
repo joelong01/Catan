@@ -1,10 +1,11 @@
 ﻿using Catan.Proxy;
+
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
 using Windows.Foundation;
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -18,13 +19,13 @@ namespace Catan10
 
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
-        
+
         readonly SolidColorBrush _blackBrush = StaticHelpers.GetResourceBrush("Black");
         readonly SolidColorBrush _whiteBrush = StaticHelpers.GetResourceBrush("White");
         private TileOrientation _orientation = TileOrientation.FaceDown;
         private bool _useClassic = true;
         private HarborLocation _location = HarborLocation.None;
-        private string[] _savePropName = new string[] { "HarborLocation" };
+        private readonly string[] _savePropName = new string[] { "HarborLocation" };
 
         public double HarborScale { get; set; } = 1.0;
 
@@ -110,14 +111,14 @@ namespace Catan10
                 Owner.GameData.RemoveOwnedHarbor(this);
                 Owner = null;
             }
-            
+
         }
 
         public FrameworkElement AnimationObject => _backGrid;
 
         public void SetHarborImage(HarborType value)
         {
-            
+
             string bitmapPath = "ms-appx:Assets/back.jpg";
 
             if (_useClassic)

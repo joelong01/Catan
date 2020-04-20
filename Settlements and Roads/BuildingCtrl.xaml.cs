@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -29,7 +30,7 @@ namespace Catan10
             set => SetValue(IndexProperty, value);
         }
 
-        SolidColorBrush _brush = new SolidColorBrush(Colors.Blue);
+        readonly SolidColorBrush _brush = new SolidColorBrush(Colors.Blue);
         public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
 
         public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();

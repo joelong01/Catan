@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.Json.Serialization;
 
 namespace Catan10
 {
@@ -21,8 +20,8 @@ namespace Catan10
 
         //
         //  i'm trying to have the class take care of its own logging when state changes
-        
-        ILog _log = null;
+
+        readonly ILog _log = null;
         // we can make lots of little changes - instead of logging all of them, we log at the end of them
         private string _beginState = "";
 

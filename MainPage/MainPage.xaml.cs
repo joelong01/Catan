@@ -1,12 +1,16 @@
-﻿using System;
+﻿using Catan.Proxy;
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
 using Windows.Networking.Sockets;
@@ -21,9 +25,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Catan.Proxy;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -35,16 +36,16 @@ namespace Catan10
     public sealed partial class MainPage : Page, ILog
     {
         public PlayerModel TheHuman { get; set; } = null;
-        public SavedState SavedAppState { get; set; } = null;        
+        public SavedState SavedAppState { get; set; } = null;
         private int _supplementalStartIndex = -1;
         public static readonly string SAVED_GAME_EXTENSION = ".log";
         public const string PlayerDataFile = "catansettings.json";
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
-        private DispatcherTimer _timer = new DispatcherTimer();  // flips tiles back to Opacaticy = 0
+        private readonly DispatcherTimer _timer = new DispatcherTimer();  // flips tiles back to Opacaticy = 0
         private bool _doDragDrop = false;   // this lets you double tap a map and then move it around
         private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
         public static MainPage Current; // a global for the game
-        private RoadRaceTracking _raceTracking = null; // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
+        private readonly RoadRaceTracking _raceTracking = null; // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
         //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel()));
 
@@ -183,8 +184,8 @@ namespace Catan10
                 state = JsonSerializer.Deserialize<SavedState>(content);
 
                 _timer.Interval = TimeSpan.FromSeconds(state.Settings.FadeSeconds);
-                
-                
+
+
 
                 return state;
             }
@@ -234,7 +235,7 @@ namespace Catan10
                 player.Log = this;
                 await player.LoadImage();
                 player.AllPlayerIndex = SavedAppState.Players.Count;
-               
+
             }
 
 
@@ -1463,12 +1464,12 @@ namespace Catan10
         private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
             await GrowOrShrink(ControlGrid);
-            
+
         }
 
         private async Task GrowOrShrink(UIElement el)
         {
-            
+
             CompositeTransform ct = el.RenderTransform as CompositeTransform;
             if (ct.ScaleX == .5)
             {
@@ -1486,7 +1487,7 @@ namespace Catan10
 
         private async void OnGrowOrShrinkRolls(object sender, RoutedEventArgs e)
         {
-           await GrowOrShrink(RollGrid);
+            await GrowOrShrink(RollGrid);
         }
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
@@ -1534,7 +1535,7 @@ namespace Catan10
             PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.Players, this);
             if (await dlg.ShowAsync() == ContentDialogResult.Primary)
             {
-                SavedAppState.Players.Clear();                
+                SavedAppState.Players.Clear();
                 SavedAppState.Players.AddRange(dlg.PlayerDataList);
                 await SaveGameState(SavedAppState);
             }
@@ -1709,7 +1710,7 @@ namespace Catan10
 
         }
 
-        private List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
+        private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
         int _randomBoardListIndex = 0;
         private async void PickAGoodBoard(PointerRoutedEventArgs e)
         {
@@ -1858,7 +1859,7 @@ namespace Catan10
             await PickSettlementsAndRoads();
         }
 
-       
+
     }
 }
 

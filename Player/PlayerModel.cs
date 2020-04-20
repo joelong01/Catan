@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Catan.Proxy;
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Catan.Proxy;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -66,7 +67,7 @@ namespace Catan10
 
         [JsonIgnore]
         public PlayerModel PlayerDataInstance => this;
-        public PlayerModel() 
+        public PlayerModel()
         {
             //_playerGameData = new PlayerGameModel(this);
             //_playerGameData.ColorAsString = "Blue";
@@ -135,7 +136,7 @@ namespace Catan10
 
         [JsonIgnore]
         public PlayerModel This => this;
-      
+
 
 
         [JsonIgnore]
@@ -167,7 +168,7 @@ namespace Catan10
         }
         [JsonIgnore]
         public ObservableCollection<ColorChoices> AvailableColors => PlayerModel._availableColors;
-       
+
 
         public PlayerModel(ILog log)
         {
@@ -286,7 +287,7 @@ namespace Catan10
             get => _colorAsString;
             set
             {
-               // if (value != _colorAsString)
+                // if (value != _colorAsString)
                 {
                     //
                     //  we need to tell the GameData what the new color is because
@@ -312,7 +313,7 @@ namespace Catan10
         }
 
 
-        
+
         public static PlayerModel Deserialize(string s, bool oneLine)
         {
             return JsonSerializer.Deserialize<PlayerModel>(s);
@@ -330,10 +331,10 @@ namespace Catan10
         /// </summary>
         public void Reset()
         {
-            
+
             GameData = new PlayerGameModel(this);
-            
-            
+
+
         }
 
         public override string ToString()

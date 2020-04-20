@@ -1,13 +1,8 @@
-﻿using System;
+﻿using Catan.Proxy;
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using Catan.Proxy;
 namespace Catan10
 {
     //   an object that encapsulates an action that has happned in the game

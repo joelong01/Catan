@@ -1,9 +1,10 @@
 ﻿using Catan.Proxy;
+
 using System;
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
+
 using Windows.Foundation;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -11,11 +12,10 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using static Catan10.StaticHelpers;
 
 namespace Catan10
 {
-   
+
     public class GridPosition
     {
         public string Name { get; set; } = "";
@@ -69,7 +69,7 @@ namespace Catan10
 
     public sealed partial class MainPage : Page
     {
-        private Dictionary<string, string> _defaultUsers = new Dictionary<string, string>()
+        private readonly Dictionary<string, string> _defaultUsers = new Dictionary<string, string>()
         {
             {"Joe", "joe.jpg;Blue" },
             {"Dodgy", "quark.jpg;Red" },
@@ -85,7 +85,7 @@ namespace Catan10
 
         //
         //  this is the name of the grids in MainPage.xaml that we want to store and retrieve locations
-        private string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView" };
+        private readonly string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView" };
 
 
 

@@ -1,10 +1,12 @@
 ﻿using Catan.Proxy;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -87,7 +89,7 @@ namespace Catan10
             {
                 case CatanAction.Rolled:
                     UndoRoll();
-                    
+
                     //    I don't remember why -- but instead of having "actions" and "consequeces" where only "actions" are logged, I log both and undo both.
                     //    in particular Rolls generate stats and the stats are logged (and then undone below).  this shoudl probably be fixed.  someday.
                     //  CountResourcesForRoll(_gameView.GetTilesWithNumber(roll), true); 
@@ -338,7 +340,7 @@ namespace Catan10
 
                 if (SavedAppState.Players.Count == 0)
                 {
-                   await LoadGameData();
+                    await LoadGameData();
                 }
 
                 Debug.Assert(SavedAppState.Players.Count > 0);
@@ -370,7 +372,7 @@ namespace Catan10
                     await SetStateAsync(null, GameState.WaitingForNewGame, true);
                     _gameView.CurrentGame = dlg.SelectedGame;
 
-                    
+
                     SavedGames.Insert(0, MainPageModel.Log);
                     await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
                     await StartGame(dlg.PlayerDataList, dlg.SelectedIndex);
@@ -1314,7 +1316,7 @@ namespace Catan10
 
         }
 
-        string[] _StateMessages = new string[] {
+        readonly string[] _StateMessages = new string[] {
             "Uninitialized",        // 0    Uninitialized,                      
             "New Game",             // 1    WaitingForNewGame,                  
             "Starting...",          // 2    Starting,                           
@@ -1340,7 +1342,7 @@ namespace Catan10
         {
             try
             {
-                StateDescription = _StateMessages[(int)state];             
+                StateDescription = _StateMessages[(int)state];
                 SetValue(GameStateProperty, state); // update things bound to GameState
 
                 //_btnNextStep.IsEnabled = false;

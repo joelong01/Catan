@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -27,7 +28,7 @@ namespace Catan10
         public static readonly DependencyProperty ImageBrushProperty = DependencyProperty.Register("ImageBrush", typeof(ImageBrush), typeof(PlayerPickerItemCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PlayerPickerItemCtrl), new PropertyMetadata(null, PlayerChanged));
         public static readonly DependencyProperty ShowCheckBoxProperty = DependencyProperty.Register("ShowCheckBox", typeof(bool), typeof(PlayerPickerItemCtrl), new PropertyMetadata(true));
-       
+
         public bool ShowCheckBox
         {
             get => (bool)GetValue(ShowCheckBoxProperty);

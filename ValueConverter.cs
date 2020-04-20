@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Catan.Proxy;
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -9,7 +12,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Catan.Proxy;
 
 namespace Catan10
 {
@@ -64,7 +66,7 @@ namespace Catan10
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            throw new NotImplementedException("IntToVisibilityConverter can't convert back");    
+            throw new NotImplementedException("IntToVisibilityConverter can't convert back");
         }
     }
 
@@ -77,13 +79,13 @@ namespace Catan10
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             HarborType harbor = (HarborType)value;
-            
+
             switch (harbor)
             {
                 case HarborType.ThreeForOne:
                     return App.Current.Resources["bmThreeForOne"];
-               case HarborType.Brick:
-                    return App.Current.Resources["bmTwoForOneBrick"];                    
+                case HarborType.Brick:
+                    return App.Current.Resources["bmTwoForOneBrick"];
                 case HarborType.Ore:
                     return App.Current.Resources["bmTwoForOneOre"];
                 case HarborType.Sheep:
@@ -93,8 +95,8 @@ namespace Catan10
                 case HarborType.Wheat:
                     return App.Current.Resources["bmTwoForOneWheat"];
                 default:
-                    throw new Exception($"Unexpected Harbor Type {harbor} in value HarborTypeToHarborBrushConverter");                    
-            }          
+                    throw new Exception($"Unexpected Harbor Type {harbor} in value HarborTypeToHarborBrushConverter");
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -110,7 +112,7 @@ namespace Catan10
         {
             ResourceType resource = (ResourceType)value;
             return TileCtrl.LoadTileImage(resource);
-            
+
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -185,7 +187,7 @@ namespace Catan10
                     return true;
                 }
             }
-            
+
             return false;
         }
 
@@ -515,7 +517,7 @@ namespace Catan10
 
     public class ColorToBrushConverter : IValueConverter
     {
-       
+
         private static Color Parse(string color)
         {
             var offset = color.StartsWith("#") ? 1 : 0;
@@ -544,7 +546,7 @@ namespace Catan10
             {
                 return new SolidColorBrush((Color)value);
             }
-                
+
 
             if (value is string)
                 return new SolidColorBrush(Parse((string)value));
@@ -557,10 +559,10 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        
+
     }
 
-   
+
 
 
 
@@ -726,7 +728,7 @@ namespace Catan10
 
     public class ResourceTypeValueConverter : IValueConverter
     {
-        EnumToStringValueConverter<ResourceType> _converter = new EnumToStringValueConverter<ResourceType>();
+        readonly EnumToStringValueConverter<ResourceType> _converter = new EnumToStringValueConverter<ResourceType>();
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -744,7 +746,7 @@ namespace Catan10
 
     public class HarborTypeValueConverter : IValueConverter
     {
-        EnumToStringValueConverter<HarborType> _converter = new EnumToStringValueConverter<HarborType>();
+        readonly EnumToStringValueConverter<HarborType> _converter = new EnumToStringValueConverter<HarborType>();
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -761,7 +763,7 @@ namespace Catan10
     }
     public class GameStateValueConverter : IValueConverter
     {
-        EnumToStringValueConverter<GameState> _converter = new EnumToStringValueConverter<GameState>();
+        readonly EnumToStringValueConverter<GameState> _converter = new EnumToStringValueConverter<GameState>();
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -779,7 +781,7 @@ namespace Catan10
 
     public class HarborLocationValueConverter : IValueConverter
     {
-        EnumToStringValueConverter<HarborLocation> _converter = new EnumToStringValueConverter<HarborLocation>();
+        readonly EnumToStringValueConverter<HarborLocation> _converter = new EnumToStringValueConverter<HarborLocation>();
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -796,7 +798,7 @@ namespace Catan10
     }
     public class TileOrientationValueConverter : IValueConverter
     {
-        EnumToStringValueConverter<TileOrientation> _converter = new EnumToStringValueConverter<TileOrientation>();
+        readonly EnumToStringValueConverter<TileOrientation> _converter = new EnumToStringValueConverter<TileOrientation>();
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {

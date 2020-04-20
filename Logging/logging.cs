@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+
 using Windows.Storage;
 using Windows.Storage.Streams;
 
@@ -26,9 +26,9 @@ namespace Catan10
     ///     3. when something is added to the Action stack and it is *not* part of a Replay, the Undo stack is cleared.
     /// </summary>
 
-    public class Log : IDisposable,  INotifyPropertyChanged
+    public class Log : IDisposable, INotifyPropertyChanged
     {
-        
+
         private string _saveFileName = "";
         private StorageFolder _folder = null;
         IRandomAccessStream _randomAccessStream = default;
@@ -94,9 +94,9 @@ namespace Catan10
             {
                 UndoStack.Clear();
             }
-          
-             
-            ActionStack.Add(le);            
+
+
+            ActionStack.Add(le);
             NotifyPropertyChanged("GameState");
             NotifyPropertyChanged("RedoPossible");
         }
@@ -107,14 +107,14 @@ namespace Catan10
             NotifyPropertyChanged("RedoPossible");
 
         }
-  
+
         public bool RedoPossible
         {
             get
             {
                 return UndoStack.Count > 0;
             }
-         
+
         }
         public LogEntry PopUndo()
         {

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Catan.Proxy;
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -7,11 +9,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Catan.Proxy;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -20,7 +22,7 @@ namespace Catan10
 
     public class PlayerGameModel : INotifyPropertyChanged
     {
-        private bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
+        private readonly bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
 
         public CardsLostUpdatedHandler OnCardsLost;
 
@@ -919,7 +921,7 @@ namespace Catan10
 
         }
 
-        private Dictionary<ResourceType, ResourceCount> _dictResourceCount = new Dictionary<ResourceType, ResourceCount>();
+        private readonly Dictionary<ResourceType, ResourceCount> _dictResourceCount = new Dictionary<ResourceType, ResourceCount>();
         // 
         /// <summary>
         ///     returns the number of resources the user actually got
