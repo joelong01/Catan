@@ -70,7 +70,7 @@
                 <Grid.RenderTransform>
                     <CompositeTransform x:Name="_gridFrontTransform" Rotation="-209.6" ScaleX="{x:Bind HarborScale, Mode=TwoWay, FallbackValue=1.0}" ScaleY="{x:Bind HarborScale, Mode=TwoWay, FallbackValue=1.0}" />
                 </Grid.RenderTransform>
-                <Ellipse x:Name="_front" Fill="{x:Bind HarborType, Converter={StaticResource HarborTypeToHarborBrushConverter}, FallbackValue=Brick, Mode=OneWay}" Stroke="{x:Bind Owner.GameData.Background, FallbackValue=Transparent, Mode=OneWay}" StrokeThickness="2" />
+                <Ellipse x:Name="_front" Fill="{x:Bind HarborType, Converter={StaticResource HarborTypeToHarborBrushConverter}, FallbackValue=Brick, Mode=OneWay}" Stroke="{x:Bind Owner.GameData.BackgroundBrush, FallbackValue=Transparent, Mode=OneWay}" StrokeThickness="2" />
                 <TextBlock x:Name="_text" HorizontalAlignment="Center" VerticalAlignment="Bottom"
                     Text="2:1" FontFamily="Segoie UI" FontSize="14" Visibility="Collapsed" />
                 <TextBlock Name="_tbIndex" Grid.Row="1" HorizontalAlignment="Center" Visibility="Collapsed"

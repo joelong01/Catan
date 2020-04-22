@@ -7,18 +7,16 @@
     d:DesignHeight="300" d:DesignWidth="600" mc:Ignorable="d">
 
 
-    <Grid Width="600" Height="300"
-        Background="{StaticResource bmCherry}"
-        CornerRadius="10" PointerPressed="OnPointerPressed">
+    <Grid Width="590" Height="250" Background="{StaticResource bmCherry}" CornerRadius="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="20" />
+            <RowDefinition Height="0" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40*" />
             <ColumnDefinition Width="10*" />
         </Grid.ColumnDefinitions>
-        <Rectangle Grid.ColumnSpan="2" Fill="Black" StrokeThickness="0" Stroke="Black" />
+
         <StackPanel Grid.Row="1" Grid.ColumnSpan="1" Margin="5,5,0,0">
             <StackPanel Orientation="Horizontal">
                 <local:ResourceCardCtrl Margin="0" ResourceType="Wood" Orientation="FaceUp" ReadOnly="True"
@@ -31,28 +29,34 @@
                     Count="{x:Bind PlayerResources.Sheep, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Ore" Orientation="FaceUp" ReadOnly="True"
                     Count="{x:Bind PlayerResources.Ore, Mode=OneWay}" />
-                <local:ResourceCardCtrl Margin="49,0,0,0" ResourceType="GoldMine" Orientation="FaceUp" ReadOnly="True"
+                <local:ResourceCardCtrl Margin="39,0,0,0" ResourceType="GoldMine" Orientation="FaceUp" ReadOnly="True"
                     Count="{x:Bind PlayerResources.GoldMine, Mode=OneWay}" />
             </StackPanel>
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                <local:ResourceCardCtrl DevCardType="VictoryPoint" Orientation="FaceUp" ReadOnly="True" Count="{x:Bind PlayerResources.VictoryPoints, Mode=OneWay}" />
-                <local:ResourceCardCtrl DevCardType="Knight" Orientation="FaceUp" ReadOnly="True" />
-                <local:ResourceCardCtrl DevCardType="YearOfPlenty" Orientation="FaceUp" ReadOnly="True" />
-                <local:ResourceCardCtrl DevCardType="Monopoly" Orientation="FaceUp" ReadOnly="True" />
-                <local:ResourceCardCtrl DevCardType="RoadBuilding" Orientation="FaceUp" ReadOnly="True" />
+                <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Knight" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.Knights, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="YearOfPlenty" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.YearOfPlenty, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Monopoly" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.Monopoly, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="RoadBuilding" Orientation="FaceUp" ReadOnly="True"
+                    Count="{x:Bind PlayerResources.RoadBuilding, Mode=OneWay}" />
+                <local:ResourceCardCtrl Margin="109,0,0,0" DevCardType="VictoryPoint" Orientation="FaceUp"
+                    ReadOnly="True"
+                    Count="{x:Bind PlayerResources.VictoryPoints, Mode=OneWay}" />
             </StackPanel>
         </StackPanel>
-        <ListBox Grid.Row="1" Grid.Column="1" Background="{StaticResource bmMaple}" ItemsSource="{x:Bind PlayedDevCards}">
+        <ListBox Grid.Row="1" Grid.Column="1" Background="{StaticResource bmMaple}" ItemsSource="{x:Bind PlayedDevCards}" Margin="5,5,5,5" CornerRadius="10">
             <DataTemplate x:DataType="proxy:DevCardType">
                 <local:ResourceCardCtrl DevCardType="{x:Bind}" Orientation="FaceUp" ReadOnly="True" CountVisible="Collapsed" />
             </DataTemplate>
+            
             <ListBox.ItemContainerStyle>
-                <Style TargetType="GridViewItem">
-                    <Setter Property="Margin" Value="0" />
-                    <Setter Property="Padding" Value="5" />
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Margin" Value="0,0,0,5" />
+                    <Setter Property="Padding" Value="0" />
                 </Style>
             </ListBox.ItemContainerStyle>
-
         </ListBox>
     </Grid>
 </UserControl>

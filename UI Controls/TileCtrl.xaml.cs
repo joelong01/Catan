@@ -185,7 +185,7 @@ namespace Catan10
 
 
 
-        public static Brush LoadTileImage(ResourceType resource)
+        public Brush LoadTileImage(ResourceType resource)
         {
             switch (resource)
             {
@@ -248,7 +248,7 @@ namespace Catan10
         internal void Reset()
         {
             OwnedBuilding.Clear();
-
+            StopHighlightingTile();
         }
 
 

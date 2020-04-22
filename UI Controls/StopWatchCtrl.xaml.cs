@@ -16,9 +16,9 @@ namespace Catan10
         TimeSpan _totalTime;
 
 
-        readonly SolidColorBrush _green = StaticHelpers.GetResourceBrush("Green");
-        readonly SolidColorBrush _red = StaticHelpers.GetResourceBrush("Red");
-        readonly SolidColorBrush _yellow = StaticHelpers.GetResourceBrush("Yellow");
+        readonly SolidColorBrush _green = CatanColors.GetResourceBrush("Green");
+        readonly SolidColorBrush _red = CatanColors.GetResourceBrush("Red");
+        readonly SolidColorBrush _yellow = CatanColors.GetResourceBrush("Yellow");
 
         new public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register("Background", typeof(Color), typeof(StopWatchCtrl), new PropertyMetadata(Colors.Black, BackgroundChanged));
         new public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register("Foreground", typeof(Color), typeof(StopWatchCtrl), new PropertyMetadata(Colors.White, ForegroundChanged));

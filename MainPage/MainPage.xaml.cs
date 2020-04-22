@@ -41,6 +41,7 @@ namespace Catan10
         public static readonly string SAVED_GAME_EXTENSION = ".log";
         public const string PlayerDataFile = "catansettings.json";
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
+        
         private readonly DispatcherTimer _timer = new DispatcherTimer();  // flips tiles back to Opacaticy = 0
         private bool _doDragDrop = false;   // this lets you double tap a map and then move it around
         private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
@@ -921,7 +922,7 @@ namespace Catan10
             List<TileCtrl> tilesWithNumber = await HighlightRolledTiles(roll);
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                tile.HighlightTile(CurrentPlayer.GameData.Background); // shows what was rolled                                
+                tile.HighlightTile(CurrentPlayer.GameData.BackgroundBrush); // shows what was rolled                                
             }
 
             if (roll == 7)

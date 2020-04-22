@@ -47,7 +47,7 @@ namespace Catan10
         }
         private void SetPlayer(PlayerModel data)
         {
-            ForegroundColor = data.GameData.Foreground.Color;
+            ForegroundColor = data.GameData.ForegroundBrush.Color;
             FillColor = data.GameData.PlayerColor;
             PlayerName = data.PlayerName;
             ImageFileName = data.ImageFileName;
@@ -111,7 +111,7 @@ namespace Catan10
         public PlayerPickerItemCtrl(PlayerModel data)
         {
             this.InitializeComponent();
-            ForegroundColor = data.GameData.Foreground.Color;
+            ForegroundColor = data.GameData.ForegroundBrush.Color;
             FillColor = data.GameData.PlayerColor;
             PlayerName = data.PlayerName;
             ImageFileName = data.ImageFileName;

@@ -26,15 +26,13 @@
         <local:ObjectToObjectValueConverter x:Key="ObjectToObjectValueConverter" />
         <local:ScoreIntToStringConverter x:Key="ScoreIntToStringConverter" />
         <local:IntToStringConverter x:Key="IntToStringConverter" />
-        <local:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+      
         <local:GameStateValueConverter x:Key="GameStateValueConverter" />
         <local:NullToBoolConverter x:Key="NullToBoolConverter" />
         <local:StorageFileToString x:Key="StorageFileToString" />
         <local:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <local:StringToIntListConverter x:Key="StringToIntListConverter" />
-        <local:ColorToColorChoice x:Key="ColorToColorChoiceConverter" />
-        <local:ColorToColorChoiceIndex x:Key="ColorToColorChoiceIndexConverter" />
         <local:StringToImageBrushConverter x:Key="StringToImageBrushConverter" />
         <local:CountToOrientationConverter x:Key="CountToOrientationConverter" />
         <local:BuildingStateToVisibilityConverter x:Key="BuildingStateToVisibilityConverter" />

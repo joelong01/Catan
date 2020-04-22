@@ -1,6 +1,7 @@
 ﻿using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -13,29 +14,28 @@ namespace Catan10
             this.InitializeComponent();
         }
 
-        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(Color), typeof(SettlementCtrl), new PropertyMetadata(Colors.Blue, PlayerColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Color), typeof(CityCtrl), new PropertyMetadata(Colors.Black));
-        public Color CastleColor
+        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(new SolidColorBrush(Colors.Blue), PlayerColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(Colors.Black));
+        public SolidColorBrush CastleColor
         {
-            get => (Color)GetValue(CastleColorProperty);
-            private set => SetValue(CastleColorProperty, value);
+            get => (SolidColorBrush)GetValue(CastleColorProperty);
+            set => SetValue(CastleColorProperty, value);
         }
 
-
-        public Color PlayerColor
+        public SolidColorBrush PlayerColor
         {
-            get => (Color)GetValue(PlayerColorProperty);
+            get => (SolidColorBrush)GetValue(PlayerColorProperty);
             set => SetValue(PlayerColorProperty, value);
         }
         private static void PlayerColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             SettlementCtrl depPropClass = d as SettlementCtrl;
-            Color depPropValue = (Color)e.NewValue;
-            depPropClass.SetPlayerColor(depPropValue);
+            SolidColorBrush depPropValue = (SolidColorBrush)e.NewValue;
+            depPropClass.SetFillColor(depPropValue);
         }
-        private void SetPlayerColor(Color color)
+        private void SetFillColor(SolidColorBrush foreground)
         {
-            CastleColor = StaticHelpers.BackgroundToForegroundColorDictionary[color];
+            CastleColor = CatanColors.GetForegroundBrush(foreground);
         }
 
     }

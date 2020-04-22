@@ -133,12 +133,12 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Rectangle Grid.Row="0" Fill="{x:Bind FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.GameData.Background}" Stroke="{StaticResource WhiteBrush}" StrokeThickness="1" />
+            <Rectangle Grid.Row="0" Fill="{x:Bind FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.GameData.BackgroundBrush}" Stroke="{StaticResource WhiteBrush}" StrokeThickness="1" />
             <Viewbox HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Button Background="Transparent" Click="OnGrowOrShrinkControls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" />
             </Viewbox>
             <Viewbox HorizontalAlignment="Center">
-                <TextBlock Text="{x:Bind FallbackValue=Nobody (yet), Mode=OneWay, Path=CurrentPlayer.PlayerName}" CharacterSpacing="0" Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=CurrentPlayer.GameData.Foreground}" />
+                <TextBlock Text="{x:Bind FallbackValue=Nobody (yet), Mode=OneWay, Path=CurrentPlayer.PlayerName}" CharacterSpacing="0" Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=CurrentPlayer.GameData.ForegroundBrush}" />
             </Viewbox>
             <Border Grid.Row="1" BorderBrush="{StaticResource WhiteBrush}" BorderThickness="1">
                 <StackPanel Margin="0" Orientation="Vertical" Background="Black">
@@ -216,9 +216,9 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="10*" />
             </Grid.RowDefinitions>
-            <Rectangle Grid.Row="0" Fill="{x:Bind Path=CurrentPlayer.GameData.Background, Mode=OneWay}" Stroke="White" StrokeThickness="1" />
+            <Rectangle Grid.Row="0" Fill="{x:Bind Path=CurrentPlayer.GameData.BackgroundBrush, Mode=OneWay}" Stroke="White" StrokeThickness="1" />
             <Viewbox HorizontalAlignment="Center">
-                <TextBlock Text="Catan" CharacterSpacing="0" Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}" />
+                <TextBlock Text="Catan" CharacterSpacing="0" Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}" />
             </Viewbox>
             <Viewbox Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Button Click="OnGrowOrShrinkRolls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" />
@@ -384,7 +384,21 @@
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Private Data"
                 Style="{StaticResource HeaderTextBlockStyle}"
                 FontSize="22" />
-            <ListBox Grid.Row="1" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            <ListBox Grid.Row="1" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" > 
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="local:PlayerModel">
+                        <local:PrivateDataCtrl PlayerResources="{x:Bind GameData.PlayerResources}" />
+                    </DataTemplate>    
+            </ListBox.ItemTemplate>
+                 
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Margin" Value="5,0,5,0" />
+                    <Setter Property="Padding" Value="5" />
+                    
+                </Style>
+            </ListBox.ItemContainerStyle>
+            </ListBox>
 
         </Grid>
         <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"

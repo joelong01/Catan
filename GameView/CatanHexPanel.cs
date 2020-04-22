@@ -69,7 +69,7 @@ namespace Catan10
         private double _normalWidth = 110;
         private double _normalHeight = 96;
         private readonly List<int> RowCounts = new List<int>(); // RowCounts[0] tells you how many rows there are in the 0th Column
-        private Color _buildColor = Colors.Black;
+        
         private TileCtrl _pirateTile = null;
         private TileCtrl _baronTile = null;
         private readonly Dictionary<int, int> BuildingIndexToHarborIndexDict = new Dictionary<int, int>();
@@ -457,11 +457,7 @@ namespace Catan10
         }
         public List<TileCtrl> DesertTiles => _desertTiles;
 
-        public string Color
-        {
-            get => StaticHelpers.ColorToStringDictionary[_buildColor];
-            set => _buildColor = StaticHelpers.StringToColorDictionary[value];
-        }
+      
         public int Columns => RowCounts.Count();
 
 

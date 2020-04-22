@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Catan.Proxy;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,6 +9,7 @@ using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 
 // The Content Dialog item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -28,7 +30,7 @@ namespace Catan10
 
         public ObservableCollection<PlayerModel> PlayerDataList { get; } = new ObservableCollection<PlayerModel>();
 
-
+        public ObservableCollection<SolidColorBrush> AvailableColors = new ObservableCollection<SolidColorBrush>();
 
         public PlayerManagementDlg(ICollection<PlayerModel> playerData, ILog log)
         {
@@ -39,7 +41,7 @@ namespace Catan10
                 PlayerDataList.Add(p);
             }
 
-
+            AvailableColors.AddRange(CatanColors.AllAvailableBrushes());
         }
 
 
@@ -164,21 +166,6 @@ namespace Catan10
     }
 
 
-    public class ColorChoices
-    {
-        public Color Background { get; set; } = Colors.Blue;
-        public Color Foreground { get; set; } = Colors.White;
-        public string Name { get; set; } = "Blue";
-        public ColorChoices(string name, Color background, Color foreground)
-        {
-            Background = background;
-            Foreground = foreground;
-            Name = name;
-        }
-        public override string ToString()
-        {
-            return String.Format($"{Name} - {Background}:{Foreground}");
-        }
-    }
+
 }
 

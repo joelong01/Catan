@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
@@ -609,13 +610,14 @@ namespace Catan10
             }
 
 
-            foreach (KeyValuePair<string, Windows.UI.Color> kvp in StaticHelpers.StringToColorDictionary)
+            foreach (var kvp in CatanColors.NameToColorDictionary)
             {
                 ToggleMenuFlyoutItem item = new ToggleMenuFlyoutItem
                 {
                     Text = kvp.Key,
                     Tag = kvp.Value
                 };
+
                 item.Click += PlayerColor_Clicked;
                 Menu_Colors.Items.Add(item);
             }

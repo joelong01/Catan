@@ -8,7 +8,7 @@
     mc:Ignorable="d">
     <Border Margin="-2" CornerRadius="30,15,15,10" BorderThickness="4" BorderBrush="{StaticResource bmMaple}">
 
-        <Grid Width="605" Background="{x:Bind PlayerData.GameData.Background, Mode=OneWay}">
+        <Grid Width="605" Background="{x:Bind PlayerData.GameData.BackgroundBrush, Mode=OneWay}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="60" />
                 <RowDefinition Height="50" />
@@ -35,7 +35,7 @@
             <!--  Top Row with resource tracking  -->
             <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Height="44"
                 Margin="3,0,5,0" VerticalAlignment="Stretch" Orientation="Horizontal"
-                BorderBrush="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                BorderBrush="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                 BorderThickness="1" CornerRadius="6">
 
 
@@ -57,7 +57,7 @@
                 </Viewbox>
                 <TextBlock Margin="2,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     Text="12" FontSize="38"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" />
 
                 <Viewbox>
@@ -73,7 +73,7 @@
 
                 <TextBlock Margin="2,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     Text="8" FontSize="38"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" />
 
                 <Viewbox Margin="5,0,0,0">
@@ -106,67 +106,67 @@
                 <!--  Roads  -->
                 <TextBlock Grid.Column="0" Margin="10,0,2,0" HorizontalAlignment="Center"
                     VerticalAlignment="Center" Text="⛙" FontFamily="Segoe UI Symbol" FontSize="38"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <TextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind PlayerData.GameData.RoadsPlayed, Mode=OneWay, FallbackValue=7}"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" FontSize="28" />
                 <TextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Text="/"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" FontSize="28" />
                 <TextBlock Name="_txtRoads" Grid.Column="1" HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Text="{x:Bind PlayerData.GameData.MaxRoads, Mode=OneWay, FallbackValue=7}"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" FontSize="28" />
 
 
                 <!--  Settlements  -->
                 <Viewbox Margin="0,0,0,0">
-                    <local:SettlementCtrl Width="30" Height="30" Margin="5,0,0,0" PlayerColor="{x:Bind PlayerData.GameData.PlayerColor, FallbackValue=Black, Mode=OneWay}" />
+                    <local:SettlementCtrl Width="30" Height="30" Margin="5,0,0,0" PlayerColor="{x:Bind PlayerData.GameData.BackgroundBrush, FallbackValue=Black, Mode=OneWay}" />
                 </Viewbox>
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind PlayerData.GameData.SettlementsPlayed, Mode=OneWay, FallbackValue=7}"
                     FontFamily="Century Schoolbook" FontSize="28"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="/"
                     FontFamily="Century Schoolbook" FontSize="28"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind PlayerData.GameData.MaxSettlements, Mode=OneWay, FallbackValue=7}"
                     FontFamily="Century Schoolbook" FontSize="28"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                 <!--  Cities  -->
                 <Viewbox Margin="0,0,0,0">
-                    <local:CityCtrl Margin="0,0,0,0" PlayerColor="{x:Bind PlayerData.GameData.PlayerColor, FallbackValue=Black, Mode=OneWay}" />
+                    <local:CityCtrl Margin="0,0,0,0" PlayerColor="{x:Bind PlayerData.GameData.BackgroundBrush, FallbackValue=Black, Mode=OneWay}" />
                 </Viewbox>
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind PlayerData.GameData.CitiesPlayed, Mode=OneWay, FallbackValue=7}"
                     FontFamily="Century Schoolbook" FontSize="28"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="/"
                     FontFamily="Century Schoolbook" FontSize="28"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind PlayerData.GameData.MaxCities, Mode=OneWay, FallbackValue=7}"
                     FontFamily="Century Schoolbook" FontSize="28"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                 <!--  Boats  -->
-                <local:SailboatCtrl Margin="50,0,0,0" CircleColor="{x:Bind PlayerData.GameData.Foreground.Color, Mode=OneWay, FallbackValue=Green}" Visibility="{x:Bind PlayerData.GameData.ShipsVisible, Mode=OneTime}" />
+                <local:SailboatCtrl Margin="50,0,0,0" CircleColor="{x:Bind PlayerData.GameData.ForegroundBrush.Color, Mode=OneWay, FallbackValue=Green}" Visibility="{x:Bind PlayerData.GameData.ShipsVisible, Mode=OneTime}" />
                 <TextBlock Grid.Column="7" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind PlayerData.GameData.ShipsPlayed, Mode=OneWay, FallbackValue=15}"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" FontSize="18"
                     Visibility="{x:Bind PlayerData.GameData.ShipsVisible, Mode=OneTime}" />
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="/"
                     FontFamily="Century Schoolbook" FontSize="18"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     Visibility="{x:Bind PlayerData.GameData.ShipsVisible, Mode=OneTime}" />
                 <TextBlock Grid.Column="7" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind PlayerData.GameData.MaxShips, Mode=OneWay, FallbackValue=15}"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     Visibility="{x:Bind PlayerData.GameData.ShipsVisible, Mode=OneTime}"
                     FontFamily="Century Schoolbook" FontSize="18" />
             </StackPanel>
@@ -179,41 +179,41 @@
 
                     <!--  Score  -->
 
-                    <TextBlock Margin="10,0,0,0" FontSize="72" Text="{x:Bind PlayerData.GameData.Score, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    <TextBlock Margin="10,0,0,0" FontSize="72" Text="{x:Bind PlayerData.GameData.Score, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                     <!--  Resources Acquired  -->
                     <local:ResourceCardCtrl Margin="30,0,0,0" Orientation="FaceDown" />
                     <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"
                         FontWeight="ExtraBold" />
-                    <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind PlayerData.GameData.ResourcesAcquired, Mode=OneWay, FallbackValue=68}" Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind PlayerData.GameData.ResourcesAcquired, Mode=OneWay, FallbackValue=68}" Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                     <!--  Gold Cards  -->
 
 
                     <local:ResourceCardCtrl Margin="30,0,0,0" ResourceType="GoldMine" Orientation="FaceUp" CountVisible="Collapsed" />
                     <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"
                         FontWeight="ExtraBold" />
-                    <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind PlayerData.GameData.GoldTotal, Mode=OneWay, FallbackValue=0}" Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind PlayerData.GameData.GoldTotal, Mode=OneWay, FallbackValue=0}" Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                     <!--  Longest Road  -->
 
                     <TextBlock Margin="30,0,5,0" Text="⛐" FontFamily="Segoe UI Symbol" FontSize="68"
-                        Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                        Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
-                    <TextBlock Text="{x:Bind PlayerData.GameData.LongestRoad, Mode=OneWay, FallbackValue=12}" FontSize="68" Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    <TextBlock Text="{x:Bind PlayerData.GameData.LongestRoad, Mode=OneWay, FallbackValue=12}" FontSize="68" Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                     <TextBlock Margin="3,0,0,0" Text="✔" FontSize="68"
-                        Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                        Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                         Visibility="{x:Bind PlayerData.GameData.HasLongestRoad, FallbackValue=Visible, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}" />
 
                     <!--  Largest Army  -->
                     <TextBlock Margin="30,0,5,0" Text="♞" FontFamily="Segoe UI Symbol" FontSize="68"
-                        Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                        Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
-                    <TextBlock FontSize="68" Text="{x:Bind PlayerData.GameData.KnightsPlayed, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    <TextBlock FontSize="68" Text="{x:Bind PlayerData.GameData.KnightsPlayed, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                     <TextBlock Margin="3,0,0,0" Text="✔" FontSize="68"
                         Visibility="{x:Bind PlayerData.GameData.LargestArmy, FallbackValue=Visible, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"
-                        Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                        Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                 </StackPanel>
             </Viewbox>
@@ -259,17 +259,17 @@
                 <!--  Current Turn Checkbox  -->
                 <TextBlock HorizontalAlignment="Left" Text="&#x2714;" FontSize="35"
                     Visibility="{x:Bind PlayerData.GameData.IsCurrentPlayer, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                 <!--  Times Targetted  -->
                 <TextBlock Margin="10,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                     FontSize="35" Text="&#xF272;" FontFamily="Segoe MDL2 Assets"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                 <TextBlock Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     FontSize="35"
                     Text="{x:Bind PlayerData.GameData.TimesTargeted, Mode=OneWay, FallbackValue=0}"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" />
 
                 <!--  Cards lost to Baron  -->
@@ -284,7 +284,7 @@
                     FontSize="35"
                     Text="{x:Bind PlayerData.GameData.CardsLostToBaron, Mode=OneWay, FallbackValue=7}"
                     FontFamily="Century Schoolbook"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                 <!--  No ResourceCount (Bad Rolls)  -->
                 <Viewbox>
@@ -298,27 +298,27 @@
                     FontSize="35"
                     Text="{x:Bind PlayerData.GameData.NoResourceCount, Mode=OneWay, FallbackValue=7}"
                     FontFamily="Century Schoolbook"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
 
                 <!--  Pips  -->
                 <TextBlock Margin="10,-17,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="&#x00B7;" FontFamily="Segoe UI" FontSize="85"
                     CharacterSpacing="0" HorizontalTextAlignment="Left"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <TextBlock Margin="-8,-17,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="&#x00B7;" FontFamily="Segoe UI" FontSize="85"
                     CharacterSpacing="0" HorizontalTextAlignment="Left"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <TextBlock Margin="-8,-17,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="&#x00B7;" FontFamily="Segoe UI" FontSize="85"
                     CharacterSpacing="0" HorizontalTextAlignment="Left"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                 <TextBlock Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     FontSize="35"
                     Text="{x:Bind PlayerData.GameData.Pips, Mode=OneWay, FallbackValue=0}"
-                    Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" />
 
             </StackPanel>
@@ -347,21 +347,21 @@
 
                 <!--  Card Stats  -->
                 <StackPanel Grid.RowSpan="5" Grid.Column="2" Margin="2,2,6,-3" Background="Transparent"
-                    BorderBrush="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}"
+                    BorderBrush="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     BorderThickness="1" CornerRadius="11">
 
                     <StackPanel Orientation="Horizontal">
 
                         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="⚃⚂"
                             FontFamily="Segoe UI Symbol" FontSize="36"
-                            Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                            Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
 
 
                         <TextBlock Grid.Row="0" Grid.Column="3" Margin="33,0,0,0" VerticalAlignment="Center"
                             FontSize="33"
                             Text="{x:Bind PlayerData.GameData.CardsLostToSeven, Mode=TwoWay, FallbackValue=88, Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                            Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                            Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                     </StackPanel>
 
@@ -380,7 +380,7 @@
                         <TextBlock Grid.Row="1" Grid.Column="2" Margin="30,0,0,0" VerticalAlignment="Center"
                             FontSize="32"
                             Text="{x:Bind PlayerData.GameData.CardsLostToMonopoly, Mode=TwoWay, FallbackValue=20, Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                            Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                            Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
 
 
@@ -389,20 +389,20 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="⚃⚁☠" FontFamily="Segoe UI Symbol"
                             FontSize="32"
-                            Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                            Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
 
 
                         <TextBlock Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
                             FontSize="32"
                             Text="{x:Bind PlayerData.GameData.MaxNoResourceRolls, Mode=OneWay, FallbackValue=15}"
-                            Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                            Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="⚃⚁☻" FontFamily="Segoe UI Symbol"
                             FontSize="32"
-                            Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                            Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
 
 
@@ -410,7 +410,7 @@
                         <TextBlock Grid.Row="3" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
                             FontSize="32"
                             Text="{x:Bind PlayerData.GameData.RollsWithResource, Mode=OneWay, FallbackValue=5}"
-                            Foreground="{x:Bind PlayerData.GameData.Foreground, Mode=OneWay, FallbackValue=White}" />
+                            Foreground="{x:Bind PlayerData.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 
 
                     </StackPanel>

@@ -11,13 +11,9 @@
 
     <ContentDialog.Resources>
 
-        <DataTemplate x:Key="ColorListDataTemplate" x:DataType="local:ColorChoices">
+        <DataTemplate x:Key="ColorListDataTemplate" x:DataType="Brush">
             <Grid>
-                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{x:Bind Background, Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Blue}" />
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Text="{x:Bind Name}"
-                    FontSize="24"
-                    Foreground="{x:Bind Foreground, Converter={StaticResource ResourceKey=ColorToBrushConverter}, FallbackValue=Blue}" />
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{x:Bind}" />
             </Grid>
 
         </DataTemplate>
@@ -34,15 +30,15 @@
                 </Grid.RowDefinitions>
                 <Rectangle Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
-                    Fill="{x:Bind FallbackValue=Blue, Mode=OneWay, Path=GameData.Background}" />
+                    Fill="{x:Bind FallbackValue=Blue, Mode=OneWay, Path=GameData.BackgroundBrush}" />
                 <Rectangle Grid.Row="0" Fill="{x:Bind ImageBrush, Mode=OneWay}" CanDrag="False" />
                 <Viewbox Grid.Row="1" Margin="1" HorizontalAlignment="Center">
-                    <TextBox HorizontalAlignment="Center" Text="{x:Bind PlayerName, FallbackValue=Nameless, Mode=TwoWay}" FontSize="22" Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.Foreground}" />
+                    <TextBox HorizontalAlignment="Center" Text="{x:Bind PlayerName, FallbackValue=Nameless, Mode=TwoWay}" FontSize="22" Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.ForegroundBrush}" />
                 </Viewbox>
                 <ComboBox Grid.Row="2" HorizontalAlignment="Stretch"
                     ItemTemplate="{StaticResource ColorListDataTemplate}"
                     ItemsSource="{x:Bind AvailableColors}"
-                    SelectedValue="{x:Bind Path=GameData.Background, Mode=OneWay}"
+                    SelectedValue="{x:Bind Path=GameData.BackgroundBrush, Mode=OneWay}"
                     SelectionChanged="OnPlayerColorChanged" />
 
                 <Grid Name="_gridSelected" Grid.RowSpan="3"
@@ -55,15 +51,15 @@
                     </Grid.ColumnDefinitions>
                     <Rectangle Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="1"
                         Fill="{StaticResource TransparentBrush}"
-                        Stroke="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.Background}"
+                        Stroke="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.BackgroundBrush}"
                         StrokeDashArray="1" StrokeThickness="4" IsHitTestVisible="False" />
                     <Rectangle Grid.Column="1" Width="20" Height="20" Margin="-10,7,0,0"
                         VerticalAlignment="Top"
-                        Fill="{x:Bind FallbackValue=Black, Mode=OneWay, Path=GameData.Foreground}"
+                        Fill="{x:Bind FallbackValue=Black, Mode=OneWay, Path=GameData.ForegroundBrush}"
                         IsHitTestVisible="False" />
                     <TextBlock Grid.Column="1" Margin="-5,2,0,0" Text="&#xE0E7;"
                         FontFamily="Segoe UI Symbol" FontSize="20" IsHitTestVisible="False"
-                        Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.Background}" />
+                        Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=GameData.BackgroundBrush}" />
 
                 </Grid>
             </Grid>

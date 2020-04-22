@@ -163,7 +163,7 @@ namespace Catan10
             {
                 if (tile.Number == roll)
                 {
-                    tile.HighlightTile(mainPage.CurrentPlayer.GameData.Background); // shows what was rolled
+                    tile.HighlightTile(mainPage.CurrentPlayer.GameData.BackgroundBrush); // shows what was rolled
                 }
                 else
                 {

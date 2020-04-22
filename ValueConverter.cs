@@ -111,7 +111,31 @@ namespace Catan10
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             ResourceType resource = (ResourceType)value;
-            return TileCtrl.LoadTileImage(resource);
+            switch (resource)
+            {
+                case ResourceType.Sheep:
+                    return (ImageBrush)App.Current.Resources["bmTileSheep"];
+                case ResourceType.Wood:
+                    return (ImageBrush)App.Current.Resources["bmTileWood"];
+                case ResourceType.Ore:
+                    return (ImageBrush)App.Current.Resources["bmTileOre"];
+                case ResourceType.Wheat:
+                    return (ImageBrush)App.Current.Resources["bmTileWheat"];
+                case ResourceType.Brick:
+                    return (ImageBrush)App.Current.Resources["bmTileBrick"];
+                case ResourceType.GoldMine:
+                    return (ImageBrush)App.Current.Resources["bmTileGoldMine"];
+                case ResourceType.Desert:
+                    return (ImageBrush)App.Current.Resources["bmTileDesert"];
+                case ResourceType.Back:
+                    return (ImageBrush)App.Current.Resources["bmTileBack"];
+                case ResourceType.Sea:
+                    return (ImageBrush)App.Current.Resources["bmTileSheep"];
+                case ResourceType.None:
+                    return (ImageBrush)App.Current.Resources["TransparentBrush"];
+                default:
+                    throw new Exception($"Unexpected value type in ResourceType {resource} in LoadTileImage");
+            }
 
         }
 
@@ -275,72 +299,7 @@ namespace Catan10
         }
     }
 
-    public class ColorToColorChoice : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-
-            foreach (ColorChoices choice in PlayerModel._availableColors)
-            {
-                if (choice.Background == (Color)value)
-                {
-                    if (targetType == typeof(String))
-                    {
-                        return choice.Name;
-                    }
-
-                    return choice;
-                }
-            }
-
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            if (value == null)
-            {
-                return Colors.Blue;
-            }
-
-            if (targetType == typeof(Color) && value.GetType() == typeof(String))
-            {
-                return StaticHelpers.StringToColorDictionary[(string)value];
-            }
-
-
-            return ((ColorChoices)value).Background;
-        }
-    }
-
-    //
-    //  pass in a color, return the index into the ColorChoices array
-    public class ColorToColorChoiceIndex : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            for (int idx = 0; idx < PlayerModel._availableColors.Count; idx++)
-            {
-                ColorChoices choice = PlayerModel._availableColors[idx];
-                if (choice.Background == (Color)value)
-                {
-                    return idx;
-                }
-            }
-
-            return -1;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            if ((int)value == -1)
-            {
-                return PlayerModel._availableColors[4].Background;
-            }
-
-            return PlayerModel._availableColors[(int)value].Background;
-        }
-    }
+   
 
     //
     //  pass in a list like "1,2,3,4" and convert it to a List<int> {1, 2, 3, 4}
@@ -515,56 +474,7 @@ namespace Catan10
         }
     }
 
-    public class ColorToBrushConverter : IValueConverter
-    {
-
-        private static Color Parse(string color)
-        {
-            var offset = color.StartsWith("#") ? 1 : 0;
-
-            var a = Byte.Parse(color.Substring(0 + offset, 2), NumberStyles.HexNumber);
-            var r = Byte.Parse(color.Substring(2 + offset, 2), NumberStyles.HexNumber);
-            var g = Byte.Parse(color.Substring(4 + offset, 2), NumberStyles.HexNumber);
-            var b = Byte.Parse(color.Substring(6 + offset, 2), NumberStyles.HexNumber);
-
-            return Color.FromArgb(a, r, g, b);
-        }
-
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-
-            if (value == null)
-                return StaticHelpers.GetResourceBrush("Transparent");
-
-            string c = StaticHelpers.GetKnownColorName(value.ToString());
-            if (c != "")
-            {
-                return StaticHelpers.GetResourceBrush(c);
-            }
-
-            if (value is Color)
-            {
-                return new SolidColorBrush((Color)value);
-            }
-
-
-            if (value is string)
-                return new SolidColorBrush(Parse((string)value));
-
-            throw new NotSupportedException("ColorToBurshConverter only supports converting from Color and String");
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-
-
-    }
-
-
-
-
+  
 
     public class ScoreIntToStringConverter : IValueConverter
     {

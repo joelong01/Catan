@@ -97,12 +97,13 @@ namespace Catan10
             switch (value)
             {
 
+                case DevCardType.Knight:
+                    ShownImage = (ImageBrush)App.Current.Resources["bmKnight"];
+                    break;
                 case DevCardType.VictoryPoint:
                     ShownImage = (ImageBrush)App.Current.Resources["bmVictoryPoint"];
                     break;
-                case DevCardType.Knight:
-                    ShownImage = (ImageBrush)App.Current.Resources["bmKnigh"];
-                    break;
+               
                 case DevCardType.YearOfPlenty:
                     ShownImage = (ImageBrush)App.Current.Resources["bmYearOfPlenty"];
                     break;
@@ -137,7 +138,7 @@ namespace Catan10
         private void SetReadOnly(bool value)
         {
 
-            _txtCount.IsReadOnly = value;
+            
         }
         //
         //  should only be set by ResourceType

@@ -43,15 +43,18 @@ namespace Catan10
         private ImageBrush _imageBrush = null;
         private string _colorAsString = "HotPink";
         private bool _isCurrentPlayer = false;
-        public static ObservableCollection<ColorChoices> _availableColors = new ObservableCollection<ColorChoices>();
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         public int AllPlayerIndex { get; set; } = -1;
 
         [JsonIgnore]
         public ILog Log { get; set; } = null;
-
         [JsonIgnore]
+        public ObservableCollection<SolidColorBrush> AvailableColors => new ObservableCollection<SolidColorBrush>(CatanColors.AllAvailableBrushes());
+
+
+
         public bool IsCurrentPlayer
         {
             get => _isCurrentPlayer;
@@ -166,24 +169,13 @@ namespace Catan10
                 }
             }
         }
-        [JsonIgnore]
-        public ObservableCollection<ColorChoices> AvailableColors => PlayerModel._availableColors;
-
+        
 
         public PlayerModel(ILog log)
         {
             GameData = new PlayerGameModel(this);
             Log = log;
-
-            if (_availableColors.Count == 0)
-            {
-                foreach (KeyValuePair<string, Color> kvp in StaticHelpers.StringToColorDictionary)
-                {
-                    ColorChoices choice = new ColorChoices(kvp.Key, kvp.Value, StaticHelpers.BackgroundToForegroundColorDictionary[kvp.Value]);
-                    _availableColors.Add(choice);
-                }
-            }
-
+          
         }
 
 

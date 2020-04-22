@@ -17,9 +17,9 @@ namespace Catan10
     {
         public int Probability { get; set; } = 0; // the number (divided by 36) that represents the probability of this number being rolled
 
-        readonly SolidColorBrush _redBrush = StaticHelpers.GetResourceBrush("Red");
-        readonly SolidColorBrush _blackBrush = StaticHelpers.GetResourceBrush("Black");
-        readonly SolidColorBrush _whiteBrush = StaticHelpers.GetResourceBrush("White");
+        readonly SolidColorBrush _redBrush = CatanColors.GetResourceBrush("Red");
+        readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black");
+        readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White");
         NumberColorTheme myTheme = NumberColorTheme.Dark;
         public NumberStyle NumberStyle { get; set; } = NumberStyle.Default;
         bool _showEyes = false;

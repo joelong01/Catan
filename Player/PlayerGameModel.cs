@@ -361,6 +361,22 @@ namespace Catan10
         private int _MaxSettlements = 0;
         private bool _useLightFile = true;
         List<List<int>> _GoldRolls = new List<List<int>>();
+        PlayerResources _PlayerResources = new PlayerResources();
+        public PlayerResources PlayerResources
+        {
+            get
+            {
+                return _PlayerResources;
+            }
+            set
+            {
+                if (_PlayerResources != value)
+                {
+                    _PlayerResources = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         public List<List<int>> GoldRolls
         {
@@ -417,13 +433,13 @@ namespace Catan10
                     LogPropertyChanged(_ColorAsString, value, true); // when you change the color, it will look like something you shoudl be able to undo, hence the "true"
                     _ColorAsString = value;
                     NotifyPropertyChanged();
-                    Background = CreateBrushFromResource(value);
+                    BackgroundBrush = CatanColors.GetResourceBrush(value);
                     NotifyPropertyChanged("Background");
-                    Foreground = CreateBrushFromResource(StaticHelpers.BackgroundToForegroundDictionary[value]);
+                    ForegroundBrush = CatanColors.GetForegroundBrush(value);
                     NotifyPropertyChanged("Foreground");
-                    PlayerColor = Background.Color;
+                    PlayerColor = BackgroundBrush.Color;
                     NotifyPropertyChanged("PlayerColor");
-                    if (Foreground.Color != Colors.White)
+                    if (ForegroundBrush.Color != Colors.White)
                     {
                         UseLightFile = true;
                     }
@@ -436,16 +452,9 @@ namespace Catan10
                 }
             }
         }
-        public SolidColorBrush Foreground { get; private set; } = (SolidColorBrush)App.Current.Resources["WhiteBrush"];  // this is what CastleColor and the like should bind to
-        public SolidColorBrush Background { get; private set; } = (SolidColorBrush)App.Current.Resources["GreenBrush"]; // this is what "Fill" and the like should bind to
+        public SolidColorBrush ForegroundBrush { get; private set; } = (SolidColorBrush)App.Current.Resources["WhiteBrush"];  // this is what CastleColor and the like should bind to
+        public SolidColorBrush BackgroundBrush { get; private set; } = (SolidColorBrush)App.Current.Resources["GreenBrush"]; // this is what "Fill" and the like should bind to
         public Color PlayerColor { get; private set; } = Colors.Green;
-
-        private SolidColorBrush CreateBrushFromResource(string color)
-        {
-            return StaticHelpers.GetResourceBrush(color);
-
-        }
-
 
 
         private int pips = 0;

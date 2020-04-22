@@ -14,16 +14,16 @@
         <!--  Used for debugging the layout and number of Buildings.  Left here for easy uncommenting  -->
         <!--<TextBlock Text="{x:Bind Index, Mode=OneWay, FallbackValue=1}" HorizontalAlignment="Center" FontSize="24" Visibility="Collapsed" />-->
         <Grid Name="GRID_Pips" Visibility="{x:Bind BuildingState, FallbackValue=Collapsed, ConverterParameter=Pips, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
-            <Ellipse Name="_pipEllipse" Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.GameData.Background, Mode=OneWay}" />
+            <Ellipse Name="_pipEllipse" Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.GameData.BackgroundBrush, Mode=OneWay}" />
             <Viewbox>
                 <StackPanel>
                     <TextBlock Margin="6,-9,5,-4" Padding="0" HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Text="{x:Bind Pips, FallbackValue=2, Mode=OneWay, Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                        Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                        Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                         CharacterSpacing="0" FontSize="32" />
                     <!--<TextBlock Text="{x:Bind Index, FallbackValue=52, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                      Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                      Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                        CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />-->
                 </StackPanel>
             </Viewbox>
@@ -31,40 +31,40 @@
         </Grid>
 
         <Grid Name="GRID_Build" Opacity="1" Visibility="{x:Bind BuildingState, FallbackValue=Visible, ConverterParameter=Build, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
-            <Ellipse Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.GameData.Background, Mode=OneWay}" />
+            <Ellipse Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.GameData.BackgroundBrush, Mode=OneWay}" />
             <Viewbox>
                 <TextBlock Margin="6,-9,5,-4" Padding="0" HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Text="{x:Bind Pips, FallbackValue=52, Mode=TwoWay, Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                    Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                    Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                     CharacterSpacing="0" FontSize="32" />
 
                 <!--<TextBlock Text="{x:Bind Index, FallbackValue=-1, Mode=TwoWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />-->
             </Viewbox>
             <!--  this is just here for debugging purposed  -->
             <!--<Viewbox>
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Grp:"Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                        <TextBlock Text="Grp:"Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4"/>
                         <TextBlock Text="{x:Bind PipGroup, FallbackValue=2, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Idx:"Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                        <TextBlock Text="Idx:"Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4"/>
                         <TextBlock Text="{x:Bind Index, FallbackValue=52, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Pips:"Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                        <TextBlock Text="Pips:"Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4"/>
                         <TextBlock Text="{x:Bind Pips, FallbackValue=52, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}"
+                                  Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                     </StackPanel>
                 </StackPanel>
@@ -73,11 +73,11 @@
         </Grid>
 
         <Grid Name="GRID_Error" Opacity=".25" Visibility="{x:Bind BuildingState, FallbackValue=Collapsed, ConverterParameter=Error, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
-            <Ellipse Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.GameData.Background, Mode=OneWay}" />
+            <Ellipse Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.GameData.BackgroundBrush, Mode=OneWay}" />
             <TextBlock x:Name="_txtPipCount" Margin="6,-9,5,-4" Padding="0"
                 HorizontalAlignment="Center" VerticalAlignment="Center" Text="X"
                 CharacterSpacing="0" FontSize="32"
-                Foreground="{x:Bind Path=CurrentPlayer.GameData.Foreground, Mode=OneWay}" />
+                Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}" />
         </Grid>
 
         <Canvas Name="CANVAS_City"
@@ -86,7 +86,7 @@
             Background="Transparent"
             Visibility="{x:Bind BuildingState, FallbackValue=Collapsed, ConverterParameter=City, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
             <Viewbox Name="_vbCity" Width="30" Height="30" Stretch="Uniform">
-                <local:CityCtrl Width="30" Height="30" PlayerColor="{x:Bind Owner.GameData.PlayerColor, FallbackValue=HotPink, Mode=OneWay}" />
+                <local:CityCtrl Width="30" Height="30" PlayerColor="{x:Bind Owner.GameData.BackgroundBrush, FallbackValue=HotPink, Mode=OneWay}" />
             </Viewbox>
         </Canvas>
 
@@ -96,7 +96,7 @@
             Background="Transparent"
             Visibility="{x:Bind BuildingState, FallbackValue=Collapsed, ConverterParameter=Settlement, Mode=OneWay, Converter={StaticResource ResourceKey=BuildingStateToVisibilityConverter}}">
             <Viewbox Name="_vbSettlement" Width="30" Height="30" Stretch="Uniform">
-                <local:SettlementCtrl Width="30" Height="30" PlayerColor="{x:Bind Path=Owner.GameData.PlayerColor, Mode=OneWay}" />
+                <local:SettlementCtrl Width="30" Height="30" PlayerColor="{x:Bind Path=Owner.GameData.BackgroundBrush, Mode=OneWay}" />
             </Viewbox>
         </Canvas>
 

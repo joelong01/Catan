@@ -20,8 +20,8 @@ namespace Catan10
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
 
-        readonly SolidColorBrush _blackBrush = StaticHelpers.GetResourceBrush("Black");
-        readonly SolidColorBrush _whiteBrush = StaticHelpers.GetResourceBrush("White");
+        readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black");
+        readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White");
         private TileOrientation _orientation = TileOrientation.FaceDown;
         private bool _useClassic = true;
         private HarborLocation _location = HarborLocation.None;

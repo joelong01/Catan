@@ -115,6 +115,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CatanColors.cs" />
     <Compile Include="CatanService\ServiceClient.cs" />
     <Compile Include="ContentDialogs\PlayerPickerDlg.xaml.cs">
       <DependentUpon>PlayerPickerDlg.xaml</DependentUpon>

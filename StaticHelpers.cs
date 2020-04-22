@@ -44,76 +44,6 @@ namespace Catan10
     public static class StaticHelpers
     {
 
-        public static Dictionary<string, Color> StringToColorDictionary { get; } = new Dictionary<string, Color>()
-        {
-            {"Blue", Colors.Blue },
-            {"Red", Colors.Red },
-            {"White", Colors.White },
-            {"Yellow", Colors.Yellow },
-            {"Green", Colors.Green },
-            {"Brown", Colors.Brown },
-            {"DarkGray", Colors.DarkGray },
-            {"Black", Colors.Black },
-            {"Purple", Colors.Purple }
-        };
-        public static Dictionary<Color, string> ColorToStringDictionary { get; } = new Dictionary<Color, string>()
-        {
-            { Colors.Blue     ,  "Blue"     },
-            { Colors.Red      ,  "Red"      },
-            { Colors.White    ,  "White"    },
-            { Colors.Yellow   ,  "Yellow"   },
-            { Colors.Green    ,  "Green"    },
-            { Colors.Brown    ,  "Brown"    },
-            { Colors.DarkGray ,  "DarkGray" },
-            { Colors.Black    ,  "Black"    },
-            {Colors.Purple, "Purple" }
-        };
-
-        public static Dictionary<string, string> BackgroundToForegroundDictionary { get; } = new Dictionary<string, string>()
-        {
-            { "Blue"     , "White" },
-            { "Red"      , "White" },
-            { "White"    , "Black" },
-            { "Yellow"   , "Black" },
-            { "Green"    , "Black" },
-            { "Brown"    , "White" },
-            { "DarkGray" , "White" },
-            { "Black"    , "White" },
-            { "Purple"   , "White" }
-
-        };
-
-        public static ObservableCollection<string> AvailableColors { get; } = new ObservableCollection<string>()
-        {
-            { "Blue"     },
-            { "Red"      },
-            { "White"    },
-            { "Yellow"   },
-            { "Green"    },
-            { "Brown"    },
-            { "DarkGray" },
-            { "Black"    },
-            {"Purple"    }
-
-        };
-
-        public static Dictionary<Color, Color> BackgroundToForegroundColorDictionary { get; } = new Dictionary<Color, Color>()
-        {
-            { Colors.Blue     , Colors.White },
-            { Colors.Red      , Colors.White },
-            {Colors.Transparent, Colors.Transparent },
-            { Colors.White    , Colors.Black },
-            { Colors.Yellow   , Colors.Black },
-            { Colors.Green    , Colors.Black },
-            { Colors.Brown, Colors.White},
-            { Colors.DarkGray , Colors.White},
-            { Colors.Black   , Colors.White },
-            { Colors.HotPink   , Colors.Purple},
-            {Colors.Purple, Colors.White }
-
-
-        };
-
         public static ResourceType HarborTypeToResourceType(HarborType ht)
         {
             switch (ht)
@@ -489,27 +419,7 @@ namespace Catan10
             return dict;
         }
 
-        internal static SolidColorBrush GetResourceBrush(string color)
-        {
-            try
-            {
-                return (SolidColorBrush)App.Current.Resources[$"{color}Brush"];
-            }
-            catch
-            {
-                App.Current.TraceMessage($"Unexpected Color {color} in CreateBrushFromResource ");
-                return (SolidColorBrush)App.Current.Resources["HotPinkBrush"];
-            }
-        }
-
-        public static string GetKnownColorName(string hexString)
-        {
-            var color = (System.Drawing.Color)new System.Drawing.ColorConverter().ConvertFromString(hexString);
-            System.Drawing.KnownColor knownColor = color.ToKnownColor();
-
-            string name = knownColor.ToString();
-            return name.Equals("0") ? "" : name;
-        }
+              
 
         //
         //  an interface called by the drag and drop code so we can simlulate the DragOver behavior
