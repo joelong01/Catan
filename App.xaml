@@ -26,7 +26,7 @@
         <local:ObjectToObjectValueConverter x:Key="ObjectToObjectValueConverter" />
         <local:ScoreIntToStringConverter x:Key="ScoreIntToStringConverter" />
         <local:IntToStringConverter x:Key="IntToStringConverter" />
-      
+
         <local:GameStateValueConverter x:Key="GameStateValueConverter" />
         <local:NullToBoolConverter x:Key="NullToBoolConverter" />
         <local:StorageFileToString x:Key="StorageFileToString" />

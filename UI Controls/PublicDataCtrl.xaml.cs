@@ -1,4 +1,6 @@
-﻿using Windows.UI.Xaml;
+﻿using Catan.Proxy;
+using System.Collections.ObjectModel;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Shapes;
 
@@ -6,18 +8,34 @@ using Windows.UI.Xaml.Shapes;
 
 namespace Catan10
 {
-    public sealed partial class PlayerGameViewCtrl : UserControl
+    public sealed partial class PublicDataCtrl : UserControl
     {
-        public static readonly DependencyProperty PlayerDataProperty = DependencyProperty.Register("PlayerData", typeof(PlayerModel), typeof(PlayerGameViewCtrl), new PropertyMetadata(new PlayerModel()));
+        private ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
+        public static readonly DependencyProperty PlayerDataProperty = DependencyProperty.Register("PlayerData", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
         public PlayerModel PlayerData
         {
             get => (PlayerModel)GetValue(PlayerDataProperty);
             set => SetValue(PlayerDataProperty, value);
         }
+        private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as PublicDataCtrl;
+            var depPropValue = (PlayerModel)e.NewValue;
+            depPropClass?.SetPlayer(depPropValue);
+        }
+        private void SetPlayer(PlayerModel value)
+        {
+            PlayedDevCards.Clear();
+            PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);
+            
+            this.PlayedDevCards.Add(DevCardType.Knight);
+            this.PlayedDevCards.Add(DevCardType.YearOfPlenty);
+            this.PlayedDevCards.Add(DevCardType.Knight);
+            this.PlayedDevCards.Add(DevCardType.Monopoly);
+        }
 
 
-
-        public PlayerGameViewCtrl()
+        public PublicDataCtrl()
         {
             this.InitializeComponent();
         }

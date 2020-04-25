@@ -14,46 +14,51 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40*" />
-            <ColumnDefinition Width="10*" />
+            <ColumnDefinition Width="105" />
+            <ColumnDefinition Width="0" />
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="1" Grid.ColumnSpan="1" Margin="5,5,0,0">
             <StackPanel Orientation="Horizontal">
                 <local:ResourceCardCtrl Margin="0" ResourceType="Wood" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.Wood, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.Wood, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Brick" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.Brick, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.Brick, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Wheat" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.Wheat, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.Wheat, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Sheep" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.Sheep, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.Sheep, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" ResourceType="Ore" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.Ore, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.Ore, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="39,0,0,0" ResourceType="GoldMine" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.GoldMine, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.GoldMine, Mode=OneWay}" />
             </StackPanel>
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                 <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Knight" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.Knights, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.Knights, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="YearOfPlenty" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.YearOfPlenty, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.YearOfPlenty, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Monopoly" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.Monopoly, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.Monopoly, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="RoadBuilding" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind PlayerResources.RoadBuilding, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.RoadBuilding, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="109,0,0,0" DevCardType="VictoryPoint" Orientation="FaceUp"
                     ReadOnly="True"
-                    Count="{x:Bind PlayerResources.VictoryPoints, Mode=OneWay}" />
+                    Count="{x:Bind Player.GameData.PlayerResources.VictoryPoints, Mode=OneWay}" />
             </StackPanel>
         </StackPanel>
-        <ListBox Grid.Row="1" Grid.Column="1" Background="{StaticResource bmMaple}" ItemsSource="{x:Bind PlayedDevCards}" Margin="5,5,5,5" CornerRadius="10">
-            <DataTemplate x:DataType="proxy:DevCardType">
-                <local:ResourceCardCtrl DevCardType="{x:Bind}" Orientation="FaceUp" ReadOnly="True" CountVisible="Collapsed" />
-            </DataTemplate>
-            
+        <ListBox Grid.Row="1" Grid.Column="1" Width="100" Height="25"
+            Margin="5,5,5,5"
+            Background="{StaticResource bmMaple}"
+            ItemsSource="{x:Bind PlayedDevCards, Mode=OneWay}">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="proxy:DevCardType">
+                    <local:ResourceCardCtrl DevCardType="{x:Bind}" Orientation="FaceUp" ReadOnly="True" CountVisible="Collapsed" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
-                    <Setter Property="Margin" Value="0,0,0,5" />
+                    <Setter Property="Margin" Value="5" />
                     <Setter Property="Padding" Value="0" />
                 </Style>
             </ListBox.ItemContainerStyle>

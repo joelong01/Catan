@@ -27,7 +27,7 @@ namespace Catan10
             NewLog = new NewLog(this);
         }
 
-        private async void OnTest1(object sdr, RoutedEventArgs rea)
+        private void OnTest1(object sdr, RoutedEventArgs rea)
         {
             _gameView.FlipAllAsync(TileOrientation.FaceDown);
         }

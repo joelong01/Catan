@@ -7,7 +7,11 @@
     d:DesignHeight="30" d:DesignWidth="30" mc:Ignorable="d">
 
     <Grid>
-        <Ellipse Width="30" Height="30" Fill="{x:Bind CircleColor, Mode=OneWay, FallbackValue=White, Converter={StaticResource ColorToBrushConverter}}" />
+        <Ellipse Width="30" Height="30">
+            <Ellipse.Fill>
+                <SolidColorBrush Color="{x:Bind CircleColor, Mode=OneWay, FallbackValue=White}" />
+            </Ellipse.Fill>
+        </Ellipse>
         <Ellipse Width="30" Height="30">
             <Ellipse.Fill>
                 <ImageBrush x:Name="ImageBrush_Sailboat" Stretch="Uniform" ImageSource="ms-appx:///Assets/sailboat_dark.png" />

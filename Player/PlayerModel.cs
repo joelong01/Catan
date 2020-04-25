@@ -43,10 +43,11 @@ namespace Catan10
         private ImageBrush _imageBrush = null;
         private string _colorAsString = "HotPink";
         private bool _isCurrentPlayer = false;
-        
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public int AllPlayerIndex { get; set; } = -1;
+      
 
         [JsonIgnore]
         public ILog Log { get; set; } = null;
@@ -169,13 +170,13 @@ namespace Catan10
                 }
             }
         }
-        
+
 
         public PlayerModel(ILog log)
         {
             GameData = new PlayerGameModel(this);
             Log = log;
-          
+
         }
 
 

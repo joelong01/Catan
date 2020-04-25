@@ -14,22 +14,26 @@ namespace Catan10
     {
         #region properties
         private ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
-        public static readonly DependencyProperty PlayerResourcesProperty = DependencyProperty.Register("PlayerResources", typeof(PlayerResources), typeof(PrivateDataCtrl), new PropertyMetadata(new PlayerResources(), PlayerResourcesChanged));
-        public PlayerResources PlayerResources
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PrivateDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
+        public PlayerModel Player
         {
-            get => (PlayerResources)GetValue(PlayerResourcesProperty);
-            set => SetValue(PlayerResourcesProperty, value);
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
         }
-        private static void PlayerResourcesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as PrivateDataCtrl;
-            var depPropValue = (PlayerResources)e.NewValue;
-            depPropClass?.SetPlayerResources(depPropValue);
+            var depPropValue = (PlayerModel)e.NewValue;
+            depPropClass?.SetPlayer(depPropValue);
         }
-        private void SetPlayerResources(PlayerResources value)
+        private void SetPlayer(PlayerModel value)
         {
             PlayedDevCards.Clear();
-            PlayedDevCards.AddRange<DevCardType>(value.PlayedDevCards);
+            PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);
+            this.PlayedDevCards.Add(DevCardType.Knight);
+            this.PlayedDevCards.Add(DevCardType.YearOfPlenty);
+            this.PlayedDevCards.Add(DevCardType.Knight);
+            this.PlayedDevCards.Add(DevCardType.Monopoly);
         }
 
         #endregion

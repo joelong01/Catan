@@ -384,20 +384,22 @@
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Private Data"
                 Style="{StaticResource HeaderTextBlockStyle}"
                 FontSize="22" />
-            <ListBox Grid.Row="1" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" > 
+            <ListBox Grid.Row="1" Margin="0" HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:PlayerModel">
-                        <local:PrivateDataCtrl PlayerResources="{x:Bind GameData.PlayerResources}" />
-                    </DataTemplate>    
-            </ListBox.ItemTemplate>
-                 
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Margin" Value="5,0,5,0" />
-                    <Setter Property="Padding" Value="5" />
-                    
-                </Style>
-            </ListBox.ItemContainerStyle>
+                        <local:PrivateDataCtrl Player="{x:Bind}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Margin" Value="5,0,5,0" />
+                        <Setter Property="Padding" Value="5" />
+
+                    </Style>
+                </ListBox.ItemContainerStyle>
             </ListBox>
 
         </Grid>

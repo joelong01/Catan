@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -20,8 +21,8 @@ namespace Catan10
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
 
-        readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black");
-        readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White");
+        readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
+        readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White", Colors.White);
         private TileOrientation _orientation = TileOrientation.FaceDown;
         private bool _useClassic = true;
         private HarborLocation _location = HarborLocation.None;

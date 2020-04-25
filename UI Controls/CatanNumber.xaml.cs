@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -17,9 +17,9 @@ namespace Catan10
     {
         public int Probability { get; set; } = 0; // the number (divided by 36) that represents the probability of this number being rolled
 
-        readonly SolidColorBrush _redBrush = CatanColors.GetResourceBrush("Red");
-        readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black");
-        readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White");
+        readonly SolidColorBrush _redBrush = CatanColors.GetResourceBrush("Red", Colors.Red);
+        readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
+        readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White", Colors.White);
         NumberColorTheme myTheme = NumberColorTheme.Dark;
         public NumberStyle NumberStyle { get; set; } = NumberStyle.Default;
         bool _showEyes = false;

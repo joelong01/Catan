@@ -348,7 +348,7 @@ namespace Catan10
                 NewGameDlg dlg = new NewGameDlg(SavedAppState.Players, _gameView.Games);
 
                 ContentDialogResult result = await dlg.ShowAsync();
-                if ((dlg.GamePlayers.Count < 3 || dlg.GamePlayers.Count > 6) && result == ContentDialogResult.Primary)
+                if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
                 {
                     string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
                     MessageDialog msgDlg = new MessageDialog(content);
@@ -375,7 +375,7 @@ namespace Catan10
 
                     SavedGames.Insert(0, MainPageModel.Log);
                     await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
-                    await StartGame(dlg.PlayerDataList, dlg.SelectedIndex);
+                    await StartGame(dlg.PlayingPlayers, dlg.SelectedIndex);
                 }
 
             }

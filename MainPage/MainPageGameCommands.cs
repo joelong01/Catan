@@ -137,8 +137,13 @@ namespace Catan10
         }
         private async void OnSetUser(object sender, RoutedEventArgs e)
         {
+            await ChooseUser();
 
+           
+        }
 
+        private async Task ChooseUser()
+        {
             var picker = new PlayerPickerDlg(SavedAppState.Players);
             _ = await picker.ShowAsync();
             if (picker.Player == null)
@@ -151,34 +156,7 @@ namespace Catan10
             this.TraceMessage($"Human: {TheHuman}");
         }
 
-        private async void OnJoinGame(object sender, RoutedEventArgs e)
-        {
-            if (TheHuman == null) return;
-            var proxy = new CatanProxy()
-            {
-                // HostName = "http://localhost:5000"
-                HostName = "http://jdlgameservice.azurewebsites.net"
-            };
-            var existingGames = await proxy.GetGames();
-            ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, SavedAppState.Players, existingGames)
-            {
-                HostName = proxy.HostName
-            };
-            proxy.Dispose();
-
-            while (true)
-            {
-                await dlg.ShowAsync();
-                if (dlg.SelectedGame == null)
-                {
-                    dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
-                }
-                if (dlg.ErrorMessage == "") break;
-
-                await StaticHelpers.ShowErrorText(dlg.ErrorMessage);
-            };
-            this.TraceMessage($"Game: {dlg.SelectedGame}");
-        }
+     
 
 
         //
@@ -646,6 +624,7 @@ namespace Catan10
             }
 
             CurrentPlayer.ColorAsString = item.Text;
+            
 
             //
             //  this is only needed because Roads don't do proper data binding yet.
@@ -911,9 +890,40 @@ namespace Catan10
 
             return targetList;
         }
-        private void OnNewNetworkGame(object sender, RoutedEventArgs e)
+        private async void OnNewNetworkGame(object sender, RoutedEventArgs e)
         {
+            if (TheHuman == null)
+            {
+                await ChooseUser();
+            };
+            if (TheHuman == null)
+            {                                
+                return;
+            }
+            var proxy = new CatanProxy()
+            {
+                HostName = "http://localhost:5000"
+                // HostName = "http://jdlgameservice.azurewebsites.net"
+            };
+            var existingGames = await proxy.GetGames();
+            ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, SavedAppState.Players, existingGames)
+            {
+                HostName = proxy.HostName
+            };
+            proxy.Dispose();
 
+            while (true)
+            {
+                await dlg.ShowAsync();
+                if (dlg.SelectedGame == null)
+                {
+                    dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
+                }
+                if (dlg.ErrorMessage == "") break;
+
+                await StaticHelpers.ShowErrorText(dlg.ErrorMessage);
+            };
+            this.TraceMessage($"Game: {dlg.SelectedGame}");
         }
     }
 

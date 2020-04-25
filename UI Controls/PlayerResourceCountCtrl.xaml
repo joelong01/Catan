@@ -51,7 +51,7 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PlayerGameViewCtrl PlayerData="{x:Bind PlayerDataInstance, Mode=OneWay}" />
+                    <local:PublicDataCtrl PlayerData="{x:Bind PlayerDataInstance, Mode=OneWay}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
 

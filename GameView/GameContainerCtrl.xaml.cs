@@ -308,13 +308,9 @@ namespace Catan10
             set => SetValue(GamesProperty, value);
         }
 
-        public async Task SetRandomBoardSettings(RandomBoardSettings randomBoard)
-        {
-            await RandomizeCatanBoard(true, randomBoard);
-        }
-
         public async Task RandomizeCatanBoard(bool placeBaron, RandomBoardSettings randomBoard = null)
         {
+          
             _currentHexPanel.DesertTiles.Clear();
             _probabilities.Clear();
 
@@ -331,7 +327,7 @@ namespace Catan10
                 if (randomBoard == null)
                 {
                     RandomBoardSettings = new RandomBoardSettings();
-                    RandomBoardSettings.TileGroupToRandomListsDictionary[index.ToString()] = new RandomLists(tileGroup);
+                    RandomBoardSettings.TileGroupToRandomListsDictionary[index.ToString()] = new RandomLists(tileGroup.RandomTileList, tileGroup.RandomNumbersList);
                 }
                 else
                 {
@@ -360,6 +356,7 @@ namespace Catan10
                 building.Pips = pips;
             }
 
+            this.TraceMessage($"{randomBoard}");
         }
 
         public async Task AssignRandomTilesToTileGroup(int tileGroupIndex, List<int> randomTileList)

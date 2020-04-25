@@ -354,7 +354,7 @@ namespace Catan10
         /// <param name="players"></param>
         /// <returns></returns>
 
-        private async Task StartGame(List<PlayerModel> players, int selectedIndex)
+        private async Task StartGame(ICollection<PlayerModel> players, int selectedIndex)
         {
 
 

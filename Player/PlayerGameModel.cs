@@ -434,9 +434,9 @@ namespace Catan10
                     _ColorAsString = value;
                     NotifyPropertyChanged();
                     BackgroundBrush = CatanColors.GetResourceBrush(value);
-                    NotifyPropertyChanged("Background");
+                    NotifyPropertyChanged("BackgroundBrush");
                     ForegroundBrush = CatanColors.GetForegroundBrush(value);
-                    NotifyPropertyChanged("Foreground");
+                    NotifyPropertyChanged("ForegroundBrush");
                     PlayerColor = BackgroundBrush.Color;
                     NotifyPropertyChanged("PlayerColor");
                     if (ForegroundBrush.Color != Colors.White)
@@ -452,8 +452,8 @@ namespace Catan10
                 }
             }
         }
-        public SolidColorBrush ForegroundBrush { get; private set; } = (SolidColorBrush)App.Current.Resources["WhiteBrush"];  // this is what CastleColor and the like should bind to
-        public SolidColorBrush BackgroundBrush { get; private set; } = (SolidColorBrush)App.Current.Resources["GreenBrush"]; // this is what "Fill" and the like should bind to
+        public SolidColorBrush ForegroundBrush { get; private set; } = CatanColors.GetResourceBrush("White", Colors.White);
+        public SolidColorBrush BackgroundBrush { get; private set; } = CatanColors.GetResourceBrush("Green", Colors.Green); // this is what "Fill" and the like should bind to
         public Color PlayerColor { get; private set; } = Colors.Green;
 
 

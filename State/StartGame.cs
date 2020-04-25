@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Catan.Proxy;
+using System.Collections.Generic;
 
 namespace Catan10
 {

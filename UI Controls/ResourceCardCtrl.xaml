@@ -42,11 +42,15 @@
                 <PlaneProjection x:Name="_ppFront" RotationY="0" />
             </Grid.Projection>
 
-            
-            
-                <TextBlock Text="{x:Bind Count, Mode=OneWay, FallbackValue=0, Converter={StaticResource StringToIntConverter}}" FontSize="30" Grid.RowSpan="3" Grid.ColumnSpan="3"
-                           VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,0,0" Foreground="{StaticResource BlackBrush}"/>
-            
+
+
+            <TextBlock Grid.RowSpan="3" Grid.ColumnSpan="3" Margin="0,0,0,0"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Text="{x:Bind Count, Mode=OneWay, FallbackValue=0, Converter={StaticResource StringToIntConverter}}"
+                FontSize="30"
+                Foreground="{StaticResource BlackBrush}"
+                Visibility="{x:Bind CountVisible, Mode=OneWay}" />
+
 
             <Viewbox Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Margin="0,0,0,0"
                 HorizontalAlignment="Left" VerticalAlignment="Top">

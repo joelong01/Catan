@@ -14,8 +14,8 @@ namespace Catan10
             this.InitializeComponent();
         }
 
-        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(new SolidColorBrush(Colors.Blue), PlayerColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(Colors.Black));
+        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(CatanColors.GetResourceBrush("Blue", Colors.Blue), PlayerColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(CatanColors.GetResourceBrush("Black", Colors.Black)));
         public SolidColorBrush CastleColor
         {
             get => (SolidColorBrush)GetValue(CastleColorProperty);

@@ -40,6 +40,7 @@ namespace Catan10
             {"DarkGray", Colors.DarkGray},
             {"Black", Colors.Black},
             {"Purple", Colors.Purple},
+            {"Blue", Colors.Blue }
 
         };
         public static List<SolidColorBrush> AllAvailableBrushes()
@@ -93,33 +94,32 @@ namespace Catan10
         }
         public static SolidColorBrush GetResourceBrush(string Name, Color color)
         {
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+                return new SolidColorBrush(color);
+            }
             string resourceName = Name + "Brush";
-
             App.Current.Resources.TryGetValue(resourceName, out object ret);
             if (ret != null)
             {
-                App.Current.TraceMessage($"found {resourceName} brush in resources");
-                return (SolidColorBrush)ret;
+              return (SolidColorBrush)ret;
             }
             App.Current.TraceMessage($"did NOT find {resourceName} brush in resources");
             SolidColorBrush brush = new SolidColorBrush(color);
-            App.Current.Resources[resourceName] = brush;
             return brush;
         }
 
        
 
-        public static SolidColorBrush GetResourceBrush(string color)
+        public static SolidColorBrush GetResourceBrush(string name)
         {
-            try
+            bool found = NameToColorDictionary.TryGetValue(name, out Color color);
+            if (found)
             {
-                return (SolidColorBrush)App.Current.Resources[$"{color}Brush"];
+                return GetResourceBrush(name, color);
             }
-            catch
-            {
-                App.Current.TraceMessage($"Unexpected Color {color} in CreateBrushFromResource ");
-                return (SolidColorBrush)App.Current.Resources["HotPinkBrush"];
-            }
+
+           return new SolidColorBrush(Colors.HotPink);
         }
 
 
