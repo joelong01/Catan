@@ -137,12 +137,12 @@ namespace Catan10
         }
         private async void OnSetUser(object sender, RoutedEventArgs e)
         {
-            await ChooseUser();
+            await PickDefaultUser();
 
-           
+
         }
 
-        private async Task ChooseUser()
+        private async Task PickDefaultUser()
         {
             var picker = new PlayerPickerDlg(SavedAppState.Players);
             _ = await picker.ShowAsync();
@@ -153,10 +153,12 @@ namespace Catan10
             }
 
             TheHuman = picker.Player;
-            this.TraceMessage($"Human: {TheHuman}");
+            SavedAppState.DefaultPlayerName = TheHuman.PlayerName;
+            await SaveGameState(SavedAppState);
+
         }
 
-     
+
 
 
         //
@@ -624,7 +626,7 @@ namespace Catan10
             }
 
             CurrentPlayer.ColorAsString = item.Text;
-            
+
 
             //
             //  this is only needed because Roads don't do proper data binding yet.
@@ -894,36 +896,52 @@ namespace Catan10
         {
             if (TheHuman == null)
             {
-                await ChooseUser();
+                await PickDefaultUser();
             };
             if (TheHuman == null)
-            {                                
+            {
                 return;
             }
-            var proxy = new CatanProxy()
-            {
-                HostName = "http://localhost:5000"
-                // HostName = "http://jdlgameservice.azurewebsites.net"
-            };
+            var proxy = MainPageModel.ServiceData.Proxy;
+
             var existingGames = await proxy.GetGames();
             ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, SavedAppState.Players, existingGames)
             {
                 HostName = proxy.HostName
             };
-            proxy.Dispose();
+            this.TraceMessage($"Human={TheHuman}");
+            await dlg.ShowAsync();
+            if (dlg.IsCanceled) return;
 
-            while (true)
+            if (dlg.SelectedGame == null)
             {
-                await dlg.ShowAsync();
-                if (dlg.SelectedGame == null)
-                {
-                    dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
-                }
-                if (dlg.ErrorMessage == "") break;
+                dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
+                return;
+            }
 
-                await StaticHelpers.ShowErrorText(dlg.ErrorMessage);
-            };
+            ResetDataForNewGame();
+            MainPageModel.ServiceData.GameName = dlg.SelectedGame;
+
             this.TraceMessage($"Game: {dlg.SelectedGame}");
+            MainPageModel.IsServiceGame = true;
+            CurrentPlayer = TheHuman;
+            await MainPageModel.Log.Init("NetworkGame" + DateTime.Now.Ticks.ToString());
+            await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            this.TraceMessage($"BoardSettings: {dlg.GameInfo.BoardSettings} ");
+
+
+            SavedGames.Insert(0, MainPageModel.Log);
+            await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
+            await _gameView.RandomizeCatanBoard(true, dlg.GameInfo.BoardSettings);
+            _currentPlayerIndex = 0;
+            
+            await AddPlayer(TheHuman, LogType.Normal);
+
+
+            await VisualShuffle(false);
+            await SetStateAsync(null, GameState.WaitingForStart, true);
+            await AnimateToPlayerIndex(_currentPlayerIndex);
+
         }
     }
 

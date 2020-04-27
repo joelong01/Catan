@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Catan.Proxy;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -182,7 +183,15 @@ namespace Catan10
 
         public async Task AppendLogLine(LogEntry le, bool save = true)
         {
-
+            if (le.Action == CatanAction.RandomizeBoard)
+            {
+                if (MainPage.Current.MainPageModel.IsServiceGame)
+                {                                     
+                    var serviceData = MainPage.Current.MainPageModel.ServiceData;
+                    var msg = await serviceData.Proxy.PostRandomBoard(serviceData.GameName, MainPage.Current.CurrentPlayer.PlayerName, le.Tag as RandomBoardSettings);                    
+                    this.TraceMessage($"New Board: {msg}");
+                }
+            }
             AppendLogLineNoDisk(le);
             if (save && this.State != LogState.Replay)
             {

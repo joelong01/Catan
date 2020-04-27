@@ -5,8 +5,9 @@
     xmlns:local="using:Catan10"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Service Game" Width="1110" Height="750" MinWidth="1110"
-    MinHeight="750" PrimaryButtonClick="OnOk" PrimaryButtonText="Close"
-    mc:Ignorable="d">
+    MinHeight="750" PrimaryButtonClick="OnOk" PrimaryButtonText="Ok"
+    IsSecondaryButtonEnabled="True" SecondaryButtonClick="OnCancel"
+    SecondaryButtonText="Cancel" mc:Ignorable="d">
     <ContentDialog.Resources>
         <Style x:Key="BtnStyle" TargetType="Button">
             <Setter Property="Margin" Value="10,0,0,10" />
@@ -35,6 +36,19 @@
             <ColumnDefinition Width="100*" />
             <ColumnDefinition Width="35*" />
         </Grid.ColumnDefinitions>
+        <Grid Name="ErrorGrid" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1"
+            Grid.ColumnSpan="2"
+            Background="{StaticResource BlackBrush}"
+            Canvas.ZIndex="999"
+            Visibility="{x:Bind ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="100" />
+            </Grid.RowDefinitions>
+            <TextBox HorizontalAlignment="Stretch" Text="{x:Bind ErrorMessage, Mode=OneWay}" FontSize="22" IsReadOnly="True" AcceptsReturn="True"  />
+            <Button Grid.Row="1" Width="100" HorizontalAlignment="Center" Content="Ok" Click="OnOkError" Margin="-220,0,0,0"/>
+            <Button Grid.Row="1" Width="100" HorizontalAlignment="Center" Content="Cancel" Click="OnCancelError" Margin="220,0,0,0" />
+        </Grid>
         <Rectangle Grid.RowSpan="6" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
             Fill="{StaticResource bmCherry}"
             RadiusX="168.5" RadiusY="168.5"

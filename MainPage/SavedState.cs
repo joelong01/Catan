@@ -14,7 +14,7 @@ namespace Catan10
     {
         #region properties
         public List<PlayerModel> Players { get; set; } = new List<PlayerModel>();
-
+        public string DefaultPlayerName { get; set; } = "";
         public Settings Settings { get; set; } = new Settings();
 
         public ServiceState ServiceState { get; set; } = new ServiceState();

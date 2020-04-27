@@ -26,19 +26,26 @@ namespace Catan10
     public sealed partial class ServiceGameDlg : ContentDialog
     {
         #region properties
-        public string ErrorMessage { get; set; }
-        private CatanProxy Proxy { get; } = new CatanProxy();
+
+        private CatanProxy Proxy { get; } = MainPage.Current.MainPageModel.ServiceData.Proxy;
         private PlayerModel CurrentPlayer { get; set; } = null;
         private List<PlayerModel> AllPlayers { get; set; } = null;
-
+        private TaskCompletionSource<bool> _tcs = null;
+        public bool IsCanceled { get; private set; } = false;
 
         public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
         public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
         public ObservableCollection<string> Games = new ObservableCollection<string>();
-
+        public GameInfo GameInfo { get; set; }
         public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
         public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", SelectedGameChanged));
         public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", HostNameChanged));
+        public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register("ErrorMessage", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
+        public string ErrorMessage
+        {
+            get => (string)GetValue(ErrorMessageProperty);
+            set => SetValue(ErrorMessageProperty, value);
+        }
         public string HostName
         {
             get => (string)GetValue(HostNameProperty);
@@ -65,9 +72,11 @@ namespace Catan10
             var depPropValue = (string)e.NewValue;
             depPropClass?.SetSelectedGame(depPropValue);
         }
-        private void SetSelectedGame(string value)
+        private async void SetSelectedGame(string value)
         {
-            this.TraceMessage($"Selected Game: {value}");
+            if (String.IsNullOrEmpty(value)) return;
+
+            GameInfo = await Proxy.GetGameInfo(value);
         }
 
 
@@ -91,22 +100,22 @@ namespace Catan10
             this.InitializeComponent();
             CurrentPlayer = currentPlayer;
             AllPlayers = players;
-            Games.AddRange(games);
-            if (games.Count > 0)
+            if (games != null) Games.AddRange(games);
+            if (Games.Count > 0)
             {
-                SelectedGame = games[0];
+                SelectedGame = Games[0];
             }
 
         }
 
         private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-
+            IsCanceled = true;
         }
 
         private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-
+            IsCanceled = false;
         }
 
         private async void OnRefresh(object sender, RoutedEventArgs e)
@@ -119,14 +128,15 @@ namespace Catan10
             ErrorMessage = "";
             try
             {
-                using (var proxy = new CatanProxy() { HostName = HostName })
+                List<string> games = await Proxy.GetGames();
+                if (games == null)
                 {
-
-                    List<string> games = await proxy.GetGames();
-                    Games.Clear();
-                    PlayersInGame.Clear();
-                    Games.AddRange(games);
+                    ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+                    return;
                 }
+                Games.Clear();
+                PlayersInGame.Clear();
+                Games.AddRange(games);
             }
             catch (Exception e)
             {
@@ -140,17 +150,29 @@ namespace Catan10
             ErrorMessage = "";
             try
             {
-                using (var proxy = new CatanProxy() { HostName = HostName })
+                GameInfo = new GameInfo();
+                GameInfo.BoardSettings.TileGroupToRandomListsDictionary["0"] = new RandomLists(GameContainerCtrl.GetRandomList(GameInfo.TileCount - 1), GameContainerCtrl.GetRandomList(GameInfo.TileCount - 1));
+                GameInfo.BoardSettings.RandomHarborTypeList = GameContainerCtrl.GetRandomList(GameInfo.HarborCount - 1);
+
+                List<string> games = await Proxy.CreateGame(NewGameName, GameInfo);
+                if (games == null)
                 {
-                    List<string> games = await proxy.CreateGame(NewGameName, new GameInfo());
+                    ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+                    return;
+                }
+                if (games != null && games.Count > 0)
+                {
                     Games.Clear();
                     PlayersInGame.Clear();
                     Games.AddRange(games);
                 }
+
+
             }
             catch (Exception e)
             {
                 ErrorMessage = e.Message;
+                this.TraceMessage($"Exception: {ErrorMessage}");
             }
 
         }
@@ -160,25 +182,24 @@ namespace Catan10
             ErrorMessage = "";
             try
             {
-                using (var proxy = new CatanProxy() { HostName = HostName })
-                {
-                    var resources = await proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
-                    if (resources != null)
-                    {
-                        await GetPlayersInGame();
-                        return;
 
-                    }
-                    if (proxy.LastError != null)
-                    {
-                        ErrorMessage = proxy.LastError.Description;
-                    }
-                    else
-                    {
-                        ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
-                    }
+                GameInfo = await Proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
+                if (GameInfo != null)
+                {
+                    await GetPlayersInGame();
+                    return;
 
                 }
+                if (Proxy.LastError != null)
+                {
+                    ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+                }
+                else
+                {
+                    ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
+                }
+
+
             }
             catch (Exception e)
             {
@@ -203,26 +224,27 @@ namespace Catan10
             if (String.IsNullOrEmpty(SelectedGame)) return;
             try
             {
-
-                using (var proxy = new CatanProxy() { HostName = this.HostName })
+                List<string> users = await Proxy.GetUsers(SelectedGame);
+                if (users == null)
                 {
-
-                    List<string> users = await proxy.GetUsers(SelectedGame);
-                    PlayersInGame.Clear();
-                    foreach (var p in users)
+                    ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+                    return;
+                }
+                PlayersInGame.Clear();
+                foreach (var p in users)
+                {
+                    foreach (var pm in AllPlayers)
                     {
-                        foreach (var pm in AllPlayers)
+                        if (pm.PlayerName.ToLower().Trim() == p)
                         {
-                            if (pm.PlayerName.ToLower().Trim() == p)
-                            {
-                                PlayersInGame.Add(pm);
-                                break;
-                            }
+                            PlayersInGame.Add(pm);
+                            break;
                         }
-
                     }
 
                 }
+
+
             }
             catch (Exception e)
             {
@@ -236,26 +258,45 @@ namespace Catan10
             if (String.IsNullOrEmpty(SelectedGame)) return;
             try
             {
-                this.Hide();
-                var answer = await StaticHelpers.AskUserYesNoQuestion($"Are you sure want to delete the game name {SelectedGame}?", "Yes", "No");
-                if (!answer) return;
 
-                using (var proxy = new CatanProxy() { HostName = this.HostName })
+                bool ret = await AskUserQuestion($"Are you sure want to delete the game name {SelectedGame}?");
+                if (ret)
                 {
-
-                    var result = await proxy.DeleteGame(SelectedGame);
+                    var result = await Proxy.DeleteGame(SelectedGame);
                     if (result == null)
                     {
-                        ErrorMessage = proxy.LastError?.Description;
+                        ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+                        return;
                     }
                     PlayersInGame.Clear();
                     await GetGames();
                 }
+
             }
             catch (Exception e)
             {
                 ErrorMessage = e.Message;
             }
+        }
+
+        private async Task<bool> AskUserQuestion(string question)
+        {
+            _tcs = new TaskCompletionSource<bool>();
+            this.ErrorMessage = question;
+            bool ret = await _tcs.Task;            
+            return ret;
+        }
+
+        private void OnCancelError(object sender, RoutedEventArgs e)
+        {
+            ErrorMessage = "";
+            if (!_tcs.Task.IsCompleted) _tcs.SetResult(false);
+        }
+
+        private void OnOkError(object sender, RoutedEventArgs e)
+        {
+            ErrorMessage = "";
+            if (!_tcs.Task.IsCompleted) _tcs.SetResult(true);
         }
     }
 }

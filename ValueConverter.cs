@@ -15,6 +15,25 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
+    public class StringToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is string)
+            {
+                if (String.IsNullOrEmpty((string)value)) return Visibility.Collapsed;
+            }
+
+            return Visibility.Visible;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("One Way only");
+
+        }
+    }
     //
     //  DON'T FORGET: add your converter class to app.xaml as a resource...
     public class StringToIntConverter : IValueConverter

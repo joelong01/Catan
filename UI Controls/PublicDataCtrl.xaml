@@ -20,22 +20,7 @@
                 <ColumnDefinition Width="175" />
             </Grid.ColumnDefinitions>
 
-            <ListBox Grid.Row="1" Grid.Column="1" Width="100" Height="25"
-                Margin="5,5,5,5"
-                Background="{StaticResource bmMaple}"
-                ItemsSource="{x:Bind PlayedDevCards, Mode=OneWay}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="proxy:DevCardType">
-                        <local:ResourceCardCtrl DevCardType="{x:Bind}" Orientation="FaceUp" ReadOnly="True" CountVisible="Collapsed" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Margin" Value="5" />
-                        <Setter Property="Padding" Value="0" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+           
             <!--  Player Picture:  Picture doesn't show up in the designer  -->
             <Ellipse Grid.RowSpan="2" Grid.ColumnSpan="2" Width="55" Height="55"
                 Margin="1,1,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"

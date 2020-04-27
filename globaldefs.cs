@@ -39,35 +39,33 @@ namespace Catan10
     //  actions are things we can undo
     public enum CatanAction
     {
-        Rolled,                                   // 0
-        ChangedState,                             // 1 
-        ChangedPlayer,                            // 2        
-        Dealt,                                    // 3
-        CardsLost,                      // 4
-        CardsLostToSeven,                         // 5
-        MissedOpportunity,                        // 6
-        DoneSupplemental,                         // 7
-        DoneResourceAllocation,                   // 8
-        PlayedKnight,                             // 9
-        RolledSeven,                              // 10
-        AssignedBaron,                            // 11
-        UpdatedRoadState,                         // 12
-        UpdateBuildingState,                    // 13
-        AssignedPirateShip,                       // 14
-        AddPlayer,                                // 15
-        RandomizeTiles,                         // 16
-        AssignHarbors,                            // 17
-        SelectGame,                               // 18
-        AssignRandomTiles,                        // 19
-        InitialAssignBaron,                       // 20
-        None,                                      // 21
-        SetFirstPlayer,                            // 22
-        RoadTrackingChanged,                         // 23
+        Rolled,                    
+        ChangedState,              
+        ChangedPlayer,             
+        Dealt,                     
+        CardsLost,                 
+        CardsLostToSeven,          
+        MissedOpportunity,         
+        DoneSupplemental,          
+        DoneResourceAllocation,    
+        PlayedKnight,              
+        RolledSeven,               
+        AssignedBaron,             
+        UpdatedRoadState,          
+        UpdateBuildingState,       
+        AssignedPirateShip,        
+        AddPlayer,                 
+        SelectGame,                
+        InitialAssignBaron,        
+        None,                      
+        SetFirstPlayer,            
+        RoadTrackingChanged,       
         AddResourceCount,
         ChangedPlayerProperty,
         SetRandomTileToGold,
         ChangePlayerAndSetState,
-        Started
+        Started,
+        RandomizeBoard
     };
     public enum AnimationSpeed { Ultra = 50, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 }; // typical animation speeds in ms
     public enum UndoOrder { PreviousThenUndo, UndoNoPrevious, None };

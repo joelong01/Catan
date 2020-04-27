@@ -40,12 +40,13 @@ namespace Catan10
         private int _supplementalStartIndex = -1;
         public static readonly string SAVED_GAME_EXTENSION = ".log";
         public const string PlayerDataFile = "catansettings.json";
+        
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
         
         private readonly DispatcherTimer _timer = new DispatcherTimer();  // flips tiles back to Opacaticy = 0
         private bool _doDragDrop = false;   // this lets you double tap a map and then move it around
         private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
-        public static MainPage Current; // a global for the game
+        public static MainPage Current { get; private set; } // a global for the game
         private readonly RoadRaceTracking _raceTracking = null; // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
         //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel()));
@@ -67,6 +68,7 @@ namespace Catan10
             _timer.Tick += AsyncReverseFade;
             _raceTracking = new RoadRaceTracking(this);
             Ctrl_PlayerResourceCountCtrl.Log = this;
+            MainPageModel.IsServiceGame = true; // for TESTING!!
         }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
@@ -177,16 +179,10 @@ namespace Catan10
             }
             try
             {
-                JsonSerializerOptions options = new JsonSerializerOptions()
-                {
-                    WriteIndented = true
-                };
-                options.Converters.Add(new JsonStringEnumConverter());
-                state = JsonSerializer.Deserialize<SavedState>(content);
+               
+                state = CatanProxy.Deserialize<SavedState>(content);
 
                 _timer.Interval = TimeSpan.FromSeconds(state.Settings.FadeSeconds);
-
-
 
                 return state;
             }
@@ -214,6 +210,7 @@ namespace Catan10
             if (SavedAppState == null)
             {
                 var list = await GetDefaultUsers();
+                
                 SavedAppState = new SavedState()
                 {
                     Players = list,
@@ -226,6 +223,7 @@ namespace Catan10
                 Debug.Assert(SavedAppState != null);
             }
 
+            
 
             foreach (var player in SavedAppState.Players)
             {
@@ -236,6 +234,10 @@ namespace Catan10
                 player.Log = this;
                 await player.LoadImage();
                 player.AllPlayerIndex = SavedAppState.Players.Count;
+                if (SavedAppState.DefaultPlayerName == player.PlayerName)
+                {
+                    TheHuman = player;
+                }
 
             }
 
@@ -304,9 +306,9 @@ namespace Catan10
 
 
 
-        private async Task VisualShuffle()
+        private async Task VisualShuffle(bool randomize = true)
         {
-            await _gameView.VisualShuffle();
+            await _gameView.VisualShuffle(randomize);
             _randomBoardList.Clear();
             _randomBoardList.Add(_gameView.RandomBoardSettings);
             _randomBoardListIndex = 0;
@@ -341,7 +343,7 @@ namespace Catan10
             }
 
             _raceTracking.Reset();
-            MainPageModel.Log?.Start();
+            
             //  await LoadPlayerData();
 
         }
@@ -1301,16 +1303,11 @@ namespace Catan10
                         case CatanAction.AddPlayer:
                             await AddPlayer(logLine, LogType.Replay);
                             break;
-                        case CatanAction.RandomizeTiles:
-                            List<int> randomNumbers = logLine.Tag as List<int>;
-                            await _gameView.AssignRandomNumbersToTileGroup(logLine.Number, randomNumbers);
+                        case CatanAction.RandomizeBoard:
+                            RandomBoardSettings boardSetting = logLine.Tag as RandomBoardSettings;
+                            await _gameView.RandomizeCatanBoard(true, boardSetting);
                             break;
-                        case CatanAction.AssignHarbors:
-                            _gameView.AssignRandomNumbersToHarbors((List<int>)logLine.Tag);
-                            break;
-                        case CatanAction.AssignRandomTiles:
-                            await _gameView.AssignRandomTilesToTileGroup(logLine.Number, (List<int>)logLine.Tag);
-                            break;
+                        
                         case CatanAction.InitialAssignBaron:
                             _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
                             break;

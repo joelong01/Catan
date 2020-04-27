@@ -121,10 +121,8 @@ namespace Catan10
                 case CatanAction.AddPlayer:
                     Tag = Enum.Parse(typeof(PlayerPosition), val);
                     break;
-                case CatanAction.AssignHarbors:
-                case CatanAction.AssignRandomTiles:
-                case CatanAction.RandomizeTiles:
-                    Tag = LogList<int>.CreateAndParse(val);
+               case CatanAction.RandomizeBoard:
+                    Tag = CatanProxy.Deserialize<RandomBoardSettings>(val);
                     break;
                 case CatanAction.ChangedState:
                     Tag = new LogStateTranstion(val);

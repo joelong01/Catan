@@ -59,6 +59,8 @@ namespace Catan10
                 case CatanAction.ChangedPlayer:
                     await ChangedPlayerController.Redo(Page, logEntry as ChangedPlayerModel);
                     break;
+                case CatanAction.RandomizeBoard:
+                    break;
                 case CatanAction.Dealt:
                     break;
                 case CatanAction.CardsLost:
@@ -85,14 +87,8 @@ namespace Catan10
                     break;
                 case CatanAction.AddPlayer:
                     break;
-                case CatanAction.RandomizeTiles:
-                    break;
-                case CatanAction.AssignHarbors:
-                    break;
                 case CatanAction.SelectGame:
-                    break;
-                case CatanAction.AssignRandomTiles:
-                    break;
+                    break;                
                 case CatanAction.InitialAssignBaron:
                     break;
                 case CatanAction.None:
@@ -163,13 +159,7 @@ namespace Catan10
                     break;
                 case CatanAction.AddPlayer:
                     break;
-                case CatanAction.RandomizeTiles:
-                    break;
-                case CatanAction.AssignHarbors:
-                    break;
                 case CatanAction.SelectGame:
-                    break;
-                case CatanAction.AssignRandomTiles:
                     break;
                 case CatanAction.InitialAssignBaron:
                     break;

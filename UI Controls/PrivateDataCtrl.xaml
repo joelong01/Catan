@@ -7,7 +7,7 @@
     d:DesignHeight="300" d:DesignWidth="600" mc:Ignorable="d">
 
 
-    <Grid Width="590" Height="250" Background="{StaticResource bmCherry}" CornerRadius="10">
+    <Grid Width="475" Height="250" Background="{StaticResource bmCherry}" CornerRadius="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />
@@ -18,7 +18,7 @@
             <ColumnDefinition Width="0" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="1" Margin="5,5,0,0">
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
             <StackPanel Orientation="Horizontal">
                 <local:ResourceCardCtrl Margin="0" ResourceType="Wood" Orientation="FaceUp" ReadOnly="True"
                     Count="{x:Bind Player.GameData.PlayerResources.Wood, Mode=OneWay}" />
@@ -47,21 +47,6 @@
                     Count="{x:Bind Player.GameData.PlayerResources.VictoryPoints, Mode=OneWay}" />
             </StackPanel>
         </StackPanel>
-        <ListBox Grid.Row="1" Grid.Column="1" Width="100" Height="25"
-            Margin="5,5,5,5"
-            Background="{StaticResource bmMaple}"
-            ItemsSource="{x:Bind PlayedDevCards, Mode=OneWay}">
-            <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="proxy:DevCardType">
-                    <local:ResourceCardCtrl DevCardType="{x:Bind}" Orientation="FaceUp" ReadOnly="True" CountVisible="Collapsed" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Margin" Value="5" />
-                    <Setter Property="Padding" Value="0" />
-                </Style>
-            </ListBox.ItemContainerStyle>
-        </ListBox>
+
     </Grid>
 </UserControl>

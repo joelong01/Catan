@@ -372,7 +372,7 @@ namespace Catan10
                 }
                 else
                 {
-                    s += string.Format($"{prop}{kvpSep}{propValue}{propSep}");
+                    s += $"{prop}{kvpSep}{propValue}{propSep}";
 
                 }
 

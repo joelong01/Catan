@@ -1,15 +1,40 @@
-﻿using System.Collections.ObjectModel;
+﻿using Catan.Proxy;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace Catan10
 {
+    public class ServiceData
+    {
+        public CatanProxy Proxy { get; } = new CatanProxy() { HostName = "http://localhost:5000" };
+        public string HostName
+        {
+            get
+            {
+                return Proxy.HostName;
+            }
+            set
+            {
 
+                Proxy.HostName = value;
+
+            }
+        }
+
+        public string GameName { get; set; } = "";
+
+        public ServiceData()
+        {
+            Proxy.HostName = HostName;
+        }
+    }
 
     public class MainPageModel : INotifyPropertyChanged
     {
-
+        public ServiceData ServiceData { get; } = new ServiceData();
+        public bool IsServiceGame { get; set; } = false;
         public MainPageModel()
         {
             _Log.PropertyChanged += Log_PropertyChanged;
