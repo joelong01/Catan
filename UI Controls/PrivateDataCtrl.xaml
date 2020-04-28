@@ -7,7 +7,7 @@
     d:DesignHeight="300" d:DesignWidth="600" mc:Ignorable="d">
 
 
-    <Grid Width="475" Height="250" Background="{StaticResource bmCherry}" CornerRadius="10">
+    <Grid Width="475" Height="295" Background="{StaticResource bmCherry}" CornerRadius="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />
@@ -34,8 +34,17 @@
                     Count="{x:Bind Player.GameData.PlayerResources.GoldMine, Mode=OneWay}" />
             </StackPanel>
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Knight" Orientation="FaceUp" ReadOnly="True"
-                    Count="{x:Bind Player.GameData.PlayerResources.Knights, Mode=OneWay}" />
+                <Button Padding="0">
+                    <Button.Content>
+                        <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Knight" Orientation="FaceUp" ReadOnly="True"
+                            Count="{x:Bind Player.GameData.PlayerResources.Knights, Mode=OneWay}" />
+                    </Button.Content>
+                    <Button.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Play" />
+                        </MenuFlyout>
+                    </Button.ContextFlyout>
+                </Button>
                 <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="YearOfPlenty" Orientation="FaceUp" ReadOnly="True"
                     Count="{x:Bind Player.GameData.PlayerResources.YearOfPlenty, Mode=OneWay}" />
                 <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Monopoly" Orientation="FaceUp" ReadOnly="True"
@@ -45,8 +54,68 @@
                 <local:ResourceCardCtrl Margin="109,0,0,0" DevCardType="VictoryPoint" Orientation="FaceUp"
                     ReadOnly="True"
                     Count="{x:Bind Player.GameData.PlayerResources.VictoryPoints, Mode=OneWay}" />
+
+            </StackPanel>
+            <Rectangle Width="465" Height="2" Margin="0,5,0,5" Fill="{StaticResource WhiteBrush}" />
+
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <Button Margin="5,0,5,0" Padding="0" Background="Transparent" ToolTipService.ToolTip="Buy Settlement">
+                    <Button.Content>
+                        <Grid>
+                            <Viewbox Margin="0,0,0,0">
+                                <local:SettlementCtrl Width="50" Height="50" Margin="5,0,0,0" PlayerColor="{x:Bind Player.GameData.BackgroundBrush, FallbackValue=Black, Mode=OneWay}" />
+                            </Viewbox>
+                        </Grid>
+                    </Button.Content>
+                </Button>
+                <Button Margin="5,0,5,0" Padding="0" Background="Transparent" ToolTipService.ToolTip="Buy City">
+                    <Button.Content>
+                        <Grid>
+                            <Viewbox Margin="0,0,0,0">
+                                <local:CityCtrl Width="50" Height="50" Margin="5,0,0,0" PlayerColor="{x:Bind Player.GameData.BackgroundBrush, FallbackValue=Black, Mode=OneWay}" />
+                            </Viewbox>
+                        </Grid>
+                    </Button.Content>
+                </Button>
+                <Button Margin="5,0,5,0" Padding="0" Background="Transparent" ToolTipService.ToolTip="Buy Road">
+                    <Button.Content>
+                        <Grid Background="{x:Bind Player.GameData.BackgroundBrush, Mode=OneWay}">
+                            <TextBlock Grid.Column="0" Margin="0" HorizontalAlignment="Center"
+                                VerticalAlignment="Center" Text="⛙" FontFamily="Segoe UI Symbol" FontSize="38"
+                                Foreground="{x:Bind Player.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}" >
+                                <TextBlock.RenderTransform>
+                                    <CompositeTransform TranslateY="-2" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
+                    </Button.Content>
+                </Button>
+
+                <Button Margin="5,0,5,0" Padding="0" Background="Transparent" ToolTipService.ToolTip="Buy Dev Card" ToolTipService.Placement="Left">
+                    <Button.Content>
+                        <Grid Width="40" Height="60" Padding="0" CornerRadius="5"
+                            Background="{StaticResource bmDevCardBack}" />
+                    </Button.Content>
+                </Button>
+                <Button Margin="5,0,5,0" Padding="0" VerticalAlignment="Center" ToolTipService.ToolTip="Trade"
+                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                    Background="Transparent">
+                    <Button.Content>
+                        <Grid Background="{x:Bind Player.GameData.BackgroundBrush, Mode=OneWay}">
+                            <TextBlock Grid.Column="0" Margin="0,0,0,0" HorizontalAlignment="Center"
+                                VerticalAlignment="Top" Text="⇄" FontFamily="Segoe UI Symbol" FontSize="38"
+                                Foreground="{x:Bind Player.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=White}">
+                                <TextBlock.RenderTransform>
+                                    <CompositeTransform TranslateY="-5" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
+                    </Button.Content>
+                </Button>
+
             </StackPanel>
         </StackPanel>
+
 
     </Grid>
 </UserControl>

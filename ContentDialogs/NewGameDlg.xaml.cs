@@ -40,6 +40,7 @@ namespace Catan10
         public NewGameDlg()
         {
             this.InitializeComponent();
+            this.DataContext = PlayingPlayers;
         }
         public NewGameDlg(IList<PlayerModel> playerData, IList<CatanGame> games)
         {
@@ -47,6 +48,7 @@ namespace Catan10
             AvailablePlayers.AddRange(playerData);
             AvailableGames.AddRange(games);
             SelectedGame = AvailableGames[0];
+            this.DataContext = this;
 
 
 

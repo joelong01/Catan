@@ -11,11 +11,11 @@ namespace Catan10
     public sealed partial class PublicDataCtrl : UserControl
     {
         private ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
-        public static readonly DependencyProperty PlayerDataProperty = DependencyProperty.Register("PlayerData", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
-        public PlayerModel PlayerData
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
+        public PlayerModel Player
         {
-            get => (PlayerModel)GetValue(PlayerDataProperty);
-            set => SetValue(PlayerDataProperty, value);
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
         }
         private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -23,11 +23,14 @@ namespace Catan10
             var depPropValue = (PlayerModel)e.NewValue;
             depPropClass?.SetPlayer(depPropValue);
         }
+       
         private void SetPlayer(PlayerModel value)
         {
             PlayedDevCards.Clear();
             PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);
-            
+            //
+            //  for testing...
+            //
             this.PlayedDevCards.Add(DevCardType.Knight);
             this.PlayedDevCards.Add(DevCardType.YearOfPlenty);
             this.PlayedDevCards.Add(DevCardType.Knight);
@@ -37,7 +40,7 @@ namespace Catan10
 
         public PublicDataCtrl()
         {
-            this.InitializeComponent();
+            this.InitializeComponent();            
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)

@@ -430,12 +430,12 @@ namespace Catan10
 
         private async void OnViewSettings(object sender, RoutedEventArgs e)
         {
-            ((Button)sender).IsEnabled = false;
+           
             _initializeSettings = true;
             SettingsDlg dlg = new SettingsDlg(this, SavedAppState.Settings);
             _initializeSettings = false;
             await dlg.ShowAsync();
-            ((Button)sender).IsEnabled = true;
+           
         }
 
         /// <summary>

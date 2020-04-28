@@ -14,10 +14,11 @@ namespace Catan10
     {
         public CityCtrl()
         {
+            this.DataContext = this;
             this.InitializeComponent();
         }
-        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(CatanColors.GetResourceBrush("Blue", Colors.Blue), PlayerColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(CatanColors.GetResourceBrush("Black", Colors.Black)));
+        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(CatanColors.GetResourceBrush(null, Colors.Blue), PlayerColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
         public SolidColorBrush CastleColor
         {
             get => (SolidColorBrush)GetValue(CastleColorProperty);
@@ -39,6 +40,7 @@ namespace Catan10
         {
 
             CastleColor = CatanColors.GetForegroundBrush(foreground);
+            this.TraceMessage($"City. Fill={foreground.Color} Background={CastleColor.Color}");
         }
     }
 }

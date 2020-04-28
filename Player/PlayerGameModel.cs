@@ -453,7 +453,7 @@ namespace Catan10
             }
         }
         public SolidColorBrush ForegroundBrush { get; private set; } = CatanColors.GetResourceBrush("White", Colors.White);
-        public SolidColorBrush BackgroundBrush { get; private set; } = CatanColors.GetResourceBrush("Green", Colors.Green); // this is what "Fill" and the like should bind to
+        public SolidColorBrush BackgroundBrush { get => backgroundBrush; private set { backgroundBrush = value; NotifyPropertyChanged(); } }
         public Color PlayerColor { get; private set; } = Colors.Green;
 
 
@@ -906,6 +906,8 @@ namespace Catan10
         }
 
         int _GoldTotal = 0;
+        private SolidColorBrush backgroundBrush = CatanColors.GetResourceBrush("Green", Colors.Green);
+
         public int GoldTotal
         {
             get

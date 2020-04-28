@@ -11,11 +11,13 @@ namespace Catan10
     {
         public SettlementCtrl()
         {
+            this.DataContext = this;
             this.InitializeComponent();
+            
         }
 
-        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(CatanColors.GetResourceBrush("Blue", Colors.Blue), PlayerColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(CatanColors.GetResourceBrush("Black", Colors.Black)));
+        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(SolidColorBrush), typeof(SettlementCtrl), new PropertyMetadata(null, PlayerColorChanged));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(SolidColorBrush), typeof(SettlementCtrl), new PropertyMetadata(new SolidColorBrush(Colors.Yellow)));
         public SolidColorBrush CastleColor
         {
             get => (SolidColorBrush)GetValue(CastleColorProperty);

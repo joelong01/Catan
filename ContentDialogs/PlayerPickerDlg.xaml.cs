@@ -23,6 +23,7 @@ namespace Catan10
         public PlayerPickerDlg()
         {
             this.InitializeComponent();
+            this.DataContext = Players;
         }
         public PlayerPickerDlg(IEnumerable<PlayerModel> players)
         {

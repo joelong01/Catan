@@ -49,13 +49,13 @@ namespace Catan10
 
         private void VerifyRoundTrip<T>(T model)
         {
-            var options = new JsonSerializerOptions() { WriteIndented = true };
-            options.Converters.Add(new JsonStringEnumConverter());
-            var jsonString = JsonSerializer.Serialize<T>(model, options);
-            T newModel = JsonSerializer.Deserialize<T>(jsonString, options);
-            var newJsonString = JsonSerializer.Serialize<T>(newModel, options);
-            //   this.TraceMessage(newJsonString);
-            Debug.Assert(newJsonString == jsonString);
+            //var options = new JsonSerializerOptions() { WriteIndented = true };
+            //options.Converters.Add(new JsonStringEnumConverter());
+            //var jsonString = JsonSerializer.Serialize<T>(model, options);
+            //T newModel = JsonSerializer.Deserialize<T>(jsonString, options);
+            //var newJsonString = JsonSerializer.Serialize<T>(newModel, options);
+            ////   this.TraceMessage(newJsonString);
+            //Debug.Assert(newJsonString == jsonString);
 
         }
 

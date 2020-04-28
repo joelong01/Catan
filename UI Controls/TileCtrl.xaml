@@ -82,8 +82,8 @@
                     <PlaneProjection x:Name="_ppHexFront" RotationY="0" />
                 </Grid.Projection>
                 <Polygon Name="_hexFront" Grid.RowSpan="3" Grid.ColumnSpan="3" Margin="0"
-                    Stroke="BurlyWood" StrokeThickness="6"
-                    Points="29,3 81,3 106.5,48 81,93 29,93 3.5,48"
+                    Stroke="{StaticResource bmMaple}"
+                    StrokeThickness="6" Points="29,3 81,3 106.5,48 81,93 29,93 3.5,48"
                     Fill="{x:Bind ShownResourceType, Mode=OneWay, Converter={StaticResource ResourceTypeToTileBrushConverter}, FallbackValue=Sheep}" />
                 <!--<Polygon Name="_hexInsideBorder" Stroke="Red" StrokeThickness="1" Margin="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Points="31,6.5 79,6.5 102.5,48 79,89.5 31,89.5 7.5,48" />-->
 

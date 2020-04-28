@@ -45,9 +45,13 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="100" />
             </Grid.RowDefinitions>
-            <TextBox HorizontalAlignment="Stretch" Text="{x:Bind ErrorMessage, Mode=OneWay}" FontSize="22" IsReadOnly="True" AcceptsReturn="True"  />
-            <Button Grid.Row="1" Width="100" HorizontalAlignment="Center" Content="Ok" Click="OnOkError" Margin="-220,0,0,0"/>
-            <Button Grid.Row="1" Width="100" HorizontalAlignment="Center" Content="Cancel" Click="OnCancelError" Margin="220,0,0,0" />
+            <TextBox HorizontalAlignment="Stretch"
+                Text="{x:Bind ErrorMessage, Mode=OneWay}"
+                FontSize="22" IsReadOnly="True" AcceptsReturn="True" />
+            <Button Grid.Row="1" Width="100" Margin="-220,0,0,0" HorizontalAlignment="Center"
+                Content="Ok" Click="OnOkError" />
+            <Button Grid.Row="1" Width="100" Margin="220,0,0,0" HorizontalAlignment="Center"
+                Content="Cancel" Click="OnCancelError" />
         </Grid>
         <Rectangle Grid.RowSpan="6" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
             Fill="{StaticResource bmCherry}"
@@ -144,7 +148,7 @@
             ItemsSource="{x:Bind PlayersInGame, Mode=OneWay}">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PlayerPickerItemCtrl Player="{x:Bind}" ShowCheckBox="False" ForegroundColor="#FFFC0000" FocusVisualPrimaryBrush="HotPink" />
+                    <local:PlayerPickerItemCtrl Player="{x:Bind}"  FocusVisualPrimaryBrush="HotPink" />
                 </DataTemplate>
             </GridView.ItemTemplate>
             <GridView.ItemContainerStyle>

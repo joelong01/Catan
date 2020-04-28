@@ -385,7 +385,8 @@
                 Style="{StaticResource HeaderTextBlockStyle}"
                 FontSize="22" />
             <ListBox Grid.Row="1" Margin="0" HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch" Background="{StaticResource bmMaple}"
+                VerticalAlignment="Stretch"
+                Background="{StaticResource bmMaple}"
                 ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="local:PlayerModel">

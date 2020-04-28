@@ -144,6 +144,7 @@ namespace Catan10
         public TileCtrl()
         {
             this.InitializeComponent();
+            this.DataContext = this;
             _ppHexFront.RotationY = 90;
 
         }

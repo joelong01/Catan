@@ -51,9 +51,7 @@
             IsSynchronizedWithCurrentItem="False" SelectionMode="Multiple" AllowDrop="True">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PlayerPickerItemCtrl Player="{x:Bind}"
-                        ShowCheckBox="False" ForegroundColor="#FFFC0000"
-                        FocusVisualPrimaryBrush="HotPink" CanDrag="True" IsHitTestVisible="False" />
+                    <local:PlayerPickerItemCtrl Player="{x:Bind This}" CanDrag="True" IsHitTestVisible="False" />
                 </DataTemplate>
             </GridView.ItemTemplate>
             <GridView.ItemContainerStyle>
@@ -95,9 +93,7 @@
             IsSynchronizedWithCurrentItem="False" SelectionMode="None" AllowDrop="True">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PlayerPickerItemCtrl Player="{x:Bind}"
-                        ShowCheckBox="False" ForegroundColor="#FFFC0000"
-                        FocusVisualPrimaryBrush="HotPink" CanDrag="True" IsHitTestVisible="false" />
+                    <local:PlayerPickerItemCtrl Player="{x:Bind}" CanDrag="True" IsHitTestVisible="false" />
                 </DataTemplate>
             </GridView.ItemTemplate>
             <GridView.ItemContainerStyle>

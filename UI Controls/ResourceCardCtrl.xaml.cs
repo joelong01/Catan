@@ -15,6 +15,7 @@ namespace Catan10
         public ResourceCardCtrl()
         {
             this.InitializeComponent();
+            this.DataContext = this;
 
         }
 
