@@ -932,7 +932,7 @@ namespace Catan10
 
             SavedGames.Insert(0, MainPageModel.Log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
-            await _gameView.RandomizeCatanBoard(true, dlg.GameInfo.BoardSettings);
+            await _gameView.SetRandomCatanBoard(true, dlg.GameInfo.BoardSettings);
             _currentPlayerIndex = 0;
             
             await AddPlayer(TheHuman, LogType.Normal);

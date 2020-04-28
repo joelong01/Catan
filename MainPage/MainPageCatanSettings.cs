@@ -182,7 +182,7 @@ namespace Catan10
             dlg.PrimaryButtonClick += async (o, i) =>
             {
 
-                await _gameView.RandomizeCatanBoard(true);
+                await _gameView.SetRandomCatanBoard(true);
                 await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
                 //  await ProcessEnter(CurrentPlayer, "");
 

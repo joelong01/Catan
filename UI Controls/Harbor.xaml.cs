@@ -20,6 +20,11 @@ namespace Catan10
 
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
+        public Harbor()
+        {
+            this.InitializeComponent();
+            this.DataContext = this;
+        }
 
         readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
         readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White", Colors.White);
@@ -100,10 +105,7 @@ namespace Catan10
             }
 
         }
-        public Harbor()
-        {
-            this.InitializeComponent();
-        }
+        
 
         public void Reset()
         {

@@ -51,7 +51,7 @@ namespace Catan10
 
         private ResourceType[] _resourceTypes = null;
         private int[] _tileNumbers = null;
-        private HarborType[] _harborTypes = null;
+        public HarborType[] StartingHarborTypes { get; private set; } = null;
         private readonly PirateShip _pirateShip = new PirateShip();
         private readonly BaronCtrl _baron = new BaronCtrl();
 
@@ -386,8 +386,8 @@ namespace Catan10
                             {
                                 TileCtrl tile = TilesInIndexOrder[i];
                                 tg.AllTiles.Add(tile);
-                                tg.ResourceTypes.Add(tile.ResourceType);
-                                tg.ValidNumbers.Add(tile.Number);
+                                tg.StartingResourceTypes.Add(tile.ResourceType);
+                                tg.StartingTileNumbers.Add(tile.Number);
                                 if (tile.ResourceType == ResourceType.Desert)
                                 {
                                     tg.DesertCount++;
@@ -395,7 +395,8 @@ namespace Catan10
 
                                 if (tile.ResourceType != ResourceType.Sea)
                                 {
-                                    tg.RandomTiles.Add(tile);
+                                    tg.TilesToRandomize.Add(tile);
+                                    tg.OriginalNonSeaTiles.Add(tile);
                                 }
 
                             }
@@ -412,9 +413,10 @@ namespace Catan10
                             Randomize = true
                         };
                         tg.AllTiles.AddRange(Tiles);
-                        tg.RandomTiles.AddRange(Tiles);
-                        tg.ResourceTypes.AddRange(_resourceTypes);
-                        tg.ValidNumbers.AddRange(_tileNumbers);
+                        tg.TilesToRandomize.AddRange(Tiles);
+                        tg.OriginalNonSeaTiles.AddRange(Tiles);
+                        tg.StartingResourceTypes.AddRange(_resourceTypes);
+                        tg.StartingTileNumbers.AddRange(_tileNumbers);
                         _tileSets.Add(tg);
                     }
                 }
@@ -443,10 +445,10 @@ namespace Catan10
 
 
 
-                    _harborTypes = new HarborType[Harbors.Count];
+                    StartingHarborTypes = new HarborType[Harbors.Count];
                     for (int i = 0; i < Harbors.Count; i++)
                     {
-                        _harborTypes[i] = Harbors[i].HarborType;
+                        StartingHarborTypes[i] = Harbors[i].HarborType;
                     }
                 }
             }
@@ -558,7 +560,7 @@ namespace Catan10
             }
         }
 
-        #endregion
+       #endregion
         public CatanHexPanel()
         {
             _pirateShip.Visibility = Visibility.Collapsed;
@@ -619,23 +621,25 @@ namespace Catan10
         {
             for (int i = 0; i < Harbors.Count; i++)
             {
-                Harbors[i].HarborType = _harborTypes[randomHarborTypeList[i]];
+                Harbors[i].HarborType = StartingHarborTypes[randomHarborTypeList[i]];
             }
 
 
         }
-        public List<int> RandomizeTiles(TileGroup tileGroup, List<int> randomResourceTypeList)
+        public List<int> ShuffleTileGroup(TileGroup tileGroup, List<int> randomResourceTypeList)
         {
 
             if (randomResourceTypeList == null)
             {
-                randomResourceTypeList = GameContainerCtrl.GetRandomList(tileGroup.RandomTiles.Count - 1);
+                randomResourceTypeList = GameContainerCtrl.GetRandomList(tileGroup.TilesToRandomize.Count - 1);
             }
 
-            for (int i = 0; i < tileGroup.RandomTiles.Count; i++)
+            for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
             {
-
-                tileGroup.RandomTiles[i].ResourceType = tileGroup.ResourceTypes[randomResourceTypeList[i]];
+                if (tileGroup.TilesToRandomize[i].ResourceType != tileGroup.StartingResourceTypes[randomResourceTypeList[i]])
+                {
+                    tileGroup.TilesToRandomize[i].ResourceType = tileGroup.StartingResourceTypes[randomResourceTypeList[i]];
+                }
             }
 
             return randomResourceTypeList;
@@ -1888,20 +1892,25 @@ namespace Catan10
 
         //
         //  the set of Tiles that particpate in Randomization and Shuffling
-        public List<TileCtrl> RandomTiles { get; set; } = new List<TileCtrl>();
+        public List<TileCtrl> TilesToRandomize { get; set; } = new List<TileCtrl>();
+        public List<TileCtrl> OriginalNonSeaTiles { get; set; } = new List<TileCtrl>();
 
-        public List<ResourceType> ResourceTypes { get; set; } = new List<ResourceType>();
-        public List<int> ValidNumbers { get; set; } = new List<int>();
-        public List<Harbor> Harbors { get; set; } = new List<Harbor>();
-
-        public List<HarborType> HarborTypes { get; set; } = new List<HarborType>();
-
-        public List<int> RandomTileList { get; set; } = new List<int>(); // the random list to shuffle the tile resources. used in save/load
-
-        public List<int> RandomNumbersList { get; set; } = new List<int>(); // the random list of numbers associated with the tiles.
-
+        public List<ResourceType> StartingResourceTypes { get; set; } = new List<ResourceType>();
+        public List<int> StartingTileNumbers { get; set; } = new List<int>();
+        
+        public RandomLists TileAndNumberLists { get; set; }
+        
 
         private int _tileCount = 0;
+
+        public void Reset()
+        {
+           for (int i =0; i< TilesToRandomize.Count -1; i++)
+            {
+                TilesToRandomize[i].ResourceType = StartingResourceTypes[i];
+                TilesToRandomize[i].Number = StartingTileNumbers[i];
+            }
+        }
 
         public int TileCount
         {
@@ -1910,6 +1919,7 @@ namespace Catan10
         }
 
         public int DesertCount { get; internal set; }
+        
 
         private readonly string[] SerializedProperties = new string[] { "Start", "End", "Randomize", "ResourceTypes", "NumberSequence", "HarborTypes", "RandomResourceTypeList", "RandomHarborTypeList", "TileCount" };
 

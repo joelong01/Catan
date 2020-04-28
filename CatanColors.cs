@@ -49,6 +49,10 @@ namespace Catan10
             foreach (var kvp in NameToColorDictionary)
             {
                 var scb = GetResourceBrush(kvp.Key, kvp.Value);
+                if (scb == null)
+                {
+                    scb.TraceMessage($"{kvp.Key} brush not found in resources");
+                }
                 list.Add(scb);
             }
             return list;
@@ -104,7 +108,7 @@ namespace Catan10
             {
               return (SolidColorBrush)ret;
             }
-            App.Current.TraceMessage($"did NOT find {resourceName} brush in resources");
+            App.Current.TraceMessage($"did NOT find {resourceName} brush in resources. Color={color}");
             SolidColorBrush brush = new SolidColorBrush(color);
             return brush;
         }

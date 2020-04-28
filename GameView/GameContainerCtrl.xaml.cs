@@ -3,6 +3,7 @@ using Catan.Proxy;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -308,120 +309,194 @@ namespace Catan10
             set => SetValue(GamesProperty, value);
         }
         /// <summary>
-        ///     Returns a *valid* Random board with no side affects
+        ///     Returns a *valid* Random board with no side affects. I random board looks like this
+        ///     {
+        ///    "TileGroupToRandomListsDictionary": {
+        ///        "0": {
+        ///            "TileList": [
+        ///                <Random List of Ints, one for each Tile>
+        ///            ],
+        ///            "NumberList": [
+        ///             <Random List of Ints, one for each Tile -- there are Catan rules that this list must follow such as "No two Red numbers next to each other">
+        ///            ]
+        ///    }
+        ///    },
+        ///    "RandomHarborTypeList": [
+        ///      <Random List of Ints, one for each Harbor>
+        ///    ]
+        ///  }
+        /// eg there is *one* HarborList per board and then each "TileGroup" (stored in a Dictionary<string, TileGroup> so that System.Text.Json can serialize it) has
+        /// a collection of Tiles, each with a list on ints for both the Numbers and the Tiles, which give an index into a fixed array used to randomize the board.
         /// </summary>
         /// <returns></returns>
         public RandomBoardSettings GetRandomBoard()
         {
             var rbs = new RandomBoardSettings();
-            for (int index = 0; index < _currentHexPanel.TileSets.Count; index++)
+            //
+            //  create a temporary board to do all our calculations.  We need to do this because they algo's here
+            //  rely on the visual layout of the tiles to determine if the number layout is valid.  We want to do this
+            //  off screen w/o impacting what the user is seeing in the game.
+
+
+
+            CatanGame game = CurrentGame;
+
+
+
+
+            for (int index = 0; index < game.HexPanel.TileSets.Count; index++)
             {
-                TileGroup tileGroup = _currentHexPanel.TileSets[index];
+                TileGroup tileGroup = game.HexPanel.TileSets[index];
+                var randomList = new RandomLists()
+                {
+                    TileList = GetRandomList(tileGroup.TilesToRandomize.Count - 1),       // RandomTiles is the list of tiles that should be randomized                    
 
-                rbs.TileGroupToRandomListsDictionary[index.ToString()] = new RandomLists(tileGroup.RandomTileList, tileGroup.RandomNumbersList);
+                };
+                tileGroup.Reset();
 
+                tileGroup.TileAndNumberLists = randomList;
+             //   this.TraceMessage($"Tiles Before Shuffle: {DumpTileList(tileGroup.TilesToRandomize)}");
+                game.HexPanel.ShuffleTileGroup(tileGroup, randomList.TileList); // put the Tiles where they go
+            //    this.TraceMessage($"Tiles After Shuffle: {DumpTileList(tileGroup.TilesToRandomize)}");
+                randomList.NumberList = RandomAndValidNumberList(tileGroup); // since the tiles are where they go, we can now assign numbers
+
+                rbs.TileGroupToRandomListsDictionary[index.ToString()] = randomList; // this is just the 
+              //  this.TraceMessage($"RBS: {rbs}");
             }
 
             rbs.RandomHarborTypeList = GetRandomList(_currentHexPanel.Harbors.Count - 1);
+            //this.TraceMessage($"Tiles: {CatanProxy.Serialize(rbs.TileGroupToRandomListsDictionary["0"].TileList)} Numbers: {CatanProxy.Serialize(rbs.TileGroupToRandomListsDictionary["0"].NumberList)}");
             return rbs;
         }
-
-        private void RandomAndValidNumberList(TileGroup tileGroup)
+        private string DumpTileList(List<TileCtrl> list)
+        {
+            string s = "";
+            foreach (var t in list)
+            {
+                s += $"{t},";
+            }
+            return s;
+        }
+        /// <summary>
+        ///     Given a tileGroup (e.g. a set of Tiles completely surrounded by water (or a continuguous set of tiles like the standard board)
+        ///     return a list of numbers that represent the random numbers for that TileGroup
+        /// </summary>
+        /// <param name="tileGroup"></param>
+        /// <returns></returns>
+        private List<int> RandomAndValidNumberList(TileGroup tileGroup)
         {
 
 
             bool valid = false;
             int iterations = 0;
-            List<int> RandomNumberSequence;
+            List<int> randomNumberSequence = new List<int>();
+            
             while (!valid)
             {
+                
+                randomNumberSequence = GetRandomList(tileGroup.StartingTileNumbers.Count - 1); // this is the index *into* TileGroup.StartingTileNumbers
+                _currentHexPanel.DesertTiles.Clear();
+                _currentHexPanel.DesertTiles.AddRange(tileGroup.TilesToRandomize.FindAll(t => t.ResourceType == ResourceType.Desert));
+                int startingDesertIndex = 0;
+                int randomDesertIndex = 0;
+                for (int i = 0; i < _currentHexPanel.DesertTiles.Count; i++)
+                {
+                    //
+                    //  the index into the TileGroup.StartingTileNumbers that has the desert number (7)
+                    startingDesertIndex = tileGroup.StartingTileNumbers.IndexOf(7, startingDesertIndex);
 
-                int numberSeqCount = 0;
-                RandomNumberSequence = GetRandomList(tileGroup.RandomTiles.Count - 1);
+                    //
+                    //  find the index in the random array that has that index
+                    randomDesertIndex = randomNumberSequence.IndexOf(startingDesertIndex, randomDesertIndex);
 
-                for (int i = 0; i < tileGroup.RandomTiles.Count; i++)
+                    // where is the Desert in the Randomtiles?
+
+                    TileCtrl desertTile = _currentHexPanel.DesertTiles[i];
+                    int desertTileIndex = tileGroup.TilesToRandomize.IndexOf(desertTile);
+
+                    randomNumberSequence.Swap(desertTileIndex, randomDesertIndex);
+
+                }
+
+                for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
                 {
 
-                    TileCtrl t = tileGroup.RandomTiles[i];
+                    TileCtrl t = tileGroup.TilesToRandomize[i];
                     t.HasBaron = false;
-                    if (t.ResourceType != ResourceType.Desert)
+                    int number = tileGroup.StartingTileNumbers[randomNumberSequence[i]];
+                    if (number == 7)
                     {
-                        int number;
-                        do
-                        {
-                            number = tileGroup.ValidNumbers[RandomNumberSequence[numberSeqCount++]];
-                        } while (number == 7); // skip over all deserts
+                        Debug.Assert(t.ResourceType == ResourceType.Desert);
 
-                        t.Number = number;
                     }
                     else
                     {
-                        t.Number = 7;
-                        if (_currentHexPanel.DesertTiles.Contains(t) == false)
-                        {
-                            _currentHexPanel.DesertTiles.Add(t);
-                        }
+                        Debug.Assert(t.ResourceType != ResourceType.Desert);
                     }
+
+                    t.Number = number;
+
 
                 }
                 iterations++;
-
-
-
                 valid = IsValidNumberLayout();
-                if (!valid)
-                {
-                    //
-                    //  if this is a saved game, it will be valid.  if we got here, it means it is a new game - get better numbers!
-                    RandomNumberSequence = null;
 
-                }
             }
+            
+          //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanProxy.Serialize(randomNumberSequence)}");
+            return randomNumberSequence;
         }
 
 
 
-        public async Task RandomizeCatanBoard(bool placeBaron, RandomBoardSettings randomBoard = null)
+        public async Task SetRandomCatanBoard(bool placeBaron, RandomBoardSettings randomBoard = null)
         {
 
             _currentHexPanel.DesertTiles.Clear();
             _probabilities.Clear();
+            
+            
+
+            if (randomBoard == null)
+            {
+                randomBoard = GetRandomBoard();
+            }
+            //
+            //  set the property
+            RandomBoardSettings = randomBoard;
+
 
             for (int index = 0; index < _currentHexPanel.TileSets.Count; index++)
             {
                 TileGroup tileGroup = _currentHexPanel.TileSets[index];
-                if (tileGroup.Randomize == false)
+                if (tileGroup.Randomize == false) // if the set is a collection of non-playable tiles such as Sea tiles
                 {
                     continue;
                 }
+                string key = index.ToString();
+                for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
+                {
+                    TileCtrl tile = tileGroup.TilesToRandomize[i];
+                    int randomIndex = randomBoard.TileGroupToRandomListsDictionary[key].TileList[i];
+                    tile.ResourceType = tileGroup.StartingResourceTypes[randomIndex];
+                    randomIndex = randomBoard.TileGroupToRandomListsDictionary[key].NumberList[i];
+                    tile.Number = tileGroup.StartingTileNumbers[randomIndex];
+                }
 
-                AssignRandomTilesToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index.ToString()].TileList);          // the randomized list of tiles
-                AssignRandomNumbersToTileGroup(index, randomBoard?.TileGroupToRandomListsDictionary[index.ToString()].NumberList);      // the randomized list of numbers
-                if (randomBoard == null)
-                {
-                    RandomBoardSettings = new RandomBoardSettings();
-                    RandomBoardSettings.TileGroupToRandomListsDictionary[index.ToString()] = new RandomLists(tileGroup.RandomTileList, tileGroup.RandomNumbersList);
-                }
-                else
-                {
-                    RandomBoardSettings = randomBoard;
-                }
+                _currentHexPanel.DesertTiles.AddRange(tileGroup.TilesToRandomize.FindAll(t => t.ResourceType == ResourceType.Desert));
 
             }
-
-            LogList<int> harborList = GetRandomList(_currentHexPanel.Harbors.Count - 1);  // the randomized list of harboes
-            if (randomBoard?.RandomHarborTypeList != null)
+            for (int i = 0; i < CurrentGame.HexPanel.Harbors.Count; i++)
             {
-                harborList.Clear();
-                ((List<int>)harborList).AddRange(randomBoard.RandomHarborTypeList);
+                CurrentGame.HexPanel.Harbors[i].HarborType = CurrentGame.HexPanel.StartingHarborTypes[randomBoard.RandomHarborTypeList[i]];
             }
-            AssignRandomNumbersToHarbors(harborList);
-            RandomBoardSettings.RandomHarborTypeList = harborList;
+
             if (placeBaron)
             {
                 await InitialPlaceBaron();
             }
-
+            //
+            //  update the Pips for each building as the numbers have changed
             foreach (BuildingCtrl building in AllBuildings)
             {
                 int pips = 0;
@@ -437,40 +512,13 @@ namespace Catan10
 
         }
 
-        public void AssignRandomTilesToTileGroup(int tileGroupIndex, List<int> randomTileList)
-        {
-            TileGroup tileGroup = _currentHexPanel.TileSets[tileGroupIndex];
 
-            if (randomTileList == null)
-            {
-                randomTileList = GameContainerCtrl.GetRandomList(tileGroup.RandomTiles.Count - 1);
-            }
-
-            //
-            //  every tile group gets to keep track of the list of random numbers that determine the resource type
-            //  of the tiles
-            tileGroup.RandomTileList = _currentHexPanel.RandomizeTiles(tileGroup, randomTileList);
-
-
-        }
-
-        public void AssignRandomNumbersToTileGroup(int tileGroupIndex, List<int> randomNumberList)
-        {
-            TileGroup tileGroup = _currentHexPanel.TileSets[tileGroupIndex];
-            AssignNumbers(tileGroup, randomNumberList);
-        }
-
-        public void AssignRandomNumbersToHarbors(List<int> harborList)
-        {
-            _currentHexPanel.ShuffleHarbors(harborList);
-
-        }
 
         public async Task VisualShuffle(bool randomize = true)
         {
             _currentHexPanel.PirateVisibility = Visibility.Collapsed;
             _currentHexPanel.BaronVisibility = Visibility.Collapsed;
-            if (randomize) await RandomizeCatanBoard(false);
+            if (randomize) await SetRandomCatanBoard(false);
             await FancyTileDistribution();
             await FancyHarborDistribution();
             await InitialPlaceBaron();
@@ -487,6 +535,8 @@ namespace Catan10
             {
                 foreach (TileCtrl tile in _currentHexPanel.Tiles)
                 {
+                    //
+                    // if there are no deserts, the baron goes on a 12
                     if (tile.Number == 12)
                     {
                         BaronTile = tile;
@@ -517,7 +567,7 @@ namespace Catan10
                 TileCtrl centerTile = _currentHexPanel.TilesInIndexOrder[tileGroup.Start + middleIndex];
 
                 int index = 0;
-                foreach (TileCtrl t in tileGroup.RandomTiles)
+                foreach (TileCtrl t in tileGroup.TilesToRandomize)
                 {
                     if (t == centerTile)
                     {
@@ -554,7 +604,7 @@ namespace Catan10
                     continue;
                 }
 
-                foreach (TileCtrl t in tileGroup.RandomTiles)
+                foreach (TileCtrl t in tileGroup.TilesToRandomize)
                 {
                     Task task = t.RotateTask(r.Next(1, 5) * 360, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
                     list.Add(task);
@@ -571,7 +621,7 @@ namespace Catan10
                     continue;
                 }
 
-                foreach (TileCtrl t in tileGroup.RandomTiles)
+                foreach (TileCtrl t in tileGroup.TilesToRandomize)
                 {
 
                     t.ResetTileRotation();
@@ -586,7 +636,7 @@ namespace Catan10
                     continue;
                 }
 
-                foreach (TileCtrl t in tileGroup.RandomTiles)
+                foreach (TileCtrl t in tileGroup.TilesToRandomize)
                 {
                     Task task = t.AnimateMoveTask(new Point(0, 0), ms, i * ms);
                     i++;
@@ -706,73 +756,51 @@ namespace Catan10
 
         #region Random Number assignment
 
-        public void AssignNumbers(TileGroup tileGroup, List<int> randomList)
+        /// <summary>
+        ///     given a randomList
+        ///     1. make sure it is a valid list
+        ///     2. assign the numbers to the tiles
+        /// </summary>
+        /// <param name="tileGroup"></param>
+        /// <param name="randomList"></param>
+        public void AssignNumbersToTileGroup(TileGroup tileGroup)
         {
             if (tileGroup.Randomize == false)
             {
                 return;
             }
 
-            bool valid = false;
-            int iterations = 0;
-            List<int> RandomNumberSequence = randomList;
-            do
+            _currentHexPanel.DesertTiles.Clear();
+
+            for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
             {
 
-                int numberSeqCount = 0;
-
-                if (RandomNumberSequence == null)
+                TileCtrl t = tileGroup.TilesToRandomize[i];
+                t.HasBaron = false;
+                if (t.ResourceType == ResourceType.Desert)
                 {
-                    RandomNumberSequence = GetRandomList(tileGroup.RandomTiles.Count - 1);
-                }
-
-                for (int i = 0; i < tileGroup.RandomTiles.Count; i++)
-                {
-
-                    TileCtrl t = tileGroup.RandomTiles[i];
-                    t.HasBaron = false;
-                    if (t.ResourceType != ResourceType.Desert)
+                    t.Number = 7;
+                    if (_currentHexPanel.DesertTiles.Contains(t) == false) // we keep track of which Tile the desert is and here is where we set that.
                     {
-                        int number = -1;
-                        do
-                        {
-                            number = tileGroup.ValidNumbers[RandomNumberSequence[numberSeqCount++]];
-                        } while (number == 7); // skip over all deserts
-
-                        t.Number = number;
-                    }
-                    else
-                    {
-                        t.Number = 7;
-                        if (_currentHexPanel.DesertTiles.Contains(t) == false)
-                        {
-                            _currentHexPanel.DesertTiles.Add(t);
-                        }
+                        _currentHexPanel.DesertTiles.Add(t);
                     }
 
                 }
-                iterations++;
-
-
-
-                valid = IsValidNumberLayout();
-                if (!valid)
+                else
                 {
-                    //
-                    //  if this is a saved game, it will be valid.  if we got here, it means it is a new game - get better numbers!
-                    RandomNumberSequence = null;
-
+                    t.Number = tileGroup.StartingTileNumbers[tileGroup.TileAndNumberLists.NumberList[i]]; // StartingTileNumbers is the Array set at runtime that has all the number for this board.                        
                 }
 
-            } while (!valid);
-
-            //
-            //  when we get here, the random number lists are valid
-            tileGroup.RandomNumbersList = RandomNumberSequence;
+            }
 
 
-            //if (iterations > 50)
-            //    this.TraceMessage($"tried {iterations} times to find a valid number sequence");
+            if (!IsValidNumberLayout())
+            {
+                this.TraceMessage($"Invalid! Tiles: {tileGroup.TileAndNumberLists}");
+                throw new ArgumentException("You passed in an invalid Random list for the Catan Numbers.  Call GetRandomBoard() for your random settings!");
+
+            }
+
 
         }
 

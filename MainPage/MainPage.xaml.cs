@@ -1305,7 +1305,7 @@ namespace Catan10
                             break;
                         case CatanAction.RandomizeBoard:
                             RandomBoardSettings boardSetting = logLine.Tag as RandomBoardSettings;
-                            await _gameView.RandomizeCatanBoard(true, boardSetting);
+                            await _gameView.SetRandomCatanBoard(true, boardSetting);
                             break;
                         
                         case CatanAction.InitialAssignBaron:
@@ -1501,7 +1501,7 @@ namespace Catan10
                 return;
             }
 
-            await _gameView.RandomizeCatanBoard(true);
+            await _gameView.SetRandomCatanBoard(true);
             _randomBoardList.Add(_gameView.RandomBoardSettings);
 
         }
@@ -1723,7 +1723,7 @@ namespace Catan10
 
                     //
                     //  get new ones
-                    await _gameView.RandomizeCatanBoard(true);
+                    await _gameView.SetRandomCatanBoard(true);
 
                     //
                     //  save the existing settings
@@ -1744,7 +1744,7 @@ namespace Catan10
                 }
             }
 
-            await _gameView.RandomizeCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
+            await _gameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
         }
         DateTime _dt = DateTime.Now;
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)

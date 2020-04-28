@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -39,7 +40,22 @@ namespace Catan10
                 collection.Add(t);
             }
         }
+        public static void Swap<T>(this IList<T> list, int firstIndex, int secondIndex)
+        {
+            Contract.Requires(list != null);
+            Contract.Requires(firstIndex >= 0 && firstIndex < list.Count);
+            Contract.Requires(secondIndex >= 0 && secondIndex < list.Count);
+            if (firstIndex == secondIndex)
+            {
+                return;
+            }
+            T temp = list[firstIndex];
+            list[firstIndex] = list[secondIndex];
+            list[secondIndex] = temp;
+        }
     }
+
+
 
     public static class StaticHelpers
     {
@@ -419,7 +435,7 @@ namespace Catan10
             return dict;
         }
 
-              
+
 
         //
         //  an interface called by the drag and drop code so we can simlulate the DragOver behavior
