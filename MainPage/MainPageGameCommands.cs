@@ -3,6 +3,7 @@
 using System;
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 using Windows.Foundation;
@@ -430,12 +431,12 @@ namespace Catan10
 
         private async void OnViewSettings(object sender, RoutedEventArgs e)
         {
-           
+
             _initializeSettings = true;
             SettingsDlg dlg = new SettingsDlg(this, SavedAppState.Settings);
             _initializeSettings = false;
             await dlg.ShowAsync();
-           
+
         }
 
         /// <summary>
@@ -927,23 +928,149 @@ namespace Catan10
             CurrentPlayer = TheHuman;
             await MainPageModel.Log.Init("NetworkGame" + DateTime.Now.Ticks.ToString());
             await SetStateAsync(null, GameState.WaitingForNewGame, true);
-            this.TraceMessage($"BoardSettings: {dlg.GameInfo.BoardSettings} ");
-
+           
 
             SavedGames.Insert(0, MainPageModel.Log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
             await _gameView.SetRandomCatanBoard(true, dlg.GameInfo.BoardSettings);
             _currentPlayerIndex = 0;
-            
-            await AddPlayer(TheHuman, LogType.Normal);
+            MainPageModel.PlayingPlayers.Clear();
+            foreach (var player in dlg.PlayersInGame)
+            {
+                await AddPlayer(player, LogType.Normal);
+            }
 
 
             await VisualShuffle(false);
             await SetStateAsync(null, GameState.WaitingForStart, true);
             await AnimateToPlayerIndex(_currentPlayerIndex);
+            StartMonitoring();
+        }
+        private PlayerModel FindPlayerByName(ICollection<PlayerModel> playerList, string playerName)
+        {
+            foreach (var player in playerList)
+            {
+                if (player.PlayerName == playerName)
+                {
+                    return player;
+                }
+            }
+            return null;
+        }
+        private async void StartMonitoring()
+        {
+            var serviceData = MainPageModel.ServiceData;
+            GameLog gameLog;
+            while (true)
+            {
+                try
+                {
 
+                    List<ServiceLogRecord> slRecordList = await serviceData.Proxy.Monitor(serviceData.GameName, TheHuman.PlayerName);
+                    if (slRecordList == null)
+                    {
+                        return;
+                    }
+
+
+                    MainPageModel.Log.State = LogState.ServiceUpdate;
+                    foreach (var serviceLogRecord in slRecordList)
+                    {
+                        if (serviceLogRecord.PlayerName == TheHuman.PlayerName) continue;
+
+                        switch (serviceLogRecord.Action)
+                        {
+                            case ServiceAction.Undefined:
+                                break;
+                            case ServiceAction.Purchased:
+                                break;
+                            case ServiceAction.PlayerAdded:
+
+                                gameLog = serviceLogRecord as GameLog;
+                                if (gameLog.PlayerName != TheHuman.PlayerName)
+                                {
+                                    var player = FindPlayerByName(MainPageModel.PlayingPlayers, gameLog.PlayerName);
+                                    if (player == null) // not playing
+                                    {
+                                        player = FindPlayerByName(SavedAppState.Players, gameLog.PlayerName);
+                                        if (player != null)
+                                        {
+                                            MainPageModel.PlayingPlayers.Add(player);
+                                        }
+                                    }
+                                }
+                                break;
+                            case ServiceAction.UserRemoved:
+                                break;
+                            case ServiceAction.GameCreated:
+                                break;
+                            case ServiceAction.GameDeleted:
+                                break;
+                            case ServiceAction.TradeGold:
+                                break;
+                            case ServiceAction.GrantResources:
+                                break;
+                            case ServiceAction.TradeResources:
+                                break;
+                            case ServiceAction.TakeCard:
+                                break;
+                            case ServiceAction.Refund:
+                                break;
+                            case ServiceAction.MeritimeTrade:
+                                break;
+                            case ServiceAction.UpdatedTurn:
+                                break;
+                            case ServiceAction.LostToMonopoly:
+                                break;
+                            case ServiceAction.PlayedMonopoly:
+                                break;
+                            case ServiceAction.PlayedRoadBuilding:
+                                break;
+                            case ServiceAction.PlayedKnight:
+                                break;
+                            case ServiceAction.PlayedYearOfPlenty:
+                                break;
+                            case ServiceAction.ReturnResources:
+                                break;
+                            case ServiceAction.StateChange:
+                                var stateChangeLog = serviceLogRecord as StateChangeLog;
+                                var lst = stateChangeLog.LogStateTranstion as LogStateTranstion;
+                                // var player = FindPlayerByName(MainPageModel.PlayingPlayers, stateChangeLog.PlayerName);
+                               // Debug.Assert(lst.OldState == this.GameState);
+                                await SetStateAsync(TheHuman, lst.NewState, true);
+                                break;
+                            case ServiceAction.GameStarted:
+
+                                break;
+                            case ServiceAction.RandomBoard:
+                                RandomBoardLog log = serviceLogRecord as RandomBoardLog;
+                                if (log.PlayerName != TheHuman.PlayerName)
+                                {
+
+                                    await Current.GameContainer.SetRandomCatanBoard(true, log.RandomBoardSettings as RandomBoardSettings);
+
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        MainPageModel.Log.State = LogState.Normal;
+                    }
+                }
+
+                catch (Exception e)
+                {
+                    this.TraceMessage($"Exception in monitor: {e}");
+                    return;
+                }
+                finally
+                {
+                    MainPageModel.Log.State = LogState.Normal; // in case the thread dies for some reason -- like starting a new game
+                }
+            }
         }
     }
+
 
 
 }

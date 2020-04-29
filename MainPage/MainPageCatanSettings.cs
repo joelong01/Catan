@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-
+using Catan.Proxy;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;

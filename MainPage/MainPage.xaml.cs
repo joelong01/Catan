@@ -546,12 +546,7 @@ namespace Catan10
                         await OnNewGame();
                         break;
                     case GameState.WaitingForStart:
-                        await CopyScreenShotToClipboard(_gameView);
-                        //
-                        //  TODO: This is where you call the service to tell it what state to start the game in
-                        //        Only the starting player should be able to hit "Start"  
-                        string boardSettings = _gameView.RandomBoardSettings.Serialize();
-                        this.TraceMessage(boardSettings);
+                        await CopyScreenShotToClipboard(_gameView);                        
                         await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, true);
                         break;
                     case GameState.AllocateResourceForward:

@@ -125,7 +125,7 @@ namespace Catan10
                     Tag = CatanProxy.Deserialize<RandomBoardSettings>(val);
                     break;
                 case CatanAction.ChangedState:
-                    Tag = new LogStateTranstion(val);
+                    Tag = LogStateTranstion.Deserialize(val);
                     break;
                 case CatanAction.CardsLost:
                     Tag = new LogCardsLost(val);
@@ -247,38 +247,7 @@ namespace Catan10
         }
 
     }
-    public class LogStateTranstion
-    {
-        public GameState OldState { get; set; } = GameState.Uninitialized;
-        public GameState NewState { get; set; } = GameState.Uninitialized;
-        public List<int> RandomGoldTiles { get; set; } = new List<int>();
-
-        private readonly string[] _serializedProperties = new string[] { "OldState", "NewState", "RandomGoldTiles" };
-
-        public LogStateTranstion(GameState old, GameState newState)
-        {
-            OldState = old;
-            NewState = newState;
-
-        }
-
-        public LogStateTranstion(string saved)
-        {
-            Deserialize(saved);
-        }
-
-        public override string ToString()
-        {
-            return StaticHelpers.SerializeObject<LogStateTranstion>(this, _serializedProperties, ":", ",");
-
-        }
-
-        public void Deserialize(string saved)
-        {
-            StaticHelpers.DeserializeObject<LogStateTranstion>(this, saved, ":", ",");
-        }
-
-    }
+   
 
     public class LogCardsLost
     {

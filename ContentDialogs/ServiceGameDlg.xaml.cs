@@ -150,9 +150,10 @@ namespace Catan10
             ErrorMessage = "";
             try
             {
-                GameInfo = new GameInfo();
-                GameInfo.BoardSettings.TileGroupToRandomListsDictionary["0"] = new RandomLists(GameContainerCtrl.GetRandomList(GameInfo.TileCount - 1), GameContainerCtrl.GetRandomList(GameInfo.TileCount - 1));
-                GameInfo.BoardSettings.RandomHarborTypeList = GameContainerCtrl.GetRandomList(GameInfo.HarborCount - 1);
+                GameInfo = new GameInfo
+                {
+                    BoardSettings = MainPage.Current.GameContainer.GetRandomBoard()
+                };
 
                 List<string> games = await Proxy.CreateGame(NewGameName, GameInfo);
                 if (games == null)
@@ -165,6 +166,7 @@ namespace Catan10
                     Games.Clear();
                     PlayersInGame.Clear();
                     Games.AddRange(games);
+                    SelectedGame = Games[Games.Count - 1];
                 }
 
 
@@ -183,10 +185,24 @@ namespace Catan10
             try
             {
 
-                GameInfo = await Proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
+                var gameLog = await Proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
+                GameInfo = gameLog.GameInfo;
                 if (GameInfo != null)
                 {
-                    await GetPlayersInGame();
+                    PlayersInGame.Clear();
+                    foreach (var p in gameLog.Players)
+                    {
+                        foreach (var pm in AllPlayers)
+                        {
+                            if (pm.PlayerName.ToLower().Trim() == p)
+                            {
+                                PlayersInGame.Add(pm);
+                                break;
+                            }
+                        }
+
+                    }
+                    this.Hide();
                     return;
 
                 }
@@ -283,7 +299,7 @@ namespace Catan10
         {
             _tcs = new TaskCompletionSource<bool>();
             this.ErrorMessage = question;
-            bool ret = await _tcs.Task;            
+            bool ret = await _tcs.Task;
             return ret;
         }
 
@@ -296,6 +312,7 @@ namespace Catan10
         private void OnOkError(object sender, RoutedEventArgs e)
         {
             ErrorMessage = "";
+            if (_tcs == null) return;
             if (!_tcs.Task.IsCompleted) _tcs.SetResult(true);
         }
     }

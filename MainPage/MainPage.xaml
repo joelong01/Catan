@@ -369,10 +369,10 @@
             </ListBox>
         </Grid>
         <Grid Name="Grid_PrivateData" Grid.Row="1" Grid.RowSpan="10" Width="500"
-            Height="1120" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Height="340" HorizontalAlignment="Left" VerticalAlignment="Top"
             Background="{StaticResource TransparentBrush}"
             BorderBrush="{StaticResource WhiteBrush}"
-            BorderThickness="2" PointerPressed="OnPointerPressed">
+            CornerRadius="10" BorderThickness="2" PointerPressed="OnPointerPressed">
             <Grid.RenderTransform>
                 <CompositeTransform />
             </Grid.RenderTransform>
@@ -380,12 +380,13 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="10*" />
             </Grid.RowDefinitions>
-            <Rectangle Grid.Row="0" Fill="{StaticResource GreenBrush}" Stroke="White" StrokeThickness="1" />
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Private Data"
+            <Rectangle Grid.Row="0" Fill="{x:Bind FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.GameData.BackgroundBrush}" />
+            <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Text="Private Data"
                 Style="{StaticResource HeaderTextBlockStyle}"
-                FontSize="22" />
-            <ListBox Grid.Row="1" Margin="0" HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
+                Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=CurrentPlayer.GameData.ForegroundBrush}"
+                FontSize="22" FontStyle="Normal" FontWeight="Normal" />
+            <ListBox Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 Background="{StaticResource bmMaple}"
                 ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}">
                 <ListBox.ItemTemplate>

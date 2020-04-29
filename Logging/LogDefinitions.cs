@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Catan.Proxy;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Catan10
@@ -7,7 +8,8 @@ namespace Catan10
     {
         Normal,
         Replay,
-        Undo
+        Undo,
+        ServiceUpdate
     }
 
     public interface ILogParserHelper

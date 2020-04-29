@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Catan.Proxy;
+using System.Text.Json.Serialization;
 
 namespace Catan10
 {
