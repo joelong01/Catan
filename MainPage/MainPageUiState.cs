@@ -81,7 +81,7 @@ namespace Catan10
 
             Rolls.Push(roll);
             LastRoll = roll;
-            PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll, StaticHelpers.SerializeList<int>(_gameView.GetCurrentRandomGoldTiles()));
+            PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll, StaticHelpers.SerializeList<int>(_gameView.CurrentRandomGoldTiles));
             UpdateGlobalRollStats();
             return true;
         }
@@ -173,7 +173,7 @@ namespace Catan10
         public async Task AnimateToPlayerIndex(int to, LogType logType = LogType.Normal)
         {
 
-            var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
             List<int> newRandomGoldTiles = null;
 
             int from = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer);

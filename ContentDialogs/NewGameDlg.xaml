@@ -1,7 +1,7 @@
 ﻿<ContentDialog x:Class="Catan10.NewGameDlg"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10"
+    xmlns:local="using:Catan10" xmlns:proxy="using:Catan.Proxy"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="New Game" Width="1110" Height="640" MinWidth="1110"
@@ -9,7 +9,7 @@
     PrimaryButtonClick="OnOk" SecondaryButtonClick="OnCancel" mc:Ignorable="d">
     <ContentDialog.Resources>
 
-        <DataTemplate x:Key="CatanGameTemplate" x:DataType="local:CatanGame">
+        <DataTemplate x:Key="CatanGameTemplate" x:DataType="local:CatanGameCtrl">
             <TextBlock Text="{x:Bind Description}" Style="{StaticResource DesignerTextBlockStyle}" />
         </DataTemplate>
 

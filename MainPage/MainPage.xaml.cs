@@ -213,7 +213,7 @@ namespace Catan10
                 
                 SavedAppState = new SavedState()
                 {
-                    Players = list,
+                    AllPlayers = list,
                     Settings = new Settings(),
                     ServiceState = new ServiceState() { HostName = "localhost:5000" }
 
@@ -225,7 +225,7 @@ namespace Catan10
 
             
 
-            foreach (var player in SavedAppState.Players)
+            foreach (var player in SavedAppState.AllPlayers)
             {
                 if (player.PlayerIdentifier == Guid.Empty)
                 {
@@ -233,7 +233,7 @@ namespace Catan10
                 }
                 player.Log = this;
                 await player.LoadImage();
-                player.AllPlayerIndex = SavedAppState.Players.Count;
+                player.AllPlayerIndex = SavedAppState.AllPlayers.Count;
                 if (SavedAppState.DefaultPlayerName == player.PlayerName)
                 {
                     TheHuman = player;
@@ -306,9 +306,9 @@ namespace Catan10
 
 
 
-        private async Task VisualShuffle(bool randomize = true)
+        private async Task VisualShuffle(RandomBoardSettings rbs = null)
         {
-            await _gameView.VisualShuffle(randomize);
+            await _gameView.VisualShuffle(rbs);
             _randomBoardList.Clear();
             _randomBoardList.Add(_gameView.RandomBoardSettings);
             _randomBoardListIndex = 0;
@@ -337,7 +337,7 @@ namespace Catan10
             Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.TurnReset();
             _stateStack.Clear();
 
-            foreach (PlayerModel player in SavedAppState.Players)
+            foreach (PlayerModel player in SavedAppState.AllPlayers)
             {
                 player.Reset();
             }
@@ -376,9 +376,9 @@ namespace Catan10
             await SetStateAsync(null, GameState.WaitingForStart, true);
             await AnimateToPlayerIndex(_currentPlayerIndex);
 
-            var model = StartGameController.StartGame(this, selectedIndex, GameContainer.RandomBoardSettings, MainPageModel.PlayingPlayers);
-            VerifyRoundTrip<StartGameModel>(model);
-            NewLog.PushAction(model);
+          //  var model = StartGameController.StartGame(this, selectedIndex, GameContainer.RandomBoardSettings, MainPageModel.PlayingPlayers);
+          //  VerifyRoundTrip<StartGamLog>(model);
+            //NewLog.PushAction(model);
         }
 
 
@@ -738,7 +738,7 @@ namespace Catan10
         public List<int> GetRandomGoldTiles()
         {
             if (!this.RandomGold || this.RandomGoldTileCount < 1) return new List<int>();
-            var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
             return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
         }
 
@@ -794,7 +794,7 @@ namespace Catan10
             _currentPlayerIndex = to;
             GameState oldState = GameState;
 
-            var currentRandomGoldTiles = _gameView.GetCurrentRandomGoldTiles();
+            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
             List<int> newRandomGoldTiles = null;
 
 
@@ -1082,13 +1082,7 @@ namespace Catan10
             }
         }
 
-        public GameState NewGameState
-        {
-            get
-            {
-                return NewLog.GameState;
-            }
-        }
+        
 
         public GameState GameState
         {
@@ -1525,11 +1519,11 @@ namespace Catan10
 
         private async void OnManagePlayers(object sender, RoutedEventArgs e)
         {
-            PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.Players, this);
+            PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.AllPlayers, this);
             if (await dlg.ShowAsync() == ContentDialogResult.Primary)
             {
-                SavedAppState.Players.Clear();
-                SavedAppState.Players.AddRange(dlg.PlayerDataList);
+                SavedAppState.AllPlayers.Clear();
+                SavedAppState.AllPlayers.AddRange(dlg.PlayerDataList);
                 await SaveGameState(SavedAppState);
             }
         }

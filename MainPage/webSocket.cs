@@ -1,23 +1,8 @@
 ﻿namespace Catan10
 {
-    public enum MessageType
-    {
-        Roll = 0,
-        Next,
-        Undo,
-        AllowMoveBaron,
-        CardsLostToMonopoly,
-        CardsLostToSeven,
-        Admonishment
-    }
+    
 
-    public class CatanMessage
-    {
-        public MessageType ID { get; set; }
-        public string User { get; set; }
-        public string Value { get; set; }
-    }
-
+   
     class CatanWebSocket
     {
         //private MessageWebSocket _webSocket = new MessageWebSocket();

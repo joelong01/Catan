@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Catan.Proxy;
+using System.Collections.Generic;
 
 using Windows.UI.Xaml.Controls;
 
@@ -27,6 +28,7 @@ namespace Catan10
 
         public List<TileCtrl> DesertTiles => _HexPanel.DesertTiles;
         public int Index { get; set; } = -1;
+        public CatanGames CatanGame { get => CatanGames.Seafarers4Player; }
         #endregion
     }
 }

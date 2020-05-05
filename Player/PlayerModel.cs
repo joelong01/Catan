@@ -39,11 +39,12 @@ namespace Catan10
         private int _gamesWon = 0;
         private PlayerPosition _PlayerPosition = PlayerPosition.Right;
         private PlayerGameModel _playerGameData = null;
-        private Guid _PlayerIdentifier = new Guid();
+        private Guid _PlayerIdentifier = Guid.NewGuid();
         private ImageBrush _imageBrush = null;
         private string _colorAsString = "HotPink";
         private bool _isCurrentPlayer = false;
-
+        [JsonIgnore]
+        public PlayerModel PlayerDataInstance => this;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public int AllPlayerIndex { get; set; } = -1;
@@ -69,8 +70,8 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public PlayerModel PlayerDataInstance => this;
+        
+        
         public PlayerModel()
         {
             //_playerGameData = new PlayerGameModel(this);

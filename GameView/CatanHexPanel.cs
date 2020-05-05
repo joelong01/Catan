@@ -92,6 +92,12 @@ namespace Catan10
         public static readonly DependencyProperty PirateVisibilityProperty = DependencyProperty.Register("PirateVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, PirateVisibilityChanged));
         public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
         public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
+        public static readonly DependencyProperty CataGameTypeProperty = DependencyProperty.Register("CataGameType", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
+        public CatanGames CataGameType
+        {
+            get => (CatanGames)GetValue(CataGameTypeProperty);
+            set => SetValue(CataGameTypeProperty, value);
+        }
         public string BuildingIndexToHarborIndex
         {
             get => (string)GetValue(BuildingIndexToHarborIndexProperty);
@@ -560,7 +566,9 @@ namespace Catan10
             }
         }
 
-       #endregion
+        
+
+        #endregion
         public CatanHexPanel()
         {
             _pirateShip.Visibility = Visibility.Collapsed;

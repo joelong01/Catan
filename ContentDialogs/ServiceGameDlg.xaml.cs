@@ -35,10 +35,10 @@ namespace Catan10
 
         public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
         public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<string> Games = new ObservableCollection<string>();
+        public ObservableCollection<SessionInfo> Sessions = new ObservableCollection<SessionInfo>();
         public GameInfo GameInfo { get; set; }
-        public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
-        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", SelectedGameChanged));
+        public static readonly DependencyProperty NewSessionNameProperty = DependencyProperty.Register("NewSessionName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty SelectedSessionProperty = DependencyProperty.Register("SelectedSession", typeof(SessionInfo), typeof(ServiceGameDlg), new PropertyMetadata(null, SelectedSessionChanged));
         public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", HostNameChanged));
         public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register("ErrorMessage", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
         public string ErrorMessage
@@ -61,30 +61,29 @@ namespace Catan10
         {
             Proxy.HostName = value;
         }
-        public string SelectedGame
+        public SessionInfo SelectedSession
         {
-            get => (string)GetValue(SelectedGameProperty);
-            set => SetValue(SelectedGameProperty, value);
+            get => (SessionInfo)GetValue(SelectedSessionProperty);
+            set => SetValue(SelectedSessionProperty, value);
         }
-        private static void SelectedGameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void SelectedSessionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as ServiceGameDlg;
-            var depPropValue = (string)e.NewValue;
-            depPropClass?.SetSelectedGame(depPropValue);
+            var depPropValue = (SessionInfo)e.NewValue;
+            depPropClass?.SetSelectedSession(depPropValue);
         }
-        private async void SetSelectedGame(string value)
+        private void SetSelectedSession(SessionInfo value)
         {
-            if (String.IsNullOrEmpty(value)) return;
+            this.TraceMessage($"New Session: {value?.Description}");
 
-            GameInfo = await Proxy.GetGameInfo(value);
         }
 
 
 
-        public string NewGameName
+        public string NewSessionName
         {
-            get => (string)GetValue(NewGameNameProperty);
-            set => SetValue(NewGameNameProperty, value);
+            get => (string)GetValue(NewSessionNameProperty);
+            set => SetValue(NewSessionNameProperty, value);
         }
 
 
@@ -95,15 +94,15 @@ namespace Catan10
             this.InitializeComponent();
         }
 
-        public ServiceGameDlg(PlayerModel currentPlayer, List<PlayerModel> players, List<string> games)
+        public ServiceGameDlg(PlayerModel currentPlayer, List<PlayerModel> players, List<SessionInfo> sessions)
         {
             this.InitializeComponent();
             CurrentPlayer = currentPlayer;
             AllPlayers = players;
-            if (games != null) Games.AddRange(games);
-            if (Games.Count > 0)
+            if (sessions != null && sessions.Count > 0) Sessions.AddRange(sessions);
+            if (Sessions.Count > 0)
             {
-                SelectedGame = Games[0];
+                SelectedSession = Sessions[0];
             }
 
         }
@@ -120,23 +119,23 @@ namespace Catan10
 
         private async void OnRefresh(object sender, RoutedEventArgs e)
         {
-            await GetGames();
+            await GetSessions();
         }
 
-        private async Task GetGames()
+        private async Task GetSessions()
         {
             ErrorMessage = "";
             try
             {
-                List<string> games = await Proxy.GetGames();
-                if (games == null)
+                List<SessionInfo> sessions = await Proxy.GetSessions();
+                if (sessions == null)
                 {
                     ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
                     return;
                 }
-                Games.Clear();
+                Sessions.Clear();
                 PlayersInGame.Clear();
-                Games.AddRange(games);
+                Sessions.AddRange(sessions);
             }
             catch (Exception e)
             {
@@ -150,23 +149,21 @@ namespace Catan10
             ErrorMessage = "";
             try
             {
-                GameInfo = new GameInfo
-                {
-                    BoardSettings = MainPage.Current.GameContainer.GetRandomBoard()
-                };
 
-                List<string> games = await Proxy.CreateGame(NewGameName, GameInfo);
-                if (games == null)
+                SessionInfo sessionInfo = new SessionInfo() { Id = Guid.NewGuid().ToString(), Description = NewSessionName, Creator = MainPage.Current.TheHuman.PlayerName };
+
+                List<SessionInfo> sessions = await Proxy.CreateSession(sessionInfo);
+                if (sessions == null)
                 {
                     ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
                     return;
                 }
-                if (games != null && games.Count > 0)
+                if (sessions != null && sessions.Count > 0)
                 {
-                    Games.Clear();
+                    Sessions.Clear();
                     PlayersInGame.Clear();
-                    Games.AddRange(games);
-                    SelectedGame = Games[Games.Count - 1];
+                    Sessions.AddRange(sessions);
+                    SelectedSession = Sessions[Sessions.Count - 1];
                 }
 
 
@@ -181,31 +178,19 @@ namespace Catan10
 
         private async void OnJoin(object sender, RoutedEventArgs re)
         {
+
             ErrorMessage = "";
             try
             {
 
-                var gameLog = await Proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
-                GameInfo = gameLog.GameInfo;
-                if (GameInfo != null)
+                var sessionInfo =  await Proxy.JoinSession(SelectedSession.Id, CurrentPlayer.PlayerName);
+                if (sessionInfo != null)
                 {
-                    PlayersInGame.Clear();
-                    foreach (var p in gameLog.Players)
-                    {
-                        foreach (var pm in AllPlayers)
-                        {
-                            if (pm.PlayerName.ToLower().Trim() == p)
-                            {
-                                PlayersInGame.Add(pm);
-                                break;
-                            }
-                        }
-
-                    }
+                    SelectedSession = sessionInfo;
                     this.Hide();
-                    return;
-
                 }
+            
+
                 if (Proxy.LastError != null)
                 {
                     ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
@@ -227,31 +212,31 @@ namespace Catan10
 
 
 
-        private async void List_GameChanged(object sender, SelectionChangedEventArgs e)
+        private async void List_SessionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 0) return;
-            SelectedGame = e.AddedItems[0] as string;
-            await GetPlayersInGame();
+            SelectedSession = e.AddedItems[0] as SessionInfo;
+            await GetPlayersInSession();
         }
 
-        private async Task GetPlayersInGame()
+        private async Task GetPlayersInSession()
         {
             ErrorMessage = "";
-            if (String.IsNullOrEmpty(SelectedGame)) return;
+          
             try
             {
-                List<string> users = await Proxy.GetUsers(SelectedGame);
-                if (users == null)
+                List<string> players = await Proxy.GetPlayers(SelectedSession.Id);
+                if (players == null)
                 {
                     ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
                     return;
                 }
                 PlayersInGame.Clear();
-                foreach (var p in users)
+                foreach (var p in players)
                 {
                     foreach (var pm in AllPlayers)
                     {
-                        if (pm.PlayerName.ToLower().Trim() == p)
+                        if (pm.PlayerName.Trim() == p)
                         {
                             PlayersInGame.Add(pm);
                             break;
@@ -271,21 +256,23 @@ namespace Catan10
         private async void OnDelete(object sender, RoutedEventArgs re)
         {
             ErrorMessage = "";
-            if (String.IsNullOrEmpty(SelectedGame)) return;
+            if (SelectedSession == null) return;
+            
             try
             {
 
-                bool ret = await AskUserQuestion($"Are you sure want to delete the game name {SelectedGame}?");
+                bool ret = await AskUserQuestion($"Are you sure want to delete the session named \"{SelectedSession.Description}\"?");
                 if (ret)
                 {
-                    var result = await Proxy.DeleteGame(SelectedGame);
-                    if (result == null)
+                    var sessions = await Proxy.DeleteSession(SelectedSession.Id);
+                    if (sessions == null)
                     {
                         ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
                         return;
                     }
                     PlayersInGame.Clear();
-                    await GetGames();
+                    Sessions.Clear();
+                    Sessions.AddRange(sessions);
                 }
 
             }

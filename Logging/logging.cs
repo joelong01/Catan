@@ -180,82 +180,14 @@ namespace Catan10
             this.PushAction(le);
 
         }
-        private async Task SendServiceMessage(LogEntry le)
+        private Task SendServiceMessage(LogEntry le)
         {
-            if (!MainPage.Current.MainPageModel.IsServiceGame) return;
-            if (this.State == LogState.ServiceUpdate) return;
-            var serviceData = MainPage.Current.MainPageModel.ServiceData;
-
-            switch (le.Action)
-            {
-                case CatanAction.Rolled:
-                    break;
-                case CatanAction.ChangedState:
-                    var chs = await serviceData.Proxy.SetState(serviceData.GameName, MainPage.Current.CurrentPlayer.PlayerName, le.Tag as LogStateTranstion);
-                    TraceServiceError(chs, le);
-                    break;
-                case CatanAction.ChangedPlayer:
-                    break;
-                case CatanAction.Dealt:
-                    break;
-                case CatanAction.CardsLost:
-                    break;
-                case CatanAction.CardsLostToSeven:
-                    break;
-                case CatanAction.MissedOpportunity:
-                    break;
-                case CatanAction.DoneSupplemental:
-                    break;
-                case CatanAction.DoneResourceAllocation:
-                    break;
-                case CatanAction.PlayedKnight:
-                    break;
-                case CatanAction.RolledSeven:
-                    break;
-                case CatanAction.AssignedBaron:
-                    break;
-                case CatanAction.UpdatedRoadState:
-                    break;
-                case CatanAction.UpdateBuildingState:
-                    break;
-                case CatanAction.AssignedPirateShip:
-                    break;
-                case CatanAction.AddPlayer:
-                    //
-                    //  Join Game happens in the NetworkGame dialog -- so don't call the service as it has already been called
-                    //
-                    //var ap = await serviceData.Proxy.JoinGame(serviceData.GameName, MainPage.Current.CurrentPlayer.PlayerName);
-                    //TraceServiceError(ap);
-                    //
-                    //  
-                    break;
-                case CatanAction.SelectGame:
-                    break;
-                case CatanAction.InitialAssignBaron:
-                    break;
-                case CatanAction.None:
-                    break;
-                case CatanAction.SetFirstPlayer:
-                    break;
-                case CatanAction.RoadTrackingChanged:
-                    break;
-                case CatanAction.AddResourceCount:
-                    break;
-                case CatanAction.ChangedPlayerProperty:
-                    break;
-                case CatanAction.SetRandomTileToGold:
-                    break;
-                case CatanAction.ChangePlayerAndSetState:
-                    break;
-                case CatanAction.Started:
-                    break;               
-                case CatanAction.RandomizeBoard:                    
-                    var msg = await serviceData.Proxy.PostRandomBoard(serviceData.GameName, MainPage.Current.CurrentPlayer.PlayerName, le.Tag as RandomBoardSettings);
-                    TraceServiceError(msg, le);
-                    break;
-                default:
-                    break;
-            }
+            //if (!MainPage.Current.MainPageModel.IsServiceGame) return;
+            //if (this.State == LogState.ServiceUpdate) return;
+            //var serviceData = MainPage.Current.MainPageModel.ServiceData;
+            //if (serviceData.Proxy == null) return;
+            //var result = await serviceData.Proxy.PostLogMessage(serviceData.SessionId.Id, le);
+            return Task.CompletedTask;
         }
         private void TraceServiceError(object response, LogEntry le)
         {

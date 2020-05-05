@@ -15,10 +15,10 @@ namespace Catan10
     {
         public ObservableCollection<PlayerModel> PlayingPlayers { get; } = new ObservableCollection<PlayerModel>();
         public ObservableCollection<PlayerModel> AvailablePlayers { get; } = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<CatanGame> AvailableGames { get; } = new ObservableCollection<CatanGame>();
+        public ObservableCollection<CatanGameCtrl> AvailableGames { get; } = new ObservableCollection<CatanGameCtrl>();
 
 
-        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(CatanGame), typeof(NewGameDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(CatanGameCtrl), typeof(NewGameDlg), new PropertyMetadata(null));
         public static readonly DependencyProperty SaveFileNameProperty = DependencyProperty.Register("SaveFileName", typeof(string), typeof(NewGameDlg), new PropertyMetadata(""));
         public string SaveFileName
         {
@@ -26,9 +26,9 @@ namespace Catan10
             set => SetValue(SaveFileNameProperty, value);
         }
 
-        public CatanGame SelectedGame
+        public CatanGameCtrl SelectedGame
         {
-            get => (CatanGame)GetValue(SelectedGameProperty);
+            get => (CatanGameCtrl)GetValue(SelectedGameProperty);
             set => SetValue(SelectedGameProperty, value);
         }
 
@@ -42,7 +42,7 @@ namespace Catan10
             this.InitializeComponent();
             this.DataContext = PlayingPlayers;
         }
-        public NewGameDlg(IList<PlayerModel> playerData, IList<CatanGame> games)
+        public NewGameDlg(IList<PlayerModel> playerData, IList<CatanGameCtrl> games)
         {
             this.InitializeComponent();
             AvailablePlayers.AddRange(playerData);

@@ -1,4 +1,5 @@
 ﻿
+using Catan.Proxy;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -21,7 +22,7 @@ namespace Catan10
         public RoadRaceTracking NewRaceTracking { get; set; } = new RoadRaceTracking();
         [JsonIgnore]
         public RoadCtrl Road { get; set; } = null;
-        public int GameIndex { get; set; } = -1;
+        public GameType GameType { get; set; }
 
         public UpdateRoadModel() { }
 
@@ -31,7 +32,7 @@ namespace Catan10
 
     public class UpdateRoadController
     {
-        public static UpdateRoadModel SetRoadState(MainPage page, RoadCtrl road, RoadState newState, RoadRaceTracking raceTracker)
+        public static UpdateRoadModel SetRoadState(IGameController gameController, RoadCtrl road, RoadState newState, RoadRaceTracking raceTracker)
         {
             RoadState oldState = road.RoadState;
 
@@ -42,44 +43,43 @@ namespace Catan10
 
             UpdateRoadModel model = new UpdateRoadModel()
             {
-                Page = page,
-                Player = page.CurrentPlayer,
-                PlayerIndex = page.CurrentPlayer.AllPlayerIndex,
-                PlayerName = page.CurrentPlayer.PlayerName,
-                OldState = page.NewGameState,
+
+                PlayerName = gameController.CurrentPlayer.PlayerName,
+                OldState = gameController.NewGameState,
                 Action = CatanAction.UpdatedRoadState,
                 RoadIndex = road.Index,
                 OldRoadState = road.RoadState,
                 NewRoadState = newState,
-                GameIndex = page.GameContainer.CurrentGame.Index,
+                CatanGame = gameController.CatanGame,
                 OldRaceTracking = raceTracker
 
             };
 
             road.RoadState = newState;
+            var player = gameController.NameToPlayer(model.PlayerName);
             switch (newState)
             {
                 case RoadState.Unowned:
                     if (oldState == RoadState.Ship)
                     {
-                        model.Player.GameData.Ships.Remove(road);
+                        player.GameData.Ships.Remove(road);
                     }
                     else
                     {
-                        model.Player.GameData.Roads.Remove(road);
+                        player.GameData.Roads.Remove(road);
                     }
 
                     road.Owner = null;
                     road.Number = -1;
                     break;
                 case RoadState.Road:
-                    road.Number = model.Player.GameData.Roads.Count; // undo-able                    
-                    model.Player.GameData.Roads.Add(road);
-                    road.Owner = model.Player;
+                    road.Number = player.GameData.Roads.Count; // undo-able                    
+                    player.GameData.Roads.Add(road);
+                    road.Owner = player;
                     break;
                 case RoadState.Ship:
-                    model.Player.GameData.Roads.Remove(road); // can't be a ship if you aren't a road
-                    model.Player.GameData.Ships.Add(road);
+                    player.GameData.Roads.Remove(road); // can't be a ship if you aren't a road
+                    player.GameData.Ships.Add(road);
                     break;
                 default:
                     break;
@@ -89,7 +89,7 @@ namespace Catan10
             RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
 
             //await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdatedRoadState, true, logType, road.Number, new LogRoadUpdate(_gameView.CurrentGame.Index, road, oldState, road.RoadState));
-            CalculateAndSetLongestRoad(page, newRaceTracker);
+            CalculateAndSetLongestRoad(gameController as MainPage, newRaceTracker);
 
             model.NewRaceTracking = newRaceTracker;
 

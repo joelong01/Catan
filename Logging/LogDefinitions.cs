@@ -27,9 +27,6 @@ namespace Catan10
     }
 
     public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo };
-
-
-
     public delegate void RedoPossibleHandler(bool redo);
     public delegate void StateChangedHandler(GameState oldState, GameState newState);
 }

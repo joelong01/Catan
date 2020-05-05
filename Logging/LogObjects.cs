@@ -125,7 +125,7 @@ namespace Catan10
                     Tag = CatanProxy.Deserialize<RandomBoardSettings>(val);
                     break;
                 case CatanAction.ChangedState:
-                    Tag = LogStateTranstion.Deserialize(val);
+                   // Tag = LogStateTranstion.Deserialize(val);
                     break;
                 case CatanAction.CardsLost:
                     Tag = new LogCardsLost(val);

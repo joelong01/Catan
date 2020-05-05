@@ -1,10 +1,45 @@
-﻿using Windows.UI.Xaml;
+﻿using Catan.Proxy;
+using System.Collections.Generic;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 // The Content Dialog item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
+    public class Settings
+    {
+        public bool RotateTile { get; set; } = false;
+        public bool AnimateFade { get; set; } = true;
+        public int FadeSeconds { get; set; } = 3;
+        public double Zoom { get; set; } = 1.0;
+        public bool ShowStopwatch { get; set; } = true;
+        public bool UseClassicTiles { get; set; } = true;
+        public int AnimationSpeed { get; set; } = 3;
+        public bool ResourceTracking { get; set; } = true;
+        public bool UseRandomNumbers { get; set; } = true;
+        public bool ValidateBuilding { get; set; } = true;
+        public List<GridPosition> GridPositions { get; set; } = new List<GridPosition>();
+
+
+
+
+        public Settings()
+        {
+
+        }
+        public string Serialize()
+        {
+            return CatanProxy.Serialize(this);
+        }
+
+        public static Settings Deserialize(string s)
+        {
+
+            return CatanProxy.Deserialize<Settings>(s);
+        }
+
+    }
 
 
     public sealed partial class SettingsDlg : ContentDialog

@@ -27,7 +27,7 @@ namespace Catan10
         //  compares 2 RolledModel objects for identity.  used for testing Redo.
         public bool Equals(RolledModel rolledModel)
         {
-            if (PlayerIndex != rolledModel.PlayerIndex || PlayerName != rolledModel.PlayerName || OldState != rolledModel.OldState ||
+            if ( PlayerName != rolledModel.PlayerName || OldState != rolledModel.OldState ||
                 Action != rolledModel.Action || Rolled != rolledModel.Rolled || PlayerToResources.Count != rolledModel.PlayerToResources.Count)
             {
                 return false;
@@ -105,10 +105,8 @@ namespace Catan10
             var currentPlayer = page.CurrentPlayer;
             RolledModel rolledModel = new RolledModel()
             {
-                Page = page,
+               
                 Rolled = roll,
-                Player = currentPlayer,
-                PlayerIndex = currentPlayer.AllPlayerIndex,
                 PlayerName = currentPlayer.PlayerName,
                 OldState = page.NewGameState,
                 Action = (roll == 7) ? CatanAction.RolledSeven : CatanAction.Rolled

@@ -23,7 +23,8 @@ namespace Catan10
             }
         }
 
-        public string GameName { get; set; } = "";
+        public SessionInfo SessionInfo { get; set; }
+        
 
         public ServiceData()
         {
@@ -71,7 +72,7 @@ namespace Catan10
             }
         }
 
-
+        public PlayerModel GameStartedBy { get; internal set; }
 
         bool _EnableUiInteraction = true;
         public bool EnableUiInteraction

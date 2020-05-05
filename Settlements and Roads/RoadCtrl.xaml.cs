@@ -220,19 +220,19 @@ namespace Catan10
             {
                 if (el.GetType() == typeof(Polygon))
                 {
-                    ((Polygon)el).Stroke = MainPage.Current.CurrentPlayer?.GameData.BackgroundBrush;
-                    ((Polygon)el).Fill = MainPage.Current.CurrentPlayer?.GameData.BackgroundBrush;
+                    ((Polygon)el).Stroke = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
+                    ((Polygon)el).Fill = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
 
                 }
                 if (el.GetType() == typeof(Line))
                 {
-                    ((Line)el).Stroke = MainPage.Current.CurrentPlayer?.GameData.ForegroundBrush;
+                    ((Line)el).Stroke = MainPage.Current.CurrentPlayer?.GameData?.ForegroundBrush;
                 }
             }
 
 
-            _shipPolygon.Fill = MainPage.Current.CurrentPlayer?.GameData.BackgroundBrush;
-            _shipPolygon.Stroke = MainPage.Current.CurrentPlayer?.GameData.ForegroundBrush;
+            _shipPolygon.Fill = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
+            _shipPolygon.Stroke = MainPage.Current.CurrentPlayer?.GameData?.ForegroundBrush;
 
         }
 

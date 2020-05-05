@@ -53,12 +53,19 @@ namespace Catan10
             list[firstIndex] = list[secondIndex];
             list[secondIndex] = temp;
         }
+        public static void ForEach<T>(this IEnumerable<T> list, Action<T> action)
+        {
+            foreach (var item in list)
+            {
+                action(item);
+            }
+        }
     }
-
 
 
     public static class StaticHelpers
     {
+
 
         public static ResourceType HarborTypeToResourceType(HarborType ht)
         {

@@ -313,6 +313,10 @@ namespace Catan10
 
         }
 
+        /// <summary>
+        ///     the reason this is not a property to get/set the highlight is that the highlight brush 
+        ///     will change every time the player changes
+        /// </summary>
         public bool Highlighted { get; private set; } = false;
 
         public void HighlightTile(Brush playerBackground) // you should never see Hotpink!
@@ -323,6 +327,8 @@ namespace Catan10
 
         public void StopHighlightingTile() // you should never see Hotpink!
         {
+            if (!Highlighted) return;
+
             if (this.ResourceType == ResourceType.Sea)
             {
                 _hexFront.Stroke = (Brush)App.Current.Resources["bmWater"];

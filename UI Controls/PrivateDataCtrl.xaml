@@ -7,7 +7,7 @@
     d:DesignHeight="300" d:DesignWidth="600" mc:Ignorable="d">
 
 
-    <Grid Width="475" Height="295" Background="{StaticResource bmCherry}" CornerRadius="10">
+    <Grid Width="475" Height="295" Background="{StaticResource TransparentBrush}" CornerRadius="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />

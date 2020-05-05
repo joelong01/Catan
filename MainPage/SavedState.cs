@@ -13,7 +13,7 @@ namespace Catan10
     public class SavedState
     {
         #region properties
-        public List<PlayerModel> Players { get; set; } = new List<PlayerModel>();
+        public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
         public string DefaultPlayerName { get; set; } = "";
         public Settings Settings { get; set; } = new Settings();
 

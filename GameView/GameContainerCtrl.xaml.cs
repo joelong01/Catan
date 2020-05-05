@@ -19,23 +19,25 @@ namespace Catan10
 {
 
 
-    public class CatanGame : ICatanGameData
+    public class CatanGameCtrl : ICatanGameData
     {
 
         public Type ControlType { get; set; } = typeof(RegularGameCtrl);
-
+        
         public string Description { get; set; } = "Regular";
         public int Index { get; set; } = -1;
-        public CatanGame(Type type, string s, int idx)
+        public CatanGames CatanGame { get; set; } = CatanGames.Regular;
+        public CatanGameCtrl(Type type, CatanGames gameType, string s, int idx)
         {
             ControlType = type;
             Description = s;
             Index = idx;
+            CatanGame = gameType;
 
         }
 
 
-
+        
 
         public UserControl Control { get; set; } = null;
 
@@ -75,6 +77,8 @@ namespace Catan10
 
         public List<TileCtrl> DesertTiles => ChildControl.DesertTiles;
 
+       
+
         #endregion
         public override string ToString()
         {
@@ -98,12 +102,12 @@ namespace Catan10
         //
         //  when you build a new Game control, add it to this list
         //
-        readonly List<CatanGame> _games = new List<CatanGame>()
+        readonly List<CatanGameCtrl> _games = new List<CatanGameCtrl>()
         {
-            new CatanGame (typeof (RegularGameCtrl), "Regular", 0),
-            new CatanGame (typeof (ExpansionCtrl), "Expansion (5-6 Players)", 1),
-            new CatanGame (typeof (Seafarers4PlayerCtrl), "Seafarers (4 Player)",2),
-            new CatanGame (typeof (FourIsland3Ctrl), "Four Islands (3 Player)", 3),
+            new CatanGameCtrl (typeof (RegularGameCtrl), CatanGames.Regular,  "Regular", 0),
+            new CatanGameCtrl (typeof (ExpansionCtrl), CatanGames.Expansion, "Expansion (5-6 Players)", 1),
+            new CatanGameCtrl (typeof (Seafarers4PlayerCtrl), CatanGames.Seafarers, "Seafarers (4 Player)",2),
+            //new CatanGameCtrl (typeof (FourIsland3Ctrl), "Four Islands (3 Player)", 3),
 
         };
 
@@ -173,7 +177,7 @@ namespace Catan10
         {
             for (int index = 0; index < _games.Count(); index++)
             {
-                CatanGame game = _games[index];
+                CatanGameCtrl game = _games[index];
                 if (game.Description.Equals(description))
                 {
                     return index;
@@ -224,13 +228,13 @@ namespace Catan10
 
 
 
-        public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGame>), typeof(CatanHexPanel), new PropertyMetadata(""));
-        public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGame), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
+        public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGameCtrl>), typeof(CatanHexPanel), new PropertyMetadata(""));
+        public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGameCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
 
         private static void OnCurrentGameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             GameContainerCtrl container = d as GameContainerCtrl;
-            container.SetGame(e.NewValue as CatanGame);
+            container.SetGame(e.NewValue as CatanGameCtrl);
         }
 
         public TileCtrl PirateShipTile
@@ -273,7 +277,7 @@ namespace Catan10
         //
         //  please don't call this directly, as it will bypass any UI that has bound to the DP
         //
-        private void SetGame(CatanGame newGame)
+        private void SetGame(CatanGameCtrl newGame)
         {
             if (newGame.Control == null)
             {
@@ -298,14 +302,14 @@ namespace Catan10
             _currentHexPanel.TileCallback = _tileCallback;
         }
 
-        public CatanGame CurrentGame
+        public CatanGameCtrl CurrentGame
         {
-            get => (CatanGame)GetValue(CurrentGameProperty);
+            get => (CatanGameCtrl)GetValue(CurrentGameProperty);
             set => SetValue(CurrentGameProperty, value);
         }
-        public List<CatanGame> Games
+        public List<CatanGameCtrl> Games
         {
-            get => (List<CatanGame>)GetValue(GamesProperty);
+            get => (List<CatanGameCtrl>)GetValue(GamesProperty);
             set => SetValue(GamesProperty, value);
         }
         /// <summary>
@@ -339,7 +343,7 @@ namespace Catan10
 
 
 
-            CatanGame game = CurrentGame;
+            CatanGameCtrl game = CurrentGame;
 
 
 
@@ -514,11 +518,11 @@ namespace Catan10
 
 
 
-        public async Task VisualShuffle(bool randomize = true)
+        public async Task VisualShuffle(RandomBoardSettings rbs = null)
         {
             _currentHexPanel.PirateVisibility = Visibility.Collapsed;
             _currentHexPanel.BaronVisibility = Visibility.Collapsed;
-            if (randomize) await SetRandomCatanBoard(false);
+            await SetRandomCatanBoard(false, rbs);
             await FancyTileDistribution();
             await FancyHarborDistribution();
             await InitialPlaceBaron();
@@ -1168,17 +1172,20 @@ namespace Catan10
             }
 
         }
-        public List<int> GetCurrentRandomGoldTiles()
+        public List<int> CurrentRandomGoldTiles
         {
-            List<int> ret = new List<int>();
-            foreach (var tile in TilesInIndexOrder)
+            get
             {
-                if (tile.TemporarilyGold)
+                List<int> ret = new List<int>();
+                foreach (var tile in TilesInIndexOrder)
                 {
-                    ret.Add(tile.Index);
+                    if (tile.TemporarilyGold)
+                    {
+                        ret.Add(tile.Index);
+                    }
                 }
+                return ret;
             }
-            return ret;
         }
     }
 }

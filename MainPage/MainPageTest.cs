@@ -20,7 +20,7 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-        private NewLog NewLog;
+        public NewLog NewLog;
 
         private void InitTest()
         {
@@ -34,10 +34,8 @@ namespace Catan10
         private async void OnTest2(object sdr, RoutedEventArgs rea)
         {
             // change player
-            ChangedPlayerModel changedPlayer = await ChangedPlayerController.ChangePlayer(this, 1, GameState.WaitingForRoll);
-            VerifyRoundTrip<ChangedPlayerModel>(changedPlayer);
-
-            NewLog.PushAction(changedPlayer);
+            ChangePlayerLog changedPlayer = await ChangePlayerLog.ChangePlayer(this, 1, GameState.WaitingForRoll);
+            VerifyRoundTrip<ChangePlayerLog>(changedPlayer);
         }
         // Undo
         private async void OnTest3(object sdr, RoutedEventArgs rea)
@@ -76,10 +74,10 @@ namespace Catan10
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
-                SavedAppState.Players[0],
-                SavedAppState.Players[1],
-                SavedAppState.Players[2],
-                SavedAppState.Players[3]
+                SavedAppState.AllPlayers[0],
+                SavedAppState.AllPlayers[1],
+                SavedAppState.AllPlayers[2],
+                SavedAppState.AllPlayers[3]
             };
             await StartGame(PlayerDataList, 0);
             await NextState(); // simluates pushing "Start"
@@ -101,11 +99,11 @@ namespace Catan10
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
-                SavedAppState.Players[0],
-                SavedAppState.Players[1],
-                SavedAppState.Players[2],
-                SavedAppState.Players[3],
-                SavedAppState.Players[4],
+                SavedAppState.AllPlayers[0],
+                SavedAppState.AllPlayers[1],
+                SavedAppState.AllPlayers[2],
+                SavedAppState.AllPlayers[3],
+                SavedAppState.AllPlayers[4],
             };
             await StartGame(PlayerDataList, 1);
             await NextState(); // simluates pushing "Start"
