@@ -39,6 +39,8 @@ namespace Catan10
         /// </summary>
         PlayerModel CurrentPlayer { get; }
 
+        Task UndoSetRandomBoard(RandomBoardLog logHeader);
+
         /// <summary>
         ///     Adds a player to the game.  if the Player is already in the game, return false.
         /// </summary>
@@ -61,15 +63,18 @@ namespace Catan10
         CatanGames CatanGame { get; set; }
         GameState CurrentState { get; }
         List<int> CurrentRandomGoldTiles { get; }
+        
         List<int> NextRandomGoldTiles { get; }
         List<int> HighlightedTiles { get; }
 
         Task StartGame(StartGameLog model);
         RandomBoardSettings GetRandomBoard();
-        Task SetRandomBoard(RandomBoardSettings randomBoard);
+        Task SetRandomBoard(RandomBoardLog randomBoard);
+        RandomBoardSettings CurrentRandomBoard();
 
         Task ChangePlayer(ChangePlayerLog log);
         Task UndoChangePlayer(ChangePlayerLog log);
+        
     }
 
     public sealed partial class MainPage : Page, ILog, IGameController
@@ -164,6 +169,8 @@ namespace Catan10
             player.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
             player.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
 
+            CurrentPlayer = MainPageModel.PlayingPlayers[0];
+
             return NewLog.PushAction(playerplayerLogHeader);
         }
         /// <summary>
@@ -182,17 +189,25 @@ namespace Catan10
 
         }
 
-        public async Task SetRandomBoard(RandomBoardSettings randomBoard)
+        public async Task SetRandomBoard(RandomBoardLog randomBoard)
         {
             if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
             {
-                await VisualShuffle(randomBoard);
+                await VisualShuffle(randomBoard.NewRandomBoard);
             }
             else
             {
-                await _gameView.SetRandomCatanBoard(true, randomBoard);
+                await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
             }
+            await NewLog.PushAction(randomBoard);
+        }
 
+        public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
+        {
+            await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
+            //
+            //  DO NOT LOG UNDO
+            //
         }
 
         /// <summary>
@@ -304,5 +319,12 @@ namespace Catan10
             }
 
         }
+
+        public RandomBoardSettings CurrentRandomBoard()
+        {
+            return _gameView.RandomBoardSettings;
+        }
+
+        
     }
 }

@@ -260,7 +260,7 @@ namespace Catan10
             {
                 if (tile.RandomGoldEligible)
                 {
-                    tile.SetTileOrientationAsync(orientation, 0);
+                    tile.TileOrientation = orientation;
                 }
             }
 

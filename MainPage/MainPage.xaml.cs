@@ -148,7 +148,7 @@ namespace Catan10
             }
 
             InitTest();
-
+            ResetDataForNewGame();
         }
 
         private Task SaveSettings()
@@ -207,7 +207,7 @@ namespace Catan10
 
 
             SavedAppState = await LoadGameState();
-            if (SavedAppState == null)
+            if (SavedAppState == null || SavedAppState.AllPlayers.Count == 0)
             {
                 var list = await GetDefaultUsers();
                 

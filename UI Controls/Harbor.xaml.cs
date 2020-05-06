@@ -243,13 +243,12 @@ namespace Catan10
             await _sbFlip.ToTask();
 
         }
-
+        //
+        //  5/5/2020: the Orientation and the _orientation were out of sync.  So we couldn't check the value and return if it was set correctly.
+        //
         public void SetOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue)
         {
-            if (_orientation == orientation)
-            {
-                return;
-            }
+            
 
             if (animationDuration == double.MaxValue)
             {

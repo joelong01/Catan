@@ -50,7 +50,8 @@ namespace Catan10
     public class LogHeader
     {
         public LogType LogType { get; set; } = LogType.Normal;
-        public string PlayerName { get; set; } = (MainPage.Current.CurrentPlayer == null) ? "NotSetYet" : MainPage.Current.CurrentPlayer.PlayerName;
+        public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer?.PlayerName;
+        public string TheHuman { get; set; } = MainPage.Current.TheHuman.PlayerName;
         public GameState OldState { get; set; } = MainPage.Current.NewLog.GameState;
         public GameState NewState { get; set; }
         public CatanAction Action { get; set; }

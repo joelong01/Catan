@@ -6,36 +6,38 @@ using System.Threading.Tasks;
 
 namespace Catan10
 {
-    public class RandomBoardModel : LogHeader
+    public class RandomBoardLog : LogHeader, ILogController
     {
-        public RandomBoardSettings RandomBoard { get; set; }
+        public RandomBoardSettings NewRandomBoard { get; set; }
+        public RandomBoardSettings PreviousRandomBoard { get; set; }
         public int GameIndex { get; set; } // this to just double check
-        public RandomBoardModel() : base()
+        public RandomBoardLog() : base()
         {
             Action = CatanAction.RandomizeBoard;
         }
-    }
 
-
-    public static class RandomBoardController
-    {
-
-        public static async Task<RandomBoardModel> RandomizeBoard(IGameController gameController, int gameIndex)
+        public static async Task<RandomBoardLog> RandomizeBoard(IGameController gameController, int gameIndex)
         {
-            RandomBoardModel model = new RandomBoardModel()
-            {
-                PlayerName = gameController.CurrentPlayer?.PlayerName,
-                RandomBoard = gameController.GetRandomBoard(),
+            RandomBoardLog model = new RandomBoardLog()
+            {                
+                NewRandomBoard = gameController.GetRandomBoard(),
+                PreviousRandomBoard = gameController.CurrentRandomBoard(),
                 GameIndex = gameIndex
             };
-            await gameController.SetRandomBoard(model.RandomBoard);
+            await gameController.SetRandomBoard(model);
             return model;
+
+        }
+        public Task Undo(IGameController gameController, LogHeader logHeader)
+        {
+            return gameController.UndoSetRandomBoard(logHeader as RandomBoardLog);
         }
 
-        public static async Task Redo(IGameController gameController, RandomBoardModel model)
+        public Task Redo(IGameController gameController, LogHeader logHeader)
         {
-            await gameController.SetRandomBoard(model.RandomBoard);
+            return gameController.SetRandomBoard(logHeader as RandomBoardLog);
         }
+
     }
 }
 

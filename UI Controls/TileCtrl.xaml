@@ -45,6 +45,7 @@
                 Storyboard.TargetProperty="(UIElement.Opacity)"
                 Storyboard.TargetName="_hexFront" To="0.5" Duration="0:0:3" />
         </Storyboard>
+       
     </Control.Resources>
 
 
@@ -58,7 +59,7 @@
 
 
     <Grid Name="VisualGrid">
-
+      
         <Rectangle x:Name="_border" Grid.RowSpan="3" Grid.ColumnSpan="3" Margin="0"
             Fill="Transparent" StrokeDashArray="1 3" Stroke="Blue" StrokeThickness="1"
             Visibility="Collapsed" StrokeDashCap="Round" Canvas.ZIndex="-1"

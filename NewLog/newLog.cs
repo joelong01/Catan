@@ -35,6 +35,7 @@ namespace Catan10
 
         public Task PushAction(LogHeader logHeader)
         {
+            if (logHeader.LocallyCreated == false) return Task.CompletedTask;
 
             ActionStack.Add(logHeader);
 

@@ -664,7 +664,8 @@ namespace Catan10
                 tile.Reset();
                 if (tile.ResourceType != ResourceType.Sea)
                 {
-                    tile.SetTileOrientationAsync(TileOrientation.FaceDown);
+                    tile.TileOrientation = TileOrientation.FaceUp;
+                    tile.TileOrientation = TileOrientation.FaceDown;                    
                 }
 
             }
@@ -681,6 +682,7 @@ namespace Catan10
             foreach (Harbor h in Harbors)
             {
                 h.Reset();
+                h.SetOrientationAsync(TileOrientation.FaceUp);
                 h.SetOrientationAsync(TileOrientation.FaceDown);
             }
 
@@ -1957,7 +1959,7 @@ namespace Catan10
                 AllTiles.Add(tile);
                 if (tile.RandomGoldEligible == false)
                 {
-                    tile.SetTileOrientationAsync(TileOrientation.FaceUp);
+                    tile.TileOrientation = TileOrientation.FaceUp;
                 }
                 // Harbors.AddRange(tile.VisibleHarbors);
             }

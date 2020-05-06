@@ -380,10 +380,10 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="10*" />
             </Grid.RowDefinitions>
-            <Rectangle Grid.Row="0" Fill="{x:Bind FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.GameData.BackgroundBrush}" />
+            <Rectangle Grid.Row="0" Fill="{Binding FallbackValue=HotPink, Mode=OneWay, Path=CurrentPlayer.GameData.BackgroundBrush}" />
             <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Text="Private Data"
-                Style="{StaticResource HeaderTextBlockStyle}"
+                Style="{StaticResource HeaderTextBlockStyle}"                       
                 Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=CurrentPlayer.GameData.ForegroundBrush}"
                 FontSize="22" FontStyle="Normal" FontWeight="Normal" />
             <ListBox Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
