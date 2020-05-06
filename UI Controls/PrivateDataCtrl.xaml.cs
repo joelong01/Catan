@@ -28,6 +28,7 @@ namespace Catan10
         }
         private void SetPlayer(PlayerModel value)
         {
+            if (value == null) return;
             PlayedDevCards.Clear();
             PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);
             this.PlayedDevCards.Add(DevCardType.Knight);

@@ -35,7 +35,22 @@ namespace Catan10
     public class MainPageModel : INotifyPropertyChanged
     {
         public ServiceData ServiceData { get; } = new ServiceData();
-        public bool IsServiceGame { get; set; } = false;
+        bool _EnableUiInteraction = true;
+        Log _Log = new Log();
+        private bool _isServiceGame = false;
+
+        public bool IsServiceGame
+        {
+            get => _isServiceGame;
+            set
+            {
+                if (value != _isServiceGame)
+                {
+                    _isServiceGame = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         public MainPageModel()
         {
             _Log.PropertyChanged += Log_PropertyChanged;
@@ -74,7 +89,7 @@ namespace Catan10
 
         public PlayerModel GameStartedBy { get; internal set; }
 
-        bool _EnableUiInteraction = true;
+  
         public bool EnableUiInteraction
         {
             get
@@ -117,7 +132,8 @@ namespace Catan10
             }
         }
 
-        Log _Log = new Log();
+      
+
         [JsonIgnore]
         public Log Log
         {

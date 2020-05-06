@@ -173,12 +173,12 @@ namespace Catan10
             {
                 players.Add(playerLogHeader.PlayerName);
             }
-
+            MainPageModel.PlayingPlayers.Clear();
             foreach (var name in players)
             {
                 var player = NameToPlayer(name);
                 Contract.Assert(player != null, "Player Can't Be Null");
-                if (MainPageModel.PlayingPlayers.Contains(player)) continue;
+                
 
                 player.Reset();
                 MainPageModel.PlayingPlayers.Add(player);

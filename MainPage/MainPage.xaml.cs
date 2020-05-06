@@ -35,7 +35,7 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-        public PlayerModel TheHuman { get; set; } = null;
+       
         public SavedState SavedAppState { get; set; } = null;
         private int _supplementalStartIndex = -1;
         public static readonly string SAVED_GAME_EXTENSION = ".log";
@@ -50,6 +50,12 @@ namespace Catan10
         private readonly RoadRaceTracking _raceTracking = null; // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
         //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel()));
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
+        public PlayerModel TheHuman
+        {
+            get => (PlayerModel)GetValue(TheHumanProperty);
+            set => SetValue(TheHumanProperty, value);
+        }
 
         public MainPageModel MainPageModel
         {
@@ -62,13 +68,11 @@ namespace Catan10
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
             this.InitializeComponent();
-
             Current = this;
             this.DataContext = this;
             _timer.Tick += AsyncReverseFade;
             _raceTracking = new RoadRaceTracking(this);
-            Ctrl_PlayerResourceCountCtrl.Log = this;
-            MainPageModel.IsServiceGame = true; // for TESTING!!
+            Ctrl_PlayerResourceCountCtrl.Log = this;            
         }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)

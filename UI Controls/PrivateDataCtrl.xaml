@@ -58,7 +58,7 @@
             </StackPanel>
             <Rectangle Width="465" Height="2" Margin="0,5,0,5" Fill="{StaticResource WhiteBrush}" />
 
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Background="{x:Bind Path=Player.GameData.ForegroundBrush, Mode=OneWay}">
                 <Button Margin="5,0,5,0" Padding="0" Background="Transparent" ToolTipService.ToolTip="Buy Settlement">
                     <Button.Content>
                         <Grid>
