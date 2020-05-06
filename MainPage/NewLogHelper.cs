@@ -150,28 +150,49 @@ namespace Catan10
             }
             return null;
         }
-        public Task AddPlayer(AddPlayerLog playerplayerLogHeader)
+        /// <summary>
+        ///     Called when a Player is added to a Service game
+        ///     we want to keep all games with identical state, so we have a race condition where each person joins a session, which creates a new game
+        ///     and adds a user.  so each person would be the first user to join the game and order isn't served.
+        ///     
+        ///     to fix this, we go to the service and get the list of users and add it in the service order.
+        ///     
+        ///     this can also be called directly by the user, so we need to make sure that it works even if the AddPlayer() hasn't been logged
+        ///     
+        /// </summary>
+        /// <param name="playerLogHeader"></param>
+        /// <returns></returns>
+        public async Task AddPlayer(AddPlayerLog playerLogHeader)
         {
-            var player = NameToPlayer(playerplayerLogHeader.PlayerName);
-            Contract.Assert(player != null, "Player Can't Be Null");
+            var proxy = MainPageModel.ServiceData.Proxy;
+            Contract.Assert(proxy != null);
 
-            if (MainPageModel.PlayingPlayers.Contains(player)) return Task.CompletedTask;
+            var players = await proxy.GetPlayers(MainPageModel.ServiceData.SessionInfo.Id);
+            Contract.Assert(players != null);                      
+            if (!players.Contains(playerLogHeader.PlayerName))
+            {
+                players.Add(playerLogHeader.PlayerName);
+            }
 
-            player.Reset();
-            MainPageModel.PlayingPlayers.Add(player);
-            player.GameData.OnCardsLost += OnPlayerLostCards;
-            AddPlayerMenu(player);
-            player.Reset();
-            //
-            //  need to give the players some data about the game
-            player.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
-            player.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
-            player.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
-            player.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
+            foreach (var name in players)
+            {
+                var player = NameToPlayer(name);
+                Contract.Assert(player != null, "Player Can't Be Null");
+                if (MainPageModel.PlayingPlayers.Contains(player)) continue;
 
+                player.Reset();
+                MainPageModel.PlayingPlayers.Add(player);
+                player.GameData.OnCardsLost += OnPlayerLostCards;
+                AddPlayerMenu(player);                
+                //
+                //  need to give the players some data about the game
+                player.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
+                player.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
+                player.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
+                player.GameData.MaxShips = _gameView.CurrentGame.MaxShips;                
+            }
             CurrentPlayer = MainPageModel.PlayingPlayers[0];
-
-            return NewLog.PushAction(playerplayerLogHeader);
+            await NewLog.PushAction(playerLogHeader);
         }
         /// <summary>
         ///     we don't call the Log to push the undo action -- that is done by the log since the log

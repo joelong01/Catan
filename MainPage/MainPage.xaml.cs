@@ -1701,7 +1701,11 @@ namespace Catan10
         int _randomBoardListIndex = 0;
         private async void PickAGoodBoard(PointerRoutedEventArgs e)
         {
-
+            if (MainPageModel.IsServiceGame)
+            {
+                RandomBoardLog log = await RandomBoardLog.RandomizeBoard(this, 0);
+                return;
+            }
 
             if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
             {
@@ -1747,13 +1751,13 @@ namespace Catan10
             }
 
             _dt = dt;
-            if (GameState == GameState.WaitingForStart)
+            if (GameState == GameState.WaitingForStart || MainPageModel.IsServiceGame)
             {
                 PickAGoodBoard(e);
                 return;
             }
 
-            if (GameState != GameState.AllocateResourceForward && GameState != GameState.AllocateResourceReverse)
+            if (GameState != GameState.AllocateResourceForward && GameState != GameState.AllocateResourceReverse && !MainPageModel.IsServiceGame)
             {
                 return;
             }
