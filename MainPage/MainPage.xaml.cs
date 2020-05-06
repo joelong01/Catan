@@ -215,7 +215,7 @@ namespace Catan10
                 {
                     AllPlayers = list,
                     Settings = new Settings(),
-                    ServiceState = new ServiceState() { HostName = "localhost:5000" }
+                    ServiceState = new ServiceState() { HostName = "http://192.168.1.128:5000" }
 
                 };
                 await SaveGameState(SavedAppState);

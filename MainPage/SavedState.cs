@@ -4,7 +4,7 @@ namespace Catan10
 {
     public class ServiceState
     {
-        public string HostName { get; set; } = "https://localhost:5000";
+        public string HostName { get; set; } = "http://192.168.1.128:5000";
         public string DefaultUser { get; set; } = "";
         public ServiceState() { }
     }

@@ -8,7 +8,7 @@ namespace Catan10
 {
     public class ServiceData
     {
-        public CatanProxy Proxy { get; } = new CatanProxy() { HostName = "http://localhost:5000" };
+        public CatanProxy Proxy { get; } = new CatanProxy() { HostName = "http://192.168.1.128:5000" };
         public string HostName
         {
             get

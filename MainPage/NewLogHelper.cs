@@ -220,7 +220,11 @@ namespace Catan10
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
 
 
-            await NewLog.PushAction(logHeader);
+           //
+           //   5/5/2020: DO NOT LOG START GAME!!
+           //             every game gets started and then monitors the log.  
+           //             double starting is bad.
+           //   
 
 
 

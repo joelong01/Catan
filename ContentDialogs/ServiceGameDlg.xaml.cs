@@ -150,7 +150,7 @@ namespace Catan10
             try
             {
 
-                SessionInfo sessionInfo = new SessionInfo() { Id = Guid.NewGuid().ToString(), Description = NewSessionName, Creator = MainPage.Current.TheHuman.PlayerName };
+                SessionInfo sessionInfo = new SessionInfo() { Id = Guid.NewGuid().ToString(), Description = NewSessionName, Creator = CurrentPlayer.PlayerName };
 
                 List<SessionInfo> sessions = await Proxy.CreateSession(sessionInfo);
                 if (sessions == null)

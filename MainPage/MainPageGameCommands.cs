@@ -923,7 +923,6 @@ namespace Catan10
                 dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
                 return;
             }
-
             MainPageModel.ServiceData.SessionInfo = dlg.SelectedSession;
             this.TraceMessage($"Game: {dlg.SelectedSession.Description}");
 
@@ -931,20 +930,26 @@ namespace Catan10
             // start a new game
             var startGameModel = await StartGameLog.StartGame(this, TheHuman.PlayerName, 0, true);
             Contract.Assert(startGameModel != null);
+            //
+            //  if the current player created teh session, then we start the game
+            //  otherwise we just listen to messages, which will have these messages in the queue
+            if (dlg.SelectedSession.Creator == TheHuman.PlayerName)
+            {
 
+                //
+                //  randomize the board
+                var randomBoardLog = await RandomBoardController.RandomizeBoard(this, 0);
+                Contract.Assert(randomBoardLog != null);
+            }
 
             //
             //  add the player
             var addPlayerLog = await AddPlayerLog.AddPlayer(this, TheHuman);
             Contract.Assert(addPlayerLog != null);
 
-
-            //
-            //  randomize the board
-            var randomBoardLog = await RandomBoardController.RandomizeBoard(this, 0);
-            Contract.Assert(randomBoardLog != null);
-
             StartMonitoring();
+
+
         }
         private PlayerModel FindPlayerByName(ICollection<PlayerModel> playerList, string playerName)
         {
@@ -974,7 +979,7 @@ namespace Catan10
                     LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
                     this.TraceMessage($"incoming message: [Origin={message.Origin}] [Action={logHeader.Action}] [Player={logHeader.PlayerName}");
                     Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
-                    if (logHeader.PlayerName != TheHuman.PlayerName)
+                    if (logHeader.PlayerName != TheHuman.PlayerName) 
                     {
                         logHeader.LocallyCreated = false;
                         if (logHeader.LogType == LogType.Undo)
