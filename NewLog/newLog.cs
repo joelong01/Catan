@@ -67,6 +67,10 @@ namespace Catan10
         }
 
 
+        /// <summary>
+        ///     Redo is called in two cases -- if the user clicks Redo from the UI or if a message comes from another machine
+        /// </summary>
+        /// <returns></returns>
         public  Task Redo()
         {
             var logHeader = UndoStack.Last();
@@ -77,9 +81,10 @@ namespace Catan10
             ILogController logController = logHeader as ILogController;
             Contract.Assert(logController != null, "Every LogHeader is a LogController!");
             return logController.Redo(Page, logHeader);
-           
-            
+                       
         }
+
+        
 
         /// <summary>
         ///     this is an Undo initiated by the Game UI (e.g. a player clicks on "Undo") or by recieving an Undo message from the service

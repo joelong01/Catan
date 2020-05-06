@@ -12,8 +12,10 @@ namespace Catan10
 
     public interface ILogController
     {
+        Task Do(IGameController gameController, LogHeader logHeader);
         Task Undo(IGameController gameController, LogHeader logHeader);
         Task Redo(IGameController gameController, LogHeader logHeader);
+        
 
     }
 

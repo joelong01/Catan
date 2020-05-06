@@ -35,15 +35,20 @@ namespace Catan10
 
         }
 
-        public async Task Redo(IGameController gameController, LogHeader logHeader)
+        public Task Do(IGameController gameController, LogHeader logHeader)
         {
-            
-            await gameController.StartGame(logHeader as StartGameLog); 
+            throw new System.NotImplementedException();
+        }
+
+        public Task Redo(IGameController gameController, LogHeader logHeader)
+        {
+
+            throw new System.NotImplementedException();
         }
 
         public Task Undo(IGameController gameController, LogHeader logHeader)
         {
-            return Task.CompletedTask;
+            throw new System.NotImplementedException();
         }
     }
 

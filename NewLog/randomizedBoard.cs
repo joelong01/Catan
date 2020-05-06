@@ -28,6 +28,12 @@ namespace Catan10
             return model;
 
         }
+
+        public Task Do(IGameController gameController, LogHeader logHeader)
+        {
+            return gameController.SetRandomBoard(logHeader as RandomBoardLog);
+        }
+
         public Task Undo(IGameController gameController, LogHeader logHeader)
         {
             return gameController.UndoSetRandomBoard(logHeader as RandomBoardLog);

@@ -32,6 +32,11 @@ namespace Catan10
 
         }
 
+        public Task Do(IGameController gameController, LogHeader logHeader)
+        {
+            return gameController.AddPlayer(logHeader as AddPlayerLog);
+        }
+
         public Task Redo(IGameController gameController, LogHeader logHeader)
         {
             return gameController.AddPlayer(logHeader as AddPlayerLog);

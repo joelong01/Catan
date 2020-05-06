@@ -77,6 +77,11 @@ namespace Catan10
             return gameController.ChangePlayer(log);            
 
         }
+
+        public Task Do(IGameController gameController, LogHeader logHeader)
+        {
+            return gameController.ChangePlayer(logHeader as ChangePlayerLog);
+        }
     }
 
 

@@ -1004,7 +1004,7 @@ namespace Catan10
                         {
                             ILogController logController = logHeader as ILogController;
                             Contract.Assert(logController != null, "every LogEntry is a LogController!");
-                            await logController.Redo(this, logHeader);
+                            await logController.Do(this, logHeader);
                         }
                     }
                 }
