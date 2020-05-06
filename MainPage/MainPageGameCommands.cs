@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -907,7 +908,7 @@ namespace Catan10
             {
                 return;
             }
-            
+
             var proxy = MainPageModel.ServiceData.Proxy;
 
             var existingSessions = await proxy.GetSessions();
@@ -924,8 +925,8 @@ namespace Catan10
                 dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
                 return;
             }
-            
-            
+
+
             MainPageModel.ServiceData.SessionInfo = dlg.SelectedSession;
             this.TraceMessage($"Game: {dlg.SelectedSession.Description}");
 
@@ -933,13 +934,13 @@ namespace Catan10
             // start a new game
             var startGameModel = await StartGameLog.StartGame(this, TheHuman.PlayerName, 0, true);
             Contract.Assert(startGameModel != null);
-            
+
             //
             //  if the current player created teh session, then we start the game
             //  otherwise we just listen to messages, which will have these messages in the queue
             if (dlg.SelectedSession.Creator == TheHuman.PlayerName)
             {
-                
+
                 //
                 //  randomize the board
                 var randomBoardLog = await RandomBoardLog.RandomizeBoard(this, 0);
@@ -968,7 +969,7 @@ namespace Catan10
         }
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
-
+        private List<CatanMessage> MessageLog { get; } = new List<CatanMessage>();
         private async void StartMonitoring()
         {
             var proxy = MainPageModel.ServiceData.Proxy;
@@ -981,7 +982,16 @@ namespace Catan10
                     Type type = CurrentAssembly.GetType(message.TypeName);
                     if (type == null) throw new ArgumentException("Unknown type!");
                     LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
-                    this.TraceMessage($"incoming message: [Origin={message.Origin}] [Action={logHeader.Action}] [Player={logHeader.PlayerName}");
+                    message.Data = logHeader;
+                    this.TraceMessage($"incoming message: [Sequence={message.Sequence}]\t[Origin={message.Origin}]\t" + 
+                                      $"[Action={logHeader.Action}]\tPlayer=[{logHeader.PlayerName}]\t[LogType={logHeader.LogType}]");
+                    if (MessageLog.Count > 1)
+                    {
+                        Contract.Assert(message.Sequence - 1 == MessageLog.Last().Sequence);
+                    }
+                    MessageLog.Add(message);
+
+                    
                     Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
                     if (logHeader.TheHuman != TheHuman.PlayerName) 
                     {

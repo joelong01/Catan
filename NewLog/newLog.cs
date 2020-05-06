@@ -44,7 +44,7 @@ namespace Catan10
                 CatanMessage message = new CatanMessage()
                 {
                     Data = logHeader,
-                    Origin = Page.CurrentPlayer.PlayerName
+                    Origin = Page.TheHuman.PlayerName
 
                 };
 
@@ -121,7 +121,7 @@ namespace Catan10
                 message = new CatanMessage()
                 {
                     Data = undoneLogHeader,                
-                    Origin = Page.CurrentPlayer.PlayerName
+                    Origin = Page.TheHuman.PlayerName
                 };
                 await PostLogMessage(message);
             }
