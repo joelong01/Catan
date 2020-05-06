@@ -53,7 +53,7 @@ namespace Catan10
         public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer?.PlayerName;
         public string TheHuman { get; set; } = MainPage.Current.TheHuman.PlayerName;
         public GameState OldState { get; set; } = MainPage.Current.NewLog.GameState;
-        public GameState NewState { get; set; }
+        public GameState NewState { get; set; } = MainPage.Current.NewLog.GameState;
         public CatanAction Action { get; set; }
         public CatanGames CatanGame { get; set; } = MainPage.Current.GameContainer.CurrentGame.CatanGame;
         public Guid LogId { get; set; } = Guid.NewGuid();

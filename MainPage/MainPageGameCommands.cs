@@ -924,9 +924,8 @@ namespace Catan10
                 dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
                 return;
             }
-
             
-
+            
             MainPageModel.ServiceData.SessionInfo = dlg.SelectedSession;
             this.TraceMessage($"Game: {dlg.SelectedSession.Description}");
 

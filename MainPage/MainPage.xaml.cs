@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -1705,11 +1706,7 @@ namespace Catan10
         int _randomBoardListIndex = 0;
         private async void PickAGoodBoard(PointerRoutedEventArgs e)
         {
-            if (MainPageModel.IsServiceGame)
-            {
-                RandomBoardLog log = await RandomBoardLog.RandomizeBoard(this, 0);
-                return;
-            }
+            
 
             if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
             {
@@ -1744,6 +1741,49 @@ namespace Catan10
             await _gameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
         }
         DateTime _dt = DateTime.Now;
+
+        /// <summary>
+        ///     Unlike previsous implementations, the use the Action/Undo stacks in the log to store the random boards.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
+        {
+
+            if (TheHuman.PlayerName != MainPageModel.ServiceData.SessionInfo.Creator) return;
+
+            if (NewLog.GameState == GameState.WaitingForStart)
+            {
+
+                if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
+
+
+                {
+                    if (NewLog.CanRedo && (NewLog.PeekUndo.Action == CatanAction.RandomizeBoard))
+                    {
+                        await NewLog.Redo();
+                    }
+                    else
+                    {
+
+                        RandomBoardLog rbl = await RandomBoardLog.RandomizeBoard(this, 0);
+                        Contract.Assert(rbl != null);
+                    }
+
+                }
+                else
+                {
+                    if (NewLog.PeekAction.Action == CatanAction.RandomizeBoard)
+                    {
+                        await NewLog.Undo();
+                    }
+                }
+            }
+
+            
+
+        }
+
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {
             DateTime dt = DateTime.Now;
@@ -1755,12 +1795,19 @@ namespace Catan10
             }
 
             _dt = dt;
-            if (GameState == GameState.WaitingForStart || MainPageModel.IsServiceGame)
+            
+            if (MainPageModel.IsServiceGame)
+            {
+                await ScrollMouseWheelInServiceGame(e);
+                return;
+            }
+
+            if (GameState == GameState.WaitingForStart)
             {
                 PickAGoodBoard(e);
                 return;
             }
-
+            
             if (GameState != GameState.AllocateResourceForward && GameState != GameState.AllocateResourceReverse && !MainPageModel.IsServiceGame)
             {
                 return;

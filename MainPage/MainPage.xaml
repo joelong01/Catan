@@ -371,7 +371,7 @@
         <Grid Name="Grid_PrivateData" Grid.Row="1" Grid.RowSpan="10" Width="500"
             Height="340" HorizontalAlignment="Left" VerticalAlignment="Top"
             Visibility="{x:Bind MainPageModel.IsServiceGame, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-            BorderBrush="{Binding Path=TheHuman.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=HotPink}"              
+            BorderBrush="{Binding Path=TheHuman.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=HotPink}"
             Background="{StaticResource bmKnight}"
             CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
 
@@ -388,7 +388,9 @@
                 Style="{StaticResource HeaderTextBlockStyle}"
                 Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}"
                 FontSize="22" FontStyle="Normal" FontWeight="Normal" />
-            <local:PrivateDataCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Player="{Binding Path=TheHuman, Mode=OneWay}" CornerRadius="10" />
+            <local:PrivateDataCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                Player="{Binding Path=TheHuman, Mode=OneWay}"
+                CornerRadius="10" />
 
 
         </Grid>

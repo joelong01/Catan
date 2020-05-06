@@ -22,7 +22,8 @@ namespace Catan10
 
             AddPlayerLog logEntry = new AddPlayerLog
             {
-                PlayerName = playerModel.PlayerName
+                PlayerName = playerModel.PlayerName,
+                NewState = GameState.WaitingForStart
             };
 
 

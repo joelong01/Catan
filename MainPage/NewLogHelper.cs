@@ -63,7 +63,7 @@ namespace Catan10
         CatanGames CatanGame { get; set; }
         GameState CurrentState { get; }
         List<int> CurrentRandomGoldTiles { get; }
-        
+
         List<int> NextRandomGoldTiles { get; }
         List<int> HighlightedTiles { get; }
 
@@ -74,7 +74,7 @@ namespace Catan10
 
         Task ChangePlayer(ChangePlayerLog log);
         Task UndoChangePlayer(ChangePlayerLog log);
-        
+
     }
 
     public sealed partial class MainPage : Page, ILog, IGameController
@@ -168,29 +168,43 @@ namespace Catan10
             Contract.Assert(proxy != null);
 
             var players = await proxy.GetPlayers(MainPageModel.ServiceData.SessionInfo.Id);
-            Contract.Assert(players != null);                      
+            Contract.Assert(players != null);
             if (!players.Contains(playerLogHeader.PlayerName))
             {
                 players.Add(playerLogHeader.PlayerName);
             }
-            MainPageModel.PlayingPlayers.Clear();
-            foreach (var name in players)
+
+            List<PlayerModel> playingPlayers = new List<PlayerModel>();
+            //
+            //  we go through and figure out what the playing player list looks like
+            players.ForEach((name) =>
             {
+
                 var player = NameToPlayer(name);
                 Contract.Assert(player != null, "Player Can't Be Null");
-                
+                if (MainPageModel.PlayingPlayers.Contains(player))
+                {
+                    playingPlayers.Add(player);
+                }
+                else
+                {
+                    player.Reset();
+                    player.GameData.OnCardsLost += OnPlayerLostCards;
+                    AddPlayerMenu(player);
+                    //
+                    //  need to give the players some data about the game
+                    player.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
+                    player.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
+                    player.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
+                    player.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
 
-                player.Reset();
-                MainPageModel.PlayingPlayers.Add(player);
-                player.GameData.OnCardsLost += OnPlayerLostCards;
-                AddPlayerMenu(player);                
-                //
-                //  need to give the players some data about the game
-                player.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
-                player.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
-                player.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
-                player.GameData.MaxShips = _gameView.CurrentGame.MaxShips;                
-            }
+                    playingPlayers.Add(player);
+                }
+            });
+
+            MainPageModel.PlayingPlayers.Clear();
+            playingPlayers.ForEach((player) => MainPageModel.PlayingPlayers.Add(player));
+
             CurrentPlayer = MainPageModel.PlayingPlayers[0];
             await NewLog.PushAction(playerLogHeader);
         }
@@ -202,7 +216,7 @@ namespace Catan10
         /// <returns></returns>
         public Task UndoAddPlayer(AddPlayerLog playerLogHeader)
         {
-           
+
             var player = NameToPlayer(playerLogHeader.PlayerName);
             Contract.Assert(player != null, "Player Can't Be Null");
             MainPageModel.PlayingPlayers.Remove(player);
@@ -241,7 +255,7 @@ namespace Catan10
         public async Task StartGame(StartGameLog logHeader)
         {
             ResetDataForNewGame();
-
+            MainPageModel.PlayingPlayers.Clear();
             NewLog = new NewLog(this);
             MainPageModel.Log = new Log();
 
@@ -256,11 +270,11 @@ namespace Catan10
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
 
 
-           //
-           //   5/5/2020: DO NOT LOG START GAME!!
-           //             every game gets started and then monitors the log.  
-           //             double starting is bad.
-           //   
+            //
+            //   5/5/2020: DO NOT LOG START GAME!!
+            //             every game gets started and then monitors the log.  
+            //             double starting is bad.
+            //   
 
 
 
@@ -287,7 +301,7 @@ namespace Catan10
 
             idx += log.Move;
             int count = MainPageModel.PlayingPlayers.Count;
-            if (idx >= count ) idx -= count;
+            if (idx >= count) idx -= count;
             if (idx < 0) idx += count;
 
             // this controller is the one spot where the CurrentPlayer is changed.  it should update all the bindings
@@ -346,6 +360,6 @@ namespace Catan10
             return _gameView.RandomBoardSettings;
         }
 
-        
+
     }
 }

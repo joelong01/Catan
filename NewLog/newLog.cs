@@ -54,6 +54,11 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
+        public LogHeader PeekAction => ActionStack.Last();            
+        public LogHeader PeekUndo => UndoStack.Last();
+        public bool CanRedo=> UndoStack.Count > 0;
+
+
         private Task PostLogMessage(CatanMessage message)
         {
             
