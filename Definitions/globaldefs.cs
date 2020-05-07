@@ -60,7 +60,7 @@ namespace Catan10
         public DateTime Time { get; set; } = DateTime.Now;
         public string TypeName { get; set; }
         public bool LocallyCreated { get; set; } = true;
-        public bool CanUndo = true;
+        public bool CanUndo { get; set; } = true;
         
 
         public LogHeader()
