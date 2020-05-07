@@ -74,7 +74,7 @@ namespace Catan10
         }
         private void SetSelectedSession(SessionInfo value)
         {
-            this.TraceMessage($"New Session: {value?.Description}");
+           // this.TraceMessage($"New Session: {value?.Description}");
 
         }
 

@@ -41,7 +41,7 @@ namespace Catan10
 
         private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.TraceMessage($"{((PlayerModel)e.AddedItems[0])?.PlayerName}");
+            
         }
 
         private void OnPlayerPicDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)

@@ -917,7 +917,7 @@ namespace Catan10
             {
                 HostName = proxy.HostName
             };
-            this.TraceMessage($"Human={TheHuman}");
+           // this.TraceMessage($"Human={TheHuman}");
             await dlg.ShowAsync();
             if (dlg.IsCanceled) return;
 
