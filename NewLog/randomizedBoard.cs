@@ -36,6 +36,7 @@ namespace Catan10
 
         public Task Undo(IGameController gameController, LogHeader logHeader)
         {
+
             return gameController.UndoSetRandomBoard(logHeader as RandomBoardLog);
         }
 

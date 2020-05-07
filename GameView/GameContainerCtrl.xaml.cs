@@ -115,7 +115,7 @@ namespace Catan10
         ITileControlCallback _tileCallback = null;
 
 
-        public RandomBoardSettings RandomBoardSettings { get; private set; } = new RandomBoardSettings();
+        public RandomBoardSettings RandomBoardSettings { get; private set; } = null;
         private Dictionary<ResourceType, double> _probabilities = new Dictionary<ResourceType, double>();
         public Dictionary<ResourceType, double> Probabilities
         {
@@ -455,6 +455,11 @@ namespace Catan10
 
         public async Task SetRandomCatanBoard(bool placeBaron, RandomBoardSettings randomBoard = null)
         {
+            if (randomBoard != null)
+            {
+                if (randomBoard.TileGroupToRandomListsDictionary.Count == 0) return;
+                if (randomBoard.RandomHarborTypeList.Count == 0) return;
+            }
 
             _currentHexPanel.DesertTiles.Clear();
             _probabilities.Clear();

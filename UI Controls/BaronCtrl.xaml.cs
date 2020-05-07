@@ -14,6 +14,11 @@ namespace Catan10
 
         public void MoveAsync(Point to)
         {
+            var animationDuration = System.TimeSpan.FromMilliseconds(MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+
+            _sbMove.Duration = animationDuration;
+            _daX.Duration = animationDuration;
+            _daY.Duration = animationDuration;
             _daX.To = to.X;
             _daY.To = to.Y;
             _sbMove.Begin();

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Catan10
@@ -37,8 +38,14 @@ namespace Catan10
         {
             try
             {
-
-                ActionStack.Add(logHeader);
+                if (logHeader.CanUndo)
+                {
+                    ActionStack.Add(logHeader);
+                }
+                else
+                {
+                    ActionStack.Insert(0, logHeader);
+                }
 
                 if (logHeader.LocallyCreated)
                 {
@@ -119,6 +126,8 @@ namespace Catan10
         ///     
         ///     pops the action off the Undo stack and calls Undo
         ///     
+        ///     CanUndo actions were added to the end of the list and non-undoable are added to the beginning 
+        ///     
         ///     if a message is passed in it means that the call originated from the service. make sure that the message is the same as the one on the stack
         ///     if no message is passed in, call the service with an undo message
         ///     
@@ -129,13 +138,13 @@ namespace Catan10
         {
             try
             {
-                var undoneLogHeader = ActionStack.Pop();
-                if (undoneLogHeader.Action == CatanAction.Started)
-                {
-                    // you can't undo at this point -- just start a new game!
-                    ActionStack.Push(undoneLogHeader); // better put it back! :)
+                var undoneLogHeader = ActionStack.Last();
+                if (!undoneLogHeader.CanUndo)
+                {                                        
                     return;
                 }
+
+                ActionStack.RemoveAt(ActionStack.Count - 1);
 
                 if (message != null)
                 {
@@ -169,14 +178,14 @@ namespace Catan10
 
         }
 
-        internal void PrintLog()
+        internal void PrintLog([CallerMemberName] string caller = "")
         {
             string s = "";
             ActionStack.ForEach((lh) => s += $"{lh.Action},");
-            this.TraceMessage($"ActionStack: {s}");
+            this.TraceMessage($"{caller}: {s}");
             s = "";
             UndoStack.ForEach((lh) => s += $"{lh.Action},");
-            this.TraceMessage($"UndoStack: {s}");
+            this.TraceMessage($"{caller}: {s}");
         }
     }
 }

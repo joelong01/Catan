@@ -239,6 +239,8 @@ namespace Catan10
 
         public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
         {
+            if (logHeader.PreviousRandomBoard == null) return;
+
             await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
             //
             //  DO NOT LOG UNDO
