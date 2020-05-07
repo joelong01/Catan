@@ -934,6 +934,10 @@ namespace Catan10
             // start a new game
             var startGameModel = await StartGameLog.StartGame(this, TheHuman.PlayerName, 0, true);
             Contract.Assert(startGameModel != null);
+            //
+            //  add the player
+            var addPlayerLog = await AddPlayerLog.AddPlayer(this, TheHuman);
+            Contract.Assert(addPlayerLog != null);
 
             //
             //  if the current player created teh session, then we start the game
@@ -947,10 +951,7 @@ namespace Catan10
                 Contract.Assert(randomBoardLog != null);
             }
 
-            //
-            //  add the player
-            var addPlayerLog = await AddPlayerLog.AddPlayer(this, TheHuman);
-            Contract.Assert(addPlayerLog != null);
+          
 
             StartMonitoring();
 
