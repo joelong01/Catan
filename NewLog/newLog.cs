@@ -35,6 +35,7 @@ namespace Catan10
 
         public Task PushAction(LogHeader logHeader)
         {
+            this.PrintLog();
             if (logHeader.LocallyCreated == false) return Task.CompletedTask;
 
             ActionStack.Add(logHeader);
@@ -138,6 +139,9 @@ namespace Catan10
             string s = "";
             ActionStack.ForEach((lh) => s += $"{lh.Action},");
             this.TraceMessage($"ActionStack: {s}");
+             s = "";
+            UndoStack.ForEach((lh) => s += $"{lh.Action},");
+            this.TraceMessage($"UndoStack: {s}");
         }
     }
 }
