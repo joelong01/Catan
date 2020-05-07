@@ -36,7 +36,7 @@ namespace Catan10
         public Task PushAction(LogHeader logHeader)
         {
             this.PrintLog();
-            if (logHeader.LocallyCreated == false) return Task.CompletedTask;
+            
 
             ActionStack.Add(logHeader);
 
@@ -72,15 +72,27 @@ namespace Catan10
         ///     Redo is called in two cases -- if the user clicks Redo from the UI or if a message comes from another machine
         /// </summary>
         /// <returns></returns>
-        public  Task Redo()
+        public  Task Redo(CatanMessage message = null)
         {
             var logHeader = UndoStack.Last();
             UndoStack.RemoveAt(UndoStack.Count - 1);
             Contract.Assert(logHeader.LogType == LogType.Undo);
             logHeader.LogType = LogType.Replay;
-            
+
+
+            if (message != null)
+            {                
+                //
+                //  when we get an Redo command, we treat it as if somebody clicked on Redo in the UI
+                //  but that means we rely on the Undo stack being identical -- assert it.
+                Contract.Assert(logHeader.LogId == ((LogHeader)message.Data).LogId);
+            }
+
             ILogController logController = logHeader as ILogController;
             Contract.Assert(logController != null, "Every LogHeader is a LogController!");
+            
+            //
+            //  this will push the action onto the ActionStack
             return logController.Redo(Page, logHeader);
                        
         }

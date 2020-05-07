@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
@@ -998,16 +999,26 @@ namespace Catan10
                     if (logHeader.TheHuman != TheHuman.PlayerName) 
                     {
                         logHeader.LocallyCreated = false;
-                        if (logHeader.LogType == LogType.Undo)
+                        ILogController logController = logHeader as ILogController;
+                        switch (logHeader.LogType)
                         {
-                            await NewLog.Undo(message);
-                        }
-                        else
-                        {
-                            ILogController logController = logHeader as ILogController;
-                            Contract.Assert(logController != null, "every LogEntry is a LogController!");
-                            await logController.Do(this, logHeader);
-                        }
+                            case LogType.Normal:
+                                
+                                Contract.Assert(logController != null, "every LogEntry is a LogController!");
+                                await logController.Do(this, logHeader);
+                                break;
+                            case LogType.Undo:
+                                await NewLog.Undo(message);
+                                break;
+                            case LogType.Replay:                                
+                                
+                                await NewLog.Redo();
+                                break;
+                            case LogType.DoNotLog:                                
+                            case LogType.DoNotUndo:                                
+                            default:
+                                throw new InvalidDataException("These Logtypes shouldn't be set in a service game");
+                        }                      
                     }
                 }
 
