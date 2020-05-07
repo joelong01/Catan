@@ -977,6 +977,7 @@ namespace Catan10
             var sessionId = MainPageModel.ServiceData.SessionInfo.Id;
             while (true)
             {
+                NewLog.PrintLog();
                 List<CatanMessage> messages = await proxy.Monitor(sessionId, TheHuman.PlayerName);
                 foreach (var message in messages)
                 {

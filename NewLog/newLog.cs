@@ -1,5 +1,5 @@
 ﻿using Catan.Proxy;
-
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -132,6 +132,12 @@ namespace Catan10
             }
            
         }
-        
+
+        internal void PrintLog()
+        {
+            string s = "";
+            ActionStack.ForEach((lh) => s += $"{lh.Action},");
+            this.TraceMessage($"ActionStack: {s}");
+        }
     }
 }
