@@ -74,6 +74,7 @@ namespace Catan10
         /// <returns></returns>
         public  Task Redo(CatanMessage message = null)
         {
+            PrintLog();
             var logHeader = UndoStack.Last();
             UndoStack.RemoveAt(UndoStack.Count - 1);
             Contract.Assert(logHeader.LogType == LogType.Undo);
@@ -113,6 +114,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task Undo(CatanMessage message = null)
         {
+            PrintLog();
             var undoneLogHeader = ActionStack.Pop();
             if (undoneLogHeader.Action == CatanAction.Started)
             {
@@ -131,11 +133,12 @@ namespace Catan10
             ILogController logController = undoneLogHeader as ILogController;
             Contract.Assert(logController != null, "all log entries must also be log controllers!");
             await logController.Undo(this.Page, undoneLogHeader);
+            undoneLogHeader.LogType = LogType.Undo;
+            
             UndoStack.Push(undoneLogHeader);
 
             if (message == null)
-            {
-                undoneLogHeader.LogType = LogType.Undo;
+            {                
                 message = new CatanMessage()
                 {
                     Data = undoneLogHeader,                

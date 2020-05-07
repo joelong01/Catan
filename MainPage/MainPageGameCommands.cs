@@ -978,7 +978,6 @@ namespace Catan10
             var sessionId = MainPageModel.ServiceData.SessionInfo.Id;
             while (true)
             {
-                NewLog.PrintLog();
                 List<CatanMessage> messages = await proxy.Monitor(sessionId, TheHuman.PlayerName);
                 foreach (var message in messages)
                 {
@@ -1000,11 +999,10 @@ namespace Catan10
                     {
                         logHeader.LocallyCreated = false;
                         ILogController logController = logHeader as ILogController;
+                        Contract.Assert(logController != null, "every LogEntry is a LogController!");
                         switch (logHeader.LogType)
                         {
                             case LogType.Normal:
-                                
-                                Contract.Assert(logController != null, "every LogEntry is a LogController!");
                                 await logController.Do(this, logHeader);
                                 break;
                             case LogType.Undo:
@@ -1012,7 +1010,7 @@ namespace Catan10
                                 break;
                             case LogType.Replay:                                
                                 
-                                await NewLog.Redo();
+                                await NewLog.Redo(message);
                                 break;
                             case LogType.DoNotLog:                                
                             case LogType.DoNotUndo:                                
