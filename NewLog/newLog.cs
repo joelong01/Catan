@@ -12,6 +12,7 @@ namespace Catan10
     {
         private readonly List<LogHeader> ActionStack = new List<LogHeader>();
         private readonly List<LogHeader> UndoStack = new List<LogHeader>();
+        private List<CatanMessage> MessageLog { get; } = new List<CatanMessage>();
         public MainPage Page { get; internal set; }
         public GameState GameState
         {
@@ -140,7 +141,7 @@ namespace Catan10
             {
                 var undoneLogHeader = ActionStack.Last();
                 if (!undoneLogHeader.CanUndo)
-                {                                        
+                {
                     return;
                 }
 
@@ -187,5 +188,22 @@ namespace Catan10
             UndoStack.ForEach((lh) => s += $"{lh.Action},");
             this.TraceMessage($"{caller}: {s}");
         }
+
+        internal void RecordMessage(CatanMessage message)
+        {
+            if (MessageLog.Count > 1)
+            {
+                Contract.Assert(message.Sequence - 1 == MessageLog.Last().Sequence);
+            }
+
+            MessageLog.Add(message);
+            MessageLog.ForEach((m) =>
+            {
+                LogHeader logHeader = (LogHeader)m.Data;
+
+                this.TraceMessage($"Messages: [Sequence={m.Sequence}]\t[id={logHeader.LogId}][Origin={m.Origin}]\t" +
+                                  $"[Action={logHeader.Action}]\tPlayer=[{logHeader.PlayerName}]\t[LogType={logHeader.LogType}]");
+            });            
     }
+}
 }

@@ -74,7 +74,7 @@ namespace Catan10
 
         private readonly List<LogEntry> ActionStack = new List<LogEntry>();
         private readonly List<LogEntry> UndoStack = new List<LogEntry>();
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         public IReadOnlyCollection<LogEntry> Actions => ActionStack;

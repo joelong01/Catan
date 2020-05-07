@@ -259,9 +259,11 @@ namespace Catan10
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
             NewLog = new NewLog(this);
+
+            //
+            //  this is to stop down asserts in the code...we eventually should remove it when we completely switch over to the new log
             MainPageModel.Log = new Log();
-
-
+            
             await MainPageModel.Log.Init("NetworkGame" + DateTime.Now.Ticks.ToString());
 
             MainPageModel.IsServiceGame = true;

@@ -971,7 +971,7 @@ namespace Catan10
         }
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
-        private List<CatanMessage> MessageLog { get; } = new List<CatanMessage>();
+        
         private async void StartMonitoring()
         {
             var proxy = MainPageModel.ServiceData.Proxy;
@@ -985,15 +985,7 @@ namespace Catan10
                     if (type == null) throw new ArgumentException("Unknown type!");
                     LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
                     message.Data = logHeader;
-                    this.TraceMessage($"incoming message: [Sequence={message.Sequence}]\t[Origin={message.Origin}]\t" + 
-                                      $"[Action={logHeader.Action}]\tPlayer=[{logHeader.PlayerName}]\t[LogType={logHeader.LogType}]");
-                    if (MessageLog.Count > 1)
-                    {
-                        Contract.Assert(message.Sequence - 1 == MessageLog.Last().Sequence);
-                    }
-                    MessageLog.Add(message);
-
-                    
+                    NewLog.RecordMessage(message);
                     Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
                     if (logHeader.TheHuman != TheHuman.PlayerName) 
                     {
