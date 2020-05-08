@@ -404,7 +404,7 @@
             CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
 
             <Grid.RenderTransform>
-                <CompositeTransform />
+                <CompositeTransform TranslateX="600" />
             </Grid.RenderTransform>
             <Grid.RowDefinitions>
                 <RowDefinition Height="30" />
@@ -422,6 +422,27 @@
 
 
         </Grid>
+
+
+        <Grid Name="Grid_Rolls" Grid.Row="1" Grid.RowSpan="10" Width="530"
+            Height="260" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Visibility="Visible"
+            BorderBrush="{StaticResource bmMaple}"
+            Background="{Binding FallbackValue=Blue, Mode=OneWay, Path=TheHuman.GameData.BackgroundBrush}"
+            CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
+
+            <Grid.RenderTransform>
+                <CompositeTransform TranslateX="1200" />
+            </Grid.RenderTransform>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="10*" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Rolls" FontSize="22" Grid.Row="0" HorizontalAlignment="Center" Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}"/>
+            <local:PlayerRollCtrl Grid.Row="1"/>
+            
+        </Grid>
+
         <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"
             HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="9999"
             IsActive="True" Visibility="Visible" />

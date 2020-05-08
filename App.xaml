@@ -5,9 +5,12 @@
     <Application.Resources>
         <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
         <x:Double x:Key="ContentDialogMaxHeight">800</x:Double>
-
-
-
+        <x:String x:Key="Dice_1">&#x2680;</x:String>
+        <x:String x:Key="Dice_2">&#x2681;</x:String>
+        <x:String x:Key="Dice_3">&#x2682;</x:String>
+        <x:String x:Key="Dice_4">&#x2683;</x:String>
+        <x:String x:Key="Dice_5">&#x2684;</x:String>
+        <x:String x:Key="Dice_6">&#x2685;</x:String>
         <SolidColorBrush x:Key="BlueBrush" Color="Blue" />
         <SolidColorBrush x:Key="RedBrush" Color="Red" />
         <SolidColorBrush x:Key="WhiteBrush" Color="White" />
@@ -19,7 +22,6 @@
         <SolidColorBrush x:Key="PurpleBrush" Color="Purple" />
         <SolidColorBrush x:Key="HotPinkBrush" Color="HotPink" />
         <SolidColorBrush x:Key="TransparentBrush" Color="Transparent" />
-
         <local:GameStateToBooleanConverter x:Key="GameStateToBooleanConverter" />
         <local:AnimationSpeedValueConverter x:Key="AnimationSpeedValueConverter" />
         <local:TileOrientationToObjectConverter x:Key="TileOrientationToObjectConverter" />
@@ -27,7 +29,6 @@
         <local:ScoreIntToStringConverter x:Key="ScoreIntToStringConverter" />
         <local:IntToStringConverter x:Key="IntToStringConverter" />
         <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
-
         <local:GameStateValueConverter x:Key="GameStateValueConverter" />
         <local:NullToBoolConverter x:Key="NullToBoolConverter" />
         <local:StorageFileToString x:Key="StorageFileToString" />
@@ -43,13 +44,9 @@
         <local:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
         <local:StringToIntConverter x:Key="StringToIntConverter" />
         <local:ResourceTypeToVisibilityConverter x:Key="ResourceTypeToVisibilityConverter" />
-
-
         <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="UniformToFill" />
-
-
         <ImageBrush x:Key="bmTileBack" ImageSource="Assets/Tiles/back.jpg" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmTileBrick" ImageSource="Assets/Tiles/brick.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmTileDesert" ImageSource="Assets/Tiles/desert.png" Stretch="UniformToFill" />
@@ -58,21 +55,18 @@
         <ImageBrush x:Key="bmTileSheep" ImageSource="Assets/Tiles/sheep.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmTileWheat" ImageSource="Assets/Tiles/wheat.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmTileWood" ImageSource="Assets/Tiles/wood.png" Stretch="UniformToFill" />
-
         <ImageBrush x:Key="bmTwoForOneBrick" ImageSource="Assets/Harbors/2 for 1 brick.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmTwoForOneOre" ImageSource="Assets/Harbors/2 for 1 ore.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmTwoForOneSheep" ImageSource="Assets/Harbors/2 for 1 sheep.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmTwoForOneWheat" ImageSource="Assets/Harbors/2 for 1 wheat.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmTwoForOneWood" ImageSource="Assets/Harbors/2 for 1 wood.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmThreeForOne" ImageSource="Assets/Harbors/3 for 1.png" Stretch="UniformToFill" />
-
         <ImageBrush x:Key="bmDevCardBack" ImageSource="Assets/DevCards/back.jpg" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmKnight" ImageSource="Assets/DevCards/knight.jpg" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmMonopoly" ImageSource="Assets/DevCards/Monopoly.jpg" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmRoadBuilding" ImageSource="Assets/DevCards/RoadBuilding.jpg" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmVictoryPoint" ImageSource="Assets/DevCards/VictoryPoint.jpg" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmYearOfPlenty" ImageSource="Assets/DevCards/YearOfPlenty.jpg" Stretch="UniformToFill" />
-
         <ImageBrush x:Key="bmResourceCardBack" ImageSource="Assets/ResourceCards/back.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmResourceCardBrick" ImageSource="Assets/ResourceCards/brick.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmResourceCardGoldMine" ImageSource="Assets/ResourceCards/goldMine.png" Stretch="UniformToFill" />
@@ -80,9 +74,6 @@
         <ImageBrush x:Key="bmResourceCardSheep" ImageSource="Assets/ResourceCards/sheep.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmResourceCardWheat" ImageSource="Assets/ResourceCards/wheat.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmResourceCardWood" ImageSource="Assets/ResourceCards/wood.png" Stretch="UniformToFill" />
-
-
-
         <Style x:Key="GameControllerStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -90,22 +81,17 @@
             <Setter Property="FontSize" Value="48" />
             <Setter Property="CharacterSpacing" Value="0" />
             <Setter Property="Margin" Value="20,0,20,0" />
-
         </Style>
         <Style x:Key="GameControllerStackPanelCommand" TargetType="StackPanel">
             <Setter Property="Orientation" Value="Horizontal" />
             <Setter Property="Margin" Value="5,10,0,0" />
         </Style>
-
-
-
         <Style x:Key="DesignerTextBlockStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="20" />
             <Setter Property="Margin" Value="0,0,0,10" />
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="VerticalAlignment" Value="Center" />
-
         </Style>
         <Style x:Key="DesignerTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontFamily" Value="Segoe UI" />
@@ -113,7 +99,6 @@
             <Setter Property="Margin" Value="10,10,0,0" />
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalAlignment" Value="Center" />
-
         </Style>
         <Style x:Key="DesignerButtonStyle" TargetType="Button">
             <Setter Property="FontFamily" Value="Segoe UI" />
@@ -130,8 +115,6 @@
             <Setter Property="Margin" Value="10,10,10,0" />
             <Setter Property="IsSynchronizedWithCurrentItem" Value="True" />
         </Style>
-
-
         <Style x:Key="ContentDialogThatDoesNotSuck" TargetType="ContentDialog">
             <Setter Property="Template">
                 <Setter.Value>
@@ -226,8 +209,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-
         <Style x:Key="ChangeScoreButton" TargetType="RepeatButton">
             <Setter Property="Background" Value="{ThemeResource ButtonBackgroundThemeBrush}" />
             <Setter Property="Foreground" Value="{ThemeResource RepeatButtonForegroundThemeBrush}" />
@@ -314,9 +295,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-
-
         <Style x:Key="SettingCheckBoxStyle" TargetType="CheckBox">
             <Setter Property="Foreground" Value="white" />
             <Setter Property="IsChecked" Value="False" />
@@ -326,7 +304,6 @@
             <Setter Property="FontSize" Value="28" />
             <Setter Property="Margin" Value="28,10,10,10" />
         </Style>
-
         <Style x:Key="SettingRadioButtonStyle" TargetType="RadioButton">
             <Setter Property="Foreground" Value="white" />
             <Setter Property="IsChecked" Value="False" />
@@ -336,17 +313,13 @@
             <Setter Property="FontSize" Value="28" />
             <Setter Property="Margin" Value="5" />
         </Style>
-
         <Style x:Key="SettingBorderStyle" TargetType="Border">
             <Setter Property="BorderThickness" Value="2" />
             <Setter Property="BorderBrush" Value="White" />
             <Setter Property="Margin" Value="10,10,10,10" />
         </Style>
-
-
         <!--  from https://msdn.microsoft.com/en-us/library/windows/apps/mt299120.aspx  -->
         <Style x:Key="CatanContentDialog" TargetType="ContentDialog">
-
             <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseHighBrush}" />
             <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" />
             <Setter Property="HorizontalAlignment" Value="Center" />
@@ -447,9 +420,5 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-
-
-
     </Application.Resources>
 </Application>

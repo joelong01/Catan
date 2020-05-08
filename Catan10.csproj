@@ -172,6 +172,12 @@
     <Compile Include="ContentDialogs\PlayerManagementDlg.xaml.cs">
       <DependentUpon>PlayerManagementDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\PlayerRollCtrl.xaml.cs">
+      <DependentUpon>PlayerRollCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\RollCtrl.xaml.cs">
+      <DependentUpon>RollCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\SailboatCtrl.xaml.cs">
       <DependentUpon>SailboatCtrl.xaml</DependentUpon>
     </Compile>
@@ -367,6 +373,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ContentDialogs\PlayerManagementDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\PlayerRollCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\RollCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
