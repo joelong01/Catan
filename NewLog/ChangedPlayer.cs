@@ -44,7 +44,7 @@ namespace Catan10
             {
 
                 PlayerName = gameController.CurrentPlayer.PlayerName, // the value before we change -- e.g. where we go when we Undo
-                OldState = gameController.CurrentState,
+                OldState = gameController.CurrentGameState,
                 NewState = newState,
                 Action = CatanAction.ChangePlayerAndSetState,                
                 Move = numberofPositions,

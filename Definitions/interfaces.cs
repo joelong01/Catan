@@ -59,7 +59,7 @@ namespace Catan10
     {
 
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
-        bool CanBuild();
+        bool CanBuild { get; }
         void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e);
         void RoadExited(RoadCtrl road, PointerRoutedEventArgs e);
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);

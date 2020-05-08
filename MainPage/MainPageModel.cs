@@ -24,7 +24,7 @@ namespace Catan10
         }
 
         public SessionInfo SessionInfo { get; set; }
-        
+
 
         public ServiceData()
         {
@@ -36,7 +36,9 @@ namespace Catan10
     {
         public ServiceData ServiceData { get; } = new ServiceData();
         bool _EnableUiInteraction = true;
-        Log _Log = new Log();
+        
+        NewLog _newLog = new NewLog();
+
         private bool _isServiceGame = false;
 
         public bool IsServiceGame
@@ -52,20 +54,16 @@ namespace Catan10
             }
         }
         public MainPageModel()
-        {
-            _Log.PropertyChanged += Log_PropertyChanged;
+        {            
+            _newLog.PropertyChanged += Log_PropertyChanged;
         }
 
         private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+
             // this.TraceMessage($"Log_PropertyChanged: [Property={e.PropertyName}] [GameState={_Log.GameState}");
-            if (e.PropertyName == "GameState")
-            {
-
-                NotifyPropertyChanged("EnableNextButton");
-                NotifyPropertyChanged("EnableRedo");
-            }
-
+            NotifyPropertyChanged("EnableNextButton");
+            NotifyPropertyChanged("EnableRedo");
 
         }
 
@@ -89,7 +87,7 @@ namespace Catan10
 
         public PlayerModel GameStartedBy { get; internal set; }
 
-  
+
         public bool EnableUiInteraction
         {
             get
@@ -113,7 +111,7 @@ namespace Catan10
         {
             get
             {
-                GameState state = _Log.GameState;
+                GameState state = Log.GameState;
                 return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart ||
                         state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
                         state == GameState.DoneResourceAllocation));
@@ -124,28 +122,23 @@ namespace Catan10
 
 
 
-        public bool EnableRedo
-        {
-            get
-            {
-                return (Log.UndoCount > 0 && EnableUiInteraction);
-            }
-        }
+        public bool EnableRedo => Log.CanRedo;
+        
 
-      
+
 
         [JsonIgnore]
-        public Log Log
+        public NewLog Log
         {
             get
             {
-                return _Log;
+                return _newLog;
             }
             set
             {
-                if (_Log != value)
+                if (_newLog != value)
                 {
-                    _Log = value;
+                    _newLog = value;
                     NotifyPropertyChanged();
                 }
             }

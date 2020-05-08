@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -20,29 +20,38 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-        public NewLog NewLog;
+        
 
         private void InitTest()
         {
-            NewLog = new NewLog(this);
+            
         }
 
-        private void OnTest1(object sdr, RoutedEventArgs rea)
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            _gameView.FlipAllAsync(TileOrientation.FaceDown);
+            int count = 0;
+            TradeResources tr;
+            do
+            {                
+                count++;
+                RandomBoardLog log = await RandomBoardLog.RandomizeBoard(this, 0);
+                tr = GetPipCount();
+                PipCount = tr;
+            } while (tr.Wheat < 10 || tr.Wood < 10 || tr.Ore < 10 || tr.Brick < 10 || tr.Sheep < 10);
+
+            this.TraceMessage($"it took {count} times");
+            // _gameView.FlipAllAsync(TileOrientation.FaceDown);
         }
-        private async void OnTest2(object sdr, RoutedEventArgs rea)
+        private void OnTest2(object sdr, RoutedEventArgs rea)
         {
             // change player
-            ChangePlayerLog changedPlayer = await ChangePlayerLog.ChangePlayer(this, 1, GameState.WaitingForRoll);
-            VerifyRoundTrip<ChangePlayerLog>(changedPlayer);
+            //ChangePlayerLog changedPlayer = await ChangePlayerLog.ChangePlayer(this, 1, GameState.WaitingForRoll);
+            //VerifyRoundTrip<ChangePlayerLog>(changedPlayer);
         }
         // Undo
-        private async void OnTest3(object sdr, RoutedEventArgs rea)
+        private void OnTest3(object sdr, RoutedEventArgs rea)
         {
-            await NewLog.Undo();
-
-            // NewLog.Redo();
+            
         }
 
         private void VerifyRoundTrip<T>(T model)
@@ -65,12 +74,12 @@ namespace Catan10
 
 
             await this.Reset();
-            await MainPageModel.Log.Init(CreateSaveFileName("Test Game"));
+         //   await MainPageModel.Log.Init(CreateSaveFileName("Test Game"));
 
             await SetStateAsync(null, GameState.WaitingForNewGame, true);
             _gameView.CurrentGame = _gameView.Games[0];
 
-            SavedGames.Insert(0, MainPageModel.Log);
+          //  SavedGames.Insert(0, MainPageModel.Log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
@@ -91,12 +100,12 @@ namespace Catan10
             AnimationSpeedBase = 10; // speed up the animations
             RandomGoldTileCount = 3;
             await this.Reset();
-            await MainPageModel.Log.Init(CreateSaveFileName("Expansion Game"));
+           // await MainPageModel.Log.Init(CreateSaveFileName("Expansion Game"));
             await SetStateAsync(null, GameState.WaitingForNewGame, true);
             _gameView.CurrentGame = _gameView.Games[1];
 
-            SavedGames.Insert(0, MainPageModel.Log);
-            await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
+         //   SavedGames.Insert(0, MainPageModel.Log);
+         //   await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
                 SavedAppState.AllPlayers[0],

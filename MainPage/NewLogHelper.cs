@@ -47,6 +47,8 @@ namespace Catan10
         /// <param name="player"></param>
         /// <returns></returns>
         Task AddPlayer(AddPlayerLog playerLogHeader);
+        Task UndoSetState(SetStateLog setStateLog);
+
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection
         /// </summary>
@@ -59,9 +61,9 @@ namespace Catan10
         /// <summary>
         ///     The current state of the game
         /// </summary>
-        GameState NewGameState { get; }
+        GameState CurrentGameState { get; }
         CatanGames CatanGame { get; set; }
-        GameState CurrentState { get; }
+        
         List<int> CurrentRandomGoldTiles { get; }
 
         List<int> NextRandomGoldTiles { get; }
@@ -74,22 +76,18 @@ namespace Catan10
 
         Task ChangePlayer(ChangePlayerLog log);
         Task UndoChangePlayer(ChangePlayerLog log);
-
+        Task SetState(SetStateLog log);
     }
 
     public sealed partial class MainPage : Page, ILog, IGameController
     {
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
-        public GameState NewGameState
-        {
-            get
-            {
-                return NewLog.GameState;
-            }
-        }
+        public GameState CurrentGameState => MainPageModel.Log.GameState;
+        public CatanProxy Proxy => MainPageModel.ServiceData.Proxy;
+        public SessionInfo SessionInfo => MainPageModel.ServiceData.SessionInfo;
 
-        public GameState CurrentState => NewGameState;
+
 
         public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
 
@@ -206,7 +204,7 @@ namespace Catan10
             playingPlayers.ForEach((player) => MainPageModel.PlayingPlayers.Add(player));
 
             CurrentPlayer = MainPageModel.PlayingPlayers[0];
-            await NewLog.PushAction(playerLogHeader);
+            await MainPageModel.Log.PushAction(playerLogHeader);
         }
         /// <summary>
         ///     we don't call the Log to push the undo action -- that is done by the log since the log
@@ -234,7 +232,7 @@ namespace Catan10
             {
                 await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
             }
-            await NewLog.PushAction(randomBoard);
+            await MainPageModel.Log.PushAction(randomBoard);
         }
 
         public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
@@ -254,17 +252,11 @@ namespace Catan10
         /// </summary>
         /// <param name="logHeader"></param>
         /// <returns></returns>
-        public async Task StartGame(StartGameLog logHeader)
+        public Task StartGame(StartGameLog logHeader)
         {
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
-            NewLog = new NewLog(this);
-
-            //
-            //  this is to stop down asserts in the code...we eventually should remove it when we completely switch over to the new log
-            MainPageModel.Log = new Log();
-            
-            await MainPageModel.Log.Init("NetworkGame" + DateTime.Now.Ticks.ToString());
+            MainPageModel.Log = new NewLog();
 
             MainPageModel.IsServiceGame = true;
             MainPageModel.GameStartedBy = FindPlayerByName(SavedAppState.AllPlayers, logHeader.PlayerName);
@@ -281,7 +273,7 @@ namespace Catan10
             //   
 
 
-
+            return Task.CompletedTask;
 
         }
         private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
@@ -321,7 +313,7 @@ namespace Catan10
 
             //
             //  in supplemental, we don't show random gold tiles
-            if (CurrentState == GameState.Supplemental)
+            if (CurrentGameState == GameState.Supplemental)
             {
                 await GameContainer.ResetRandomGoldTiles();
             }
@@ -338,7 +330,7 @@ namespace Catan10
                 await SetRandomTileToGold(log.NewRandomGoldTiles);
             }
 
-            await NewLog.PushAction(log);
+            await MainPageModel.Log.PushAction(log);
         }
 
         public async Task UndoChangePlayer(ChangePlayerLog logHeader)
@@ -364,6 +356,20 @@ namespace Catan10
             return _gameView.RandomBoardSettings;
         }
 
+        public async Task SetState(SetStateLog log)
+        {
+            await MainPageModel.Log.PushAction(log);
 
+        }
+        //
+        //  State in the game is stored at the top of the NewLog.ActionStack
+        //  so "Undoing" state is just moving the record from the ActionStack
+        //  to the Undo stack
+        public Task UndoSetState(SetStateLog setStateLog)
+        {
+            throw new NotImplementedException();
+        }
+
+        
     }
 }

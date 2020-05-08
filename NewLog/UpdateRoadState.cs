@@ -45,7 +45,7 @@ namespace Catan10
             {
 
                 PlayerName = gameController.CurrentPlayer.PlayerName,
-                OldState = gameController.NewGameState,
+                OldState = gameController.CurrentGameState,
                 Action = CatanAction.UpdatedRoadState,
                 RoadIndex = road.Index,
                 OldRoadState = road.RoadState,
@@ -207,7 +207,7 @@ namespace Catan10
                 //
                 //  this pattern makes it so we can change race tracking multiple times but only end up with 
                 //  one log write
-                raceTracking.EndChanges(page.CurrentPlayer, page.GameState, LogType.Normal);
+                raceTracking.EndChanges(page.CurrentPlayer, page.GameStateFromOldLog, LogType.Normal);
             }
 
         }

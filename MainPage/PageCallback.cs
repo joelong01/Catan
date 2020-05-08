@@ -24,7 +24,7 @@ namespace Catan10
                 return;
             }
 
-            if (State.GameState == GameState.WaitingForNewGame)
+            if (CurrentGameState == GameState.WaitingForNewGame)
             {
                 _gameView.CurrentGame = game;
 
@@ -149,7 +149,7 @@ namespace Catan10
 
                 case CatanAction.DoneSupplemental:
                     _supplementalStartIndex = logLine.Number; // we don't stop undoing on this one -- just set the number we need to terminate the loop and continue on
-                    await AddLogEntry(CurrentPlayer, GameState, CatanAction.DoneSupplemental, false, LogType.Undo);
+                    await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.DoneSupplemental, false, LogType.Undo);
                     break;
                 case CatanAction.Dealt:
                     await Reshuffle();
@@ -176,7 +176,7 @@ namespace Catan10
                     break;
                 case CatanAction.RoadTrackingChanged:
                     LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
-                    _raceTracking.Undo(lrtc.OldState, lrtc.NewState, logLine.PlayerData, this, this.GameState); // this will log the undo action to balance the log write
+                    _raceTracking.Undo(lrtc.OldState, lrtc.NewState, logLine.PlayerData, this, this.GameStateFromOldLog); // this will log the undo action to balance the log write
                     Debug.Assert(logLine.StopProcessingUndo == false, "this has no UI affect");
                     break;
                 case CatanAction.ChangedPlayerProperty:
@@ -203,108 +203,110 @@ namespace Catan10
             throw new Exception("bad name passed PlayerNameToPlayer");
         }
 
-        public async Task OnRedo(bool saveToDisk = true)
+        public Task OnRedo(bool saveToDisk = true)
         {
-            if (MainPageModel.Log.UndoCount == 0) return;
-            try
-            {
-                MainPageModel.Log.State = LogState.Replay; // this is literally like doing the action from the UI
-                for (; ; )
-                {
-                    if (MainPageModel.Log.GameState == GameState.WaitingForStart) break;
+            return MainPageModel.Log.Redo();
+            //if (MainPageModel.Log.UndoCount == 0) return;
+            //try
+            //{
+            //    MainPageModel.Log.State = LogState.Replay; // this is literally like doing the action from the UI
+            //    for (; ; )
+            //    {
+            //        if (MainPageModel.Log.GameState == GameState.WaitingForStart) break;
 
-                    var le = MainPageModel.Log.PopUndo();
-                    if (le == null) break;
-                    bool ret = await RedoLogLine(le);
-                    // you don't push action because RedoLogLine will cause the logs to be updated
-                    bool stop = false;
-                    switch (le.Action)
-                    {
-                        case CatanAction.Rolled:
-                        case CatanAction.ChangedPlayer:
-                        case CatanAction.PlayedKnight:
-                        case CatanAction.AssignedBaron:
-                        case CatanAction.UpdatedRoadState:
-                        case CatanAction.UpdateBuildingState:
-                        case CatanAction.AssignedPirateShip:
-                        case CatanAction.RolledSeven:
-                        case CatanAction.ChangePlayerAndSetState:
-                            stop = true;
-                            break;
-                        default:
-                            break;
-                    }
+            //        var le = MainPageModel.Log.PopUndo();
+            //        if (le == null) break;
+            //        bool ret = await RedoLogLine(le);
+            //        // you don't push action because RedoLogLine will cause the logs to be updated
+            //        bool stop = false;
+            //        switch (le.Action)
+            //        {
+            //            case CatanAction.Rolled:
+            //            case CatanAction.ChangedPlayer:
+            //            case CatanAction.PlayedKnight:
+            //            case CatanAction.AssignedBaron:
+            //            case CatanAction.UpdatedRoadState:
+            //            case CatanAction.UpdateBuildingState:
+            //            case CatanAction.AssignedPirateShip:
+            //            case CatanAction.RolledSeven:
+            //            case CatanAction.ChangePlayerAndSetState:
+            //                stop = true;
+            //                break;
+            //            default:
+            //                break;
+            //        }
 
-                    if (stop)
-                    {
-                        break;
-                    }
-                }
-            }
-            finally
-            {
-                MainPageModel.Log.State = LogState.Normal;
-                UpdateUiForState(MainPageModel.Log.GameState);
-            }
+            //        if (stop)
+            //        {
+            //            break;
+            //        }
+            //    }
+            //}
+            //finally
+            //{
+            //    MainPageModel.Log.State = LogState.Normal;
+            //    UpdateUiForState(MainPageModel.Log.GameState);
+            //}
 
-            if (saveToDisk)
-            {
-                await MainPageModel.Log.WriteFullLogToDisk();
-            }
+            //if (saveToDisk)
+            //{
+            //    await MainPageModel.Log.WriteFullLogToDisk();
+            //}
         }
 
 
-        public async Task OnUndo(bool saveToDisk = true)
+        public  Task OnUndo(bool saveToDisk = true)
         {
-            if (MainPageModel.Log.ActionCount < SMALLEST_STATE_COUNT) // the games starts with 5 states that can't be undone
-            {
-                return;
-            }
+            return MainPageModel.Log.Undo();
+            //if (MainPageModel.Log.ActionCount < SMALLEST_STATE_COUNT) // the games starts with 5 states that can't be undone
+            //{
+            //    return;
+            //}
 
-            try
-            {
-                MainPageModel.Log.State = LogState.Undo;
-                for (; ; )
-                {
-                    if (MainPageModel.Log.GameState == GameState.WaitingForStart) break;
+            //try
+            //{
+            //    MainPageModel.Log.State = LogState.Undo;
+            //    for (; ; )
+            //    {
+            //        if (MainPageModel.Log.GameState == GameState.WaitingForStart) break;
 
-                    var le = MainPageModel.Log.PopAction();
-                    await UndoLogLine(le);
-                    bool stop = false;
-                    switch (le.Action)
-                    {
-                        case CatanAction.Rolled:
-                        case CatanAction.ChangedPlayer:
-                        case CatanAction.PlayedKnight:
-                        case CatanAction.AssignedBaron:
-                        case CatanAction.UpdatedRoadState:
-                        case CatanAction.UpdateBuildingState:
-                        case CatanAction.AssignedPirateShip:
-                        case CatanAction.ChangePlayerAndSetState:
-                        case CatanAction.RolledSeven:
-                            MainPageModel.Log.PushUndo(le); // we only need the top level UI changes -- all other log lines generated by the act of applying the change
-                            stop = true;
-                            break;
-                        default:
-                            break;
-                    }
+            //        var le = MainPageModel.Log.PopAction();
+            //        await UndoLogLine(le);
+            //        bool stop = false;
+            //        switch (le.Action)
+            //        {
+            //            case CatanAction.Rolled:
+            //            case CatanAction.ChangedPlayer:
+            //            case CatanAction.PlayedKnight:
+            //            case CatanAction.AssignedBaron:
+            //            case CatanAction.UpdatedRoadState:
+            //            case CatanAction.UpdateBuildingState:
+            //            case CatanAction.AssignedPirateShip:
+            //            case CatanAction.ChangePlayerAndSetState:
+            //            case CatanAction.RolledSeven:
+            //                MainPageModel.Log.PushUndo(le); // we only need the top level UI changes -- all other log lines generated by the act of applying the change
+            //                stop = true;
+            //                break;
+            //            default:
+            //                break;
+            //        }
 
-                    if (stop)
-                    {
-                        break;
-                    }
-                }
-            }
-            finally
-            {
-                MainPageModel.Log.State = LogState.Normal;
-                UpdateUiForState(MainPageModel.Log.GameState);
-            }
+            //        if (stop)
+            //        {
+            //            break;
+            //        }
+            //    }
+            //}
+            //finally
+            //{
+            //    MainPageModel.Log.State = LogState.Normal;
+            //    UpdateUiForState(MainPageModel.Log.GameState);
+            //}
 
-            if (saveToDisk)
-            {
-                await MainPageModel.Log.WriteFullLogToDisk();
-            }
+            //if (saveToDisk)
+            //{
+            //    await MainPageModel.Log.WriteFullLogToDisk();
+            //}
         }
 
 
@@ -318,71 +320,72 @@ namespace Catan10
 
         }
 
-        public async Task OnNewGame()
+        public  Task OnNewGame()
         {
-            if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
-            {
-                if (State.GameState != GameState.WaitingForNewGame)
-                {
-                    if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
-                    {
+            return Task.CompletedTask;
+            //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
+            //{
+            //    if (State.GameState != GameState.WaitingForNewGame)
+            //    {
+            //        if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
+            //        {
 
-                        return;
-                    }
-                }
-            }
+            //            return;
+            //        }
+            //    }
+            //}
 
-            try
-            {
-
-
-
-
-                if (SavedAppState.AllPlayers.Count == 0)
-                {
-                    await LoadGameData();
-                }
-
-                Debug.Assert(SavedAppState.AllPlayers.Count > 0);
-
-                NewGameDlg dlg = new NewGameDlg(SavedAppState.AllPlayers, _gameView.Games);
-
-                ContentDialogResult result = await dlg.ShowAsync();
-                if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
-                {
-                    string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
-                    MessageDialog msgDlg = new MessageDialog(content);
-                    await msgDlg.ShowAsync();
-                    return;
-                }
-
-                if (dlg.SelectedGame == null)
-                {
-                    string content = String.Format($"Pick a game!!");
-                    MessageDialog msgDlg = new MessageDialog(content);
-                    await msgDlg.ShowAsync();
-                    return;
-                }
-
-                if (result != ContentDialogResult.Secondary)
-                {
-                    _gameView.Reset();
-                    await this.Reset();
-                    await MainPageModel.Log.Init(dlg.SaveFileName);
-                    await SetStateAsync(null, GameState.WaitingForNewGame, true);
-                    _gameView.CurrentGame = dlg.SelectedGame;
+            //try
+            //{
 
 
-                    SavedGames.Insert(0, MainPageModel.Log);
-                    await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
-                    await StartGame(dlg.PlayingPlayers, dlg.SelectedIndex);
-                }
 
-            }
-            finally
-            {
-                VerifyRoundTrip<MainPageModel>(MainPageModel);
-            }
+
+            //    if (SavedAppState.AllPlayers.Count == 0)
+            //    {
+            //        await LoadGameData();
+            //    }
+
+            //    Debug.Assert(SavedAppState.AllPlayers.Count > 0);
+
+            //    NewGameDlg dlg = new NewGameDlg(SavedAppState.AllPlayers, _gameView.Games);
+
+            //    ContentDialogResult result = await dlg.ShowAsync();
+            //    if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
+            //    {
+            //        string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
+            //        MessageDialog msgDlg = new MessageDialog(content);
+            //        await msgDlg.ShowAsync();
+            //        return;
+            //    }
+
+            //    if (dlg.SelectedGame == null)
+            //    {
+            //        string content = String.Format($"Pick a game!!");
+            //        MessageDialog msgDlg = new MessageDialog(content);
+            //        await msgDlg.ShowAsync();
+            //        return;
+            //    }
+
+            //    if (result != ContentDialogResult.Secondary)
+            //    {
+            //        _gameView.Reset();
+            //        await this.Reset();
+            //        await MainPageModel.Log.Init(dlg.SaveFileName);
+            //        await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            //        _gameView.CurrentGame = dlg.SelectedGame;
+
+
+            //        SavedGames.Insert(0, MainPageModel.Log);
+            //        await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
+            //        await StartGame(dlg.PlayingPlayers, dlg.SelectedIndex);
+            //    }
+
+            //}
+            //finally
+            //{
+            //    VerifyRoundTrip<MainPageModel>(MainPageModel);
+            //}
         }
 
         private async Task PromptForLostCards(PlayerModel targetedPlayer, CatanAction action)
@@ -469,28 +472,28 @@ namespace Catan10
         }
 
 
-        public bool CanBuild()
+        public bool CanBuild
+            
         {
-            if (MainPageModel.Log == null)
+            get
             {
+                if (MainPageModel.Log == null)
+                {
+                    return false;
+                }
+
+
+                GameState state = CurrentGameState;
+
+                if (state == GameState.WaitingForNext || // I can build after I roll               
+                    state == GameState.AllocateResourceForward || // I can build during the initial phase )
+                    state == GameState.AllocateResourceReverse || state == GameState.Supplemental)
+                {
+                    return true;
+                }
+
                 return false;
             }
-
-            if (MainPageModel.Log.ActionCount == 0)
-            {
-                return false;
-            }
-
-            GameState state = State.GameState;
-
-            if (state == GameState.WaitingForNext || // I can build after I roll               
-                state == GameState.AllocateResourceForward || // I can build during the initial phase )
-                state == GameState.AllocateResourceReverse || state == GameState.Supplemental)
-            {
-                return true;
-            }
-
-            return false;
         }
 
 
@@ -546,14 +549,14 @@ namespace Catan10
             }
 
 
-            await AddLogEntry(CurrentPlayer, GameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
+            await AddLogEntry(CurrentPlayer, GameStateFromOldLog, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
 
-            if (GameState == GameState.MustMoveBaron && logType != LogType.Undo)
+            if (GameStateFromOldLog == GameState.MustMoveBaron && logType != LogType.Undo)
             {
                 await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false, logType);
             }
 
-            if (GameState == GameState.WaitingForRoll)
+            if (GameStateFromOldLog == GameState.WaitingForRoll)
             {
                 if (logType == LogType.Undo)
                 {
@@ -587,13 +590,13 @@ namespace Catan10
         //  
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
-            if (GameState != GameState.MustMoveBaron && GameState != GameState.WaitingForNext &&
-                GameState != GameState.WaitingForRoll)
+            if (GameStateFromOldLog != GameState.MustMoveBaron && GameStateFromOldLog != GameState.WaitingForNext &&
+                GameStateFromOldLog != GameState.WaitingForRoll)
             {
                 return;
             }
 
-            if ((GameState == GameState.WaitingForRoll && !this.CanMoveBaronBeforeRoll) && GameState != GameState.MustMoveBaron)
+            if ((GameStateFromOldLog == GameState.WaitingForRoll && !this.CanMoveBaronBeforeRoll) && GameStateFromOldLog != GameState.MustMoveBaron)
             {
                 Debug.WriteLine("You need to check the baron button before assiging baron");
                 return;
@@ -925,7 +928,7 @@ namespace Catan10
 
 
 
-            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdatedRoadState, true, logType, road.Number, new LogRoadUpdate(_gameView.CurrentGame.Index, road, oldState, road.RoadState));
+            await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.UpdatedRoadState, true, logType, road.Number, new LogRoadUpdate(_gameView.CurrentGame.Index, road, oldState, road.RoadState));
             CalculateAndSetLongestRoad(logType);
 
         }
@@ -1065,7 +1068,7 @@ namespace Catan10
                 //
                 //  this pattern makes it so we can change race tracking multiple times but only end up with 
                 //  one log write
-                _raceTracking.EndChanges(CurrentPlayer, this.GameState, logType);
+                _raceTracking.EndChanges(CurrentPlayer, this.GameStateFromOldLog, logType);
             }
 
         }
@@ -1414,7 +1417,7 @@ namespace Catan10
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
             _stopWatchForTurn.StartTimer();
 
-            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
             {
 
                 await HideAllPipEllipses();
@@ -1443,7 +1446,7 @@ namespace Catan10
         public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
         {
 
-            if (!CanBuild())
+            if (!CanBuild)
             {
                 return;
             }
@@ -1476,7 +1479,7 @@ namespace Catan10
 
         public void RoadExited(RoadCtrl road, PointerRoutedEventArgs e)
         {
-            if (!CanBuild())
+            if (!CanBuild)
             {
                 return;
             }
@@ -1505,7 +1508,7 @@ namespace Catan10
         {
 
 
-            if (!CanBuild())
+            if (!CanBuild)
             {
                 return;
             }
@@ -1539,7 +1542,7 @@ namespace Catan10
         bool ValidateBuildingLocation(BuildingCtrl building, out bool showErrorUI)
         {
             showErrorUI = true;
-            if (GameState == GameState.WaitingForNewGame || GameState == GameState.WaitingForStart)
+            if (GameStateFromOldLog == GameState.WaitingForNewGame || GameStateFromOldLog == GameState.WaitingForStart)
             {
                 showErrorUI = false;
                 return false;
@@ -1550,7 +1553,7 @@ namespace Catan10
                 return true;
             }
 
-            if (!CanBuild())
+            if (!CanBuild)
             {
                 return false;
             }
@@ -1565,14 +1568,14 @@ namespace Catan10
             bool allocationPhase = false;
             bool error = false;
 
-            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
             {
                 allocationPhase = true;
             }
 
             error = SettlementsWithinOneSpace(building);
 
-            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
             {
                 if (building.BuildingToTileDictionary.Count > 0)
                 {
@@ -1638,7 +1641,7 @@ namespace Catan10
 
             //
             //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
-            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse)
+            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
             {
                 if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
                 {
@@ -1652,7 +1655,7 @@ namespace Catan10
 
             //
             //  NOTE:  these have to be called in this order so that the undo works correctly
-            await AddLogEntry(CurrentPlayer, GameState, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
+            await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
             CalculateAndSetLongestRoad(logType);
 
@@ -1672,7 +1675,7 @@ namespace Catan10
                     return false;
                 }
             }
-            if (GameState == GameState.AllocateResourceForward || GameState == GameState.AllocateResourceReverse || GameState == GameState.Supplemental || GameState == GameState.WaitingForNext)
+            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse || GameStateFromOldLog == GameState.Supplemental || GameStateFromOldLog == GameState.WaitingForNext)
             {
                 return true;
             }

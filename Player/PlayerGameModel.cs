@@ -88,9 +88,9 @@ namespace Catan10
         private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
         {
 
-            _playerData.Log?.PostLogEntry(_playerData, GameState.Unknown,
-                                                             CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
-                                                             new LogPropertyChanged(propertyName, oldVal, newVal));
+            //_playerData.Log?.PostLogEntry(_playerData, GameState.Unknown,
+            //                                                 CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
+            //                                                 new LogPropertyChanged(propertyName, oldVal, newVal));
         }
 
         private void LogPropertyChanged(int oldVal, int newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
@@ -108,7 +108,7 @@ namespace Catan10
         }
         private void OnGameModelResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
         {
-            _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
+           // _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
 
         }
 

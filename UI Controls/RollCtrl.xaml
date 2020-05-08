@@ -7,7 +7,7 @@
     d:DesignHeight="175" d:DesignWidth="120" mc:Ignorable="d">
     <Control.Resources>
 
-        
+
         <Storyboard x:Name="FlipOpen">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FaceDown" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
                 <EasingDoubleKeyFrame KeyTime="0" Value="0" />
@@ -27,7 +27,7 @@
                 <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="-90" />
                 <SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="-90" />
             </DoubleAnimationUsingKeyFrames>
-        </Storyboard>       
+        </Storyboard>
     </Control.Resources>
     <Grid>
         <Grid Name="Grid_FaceDown" Width="120" Height="170" Background="{StaticResource bmResourceCardBack}">
@@ -40,10 +40,12 @@
                 <PlaneProjection x:Name="PlaneProjection_FaceUp" RotationY="-90" />
             </Grid.Projection>
             <TextBlock Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                FontFamily="Segoe UI Symbol" FontSize="100" Text="{x:Bind DiceOne, Mode=OneWay}"
+                FontFamily="Segoe UI Symbol" FontSize="100"
+                Text="{x:Bind DiceOne, Mode=OneWay}"
                 TextLineBounds="Tight" />
             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                FontFamily="Segoe UI Symbol" FontSize="100" Text="{x:Bind DiceTwo, Mode=OneWay}"
+                FontFamily="Segoe UI Symbol" FontSize="100"
+                Text="{x:Bind DiceTwo, Mode=OneWay}"
                 TextLineBounds="Tight" />
         </Grid>
     </Grid>

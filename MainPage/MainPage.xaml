@@ -356,7 +356,7 @@
             <Viewbox HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Button Background="Transparent" Click="OnCloseSavedGames" Content="&#xE947;" FontFamily="Segoe MDL2 Assets" />
             </Viewbox>
-            <ListBox x:Name="_lbGames" Grid.Row="1" Grid.RowSpan="1" Grid.ColumnSpan="2"
+            <!--<ListBox x:Name="_lbGames" Grid.Row="1" Grid.RowSpan="1" Grid.ColumnSpan="2"
                 Margin="4"
                 ItemsSource="{x:Bind SavedGames}"
                 Background="{StaticResource bmMaple}"
@@ -366,7 +366,7 @@
                         <TextBlock Text="{x:Bind DisplayName}" Foreground="White" FontSize="20" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-            </ListBox>
+            </ListBox>-->
         </Grid>
 
         <Grid Name="Grid_PrivateData" Grid.Row="1" Grid.RowSpan="10" Width="500"
@@ -438,9 +438,10 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="10*" />
             </Grid.RowDefinitions>
-            <TextBlock Text="Rolls" FontSize="22" Grid.Row="0" HorizontalAlignment="Center" Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}"/>
-            <local:PlayerRollCtrl Grid.Row="1"/>
-            
+            <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Rolls" FontSize="22"
+                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}" />
+            <local:PlayerRollCtrl Grid.Row="1" />
+
         </Grid>
 
         <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"

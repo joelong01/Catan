@@ -27,7 +27,7 @@ namespace Catan10
     ///     3. when something is added to the Action stack and it is *not* part of a Replay, the Undo stack is cleared.
     /// </summary>
 
-    public class Log : IDisposable, INotifyPropertyChanged
+    public class DeprecatedLog : IDisposable, INotifyPropertyChanged
     {
 
         private string _saveFileName = "";
@@ -57,7 +57,7 @@ namespace Catan10
 
 
 
-        public Log(StorageFile file)
+        public DeprecatedLog(StorageFile file)
         {
             _file = file;
             _saveFileName = _file.DisplayName;
@@ -65,7 +65,7 @@ namespace Catan10
 
         }
 
-        public Log()
+        public DeprecatedLog()
         {
 
         }

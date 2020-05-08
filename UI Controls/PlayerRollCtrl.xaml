@@ -18,8 +18,10 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Button Width="100" Content="Reset" Click="OnReset" Foreground="White" />
-                <Button Width="100" Content="FaceUp" Click="OnFaceUp" Foreground="White" Visibility="Collapsed" />
-                <Button Width="100" Content="FaceDown" Click="OnFaceDown" Foreground="White" Visibility="Collapsed"/>
+                <Button Width="100" Content="FaceUp" Click="OnFaceUp" Foreground="White"
+                    Visibility="Collapsed" />
+                <Button Width="100" Content="FaceDown" Click="OnFaceDown" Foreground="White"
+                    Visibility="Collapsed" />
                 <Button Width="100" Height="30" Margin="10,0,0,0" HorizontalAlignment="Right"
                     VerticalAlignment="Bottom" Click="OnShowAll">
                     <Button.Content>

@@ -391,7 +391,7 @@ namespace Catan10
 
         private void OnUndo(object sender, RoutedEventArgs e)
         {
-            if (GameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
+            if (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
             {
                 return;
             }
@@ -409,7 +409,7 @@ namespace Catan10
         }
         private void OnRedo(object sender, RoutedEventArgs e)
         {
-            if (GameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
+            if (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
             {
                 return;
             }
@@ -447,9 +447,9 @@ namespace Catan10
         /// <summary>
         ///     we stopped tracking Winner as that drove conflict when everybody forgot to set the winner...
         /// </summary
-        private async void OnWinnerClicked(object sender, RoutedEventArgs e)
+        private void OnWinnerClicked(object sender, RoutedEventArgs e)
         {
-            await OnWin();
+          //  await OnWin();
         }
 
         private async void OnNumberTapped(object sender, TappedRoutedEventArgs e)
@@ -457,7 +457,7 @@ namespace Catan10
             Button button = sender as Button;
             CatanNumber number = button.Content as CatanNumber;
 
-            if (this.State.GameState != GameState.WaitingForRoll)
+            if (CurrentGameState != GameState.WaitingForRoll)
             {
                 HideNumberUi();
                 return;
@@ -670,7 +670,7 @@ namespace Catan10
         private async void OnPickOptimalBaron(object sender, RoutedEventArgs e)
         {
 
-            if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext && GameState != GameState.MustMoveBaron)
+            if (GameStateFromOldLog != GameState.WaitingForRoll && GameStateFromOldLog != GameState.WaitingForNext && GameStateFromOldLog != GameState.MustMoveBaron)
             {
                 return;
             }
@@ -761,7 +761,7 @@ namespace Catan10
 
             CatanAction action = CatanAction.PlayedKnight;
             TargetWeapon weapon = TargetWeapon.Baron;
-            if (GameState == GameState.MustMoveBaron)
+            if (GameStateFromOldLog == GameState.MustMoveBaron)
             {
                 action = CatanAction.AssignedBaron;
             }
@@ -809,7 +809,7 @@ namespace Catan10
         /// </summary>
         private async void OnPickRandomBaron(object sender, RoutedEventArgs e)
         {
-            if (GameState != GameState.WaitingForRoll && GameState != GameState.WaitingForNext && GameState != GameState.MustMoveBaron)
+            if (GameStateFromOldLog != GameState.WaitingForRoll && GameStateFromOldLog != GameState.WaitingForNext && GameStateFromOldLog != GameState.MustMoveBaron)
             {
                 return;
             }
@@ -832,7 +832,7 @@ namespace Catan10
             Target target = targetList[index];
             CatanAction action = CatanAction.PlayedKnight;
             TargetWeapon weapon = TargetWeapon.Baron;
-            if (GameState == GameState.MustMoveBaron)
+            if (GameStateFromOldLog == GameState.MustMoveBaron)
             {
                 action = CatanAction.AssignedBaron;
             }
@@ -985,7 +985,7 @@ namespace Catan10
                     if (type == null) throw new ArgumentException("Unknown type!");
                     LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
                     message.Data = logHeader;
-                    NewLog.RecordMessage(message);
+                    MainPageModel.Log.RecordMessage(message);
                     Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
                     if (logHeader.TheHuman != TheHuman.PlayerName) 
                     {
@@ -998,11 +998,11 @@ namespace Catan10
                                 await logController.Do(this, logHeader);
                                 break;
                             case LogType.Undo:
-                                await NewLog.Undo(message);
+                                await MainPageModel.Log.Undo(message);
                                 break;
                             case LogType.Replay:                                
                                 
-                                await NewLog.Redo(message);
+                                await MainPageModel.Log.Redo(message);
                                 break;
                             case LogType.DoNotLog:                                
                             case LogType.DoNotUndo:                                

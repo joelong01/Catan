@@ -108,7 +108,7 @@ namespace Catan10
                
                 Rolled = roll,
                 PlayerName = currentPlayer.PlayerName,
-                OldState = page.NewGameState,
+                OldState = page.CurrentGameState,
                 Action = (roll == 7) ? CatanAction.RolledSeven : CatanAction.Rolled
             };
 

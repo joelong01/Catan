@@ -1,44 +1,32 @@
 ﻿using Catan.Proxy;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Windows.System.Diagnostics;
 
 namespace Catan10
 {
-    public class NewLog
+    class Stacks : INotifyPropertyChanged
     {
         private readonly List<LogHeader> ActionStack = new List<LogHeader>();
         private readonly List<LogHeader> UndoStack = new List<LogHeader>();
-        private List<CatanMessage> MessageLog { get; } = new List<CatanMessage>();
-        public MainPage Page { get; internal set; }
-        public GameState GameState
+        public event PropertyChangedEventHandler PropertyChanged;
+        public Stacks() { }
+        public bool CanUndo => UndoStack.Count > 0;
+        public int ActionCount => ActionStack.Count;
+        public void PushAction(LogHeader logHeader)
         {
-            get
-            {
 
-                if (ActionStack.Count == 0)
-                {
-                    return GameState.WaitingForNewGame;
-                }
-
-                return ActionStack.Last().NewState;
-
-            }
-
-        }
-
-        public NewLog(MainPage p)
-        {
-            Page = p;
-        }
-
-        public Task PushAction(LogHeader logHeader)
-        {
             try
             {
+                if (logHeader.LogType != LogType.Replay)
+                {
+                    UndoStack.Clear();
+                }
                 if (logHeader.CanUndo)
                 {
                     ActionStack.Add(logHeader);
@@ -46,6 +34,146 @@ namespace Catan10
                 else
                 {
                     ActionStack.Insert(0, logHeader);
+                }
+
+
+            }
+            finally
+            {
+                NotifyPropertyChanged("GameState");
+                NotifyPropertyChanged("RedoPossible"); // because it is no longer possible
+                NotifyPropertyChanged("ActionStack");
+                // PrintLog();
+
+            }
+        }
+        public void InsertAction(LogHeader logHeader)
+        {
+            ActionStack.Insert(0, logHeader);
+        }
+        public LogHeader PeekAction
+        {
+            get
+            {
+                if (ActionStack.Count > 0) return ActionStack.Last();
+
+                return null;
+            }
+        }
+        public LogHeader PeekUndo
+        {
+            get
+            {
+                if (UndoStack.Count > 0) return UndoStack.Last();
+
+                return null;
+            }
+        }
+        public LogHeader PopAction()
+        {
+            if (ActionStack.Count == 0) return null;
+
+            LogHeader lh = ActionStack.Last();
+            ActionStack.Remove(lh);
+            NotifyPropertyChanged("GameState");
+            NotifyPropertyChanged("ActionStack");
+            return lh;
+        }
+        public LogHeader PopUndo()
+        {
+            if (UndoStack.Count == 0) return null;
+            var lh = UndoStack.Last();
+            UndoStack.Remove(lh);
+            NotifyPropertyChanged("RedoPossible");
+            return lh;
+        }
+        public void ClearUndo()
+        {
+            UndoStack.Clear();
+        }
+        public void PushUndo(LogHeader lh)
+        {
+            UndoStack.Add(lh);
+            NotifyPropertyChanged("RedoPossible");
+
+        }
+        //
+        //  whenever we push or pop from the stack we should notify up  
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        internal void PrintLog([CallerMemberName] string caller = "")
+        {
+            string s = "";
+            ActionStack.ForEach((lh) => s += $"{lh.Action},");
+            this.TraceMessage($"{caller}: {s}");
+            s = "";
+            UndoStack.ForEach((lh) => s += $"{lh.Action},");
+            this.TraceMessage($"{caller}: {s}");
+        }
+    }
+
+
+    public class NewLog : INotifyPropertyChanged, IDisposable
+    {
+
+        private readonly Stacks Stacks = new Stacks();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+
+
+        private List<CatanMessage> MessageLog { get; } = new List<CatanMessage>();
+        public MainPage Page { get; internal set; }
+        public GameState GameState
+        {
+            get
+            {
+
+                if (Stacks.ActionCount == 0)
+                {
+                    return GameState.WaitingForNewGame;
+                }
+
+                return Stacks.PeekAction.NewState;
+
+            }
+
+        }
+
+        public NewLog()
+        {
+            Page = MainPage.Current;
+            Stacks.PropertyChanged += Stacks_PropertyChanged;
+        }
+
+        /// <summary>
+        ///     forward the event to the Log's customers
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Stacks_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            NotifyPropertyChanged(e.PropertyName);
+        }
+
+        public Task PushAction(LogHeader logHeader)
+        {
+            GameState currentState = GameState;
+            try
+            {
+                if (logHeader.LogType != LogType.Replay)
+                {
+                    Stacks.ClearUndo();
+                }
+                if (logHeader.CanUndo)
+                {
+                    Stacks.PushAction(logHeader);
+                }
+                else
+                {
+                    Stacks.InsertAction(logHeader);
                 }
 
                 if (logHeader.LocallyCreated)
@@ -64,15 +192,23 @@ namespace Catan10
             }
             finally
             {
-               // PrintLog();
 
+                // PrintLog();
             }
         }
 
-        public LogHeader PeekAction => ActionStack.Last();
-        public LogHeader PeekUndo => UndoStack.Last();
-        public bool CanRedo => UndoStack.Count > 0;
 
+        //
+        //  whenever we push or pop from the stack we should 
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public bool CanRedo => Stacks.CanUndo;
+
+        public LogHeader PeekAction => Stacks.PeekAction;
+        public LogHeader PeekUndo => Stacks.PeekUndo;
 
         private Task PostLogMessage(CatanMessage message)
         {
@@ -90,8 +226,7 @@ namespace Catan10
         {
             try
             {
-                var logHeader = UndoStack.Last();
-                UndoStack.RemoveAt(UndoStack.Count - 1);
+                var logHeader = Stacks.PopUndo();
                 Contract.Assert(logHeader.LogType == LogType.Undo);
                 logHeader.LogType = LogType.Replay;
 
@@ -113,7 +248,9 @@ namespace Catan10
             }
             finally
             {
-             //   PrintLog();
+                //   PrintLog();
+                NotifyPropertyChanged("Do");
+                NotifyPropertyChanged("Undo");
 
             }
 
@@ -139,13 +276,14 @@ namespace Catan10
         {
             try
             {
-                var undoneLogHeader = ActionStack.Last();
+                var undoneLogHeader = Stacks.PeekAction;
                 if (!undoneLogHeader.CanUndo)
                 {
                     return;
                 }
 
-                ActionStack.RemoveAt(ActionStack.Count - 1);
+                Stacks.PopAction();
+
 
                 if (message != null)
                 {
@@ -159,7 +297,7 @@ namespace Catan10
                 await logController.Undo(this.Page, undoneLogHeader);
                 undoneLogHeader.LogType = LogType.Undo;
 
-                UndoStack.Push(undoneLogHeader);
+                Stacks.PushUndo(undoneLogHeader);
 
                 if (message == null)
                 {
@@ -173,21 +311,13 @@ namespace Catan10
             }
             finally
             {
-              //  PrintLog();
+                //  PrintLog();
 
             }
 
         }
 
-        internal void PrintLog([CallerMemberName] string caller = "")
-        {
-            string s = "";
-            ActionStack.ForEach((lh) => s += $"{lh.Action},");
-            this.TraceMessage($"{caller}: {s}");
-            s = "";
-            UndoStack.ForEach((lh) => s += $"{lh.Action},");
-            this.TraceMessage($"{caller}: {s}");
-        }
+
 
         internal void RecordMessage(CatanMessage message)
         {
@@ -208,6 +338,11 @@ namespace Catan10
                 this.TraceMessage($"Messages: [Sequence={m.Sequence}]\t[id={logHeader.LogId}][Origin={m.Origin}]\t" +
                                   $"[Action={logHeader.Action}]\tPlayer=[{logHeader.PlayerName}]\t[LogType={logHeader.LogType}]");
             });
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
     }
 

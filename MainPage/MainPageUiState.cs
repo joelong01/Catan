@@ -81,7 +81,7 @@ namespace Catan10
 
             Rolls.Push(roll);
             LastRoll = roll;
-            PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll, StaticHelpers.SerializeList<int>(_gameView.CurrentRandomGoldTiles));
+            // PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll, StaticHelpers.SerializeList<int>(_gameView.CurrentRandomGoldTiles));
             UpdateGlobalRollStats();
             return true;
         }
@@ -104,7 +104,7 @@ namespace Catan10
             {
                 LastRoll = 0;
             }
-            PostLogEntry(CurrentPlayer, GameState, CatanAction.Rolled, true, LogType.Undo, lastRoll);
+           // PostLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.Rolled, true, LogType.Undo, lastRoll);
             UpdateGlobalRollStats();
             foreach (TileCtrl t in _gameView.AllTiles)
             {
@@ -163,7 +163,7 @@ namespace Catan10
 
                 if (MainPageModel.Log != null)
                 {
-                    await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.SetFirstPlayer, true, logType, -1, new LogSetFirstPlayer(idx));
+                  //  await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.SetFirstPlayer, true, logType, -1, new LogSetFirstPlayer(idx));
                 }
             }
 
@@ -195,7 +195,7 @@ namespace Catan10
             // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
             // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
-            if (logType != LogType.Undo && (GameState == GameState.WaitingForNext || GameState == GameState.WaitingForRoll))
+            if (logType != LogType.Undo && (GameStateFromOldLog == GameState.WaitingForNext || GameStateFromOldLog == GameState.WaitingForRoll))
             {
                 int playerRoll = TotalRolls / MainPageModel.PlayingPlayers.Count;  // integer divide - drops remainder
                 if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
@@ -221,7 +221,7 @@ namespace Catan10
 
             if (MainPageModel.Log != null)
             {
-                await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, GameState.Unknown, currentRandomGoldTiles, newRandomGoldTiles));
+               // await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, GameState.Unknown, currentRandomGoldTiles, newRandomGoldTiles));
             }
 
         }
