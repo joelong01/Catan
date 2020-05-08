@@ -397,7 +397,7 @@
         </Grid>
 
         <Grid Name="Grid_BoardMeasurement" Grid.Row="1" Grid.RowSpan="10" Width="500"
-            Height="200" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Height="300" HorizontalAlignment="Left" VerticalAlignment="Top"
             Visibility="{x:Bind MainPageModel.IsServiceGame, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
             BorderBrush="{StaticResource bmMaple}"
             Background="{StaticResource bmKnight}"
@@ -418,6 +418,10 @@
                 FontSize="22" FontStyle="Normal" FontWeight="Normal" />
             <local:BoardMeasurementCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 PipCount="{Binding Path=PipCount, Mode=OneWay}"
+                FiveStarPositions="{x:Bind Path=MainPageModel.FiveStarPositions, Mode=OneWay}"
+                FourStarPositions="{x:Bind Path=MainPageModel.FourStarPositions, Mode=OneWay}"
+                ThreeStarPositions="{x:Bind Path=MainPageModel.ThreeStarPositions, Mode=OneWay}"
+                TwoStarPositions="{x:Bind Path=MainPageModel.TwoStarPositions, Mode=OneWay}"
                 CornerRadius="10" />
 
 

@@ -121,6 +121,17 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
+
+            <Button Margin="0,20,0,0" Style="{StaticResource BtnStyle}" Click="OnDeleteAll" Background="{StaticResource bmMaple}">
+                <Button.Content>
+                    <StackPanel Style="{StaticResource StkPnlStyle}">
+                        <TextBlock Margin="10,0,81,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Text="Delete All" Foreground="Red" FontSize="22" />
+                        <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="☬"
+                             Foreground="Red" FontSize="36" />
+                    </StackPanel>
+                </Button.Content>
+            </Button>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,10,0"
             Orientation="Horizontal" Canvas.ZIndex="99">

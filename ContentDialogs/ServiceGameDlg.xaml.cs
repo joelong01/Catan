@@ -74,7 +74,7 @@ namespace Catan10
         }
         private void SetSelectedSession(SessionInfo value)
         {
-           // this.TraceMessage($"New Session: {value?.Description}");
+            // this.TraceMessage($"New Session: {value?.Description}");
 
         }
 
@@ -183,13 +183,13 @@ namespace Catan10
             try
             {
 
-                var sessionInfo =  await Proxy.JoinSession(SelectedSession.Id, CurrentPlayer.PlayerName);
+                var sessionInfo = await Proxy.JoinSession(SelectedSession.Id, CurrentPlayer.PlayerName);
                 if (sessionInfo != null)
                 {
                     SelectedSession = sessionInfo;
                     this.Hide();
                 }
-            
+
 
                 if (Proxy.LastError != null)
                 {
@@ -222,7 +222,7 @@ namespace Catan10
         private async Task GetPlayersInSession()
         {
             ErrorMessage = "";
-          
+
             try
             {
                 List<string> players = await Proxy.GetPlayers(SelectedSession.Id);
@@ -257,7 +257,7 @@ namespace Catan10
         {
             ErrorMessage = "";
             if (SelectedSession == null) return;
-            
+
             try
             {
 
@@ -293,6 +293,7 @@ namespace Catan10
         private void OnCancelError(object sender, RoutedEventArgs e)
         {
             ErrorMessage = "";
+            if (_tcs == null) return;
             if (!_tcs.Task.IsCompleted) _tcs.SetResult(false);
         }
 
@@ -301,6 +302,26 @@ namespace Catan10
             ErrorMessage = "";
             if (_tcs == null) return;
             if (!_tcs.Task.IsCompleted) _tcs.SetResult(true);
+        }
+
+        private async void OnDeleteAll(object sender, RoutedEventArgs e)
+        {
+            bool ret = await AskUserQuestion($"Are you sure want to delete all the sessions?");
+            if (ret)
+            {
+                Sessions.ForEach(async (session) =>
+                {
+                    var sessions = await Proxy.DeleteSession(session.Id);
+                    if (sessions == null)
+                    {
+                        ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+                        this.TraceMessage(ErrorMessage);
+                    }
+                });
+
+                PlayersInGame.Clear();
+                Sessions.Clear();
+            }
         }
     }
 }

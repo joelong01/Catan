@@ -1,4 +1,5 @@
 ﻿using Catan.Proxy;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -36,7 +37,32 @@ namespace Catan10
     {
         public ServiceData ServiceData { get; } = new ServiceData();
         bool _EnableUiInteraction = true;
-        
+        Dictionary<int, List<BuildingCtrl>> _pipCountDict = null;
+        public Dictionary<int, List<BuildingCtrl>> PipCountDictionary
+        {
+            get
+            {
+                return _pipCountDict;
+            }
+            set
+            {
+                _pipCountDict = value;
+                FiveStarPositions = GetBuildingPipCount(13);
+                FourStarPositions = GetBuildingPipCount(12);
+                ThreeStarPositions = GetBuildingPipCount(11);
+                TwoStarPositions = GetBuildingPipCount(10);
+            }
+        }
+        private int GetBuildingPipCount(int n)
+        {
+            if (_pipCountDict == null) return 0;
+            if (_pipCountDict.TryGetValue(n, out List<BuildingCtrl> list))
+            {
+                return list.Count;
+            }
+            return 0;
+        }
+
         NewLog _newLog = new NewLog();
 
         private bool _isServiceGame = false;
@@ -54,7 +80,7 @@ namespace Catan10
             }
         }
         public MainPageModel()
-        {            
+        {
             _newLog.PropertyChanged += Log_PropertyChanged;
         }
 
@@ -123,7 +149,7 @@ namespace Catan10
 
 
         public bool EnableRedo => Log.CanRedo;
-        
+
 
 
 
@@ -143,6 +169,73 @@ namespace Catan10
                 }
             }
         }
+
+        int _FiveStarPositions = 0;
+        public int FiveStarPositions
+        {
+            get
+            {
+                return _FiveStarPositions;
+            }
+            set
+            {
+                if (_FiveStarPositions != value)
+                {
+                    _FiveStarPositions = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        int _FourStarPosition = 0;
+        public int FourStarPositions
+        {
+            get
+            {
+                return _FourStarPosition;
+            }
+            set
+            {
+                if (_FourStarPosition != value)
+                {
+                    _FourStarPosition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        int _ThreeStarPosition = 0;
+        public int ThreeStarPositions
+        {
+            get
+            {
+                return _ThreeStarPosition;
+            }
+            set
+            {
+                if (_ThreeStarPosition != value)
+                {
+                    _ThreeStarPosition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        int _TwoStarPosition = 0;
+        public int TwoStarPositions
+        {
+            get
+            {
+                return _TwoStarPosition;
+            }
+            set
+            {
+                if (_TwoStarPosition != value)
+                {
+                    _TwoStarPosition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {

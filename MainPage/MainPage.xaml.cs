@@ -337,7 +337,7 @@ namespace Catan10
 
 
 
-           // _lbGames.SelectedValue = MainPageModel.Log;
+            // _lbGames.SelectedValue = MainPageModel.Log;
             await ResetTiles(true);
             Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.TurnReset();
             _stateStack.Clear();
@@ -1031,828 +1031,830 @@ namespace Catan10
         public void PostLogEntry(PlayerModel player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
 
         {
-        //    if (MainPageModel.Log == null)
-        //    {
-        //        return;
-        //    }
+            //    if (MainPageModel.Log == null)
+            //    {
+            //        return;
+            //    }
 
-        //    if (state == GameState.Unknown)
-        //    {
-        //        state = this.GameStateFromOldLog;
-        //    }
+            //    if (state == GameState.Unknown)
+            //    {
+            //        state = this.GameStateFromOldLog;
+            //    }
 
-        //    MainPageModel.Log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
+            //    MainPageModel.Log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
 
         }
 
-    public Task SetStateAsync(PlayerModel playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
+        public Task SetStateAsync(PlayerModel playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
 
-    {
-        return Task.CompletedTask;
-        //if (MainPageModel.Log == null)
-        //{
-        //    return;
-        //}
-
-        //LogStateTranstion lst = new LogStateTranstion(GameStateFromOldLog, newState);
-        //await MainPageModel.Log.AppendLogLine(new LogEntry(playerData, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, cmn, lineNumber, filePath));
-        //UpdateUiForState(newState);
-
-
-
-    }
-
-
-
-    private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
-    {
-        ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-    }
-
-    private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-    {
-        TextBox tb = sender as TextBox;
-        tb.SelectAll();
-    }
-
-
-    private void OnGameViewControlTapped(object sender, TappedRoutedEventArgs e)
-    {
-        //   Pointer p = await StaticHelpers.DragAsync((UIElement)sender, e);
-    }
-
-    private async void GameViewControlPointerPressed(object sender, PointerRoutedEventArgs pRoutedEvents)
-    {
-        if (_doDragDrop)
         {
-            await StaticHelpers.DragAsync((UIElement)sender, pRoutedEvents);
+            return Task.CompletedTask;
+            //if (MainPageModel.Log == null)
+            //{
+            //    return;
+            //}
+
+            //LogStateTranstion lst = new LogStateTranstion(GameStateFromOldLog, newState);
+            //await MainPageModel.Log.AppendLogLine(new LogEntry(playerData, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, cmn, lineNumber, filePath));
+            //UpdateUiForState(newState);
+
+
+
         }
 
-    }
 
 
-
-    private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
-    {
-        _doDragDrop = _doDragDrop ? false : true;
-    }
-
-    public async Task<bool> ReplayLog(DeprecatedLog log)
-    {
-        try
+        private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            _progress.IsActive = true;
-            _progress.Visibility = Visibility.Visible;
-            await Task.Delay(0);
-            await this.Reset();
-            ResetDataForNewGame();
-            int n = 0;
-            log.State = LogState.Replay;
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+        }
 
-            //
-            //  go through the first time and mark all entries that have been undone.
-            //  this has to be two pass because the log needs to be replayed in order
-            //  marking records as undone means we don't have to replay and then undo them
-            //
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            tb.SelectAll();
+        }
 
 
+        private void OnGameViewControlTapped(object sender, TappedRoutedEventArgs e)
+        {
+            //   Pointer p = await StaticHelpers.DragAsync((UIElement)sender, e);
+        }
 
-            foreach (LogEntry logLine in log.Actions)
+        private async void GameViewControlPointerPressed(object sender, PointerRoutedEventArgs pRoutedEvents)
+        {
+            if (_doDragDrop)
             {
-                n++;
-                if (logLine.LogType == LogType.Undo)
-                {
-                    continue;
-                }
-
-
-
-                switch (logLine.Action)
-                {
-                    case CatanAction.Rolled:
-                        PushRoll(logLine.Number);
-                        break;
-                    case CatanAction.AddResourceCount:
-                        LogResourceCount lrc = logLine.Tag as LogResourceCount;
-                        if (logLine.PlayerData != null)
-                        {
-                            logLine.PlayerData.GameData.PlayerTurnResourceCount.AddResourceCount(lrc.ResourceType, logLine.Number);
-                        }
-                        else
-                        {
-                            Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(lrc.ResourceType, logLine.Number);
-                        }
-
-                        break;
-                    case CatanAction.ChangedState:
-                        break;
-                    case CatanAction.ChangedPlayer:
-                        LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
-                        await AnimateToPlayerIndex(lcp.To, LogType.Replay);
-                        break;
-                    case CatanAction.Dealt:
-                        break;
-                    case CatanAction.CardsLost:
-                        LogCardsLost lcl = logLine.Tag as LogCardsLost;
-                        await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
-                        break;
-                    case CatanAction.CardsLostToSeven:
-                        break;
-                    case CatanAction.MissedOpportunity:
-                        break;
-                    case CatanAction.DoneSupplemental:
-                        break;
-                    case CatanAction.DoneResourceAllocation:
-                        break;
-                    case CatanAction.SetFirstPlayer:
-                        if (logLine.Tag == null)
-                        {
-                            continue;
-                        }
-
-                        LogSetFirstPlayer lsfp = logLine.Tag as LogSetFirstPlayer;
-                        await SetFirst(MainPageModel.PlayingPlayers[lsfp.FirstPlayerIndex]);
-                        break;
-                    case CatanAction.PlayedKnight:
-                    case CatanAction.AssignedBaron:
-                    case CatanAction.AssignedPirateShip:
-                        LogBaronOrPirate lbp = logLine.Tag as LogBaronOrPirate;
-                        await AssignBaronOrKnight(lbp.TargetPlayer, lbp.TargetTile, lbp.TargetWeapon, lbp.Action, LogType.Replay);
-                        break;
-                    case CatanAction.UpdatedRoadState:
-                        LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
-                        if (roadUpdate.NewRoadState != RoadState.Unowned)
-                        {
-                            roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
-                        }
-                        else
-                        {
-                            roadUpdate.Road.Color = Colors.Transparent;
-                        }
-
-                        await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
-                        break;
-                    case CatanAction.UpdateBuildingState:
-
-                        LogBuildingUpdate lsu = (LogBuildingUpdate)logLine.Tag;
-                        if (lsu.OldBuildingState != BuildingState.City)
-                        {
-                            lsu.Building.Owner = CurrentPlayer;
-                        }
-
-                        await lsu.Building.UpdateBuildingState(lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
-                        break;
-                    case CatanAction.AddPlayer:
-                        await AddPlayer(logLine, LogType.Replay);
-                        break;
-                    case CatanAction.RandomizeBoard:
-                        RandomBoardSettings boardSetting = logLine.Tag as RandomBoardSettings;
-                        await _gameView.SetRandomCatanBoard(true, boardSetting);
-                        break;
-
-                    case CatanAction.InitialAssignBaron:
-                        _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
-                        break;
-                    case CatanAction.SelectGame:
-                        _gameView.CurrentGame = _gameView.Games[logLine.Number];
-                        await Task.Delay(0);
-                        break;
-                    case CatanAction.RoadTrackingChanged:
-                        LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
-                        _raceTracking.Deserialize(lrtc.NewState, this);
-                        break;
-                    case CatanAction.ChangedPlayerProperty:
-                        LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
-                        logLine.PlayerData.GameData.SetKeyValue<PlayerGameModel>(lpc.PropertyName, lpc.NewVal);
-                        break;
-                    default:
-                        break;
-                }
-
-
-
+                await StaticHelpers.DragAsync((UIElement)sender, pRoutedEvents);
             }
 
-
-            _gameView.FlipAllAsync(TileOrientation.FaceUp);
         }
-        finally
+
+
+
+        private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            _progress.IsActive = false;
-            _progress.Visibility = Visibility.Collapsed;
-            log.State = LogState.Normal;
-
-        }
-        return true;
-
-
-    }
-
-
-    public async Task<List<TileCtrl>> PlayRollAnimation(int rolledNumber)
-    {
-        List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
-        List<Task> tasks = new List<Task>();
-        foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
-        {
-
-            if (t.Number == rolledNumber)
-
-            {
-                tilesWithNumber.Add(t);
-                if (SavedAppState.Settings.AnimateFade)
-                {
-
-                    t.AnimateFade(1.0, tasks);
-
-                }
-                if (SavedAppState.Settings.RotateTile)
-                {
-                    t.Rotate(180, tasks, true);
-                }
-            }
-            else
-            {
-                if (SavedAppState.Settings.AnimateFade)
-                {
-                    t.AnimateFade(0.25, tasks);
-                }
-            }
+            _doDragDrop = _doDragDrop ? false : true;
         }
 
-        if (tasks.Count > 0)
-        {
-            await Task.WhenAll(tasks.ToArray());
-        }
-
-        //
-        // now make sure we reverse the fade
-        _timer.Start();
-
-        return tilesWithNumber;
-    }
-
-    private async void OnWebSocketTest(object sdr, RoutedEventArgs rea)
-    {
-        /* using (var client = new HttpClient())
-         {
-             client.BaseAddress = new Uri("http://localhost:8080/");
-             client.DefaultRequestHeaders.Accept.Clear();
-             //GET Method  
-             HttpResponseMessage response = await client.GetAsync("/roll/");
-             if (response.IsSuccessStatusCode)
-             {
-                 var resp = await response.Content.ReadAsStringAsync();
-                 Debug.WriteLine(resp);
-             }
-             else
-             {
-                 Debug.WriteLine("Internal server Error");
-             }
-         }
-*/
-
-
-        MessageWebSocket messageWebSocket = new MessageWebSocket();
-        Uri catanRelay = new Uri("ws://localhost/ws");
-
-
-        // In this example, we send/receive a string, so we need to set the MessageType to Utf8.
-        messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
-
-        messageWebSocket.MessageReceived += (sender, args) =>
+        public async Task<bool> ReplayLog(DeprecatedLog log)
         {
             try
             {
-                using (DataReader dataReader = args.GetDataReader())
+                _progress.IsActive = true;
+                _progress.Visibility = Visibility.Visible;
+                await Task.Delay(0);
+                await this.Reset();
+                ResetDataForNewGame();
+                int n = 0;
+                log.State = LogState.Replay;
+
+                //
+                //  go through the first time and mark all entries that have been undone.
+                //  this has to be two pass because the log needs to be replayed in order
+                //  marking records as undone means we don't have to replay and then undo them
+                //
+
+
+
+                foreach (LogEntry logLine in log.Actions)
                 {
-                    dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
-                    string message = dataReader.ReadString(dataReader.UnconsumedBufferLength);
-                    Debug.WriteLine("Message received from MessageWebSocket: " + message);
-                    messageWebSocket.Dispose();
+                    n++;
+                    if (logLine.LogType == LogType.Undo)
+                    {
+                        continue;
+                    }
+
+
+
+                    switch (logLine.Action)
+                    {
+                        case CatanAction.Rolled:
+                            PushRoll(logLine.Number);
+                            break;
+                        case CatanAction.AddResourceCount:
+                            LogResourceCount lrc = logLine.Tag as LogResourceCount;
+                            if (logLine.PlayerData != null)
+                            {
+                                logLine.PlayerData.GameData.PlayerTurnResourceCount.AddResourceCount(lrc.ResourceType, logLine.Number);
+                            }
+                            else
+                            {
+                                Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(lrc.ResourceType, logLine.Number);
+                            }
+
+                            break;
+                        case CatanAction.ChangedState:
+                            break;
+                        case CatanAction.ChangedPlayer:
+                            LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
+                            await AnimateToPlayerIndex(lcp.To, LogType.Replay);
+                            break;
+                        case CatanAction.Dealt:
+                            break;
+                        case CatanAction.CardsLost:
+                            LogCardsLost lcl = logLine.Tag as LogCardsLost;
+                            await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
+                            break;
+                        case CatanAction.CardsLostToSeven:
+                            break;
+                        case CatanAction.MissedOpportunity:
+                            break;
+                        case CatanAction.DoneSupplemental:
+                            break;
+                        case CatanAction.DoneResourceAllocation:
+                            break;
+                        case CatanAction.SetFirstPlayer:
+                            if (logLine.Tag == null)
+                            {
+                                continue;
+                            }
+
+                            LogSetFirstPlayer lsfp = logLine.Tag as LogSetFirstPlayer;
+                            await SetFirst(MainPageModel.PlayingPlayers[lsfp.FirstPlayerIndex]);
+                            break;
+                        case CatanAction.PlayedKnight:
+                        case CatanAction.AssignedBaron:
+                        case CatanAction.AssignedPirateShip:
+                            LogBaronOrPirate lbp = logLine.Tag as LogBaronOrPirate;
+                            await AssignBaronOrKnight(lbp.TargetPlayer, lbp.TargetTile, lbp.TargetWeapon, lbp.Action, LogType.Replay);
+                            break;
+                        case CatanAction.UpdatedRoadState:
+                            LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
+                            if (roadUpdate.NewRoadState != RoadState.Unowned)
+                            {
+                                roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
+                            }
+                            else
+                            {
+                                roadUpdate.Road.Color = Colors.Transparent;
+                            }
+
+                            await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
+                            break;
+                        case CatanAction.UpdateBuildingState:
+
+                            LogBuildingUpdate lsu = (LogBuildingUpdate)logLine.Tag;
+                            if (lsu.OldBuildingState != BuildingState.City)
+                            {
+                                lsu.Building.Owner = CurrentPlayer;
+                            }
+
+                            await lsu.Building.UpdateBuildingState(lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
+                            break;
+                        case CatanAction.AddPlayer:
+                            await AddPlayer(logLine, LogType.Replay);
+                            break;
+                        case CatanAction.RandomizeBoard:
+                            RandomBoardSettings boardSetting = logLine.Tag as RandomBoardSettings;
+                            await _gameView.SetRandomCatanBoard(true, boardSetting);
+                            break;
+
+                        case CatanAction.InitialAssignBaron:
+                            _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
+                            break;
+                        case CatanAction.SelectGame:
+                            _gameView.CurrentGame = _gameView.Games[logLine.Number];
+                            await Task.Delay(0);
+                            break;
+                        case CatanAction.RoadTrackingChanged:
+                            LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
+                            _raceTracking.Deserialize(lrtc.NewState, this);
+                            break;
+                        case CatanAction.ChangedPlayerProperty:
+                            LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
+                            logLine.PlayerData.GameData.SetKeyValue<PlayerGameModel>(lpc.PropertyName, lpc.NewVal);
+                            break;
+                        default:
+                            break;
+                    }
+
+
+
+                }
+
+
+                _gameView.FlipAllAsync(TileOrientation.FaceUp);
+            }
+            finally
+            {
+                _progress.IsActive = false;
+                _progress.Visibility = Visibility.Collapsed;
+                log.State = LogState.Normal;
+
+            }
+            return true;
+
+
+        }
+
+
+        public async Task<List<TileCtrl>> PlayRollAnimation(int rolledNumber)
+        {
+            List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
+            List<Task> tasks = new List<Task>();
+            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
+            {
+
+                if (t.Number == rolledNumber)
+
+                {
+                    tilesWithNumber.Add(t);
+                    if (SavedAppState.Settings.AnimateFade)
+                    {
+
+                        t.AnimateFade(1.0, tasks);
+
+                    }
+                    if (SavedAppState.Settings.RotateTile)
+                    {
+                        t.Rotate(180, tasks, true);
+                    }
+                }
+                else
+                {
+                    if (SavedAppState.Settings.AnimateFade)
+                    {
+                        t.AnimateFade(0.25, tasks);
+                    }
+                }
+            }
+
+            if (tasks.Count > 0)
+            {
+                await Task.WhenAll(tasks.ToArray());
+            }
+
+            //
+            // now make sure we reverse the fade
+            _timer.Start();
+
+            return tilesWithNumber;
+        }
+
+        private async void OnWebSocketTest(object sdr, RoutedEventArgs rea)
+        {
+            /* using (var client = new HttpClient())
+             {
+                 client.BaseAddress = new Uri("http://localhost:8080/");
+                 client.DefaultRequestHeaders.Accept.Clear();
+                 //GET Method  
+                 HttpResponseMessage response = await client.GetAsync("/roll/");
+                 if (response.IsSuccessStatusCode)
+                 {
+                     var resp = await response.Content.ReadAsStringAsync();
+                     Debug.WriteLine(resp);
+                 }
+                 else
+                 {
+                     Debug.WriteLine("Internal server Error");
+                 }
+             }
+    */
+
+
+            MessageWebSocket messageWebSocket = new MessageWebSocket();
+            Uri catanRelay = new Uri("ws://localhost/ws");
+
+
+            // In this example, we send/receive a string, so we need to set the MessageType to Utf8.
+            messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
+
+            messageWebSocket.MessageReceived += (sender, args) =>
+            {
+                try
+                {
+                    using (DataReader dataReader = args.GetDataReader())
+                    {
+                        dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                        string message = dataReader.ReadString(dataReader.UnconsumedBufferLength);
+                        Debug.WriteLine("Message received from MessageWebSocket: " + message);
+                        messageWebSocket.Dispose();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Windows.Web.WebErrorStatus webErrorStatus = Windows.Networking.Sockets.WebSocketError.GetStatus(ex.GetBaseException().HResult);
+                    // Add additional code here to handle exceptions.
+                }
+            };
+            messageWebSocket.Closed += (s, a) =>
+            {
+                Debug.WriteLine("Socket closed");
+            };
+
+            try
+            {
+                await messageWebSocket.ConnectAsync(catanRelay);
+                using (var dataWriter = new DataWriter(messageWebSocket.OutputStream))
+                {
+                    dataWriter.WriteString("This is the first fucking message!");
+                    await dataWriter.StoreAsync();
+                    dataWriter.DetachStream();
                 }
             }
             catch (Exception ex)
             {
                 Windows.Web.WebErrorStatus webErrorStatus = Windows.Networking.Sockets.WebSocketError.GetStatus(ex.GetBaseException().HResult);
-                    // Add additional code here to handle exceptions.
+                // Add additional code here to handle exceptions.
+            }
+
+        }
+
+        private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
+        {
+            await GrowOrShrink(ControlGrid);
+
+        }
+
+        private async Task GrowOrShrink(UIElement el)
+        {
+
+            CompositeTransform ct = el.RenderTransform as CompositeTransform;
+            if (ct.ScaleX == .5)
+            {
+                ct.ScaleX = 1.0;
+                ct.ScaleY = 1.0;
+            }
+            else
+            {
+                ct.ScaleX = .5;
+                ct.ScaleY = .5;
+            }
+
+            await SaveGridLocations();
+        }
+
+        private async void OnGrowOrShrinkRolls(object sender, RoutedEventArgs e)
+        {
+            await GrowOrShrink(RollGrid);
+        }
+
+        private async void OnAssignNumbers(object sender, RoutedEventArgs e)
+        {
+            if (GameStateFromOldLog != GameState.WaitingForStart)
+            {
+                return;
+            }
+
+            bool ret = await StaticHelpers.AskUserYesNoQuestion(string.Format($"Are you sure?  This will likely offend some people and annoy others."), "Yes", "No");
+            if (!ret)
+            {
+                return;
+            }
+
+            await _gameView.SetRandomCatanBoard(true);
+            _randomBoardList.Add(_gameView.RandomBoardSettings);
+
+        }
+
+        private const int SMALLEST_STATE_COUNT = 8; // can only undo to the first resource allocation
+
+
+        private async Task OnWin()
+        {
+
+            bool ret = await StaticHelpers.AskUserYesNoQuestion(string.Format($"Did {CurrentPlayer.PlayerName} really win?"), "Yes", "No");
+            if (ret == true)
+            {
+                try
+                {
+                    await PlayerWon();
+                    // await SetStateAsync(State.PlayerData, GameState.WaitingForNewGame, true);
                 }
-        };
-        messageWebSocket.Closed += (s, a) =>
-        {
-            Debug.WriteLine("Socket closed");
-        };
-
-        try
-        {
-            await messageWebSocket.ConnectAsync(catanRelay);
-            using (var dataWriter = new DataWriter(messageWebSocket.OutputStream))
-            {
-                dataWriter.WriteString("This is the first fucking message!");
-                await dataWriter.StoreAsync();
-                dataWriter.DetachStream();
+                catch (Exception e)
+                {
+                    MessageDialog dlg = new MessageDialog(string.Format($"Error in OnWin\n{e.Message}"));
+                    await dlg.ShowAsync();
+                }
             }
         }
-        catch (Exception ex)
+
+        private async void OnManagePlayers(object sender, RoutedEventArgs e)
         {
-            Windows.Web.WebErrorStatus webErrorStatus = Windows.Networking.Sockets.WebSocketError.GetStatus(ex.GetBaseException().HResult);
-            // Add additional code here to handle exceptions.
-        }
-
-    }
-
-    private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
-    {
-        await GrowOrShrink(ControlGrid);
-
-    }
-
-    private async Task GrowOrShrink(UIElement el)
-    {
-
-        CompositeTransform ct = el.RenderTransform as CompositeTransform;
-        if (ct.ScaleX == .5)
-        {
-            ct.ScaleX = 1.0;
-            ct.ScaleY = 1.0;
-        }
-        else
-        {
-            ct.ScaleX = .5;
-            ct.ScaleY = .5;
-        }
-
-        await SaveGridLocations();
-    }
-
-    private async void OnGrowOrShrinkRolls(object sender, RoutedEventArgs e)
-    {
-        await GrowOrShrink(RollGrid);
-    }
-
-    private async void OnAssignNumbers(object sender, RoutedEventArgs e)
-    {
-        if (GameStateFromOldLog != GameState.WaitingForStart)
-        {
-            return;
-        }
-
-        bool ret = await StaticHelpers.AskUserYesNoQuestion(string.Format($"Are you sure?  This will likely offend some people and annoy others."), "Yes", "No");
-        if (!ret)
-        {
-            return;
-        }
-
-        await _gameView.SetRandomCatanBoard(true);
-        _randomBoardList.Add(_gameView.RandomBoardSettings);
-
-    }
-
-    private const int SMALLEST_STATE_COUNT = 8; // can only undo to the first resource allocation
-
-
-    private async Task OnWin()
-    {
-
-        bool ret = await StaticHelpers.AskUserYesNoQuestion(string.Format($"Did {CurrentPlayer.PlayerName} really win?"), "Yes", "No");
-        if (ret == true)
-        {
-            try
+            PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.AllPlayers, this);
+            if (await dlg.ShowAsync() == ContentDialogResult.Primary)
             {
-                await PlayerWon();
-                // await SetStateAsync(State.PlayerData, GameState.WaitingForNewGame, true);
-            }
-            catch (Exception e)
-            {
-                MessageDialog dlg = new MessageDialog(string.Format($"Error in OnWin\n{e.Message}"));
-                await dlg.ShowAsync();
+                SavedAppState.AllPlayers.Clear();
+                SavedAppState.AllPlayers.AddRange(dlg.PlayerDataList);
+                await SaveGameState(SavedAppState);
             }
         }
-    }
 
-    private async void OnManagePlayers(object sender, RoutedEventArgs e)
-    {
-        PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.AllPlayers, this);
-        if (await dlg.ShowAsync() == ContentDialogResult.Primary)
+        private void SavedGame_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SavedAppState.AllPlayers.Clear();
-            SavedAppState.AllPlayers.AddRange(dlg.PlayerDataList);
-            await SaveGameState(SavedAppState);
+            //try
+            //{
+            //    if (e.AddedItems.Count > 0)
+            //    {
+            //        DeprecatedLog newLog = e.AddedItems[0] as DeprecatedLog;
+            //        if (MainPageModel.Log == newLog)
+            //        {
+            //            return;
+            //        }
+
+            //        if (await StaticHelpers.AskUserYesNoQuestion($"Switch to {newLog.File.DisplayName}?", "Yes", "No"))
+            //        {
+            //            MainPageModel.Log = newLog;
+            //            //   await newLog.Parse(this);
+            //            // TODO:...
+            //            await ReplayLog(newLog);
+            //            UpdateUiForState(MainPageModel.Log.Last().GameState);
+            //        }
+            //        else
+            //        {
+            //            _lbGames.SelectedItem = MainPageModel.Log;
+            //        }
+
+
+            //    }
+            //}
+            //catch (Exception exception)
+            //{
+            //    MessageDialog dlg = new MessageDialog($"Error loading file {e.AddedItems[0]}\nMessage:\n{exception.Message}");
+            //}
+
+
         }
-    }
 
-    private void SavedGame_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        //try
-        //{
-        //    if (e.AddedItems.Count > 0)
-        //    {
-        //        DeprecatedLog newLog = e.AddedItems[0] as DeprecatedLog;
-        //        if (MainPageModel.Log == newLog)
-        //        {
-        //            return;
-        //        }
-
-        //        if (await StaticHelpers.AskUserYesNoQuestion($"Switch to {newLog.File.DisplayName}?", "Yes", "No"))
-        //        {
-        //            MainPageModel.Log = newLog;
-        //            //   await newLog.Parse(this);
-        //            // TODO:...
-        //            await ReplayLog(newLog);
-        //            UpdateUiForState(MainPageModel.Log.Last().GameState);
-        //        }
-        //        else
-        //        {
-        //            _lbGames.SelectedItem = MainPageModel.Log;
-        //        }
-
-
-        //    }
-        //}
-        //catch (Exception exception)
-        //{
-        //    MessageDialog dlg = new MessageDialog($"Error loading file {e.AddedItems[0]}\nMessage:\n{exception.Message}");
-        //}
-
-
-    }
-
-    private void OnCloseSavedGames(object sender, RoutedEventArgs e)
-    {
-        _savedGameGrid.Visibility = Visibility.Collapsed;
-    }
-    /// <summary>
-    ///     This will go through all the buildings and find the ones that are
-    ///        1. Buildable
-    ///        2. in the "none" state (e.g. not already shown in some way) 
-    ///      and then have them show the PipGroup.  
-    ///      you have to do this every time because people might have built in locations that change the PipGroup
-    /// </summary>
-    private int _showPipGroupIndex = 0;
-    private void OnShowPips(object sender, RoutedEventArgs e)
-    {
-
-
-
-
-    }
-
-    private async void OnClearPips(object sender, RoutedEventArgs e)
-    {
-
-        await HideAllPipEllipses();
-        _showPipGroupIndex = 0;
-
-    }
-
-
-    private void OnRedoPossible(bool redo)
-    {
-        EnableRedo = redo;
-    }
-
-    private async Task PickSettlementsAndRoads()
-    {
-        while (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
+        private void OnCloseSavedGames(object sender, RoutedEventArgs e)
         {
-            await SetBuildingAndRoad();
-            // move to next
-            GameState oldState = GameStateFromOldLog;
-            await NextState();
-            //
-            //  we do it this way because the last player goes twice in the same state
-            //
-            if (oldState == GameState.AllocateResourceForward && GameStateFromOldLog == GameState.AllocateResourceReverse)
+            _savedGameGrid.Visibility = Visibility.Collapsed;
+        }
+        /// <summary>
+        ///     This will go through all the buildings and find the ones that are
+        ///        1. Buildable
+        ///        2. in the "none" state (e.g. not already shown in some way) 
+        ///      and then have them show the PipGroup.  
+        ///      you have to do this every time because people might have built in locations that change the PipGroup
+        /// </summary>
+        private int _showPipGroupIndex = 0;
+        private void OnShowPips(object sender, RoutedEventArgs e)
+        {
+
+
+
+
+        }
+
+        private async void OnClearPips(object sender, RoutedEventArgs e)
+        {
+
+            await HideAllPipEllipses();
+            _showPipGroupIndex = 0;
+
+        }
+
+
+        private void OnRedoPossible(bool redo)
+        {
+            EnableRedo = redo;
+        }
+
+        private async Task PickSettlementsAndRoads()
+        {
+            while (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
             {
                 await SetBuildingAndRoad();
+                // move to next
+                GameState oldState = GameStateFromOldLog;
+                await NextState();
+                //
+                //  we do it this way because the last player goes twice in the same state
+                //
+                if (oldState == GameState.AllocateResourceForward && GameStateFromOldLog == GameState.AllocateResourceReverse)
+                {
+                    await SetBuildingAndRoad();
+                }
             }
         }
-    }
 
-    private async Task SetBuildingAndRoad()
-    {
-        // pick a tile with the highest pips and put a settlement on it
-        var building = GetHighestPipsBuilding();
-        await building.UpdateBuildingState(building.BuildingState, BuildingState.Settlement);
-
-        // pick a Random Road
-        var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
-        road.Color = CurrentPlayer.GameData.PlayerColor;
-        await UpdateRoadState(road, road.RoadState, RoadState.Road, LogType.Normal);
-    }
-
-    private BuildingCtrl GetHighestPipsBuilding()
-    {
-        Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = GetBuildingByPips();
-        for (int i = 0; i < 14; i++)
+        private async Task SetBuildingAndRoad()
         {
-            if (dictPipsToBuildings.TryGetValue(i, out var buildings) == true)
+            // pick a tile with the highest pips and put a settlement on it
+            var building = GetHighestPipsBuilding();
+            await building.UpdateBuildingState(building.BuildingState, BuildingState.Settlement);
+
+            // pick a Random Road
+            var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
+            road.Color = CurrentPlayer.GameData.PlayerColor;
+            await UpdateRoadState(road, road.RoadState, RoadState.Road, LogType.Normal);
+        }
+
+        private BuildingCtrl GetHighestPipsBuilding()
+        {
+            Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = GetBuildingByPips();
+            for (int i = 0; i < 14; i++)
             {
-                foreach (var b in buildings)
+                if (dictPipsToBuildings.TryGetValue(i, out var buildings) == true)
                 {
-                    if (b.BuildingState != BuildingState.Settlement && b.BuildingState != BuildingState.City)
+                    foreach (var b in buildings)
                     {
-                        if (ValidateBuildingLocation(b, out bool showError))
-                            return b;
+                        if (b.BuildingState != BuildingState.Settlement && b.BuildingState != BuildingState.City)
+                        {
+                            if (ValidateBuildingLocation(b, out bool showError))
+                                return b;
+                        }
                     }
                 }
             }
+
+            return null;
         }
 
-        return null;
-    }
-
-    public static string CreateSaveFileName(string Description)
-    {
-        DateTime dt = DateTime.Now;
-
-        string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
-        string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
-
-        return string.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
-    }
-    /// <summary>
-    ///     return a Dictionary of PipGroup to a List of Building that have that number of Pips
-    /// </summary>
-    /// <returns></returns>
-    private Dictionary<int, List<BuildingCtrl>> GetBuildingByPips()
-    {
-        List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
-        buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
-        Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = new Dictionary<int, List<BuildingCtrl>>();
-        //
-        //  first a map of Pips -> building that have that #of Pips
-        foreach (BuildingCtrl building in buildingsOrderedByPips)
+        public static string CreateSaveFileName(string Description)
         {
-            if (!dictPipsToBuildings.TryGetValue(building.Pips, out List<BuildingCtrl> list))
+            DateTime dt = DateTime.Now;
+
+            string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
+            string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
+
+            return string.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
+        }
+        /// <summary>
+        ///     return a Dictionary of PipGroup to a List of Building that have that number of Pips
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<int, List<BuildingCtrl>> GetBuildingByPips()
+        {
+            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
+            buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+            Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = new Dictionary<int, List<BuildingCtrl>>();
+            //
+            //  first a map of Pips -> building that have that #of Pips
+            foreach (BuildingCtrl building in buildingsOrderedByPips)
             {
+                if (!dictPipsToBuildings.TryGetValue(building.Pips, out List<BuildingCtrl> list))
+                {
 
-                list = new List<BuildingCtrl>();
-                dictPipsToBuildings[building.Pips] = list;
+                    list = new List<BuildingCtrl>();
+                    dictPipsToBuildings[building.Pips] = list;
 
+                }
+                list.Add(building);
             }
-            list.Add(building);
-        }
-        //
-        //  we now have a map of Pips to Buildings, but we want PipGroup to building
-        Dictionary<int, List<BuildingCtrl>> pipGroupToBuildings = new Dictionary<int, List<BuildingCtrl>>();
-        int pipGroup = 0;
-        for (int i = 13; i > 0; i--) // can't have >13 pips in Catan
-        {
-            if (dictPipsToBuildings.TryGetValue(i, out List<BuildingCtrl> list))
+            //
+            //  we now have a map of Pips to Buildings, but we want PipGroup to building
+            Dictionary<int, List<BuildingCtrl>> pipGroupToBuildings = new Dictionary<int, List<BuildingCtrl>>();
+            int pipGroup = 0;
+            for (int i = 13; i > 0; i--) // can't have >13 pips in Catan
             {
-                pipGroupToBuildings[pipGroup] = list;
-                pipGroup++;
-            }
-        }
-
-        return pipGroupToBuildings;
-
-    }
-
-    private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
-    int _randomBoardListIndex = 0;
-    private async void PickAGoodBoard(PointerRoutedEventArgs e)
-    {
-
-
-        if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
-        {
-            _randomBoardListIndex++;
-            if (_randomBoardListIndex >= _randomBoardList.Count)
-            {
-
-
-                //
-                //  get new ones
-                await _gameView.SetRandomCatanBoard(true);
-
-                //
-                //  save the existing settings
-                _randomBoardList.Add(_gameView.RandomBoardSettings);
-                _randomBoardListIndex = _randomBoardList.Count - 1;
-
-
+                if (dictPipsToBuildings.TryGetValue(i, out List<BuildingCtrl> list))
+                {
+                    pipGroupToBuildings[pipGroup] = list;
+                    pipGroup++;
+                }
             }
 
-        }
-        else
-        {
-            //wants to see what we had before
-            _randomBoardListIndex--;
-            if (_randomBoardListIndex < 0)
-            {
-                _randomBoardListIndex = 0;
-            }
+            return pipGroupToBuildings;
+
         }
 
-        await _gameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
-    }
-
-    private TradeResources GetPipCount()
-    {
-        TradeResources tr = new TradeResources();
-        foreach (var tile in _gameView.AllTiles)
+        private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
+        int _randomBoardListIndex = 0;
+        private async void PickAGoodBoard(PointerRoutedEventArgs e)
         {
-            switch (tile.ResourceType)
-            {
-                case ResourceType.Sheep:
-                    tr.Sheep += tile.Pips;
-                    break;
-                case ResourceType.Wood:
-                    tr.Wood += tile.Pips;
-                    break;
-                case ResourceType.Ore:
-                    tr.Ore += tile.Pips;
-                    break;
-                case ResourceType.Wheat:
-                    tr.Wheat += tile.Pips;
-                    break;
-                case ResourceType.Brick:
-                    tr.Brick += tile.Pips;
-                    break;
-                case ResourceType.GoldMine:
-                    break;
-                case ResourceType.Desert:
-                    break;
-                case ResourceType.Back:
-                    break;
-                case ResourceType.None:
-                    break;
-                case ResourceType.Sea:
-                    break;
-                default:
-                    break;
-            }
-        }
 
-        return tr;
-    }
-
-    DateTime _dt = DateTime.Now;
-
-    /// <summary>
-    ///     Unlike previsous implementations, the use the Action/Undo stacks in the log to store the random boards.
-    /// </summary>
-    /// <param name="e"></param>
-    /// <returns></returns>
-    private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
-    {
-
-        if (TheHuman.PlayerName != MainPageModel.ServiceData.SessionInfo.Creator) return;
-
-        if (MainPageModel.Log.GameState == GameState.WaitingForStart)
-        {
 
             if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
-
-
             {
-                if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
-                {
-                    await MainPageModel.Log.Redo();
-                }
-                else
+                _randomBoardListIndex++;
+                if (_randomBoardListIndex >= _randomBoardList.Count)
                 {
 
-                    RandomBoardLog rbl = await RandomBoardLog.RandomizeBoard(this, 0);
-                    Contract.Assert(rbl != null);
+
+                    //
+                    //  get new ones
+                    await _gameView.SetRandomCatanBoard(true);
+
+                    //
+                    //  save the existing settings
+                    _randomBoardList.Add(_gameView.RandomBoardSettings);
+                    _randomBoardListIndex = _randomBoardList.Count - 1;
+
+
                 }
 
             }
             else
             {
-                if (MainPageModel.Log.PeekAction.Action == CatanAction.RandomizeBoard)
+                //wants to see what we had before
+                _randomBoardListIndex--;
+                if (_randomBoardListIndex < 0)
                 {
-                    await MainPageModel.Log.Undo();
+                    _randomBoardListIndex = 0;
                 }
             }
+
+            await _gameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
         }
 
-        PipCount = GetPipCount();
-        ShowBoardMeasurement = true;
-
-    }
-
-    private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
-    {
-        DateTime dt = DateTime.Now;
-        TimeSpan diff = DateTime.Now - _dt;
-        if (diff.TotalSeconds < 0.1)
+        private TradeResources GetPipCount()
         {
-            this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
-            return;
-        }
-
-        _dt = dt;
-
-        if (MainPageModel.IsServiceGame)
-        {
-            await ScrollMouseWheelInServiceGame(e);
-            return;
-        }
-
-        if (GameStateFromOldLog == GameState.WaitingForStart)
-        {
-            PickAGoodBoard(e);
-            return;
-        }
-
-        if (GameStateFromOldLog != GameState.AllocateResourceForward && GameStateFromOldLog != GameState.AllocateResourceReverse && !MainPageModel.IsServiceGame)
-        {
-            return;
-        }
-
-        int showPipGroupIndex = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
-
-        if (showPipGroupIndex >= 0)
-        {
-            showPipGroupIndex = 1;
-        }
-        else
-        {
-            showPipGroupIndex = -1;
-        }
-
-        _showPipGroupIndex += showPipGroupIndex;
-
-
-        if (_showPipGroupIndex <= 0)
-        {
-
-            _showPipGroupIndex = 0;
-
-        }
-        Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = GetBuildingByPips();
-        if (showPipGroupIndex < 0)
-        {
-            //
-            //  if we went "down" turn off Pips on the last group we showed
-            for (int hideIndex = _showPipGroupIndex; hideIndex < dictPipsToBuildings.Count; hideIndex++)
+            TradeResources tr = new TradeResources();
+            foreach (var tile in _gameView.AllTiles)
             {
-                List<BuildingCtrl> list = dictPipsToBuildings[hideIndex];
-                if (list.Count == 0)
+                switch (tile.ResourceType)
                 {
-                    Debug.WriteLine($"{hideIndex} doesn't have any buildings");
+                    case ResourceType.Sheep:
+                        tr.Sheep += tile.Pips;
+                        break;
+                    case ResourceType.Wood:
+                        tr.Wood += tile.Pips;
+                        break;
+                    case ResourceType.Ore:
+                        tr.Ore += tile.Pips;
+                        break;
+                    case ResourceType.Wheat:
+                        tr.Wheat += tile.Pips;
+                        break;
+                    case ResourceType.Brick:
+                        tr.Brick += tile.Pips;
+                        break;
+                    case ResourceType.GoldMine:
+                        break;
+                    case ResourceType.Desert:
+                        break;
+                    case ResourceType.Back:
+                        break;
+                    case ResourceType.None:
+                        break;
+                    case ResourceType.Sea:
+                        break;
+                    default:
+                        break;
                 }
-                foreach (BuildingCtrl building in list)
+            }
+
+            return tr;
+        }
+
+        DateTime _dt = DateTime.Now;
+
+        /// <summary>
+        ///     Unlike previsous implementations, the use the Action/Undo stacks in the log to store the random boards.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
+        {
+
+            if (TheHuman.PlayerName != MainPageModel.ServiceData.SessionInfo.Creator) return;
+
+            if (MainPageModel.Log.GameState == GameState.WaitingForStart)
+            {
+
+                if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
+
+
                 {
-                    if (building.BuildingState == BuildingState.Pips)
+                    if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
                     {
-                        await building.UpdateBuildingState(building.BuildingState, BuildingState.None, LogType.DoNotLog);
+                        await MainPageModel.Log.Redo();
+                    }
+                    else
+                    {
+
+                        RandomBoardLog rbl = await RandomBoardLog.RandomizeBoard(this, 0);
+                        Contract.Assert(rbl != null);
+                    }
+
+                }
+                else
+                {
+                    if (MainPageModel.Log.PeekAction.Action == CatanAction.RandomizeBoard)
+                    {
+                        await MainPageModel.Log.Undo();
                     }
                 }
             }
 
-            return;
+            PipCount = GetPipCount();
+            MainPageModel.PipCountDictionary = GetBuildingByPips();
+         
+            ShowBoardMeasurement = true;
+
         }
 
-        if (_showPipGroupIndex > dictPipsToBuildings.Count - 1)
+        private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {
-            _showPipGroupIndex = dictPipsToBuildings.Count - 1;
+            DateTime dt = DateTime.Now;
+            TimeSpan diff = DateTime.Now - _dt;
+            if (diff.TotalSeconds < 0.1)
+            {
+                this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
+                return;
+            }
+
+            _dt = dt;
+
+            if (MainPageModel.IsServiceGame)
+            {
+                await ScrollMouseWheelInServiceGame(e);
+                return;
+            }
+
+            if (GameStateFromOldLog == GameState.WaitingForStart)
+            {
+                PickAGoodBoard(e);
+                return;
+            }
+
+            if (GameStateFromOldLog != GameState.AllocateResourceForward && GameStateFromOldLog != GameState.AllocateResourceReverse && !MainPageModel.IsServiceGame)
+            {
+                return;
+            }
+
+            int showPipGroupIndex = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
+
+            if (showPipGroupIndex >= 0)
+            {
+                showPipGroupIndex = 1;
+            }
+            else
+            {
+                showPipGroupIndex = -1;
+            }
+
+            _showPipGroupIndex += showPipGroupIndex;
+
+
+            if (_showPipGroupIndex <= 0)
+            {
+
+                _showPipGroupIndex = 0;
+
+            }
+            Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = GetBuildingByPips();
+            if (showPipGroupIndex < 0)
+            {
+                //
+                //  if we went "down" turn off Pips on the last group we showed
+                for (int hideIndex = _showPipGroupIndex; hideIndex < dictPipsToBuildings.Count; hideIndex++)
+                {
+                    List<BuildingCtrl> list = dictPipsToBuildings[hideIndex];
+                    if (list.Count == 0)
+                    {
+                        Debug.WriteLine($"{hideIndex} doesn't have any buildings");
+                    }
+                    foreach (BuildingCtrl building in list)
+                    {
+                        if (building.BuildingState == BuildingState.Pips)
+                        {
+                            await building.UpdateBuildingState(building.BuildingState, BuildingState.None, LogType.DoNotLog);
+                        }
+                    }
+                }
+
+                return;
+            }
+
+            if (_showPipGroupIndex > dictPipsToBuildings.Count - 1)
+            {
+                _showPipGroupIndex = dictPipsToBuildings.Count - 1;
+            }
+
+            for (int i = 0; i < _showPipGroupIndex; i++)
+            {
+                List<BuildingCtrl> list = dictPipsToBuildings[i];
+                if (list.Count == 0)
+                {
+                    Debug.WriteLine($"going up and no buildigs for {i}");
+                }
+                foreach (BuildingCtrl building in list)
+                {
+
+                    if (building.Pips == 0)  // throw out the ones that have no pips
+                    {
+                        Debug.WriteLine("Buildings.pips == 0");
+                        building.PipGroup = -1;
+                        continue; // outside the main map or a desert next to nothing
+                    }
+
+                    if (ValidateBuildingLocation(building, out bool showerror) == false) // throw out the ones you can't build in
+                    {
+                        continue;
+                    }
+
+                    if (building.BuildingState != BuildingState.None)
+                    {
+                        continue;  // throw out the non-empty ones
+                    }
+
+                    building.PipGroup = i;
+                    await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.DoNotLog);
+                }
+            }
         }
 
-        for (int i = 0; i < _showPipGroupIndex; i++)
+        private async void PickSettlementsAndRoads(object sender, RoutedEventArgs e)
         {
-            List<BuildingCtrl> list = dictPipsToBuildings[i];
-            if (list.Count == 0)
-            {
-                Debug.WriteLine($"going up and no buildigs for {i}");
-            }
-            foreach (BuildingCtrl building in list)
-            {
 
-                if (building.Pips == 0)  // throw out the ones that have no pips
-                {
-                    Debug.WriteLine("Buildings.pips == 0");
-                    building.PipGroup = -1;
-                    continue; // outside the main map or a desert next to nothing
-                }
-
-                if (ValidateBuildingLocation(building, out bool showerror) == false) // throw out the ones you can't build in
-                {
-                    continue;
-                }
-
-                if (building.BuildingState != BuildingState.None)
-                {
-                    continue;  // throw out the non-empty ones
-                }
-
-                building.PipGroup = i;
-                await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.DoNotLog);
-            }
+            await PickSettlementsAndRoads();
         }
+
+
     }
-
-    private async void PickSettlementsAndRoads(object sender, RoutedEventArgs e)
-    {
-
-        await PickSettlementsAndRoads();
-    }
-
-
-}
 }
 
 
