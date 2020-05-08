@@ -92,7 +92,7 @@ namespace Catan10
 
         //
         //  this is the name of the grids in MainPage.xaml that we want to store and retrieve locations
-        private readonly string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView", "Grid_PrivateData" };
+        private readonly string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView", "Grid_PrivateData", "Grid_BoardMeasurement" };
 
 
 

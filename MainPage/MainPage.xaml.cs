@@ -36,14 +36,14 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-       
+
         public SavedState SavedAppState { get; set; } = null;
         private int _supplementalStartIndex = -1;
         public static readonly string SAVED_GAME_EXTENSION = ".log";
         public const string PlayerDataFile = "catansettings.json";
-        
+
         public ObservableCollection<Log> SavedGames { get; set; } = new ObservableCollection<Log>();
-        
+
         private readonly DispatcherTimer _timer = new DispatcherTimer();  // flips tiles back to Opacaticy = 0
         private bool _doDragDrop = false;   // this lets you double tap a map and then move it around
         private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
@@ -73,7 +73,7 @@ namespace Catan10
             this.DataContext = this;
             _timer.Tick += AsyncReverseFade;
             _raceTracking = new RoadRaceTracking(this);
-            Ctrl_PlayerResourceCountCtrl.Log = this;            
+            Ctrl_PlayerResourceCountCtrl.Log = this;
         }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
@@ -184,7 +184,7 @@ namespace Catan10
             }
             try
             {
-               
+
                 state = CatanProxy.Deserialize<SavedState>(content);
 
                 _timer.Interval = TimeSpan.FromSeconds(state.Settings.FadeSeconds);
@@ -215,7 +215,7 @@ namespace Catan10
             if (SavedAppState == null || SavedAppState.AllPlayers.Count == 0)
             {
                 var list = await GetDefaultUsers();
-                
+
                 SavedAppState = new SavedState()
                 {
                     AllPlayers = list,
@@ -228,7 +228,7 @@ namespace Catan10
                 Debug.Assert(SavedAppState != null);
             }
 
-            
+
 
             foreach (var player in SavedAppState.AllPlayers)
             {
@@ -348,7 +348,7 @@ namespace Catan10
             }
 
             _raceTracking.Reset();
-            
+
             //  await LoadPlayerData();
 
         }
@@ -381,8 +381,8 @@ namespace Catan10
             await SetStateAsync(null, GameState.WaitingForStart, true);
             await AnimateToPlayerIndex(_currentPlayerIndex);
 
-          //  var model = StartGameController.StartGame(this, selectedIndex, GameContainer.RandomBoardSettings, MainPageModel.PlayingPlayers);
-          //  VerifyRoundTrip<StartGamLog>(model);
+            //  var model = StartGameController.StartGame(this, selectedIndex, GameContainer.RandomBoardSettings, MainPageModel.PlayingPlayers);
+            //  VerifyRoundTrip<StartGamLog>(model);
             //NewLog.PushAction(model);
         }
 
@@ -551,7 +551,7 @@ namespace Catan10
                         await OnNewGame();
                         break;
                     case GameState.WaitingForStart:
-                        await CopyScreenShotToClipboard(_gameView);                        
+                        await CopyScreenShotToClipboard(_gameView);
                         await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, true);
                         break;
                     case GameState.AllocateResourceForward:
@@ -1087,7 +1087,7 @@ namespace Catan10
             }
         }
 
-        
+
 
         public GameState GameState
         {
@@ -1301,7 +1301,7 @@ namespace Catan10
                             RandomBoardSettings boardSetting = logLine.Tag as RandomBoardSettings;
                             await _gameView.SetRandomCatanBoard(true, boardSetting);
                             break;
-                        
+
                         case CatanAction.InitialAssignBaron:
                             _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
                             break;
@@ -1706,7 +1706,7 @@ namespace Catan10
         int _randomBoardListIndex = 0;
         private async void PickAGoodBoard(PointerRoutedEventArgs e)
         {
-            
+
 
             if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
             {
@@ -1740,6 +1740,47 @@ namespace Catan10
 
             await _gameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
         }
+
+        private TradeResources GetPipCount()
+        {
+            TradeResources tr = new TradeResources();
+            foreach (var tile in _gameView.AllTiles)
+            {
+                switch (tile.ResourceType)
+                {
+                    case ResourceType.Sheep:
+                        tr.Sheep += tile.Pips;
+                        break;
+                    case ResourceType.Wood:
+                        tr.Wood += tile.Pips;
+                        break;
+                    case ResourceType.Ore:
+                        tr.Ore += tile.Pips;
+                        break;
+                    case ResourceType.Wheat:
+                        tr.Wheat += tile.Pips;
+                        break;
+                    case ResourceType.Brick:
+                        tr.Brick += tile.Pips;
+                        break;
+                    case ResourceType.GoldMine:
+                        break;
+                    case ResourceType.Desert:
+                        break;
+                    case ResourceType.Back:
+                        break;
+                    case ResourceType.None:
+                        break;
+                    case ResourceType.Sea:
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return tr;
+        }
+
         DateTime _dt = DateTime.Now;
 
         /// <summary>
@@ -1780,7 +1821,8 @@ namespace Catan10
                 }
             }
 
-            
+            PipCount = GetPipCount();
+            ShowBoardMeasurement = true;
 
         }
 
@@ -1795,7 +1837,7 @@ namespace Catan10
             }
 
             _dt = dt;
-            
+
             if (MainPageModel.IsServiceGame)
             {
                 await ScrollMouseWheelInServiceGame(e);
@@ -1807,7 +1849,7 @@ namespace Catan10
                 PickAGoodBoard(e);
                 return;
             }
-            
+
             if (GameState != GameState.AllocateResourceForward && GameState != GameState.AllocateResourceReverse && !MainPageModel.IsServiceGame)
             {
                 return;

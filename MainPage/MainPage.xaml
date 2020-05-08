@@ -368,10 +368,11 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
+
         <Grid Name="Grid_PrivateData" Grid.Row="1" Grid.RowSpan="10" Width="500"
             Height="340" HorizontalAlignment="Left" VerticalAlignment="Top"
-            Visibility="{x:Bind MainPageModel.IsServiceGame, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-            BorderBrush="{Binding Path=TheHuman.GameData.ForegroundBrush, Mode=OneWay, FallbackValue=HotPink}"
+            Visibility="{x:Bind ShowBoardMeasurement, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+            BorderBrush="{StaticResource bmMaple}"
             Background="{StaticResource bmKnight}"
             CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
 
@@ -390,6 +391,33 @@
                 FontSize="22" FontStyle="Normal" FontWeight="Normal" />
             <local:PrivateDataCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 Player="{Binding Path=TheHuman, Mode=OneWay}"
+                CornerRadius="10" />
+
+
+        </Grid>
+
+        <Grid Name="Grid_BoardMeasurement" Grid.Row="1" Grid.RowSpan="10" Width="500"
+            Height="200" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Visibility="{x:Bind MainPageModel.IsServiceGame, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+            BorderBrush="{StaticResource bmMaple}"
+            Background="{StaticResource bmKnight}"
+            CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
+
+            <Grid.RenderTransform>
+                <CompositeTransform />
+            </Grid.RenderTransform>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="10*" />
+            </Grid.RowDefinitions>
+            <Rectangle Grid.Row="0" Fill="{Binding FallbackValue=HotPink, Mode=OneWay, Path=TheHuman.GameData.BackgroundBrush}" />
+            <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Text="Pip Count"
+                Style="{StaticResource HeaderTextBlockStyle}"
+                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}"
+                FontSize="22" FontStyle="Normal" FontWeight="Normal" />
+            <local:BoardMeasurementCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                PipCount="{Binding Path=PipCount, Mode=OneWay}"
                 CornerRadius="10" />
 
 

@@ -64,7 +64,7 @@ namespace Catan10
             }
             finally
             {
-                PrintLog();
+               // PrintLog();
 
             }
         }
@@ -113,7 +113,7 @@ namespace Catan10
             }
             finally
             {
-                PrintLog();
+             //   PrintLog();
 
             }
 
@@ -173,7 +173,7 @@ namespace Catan10
             }
             finally
             {
-                PrintLog();
+              //  PrintLog();
 
             }
 
@@ -197,13 +197,18 @@ namespace Catan10
             }
 
             MessageLog.Add(message);
+        }
+
+        public void DumpLogRecords()
+        {
             MessageLog.ForEach((m) =>
             {
                 LogHeader logHeader = (LogHeader)m.Data;
 
                 this.TraceMessage($"Messages: [Sequence={m.Sequence}]\t[id={logHeader.LogId}][Origin={m.Origin}]\t" +
                                   $"[Action={logHeader.Action}]\tPlayer=[{logHeader.PlayerName}]\t[LogType={logHeader.LogType}]");
-            });            
+            });
+        }
     }
-}
+
 }
