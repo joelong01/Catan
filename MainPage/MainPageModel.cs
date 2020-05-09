@@ -35,36 +35,62 @@ namespace Catan10
 
     public class MainPageModel : INotifyPropertyChanged
     {
-        public ServiceData ServiceData { get; } = new ServiceData();
-        bool _EnableUiInteraction = true;
-        Dictionary<int, List<BuildingCtrl>> _pipCountDict = null;
-        public Dictionary<int, List<BuildingCtrl>> PipCountDictionary
+        readonly string[] _StateMessages = new string[] {
+            "Uninitialized",        // 0    Uninitialized,                      
+            "New Game",             // 1    WaitingForNewGame,                  
+            "Starting...",          // 2    Starting,                           
+            "Dealing",              // 3    Dealing,                            
+            "Start Game",           // 4    WaitingForStart,                    
+            "Next When Done",       // 5    AllocResourceForward,            
+            "Next When Done",       // 6    AllocateResourceReverse,            
+            "",                     // 7    DoneResourceAllocation,             
+            "Enter Roll",           // 8    WaitingForRoll,                     
+            "Targeted",             // 9    Targeted,                           
+            "Cards Lost",           // 10    LostToCardsLikeMonopoly,            
+            "Supplemental?",        // 11    Supplemental,                       
+            "Done",                 // 12    DoneSupplemental,                   
+            "NextWhenDone",         // 13    WaitingForNext,                     
+            "Cards Lost",           // 14    LostCardsToSeven,                   
+            "Cards Lost",           // 15    MissedOpportunity,                  
+            "Pick Game",            // 16    GamePicked,                         
+            "Move Baron or Ship",   // 17    MustMoveBaron  
+            "",                     // 18    Unknown
+            "Roll For Order"        // 19     WaitingToRollForPosition
+
+
+        };
+
+        string _StateMessage = "Uninitialized";
+        public string StateMessage
         {
             get
             {
-                return _pipCountDict;
+                return _StateMessage;
             }
             set
             {
-                _pipCountDict = value;
-                FiveStarPositions = GetBuildingPipCount(13);
-                FourStarPositions = GetBuildingPipCount(12);
-                ThreeStarPositions = GetBuildingPipCount(11);
-                TwoStarPositions = GetBuildingPipCount(10);
+                if (_StateMessage != value)
+                {
+                    _StateMessage = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
-        private int GetBuildingPipCount(int n)
+
+        public ServiceData ServiceData { get; } = new ServiceData();
+        bool _EnableUiInteraction = true;
+
+        public void SetPipCount(int[] value)
         {
-            if (_pipCountDict == null) return 0;
-            if (_pipCountDict.TryGetValue(n, out List<BuildingCtrl> list))
-            {
-                return list.Count;
-            }
-            return 0;
+            FiveStarPositions = value[0];
+            FourStarPositions = value[1];
+            ThreeStarPositions = value[2];
+            TwoStarPositions = value[3];
+
         }
 
-        NewLog _newLog = new NewLog();
 
+       
         private bool _isServiceGame = false;
 
         public bool IsServiceGame
@@ -81,7 +107,7 @@ namespace Catan10
         }
         public MainPageModel()
         {
-            _newLog.PropertyChanged += Log_PropertyChanged;
+           
         }
 
         private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -90,6 +116,8 @@ namespace Catan10
             // this.TraceMessage($"Log_PropertyChanged: [Property={e.PropertyName}] [GameState={_Log.GameState}");
             NotifyPropertyChanged("EnableNextButton");
             NotifyPropertyChanged("EnableRedo");
+
+            StateMessage = _StateMessages[(int)_newLog.GameState];
 
         }
 
@@ -137,10 +165,11 @@ namespace Catan10
         {
             get
             {
+                if (Log == null) return true;
                 GameState state = Log.GameState;
                 return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart ||
                         state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
-                        state == GameState.DoneResourceAllocation));
+                        state == GameState.DoneResourceAllocation || state == GameState.WaitingToRollForPosition));
 
             }
         }
@@ -148,11 +177,17 @@ namespace Catan10
 
 
 
-        public bool EnableRedo => Log.CanRedo;
-
-
-
-
+        public bool EnableRedo
+        {
+            get
+            {
+                if (Log == null) return false;
+                
+                return Log.CanRedo;
+            }
+        }
+        
+        NewLog _newLog = null;
         [JsonIgnore]
         public NewLog Log
         {
@@ -164,7 +199,8 @@ namespace Catan10
             {
                 if (_newLog != value)
                 {
-                    _newLog = value;
+                   _newLog = value;
+                    _newLog.LogChanged += Log_PropertyChanged;
                     NotifyPropertyChanged();
                 }
             }

@@ -562,7 +562,7 @@ namespace Catan10
 
 
             List<Task> list = new List<Task>();
-            double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
+            double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Ultra);
             int i = 0;
             foreach (TileGroup tileGroup in _currentHexPanel.TileSets)
             {

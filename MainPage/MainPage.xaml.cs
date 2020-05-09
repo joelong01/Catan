@@ -490,6 +490,8 @@ namespace Catan10
                 {
                     case GameState.Dealing: // a state just to be undone...
                         break;
+                    case GameState.WaitingToRollForPosition:
+                        break;
                     case GameState.WaitingForNewGame:
                         await OnNewGame();
                         break;
@@ -796,7 +798,7 @@ namespace Catan10
             //
             //  we are on the right person, now set the state
 
-            UpdateUiForState(newState);
+       
             if (logType == LogType.Normal || logType == LogType.Replay)
             {
                 await AddLogEntry(CurrentPlayer, newState, CatanAction.ChangePlayerAndSetState, true, logType, -1, new LogChangePlayer(from, to, oldState, currentRandomGoldTiles, newRandomGoldTiles));
@@ -1701,7 +1703,7 @@ namespace Catan10
 
             if (TheHuman.PlayerName != MainPageModel.ServiceData.SessionInfo.Creator) return;
 
-            if (MainPageModel.Log.GameState == GameState.WaitingForStart)
+            if (MainPageModel.Log.GameState == GameState.WaitingToRollForPosition)
             {
 
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
@@ -1729,12 +1731,29 @@ namespace Catan10
                 }
             }
 
-            PipCount = GetPipCount();
-            MainPageModel.PipCountDictionary = GetBuildingByPips();
-         
-            ShowBoardMeasurement = true;
+            
 
         }
+
+        public void UpdateBoardMeasurements()
+        {
+            ShowBoardMeasurement = true;
+            PipCount = GetPipCount();
+            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
+            buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+            Dictionary<int, int> pipCountDictionary = new Dictionary<int, int>();
+            int[] pipCount = new int[4] { 0, 0, 0, 0 };
+
+            foreach (var building in buildingsOrderedByPips)
+            {
+                if (13 - building.Pips > pipCount.Length - 1) break;
+                pipCount[13 - building.Pips]++;
+
+            }
+
+            MainPageModel.SetPipCount(pipCount);
+        }
+
 
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {

@@ -122,7 +122,7 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-
+        public event PropertyChangedEventHandler LogChanged;
 
         private List<CatanMessage> MessageLog { get; } = new List<CatanMessage>();
         public MainPage Page { get; internal set; }
@@ -203,6 +203,7 @@ namespace Catan10
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            LogChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public bool CanRedo => Stacks.CanUndo;

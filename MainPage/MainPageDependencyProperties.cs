@@ -38,12 +38,7 @@ namespace Catan10
             set => SetValue(CanMoveBaronBeforeRollProperty, value);
         }
 
-        public static readonly DependencyProperty StateDescriptionProperty = DependencyProperty.Register("StateDescription", typeof(string), typeof(MainPage), new PropertyMetadata("New Game"));
-        public string StateDescription
-        {
-            get => (string)GetValue(StateDescriptionProperty);
-            set => SetValue(StateDescriptionProperty, value);
-        }
+        
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(new PlayerModel() { PlayerName = "Unset" }, CurrentPlayerChanged));
         public PlayerModel CurrentPlayer

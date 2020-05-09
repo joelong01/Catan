@@ -83,7 +83,14 @@ namespace Catan10
     {
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
-        public GameState CurrentGameState => MainPageModel.Log.GameState;
+        public GameState CurrentGameState
+        {
+            get
+            {
+                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
+                return MainPageModel.Log.GameState;
+            }
+        }
         public CatanProxy Proxy => MainPageModel.ServiceData.Proxy;
         public SessionInfo SessionInfo => MainPageModel.ServiceData.SessionInfo;
 
@@ -162,6 +169,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task AddPlayer(AddPlayerLog playerLogHeader)
         {
+            
             var proxy = MainPageModel.ServiceData.Proxy;
             Contract.Assert(proxy != null);
 
@@ -214,7 +222,7 @@ namespace Catan10
         /// <returns></returns>
         public Task UndoAddPlayer(AddPlayerLog playerLogHeader)
         {
-
+            
             var player = NameToPlayer(playerLogHeader.PlayerName);
             Contract.Assert(player != null, "Player Can't Be Null");
             MainPageModel.PlayingPlayers.Remove(player);
@@ -224,6 +232,7 @@ namespace Catan10
 
         public async Task SetRandomBoard(RandomBoardLog randomBoard)
         {
+            
             if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
             {
                 await VisualShuffle(randomBoard.NewRandomBoard);
@@ -233,13 +242,16 @@ namespace Catan10
                 await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
             }
             await MainPageModel.Log.PushAction(randomBoard);
+            UpdateBoardMeasurements();
         }
 
         public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
         {
+            
             if (logHeader.PreviousRandomBoard == null) return;
 
             await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
+            UpdateBoardMeasurements();
             //
             //  DO NOT LOG UNDO
             //

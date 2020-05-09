@@ -20,27 +20,31 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-        
+
 
         private void InitTest()
         {
-            
+
         }
 
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
             int count = 0;
-            TradeResources tr;
+
             do
-            {                
+            {
                 count++;
                 RandomBoardLog log = await RandomBoardLog.RandomizeBoard(this, 0);
-                tr = GetPipCount();
-                PipCount = tr;
-            } while (tr.Wheat < 10 || tr.Wood < 10 || tr.Ore < 10 || tr.Brick < 10 || tr.Sheep < 10);
+                UpdateBoardMeasurements();
+
+                if (count > 1000) break;
+
+            } while (PipCount.Wheat < 10 || PipCount.Wood < 10 || PipCount.Ore < 10 ||
+                    PipCount.Brick < 10 || PipCount.Sheep < 10 || MainPageModel.FiveStarPositions < 1);
+
 
             this.TraceMessage($"it took {count} times");
-            // _gameView.FlipAllAsync(TileOrientation.FaceDown);
+
         }
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
@@ -51,7 +55,7 @@ namespace Catan10
         // Undo
         private void OnTest3(object sdr, RoutedEventArgs rea)
         {
-            
+
         }
 
         private void VerifyRoundTrip<T>(T model)
@@ -74,12 +78,12 @@ namespace Catan10
 
 
             await this.Reset();
-         //   await MainPageModel.Log.Init(CreateSaveFileName("Test Game"));
+            //   await MainPageModel.Log.Init(CreateSaveFileName("Test Game"));
 
             await SetStateAsync(null, GameState.WaitingForNewGame, true);
             _gameView.CurrentGame = _gameView.Games[0];
 
-          //  SavedGames.Insert(0, MainPageModel.Log);
+            //  SavedGames.Insert(0, MainPageModel.Log);
             await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
@@ -100,12 +104,12 @@ namespace Catan10
             AnimationSpeedBase = 10; // speed up the animations
             RandomGoldTileCount = 3;
             await this.Reset();
-           // await MainPageModel.Log.Init(CreateSaveFileName("Expansion Game"));
+            // await MainPageModel.Log.Init(CreateSaveFileName("Expansion Game"));
             await SetStateAsync(null, GameState.WaitingForNewGame, true);
             _gameView.CurrentGame = _gameView.Games[1];
 
-         //   SavedGames.Insert(0, MainPageModel.Log);
-         //   await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
+            //   SavedGames.Insert(0, MainPageModel.Log);
+            //   await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
                 SavedAppState.AllPlayers[0],

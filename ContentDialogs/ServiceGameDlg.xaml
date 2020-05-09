@@ -127,8 +127,8 @@
                     <StackPanel Style="{StaticResource StkPnlStyle}">
                         <TextBlock Margin="10,0,81,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                             Text="Delete All" Foreground="Red" FontSize="22" />
-                        <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="☬"
-                             Foreground="Red" FontSize="36" />
+                        <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="☬" Foreground="Red"
+                            FontSize="36" />
                     </StackPanel>
                 </Button.Content>
             </Button>
