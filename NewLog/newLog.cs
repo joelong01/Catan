@@ -133,7 +133,7 @@ namespace Catan10
 
                 if (Stacks.ActionCount == 0)
                 {
-                    return GameState.WaitingForNewGame;
+                    return GameState.WaitingForPlayers;
                 }
 
                 return Stacks.PeekAction.NewState;

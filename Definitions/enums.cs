@@ -43,7 +43,8 @@ namespace Catan10
         Undefined,
         TradeResources,
         PlayedKnight,
-        StartGame
+        StartGame,
+        RollToSeeWhoGoesFirst
     };
     public enum CatanGames { Regular, Expansion, Seafarers, Seafarers4Player };
     public enum TileOrientation { FaceDown, FaceUp, None };
@@ -70,7 +71,7 @@ namespace Catan10
         GamePicked,                         // 16
         MustMoveBaron,                       // 17
         Unknown,
-        WaitingToRollForPosition,
+        WaitingForPlayers,
     };
     public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea };
     //

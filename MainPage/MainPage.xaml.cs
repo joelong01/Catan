@@ -469,7 +469,13 @@ namespace Catan10
 
         }
 
-        private async Task ProcessEnter(PlayerModel player, string inputText)
+        /// <summary>
+        ///     this is called when the UI interactions cause a state change
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="inputText"></param>
+        /// <returns></returns>
+        private async Task ProcessState(PlayerModel player, string inputText)
         {
 
 
@@ -479,7 +485,8 @@ namespace Catan10
                 {
                     case GameState.Dealing: // a state just to be undone...
                         break;
-                    case GameState.WaitingToRollForPosition:
+                    case GameState.WaitingForPlayers:
+                        await SynchronizedRollLog.StartSyncronizedRoll(this);
                         break;
                     case GameState.WaitingForNewGame:
                         await OnNewGame();
@@ -1690,7 +1697,7 @@ namespace Catan10
 
             if (TheHuman.PlayerName != MainPageModel.ServiceData.SessionInfo.Creator) return;
 
-            if (MainPageModel.Log.GameState == GameState.WaitingToRollForPosition)
+            if (MainPageModel.Log.GameState == GameState.WaitingForPlayers)
             {
 
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -19,13 +20,14 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
-    public delegate void RolledDelegate(int roll);
+    
     public sealed partial class PlayerRollCtrl : UserControl
     {
         bool _rolled = false;
         List<RollCtrl> _rollControls = new List<RollCtrl>();
+        TaskCompletionSource<int> RollTcs { get; set; } = null;
 
-        public RolledDelegate OnRolled;
+    
         public PlayerRollCtrl()
         {
             this.InitializeComponent();
@@ -42,7 +44,11 @@ namespace Catan10
             RollCtrl rollCtrl = sender as RollCtrl;
             _roll = rollCtrl.Roll;
             rollCtrl.Orientation = TileOrientation.FaceUp;
-            OnRolled?.Invoke(_roll);
+            if (RollTcs != null)
+            {
+                RollTcs.SetResult(_roll);
+                RollTcs = null;
+            }
         }
 
         private int _roll = 0;
@@ -91,6 +97,15 @@ namespace Catan10
             var list = new List<Task>();
             _rollControls.ForEach((ctrl) => list.Add(ctrl.GetFlipTask(TileOrientation.FaceDown)));
             await Task.WhenAll(list);
+        }
+
+        internal async Task<int> GetRoll()
+        {
+            Contract.Assert(RollTcs == null);
+            RollTcs = new TaskCompletionSource<int>();
+            await this.Reset();
+            return await RollTcs.Task;
+
         }
     }
 }

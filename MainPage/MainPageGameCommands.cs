@@ -387,7 +387,7 @@ namespace Catan10
                 return false;
             }
 
-            await ProcessEnter(CurrentPlayer, "");
+            await ProcessState(CurrentPlayer, "");
             return true;
         }
 

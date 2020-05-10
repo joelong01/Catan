@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using Windows.UI.Xaml;
 
 namespace Catan10
 {
@@ -169,12 +170,32 @@ namespace Catan10
                 GameState state = Log.GameState;
                 return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart ||
                         state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
-                        state == GameState.DoneResourceAllocation || state == GameState.WaitingToRollForPosition));
+                        state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers));
 
             }
         }
 
+        public bool RollGridEnabled
+        {
+            get
+            {
+                if (Log == null) return true;
+                GameState state = Log.GameState;
 
+                return false;
+            }
+        }
+
+        public Visibility RollGridVisible
+        {
+            get
+            {
+                if (Log == null) return Visibility.Visible;
+                GameState state = Log.GameState;
+                if (EnableUiInteraction && (state == GameState.WaitingForRoll || state == GameState.WaitingForPlayers)) return Visibility.Visible;
+                return Visibility.Collapsed;
+            }
+        }
 
 
         public bool EnableRedo

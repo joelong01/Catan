@@ -140,7 +140,8 @@
     <Compile Include="MainPage\webSocket.cs" />
     <Compile Include="NewLog\playeDevCard.cs" />
     <Compile Include="NewLog\randomizedBoard.cs" />
-    <Compile Include="NewLog\SetStatLog.cs" />
+    <Compile Include="NewLog\SetStateLog.cs" />
+    <Compile Include="NewLog\SynchronizedRollLog.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
     <Compile Include="NewLog\AddPlayer.cs" />
     <Compile Include="NewLog\ChangedPlayer.cs" />

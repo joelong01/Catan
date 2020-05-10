@@ -1,5 +1,6 @@
 ﻿using Catan.Proxy;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 namespace Catan10
@@ -19,13 +20,14 @@ namespace Catan10
         public bool ServiceGame { get; set; } = true;
         public static async Task<StartGameLog> StartGame(IGameController gameController, string startingPlayer, int gameIndex, bool serviceGame)
         {
+            
             StartGameLog model = new StartGameLog
             {
                 
                 PlayerName = startingPlayer,
                 ServiceGame = serviceGame,
-                NewState= GameState.WaitingForStart,
-                OldState= GameState.WaitingForNewGame,
+                NewState= GameState.WaitingForPlayers,
+                OldState= GameState.WaitingForNewGame, // this is a lie -- you can start a new game whenever you want.  
                 Action = CatanAction.GameCreated,
                 GameIndex = gameIndex,
 

@@ -444,7 +444,7 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Rolls" FontSize="22"
                 Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}" />
-            <local:PlayerRollCtrl Grid.Row="1" />
+            <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" />
 
         </Grid>
 

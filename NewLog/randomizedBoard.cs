@@ -22,8 +22,7 @@ namespace Catan10
             {                
                 NewRandomBoard = gameController.GetRandomBoard(),
                 PreviousRandomBoard = gameController.CurrentRandomBoard(),
-                GameIndex = gameIndex,
-                NewState = GameState.WaitingToRollForPosition
+                GameIndex = gameIndex                
             };
             await gameController.SetRandomBoard(model);
             return model;

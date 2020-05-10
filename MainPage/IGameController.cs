@@ -20,6 +20,7 @@ using Windows.Storage.Search;
 using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Popups;
+using Windows.UI.Text.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -63,7 +64,7 @@ namespace Catan10
         /// </summary>
         GameState CurrentGameState { get; }
         CatanGames CatanGame { get; set; }
-        
+
         List<int> CurrentRandomGoldTiles { get; }
 
         List<int> NextRandomGoldTiles { get; }
@@ -73,7 +74,7 @@ namespace Catan10
         RandomBoardSettings GetRandomBoard();
         Task SetRandomBoard(RandomBoardLog randomBoard);
         RandomBoardSettings CurrentRandomBoard();
-
+        Task SynchronizedRoll(SynchronizedRollLog log);
         Task ChangePlayer(ChangePlayerLog log);
         Task UndoChangePlayer(ChangePlayerLog log);
         Task SetState(SetStateLog log);
@@ -87,7 +88,8 @@ namespace Catan10
         {
             get
             {
-                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
+                if (MainPageModel.Log == null) return GameState.WaitingForPlayers;
+
                 return MainPageModel.Log.GameState;
             }
         }
@@ -169,7 +171,8 @@ namespace Catan10
         /// <returns></returns>
         public async Task AddPlayer(AddPlayerLog playerLogHeader)
         {
-            
+            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
+
             var proxy = MainPageModel.ServiceData.Proxy;
             Contract.Assert(proxy != null);
 
@@ -222,7 +225,7 @@ namespace Catan10
         /// <returns></returns>
         public Task UndoAddPlayer(AddPlayerLog playerLogHeader)
         {
-            
+
             var player = NameToPlayer(playerLogHeader.PlayerName);
             Contract.Assert(player != null, "Player Can't Be Null");
             MainPageModel.PlayingPlayers.Remove(player);
@@ -232,7 +235,8 @@ namespace Catan10
 
         public async Task SetRandomBoard(RandomBoardLog randomBoard)
         {
-            
+            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
+
             if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
             {
                 await VisualShuffle(randomBoard.NewRandomBoard);
@@ -247,7 +251,7 @@ namespace Catan10
 
         public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
         {
-            
+
             if (logHeader.PreviousRandomBoard == null) return;
 
             await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
@@ -382,6 +386,52 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        
+        public async Task SynchronizedRoll(SynchronizedRollLog logEntry)
+        {
+            //
+            //  show the UI
+            ShowBoardMeasurement = true;
+
+            //
+            //  has everybody rolled?
+            if (logEntry.PlayerRolls.Rolls.Count == MainPageModel.PlayingPlayers.Count)
+            {
+                //
+                //  are there any ties?
+                if (logEntry.PlayerRolls.HasTies() == false)
+                {
+                    //
+                    //  no?  then we are done
+                    await SetStateLog.SetState(this, GameState.WaitingForStart);
+                    //
+                    // hide UI
+                    ShowBoardMeasurement = false;
+                    return;
+                }
+            }
+
+            //
+            //  find the current players rolls
+            var myRolls = logEntry.PlayerRolls.Rolls.Find((synchedRoll) => (synchedRoll.PlayerName == logEntry.PlayerName));
+            int roll = 0;
+            //
+            //  they haven't rolled yet, create the object and populate it.
+            if (myRolls == null)
+            {
+                myRolls = new SynchronizedRoll() { PlayerName = logEntry.PlayerName, Rolls = new List<int>() };
+                roll = await _rollControl.GetRoll();
+                myRolls.Rolls.Add(roll);
+            }
+            else if (logEntry.PlayerRolls.InTie(myRolls)) // we could do this consecutively but I think we should do one roll at a time
+            {
+                //
+                //  does the current player need to roll?
+                roll = await _rollControl.GetRoll();
+                myRolls.Rolls.Add(roll);
+            }
+
+            await MainPageModel.Log.PushAction(logEntry);
+
+        }
     }
 }

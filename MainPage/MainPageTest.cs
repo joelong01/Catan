@@ -2,10 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Windows.ApplicationModel.Activation;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -18,25 +15,49 @@ namespace Catan10
 {
 
 
+
     public sealed partial class MainPage : Page, ILog
     {
-
-
+        
         private void InitTest()
         {
 
         }
-        int toggle = 0;
-        private async void OnTest1(object sdr, RoutedEventArgs rea)
+        // int toggle = 0;
+        private  void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            int n = 8;
-            toggle = 1 - toggle;
+            SyncronizedPlayerRolls playerRolls = new SyncronizedPlayerRolls();
 
-            TileOrientation orientation = TileOrientation.FaceUp;
-            if (toggle == 0) orientation = TileOrientation.FaceDown;
-            GameContainer.AllTiles.ForEach((t) => t.SetTileOrientationAsync(orientation, 1000));
-            
-          
+            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Joe", Rolls = new List<int>() { 6 } });
+            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "James", Rolls = new List<int>() { 10, 9, 4 } });
+            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Doug", Rolls = new List<int>() { 7, 6 } });
+            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Adrian", Rolls = new List<int>() { 7,8 } });
+            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Chris", Rolls = new List<int>() { 10, 9, 5 } });
+
+
+
+            bool ties = playerRolls.HasTies();
+
+            playerRolls.Sort();
+
+            //var dict = new Dictionary<string, List<int>>();
+
+            //dict["Joe"] = new List<int>() { 10, 9, 5 };
+            //dict["Dodgy"] = new List<int>() { 10, 9, 4 };
+            //dict["Doug"] = new List<int>() { 9, 12 };
+            //dict["Adrian"] = new List<int>() { 8 };
+            //dict["Chris"] = new List<int>() { 8, 2 };
+
+            this.TraceMessage(CatanProxy.Serialize(playerRolls, true));
+
+            //int n = 8;
+            //toggle = 1 - toggle;
+
+            //TileOrientation orientation = TileOrientation.FaceUp;
+            //if (toggle == 0) orientation = TileOrientation.FaceDown;
+            //GameContainer.AllTiles.ForEach((t) => t.SetTileOrientationAsync(orientation, 1000));
+
+
 
 
             //await PlayRollAnimation(n);
@@ -69,7 +90,7 @@ namespace Catan10
         // Undo
         private void OnTest3(object sdr, RoutedEventArgs rea)
         {
-            
+
         }
 
         private void VerifyRoundTrip<T>(T model)
