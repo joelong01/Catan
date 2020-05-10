@@ -57,11 +57,7 @@ namespace Catan10
             set
             {
                 SavedAppState.Settings.FadeSeconds = value;
-                _timer.Interval = TimeSpan.FromSeconds(value);
-                if (value == 0)
-                {
-                    _timer.Interval = TimeSpan.FromMilliseconds(250);
-                }
+               
             }
         }
 

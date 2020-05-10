@@ -664,7 +664,7 @@ namespace Catan10
                 tile.Reset();
                 if (tile.ResourceType != ResourceType.Sea)
                 {
-                    tile.TileOrientation = TileOrientation.FaceUp;
+                   // tile.TileOrientation = TileOrientation.FaceUp;
                     tile.TileOrientation = TileOrientation.FaceDown;                    
                 }
 
@@ -1886,112 +1886,6 @@ namespace Catan10
 
     }
 
-    public class TileGroup
-    {
-
-        public int Start { get; set; }
-
-        public int End { get; set; }
-
-        public bool Randomize { get; set; }
-
-        //
-        //  All the tiles in the Tilegroup -- including Sea Tiles that won't be randomized
-
-        public List<TileCtrl> AllTiles { get; set; } = new List<TileCtrl>();
-
-        //
-        //  the set of Tiles that particpate in Randomization and Shuffling
-        public List<TileCtrl> TilesToRandomize { get; set; } = new List<TileCtrl>();
-        public List<TileCtrl> OriginalNonSeaTiles { get; set; } = new List<TileCtrl>();
-
-        public List<ResourceType> StartingResourceTypes { get; set; } = new List<ResourceType>();
-        public List<int> StartingTileNumbers { get; set; } = new List<int>();
-        
-        public RandomLists TileAndNumberLists { get; set; }
-        
-
-        private int _tileCount = 0;
-
-        public void Reset()
-        {
-           for (int i =0; i< TilesToRandomize.Count -1; i++)
-            {
-                TilesToRandomize[i].ResourceType = StartingResourceTypes[i];
-                TilesToRandomize[i].Number = StartingTileNumbers[i];
-            }
-        }
-
-        public int TileCount
-        {
-            get => AllTiles.Count;
-            set => _tileCount = value;  // set by Deserialization
-        }
-
-        public int DesertCount { get; internal set; }
-        
-
-        private readonly string[] SerializedProperties = new string[] { "Start", "End", "Randomize", "ResourceTypes", "NumberSequence", "HarborTypes", "RandomResourceTypeList", "RandomHarborTypeList", "TileCount" };
-
-        public string Serialize(int groupIndex)
-        {
-            string s = "";
-            string nl = StaticHelpers.lineSeperator;
-            s = StaticHelpers.SerializeObject<TileGroup>(this, SerializedProperties, "=", "|");
-            s += nl;
-            for (int i = 0; i < TileCount; i++)
-            {
-                s += string.Format($"[Tile {i}.{groupIndex}]{nl}");
-                s += AllTiles[i].Serialize(false);
-                s += nl;
-            }
-
-            return s;
-        }
-        public void Deserialize(string s, Dictionary<string, string> sections, int groupIndex)
-        {
-            StaticHelpers.DeserializeObject<TileGroup>(this, s, "=", "|");
-            for (int i = 0; i < _tileCount; i++)
-            {
-                string serilizedTile = sections[$"Tile {i}.{groupIndex}"];
-                TileCtrl tile = new TileCtrl();
-                tile.Deserialize(serilizedTile, false);
-                AllTiles.Add(tile);
-                if (tile.RandomGoldEligible == false)
-                {
-                    tile.TileOrientation = TileOrientation.FaceUp;
-                }
-                // Harbors.AddRange(tile.VisibleHarbors);
-            }
-
-
-        }
-
-        public override string ToString()
-        {
-            return string.Format($"{Start}-{End}.{Randomize}");
-        }
-        public TileGroup() { }
-        public TileGroup(string s)
-        {
-            string[] tokens = s.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
-            Start = int.Parse(tokens[0]);
-            End = int.Parse(tokens[1]);
-            Randomize = bool.Parse(tokens[2]);
-        }
-
-        public static List<TileGroup> BuildList(string s)
-        {
-            List<TileGroup> list = new List<TileGroup>();
-            string[] tokens = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string token in tokens)
-            {
-                TileGroup tg = new TileGroup(token);
-                list.Add(tg);
-            }
-
-            return list;
-        }
-    }
+   
 
 }

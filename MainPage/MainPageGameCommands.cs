@@ -203,11 +203,14 @@ namespace Catan10
                 foreach (GridPosition pos in SavedAppState.Settings.GridPositions)
                 {
                     UIElement el = (UIElement)this.FindName(pos.Name);
-                    CompositeTransform ct = (CompositeTransform)el.RenderTransform;
-                    ct.TranslateX = pos.TranslateX;
-                    ct.TranslateY = pos.TranslateY;
-                    ct.ScaleX = pos.ScaleX;
-                    ct.ScaleY = pos.ScaleY;
+                    if (el != null)
+                    {
+                        CompositeTransform ct = (CompositeTransform)el.RenderTransform;
+                        ct.TranslateX = pos.TranslateX;
+                        ct.TranslateY = pos.TranslateY;
+                        ct.ScaleX = pos.ScaleX;
+                        ct.ScaleY = pos.ScaleY;
+                    }
                 }
             }
             catch (Exception e)

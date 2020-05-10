@@ -17,26 +17,254 @@ using Windows.UI.Xaml.Media;
 namespace Catan10
 {
 
-    public class TileData
+    public class TileData : INotifyPropertyChanged
     {
-        public TileOrientation TileOrientation { get; set; } = TileOrientation.FaceDown;
+        #region properties
+        private TileOrientation _tileOrientation = TileOrientation.FaceDown;
+        private bool _hasBaron = false;
+        private bool _hasPirateShip = false;
+        private int _number = 0;
+        private ResourceType _resourceType = ResourceType.Sea;
+        private int _zIndex = 0;
+        private int _index = -1;
+        private bool _randomTile = true;
+        private bool _showIndex = false;
+        private HarborLocation _harborLocation = HarborLocation.None;
+        private HarborType _harborType = HarborType.None;
+        private bool _useClassic = true;
+        private int _row = -1;
+        private int _col = -1;
+        private List<BuildingCtrl> _ownedBuildings = new List<BuildingCtrl>();
 
-        public bool HasBaron { get; set; } = false;
-        public bool HasPirateShip { get; set; } = false;
 
-        public int Number { get; set; } = 0;
-        public ResourceType ResourceType { get; set; } = ResourceType.Sea;
-        public int zIndex { get; set; } = 0;
-        public int Index { get; set; } = -1;
-        public bool RandomTile { get; set; } = true;
-        public bool ShowIndex { get; set; } = false;
-        public HarborLocation HarborLocation { get; set; } = HarborLocation.None;
-        public HarborType HarborType { get; set; } = HarborType.None;
-        public bool UseClassic { get; set; } = true;
+        public TileOrientation TileOrientation
+        {
+            get
+            {
+                return _tileOrientation;
+            }
+            set
+            {
+                if (value != _tileOrientation)
+                {
+                    _tileOrientation = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool HasBaron
+        {
+            get
+            {
+                return _hasBaron;
+            }
+            set
+            {
+                if (value != _hasBaron)
+                {
+                    _hasBaron = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool HasPirateShip
+        {
+            get
+            {
+                return _hasPirateShip;
+            }
+            set
+            {
+                if (value != _hasPirateShip)
+                {
+                    _hasPirateShip = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Number
+        {
+            get
+            {
+                return _number;
+            }
+            set
+            {
+                if (value != _number)
+                {
+                    _number = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public ResourceType ResourceType
+        {
+            get
+            {
+                return _resourceType;
+            }
+            set
+            {
+                if (value != _resourceType)
+                {
+                    _resourceType = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int zIndex
+        {
+            get
+            {
+                return _zIndex;
+            }
+            set
+            {
+                if (value != _zIndex)
+                {
+                    _zIndex = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Index
+        {
+            get
+            {
+                return _index;
+            }
+            set
+            {
+                if (value != _index)
+                {
+                    _index = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool RandomTile
+        {
+            get
+            {
+                return _randomTile;
+            }
+            set
+            {
+                if (value != _randomTile)
+                {
+                    _randomTile = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool ShowIndex
+        {
+            get
+            {
+                return _showIndex;
+            }
+            set
+            {
+                if (value != _showIndex)
+                {
+                    _showIndex = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public HarborLocation HarborLocation
+        {
+            get
+            {
+                return _harborLocation;
+            }
+            set
+            {
+                if (value != _harborLocation)
+                {
+                    _harborLocation = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public HarborType HarborType
+        {
+            get
+            {
+                return _harborType;
+            }
+            set
+            {
+                if (value != _harborType)
+                {
+                    _harborType = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool UseClassic
+        {
+            get
+            {
+                return _useClassic;
+            }
+            set
+            {
+                if (value != _useClassic)
+                {
+                    _useClassic = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Row
+        {
+            get
+            {
+                return _row;
+            }
+            set
+            {
+                if (value != _row)
+                {
+                    _row = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int Col
+        {
+            get
+            {
+                return _col;
+            }
+            set
+            {
+                if (value != _col)
+                {
+                    _col = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public List<BuildingCtrl> OwnedBuildings
+        {
+            get
+            {
+                return _ownedBuildings;
+            }
+            set
+            {
+                if (value != _ownedBuildings)
+                {
+                    _ownedBuildings = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        #endregion
 
-        public int Row { get; set; } = -1;
-        public int Col { get; set; } = -1;
-
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public string Serialize(bool oneLine)
         {
@@ -47,16 +275,15 @@ namespace Catan10
 
             return CatanProxy.Deserialize<TileData>(json);
         }
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
     }
 
-
-    public enum TileDisplay { Normal, Gold };
-
     public sealed partial class TileCtrl : UserControl, INotifyPropertyChanged, IEqualityComparer<TileCtrl>
     {
-
-        private readonly List<string> _savedProperties = new List<string> { "Number", "ResourceType", "HarborLocation", "HarborType", "TileOrientation", "zIndex", "Index", "HarborLocation", "RandomTile", "HexOrder", "UseClassic", "ShowIndex", "HasPirateShip", "HasBaron" };
 
 
         public bool HasBaron { get; set; } = false;
@@ -77,6 +304,23 @@ namespace Catan10
         public static readonly DependencyProperty ShownResourceTypeProperty = DependencyProperty.Register("ShownResourceType", typeof(ResourceType), typeof(TileCtrl), new PropertyMetadata(ResourceType.Sheep, ShownResourceTypeChanged));
         public static readonly DependencyProperty ResourceTypeProperty = DependencyProperty.Register("ResourceType", typeof(ResourceType), typeof(TileCtrl), new PropertyMetadata(ResourceType.None, ResourceTypeChanged));
         public static readonly DependencyProperty TileOrientationProperty = DependencyProperty.Register("TileOrientation", typeof(TileOrientation), typeof(TileCtrl), new PropertyMetadata(TileOrientation.FaceUp, TileOrientationChanged));
+        public static readonly DependencyProperty TileDataProperty = DependencyProperty.Register("TileData", typeof(TileData), typeof(TileCtrl), new PropertyMetadata(new TileData(), TileDataChanged));
+        public TileData TileData
+        {
+            get => (TileData)GetValue(TileDataProperty);
+            set => SetValue(TileDataProperty, value);
+        }
+        private static void TileDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as TileCtrl;
+            var depPropValue = (TileData)e.NewValue;
+            depPropClass?.SetTileData(depPropValue);
+        }
+        private void SetTileData(TileData tileData)
+        {
+
+        }
+
         public TileOrientation TileOrientation
         {
             get => (TileOrientation)GetValue(TileOrientationProperty);
@@ -253,16 +497,7 @@ namespace Catan10
         }
 
 
-        public string Serialize(bool oneLine)
-        {
-            return StaticHelpers.SerializeObject<TileCtrl>(this, _savedProperties, "=", "|");
-        }
-        public bool Deserialize(string s, bool oneLine)
-        {
 
-            StaticHelpers.DeserializeObject<TileCtrl>(this, s, "=", "|");
-            return true;
-        }
         public int ZIndex
         {
             get => Canvas.GetZIndex(this);
@@ -342,13 +577,51 @@ namespace Catan10
 
         }
 
+        public void CancelFade()
+        {
+            _sbAnimateOpacityReverse.Seek(TimeSpan.FromSeconds(0));
+            _sbAnimateOpacity.Seek(TimeSpan.FromSeconds(0));
+            this.Opacity = 1.0;
+
+        }
+        public void AnimateFadeAsync(double opacity)
+        {
+            // CancelFade();
+            //double fast = 100; //MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
+            //double slow = 1000; // fast + MainPage.GetAnimationSpeed(AnimationSpeed.Slow);
+            //_sbAnimateOpacity.Duration = TimeSpan.FromMilliseconds(fast);
+            //_sbAnimateOpacityReverse.Duration = TimeSpan.FromMilliseconds(fast);
+
+            //_daAnimateOpacity.Duration = TimeSpan.FromMilliseconds(0);  //TimeSpan.FromMilliseconds(fast); // this is how long you take to fade, not how long you stay faded
+            //_daAnimateOpacity.To = opacity;
+            //_daAnimateOpacity.From  = 1.0;
+
+            //_daAnimateOpacityReverse.Duration = TimeSpan.FromMilliseconds(fast); // this is how long you take to fade, not how long you stay faded
+            //_daAnimateOpacityReverse.To = 1.0;
+            //_sbAnimateOpacityReverse.BeginTime = TimeSpan.FromSeconds(slow); // this is the delat
+            CancelFade();
+            _sbAnimateOpacity.Begin();
+            
+
+        }
+        private void AnimateFadeCompleted(object sender, object e)
+        {
+            _sbAnimateOpacityReverse.Begin();
+        }
 
 
         public void AnimateFade(double opacity, List<Task> tasks)
         {
-            _daAnimateOpacity.Duration = TimeSpan.FromMilliseconds(MainPage.GetAnimationSpeed(AnimationSpeed.Fast)); // this is how long you take to fade, not how long you stay faded
+            double fast = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
+            double slow = fast + MainPage.GetAnimationSpeed(AnimationSpeed.Slow);
+            _daAnimateOpacity.Duration = TimeSpan.FromMilliseconds(fast); // this is how long you take to fade, not how long you stay faded
             _daAnimateOpacity.To = opacity;
             tasks.Add(_sbAnimateOpacity.ToTask());
+            _daAnimateOpacityReverse.Duration = TimeSpan.FromMilliseconds(fast); // this is how long you take to fade, not how long you stay faded
+            _daAnimateOpacityReverse.To = 1.0;
+            _sbAnimateOpacityReverse.BeginTime = TimeSpan.FromSeconds(slow); // this is the delat
+            tasks.Add(_sbAnimateOpacityReverse.ToTask());
+
 
         }
 
@@ -370,6 +643,8 @@ namespace Catan10
             _daRotateTile.Duration = TimeSpan.FromMilliseconds(ms);
             return _sbRotate.ToTask();
         }
+
+       
         public async Task SetTileOrientation(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
             if (ActualOrientTation == orientation) return;
@@ -404,9 +679,9 @@ namespace Catan10
                 return (_ppHexFront.RotationY != 0) ? TileOrientation.FaceDown : TileOrientation.FaceUp;
             }
         }
-        private void SetTileOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
+        public void SetTileOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
-          //  if (ActualOrientTation == orientation) return;
+            //  if (ActualOrientTation == orientation) return;
 
             if (animationDuration == double.MaxValue)
             {
@@ -416,7 +691,7 @@ namespace Catan10
             {
                 animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
             }
-            
+
 
             StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, animationDuration, 0);
 
@@ -429,7 +704,7 @@ namespace Catan10
         public void SetTileOrientation(TileOrientation orientation, List<Task> taskList, double animationDuration = double.MaxValue)
         {
 
-         //   if (ActualOrientTation == orientation) return;
+            //   if (ActualOrientTation == orientation) return;
 
             StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.Normal), 0);
 
@@ -607,6 +882,8 @@ namespace Catan10
         {
             return obj.GetHashCode();
         }
+
+     
     }
 
 }

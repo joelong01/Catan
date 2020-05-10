@@ -40,11 +40,17 @@
                 Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)"
                 Storyboard.TargetName="ResourceTileGrid" To="0" Duration="0:0:2" />
         </Storyboard>
-        <Storyboard x:Name="_sbAnimateOpacity">
-            <DoubleAnimation x:Name="_daAnimateOpacity" AutoReverse="False"
+        <Storyboard x:Name="_sbAnimateOpacity" >
+            <DoubleAnimation x:Name="_daAnimateOpacity" AutoReverse="False" Completed="AnimateFadeCompleted"
                 Storyboard.TargetProperty="(UIElement.Opacity)"
-                Storyboard.TargetName="_hexFront" To="0.5" Duration="0:0:3" />
+                Storyboard.TargetName="_hexFrontGrid" From="1.0" To="0.25" Duration="0:0:2" />
         </Storyboard>
+        <Storyboard x:Name="_sbAnimateOpacityReverse"  >
+            <DoubleAnimation x:Name="_daAnimateOpacityReverse" AutoReverse="False" BeginTime="0:0:3"
+                Storyboard.TargetProperty="(UIElement.Opacity)"
+                Storyboard.TargetName="_hexFrontGrid" From=".25" To="1.0" Duration="0:0:1" /> <!--  -->
+        </Storyboard>
+
 
     </Control.Resources>
 

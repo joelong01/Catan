@@ -44,7 +44,7 @@ namespace Catan10
 
         public ObservableCollection<DeprecatedLog> SavedGames { get; set; } = new ObservableCollection<DeprecatedLog>();
 
-        private readonly DispatcherTimer _timer = new DispatcherTimer();  // flips tiles back to Opacaticy = 0
+        
         private bool _doDragDrop = false;   // this lets you double tap a map and then move it around
         private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
         public static MainPage Current { get; private set; } // a global for the game
@@ -71,7 +71,6 @@ namespace Catan10
             this.InitializeComponent();
             Current = this;
             this.DataContext = this;
-            _timer.Tick += AsyncReverseFade;
             _raceTracking = new RoadRaceTracking(this);
             Ctrl_PlayerResourceCountCtrl.Log = this;
         }
@@ -187,7 +186,7 @@ namespace Catan10
 
                 state = CatanProxy.Deserialize<SavedState>(content);
 
-                _timer.Interval = TimeSpan.FromSeconds(state.Settings.FadeSeconds);
+               
 
                 return state;
             }
@@ -296,17 +295,7 @@ namespace Catan10
 
 
 
-        private async void AsyncReverseFade(object sender, object e)
-        {
-            List<Task> tasks = new List<Task>();
-            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
-            {
-                t.AnimateFade(1.0, tasks);
-            }
-
-            await Task.WhenAll(tasks.ToArray());
-            _timer.Stop();
-        }
+       
 
 
 
@@ -464,7 +453,7 @@ namespace Catan10
             List<Task> tasks = new List<Task>();
             foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
             {
-                t.AnimateFade(1.0, tasks);
+                t.AnimateFadeAsync(1.0);
                 t.Rotate(0, tasks, false);
 
             }
@@ -928,7 +917,7 @@ namespace Catan10
                     if (SavedAppState.Settings.AnimateFade)
                     {
 
-                        t.AnimateFade(1.0, tasks);
+                        t.AnimateFadeAsync(1.0);
 
                     }
                     if (SavedAppState.Settings.RotateTile)
@@ -940,7 +929,7 @@ namespace Catan10
                 {
                     if (SavedAppState.Settings.AnimateFade)
                     {
-                        t.AnimateFade(0.25, tasks);
+                        t.AnimateFadeAsync(.25);
                     }
                 }
             }
@@ -952,7 +941,7 @@ namespace Catan10
 
             //
             // now make sure we reverse the fade
-            _timer.Start();
+          
             return tilesWithNumber;
         }
 
@@ -1265,7 +1254,7 @@ namespace Catan10
                     if (SavedAppState.Settings.AnimateFade)
                     {
 
-                        t.AnimateFade(1.0, tasks);
+                        t.AnimateFadeAsync(1.0);
 
                     }
                     if (SavedAppState.Settings.RotateTile)
@@ -1277,7 +1266,7 @@ namespace Catan10
                 {
                     if (SavedAppState.Settings.AnimateFade)
                     {
-                        t.AnimateFade(0.25, tasks);
+                        t.AnimateFadeAsync(0.25);
                     }
                 }
             }
@@ -1287,9 +1276,7 @@ namespace Catan10
                 await Task.WhenAll(tasks.ToArray());
             }
 
-            //
-            // now make sure we reverse the fade
-            _timer.Start();
+          
 
             return tilesWithNumber;
         }

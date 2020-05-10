@@ -26,28 +26,42 @@ namespace Catan10
         {
 
         }
-
+        int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            int count = 0;
+            int n = 8;
+            toggle = 1 - toggle;
 
-            do
-            {
-                count++;
-                RandomBoardLog log = await RandomBoardLog.RandomizeBoard(this, 0);
-                UpdateBoardMeasurements();
-
-                if (count > 1000) break;
-
-            } while (PipCount.Wheat < 10 || PipCount.Wood < 10 || PipCount.Ore < 10 ||
-                    PipCount.Brick < 10 || PipCount.Sheep < 10 || MainPageModel.FiveStarPositions < 1);
+            TileOrientation orientation = TileOrientation.FaceUp;
+            if (toggle == 0) orientation = TileOrientation.FaceDown;
+            GameContainer.AllTiles.ForEach((t) => t.SetTileOrientationAsync(orientation, 1000));
+            
+          
 
 
-            this.TraceMessage($"it took {count} times");
+            //await PlayRollAnimation(n);
+
+            //int count = 0;
+
+            //do
+            //{
+            //    count++;
+            //    RandomBoardLog log = await RandomBoardLog.RandomizeBoard(this, 0);
+            //    UpdateBoardMeasurements();
+
+            //    if (count > 1000) break;
+
+            //} while (PipCount.Wheat < 10 || PipCount.Wood < 10 || PipCount.Ore < 10 ||
+            //        PipCount.Brick < 10 || PipCount.Sheep < 10 || MainPageModel.FiveStarPositions < 1);
+
+
+            //this.TraceMessage($"it took {count} times");
 
         }
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
+            GameContainer.AllTiles.ForEach((t) => t.AnimateFadeAsync(.25));
+
             // change player
             //ChangePlayerLog changedPlayer = await ChangePlayerLog.ChangePlayer(this, 1, GameState.WaitingForRoll);
             //VerifyRoundTrip<ChangePlayerLog>(changedPlayer);
@@ -55,7 +69,7 @@ namespace Catan10
         // Undo
         private void OnTest3(object sdr, RoutedEventArgs rea)
         {
-
+            
         }
 
         private void VerifyRoundTrip<T>(T model)

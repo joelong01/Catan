@@ -1,6 +1,8 @@
 ﻿
 namespace Catan10
 {
+    public enum TileDisplay { Normal, Gold };
+
     public enum CatanAction
     {
         Rolled,

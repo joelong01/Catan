@@ -128,12 +128,13 @@
     <Compile Include="Games\ExpansionCtrl.xaml.cs">
       <DependentUpon>ExpansionCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GameView\TileGroup.cs" />
     <Compile Include="Logging\LogDefinitions.cs" />
     <Compile Include="Logging\LogObjects.cs" />
     <Compile Include="MainPage\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
-    <Compile Include="MainPage\NewLogHelper.cs" />
+    <Compile Include="MainPage\IGameController.cs" />
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\SavedState.cs" />
     <Compile Include="MainPage\webSocket.cs" />
