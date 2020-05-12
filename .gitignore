@@ -8,6 +8,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+Catan10_TemporaryKey.pfx
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
