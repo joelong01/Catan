@@ -271,11 +271,11 @@ namespace Catan10
         public Task StartGame(StartGameLog logHeader)
         {
 
-            if (MainPageModel.Log!= null && MainPageModel.Log.GameState != GameState.WaitingForNewGame) return Task.CompletedTask;
+            MainPageModel.Log = new NewLog();
 
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
-            MainPageModel.Log = new NewLog();
+            
 
             MainPageModel.IsServiceGame = true;
             MainPageModel.GameStartedBy = FindPlayerByName(SavedAppState.AllPlayers, logHeader.PlayerName);

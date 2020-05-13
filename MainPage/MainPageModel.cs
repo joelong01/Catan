@@ -181,9 +181,17 @@ namespace Catan10
             {
                 if (Log == null) return true;
                 GameState state = Log.GameState;
-                if (state == GameState.PickingBoard || state == GameState.WaitingForRollForOrder)
+
+                
+
+                if (state == GameState.PickingBoard || state == GameState.WaitingForRollForOrder || state == GameState.WaitingForPlayers)
                 {
                     return (MainPage.Current.TheHuman == this.GameStartedBy);
+                }
+
+                if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll)
+                {
+                    return (MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer); // only the person whose turn it is can hit "Next"
                 }
 
                 return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||

@@ -396,11 +396,11 @@ namespace Catan10
 
             switch (CurrentGameState)
             {
-                
-                
+
+
                 case GameState.WaitingForNewGame:
                     OnNewNetworkGame(null, null);
-                   
+
                     break;
                 case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
                     await SetStateLog.SetState(this, GameState.PickingBoard);
@@ -412,10 +412,10 @@ namespace Catan10
                         Contract.Assert(randomBoardLog != null);
                     }
 
-                    
+
                     break;
                 case GameState.PickingBoard:  // you get here by clicking the "=>" button
-                    await _rollControl.Reset();                    
+                    await _rollControl.Reset();
                     MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceUp); // I hate this hack but I couldn't figure out how to do it with DataBinding
                     await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
                     await SynchronizedRollLog.StartSyncronizedRoll(this);
@@ -455,7 +455,7 @@ namespace Catan10
                     break;
                 case GameState.Unknown:
                     break;
-               
+
 
                 //
                 //  these don't ever get called when Next is hit
@@ -528,7 +528,7 @@ namespace Catan10
         /// </summary
         private void OnWinnerClicked(object sender, RoutedEventArgs e)
         {
-          //  await OnWin();
+            //  await OnWin();
         }
 
         private async void OnNumberTapped(object sender, TappedRoutedEventArgs e)
@@ -996,7 +996,7 @@ namespace Catan10
             {
                 HostName = proxy.HostName
             };
-           // this.TraceMessage($"Human={TheHuman}");
+            // this.TraceMessage($"Human={TheHuman}");
             await dlg.ShowAsync();
             if (dlg.IsCanceled) return;
 
@@ -1012,24 +1012,18 @@ namespace Catan10
 
             //
             // start a new game
+
+
             var startGameModel = await StartGameLog.StartGame(this, TheHuman.PlayerName, 0, true);
             Contract.Assert(startGameModel != null);
 
-            if (dlg.JoinedExistingSession)
-            {
-                //
-                //   if you joined an existing session, you need to get all the logs and go through them
+            //
+            //  add the player
+            var addPlayerLog = await AddPlayerLog.AddPlayer(this, TheHuman);
+            Contract.Assert(addPlayerLog != null);
+            MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedSession.Creator);
 
-            }
-            else
-            {
-                //
-                //  add the player
-                var addPlayerLog = await AddPlayerLog.AddPlayer(this, TheHuman);
-                Contract.Assert(addPlayerLog != null);
-                MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedSession.Creator);
-                
-            }
+
 
             StartMonitoring();
 
@@ -1047,21 +1041,27 @@ namespace Catan10
             return null;
         }
 
-        
+
         private Task ReplayGame(SessionInfo session, string playerName)
         {
             var Proxy = MainPageModel.ServiceData.Proxy;
             Contract.Assert(Proxy != null);
             return Task.CompletedTask;
-         //   var messages = await Proxy.
+            //   var messages = await Proxy.
         }
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
-        
+
         private async void StartMonitoring()
         {
+
+
             var proxy = MainPageModel.ServiceData.Proxy;
             var sessionId = MainPageModel.ServiceData.SessionInfo.Id;
+
+            var players = await proxy.GetPlayers(sessionId);
+            Contract.Assert(players.Contains(TheHuman.PlayerName));
+
             while (true)
             {
                 List<CatanMessage> messages = await proxy.Monitor(sessionId, TheHuman.PlayerName);
@@ -1073,7 +1073,7 @@ namespace Catan10
                     message.Data = logHeader;
                     MainPageModel.Log.RecordMessage(message);
                     Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
-                    if (logHeader.TheHuman != TheHuman.PlayerName) 
+                    if (logHeader.TheHuman != TheHuman.PlayerName)
                     {
                         logHeader.LocallyCreated = false;
                         ILogController logController = logHeader as ILogController;
@@ -1086,15 +1086,15 @@ namespace Catan10
                             case LogType.Undo:
                                 await MainPageModel.Log.Undo(message);
                                 break;
-                            case LogType.Replay:                                
-                                
+                            case LogType.Replay:
+
                                 await MainPageModel.Log.Redo(message);
                                 break;
-                            case LogType.DoNotLog:                                
-                            case LogType.DoNotUndo:                                
+                            case LogType.DoNotLog:
+                            case LogType.DoNotUndo:
                             default:
                                 throw new InvalidDataException("These Logtypes shouldn't be set in a service game");
-                        }                      
+                        }
                     }
                 }
 
