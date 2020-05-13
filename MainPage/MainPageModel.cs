@@ -181,6 +181,11 @@ namespace Catan10
             {
                 if (Log == null) return true;
                 GameState state = Log.GameState;
+                if (state == GameState.PickingBoard || state == GameState.WaitingForRollForOrder)
+                {
+                    return (MainPage.Current.TheHuman == this.GameStartedBy);
+                }
+
                 return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
                         state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
                         state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers));

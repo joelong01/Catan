@@ -40,18 +40,18 @@ namespace Catan10
 
         public Task Do(IGameController gameController, LogHeader logHeader)
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task Redo(IGameController gameController, LogHeader logHeader)
         {
 
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task Undo(IGameController gameController, LogHeader logHeader)
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 
