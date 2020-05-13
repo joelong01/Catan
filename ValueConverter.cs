@@ -15,6 +15,29 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
+
+    /// <summary>
+    ///    
+    /// </summary>
+    public class DiceRollToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            int diceNumber = (int)Int32.Parse((string)parameter);
+            int rolledNumber = (int)value;
+            if (diceNumber == rolledNumber)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new Exception("DiceRollToVisibilityConverter cannot be used in a TwoWay binding");
+        }
+    }
+
     public class StringToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
@@ -188,7 +211,7 @@ namespace Catan10
     }
 
     /// <summary>
-    ///     used in the PlayerResourceCountCtrl
+    ///     used in the PlayersTrackerCtrl
     ///     allows you to bind Visibility to *one* gamestate.  if the GameState is the parameter value, then be visible.
     ///     else be collapsed
     /// </summary>
@@ -283,6 +306,37 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
+        }
+    }
+    public class BoolToOrientationConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return ((bool)value) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            try
+            {
+                if (value is TileOrientation)
+                {
+                    if (((TileOrientation)value) == TileOrientation.FaceDown)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 

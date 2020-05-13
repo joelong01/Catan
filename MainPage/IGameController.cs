@@ -88,7 +88,7 @@ namespace Catan10
         {
             get
             {
-                if (MainPageModel.Log == null) return GameState.WaitingForPlayers;
+                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
 
                 return MainPageModel.Log.GameState;
             }
@@ -235,7 +235,7 @@ namespace Catan10
 
         public async Task SetRandomBoard(RandomBoardLog randomBoard)
         {
-            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
+            Contract.Assert(CurrentGameState == GameState.PickingBoard);
 
             if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
             {
@@ -270,6 +270,9 @@ namespace Catan10
         /// <returns></returns>
         public Task StartGame(StartGameLog logHeader)
         {
+
+            if (MainPageModel.Log!= null && MainPageModel.Log.GameState != GameState.WaitingForNewGame) return Task.CompletedTask;
+
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
             MainPageModel.Log = new NewLog();
@@ -283,13 +286,11 @@ namespace Catan10
 
 
             //
-            //   5/5/2020: DO NOT LOG START GAME!!
-            //             every game gets started and then monitors the log.  
-            //             double starting is bad.
-            //   
+            //   5/12/2020: You have to log so that the GameState is set correctly.  the function is protected at the top by looking at the state
+            //              and not starting unless we need to start                            
 
+            return MainPageModel.Log.PushAction(logHeader);
 
-            return Task.CompletedTask;
 
         }
         private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
@@ -390,8 +391,9 @@ namespace Catan10
         {
             //
             //  show the UI
-            ShowBoardMeasurement = true;
-
+           
+            PlayerModel player = PlayerNameToPlayer(logEntry.PlayerName);
+            Contract.Assert(player != null);
             //
             //  has everybody rolled?
             if (logEntry.PlayerRolls.Rolls.Count == MainPageModel.PlayingPlayers.Count)
@@ -403,32 +405,43 @@ namespace Catan10
                     //
                     //  no?  then we are done
                     await SetStateLog.SetState(this, GameState.WaitingForStart);
-                    //
-                    // hide UI
-                    ShowBoardMeasurement = false;
+                   
+                    player.GameData.DiceOne = 0; // which will update the UI
+                    player.GameData.DiceTwo = 0;
                     return;
                 }
             }
 
             //
             //  find the current players rolls
-            var myRolls = logEntry.PlayerRolls.Rolls.Find((synchedRoll) => (synchedRoll.PlayerName == logEntry.PlayerName));
+            SynchronizedRoll mySynchronizedRoll = logEntry.PlayerRolls.Rolls.Find((synchedRoll) => (synchedRoll.PlayerName == logEntry.PlayerName));
             int roll = 0;
             //
             //  they haven't rolled yet, create the object and populate it.
-            if (myRolls == null)
+            if (mySynchronizedRoll == null)
             {
-                myRolls = new SynchronizedRoll() { PlayerName = logEntry.PlayerName, Rolls = new List<int>() };
-                roll = await _rollControl.GetRoll();
-                myRolls.Rolls.Add(roll);
+                mySynchronizedRoll = new SynchronizedRoll() { PlayerName = logEntry.PlayerName, Rolls = new List<int>() };                                
             }
-            else if (logEntry.PlayerRolls.InTie(myRolls)) // we could do this consecutively but I think we should do one roll at a time
+
+            if (logEntry.PlayerRolls.InTie(mySynchronizedRoll)) // we could do this consecutively but I think we should do one roll at a time
             {
+                player.GameData.DiceOne = 0; 
+                player.GameData.DiceTwo = 0;
+
                 //
                 //  does the current player need to roll?
                 roll = await _rollControl.GetRoll();
-                myRolls.Rolls.Add(roll);
+                mySynchronizedRoll.Rolls.Add(roll);
+                mySynchronizedRoll.DiceOne = _rollControl.DiceOne;
+                mySynchronizedRoll.DiceTwo = _rollControl.DiceTwo;
+                player.GameData.DiceOne = _rollControl.DiceOne; // which will had the UI
+                player.GameData.DiceTwo = _rollControl.DiceTwo;
+                
+
+
+
             }
+
 
             await MainPageModel.Log.PushAction(logEntry);
 

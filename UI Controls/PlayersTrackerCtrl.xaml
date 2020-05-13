@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Catan10.PlayerResourceCountCtrl"
+﻿<UserControl x:Class="Catan10.PlayersTrackerCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Catan10"
@@ -51,7 +51,7 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PublicDataCtrl Player="{x:Bind This, Mode=OneWay}" />
+                    <local:PublicDataCtrl Player="{x:Bind This, Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
 

@@ -10,7 +10,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-    public sealed partial class PlayerResourceCountCtrl : UserControl
+    public sealed partial class PlayersTrackerCtrl : UserControl
     {
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace Catan10
         public PlayerResourceModel GlobalResourceCount { get; } = new PlayerResourceModel(null);
         public ILog Log { get; set; } = null;
 
-        public PlayerResourceCountCtrl()
+        public PlayersTrackerCtrl()
         {
             this.InitializeComponent();
             GlobalResourceCount.TurnReset();
@@ -28,7 +28,13 @@ namespace Catan10
 
 
 
-        public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayerResourceCountCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayersTrackerCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PlayersTrackerCtrl), new PropertyMetadata(GameState.WaitingForNewGame));
+        public GameState GameState
+        {
+            get => (GameState)GetValue(GameStateProperty);
+            set => SetValue(GameStateProperty, value);
+        }
         public MainPage MainPage
         {
             get => (MainPage)GetValue(MainPageProperty);
@@ -53,7 +59,7 @@ namespace Catan10
 
         public ObservableCollection<PlayerModel> TestPlayers { get; set; } = new ObservableCollection<PlayerModel>();
 
-        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayerResourceCountCtrl), new PropertyMetadata(new ObservableCollection<PlayerModel>(), PlayingPlayersChanged));
+        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayersTrackerCtrl), new PropertyMetadata(new ObservableCollection<PlayerModel>(), PlayingPlayersChanged));
         public ObservableCollection<PlayerModel> PlayingPlayers
         {
             get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
@@ -61,7 +67,7 @@ namespace Catan10
         }
         private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            PlayerResourceCountCtrl depPropClass = d as PlayerResourceCountCtrl;
+            PlayersTrackerCtrl depPropClass = d as PlayersTrackerCtrl;
             ObservableCollection<PlayerModel> depPropValue = (ObservableCollection<PlayerModel>)e.NewValue;
             depPropClass?.SetPlayingPlayers(depPropValue);
         }

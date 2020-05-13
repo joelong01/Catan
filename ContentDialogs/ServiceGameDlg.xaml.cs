@@ -32,6 +32,7 @@ namespace Catan10
         private List<PlayerModel> AllPlayers { get; set; } = null;
         private TaskCompletionSource<bool> _tcs = null;
         public bool IsCanceled { get; private set; } = false;
+        public bool JoinedExistingSession { get; private set; } = false;
 
         public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
         public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
@@ -122,11 +123,14 @@ namespace Catan10
             await GetSessions();
         }
 
+       
+
         private async Task GetSessions()
         {
             ErrorMessage = "";
             try
             {
+                
                 List<SessionInfo> sessions = await Proxy.GetSessions();
                 if (sessions == null)
                 {
@@ -182,7 +186,18 @@ namespace Catan10
             ErrorMessage = "";
             try
             {
+                foreach (var player in PlayersInGame)
+                {
+                    if (player.PlayerName == CurrentPlayer.PlayerName)
+                    {
+                        JoinedExistingSession = true;
+                        this.Hide();
+                        return;
 
+                        
+                    }
+                }
+                
                 var sessionInfo = await Proxy.JoinSession(SelectedSession.Id, CurrentPlayer.PlayerName);
                 if (sessionInfo != null)
                 {

@@ -133,7 +133,7 @@ namespace Catan10
 
                 if (Stacks.ActionCount == 0)
                 {
-                    return GameState.WaitingForPlayers;
+                    return GameState.WaitingForNewGame;
                 }
 
                 return Stacks.PeekAction.NewState;
@@ -192,7 +192,7 @@ namespace Catan10
             }
             finally
             {
-
+                NotifyPropertyChanged("GameState");
                 // PrintLog();
             }
         }
@@ -203,7 +203,7 @@ namespace Catan10
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            LogChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            LogChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public bool CanRedo => Stacks.CanUndo;
@@ -252,6 +252,7 @@ namespace Catan10
                 //   PrintLog();
                 NotifyPropertyChanged("Do");
                 NotifyPropertyChanged("Undo");
+                NotifyPropertyChanged("GameState");
 
             }
 
@@ -313,6 +314,7 @@ namespace Catan10
             finally
             {
                 //  PrintLog();
+                NotifyPropertyChanged("GameState");
 
             }
 

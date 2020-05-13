@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 using Windows.Storage;
 using Windows.UI;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -74,8 +75,25 @@ namespace Catan10
         
         public PlayerModel()
         {
-            //_playerGameData = new PlayerGameModel(this);
-            //_playerGameData.ColorAsString = "Blue";
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+
+                BitmapImage bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/DefaultPlayers/guest.jpg", UriKind.RelativeOrAbsolute));
+                ImageBrush brush = new ImageBrush
+                {
+                    AlignmentX = AlignmentX.Left,
+                    AlignmentY = AlignmentY.Top,
+                    Stretch = Stretch.UniformToFill,
+                    ImageSource = bitmapImage
+                };
+                ImageBrush = brush;
+                _imageBrush = new ImageBrush();
+
+                _playerGameData = new PlayerGameModel(this);
+                _playerGameData.ColorAsString = "Blue";
+
+            }
+
 
         } // needed for serialization
 

@@ -153,11 +153,14 @@
     <Compile Include="UI Controls\BoardMeasurementCtrl.xaml.cs">
       <DependentUpon>BoardMeasurementCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\DiceCtrl.xaml.cs">
+      <DependentUpon>DiceCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\PublicDataCtrl.xaml.cs">
       <DependentUpon>PublicDataCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\PlayerResourceCountCtrl.xaml.cs">
-      <DependentUpon>PlayerResourceCountCtrl.xaml</DependentUpon>
+    <Compile Include="UI Controls\PlayersTrackerCtrl.xaml.cs">
+      <DependentUpon>PlayersTrackerCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\PrivateDataCtrl.xaml.cs">
       <DependentUpon>PrivateDataCtrl.xaml</DependentUpon>
@@ -261,6 +264,8 @@
     <None Include="Catan10_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\dice_stop_dark.svg" />
+    <Content Include="Assets\dice_stop_light.svg" />
     <Content Include="Assets\Tiles\back.jpg" />
     <Content Include="Assets\cherry.jpg" />
     <Content Include="Assets\DefaultPlayers\Adrian.jpg" />
@@ -351,11 +356,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI Controls\DiceCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\PublicDataCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\PlayerResourceCountCtrl.xaml">
+    <Page Include="UI Controls\PlayersTrackerCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -473,7 +482,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.5.5.125514</Version>
+      <Version>2020.5.11.123258</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>

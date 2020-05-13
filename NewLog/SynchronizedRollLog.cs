@@ -12,6 +12,14 @@ namespace Catan10
     {
         public string PlayerName { get; set; }
         public List<int> Rolls { get; set; }
+        public int DiceOne { get; set; }   // for the latest roll, what was the value of the first die?
+        public int DiceTwo { get; set; }
+        public override string ToString()
+        {
+            string s = "";
+            Rolls.ForEach(r => s += $"{r},");
+            return $"{PlayerName}: {s} ";
+        }
 
         public int CompareTo(SynchronizedRoll other)
         {
@@ -56,6 +64,11 @@ namespace Catan10
         public void Sort()
         {
             Rolls.Sort();
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
         }
 
         public bool HasTies()
@@ -103,7 +116,8 @@ namespace Catan10
             SynchronizedRollLog log = new SynchronizedRollLog()
             {
                 CanUndo = false, 
-                Action = CatanAction.RollToSeeWhoGoesFirst
+                Action = CatanAction.RollToSeeWhoGoesFirst,
+                NewState = GameState.WaitingForRollForOrder
             };
             await gameController.SynchronizedRoll(log);
             return log;

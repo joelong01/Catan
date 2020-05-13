@@ -36,47 +36,39 @@ namespace Catan10
 
     public class MainPageModel : INotifyPropertyChanged
     {
-        readonly string[] _StateMessages = new string[] {
-            "Uninitialized",        // 0    Uninitialized,                      
-            "New Game",             // 1    WaitingForNewGame,                  
-            "Starting...",          // 2    Starting,                           
-            "Dealing",              // 3    Dealing,                            
-            "Start Game",           // 4    WaitingForStart,                    
-            "Next When Done",       // 5    AllocResourceForward,            
-            "Next When Done",       // 6    AllocateResourceReverse,            
-            "",                     // 7    DoneResourceAllocation,             
-            "Enter Roll",           // 8    WaitingForRoll,                     
-            "Targeted",             // 9    Targeted,                           
-            "Cards Lost",           // 10    LostToCardsLikeMonopoly,            
-            "Supplemental?",        // 11    Supplemental,                       
-            "Done",                 // 12    DoneSupplemental,                   
-            "NextWhenDone",         // 13    WaitingForNext,                     
-            "Cards Lost",           // 14    LostCardsToSeven,                   
-            "Cards Lost",           // 15    MissedOpportunity,                  
-            "Pick Game",            // 16    GamePicked,                         
-            "Move Baron or Ship",   // 17    MustMoveBaron  
-            "",                     // 18    Unknown
-            "Roll For Order"        // 19     WaitingToRollForPosition
-
-
+        private Dictionary<GameState, string> StateMessages { get; } = new Dictionary<GameState, string>()
+        {
+               {GameState.Uninitialized, "" },
+               {GameState.WaitingForNewGame, "New Game" },
+               {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
+               {GameState.PickingBoard, "Roll for Order" },
+               {GameState.WaitingForRollForOrder, "Start" },
+               {GameState.WaitingForStart, "Pick Resource" },
+               {GameState.AllocateResourceForward, "Pick Resource" },
+               {GameState.AllocateResourceReverse, "Pick Resource" },               
+               {GameState.WaitingForRoll, "Select Roll" },
+               {GameState.WaitingForNext, "Done" },
+               {GameState.Supplemental, "Suplemental" }
         };
 
-        string _StateMessage = "Uninitialized";
+
+
         public string StateMessage
         {
             get
             {
-                return _StateMessage;
-            }
-            set
-            {
-                if (_StateMessage != value)
+                if (Log == null) return "New Game";
+
+                if (StateMessages.TryGetValue(Log.GameState, out string msg))
                 {
-                    _StateMessage = value;
-                    NotifyPropertyChanged();
+                    return msg;
                 }
+
+                return $"GameStart.{Log.GameState}";
             }
         }
+
+
 
         public ServiceData ServiceData { get; } = new ServiceData();
         bool _EnableUiInteraction = true;
@@ -91,7 +83,7 @@ namespace Catan10
         }
 
 
-       
+
         private bool _isServiceGame = false;
 
         public bool IsServiceGame
@@ -108,18 +100,39 @@ namespace Catan10
         }
         public MainPageModel()
         {
-           
-        }
 
+        }
+        /// <summary>
+        ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
+        ///     if we add one of these properties (which are usually the get'ers only)
+        /// </summary>
+        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton" , "EnableRedo" , "StateMessage", "ShowBoardMeasurements", "ShowRolls" };
         private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
 
-            // this.TraceMessage($"Log_PropertyChanged: [Property={e.PropertyName}] [GameState={_Log.GameState}");
-            NotifyPropertyChanged("EnableNextButton");
-            NotifyPropertyChanged("EnableRedo");
+            DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
 
-            StateMessage = _StateMessages[(int)_newLog.GameState];
+        }
 
+        public Visibility ShowRolls
+        {
+            get
+            {
+                if (Log == null) return Visibility.Collapsed;
+
+                if ( (Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder)) return Visibility.Visible;
+                return Visibility.Collapsed;
+            }
+        }
+
+        public Visibility ShowBoardMeasurements
+        {
+            get
+            {
+                if (Log == null) return Visibility.Collapsed;
+                if (Log.GameState == GameState.PickingBoard) return Visibility.Visible;
+                return Visibility.Collapsed;
+            }
         }
 
         private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
@@ -168,7 +181,7 @@ namespace Catan10
             {
                 if (Log == null) return true;
                 GameState state = Log.GameState;
-                return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart ||
+                return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
                         state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
                         state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers));
 
@@ -203,11 +216,11 @@ namespace Catan10
             get
             {
                 if (Log == null) return false;
-                
+
                 return Log.CanRedo;
             }
         }
-        
+
         NewLog _newLog = null;
         [JsonIgnore]
         public NewLog Log
@@ -220,7 +233,7 @@ namespace Catan10
             {
                 if (_newLog != value)
                 {
-                   _newLog = value;
+                    _newLog = value;
                     _newLog.LogChanged += Log_PropertyChanged;
                     NotifyPropertyChanged();
                 }

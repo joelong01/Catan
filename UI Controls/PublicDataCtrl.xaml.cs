@@ -12,6 +12,50 @@ namespace Catan10
     {
         private ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
+        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PublicDataCtrl), new PropertyMetadata(GameState.WaitingForNewGame, GameStateChanged));
+        public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
+        public TileOrientation RollOrientation
+        {
+            get => (TileOrientation)GetValue(RollOrientationProperty);
+            set => SetValue(RollOrientationProperty, value);
+        }
+        private static void RollOrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as PublicDataCtrl;
+            var depPropValue = (TileOrientation)e.NewValue;
+            depPropClass?.SetRollOrientation(depPropValue);
+        }
+        private void SetRollOrientation(TileOrientation orientation)
+        {
+            if (orientation == TileOrientation.FaceDown) 
+                ShowPlayerPicture.Begin();
+            else
+                ShowLatestRoll.Begin();
+        }
+
+        public GameState GameState
+        {
+            get => (GameState)GetValue(GameStateProperty);
+            set => SetValue(GameStateProperty, value);
+        }
+        private static void GameStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as PublicDataCtrl;
+            var depPropValue = (GameState)e.NewValue;
+            depPropClass?.SetGameState(depPropValue);
+        }
+        private void SetGameState(GameState state)
+        {
+            if (state == GameState.WaitingForRollForOrder)
+            {
+                ShowLatestRoll.Begin();
+            }
+            else
+            {
+                ShowPlayerPicture.Begin();
+            }
+        }
+
         public PlayerModel Player
         {
             get => (PlayerModel)GetValue(PlayerProperty);
@@ -27,7 +71,7 @@ namespace Catan10
         private void SetPlayer(PlayerModel value)
         {
             PlayedDevCards.Clear();
-            PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);
+            PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);            
             //
             //  for testing...
             //
@@ -35,12 +79,15 @@ namespace Catan10
             this.PlayedDevCards.Add(DevCardType.YearOfPlenty);
             this.PlayedDevCards.Add(DevCardType.Knight);
             this.PlayedDevCards.Add(DevCardType.Monopoly);
+            
         }
 
+       
 
         public PublicDataCtrl()
         {
-            this.InitializeComponent();            
+            this.InitializeComponent();
+            ShowPlayerPicture.Begin();
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)

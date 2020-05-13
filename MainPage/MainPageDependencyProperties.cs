@@ -11,12 +11,7 @@ namespace Catan10
 
     public sealed partial class MainPage : Page
     {
-        public static readonly DependencyProperty ShowBoardMeasurementProperty = DependencyProperty.Register("ShowBoardMeasurement", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
-        public bool ShowBoardMeasurement
-        {
-            get => (bool)GetValue(ShowBoardMeasurementProperty);
-            set => SetValue(ShowBoardMeasurementProperty, value);
-        }
+       
         public static readonly DependencyProperty PipCountProperty = DependencyProperty.Register("PipCount", typeof(TradeResources), typeof(MainPage), new PropertyMetadata(new TradeResources()));
         public TradeResources PipCount
         {

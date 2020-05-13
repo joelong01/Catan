@@ -116,9 +116,10 @@
                 </local:GameContainerCtrl.RenderTransform>
             </local:GameContainerCtrl>
         </Viewbox>
-        <local:PlayerResourceCountCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Width="615" Margin="0,47,38,29"
+        <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Width="615" Margin="0,47,38,29"
             HorizontalAlignment="Right"
-            PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
+            PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
+            GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" />
 
         <Grid x:Name="ControlGrid" Width="250" Height="500" Margin="0"
             HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -208,6 +209,7 @@
             HorizontalAlignment="Left" VerticalAlignment="Bottom"
             Background="{StaticResource BlackBrush}"
             BorderBrush="{StaticResource WhiteBrush}"
+            Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
             PointerPressed="OnPointerPressed" BorderThickness="1" IsHitTestVisible="True">
             <Grid.RenderTransform>
                 <CompositeTransform TranslateX="-0" ScaleX="1" ScaleY="1" />
@@ -371,7 +373,7 @@
 
         <Grid Name="Grid_PrivateData" Grid.Row="1" Grid.RowSpan="10" Width="500"
             Height="340" HorizontalAlignment="Left" VerticalAlignment="Top"
-            Visibility="{x:Bind ShowBoardMeasurement, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+            Visibility="Visible"
             BorderBrush="{StaticResource bmMaple}"
             Background="{StaticResource bmKnight}"
             CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
@@ -398,7 +400,7 @@
 
         <Grid Name="Grid_BoardMeasurement" Grid.Row="1" Grid.RowSpan="10" Width="500"
             Height="300" HorizontalAlignment="Left" VerticalAlignment="Top"
-            Visibility="{x:Bind MainPageModel.IsServiceGame, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+            Visibility="{x:Bind MainPageModel.ShowBoardMeasurements, Mode=OneWay}"
             BorderBrush="{StaticResource bmMaple}"
             Background="{StaticResource bmKnight}"
             CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
@@ -422,7 +424,13 @@
                 FourStarPositions="{x:Bind Path=MainPageModel.FourStarPositions, Mode=OneWay}"
                 ThreeStarPositions="{x:Bind Path=MainPageModel.ThreeStarPositions, Mode=OneWay}"
                 TwoStarPositions="{x:Bind Path=MainPageModel.TwoStarPositions, Mode=OneWay}"
-                CornerRadius="10" />
+                CornerRadius="10">
+                <local:BoardMeasurementCtrl.Transitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition />
+                    </TransitionCollection>
+                </local:BoardMeasurementCtrl.Transitions>
+            </local:BoardMeasurementCtrl>
 
 
         </Grid>
@@ -430,7 +438,7 @@
 
         <Grid Name="Grid_Rolls" Grid.Row="1" Grid.RowSpan="10" Width="530"
             Height="260" HorizontalAlignment="Left" VerticalAlignment="Top"
-            Visibility="Visible"
+            Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
             BorderBrush="{StaticResource bmMaple}"
             Background="{Binding FallbackValue=Blue, Mode=OneWay, Path=TheHuman.GameData.BackgroundBrush}"
             CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">

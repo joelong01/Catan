@@ -323,7 +323,7 @@ namespace Catan10
             }
 
             MainPageModel = new MainPageModel();
-
+            
 
 
             // _lbGames.SelectedValue = MainPageModel.Log;
@@ -411,7 +411,7 @@ namespace Catan10
         }
 
 
-        private async Task AddPlayer(PlayerModel pData, LogType logType)
+        private  Task AddPlayer(PlayerModel pData, LogType logType)
         {
 
             MainPageModel.PlayingPlayers.Add(pData);
@@ -428,7 +428,8 @@ namespace Catan10
 
 
             //  _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
-            await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, MainPageModel.PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
+            // await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, MainPageModel.PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
+            return Task.CompletedTask;
 
         }
 
@@ -481,17 +482,35 @@ namespace Catan10
 
             try
             {
-                switch (CurrentGameState)
+                switch (CurrentGameState) // this is actually better thought of as the state we are about to change or that we need to do something and the user takes care of hitting the Next button
                 {
-                    case GameState.Dealing: // a state just to be undone...
+                  
+                    case GameState.WaitingForNewGame:
+                        OnNewNetworkGame(null, null);
                         break;
                     case GameState.WaitingForPlayers:
+                        //
+                        //  if the current player created the session, then we start the game
+                        //  otherwise we just listen to messages, which will have these messages in the queue
+                        if (MainPageModel.GameStartedBy == TheHuman)
+                        {
+
+                            //
+                            //  randomize the board
+                            var randomBoardLog = await RandomBoardLog.RandomizeBoard(this, 0);
+                            Contract.Assert(randomBoardLog != null);
+                        }
+                        await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
+                        
+                        break;
+                    case GameState.WaitingForRollForOrder:
+                        //
+                        // hide board measurement UI as we've now picked out poison
+                       
                         await SynchronizedRollLog.StartSyncronizedRoll(this);
-                        break;
-                    case GameState.WaitingForNewGame:
-                        await OnNewGame();
-                        break;
+                        break;                   
                     case GameState.WaitingForStart:
+                        MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceDown);
                         await CopyScreenShotToClipboard(_gameView);
                         await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, true);
                         break;
@@ -1697,7 +1716,7 @@ namespace Catan10
 
             if (TheHuman.PlayerName != MainPageModel.ServiceData.SessionInfo.Creator) return;
 
-            if (MainPageModel.Log.GameState == GameState.WaitingForPlayers)
+            if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
 
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
@@ -1731,7 +1750,7 @@ namespace Catan10
 
         public void UpdateBoardMeasurements()
         {
-            ShowBoardMeasurement = true;
+           
             PipCount = GetPipCount();
             List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
             buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);

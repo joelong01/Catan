@@ -28,25 +28,45 @@
                 <SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="-90" />
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
+        <Style x:Key="RollCtrl_GridStyle" TargetType="Grid">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="BorderBrush" Value="{StaticResource bmCherry}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="10" />
+        </Style>
     </Control.Resources>
-    <Grid>
-        <Grid Name="Grid_FaceDown" Width="120" Height="170" Background="{StaticResource bmResourceCardBack}">
-            <Grid.Projection>
-                <PlaneProjection x:Name="PlaneProjection_FaceDown" RotationY="0" />
-            </Grid.Projection>
+    <Viewbox Stretch="Uniform">
+        <Grid Width="120" Height="170">
+            <Grid Name="Grid_FaceDown" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource bmResourceCardBack}">
+
+
+                <Grid.Projection>
+                    <PlaneProjection x:Name="PlaneProjection_FaceDown" RotationY="0" />
+                </Grid.Projection>
+
+                <Image Margin="1" Source="ms-appx:///Assets/dice_dark.svg" />
+
+
+
+
+            </Grid>
+            <Grid Name="Grid_FaceUp" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource bmResourceCardGoldMine}">
+                <Grid.Projection>
+                    <PlaneProjection x:Name="PlaneProjection_FaceUp" RotationY="-90" />
+                </Grid.Projection>
+                <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    FillColor="{StaticResource WhiteBrush}"
+                    Thickness="15"
+                    Number="{x:Bind DiceOne, Mode=OneWay}" />
+                <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    FillColor="{StaticResource WhiteBrush}"
+                    Thickness="15"
+                    Number="{x:Bind DiceTwo, Mode=OneWay}" />
+
+            </Grid>
+
         </Grid>
-        <Grid Name="Grid_FaceUp" Background="{StaticResource bmCherry}">
-            <Grid.Projection>
-                <PlaneProjection x:Name="PlaneProjection_FaceUp" RotationY="-90" />
-            </Grid.Projection>
-            <TextBlock Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                FontFamily="Segoe UI Symbol" FontSize="100"
-                Text="{x:Bind DiceOne, Mode=OneWay}"
-                TextLineBounds="Tight" />
-            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                FontFamily="Segoe UI Symbol" FontSize="100"
-                Text="{x:Bind DiceTwo, Mode=OneWay}"
-                TextLineBounds="Tight" />
-        </Grid>
-    </Grid>
+    </Viewbox>
 </UserControl>

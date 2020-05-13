@@ -20,17 +20,18 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
-    
+
     public sealed partial class PlayerRollCtrl : UserControl
     {
         bool _rolled = false;
         List<RollCtrl> _rollControls = new List<RollCtrl>();
         TaskCompletionSource<int> RollTcs { get; set; } = null;
 
-    
+
         public PlayerRollCtrl()
         {
             this.InitializeComponent();
+            this.DataContext = this;
             _rollControls.Add(RollCtrl_One);
             _rollControls.Add(RollCtrl_Two);
             _rollControls.Add(RollCtrl_Three);
@@ -42,24 +43,32 @@ namespace Catan10
             if (_rolled) return;
 
             RollCtrl rollCtrl = sender as RollCtrl;
-            _roll = rollCtrl.Roll;
+            DiceOne = rollCtrl.DiceOne;
+            DiceTwo = rollCtrl.DiceTwo;
+            
             rollCtrl.Orientation = TileOrientation.FaceUp;
             if (RollTcs != null)
             {
-                RollTcs.SetResult(_roll);
+                RollTcs.SetResult(Roll);
                 RollTcs = null;
             }
         }
 
-        private int _roll = 0;
-        public int Roll => _roll;
+        public int Roll => DiceOne + DiceTwo;
+        public int DiceOne { get; private set; } = 0;
+        public int DiceTwo { get; private set; } = 0;
 
         public async Task Reset()
         {
             var list = new List<Task>();
-            _rollControls.ForEach((ctrl) => list.Add(ctrl.GetFlipTask(TileOrientation.FaceDown)));
+            _rollControls.ForEach((ctrl) =>
+            {
+                var task = ctrl.GetFlipTask(TileOrientation.FaceDown);
+                list.Add(task);
+            });
             await Task.WhenAll(list);
             _rolled = false;
+            Randomize();
 
         }
 

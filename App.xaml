@@ -44,6 +44,18 @@
         <local:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
         <local:StringToIntConverter x:Key="StringToIntConverter" />
         <local:ResourceTypeToVisibilityConverter x:Key="ResourceTypeToVisibilityConverter" />
+        <local:DiceRollToVisibilityConverter x:Key="DiceRollToVisibilityConverter" />
+        <local:BoolToOrientationConverter x:Key="BoolToOrientationConverter" />
+
+
+
+        <ImageBrush x:Key="bmDice_1" ImageSource="Assets/Dice/oneWhite.svg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmDice_2" ImageSource="Assets/Dice/twoWhite.svg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmDice_3" ImageSource="Assets/Dice/threeWhite.svg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmDice_4" ImageSource="Assets/Dice/fourWhite.svg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmDice_5" ImageSource="Assets/Dice/fiveWhite.svg" Stretch="UniformToFill" />
+        <ImageBrush x:Key="bmDice_6" ImageSource="Assets/Dice/sixWhite.svg" Stretch="UniformToFill" />
+
         <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="UniformToFill" />
         <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="UniformToFill" />

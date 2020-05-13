@@ -43,7 +43,10 @@ namespace Catan10
                                                                                 "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
 
-        public PlayerGameModel() { }
+        public PlayerGameModel() 
+        {
+            
+        }
 
         private PlayerModel _playerData = null; // back pointer
 
@@ -362,6 +365,68 @@ namespace Catan10
         private bool _useLightFile = true;
         List<List<int>> _GoldRolls = new List<List<int>>();
         PlayerResources _PlayerResources = new PlayerResources();
+        
+        int _DiceOne = -1;
+        int _DiceTwo = -1;
+        TileOrientation _RollOrientation = TileOrientation.FaceDown;
+        public TileOrientation RollOrientation
+        {
+            get
+            {
+                return _RollOrientation;
+            }
+            set
+            {
+                if (_RollOrientation != value)
+                {
+                    _RollOrientation = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int DiceTwo
+        {
+            get
+            {
+                return _DiceTwo;
+            }
+            set
+            {
+                if (_DiceTwo != value)
+                {
+                    _DiceTwo = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("ShowLatestRoll");
+                }
+            }
+        }
+        public int DiceOne
+        {
+            get
+            {
+                return _DiceOne;
+            }
+            set
+            {
+                if (_DiceOne != value)
+                {
+                    _DiceOne = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("ShowLatestRoll");
+                }
+            }
+        }
+
+        public bool ShowLatestRoll
+        {
+            get
+            {
+                return ( (DiceOne > 1 && DiceTwo > 1));
+            }
+            
+        }
+        public int LatestRoll => DiceOne + DiceTwo;
+        
         public PlayerResources PlayerResources
         {
             get
@@ -540,10 +605,10 @@ namespace Catan10
         {
             get
             {
-                string bitmapPath = "ms-appx:///Assets/dice_dark.svg";
+                string bitmapPath = "ms-appx:///Assets/dice_stop_dark.svg";
                 if (UseLightFile)
                 {
-                    bitmapPath = "ms-appx:///Assets/dice_light.svg";
+                    bitmapPath = "ms-appx:///Assets/dice_stop_light.svg";
                 }
                 BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
                 return bitmapImage;
@@ -924,6 +989,8 @@ namespace Catan10
                 }
             }
         }
+
+        
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

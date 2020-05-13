@@ -378,7 +378,14 @@ namespace Catan10
 
                });
         }
-
+        /// <summary>
+        ///     This is called when the user clicks on the "Next" button.
+        ///     its job is to do all of the updates nesessary to move to the next state
+        /// 
+        ///     if you aren't changing the state here -- think about it... 
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> NextState()
         {
             if (CurrentPlayer == null)
@@ -387,7 +394,76 @@ namespace Catan10
                 return false;
             }
 
-            await ProcessState(CurrentPlayer, "");
+            switch (CurrentGameState)
+            {
+                
+                
+                case GameState.WaitingForNewGame:
+                    OnNewNetworkGame(null, null);
+                   
+                    break;
+                case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
+                    await SetStateLog.SetState(this, GameState.PickingBoard);
+                    if (MainPageModel.GameStartedBy == TheHuman)
+                    {
+                        //
+                        //  randomize the board
+                        var randomBoardLog = await RandomBoardLog.RandomizeBoard(this, 0);
+                        Contract.Assert(randomBoardLog != null);
+                    }
+
+                    
+                    break;
+                case GameState.PickingBoard:  // you get here by clicking the "=>" button
+                    await _rollControl.Reset();                    
+                    MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceUp); // I hate this hack but I couldn't figure out how to do it with DataBinding
+                    await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
+                    await SynchronizedRollLog.StartSyncronizedRoll(this);
+                    break;
+                case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
+                    await SetStateLog.SetState(this, GameState.WaitingForStart);
+                    MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceDown); // I hate this hack but I couldn't figure out how to do it with DataBinding
+                    break;
+                case GameState.WaitingForStart:
+                    await SetStateLog.SetState(this, GameState.AllocateResourceForward);
+                    break;
+                case GameState.AllocateResourceForward:
+                    break;
+                case GameState.AllocateResourceReverse:
+                    break;
+                case GameState.DoneResourceAllocation:
+                    break;
+                case GameState.WaitingForRoll:
+                    break;
+                case GameState.Targeted:
+                    break;
+                case GameState.LostToCardsLikeMonopoly:
+                    break;
+                case GameState.Supplemental:
+                    break;
+                case GameState.DoneSupplemental:
+                    break;
+                case GameState.WaitingForNext:
+                    break;
+                case GameState.LostCardsToSeven:
+                    break;
+                case GameState.MissedOpportunity:
+                    break;
+                case GameState.GamePicked:
+                    break;
+                case GameState.MustMoveBaron:
+                    break;
+                case GameState.Unknown:
+                    break;
+               
+
+                //
+                //  these don't ever get called when Next is hit
+                case GameState.Uninitialized:
+                default:
+                    Contract.Assert(false, "Next should not have been anabled for this state!");
+                    break;
+            }
             return true;
         }
 
@@ -938,24 +1014,22 @@ namespace Catan10
             // start a new game
             var startGameModel = await StartGameLog.StartGame(this, TheHuman.PlayerName, 0, true);
             Contract.Assert(startGameModel != null);
-            //
-            //  add the player
-            var addPlayerLog = await AddPlayerLog.AddPlayer(this, TheHuman);
-            Contract.Assert(addPlayerLog != null);
 
-            //
-            //  if the current player created teh session, then we start the game
-            //  otherwise we just listen to messages, which will have these messages in the queue
-            if (dlg.SelectedSession.Creator == TheHuman.PlayerName)
+            if (dlg.JoinedExistingSession)
             {
-
                 //
-                //  randomize the board
-                var randomBoardLog = await RandomBoardLog.RandomizeBoard(this, 0);
-                Contract.Assert(randomBoardLog != null);
-            }
+                //   if you joined an existing session, you need to get all the logs and go through them
 
-          
+            }
+            else
+            {
+                //
+                //  add the player
+                var addPlayerLog = await AddPlayerLog.AddPlayer(this, TheHuman);
+                Contract.Assert(addPlayerLog != null);
+                MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedSession.Creator);
+                
+            }
 
             StartMonitoring();
 
@@ -971,6 +1045,15 @@ namespace Catan10
                 }
             }
             return null;
+        }
+
+        
+        private Task ReplayGame(SessionInfo session, string playerName)
+        {
+            var Proxy = MainPageModel.ServiceData.Proxy;
+            Contract.Assert(Proxy != null);
+            return Task.CompletedTask;
+         //   var messages = await Proxy.
         }
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();

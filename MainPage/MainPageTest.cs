@@ -2,9 +2,14 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Windows.Media.Audio;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Shapes;
 
 
 
@@ -18,27 +23,94 @@ namespace Catan10
 
     public sealed partial class MainPage : Page, ILog
     {
-        
+
+
         private void InitTest()
         {
 
         }
-        // int toggle = 0;
-        private  void OnTest1(object sdr, RoutedEventArgs rea)
+
+        private async Task<List<int>> GetRandomOrg()
         {
-            SyncronizedPlayerRolls playerRolls = new SyncronizedPlayerRolls();
+            List<int> list = new List<int>();
+            HttpClient Client = new HttpClient() { Timeout = TimeSpan.FromDays(1) };
+            int count = 10000;
+            string url = "https://www.random.org/integers/?num=" + count.ToString() + "&min=1&max=6&col=1&base=10&format=plain&rnd=new";
+            var response = await Client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string res = await response.Content.ReadAsStringAsync();
+                string[] dicerolls = res.Split(new char[] { '\n', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < dicerolls.Count(); i += 2)
+                {
 
-            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Joe", Rolls = new List<int>() { 6 } });
-            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "James", Rolls = new List<int>() { 10, 9, 4 } });
-            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Doug", Rolls = new List<int>() { 7, 6 } });
-            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Adrian", Rolls = new List<int>() { 7,8 } });
-            playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Chris", Rolls = new List<int>() { 10, 9, 5 } });
+                    list.Add(Int32.Parse(dicerolls[i]) + Int32.Parse(dicerolls[i + 1]));
+                }
+            }
+
+            return list;
+        }
+
+        // int toggle = 0;
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
+        {
 
 
 
-            bool ties = playerRolls.HasTies();
 
-            playerRolls.Sort();
+            MersenneTwister twist = new MersenneTwister((int)DateTime.Now.Ticks);
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            //int roll;
+            //int count = 0;
+            int[] distribution = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            List<int> list = new List<int>();
+            for (int i = 0; i < 10; i++)
+            {
+                var temp = await GetRandomOrg();
+                if (temp != null && temp.Count > 0)
+                    list.AddRange(temp);
+            }
+
+
+            foreach (int i in list)
+            {
+                distribution[i - 2]++;
+            }
+
+
+            //do
+            //{
+            //    // roll = rand.Next(1, 7) + rand.Next(1, 7);
+            //    roll = twist.Next(1, 7) + twist.Next(1, 7);
+            //    distribution[roll]++;
+            //    count++;
+            //} while (count < 200000);
+            //this.TraceMessage($"took {count} times");
+
+            distribution.ForEach((n) => Debug.WriteLine(n));
+
+
+
+            //Random rand = new Random((int)DateTime.Now.Ticks);
+            //foreach (var player in MainPageModel.PlayingPlayers)
+            //{
+            //    player.GameData.DiceOne = rand.Next(1, 6);
+            //    player.GameData.DiceTwo = rand.Next(1, 6);
+            //}
+
+            //SyncronizedPlayerRolls playerRolls = new SyncronizedPlayerRolls();
+
+            //playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Joe", Rolls = new List<int>() { 6 } });
+            //playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "James", Rolls = new List<int>() { 10, 9, 4 } });
+            //playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Doug", Rolls = new List<int>() { 7, 6 } });
+            //playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Adrian", Rolls = new List<int>() { 7,8 } });
+            //playerRolls.Rolls.Add(new SynchronizedRoll() { PlayerName = "Chris", Rolls = new List<int>() { 10, 9, 5 } });
+
+
+
+            //bool ties = playerRolls.HasTies();
+
+            //playerRolls.Sort();
 
             //var dict = new Dictionary<string, List<int>>();
 
@@ -48,7 +120,7 @@ namespace Catan10
             //dict["Adrian"] = new List<int>() { 8 };
             //dict["Chris"] = new List<int>() { 8, 2 };
 
-            this.TraceMessage(CatanProxy.Serialize(playerRolls, true));
+            //this.TraceMessage(CatanProxy.Serialize(playerRolls, true));
 
             //int n = 8;
             //toggle = 1 - toggle;
@@ -81,7 +153,9 @@ namespace Catan10
         }
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
-            GameContainer.AllTiles.ForEach((t) => t.AnimateFadeAsync(.25));
+            //  GameContainer.AllTiles.ForEach((t) => t.AnimateFadeAsync(.25));
+
+            MainPageModel.PlayingPlayers.ForEach((p) => { p.GameData.DiceOne = 0; p.GameData.DiceOne = 0; });
 
             // change player
             //ChangePlayerLog changedPlayer = await ChangePlayerLog.ChangePlayer(this, 1, GameState.WaitingForRoll);
