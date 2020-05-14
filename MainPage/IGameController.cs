@@ -235,7 +235,7 @@ namespace Catan10
 
         public async Task SetRandomBoard(RandomBoardLog randomBoard)
         {
-            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.PickingBoard); // the first is true the first time through then it is the second
+            Contract.Assert(CurrentGameState == GameState.PickingBoard); // the first is true the first time through then it is the second
             Contract.Assert(randomBoard.NewState == GameState.PickingBoard);
 
             if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)

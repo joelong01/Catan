@@ -405,6 +405,7 @@ namespace Catan10
                     return false;
                     
                 case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
+                    await SetStateLog.SetState(this, GameState.PickingBoard);
                     await RandomBoardLog.RandomizeBoard(this, 0);                    
                     break;
                 case GameState.PickingBoard:  // you get here by clicking the "=>" button                   
