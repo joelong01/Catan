@@ -114,13 +114,25 @@ namespace Catan10
 
         }
 
+        public bool EnableRolls
+        {
+            get
+            {
+                if (Log == null) return false;
+                if ((Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder)) return true;
+                return false;
+                
+
+            }
+        }
+
         public Visibility ShowRolls
         {
             get
             {
                 if (Log == null) return Visibility.Collapsed;
 
-                if ( (Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder)) return Visibility.Visible;
+                if ( (Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder) || (Log.GameState == GameState.WaitingForStart)) return Visibility.Visible;
                 return Visibility.Collapsed;
             }
         }

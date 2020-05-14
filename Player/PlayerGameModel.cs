@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -43,9 +44,9 @@ namespace Catan10
                                                                                 "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
 
-        public PlayerGameModel() 
+        public PlayerGameModel()
         {
-            
+
         }
 
         private PlayerModel _playerData = null; // back pointer
@@ -111,7 +112,7 @@ namespace Catan10
         }
         private void OnGameModelResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
         {
-           // _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
+            // _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
 
         }
 
@@ -365,10 +366,10 @@ namespace Catan10
         private bool _useLightFile = true;
         List<List<int>> _GoldRolls = new List<List<int>>();
         PlayerResources _PlayerResources = new PlayerResources();
-        
-        int _DiceOne = -1;
-        int _DiceTwo = -1;
         TileOrientation _RollOrientation = TileOrientation.FaceDown;
+
+        public SyncronizedPlayerRolls SyncronizedPlayerRolls { get; } = new SyncronizedPlayerRolls();
+
         public TileOrientation RollOrientation
         {
             get
@@ -384,49 +385,10 @@ namespace Catan10
                 }
             }
         }
-        public int DiceTwo
-        {
-            get
-            {
-                return _DiceTwo;
-            }
-            set
-            {
-                if (_DiceTwo != value)
-                {
-                    _DiceTwo = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("ShowLatestRoll");
-                }
-            }
-        }
-        public int DiceOne
-        {
-            get
-            {
-                return _DiceOne;
-            }
-            set
-            {
-                if (_DiceOne != value)
-                {
-                    _DiceOne = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("ShowLatestRoll");
-                }
-            }
-        }
 
-        public bool ShowLatestRoll
-        {
-            get
-            {
-                return ( (DiceOne > 1 && DiceTwo > 1));
-            }
-            
-        }
-        public int LatestRoll => DiceOne + DiceTwo;
-        
+
+       
+
         public PlayerResources PlayerResources
         {
             get
@@ -990,7 +952,7 @@ namespace Catan10
             }
         }
 
-        
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -1230,4 +1192,170 @@ namespace Catan10
 
 
     }
+   
+    /// <summary>
+    ///     this class has 
+    ///         1. the list of the rolls a player has made
+    ///         2. the values of the 2 dice rolled
+    ///     It also knows
+    ///         1. How to compare the full list of Rolls while preserving order 
+    ///            (e.g. person 1 with rolls 5,7,7,4 wins over person 2 with 5,7,7,3 and person 3 with rolls 6 wins over all)
+    ///         2. how to tell if to SynchronizedPlayerRolls are in a tie
+    /// </summary>
+
+    public class SyncronizedPlayerRolls : IComparable<SyncronizedPlayerRolls>, INotifyPropertyChanged
+    {
+        
+        public List<int> Rolls { get; set; } = new List<int>();
+        int _DiceOne = -1;
+        int _DiceTwo = -1;
+        public int DiceTwo
+        {
+            get
+            {
+                return _DiceTwo;
+            }
+            set
+            {
+                if (_DiceTwo != value)
+                {
+                    _DiceTwo = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("LatestRoll");
+                    NotifyPropertyChanged("ShowLatestRoll");
+                }
+            }
+        }
+        public int DiceOne
+        {
+            get
+            {
+                return _DiceOne;
+            }
+            set
+            {
+                if (_DiceOne != value)
+                {
+                    _DiceOne = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("LatestRoll");
+                    NotifyPropertyChanged("ShowLatestRoll");
+                    
+                }
+            }
+        }
+
+
+        
+
+        public void AddRoll(int d1, int d2)
+        {
+            DiceOne = d1;
+            DiceTwo = d2;
+            Rolls.Add(d1 + d2);
+        }
+        public bool ShowLatestRoll
+        {
+            get
+            {
+                return ((DiceOne > 0 && DiceTwo > 0));
+            }
+
+        }
+        public int LatestRoll => DiceOne + DiceTwo;
+
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public bool TiedWith(List<int> rolls)
+        {
+            if (Math.Abs(rolls.Count - Rolls.Count) > 1) return false; // 
+
+            int count = Math.Min(rolls.Count, Rolls.Count);
+            for (int i=0; i<count; i++)
+            {
+                if (rolls[i] != Rolls[i])
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool InTie(SyncronizedPlayerRolls roll)
+        {
+            Contract.Assert(roll != null);
+            if (roll.Rolls.Count == 0) return true;
+
+            foreach (var r in Rolls)
+            {
+                if (r.CompareTo(roll) == 0)
+                {
+                    if (roll.Rolls.Count <= this.Rolls.Count) // the same or missing a roll
+                    {
+
+                        return true;
+                    }
+
+                }
+            }
+
+            return false;
+        }
+
+        public int Hash
+        {
+            get
+            {
+                int total = 0;
+                foreach (var roll in Rolls)
+                {
+                    total = total * 10 + roll;
+                }
+                return total;
+            }
+        }
+
+        public int CompareTo(SyncronizedPlayerRolls other)
+        {
+            int max = this.Rolls.Count;
+            if (other.Rolls.Count > max) max = other.Rolls.Count;
+
+
+
+            for (int i = 0; i < max; i++)
+            {
+                if (i < this.Rolls.Count && i < other.Rolls.Count)
+                {
+                    if (this.Rolls[i] == other.Rolls[i]) continue;   // tie
+
+                    if (this.Rolls[i] < other.Rolls[i])
+                    {
+                        return 1; // b bigger
+                    }
+                    else
+                    {
+                        return -1; // b smaller
+                    }
+                }
+            }
+
+            if (this.Rolls.Count == other.Rolls.Count) return 0;  // tie for all rolls!
+                                                                  //
+                                                                  //   this means that there is a tie, but somebody has extra rolls -- call it a ties
+
+            return 0;
+        }
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        }
+    }
+
 }

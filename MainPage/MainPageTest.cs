@@ -153,13 +153,60 @@ namespace Catan10
         }
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
-            //  GameContainer.AllTiles.ForEach((t) => t.AnimateFadeAsync(.25));
 
-            MainPageModel.PlayingPlayers.ForEach((p) => { p.GameData.DiceOne = 0; p.GameData.DiceOne = 0; });
+            
+            List<SyncronizedPlayerRolls> playerRolls = new List<SyncronizedPlayerRolls>();
+            playerRolls.Add(new SyncronizedPlayerRolls() { Rolls = new List<int> { 3 } });
+            playerRolls.Add(new SyncronizedPlayerRolls() { Rolls = new List<int> { 7 } });
+            playerRolls.Add(new SyncronizedPlayerRolls() { Rolls = new List<int> { 5, 9, 2, 12 } });
+            playerRolls.Add(new SyncronizedPlayerRolls() { Rolls = new List<int> { 5, 9, 2, 11 } });
+            playerRolls.Add(new SyncronizedPlayerRolls() { Rolls = new List<int> { 6, 7, 8 } });
+            playerRolls.Add(new SyncronizedPlayerRolls() { Rolls = new List<int> { 6, 7, 9 } });
 
-            // change player
-            //ChangePlayerLog changedPlayer = await ChangePlayerLog.ChangePlayer(this, 1, GameState.WaitingForRoll);
-            //VerifyRoundTrip<ChangePlayerLog>(changedPlayer);
+
+            List<int> hashes = new List<int>();
+            foreach (var spr in playerRolls)
+            {
+                hashes.Add(spr.Hash);
+            }
+
+
+            hashes.Sort((a, b) =>
+           {
+
+               if (Math.Abs(a - b) < 12) return 0;
+               return a - b;
+           });
+
+
+            int count = playerRolls.Count;
+            bool done = true;
+            for (int i = 0; i < count; i++)
+            {
+                var p1 = playerRolls[i];
+                for (int j = i; j < count; j++)
+                {
+                    var p2 = playerRolls[j];
+                    if (p2 == p1) continue;
+                    if (p2.CompareTo(p1) == 0)
+                    {
+                        done = false;
+                        break;
+                    }
+                }
+                i++;
+            }
+
+            playerRolls.Sort();
+            playerRolls.ForEach((p) =>
+            {
+                string s="";
+                p.Rolls.ForEach( (r) => s += $"{r},");
+
+                Debug.WriteLine($"{s}");
+             });
+
+            this.TraceMessage($"done={done}");
         }
         // Undo
         private void OnTest3(object sdr, RoutedEventArgs rea)

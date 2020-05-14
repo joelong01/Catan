@@ -439,6 +439,7 @@
         <Grid Name="Grid_Rolls" Grid.Row="1" Grid.RowSpan="10" Width="530"
             Height="260" HorizontalAlignment="Left" VerticalAlignment="Top"
             Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
+            IsTapEnabled="{x:Bind MainPageModel.EnableRolls, Mode=OneWay}"
             BorderBrush="{StaticResource bmMaple}"
             Background="{Binding FallbackValue=Blue, Mode=OneWay, Path=TheHuman.GameData.BackgroundBrush}"
             CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
@@ -452,7 +453,7 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Rolls" FontSize="22"
                 Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}" />
-            <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" />
+            <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" />
 
         </Grid>
 

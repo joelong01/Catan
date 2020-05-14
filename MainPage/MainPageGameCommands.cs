@@ -382,7 +382,10 @@ namespace Catan10
         ///     This is called when the user clicks on the "Next" button.
         ///     its job is to do all of the updates nesessary to move to the next state
         /// 
-        ///     if you aren't changing the state here -- think about it... 
+        ///     We need to be identical here and in the IGameController::SetState(SetStateLog log) function in that hitting "next" on this machine
+        ///     does the exact same thing to all the other machines in the game.
+        ///     
+        ///     intuition says that this switch should just call a LogHeader static to initiate the action.
         /// 
         /// </summary>
         /// <returns></returns>
@@ -399,30 +402,16 @@ namespace Catan10
 
 
                 case GameState.WaitingForNewGame:
-                    OnNewNetworkGame(null, null);
-
-                    break;
+                    return false;
+                    
                 case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
-                    await SetStateLog.SetState(this, GameState.PickingBoard);
-                    if (MainPageModel.GameStartedBy == TheHuman)
-                    {
-                        //
-                        //  randomize the board
-                        var randomBoardLog = await RandomBoardLog.RandomizeBoard(this, 0);
-                        Contract.Assert(randomBoardLog != null);
-                    }
-
-
+                    await RandomBoardLog.RandomizeBoard(this, 0);                    
                     break;
-                case GameState.PickingBoard:  // you get here by clicking the "=>" button
-                    await _rollControl.Reset();
-                    MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceUp); // I hate this hack but I couldn't figure out how to do it with DataBinding
+                case GameState.PickingBoard:  // you get here by clicking the "=>" button                   
                     await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
-                    await SynchronizedRollLog.StartSyncronizedRoll(this);
                     break;
                 case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
-                    await SetStateLog.SetState(this, GameState.WaitingForStart);
-                    MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceDown); // I hate this hack but I couldn't figure out how to do it with DataBinding
+                    await SetStateLog.SetState(this, GameState.WaitingForStart);                    
                     break;
                 case GameState.WaitingForStart:
                     await SetStateLog.SetState(this, GameState.AllocateResourceForward);

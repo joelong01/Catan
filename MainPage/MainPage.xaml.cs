@@ -506,8 +506,7 @@ namespace Catan10
                     case GameState.WaitingForRollForOrder:
                         //
                         // hide board measurement UI as we've now picked out poison
-                       
-                        await SynchronizedRollLog.StartSyncronizedRoll(this);
+                      
                         break;                   
                     case GameState.WaitingForStart:
                         MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceDown);
@@ -1885,7 +1884,13 @@ namespace Catan10
             await PickSettlementsAndRoads();
         }
 
+       
+        private async void OnRolled(int dice1, int dice2)
+        {
+            if (!MainPageModel.EnableRolls) return;
 
+            await SynchronizedRollLog.StartSyncronizedRoll(this, dice1, dice2);
+        }
     }
 }
 

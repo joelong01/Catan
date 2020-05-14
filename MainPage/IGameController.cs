@@ -235,7 +235,8 @@ namespace Catan10
 
         public async Task SetRandomBoard(RandomBoardLog randomBoard)
         {
-            Contract.Assert(CurrentGameState == GameState.PickingBoard);
+            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.PickingBoard); // the first is true the first time through then it is the second
+            Contract.Assert(randomBoard.NewState == GameState.PickingBoard);
 
             if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
             {
@@ -275,7 +276,7 @@ namespace Catan10
 
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
-            
+
 
             MainPageModel.IsServiceGame = true;
             MainPageModel.GameStartedBy = FindPlayerByName(SavedAppState.AllPlayers, logHeader.PlayerName);
@@ -373,8 +374,84 @@ namespace Catan10
             return _gameView.RandomBoardSettings;
         }
 
+        /// <summary>
+        ///     Need to clean up any UI actions  -- e.g. if the GameStarter clicks on "Roll to See who goes first", then that will cause
+        ///     messages to be Posted to the other clients.  They end up calling this function.  it needs to be exactly the same as if the
+        ///     button was clicked on.
+        /// </summary>
+        /// <param name="log"></param>
+        /// <returns></returns>
         public async Task SetState(SetStateLog log)
         {
+            var stateLeaving = log.OldState;
+            switch (stateLeaving)
+            {
+                case GameState.Uninitialized:
+                    break;
+                case GameState.WaitingForNewGame:
+                    break;
+                case GameState.WaitingForStart:
+                    MainPageModel.PlayingPlayers.ForEach((p) =>
+                    {
+                        p.GameData.RollOrientation = TileOrientation.FaceDown;
+                        p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
+                        p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
+
+                    }); // I hate this hack but I couldn't figure out how to do it with DataBinding
+
+                    break;
+                case GameState.WaitingForPlayers:
+                    break;
+                case GameState.PickingBoard:
+
+                    //
+                    //  when leaving PickingBoard, WaitingForRollOrder is next
+                    Contract.Assert(log.NewState == GameState.WaitingForRollForOrder);
+                    await _rollControl.Reset();
+                    MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceUp); // I hate this hack but I couldn't figure out how to do it with DataBinding
+                    break;
+                case GameState.WaitingForRollForOrder:
+                    //
+                    //  When leaving WaitingForRollOrder, next state is going to be AllocationResorucesForward -- get rid of the UI that shows all the player rolls
+
+
+                    break;
+                case GameState.AllocateResourceForward:
+
+                    break;
+                case GameState.AllocateResourceReverse:
+                    break;
+                case GameState.DoneResourceAllocation:
+                    break;
+                case GameState.WaitingForRoll:
+                    break;
+                case GameState.WaitingForNext:
+
+
+                    break;
+                case GameState.Supplemental:
+                    break;
+                case GameState.Targeted:
+                    break;
+                case GameState.LostToCardsLikeMonopoly:
+                    break;
+                case GameState.DoneSupplemental:
+                    break;
+                case GameState.LostCardsToSeven:
+                    break;
+                case GameState.MissedOpportunity:
+                    break;
+                case GameState.GamePicked:
+                    break;
+                case GameState.MustMoveBaron:
+                    break;
+                case GameState.Unknown:
+                    break;
+
+                default:
+                    break;
+            }
+
             await MainPageModel.Log.PushAction(log);
 
         }
@@ -386,64 +463,95 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
-
+        /// <summary>
+        ///     this is where we do the work to synchronize a roll across devices.  
+        ///     
+        ///     General Algorythm:
+        ///     
+        ///     1. Store the rolls in PlayerData.GameData (they are rolls for the game)
+        ///     2. When called, see if we've hit the terminating conditions
+        ///         a) everybody has rolled
+        ///         b) there are no ties
+        ///     3. if we need more rolls
+        ///         a) check to see if TheHuman (e.g. player on this machine) needs to roll
+        ///         b) if so, wait for a roll
+        ///         c) update GameData
+        ///         d) log results
+        ///                 
+        /// </summary>
+        /// <param name="logEntry"></param>
+        /// <returns></returns>
         public async Task SynchronizedRoll(SynchronizedRollLog logEntry)
         {
+
+
             //
-            //  show the UI
-           
-            PlayerModel player = PlayerNameToPlayer(logEntry.PlayerName);
-            Contract.Assert(player != null);
-            //
-            //  has everybody rolled?
-            if (logEntry.PlayerRolls.Rolls.Count == MainPageModel.PlayingPlayers.Count)
+            // need to update the state first because data binding is used to show/hide roll UI and it is driven off of
+            // GameState.  the end of this function changes the state to GameState.WaitingForRollForOrder as well
+
+            if (CurrentGameState != GameState.WaitingForRollForOrder)
             {
-                //
-                //  are there any ties?
-                if (logEntry.PlayerRolls.HasTies() == false)
+                await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
+            }
+
+            Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
+
+            PlayerModel player = PlayerNameToPlayer(logEntry.PlayerName);
+
+            Contract.Assert(player != null);
+            Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);
+            Contract.Assert(logEntry.DiceTwo > 0 && logEntry.DiceTwo < 7);
+            Contract.Assert(logEntry.RollCount == player.GameData.SyncronizedPlayerRolls.Rolls.Count);
+            player.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.DiceOne, logEntry.DiceTwo);
+
+
+            //
+            //  look at all the rolls and see if the current player needs to roll again
+            foreach (var p in MainPageModel.PlayingPlayers)
+            {
+                if (p == TheHuman) continue; // don't compare yourself to yourself
+                if (p.GameData.SyncronizedPlayerRolls.CompareTo(TheHuman.GameData.SyncronizedPlayerRolls) == 0)
                 {
-                    //
-                    //  no?  then we are done
-                    await SetStateLog.SetState(this, GameState.WaitingForStart);
-                   
-                    player.GameData.DiceOne = 0; // which will update the UI
-                    player.GameData.DiceTwo = 0;
-                    return;
+                    await _rollControl.Reset();
+                    
                 }
             }
 
+
             //
-            //  find the current players rolls
-            SynchronizedRoll mySynchronizedRoll = logEntry.PlayerRolls.Rolls.Find((synchedRoll) => (synchedRoll.PlayerName == logEntry.PlayerName));
-            int roll = 0;
+            //  this will eitehr be the logEntry passed in for another player or the one that we generated
+            //  and filled out from this machine.
             //
-            //  they haven't rolled yet, create the object and populate it.
-            if (mySynchronizedRoll == null)
-            {
-                mySynchronizedRoll = new SynchronizedRoll() { PlayerName = logEntry.PlayerName, Rolls = new List<int>() };                                
-            }
-
-            if (logEntry.PlayerRolls.InTie(mySynchronizedRoll)) // we could do this consecutively but I think we should do one roll at a time
-            {
-                player.GameData.DiceOne = 0; 
-                player.GameData.DiceTwo = 0;
-
-                //
-                //  does the current player need to roll?
-                roll = await _rollControl.GetRoll();
-                mySynchronizedRoll.Rolls.Add(roll);
-                mySynchronizedRoll.DiceOne = _rollControl.DiceOne;
-                mySynchronizedRoll.DiceTwo = _rollControl.DiceTwo;
-                player.GameData.DiceOne = _rollControl.DiceOne; // which will had the UI
-                player.GameData.DiceTwo = _rollControl.DiceTwo;
-                
-
-
-
-            }
-
 
             await MainPageModel.Log.PushAction(logEntry);
+
+
+            //
+            //  TODO how do we know to stop? - go through PlayingPlayers and ask if any are tied and if any need to roll
+            //
+
+            int count = MainPageModel.PlayingPlayers.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                var p1 = MainPageModel.PlayingPlayers[i];
+                for (int j = i; j < count; j++)
+                {
+                    var p2 = MainPageModel.PlayingPlayers[j];
+                    if (p2 == p1) continue;
+                    if (p2.GameData.SyncronizedPlayerRolls.CompareTo(p1.GameData.SyncronizedPlayerRolls) == 0)
+                    {
+                        //
+                        //  there is a tie.  keep going
+                        return;
+                    }
+                }
+                i++;
+            }
+
+            // done
+
+            await SetStateLog.SetState(this, GameState.WaitingForStart);
 
         }
     }

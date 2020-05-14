@@ -20,13 +20,13 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
-
+    public delegate void OnRolledHandler(int dice1, int dice2);
     public sealed partial class PlayerRollCtrl : UserControl
     {
         bool _rolled = false;
         List<RollCtrl> _rollControls = new List<RollCtrl>();
         TaskCompletionSource<int> RollTcs { get; set; } = null;
-
+        public event OnRolledHandler OnRolled;
 
         public PlayerRollCtrl()
         {
@@ -41,17 +41,20 @@ namespace Catan10
         private void Roll_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             if (_rolled) return;
-
+            _rolled = true;
             RollCtrl rollCtrl = sender as RollCtrl;
             DiceOne = rollCtrl.DiceOne;
             DiceTwo = rollCtrl.DiceTwo;
-            
+
             rollCtrl.Orientation = TileOrientation.FaceUp;
             if (RollTcs != null)
             {
                 RollTcs.SetResult(Roll);
                 RollTcs = null;
             }
+
+            OnRolled?.Invoke(DiceOne, DiceTwo);
+
         }
 
         public int Roll => DiceOne + DiceTwo;

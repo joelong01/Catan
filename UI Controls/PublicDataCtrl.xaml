@@ -373,7 +373,7 @@
                     <Grid.Projection>
                         <PlaneProjection RotationY="90" />
                     </Grid.Projection>
-                    <local:RollCtrl DiceOne="{x:Bind Player.GameData.DiceOne, Mode=OneWay}" DiceTwo="{x:Bind Player.GameData.DiceTwo, Mode=OneWay}" Orientation="{x:Bind Player.GameData.ShowLatestRoll, Converter={StaticResource BoolToOrientationConverter}, Mode=OneWay}" />
+                    <local:RollCtrl DiceOne="{x:Bind Player.GameData.SyncronizedPlayerRolls.DiceOne, Mode=OneWay}" DiceTwo="{x:Bind Player.GameData.SyncronizedPlayerRolls.DiceTwo, Mode=OneWay}" Orientation="{x:Bind Player.GameData.SyncronizedPlayerRolls.ShowLatestRoll, Converter={StaticResource BoolToOrientationConverter}, Mode=OneWay}" />
                 </Grid>
 
             </Grid>

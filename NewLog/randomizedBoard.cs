@@ -20,6 +20,7 @@ namespace Catan10
         {
             RandomBoardLog model = new RandomBoardLog()
             {                
+                NewState = GameState.PickingBoard,
                 NewRandomBoard = gameController.GetRandomBoard(),
                 PreviousRandomBoard = gameController.CurrentRandomBoard(),
                 GameIndex = gameIndex                
