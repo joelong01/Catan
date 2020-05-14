@@ -1320,9 +1320,15 @@ namespace Catan10
 
         public int CompareTo(SyncronizedPlayerRolls other)
         {
-            int max = this.Rolls.Count;
-            if (other.Rolls.Count > max) max = other.Rolls.Count;
+            
 
+            if (this.Rolls.Count == 0)
+            {
+                return this.Rolls.Count - other.Rolls.Count;
+            }
+
+            int max = Math.Max(this.Rolls.Count, other.Rolls.Count);
+            
 
 
             for (int i = 0; i < max; i++)

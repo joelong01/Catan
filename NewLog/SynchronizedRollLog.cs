@@ -18,8 +18,7 @@ namespace Catan10
         }
 
         public int DiceOne { get; set; } = -1;
-        public int DiceTwo { get; set; } = -1;
-        public int RollCount { get; set; } = 0;
+        public int DiceTwo { get; set; } = -1;        
         [JsonIgnore]
         public int Roll => DiceOne + DiceTwo;
 
@@ -32,7 +31,7 @@ namespace Catan10
                 NewState = GameState.WaitingForRollForOrder,
                 DiceOne = dice1,
                 DiceTwo = dice2,
-                RollCount = gameController.CurrentPlayer.GameData.SyncronizedPlayerRolls.Rolls.Count, // this works because until we start the game, CurrentPlayer == TheHuman
+                
             };
             await gameController.SynchronizedRoll(log);
             return log;

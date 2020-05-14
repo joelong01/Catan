@@ -78,6 +78,7 @@ namespace Catan10
         Task ChangePlayer(ChangePlayerLog log);
         Task UndoChangePlayer(ChangePlayerLog log);
         Task SetState(SetStateLog log);
+        PlayerModel TheHuman { get; }
     }
 
     public sealed partial class MainPage : Page, ILog, IGameController
@@ -496,7 +497,7 @@ namespace Catan10
             Contract.Assert(theHuman != null);
             Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);
             Contract.Assert(logEntry.DiceTwo > 0 && logEntry.DiceTwo < 7);
-            Contract.Assert(logEntry.RollCount == theHuman.GameData.SyncronizedPlayerRolls.Rolls.Count);
+            
             theHuman.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.DiceOne, logEntry.DiceTwo);
 
 
