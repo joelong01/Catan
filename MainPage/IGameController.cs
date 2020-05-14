@@ -489,20 +489,15 @@ namespace Catan10
             // need to update the state first because data binding is used to show/hide roll UI and it is driven off of
             // GameState.  the end of this function changes the state to GameState.WaitingForRollForOrder as well
 
-            if (CurrentGameState != GameState.WaitingForRollForOrder)
-            {
-                await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
-            }
-
             Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
 
-            PlayerModel player = PlayerNameToPlayer(logEntry.PlayerName);
+            PlayerModel theHuman = PlayerNameToPlayer(logEntry.TheHuman);
 
-            Contract.Assert(player != null);
+            Contract.Assert(theHuman != null);
             Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);
             Contract.Assert(logEntry.DiceTwo > 0 && logEntry.DiceTwo < 7);
-            Contract.Assert(logEntry.RollCount == player.GameData.SyncronizedPlayerRolls.Rolls.Count);
-            player.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.DiceOne, logEntry.DiceTwo);
+            Contract.Assert(logEntry.RollCount == theHuman.GameData.SyncronizedPlayerRolls.Rolls.Count);
+            theHuman.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.DiceOne, logEntry.DiceTwo);
 
 
             //
@@ -513,7 +508,7 @@ namespace Catan10
                 if (p.GameData.SyncronizedPlayerRolls.CompareTo(TheHuman.GameData.SyncronizedPlayerRolls) == 0)
                 {
                     await _rollControl.Reset();
-                    
+
                 }
             }
 
@@ -531,7 +526,7 @@ namespace Catan10
             //
 
             int count = MainPageModel.PlayingPlayers.Count;
-
+            bool tie = false;
             for (int i = 0; i < count; i++)
             {
                 var p1 = MainPageModel.PlayingPlayers[i];
@@ -543,15 +538,27 @@ namespace Catan10
                     {
                         //
                         //  there is a tie.  keep going
-                        return;
+                        tie = true;
+                        break;
                     }
                 }
                 i++;
             }
 
-            // done
+            bool allPlayersRolled = true;
+            foreach (var p in MainPageModel.PlayingPlayers)
+            {
+                if (p.GameData.SyncronizedPlayerRolls.Rolls.Count == 0)
+                {
+                    allPlayersRolled = false;
+                    break;
+                }
+            }
 
-            await SetStateLog.SetState(this, GameState.WaitingForStart);
+            if (allPlayersRolled && !tie)
+            {
+                await SetStateLog.SetState(this, GameState.WaitingForStart);
+            }
 
         }
     }
