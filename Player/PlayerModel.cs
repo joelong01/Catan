@@ -38,7 +38,7 @@ namespace Catan10
         private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
         private int _GamesPlayed = 0;
         private int _gamesWon = 0;
-        private PlayerPosition _PlayerPosition = PlayerPosition.Right;
+        
         private PlayerGameModel _playerGameData = null;
         private Guid _PlayerIdentifier = Guid.NewGuid();
         private ImageBrush _imageBrush = null;
@@ -227,19 +227,6 @@ namespace Catan10
         }
 
         [JsonIgnore]
-        public PlayerPosition PlayerPosition
-        {
-            get => _PlayerPosition;
-            set
-            {
-                if (_PlayerPosition != value)
-                {
-                    _PlayerPosition = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        [JsonIgnore]
         public int GamesWon
         {
             get => _gamesWon;
@@ -351,7 +338,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"{PlayerName}.{ColorAsString}.{PlayerPosition}");
+            return String.Format($"{PlayerName}.{ColorAsString}");
         }
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {

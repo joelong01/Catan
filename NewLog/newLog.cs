@@ -1,11 +1,15 @@
 ﻿using Catan.Proxy;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.Storage;
 using Windows.System.Diagnostics;
 
 namespace Catan10
@@ -123,8 +127,10 @@ namespace Catan10
         public event PropertyChangedEventHandler PropertyChanged;
 
         public event PropertyChangedEventHandler LogChanged;
+        private string SaveFileName { get; set; }
+        
+        private ConcurrentQueue<CatanMessage> MessageLog{ get; } = new ConcurrentQueue<CatanMessage>();
 
-        private List<CatanMessage> MessageLog { get; } = new List<CatanMessage>();
         public MainPage Page { get; internal set; }
         public GameState GameState
         {
@@ -146,6 +152,13 @@ namespace Catan10
         {
             Page = MainPage.Current;
             Stacks.PropertyChanged += Stacks_PropertyChanged;
+            DateTime dt = DateTime.Now;
+
+            string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
+            string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
+
+            SaveFileName = String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm}{MainPage.SAVED_GAME_EXTENSION}");
+            
         }
 
         /// <summary>
@@ -192,7 +205,7 @@ namespace Catan10
             }
             finally
             {
-                NotifyPropertyChanged("GameState");
+               
                 // PrintLog();
             }
         }
@@ -250,9 +263,7 @@ namespace Catan10
             finally
             {
                 //   PrintLog();
-                NotifyPropertyChanged("Do");
-                NotifyPropertyChanged("Undo");
-                NotifyPropertyChanged("GameState");
+               
 
             }
 
@@ -314,7 +325,7 @@ namespace Catan10
             finally
             {
                 //  PrintLog();
-                NotifyPropertyChanged("GameState");
+             
 
             }
 
@@ -329,8 +340,38 @@ namespace Catan10
                 Contract.Assert(message.Sequence - 1 == MessageLog.Last().Sequence);
             }
 
-            MessageLog.Add(message);
+            MessageLog.Enqueue(message);
+            SaveLogAsync();
         }
+
+        private async void SaveLogAsync()
+        {
+            
+            await Task.Run(() => 
+            {
+
+                WriteToDisk();
+                
+            });
+        }
+        
+        private void WriteToDisk()
+        {
+            try
+            {
+
+                string json = CatanProxy.Serialize(MessageLog, true);
+                var folder = MainPage.Current.SaveFolder;
+                var file = folder.CreateFileAsync(SaveFileName, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+                FileIO.WriteTextAsync(file, json).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            catch(Exception e)
+            {
+                this.TraceMessage($"{e}");
+            }
+            
+        }
+
 
         public void DumpLogRecords()
         {

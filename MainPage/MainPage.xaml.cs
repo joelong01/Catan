@@ -44,7 +44,7 @@ namespace Catan10
 
         public ObservableCollection<DeprecatedLog> SavedGames { get; set; } = new ObservableCollection<DeprecatedLog>();
 
-        
+
         private bool _doDragDrop = false;   // this lets you double tap a map and then move it around
         private int _currentPlayerIndex = 0; // the index into PlayingPlayers that is the CurrentPlayer
         public static MainPage Current { get; private set; } // a global for the game
@@ -171,10 +171,18 @@ namespace Catan10
             await FileIO.WriteTextAsync(file, content);
         }
 
+        public StorageFolder SaveFolder { get; set; } = null;
+
+        
+
         private async Task<SavedState> LoadGameState()
         {
-            StorageFolder folder = await StaticHelpers.GetSaveFolder();
-            string content = await StaticHelpers.ReadWholeFile(folder, PlayerDataFile);
+            if (SaveFolder == null)
+            {
+                SaveFolder = await StaticHelpers.GetSaveFolder();
+            }
+            
+            string content = await StaticHelpers.ReadWholeFile(SaveFolder, PlayerDataFile);
             SavedState state;
 
             if (String.IsNullOrEmpty(content))

@@ -93,7 +93,7 @@ namespace Catan10
     public enum AnimationSpeed { Ultra = 50, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 }; // typical animation speeds in ms
     public enum UndoOrder { PreviousThenUndo, UndoNoPrevious, None };
     public enum RoadState { Unowned, Road, Ship };
-    public enum PlayerPosition { BottomLeft, TopLeft, TopRight, BottomRight, Left, Right, None }; // the order is semantic!
+    
 
     public enum HarborLocation { None = 0x00000000, TopRight = 0x00100000, TopLeft = 0x00010000, BottomRight = 0x00001000, BottomLeft = 0x00000100, Top = 0x00000010, Bottom = 0x00000001 };
     public enum RoadLocation { None = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };

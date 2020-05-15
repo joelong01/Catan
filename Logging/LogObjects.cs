@@ -85,7 +85,7 @@ namespace Catan10
 
             if (PlayerData != null)
             {
-                PlayerDataString = String.Format($"{PlayerData.PlayerName}.{PlayerData.AllPlayerIndex}.{PlayerData.PlayerPosition}");
+                PlayerDataString = String.Format($"{PlayerData.PlayerName}.{PlayerData.AllPlayerIndex}");
             }
 
             return StaticHelpers.SerializeObject<LogEntry>(this, _serializeProperties, "=", "|");
@@ -119,7 +119,7 @@ namespace Catan10
                     Tag = new LogBuildingUpdate(val, parseHelper);
                     break;
                 case CatanAction.AddPlayer:
-                    Tag = Enum.Parse(typeof(PlayerPosition), val);
+                   
                     break;
                case CatanAction.RandomizeBoard:
                     Tag = CatanProxy.Deserialize<RandomBoardSettings>(val);
@@ -163,22 +163,7 @@ namespace Catan10
             }
 
 
-            if (Int32.TryParse(tokens[1], out int index))
-            {
-                PlayerData = parseHelper.GetPlayerData(index);
-                if (tokens.Length > 2)
-                {
-                    if (Enum.TryParse<PlayerPosition>(tokens[2], out PlayerPosition pos))
-                    {
-                        PlayerData.PlayerPosition = pos;
-                    }
-                    else
-                    {
-                        this.TraceMessage($"No player Position in PlayerData: {PlayerData}");
-                    }
-
-                }
-            }
+            
         }
 
 
