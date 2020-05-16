@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
@@ -162,13 +163,17 @@ namespace Catan10
 
         private async Task SaveGameState(SavedState state)
         {
-            StorageFolder folder = await StaticHelpers.GetSaveFolder();
-
-
-            var content = JsonSerializer.Serialize<SavedState>(state);
-
-            StorageFile file = await folder.CreateFileAsync(PlayerDataFile, CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(file, content);
+            try
+            {
+                StorageFolder folder = await StaticHelpers.GetSaveFolder();
+                var content = CatanProxy.Serialize<SavedState>(state, true);
+                StorageFile file = await folder.CreateFileAsync(PlayerDataFile, CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(file, content);
+            }
+            catch(Exception e)
+            {
+                this.TraceMessage($"eating exception: {e}");
+            }
         }
 
         public StorageFolder SaveFolder { get; set; } = null;
@@ -243,9 +248,9 @@ namespace Catan10
                 {
                     player.PlayerIdentifier = Guid.NewGuid();
                 }
-                player.Log = this;
+               
                 await player.LoadImage();
-                player.AllPlayerIndex = SavedAppState.AllPlayers.Count;
+              
                 if (SavedAppState.DefaultPlayerName == player.PlayerName)
                 {
                     TheHuman = player;
@@ -891,7 +896,7 @@ namespace Catan10
             List<TileCtrl> tilesWithNumber = await HighlightRolledTiles(roll);
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                tile.HighlightTile(CurrentPlayer.GameData.BackgroundBrush); // shows what was rolled                                
+                tile.HighlightTile(CurrentPlayer.BackgroundBrush); // shows what was rolled                                
             }
 
             if (roll == 7)
@@ -1207,11 +1212,12 @@ namespace Catan10
                             LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
                             if (roadUpdate.NewRoadState != RoadState.Unowned)
                             {
-                                roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
+                               
+                             //   roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
                             }
                             else
                             {
-                                roadUpdate.Road.Color = Colors.Transparent;
+                              //  roadUpdate.Road.Color = Colors.Transparent;
                             }
 
                             await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
@@ -1559,7 +1565,10 @@ namespace Catan10
 
             // pick a Random Road
             var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
-            road.Color = CurrentPlayer.GameData.PlayerColor;
+            //
+            //  5/15/2020: moved to passying CurrentPlayer pointer around and binding to its colors
+            road.CurrentPlayer = CurrentPlayer;
+            
             await UpdateRoadState(road, road.RoadState, RoadState.Road, LogType.Normal);
         }
 
@@ -1781,7 +1790,7 @@ namespace Catan10
             TimeSpan diff = DateTime.Now - _dt;
             if (diff.TotalSeconds < 0.1)
             {
-                this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
+              //  this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
                 return;
             }
 

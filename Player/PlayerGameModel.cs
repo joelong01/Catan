@@ -10,7 +10,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-
+using System.Text.Json.Serialization;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
@@ -27,16 +27,17 @@ namespace Catan10
 
         public CardsLostUpdatedHandler OnCardsLost;
 
-
+        [JsonIgnore]
         public ObservableCollection<RoadCtrl> Roads { get; private set; } = new ObservableCollection<RoadCtrl>();
-
+        [JsonIgnore]
         public ObservableCollection<RoadCtrl> Ships { get; } = new ObservableCollection<RoadCtrl>();
-
+        [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Settlements { get; } = new ObservableCollection<BuildingCtrl>();
-
+        [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
+        [JsonIgnore]
         public ObservableCollection<Harbor> OwnedHarbors { get; } = new ObservableCollection<Harbor>();
-
+        [JsonIgnore]
         public PlayerResourceModel PlayerTurnResourceCount { get; set; } = null;
         private readonly List<string> _savedGameProperties = new List<string> { "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource",
                                                                                 "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
@@ -73,7 +74,7 @@ namespace Catan10
             PlayerModel = pData;
             PlayerTurnResourceCount = new PlayerResourceModel(pData);
             PlayerTurnResourceCount.OnPlayerResourceUpdate += OnGameModelResourceUpdate; // currently only logs that a resource was allocated
-            ColorAsString = pData.ColorAsString;
+            
         }
 
 
@@ -355,7 +356,7 @@ namespace Catan10
         private bool? _MovedBaronAfterRollingSeven = null;
         private bool _PlayedKnightThisTurn = false;
         private int _CardsLostToBaron = 0;
-        private string _ColorAsString = "HotPink"; // a useful default to pick out visually - you should *NEVER* see this color in the UI
+        
 
         private int _IslandsPlayed = 0;
         private bool _isCurrentPlayer = false;
@@ -367,6 +368,8 @@ namespace Catan10
         List<List<int>> _GoldRolls = new List<List<int>>();
         PlayerResources _PlayerResources = new PlayerResources();
         TileOrientation _RollOrientation = TileOrientation.FaceDown;
+
+       
 
         public SyncronizedPlayerRolls SyncronizedPlayerRolls { get; } = new SyncronizedPlayerRolls();
 
@@ -436,53 +439,9 @@ namespace Catan10
             }
         }
 
-        //
-        //  This is the Color that drives the player UI
-        //  this gets set (say) "Red" and it will create the right 2 brushes
-        //  to be used by *everything* that wants to show the players colors.
-        //
-        //  Note:  
-        //          NOT a unique identifier, as you can have two players with 
-        //          the same color, as least temporarily.
-        //
-        //  this will set the SolidColorBrush used as Background ("Fill") and Foreground (the color of the shapes)
-        //
-        //  there should be no other brushes uses for players colors than these two.
-        //  
-
-        public string ColorAsString
-        {
-            get => _ColorAsString;
-            set
-            {
-                if (_ColorAsString != value)
-                {
-                    LogPropertyChanged(_ColorAsString, value, true); // when you change the color, it will look like something you shoudl be able to undo, hence the "true"
-                    _ColorAsString = value;
-                    NotifyPropertyChanged();
-                    BackgroundBrush = CatanColors.GetResourceBrush(value);
-                    NotifyPropertyChanged("BackgroundBrush");
-                    ForegroundBrush = CatanColors.GetForegroundBrush(value);
-                    NotifyPropertyChanged("ForegroundBrush");
-                    PlayerColor = BackgroundBrush.Color;
-                    NotifyPropertyChanged("PlayerColor");
-                    if (ForegroundBrush.Color != Colors.White)
-                    {
-                        UseLightFile = true;
-                    }
-                    else
-                    {
-                        UseLightFile = false;
-                    }
-
-
-                }
-            }
-        }
-        public SolidColorBrush ForegroundBrush { get; private set; } = CatanColors.GetResourceBrush("White", Colors.White);
-        public SolidColorBrush BackgroundBrush { get => backgroundBrush; private set { backgroundBrush = value; NotifyPropertyChanged(); } }
-        public Color PlayerColor { get; private set; } = Colors.Green;
-
+        
+        
+        
 
         private int pips = 0;
         public int Pips
@@ -933,8 +892,6 @@ namespace Catan10
         }
 
         int _GoldTotal = 0;
-        private SolidColorBrush backgroundBrush = CatanColors.GetResourceBrush("Green", Colors.Green);
-
         public int GoldTotal
         {
             get
@@ -945,7 +902,7 @@ namespace Catan10
             {
                 if (_GoldTotal != value)
                 {
-                    // OnPlayerGoldTotalUpdate?.Invoke(_playerData, _GoldTotal, value);
+        
                     _GoldTotal = value;
                     NotifyPropertyChanged();
                 }

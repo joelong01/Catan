@@ -44,7 +44,7 @@
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.Items>
-                <local:PublicDataCtrl/>
+                <local:PublicDataCtrl />
             </ListBox.Items>
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">

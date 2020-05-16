@@ -46,7 +46,7 @@
         <local:ResourceTypeToVisibilityConverter x:Key="ResourceTypeToVisibilityConverter" />
         <local:DiceRollToVisibilityConverter x:Key="DiceRollToVisibilityConverter" />
         <local:BoolToOrientationConverter x:Key="BoolToOrientationConverter" />
-
+        <local:CachedColorToBrushConverter x:Key="CachedColorToBrushConverter" />
 
 
         <ImageBrush x:Key="bmDice_1" ImageSource="Assets/Dice/oneWhite.svg" Stretch="UniformToFill" />

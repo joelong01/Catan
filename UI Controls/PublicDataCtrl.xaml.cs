@@ -1,5 +1,6 @@
 ﻿using Catan.Proxy;
 using System.Collections.ObjectModel;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Shapes;
@@ -14,6 +15,18 @@ namespace Catan10
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PublicDataCtrl), new PropertyMetadata(GameState.WaitingForNewGame, GameStateChanged));
         public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
+        public static readonly DependencyProperty GradientStopOneColorProperty = DependencyProperty.Register("GradientStopOneColor", typeof(Color), typeof(PublicDataCtrl), new PropertyMetadata(Colors.SlateBlue));
+        public static readonly DependencyProperty GradientStopTwoColorProperty = DependencyProperty.Register("GradientStopTwoColor", typeof(Color), typeof(PublicDataCtrl), new PropertyMetadata(Colors.Black));
+        public Color GradientStopTwoColor
+        {
+            get => (Color)GetValue(GradientStopTwoColorProperty);
+            set => SetValue(GradientStopTwoColorProperty, value);
+        }
+        public Color GradientStopOneColor
+        {
+            get => (Color)GetValue(GradientStopOneColorProperty);
+            set => SetValue(GradientStopOneColorProperty, value);
+        }
         public TileOrientation RollOrientation
         {
             get => (TileOrientation)GetValue(RollOrientationProperty);

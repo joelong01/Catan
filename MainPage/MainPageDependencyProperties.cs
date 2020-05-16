@@ -66,12 +66,14 @@ namespace Catan10
                 _showPipGroupIndex = 0;
 
             }
+            //
+            //  5/15/2020: Update CurrentPlayer via attached property
 
             // tell all the Buildings that the CurrentPlayer has changed
-            foreach (BuildingCtrl building in _gameView.AllBuildings)
-            {
-                building.CurrentPlayer = player;
-            }
+            //foreach (BuildingCtrl building in _gameView.AllBuildings)
+            //{
+            //    building.CurrentPlayer = player;
+            //}
         }
 
         public static readonly DependencyProperty RandomGoldProperty = DependencyProperty.Register("RandomGold", typeof(bool), typeof(MainPage), new PropertyMetadata(true, RandomGoldChanged));

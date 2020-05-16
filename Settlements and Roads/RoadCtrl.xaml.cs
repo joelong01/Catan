@@ -8,6 +8,7 @@ using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -26,8 +27,23 @@ namespace Catan10
         public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
         Ship _ship = null;
 
+        public static Color GetFillColor(PlayerModel owner, PlayerModel current)
+        {
+            return Colors.HotPink;
 
-        public PlayerModel Owner { get; set; } = null;
+            //if (owner != null)
+            //{
+            //    return owner.BackgroundBrush;
+            //}
+            //if (current != null)
+            //{
+            //    return current.BackgroundBrush;
+            //}
+
+            //// var brush = ConverterGlobals.GetLinearGradientBrush(Colors.Purple, Colors.Black);
+            //return ConverterGlobals.GetBrush(Colors.HotPink);
+        }
+
 
         public int Index { get; set; } = -1;
 
@@ -43,6 +59,8 @@ namespace Catan10
             _locationToRoadDataDict[RoadLocation.BottomLeft] = new RoadLocationData(-13.7, 66.8, 240.5);
             _locationToRoadDataDict[RoadLocation.TopLeft] = new RoadLocationData(-13.2, 18.2, -60.5);
 
+            Self = this;
+
         }
 
 
@@ -51,6 +69,32 @@ namespace Catan10
         public static readonly DependencyProperty TileZeroZeroProperty = DependencyProperty.Register("TileZeroZero", typeof(Point), typeof(RoadCtrl), new PropertyMetadata(new Point(double.NaN, double.NaN), TileZeroZeroChanged));
         public static readonly DependencyProperty RoadTypeProperty = DependencyProperty.Register("RoadType", typeof(RoadType), typeof(RoadCtrl), new PropertyMetadata(RoadType.Single, RoadTypeChanged));
         public static readonly DependencyProperty RoadStateProperty = DependencyProperty.Register("RoadState", typeof(RoadState), typeof(RoadCtrl), new PropertyMetadata(RoadState.Unowned, RoadStateChanged));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty PlayerModelProperty = DependencyProperty.Register("PlayerModel", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public PlayerModel PlayerModel
+        {
+            get => (PlayerModel)GetValue(PlayerModelProperty);
+            set => SetValue(PlayerModelProperty, value);
+        }
+        public RoadCtrl Self
+        {
+            get => (RoadCtrl)GetValue(SelfProperty);
+            set => SetValue(SelfProperty, value);
+        }
+
+
+        public PlayerModel Owner
+        {
+            get => (PlayerModel)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+        public PlayerModel CurrentPlayer
+        {
+            get => (PlayerModel)GetValue(CurrentPlayerProperty);
+            set => SetValue(CurrentPlayerProperty, value);
+        }
         public RoadState RoadState
         {
             get => (RoadState)GetValue(RoadStateProperty);
@@ -63,27 +107,6 @@ namespace Catan10
             depPropClass.SetRoadState(depPropValue);
         }
 
-        //public RoadState RoadState
-        //{
-        //    get
-        //    {
-        //        return _roadState;
-        //    }
-        //    set
-        //    {
-        //        _roadState = value;
-
-        //        //
-        //        //  do not set the color to Transparent as that will make the build color wrong
-        //        if (value == RoadState.Unowned)
-        //            Show(false);
-        //        else
-        //            Show(true);
-
-        //        this.Background = Background;
-
-        //    }
-        //}
 
         //
         //  the controls Opacity is what controls the user seeing a build shape
@@ -195,6 +218,8 @@ namespace Catan10
             SetColors(_gridRoads);
         }
 
+
+
         public RoadLocation Location
         {
             get => (RoadLocation)GetValue(LocationProperty);
@@ -216,23 +241,23 @@ namespace Catan10
 
         private void SetColors(Grid grid)
         {
-            foreach (UIElement el in grid.Children)
-            {
-                if (el.GetType() == typeof(Polygon))
-                {
-                    ((Polygon)el).Stroke = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
-                    ((Polygon)el).Fill = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
+            //foreach (UIElement el in grid.Children)
+            //{
+            //    if (el.GetType() == typeof(Polygon))
+            //    {
+            //        ((Polygon)el).Stroke = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
+            //        ((Polygon)el).Fill = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
 
-                }
-                if (el.GetType() == typeof(Line))
-                {
-                    ((Line)el).Stroke = MainPage.Current.CurrentPlayer?.GameData?.ForegroundBrush;
-                }
-            }
+            //    }
+            //    if (el.GetType() == typeof(Line))
+            //    {
+            //        ((Line)el).Stroke = MainPage.Current.CurrentPlayer?.GameData?.ForegroundBrush;
+            //    }
+            //}
 
 
-            _shipPolygon.Fill = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
-            _shipPolygon.Stroke = MainPage.Current.CurrentPlayer?.GameData?.ForegroundBrush;
+            //_shipPolygon.Fill = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
+            //_shipPolygon.Stroke = MainPage.Current.CurrentPlayer?.GameData?.ForegroundBrush;
 
         }
 
@@ -360,15 +385,15 @@ namespace Catan10
             List<RoadCtrl> list = new List<RoadCtrl>();
             foreach (RoadCtrl r in AdjacentRoads)
             {
-                if (r.IsOwned && r.Color == this.Color)
+                if (r.IsOwned && r.Owner == this.Owner)
                 {
 
-                    if (r.AdjacentBuildings[0].Owner?.GameData.PlayerColor != this.Color && r.AdjacentBuildings[0].BuildingState != BuildingState.None)
+                    if (r.AdjacentBuildings[0].Owner != this.Owner && r.AdjacentBuildings[0].BuildingState != BuildingState.None)
                     {
                         continue;
                     }
 
-                    if (r.AdjacentBuildings[1].Owner?.GameData.PlayerColor != this.Color && r.AdjacentBuildings[1].BuildingState != BuildingState.None)
+                    if (r.AdjacentBuildings[1].Owner != this.Owner && r.AdjacentBuildings[1].BuildingState != BuildingState.None)
                     {
                         continue;
                     }

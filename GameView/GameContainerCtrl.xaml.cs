@@ -998,38 +998,6 @@ namespace Catan10
         }
 
 
-        internal void OnTest()
-        {
-
-          
-
-            /*
-            var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromSeconds(30));
-
-            var httpClient = new HttpClient();
-            var resourceUri = new Uri("localhost:8080/roll/");
-
-            try
-            {
-                HttpResponseMessage response = await httpClient.GetAsync(resourceUri, cts.Token);
-            }
-            catch (TaskCanceledException ex)
-            {
-                // Handle request being canceled due to timeout.
-            }
-            catch (HttpRequestException ex)
-            {
-                // Handle other possible exceptions.
-            }
-            */
-
-
-
-
-
-
-        }
 
         public bool HasIslands => _currentHexPanel.HasIslands;
 

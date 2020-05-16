@@ -448,28 +448,6 @@ namespace Catan10
         }
 
 
-        /// <summary>
-        ///     Somebody picked a menu item to change the color
-        /// </summary>
-        /// <param name="player"></param>
-        public void CurrentPlayerColorChanged(PlayerModel player)
-        {
-            foreach (RoadCtrl road in player.GameData.Roads)
-            {
-                road.Color = player.GameData.PlayerColor;
-
-            }
-
-            //
-            //  TODO: delete this comment.  I don't think it is needed after we used databinding for the colors.
-
-            //foreach (BuildingCtrl buildings in player.GameData.Buildings)
-            //{
-            //    buildings.Color = player.Background;
-
-            //}
-
-        }
 
 
         public bool CanBuild
@@ -1087,7 +1065,12 @@ namespace Catan10
 
             foreach (RoadCtrl adjacentRoad in road.AdjacentRoads)
             {
-                if (adjacentRoad.Color == road.Color && adjacentRoad.RoadState != RoadState.Unowned)
+                this.TraceMessage("You updated this -- if roads don't work,  look here");
+                //if (adjacentRoad.Color == road.Color && adjacentRoad.RoadState != RoadState.Unowned)
+                //{
+                //    return true;
+                //}
+                if (adjacentRoad.Owner == CurrentPlayer && adjacentRoad.RoadState != RoadState.Unowned)
                 {
                     return true;
                 }
@@ -1374,7 +1357,7 @@ namespace Catan10
                 return;
             }
 
-            road.Color = CurrentPlayer.GameData.PlayerColor;
+            road.CurrentPlayer = CurrentPlayer;
 
 
 
@@ -1438,7 +1421,7 @@ namespace Catan10
 
             if (road.IsOwned)
             {
-                if (road.Color != CurrentPlayer.GameData.PlayerColor) // this is not my road I'm clicking on -- bail
+                if (road.Owner != CurrentPlayer) // this is not my road I'm clicking on -- bail
                 {
                     return;
                 }
@@ -1532,7 +1515,7 @@ namespace Catan10
                 //   if the settlement is not next to another settlement and we are not in allocation phase, we have to be next to a road
                 foreach (RoadCtrl road in building.AdjacentRoads)
                 {
-                    if (road.Color == CurrentPlayer.GameData.PlayerColor && road.RoadState != RoadState.Unowned)
+                    if (road.Owner == CurrentPlayer && road.RoadState != RoadState.Unowned)
                     {
                         error = false;
                         break;
@@ -1588,7 +1571,7 @@ namespace Catan10
         {
             if (building.Owner != null)
             {
-                if (building.Owner.ColorAsString != CurrentPlayer?.ColorAsString) // you can only click on your own stuff and when it is your turn
+                if (building.Owner != CurrentPlayer) // you can only click on your own stuff and when it is your turn
                 {
                     return false;
                 }

@@ -39,7 +39,7 @@
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{x:Bind Path=FourStarPositions, Mode=OneWay}" FontSize="26" />
                     </Grid>
                     <Grid>
-                        <Ellipse Width="75" Height="75" Fill="{Binding Path=Current.TheHuman.GameData.BackgroundBrush, Mode=OneWay}" />
+                        <Ellipse Width="75" Height="75" Fill="{Binding Path=Current.TheHuman.BackgroundBrush, Mode=OneWay}" />
                         <Ellipse Width="75" Height="75" Fill="{StaticResource bmTileGoldMine}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="★★★" FontSize="16"
                             Foreground="Red" />

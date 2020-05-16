@@ -102,29 +102,30 @@ namespace Catan10
         //  
         public string Serialize(bool useNames = false, string keySep = "/", string listSep = ",")
         {
-            string s = "";
-            foreach (KeyValuePair<string, List<PlayerModel>> kvp in raceDictionary)
-            {
-                if (kvp.Value == null)
-                {
-                    continue;
-                }
+            throw new NotImplementedException();
+            //string s = "";
+            //foreach (KeyValuePair<string, List<PlayerModel>> kvp in raceDictionary)
+            //{
+            //    if (kvp.Value == null)
+            //    {
+            //        continue;
+            //    }
 
-                s += kvp.Key + "=";
-                foreach (PlayerModel v in kvp.Value)
-                {
+            //    s += kvp.Key + "=";
+            //    foreach (PlayerModel v in kvp.Value)
+            //    {
 
-                    s += useNames ? v.PlayerName : v.AllPlayerIndex.ToString();
-                    s += listSep;
-
-
-                }
-
-                s += keySep;
-            }
+            //        s += useNames ? v.PlayerName : v.AllPlayerIndex.ToString();
+            //        s += listSep;
 
 
-            return s;
+            //    }
+
+            //    s += keySep;
+            //}
+
+
+           // return s;
         }
         public override string ToString()
         {

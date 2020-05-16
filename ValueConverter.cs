@@ -15,10 +15,91 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
+    public static class ConverterGlobals
+    {
+        public static Dictionary<Color, SolidColorBrush> SolidColorBrushCache { get; } = new Dictionary<Color, SolidColorBrush>();
+        public static Dictionary<(Color, Color), LinearGradientBrush> LinearGradientBrushCache { get; } = new Dictionary<(Color, Color), LinearGradientBrush>();
+        public static SolidColorBrush GetBrush(Color color)
+        {
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+                return new SolidColorBrush(color);
+            }
 
-    /// <summary>
-    ///    
-    /// </summary>
+            if (ConverterGlobals.SolidColorBrushCache.TryGetValue(color, out SolidColorBrush brush))
+            {
+                return brush;
+            }
+
+            brush = new SolidColorBrush(color);
+            ConverterGlobals.SolidColorBrushCache[color] = brush;
+            return brush;
+        }
+        public static LinearGradientBrush GetLinearGradientBrush(Color color1, Color color2)
+        {
+            
+            
+            if (!StaticHelpers.IsInVisualStudioDesignMode && ConverterGlobals.LinearGradientBrushCache.TryGetValue( (color1, color2), out LinearGradientBrush brush))
+            {
+                return brush;
+            }
+            var gradientStopCollection = new GradientStopCollection();
+            gradientStopCollection.Add(new GradientStop() { Color = color1 });
+            gradientStopCollection.Add(new GradientStop() { Color = color2, Offset=0.5 });
+            brush = new LinearGradientBrush(gradientStopCollection, 45);
+            if (!StaticHelpers.IsInVisualStudioDesignMode)
+            {
+                ConverterGlobals.LinearGradientBrushCache[(color1, color2)] = brush;
+            }
+            return brush;
+        }
+    }
+    
+    //public class RoadOwnerOrVisitorColorConverter : IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, string language)
+    //    {
+    //        RoadCtrl ctrl = (RoadCtrl)value;
+    //        if (ctrl != null)
+    //        {
+    //            if (ctrl.Owner != null)
+    //            {
+    //                if ((string)parameter == "Foreground")
+    //                {
+    //                    return ConverterGlobals.GetBrush(ctrl.Owner.Foreground);
+    //                }
+    //                else
+    //                {
+    //                    return ctrl.Owner.;
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
+
+    public class CachedColorToBrushConverter : IValueConverter
+    {
+
+        
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            Color color = (Color)value;
+            return ConverterGlobals.GetBrush(color);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            SolidColorBrush brush = (SolidColorBrush)value;
+            return brush.Color;
+        }
+    }
+
+
     public class DiceRollToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)

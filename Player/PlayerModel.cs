@@ -36,43 +36,135 @@ namespace Catan10
 
         private string _playerName = "Nameless";
         private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
-        private int _GamesPlayed = 0;
-        private int _gamesWon = 0;
-        
         private PlayerGameModel _playerGameData = null;
-        private Guid _PlayerIdentifier = Guid.NewGuid();
+        private Guid _PlayerIdentifier;
         private ImageBrush _imageBrush = null;
-        private string _colorAsString = "HotPink";
-        private bool _isCurrentPlayer = false;
-        [JsonIgnore]
-        public PlayerModel PlayerDataInstance => this;
-        public event PropertyChangedEventHandler PropertyChanged;
+        
 
-        public int AllPlayerIndex { get; set; } = -1;
-      
-
-        [JsonIgnore]
-        public ILog Log { get; set; } = null;
-        [JsonIgnore]
-        public ObservableCollection<SolidColorBrush> AvailableColors => new ObservableCollection<SolidColorBrush>(CatanColors.AllAvailableBrushes());
-
-
-
-        public bool IsCurrentPlayer
+        Color _primaryBackgroundColor = Colors.SlateBlue;
+        Color _secondaryBackgroundColor = Colors.Black;
+        Color _Foreground = Colors.White;
+        public string PlayerName
         {
-            get => _isCurrentPlayer;
+            get => _playerName;
             set
             {
-                if (_isCurrentPlayer != value)
+                if (_playerName != value)
                 {
-                    _isCurrentPlayer = value;
+                    _playerName = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public Guid PlayerIdentifier
+        {
+            get => _PlayerIdentifier;
+            set
+            {
+                if (_PlayerIdentifier != value)
+                {
+                    _PlayerIdentifier = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        
-        
+        public string ImageFileName
+        {
+            get => _ImageFileName;
+            set
+            {
+                if (_ImageFileName != value)
+                {
+                    _ImageFileName = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public Color ForegroundColor
+        {
+            get
+            {
+                return _Foreground;
+            }
+            set
+            {
+                if (_Foreground != value)
+                {
+                    _Foreground = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("ForegroundBrush");
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public SolidColorBrush ForegroundBrush
+        {
+            get
+            {
+                return ConverterGlobals.GetBrush(this.ForegroundColor);
+            }
+        }
+
+        public Color SecondaryBackgroundColor
+        {
+            get
+            {
+                return _secondaryBackgroundColor;
+            }
+            set
+            {
+                if (_secondaryBackgroundColor != value)
+                {
+                    _secondaryBackgroundColor = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("BackgroundBrush");
+                }
+            }
+        }
+        public Color PrimaryBackgroundColor
+        {
+            get
+            {
+                return _primaryBackgroundColor;
+            }
+            set
+            {
+                if (_primaryBackgroundColor != value)
+                {
+                    _primaryBackgroundColor = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("BackgroundBrush");
+                }
+            }
+        }
+        [JsonIgnore]
+        public LinearGradientBrush BackgroundBrush
+        {
+            get
+            {
+                return ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
+            }
+        }
+
+        [JsonIgnore]
+        public SolidColorBrush SolidBackgroupBrush
+        {
+            get
+            {
+                return ConverterGlobals.GetBrush(PrimaryBackgroundColor);
+            }
+        }
+
+        [JsonIgnore]
+        public PlayerModel PlayerDataInstance => this;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+
+        [JsonIgnore]
+        public ObservableCollection<Brush> AvailableColors => new ObservableCollection<Brush>(CatanColors.AllAvailableBrushes());
+
         public PlayerModel()
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
@@ -88,20 +180,17 @@ namespace Catan10
                 };
                 ImageBrush = brush;
                 _imageBrush = new ImageBrush();
-
-                _playerGameData = new PlayerGameModel(this);
-                _playerGameData.ColorAsString = "Blue";
-
+                            
             }
 
+            _playerGameData = new PlayerGameModel(this);
 
-        } // needed for serialization
+        }
 
 
         public async Task<StorageFile> CopyImage(StorageFile file)
         {
             StorageFolder folder = await StaticHelpers.GetSaveFolder();
-
             StorageFolder imageFolder = await folder.CreateFolderAsync("Player Images", CreationCollisionOption.OpenIfExists);
             return await file.CopyAsync(imageFolder, file.Name, NameCollisionOption.ReplaceExisting);
         }
@@ -191,26 +280,9 @@ namespace Catan10
         }
 
 
-        public PlayerModel(ILog log)
-        {
-            GameData = new PlayerGameModel(this);
-            Log = log;
-
-        }
 
 
-        public Guid PlayerIdentifier
-        {
-            get => _PlayerIdentifier;
-            set
-            {
-                if (_PlayerIdentifier != value)
-                {
-                    _PlayerIdentifier = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+       
 
         [JsonIgnore]
         public PlayerGameModel GameData
@@ -226,96 +298,22 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public int GamesWon
-        {
-            get => _gamesWon;
-            set
-            {
-                if (_gamesWon != value)
-                {
-                    _gamesWon = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        [JsonIgnore]
-        public int GamesPlayed
-        {
-            get => _GamesPlayed;
-            set
-            {
-                if (_GamesPlayed != value)
-                {
-                    _GamesPlayed = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public string ImageFileName
-        {
-            get => _ImageFileName;
-            set
-            {
-                if (_ImageFileName != value)
-                {
-                    _ImageFileName = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public string PlayerName
-        {
-            get => _playerName;
-            set
-            {
-                if (_playerName != value)
-                {
-                    _playerName = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        //
-        //  the color that is saved
-
-        public string ColorAsString
-        {
-            get => _colorAsString;
-            set
-            {
-                // if (value != _colorAsString)
-                {
-                    //
-                    //  we need to tell the GameData what the new color is because
-                    //  everything binds to the GameData -- NOTHING should bind to 
-                    //  PlayerData.ColorAsString, except for managment UI that wants
-                    //  to change the color
-                    if (GameData == null) // this happens when we deserialize
-                    {
-                        GameData = new PlayerGameModel(this);
-                    }
-                    GameData.ColorAsString = value;
-                    _colorAsString = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+       
 
 
-        public string Serialize(bool oneLine)
+      
+     
+        public string Serialize(bool indented)
         {
-            return JsonSerializer.Serialize<PlayerModel>(this);
-            // return StaticHelpers.SerializeObject<PlayerModel>(this, _savedProperties, "=", StaticHelpers.lineSeperator);
+            return CatanProxy.Serialize<PlayerModel>(this, indented);
+            
         }
 
 
 
-        public static PlayerModel Deserialize(string s, bool oneLine)
+        public static PlayerModel Deserialize(string json)
         {
-            return JsonSerializer.Deserialize<PlayerModel>(s);
+            return CatanProxy.Deserialize<PlayerModel>(json);
 
         }
 
@@ -338,7 +336,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"{PlayerName}.{ColorAsString}");
+            return String.Format($"{PlayerName}");
         }
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -346,22 +344,6 @@ namespace Catan10
 
         }
 
-        /// <summary>
-        ///     when I serialize, I assume
-        ///     1. the board is set the same    
-        ///         => so I can store the index of roads, settlements, etc. and just set them
-        ///     2. we don't replay rolls, so all resource data is saved/loaded
-        /// </summary>
-        /// <returns></returns>
-        internal string Serialize()
-        {
-
-            //  var s = JsonConvert.SerializeObject(this);
-            //  Debug.WriteLine(s);
-            // return s;
-            throw new NotImplementedException();
-
-        }
     }
 
     class ResourceCount

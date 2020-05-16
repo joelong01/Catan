@@ -58,12 +58,19 @@ namespace Catan10
         {
             var depPropClass = d as RollCtrl;
             var depPropValue = (TileOrientation)e.NewValue;
-            depPropClass?.SetOrientation(depPropValue);
+            depPropClass?.SetOrientation(depPropValue);            
         }
         private void SetOrientation(TileOrientation orientation)
         {
-            if (orientation == TileOrientation.FaceDown) FlipClose.Begin();
-            if (orientation == TileOrientation.FaceUp) FlipOpen.Begin();
+            if (PlaneProjection_FaceDown.RotationY == 0 && orientation == TileOrientation.FaceUp)
+            {
+                FlipOpen.Begin();
+            }
+            else if(PlaneProjection_FaceDown.RotationY != 0  && orientation == TileOrientation.FaceDown)
+            {
+                FlipClose.Begin();
+            }
+         
         }
 
         public void Randomize()

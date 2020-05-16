@@ -17,30 +17,19 @@ namespace Catan10
             this.DataContext = this;
             this.InitializeComponent();
         }
-        public static readonly DependencyProperty PlayerColorProperty = DependencyProperty.Register("PlayerColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(CatanColors.GetResourceBrush("HotPink", Colors.HotPink), PlayerColorChanged));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(SolidColorBrush), typeof(CityCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
-        public SolidColorBrush CastleColor
+        public static readonly DependencyProperty CircleColorProperty = DependencyProperty.Register("CircleColor", typeof(Brush), typeof(CityCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
+        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Brush), typeof(CityCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
+        public Brush CastleColor
         {
-            get => (SolidColorBrush)GetValue(CastleColorProperty);
+            get => (Brush)GetValue(CastleColorProperty);
             set => SetValue(CastleColorProperty, value);
         }
 
-        public SolidColorBrush PlayerColor
+        public Brush CircleColor
         {
-            get => (SolidColorBrush)GetValue(PlayerColorProperty);
-            set => SetValue(PlayerColorProperty, value);
+            get => (Brush)GetValue(CircleColorProperty);
+            set => SetValue(CircleColorProperty, value);
         }
-        private static void PlayerColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            CityCtrl depPropClass = d as CityCtrl;
-            SolidColorBrush depPropValue = (SolidColorBrush)e.NewValue;
-            depPropClass.SetFillColor(depPropValue);
-        }
-        private void SetFillColor(SolidColorBrush foreground)
-        {
-
-            CastleColor = CatanColors.GetForegroundBrush(foreground);
-
-        }
+       
     }
 }

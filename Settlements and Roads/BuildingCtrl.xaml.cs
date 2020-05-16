@@ -21,16 +21,9 @@ namespace Catan10
     public enum BuildingState { None, Build, Error, Pips, Settlement, City };
     public sealed partial class BuildingCtrl : UserControl
     {
-        // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
-        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
+       
 
-        public int Index
-        {
-            get => (int)GetValue(IndexProperty);
-            set => SetValue(IndexProperty, value);
-        }
-
-        readonly SolidColorBrush _brush = new SolidColorBrush(Colors.Blue);
+        
         public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
 
         public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
@@ -53,7 +46,15 @@ namespace Catan10
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
-        public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
+        public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));        
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
+
+        // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
+        public int Index
+        {
+            get => (int)GetValue(IndexProperty);
+            set => SetValue(IndexProperty, value);
+        }
         public int Pips
         {
             get => (int)GetValue(PipsProperty);
@@ -70,38 +71,7 @@ namespace Catan10
 
         }
 
-        /// <summary>
-        ///     this is an unused experiement (at this point) for delay loading the buildinds.
-        /// </summary>
-        bool loaded = false;
-        public async Task LoadUiElements()
-        {
-            if (loaded)
-            {
-                return;
-            }
-
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-
-            void finishedLoading(object sender, RoutedEventArgs e)
-            {
-                tcs.TrySetResult(null);
-            }
-
-            try
-            {
-                ((Grid)FindName("LayoutRoot")).Loaded += finishedLoading;
-                await tcs.Task;
-                loaded = true;
-            }
-            catch
-            {
-                LayoutRoot.Loaded -= finishedLoading;
-            }
-
-
-        }
-
+        
 
         public int PipGroup
         {
@@ -155,12 +125,8 @@ namespace Catan10
 
         private void SetBuildingState(BuildingCtrl ctrl, BuildingState value)
         {
-            // await ctrl.LoadUiElements();
+            
         }
-
-
-
-
 
 
 

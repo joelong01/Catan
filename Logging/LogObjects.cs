@@ -83,10 +83,10 @@ namespace Catan10
                 TagAsString = Tag.ToString();
             }
 
-            if (PlayerData != null)
-            {
-                PlayerDataString = String.Format($"{PlayerData.PlayerName}.{PlayerData.AllPlayerIndex}");
-            }
+            //if (PlayerData != null)
+            //{
+            //    PlayerDataString = String.Format($"{PlayerData.PlayerName}.{PlayerData.AllPlayerIndex}");
+            //}
 
             return StaticHelpers.SerializeObject<LogEntry>(this, _serializeProperties, "=", "|");
         }
@@ -446,16 +446,16 @@ namespace Catan10
             TargetTileIndex = targetTile.Index;
             TargetWeapon = weapon;
             TargetPlayer = targetPlayer;
-            if (targetPlayer != null)
-            {
-                TargetPlayerIndex = targetPlayer.AllPlayerIndex;
-            }
+            //if (targetPlayer != null)
+            //{
+            //    TargetPlayerIndex = targetPlayer.AllPlayerIndex;
+            //}
 
-            SourcePlayer = sourcePlayer;
-            if (sourcePlayer != null)
-            {
-                SourcePlayerIndex = sourcePlayer.AllPlayerIndex;
-            }
+            //SourcePlayer = sourcePlayer;
+            //if (sourcePlayer != null)
+            //{
+            //    SourcePlayerIndex = sourcePlayer.AllPlayerIndex;
+            //}
         }
 
         public override string ToString()

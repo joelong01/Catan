@@ -36,7 +36,9 @@
             <Setter Property="IsEnabled" Value="{x:Bind MainPageModel.Log.GameState, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToBooleanConverter}, FallbackValue=true, ConverterParameter=WaitingForRoll}" />
         </Style>
     </Page.Resources>
-    <Grid x:Name="ContentRoot" PointerWheelChanged="OnScrollMouseWheel"
+    <Grid x:Name="ContentRoot"
+        local:CatanAttachedProperties.CurrentPlayerModel="{x:Bind CurrentPlayer, Mode=TwoWay}"
+        PointerWheelChanged="OnScrollMouseWheel"
         Background="{StaticResource bmCherry}"
         CornerRadius="50"
         BorderBrush="{StaticResource bmMaple}"
@@ -134,12 +136,12 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Rectangle Grid.Row="0" Fill="{x:Bind FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.GameData.BackgroundBrush}" Stroke="{StaticResource WhiteBrush}" StrokeThickness="1" />
+            <Rectangle Grid.Row="0" Fill="{x:Bind FallbackValue=Green, Mode=OneWay, Path=CurrentPlayer.BackgroundBrush}" Stroke="{StaticResource WhiteBrush}" StrokeThickness="1" />
             <Viewbox HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Button Background="Transparent" Click="OnGrowOrShrinkControls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" />
             </Viewbox>
             <Viewbox HorizontalAlignment="Center">
-                <TextBlock Text="{x:Bind FallbackValue=Nobody (yet), Mode=OneWay, Path=CurrentPlayer.PlayerName}" CharacterSpacing="0" Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=CurrentPlayer.GameData.ForegroundBrush}" />
+                <TextBlock Text="{x:Bind FallbackValue=Nobody (yet), Mode=OneWay, Path=CurrentPlayer.PlayerName}" CharacterSpacing="0" Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=CurrentPlayer.ForegroundBrush}" />
             </Viewbox>
             <Border Grid.Row="1" BorderBrush="{StaticResource WhiteBrush}" BorderThickness="1">
                 <StackPanel Margin="0" Orientation="Vertical" Background="Black">
@@ -218,9 +220,9 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="10*" />
             </Grid.RowDefinitions>
-            <Rectangle Grid.Row="0" Fill="{x:Bind Path=CurrentPlayer.GameData.BackgroundBrush, Mode=OneWay}" Stroke="White" StrokeThickness="1" />
+            <Rectangle Grid.Row="0" Fill="{x:Bind Path=CurrentPlayer.BackgroundBrush, Mode=OneWay}" Stroke="White" StrokeThickness="1" />
             <Viewbox HorizontalAlignment="Center">
-                <TextBlock Text="Catan" CharacterSpacing="0" Foreground="{x:Bind Path=CurrentPlayer.GameData.ForegroundBrush, Mode=OneWay}" />
+                <TextBlock Text="Catan" CharacterSpacing="0" Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
             </Viewbox>
             <Viewbox Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Button Click="OnGrowOrShrinkRolls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" />
@@ -385,11 +387,11 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="10*" />
             </Grid.RowDefinitions>
-            <Rectangle Grid.Row="0" Fill="{Binding FallbackValue=HotPink, Mode=OneWay, Path=TheHuman.GameData.BackgroundBrush}" />
+            <Rectangle Grid.Row="0" Fill="{Binding FallbackValue=HotPink, Mode=OneWay, Path=TheHuman.BackgroundBrush}" />
             <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Text="Private Data"
                 Style="{StaticResource HeaderTextBlockStyle}"
-                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}"
+                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.ForegroundBrush}"
                 FontSize="22" FontStyle="Normal" FontWeight="Normal" />
             <local:PrivateDataCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 Player="{Binding Path=TheHuman, Mode=OneWay}"
@@ -412,11 +414,11 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="10*" />
             </Grid.RowDefinitions>
-            <Rectangle Grid.Row="0" Fill="{Binding FallbackValue=HotPink, Mode=OneWay, Path=TheHuman.GameData.BackgroundBrush}" />
+            <Rectangle Grid.Row="0" Fill="{Binding FallbackValue=HotPink, Mode=OneWay, Path=TheHuman.BackgroundBrush}" />
             <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                 Text="Pip Count"
                 Style="{StaticResource HeaderTextBlockStyle}"
-                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}"
+                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.ForegroundBrush}"
                 FontSize="22" FontStyle="Normal" FontWeight="Normal" />
             <local:BoardMeasurementCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 PipCount="{Binding Path=PipCount, Mode=OneWay}"
@@ -441,7 +443,7 @@
             Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
             IsTapEnabled="{x:Bind MainPageModel.EnableRolls, Mode=OneWay}"
             BorderBrush="{StaticResource bmMaple}"
-            Background="{Binding FallbackValue=Blue, Mode=OneWay, Path=TheHuman.GameData.BackgroundBrush}"
+            Background="{Binding FallbackValue=Blue, Mode=OneWay, Path=TheHuman.BackgroundBrush}"
             CornerRadius="10" BorderThickness="4" PointerPressed="OnPointerPressed">
 
             <Grid.RenderTransform>
@@ -452,7 +454,7 @@
                 <RowDefinition Height="10*" />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Rolls" FontSize="22"
-                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.GameData.ForegroundBrush}" />
+                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=TheHuman.ForegroundBrush}" />
             <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" />
 
         </Grid>

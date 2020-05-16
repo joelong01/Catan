@@ -44,7 +44,7 @@
                     <PlaneProjection x:Name="PlaneProjection_FaceDown" RotationY="0" />
                 </Grid.Projection>
 
-                <Image Margin="1" Source="ms-appx:///Assets/dice_dark.svg" Width="100" Height="100" />
+                <Image Width="100" Height="100" Margin="1" Source="ms-appx:///Assets/dice_dark.svg" />
 
 
 

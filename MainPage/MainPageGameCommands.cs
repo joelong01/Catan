@@ -76,19 +76,21 @@ namespace Catan10
 
     public sealed partial class MainPage : Page
     {
-        private readonly Dictionary<string, string> _defaultUsers = new Dictionary<string, string>()
+        private readonly List<PlayerModel> defaultPlayers = new List<PlayerModel>()
         {
-            {"Joe", "joe.jpg;Blue" },
-            {"Dodgy", "quark.jpg;Red" },
-            {"Doug", "doug.jpg;White" },
-            {"Adrian", "Adrian.jpg;Purple" },
-            {"Robert", "robert.jpg;Black" },
-            {"Chris", "chris.jpg;Yellow" },
-            {"Cort", "cort.jpg;Green" },
-            {"Craig", "craig.jpg;DarkGray" },
-            {"John", "john.jpg;Brown" }
+            new PlayerModel() {PlayerName = "Joe", ImageFileName = "ms-appx:Assets/DefaultPlayers/joe.jpg", 
+                               ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black, 
+                               PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC5}")},
+            new PlayerModel() {PlayerName = "Dodgy", ImageFileName = "ms-appx:Assets/DefaultPlayers/dodgy.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Red, SecondaryBackgroundColor = Colors.Black , PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC6}")},
+            new PlayerModel() {PlayerName = "Doug", ImageFileName = "ms-appx:Assets/DefaultPlayers/doug.jpg", ForegroundColor=Colors.Black, PrimaryBackgroundColor=Colors.White, SecondaryBackgroundColor = Colors.Wheat, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC7}") },
+            new PlayerModel() {PlayerName = "Robert", ImageFileName = "ms-appx:Assets/DefaultPlayers/robert.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Black, SecondaryBackgroundColor = Colors.DarkGray, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC8}")},
+            new PlayerModel() {PlayerName = "Chris", ImageFileName = "ms-appx:Assets/DefaultPlayers/chris.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Teal, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC9}") },
+            new PlayerModel() {PlayerName = "Cort", ImageFileName = "ms-appx:Assets/DefaultPlayers/cort.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Green, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACA}") },
+            new PlayerModel() {PlayerName = "Adrian", ImageFileName = "ms-appx:Assets/DefaultPlayers/adrian.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Purple, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACB}") },
 
         };
+
+
 
         //
         //  this is the name of the grids in MainPage.xaml that we want to store and retrieve locations
@@ -98,24 +100,15 @@ namespace Catan10
 
         private async Task<List<PlayerModel>> GetDefaultUsers()
         {
-            List<PlayerModel> list = new List<PlayerModel>();
-            foreach (KeyValuePair<string, string> kvp in _defaultUsers)
+
+            foreach (var player in defaultPlayers)
             {
-                PlayerModel p = new PlayerModel(this)
-                {
-                    PlayerName = kvp.Key
+                await player.LoadImage();
 
-                };
-                string[] tokens = kvp.Value.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                string bitmapPath = string.Format($"ms-appx:Assets/DefaultPlayers/{tokens[0]}");
-                p.ColorAsString = tokens[1];
-                p.ImageFileName = bitmapPath;
-                await p.LoadImage();
-                list.Add(p);
+            };
 
-
-            }
-            return list;
+            
+            return defaultPlayers;
         }
 
         private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
@@ -403,16 +396,16 @@ namespace Catan10
 
                 case GameState.WaitingForNewGame:
                     return false;
-                    
+
                 case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
                     await SetStateLog.SetState(this, GameState.PickingBoard);
-                    await RandomBoardLog.RandomizeBoard(this, 0);                    
+                    await RandomBoardLog.RandomizeBoard(this, 0);
                     break;
                 case GameState.PickingBoard:  // you get here by clicking the "=>" button                   
                     await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
                     break;
                 case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
-                    await SetStateLog.SetState(this, GameState.WaitingForStart);                    
+                    await SetStateLog.SetState(this, GameState.WaitingForStart);
                     break;
                 case GameState.WaitingForStart:
                     await SetStateLog.SetState(this, GameState.AllocateResourceForward);
@@ -700,12 +693,10 @@ namespace Catan10
                 }
             }
 
-            CurrentPlayer.ColorAsString = item.Text;
+            //   CurrentPlayer.ColorAsString = item.Text;
 
 
-            //
-            //  this is only needed because Roads don't do proper data binding yet.
-            CurrentPlayerColorChanged(CurrentPlayer);
+
 
             await SaveSettings();
         }

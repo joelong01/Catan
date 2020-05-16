@@ -48,7 +48,7 @@ namespace Catan10
 
         private async void OnAddPlayer(object sender, RoutedEventArgs e)
         {
-            PlayerModel pd = new PlayerModel(_log);
+            PlayerModel pd = new PlayerModel();
             await pd.LoadImage();
             PlayerDataList.Add(pd);
             _gvPlayers.ScrollIntoView(pd);
@@ -60,7 +60,7 @@ namespace Catan10
             {
                 PlayerDataList.Remove(_selectedPlayer);
                 _selectedPlayer = PlayerDataList.FirstOrDefault();
-                _selectedPlayer.IsCurrentPlayer = true;
+                _selectedPlayer.GameData.IsCurrentPlayer = true;
                 _gvPlayers.ScrollIntoView(_selectedPlayer);
             }
         }
@@ -80,7 +80,7 @@ namespace Catan10
                 {
                     //
                     //   unselected
-                    _selectedPlayer.IsCurrentPlayer = false;
+                    _selectedPlayer.GameData.IsCurrentPlayer = false;
                     _selectedPlayer = null;
 
                 }
@@ -91,10 +91,10 @@ namespace Catan10
             PlayerModel player = e.AddedItems[0] as PlayerModel; // single select only
             if (_selectedPlayer != null)
             {
-                _selectedPlayer.IsCurrentPlayer = false;
+                _selectedPlayer.GameData.IsCurrentPlayer = false;
             }
             _selectedPlayer = player;
-            _selectedPlayer.IsCurrentPlayer = true;
+            _selectedPlayer.GameData.IsCurrentPlayer = true;
             this.TraceMessage($"Selected {_selectedPlayer}");
 
 

@@ -364,7 +364,7 @@ namespace Catan10
                     await SetRandomTileToGold(logHeader.OldRandomGoldTiles);
                 }
 
-                logHeader.HighlightedTiles.ForEach((idx) => GameContainer.AllTiles[idx].HighlightTile(CurrentPlayer.GameData.BackgroundBrush));
+                logHeader.HighlightedTiles.ForEach((idx) => GameContainer.AllTiles[idx].HighlightTile(CurrentPlayer.BackgroundBrush));
 
             }
 
