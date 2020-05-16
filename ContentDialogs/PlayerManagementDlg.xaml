@@ -4,43 +4,47 @@
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Width="1000" Height="601" PrimaryButtonText="Save and Close"
-    SecondaryButtonText="Cancel" PrimaryButtonClick="OnSaveAndclose"
-    Background="{StaticResource bmWater}"
+    Width="1500" Height="801" HorizontalAlignment="Center"
+    PrimaryButtonText="Save and Close" SecondaryButtonText="Cancel"
+    PrimaryButtonClick="OnSaveAndclose"
+    Background="{StaticResource BlackBrush}"
     mc:Ignorable="d">
-
     <ContentDialog.Resources>
+        <DataTemplate x:Key="ColorChoiceDataTemplate" x:DataType="local:ColorChoice">
+            <Grid Width="550" Height="25" HorizontalAlignment="Left" AllowFocusOnInteraction="True">
+                <Grid.RenderTransform>
+                    <RotateTransform Angle="0.001"/>
+                </Grid.RenderTransform>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="0,-4,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    Text="{x:Bind Description}"
+                    FontSize="18" LineStackingStrategy="BaselineToBaseline" />
 
-        <DataTemplate x:Key="ColorListDataTemplate" x:DataType="Brush">
-            <Grid>
-                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{x:Bind}" />
+                <Rectangle Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    Fill="{x:Bind local:BrushDependecyFunctions.ColorToBrush(Color)}"
+                    Stroke="Black" StrokeThickness="1" />
             </Grid>
-
         </DataTemplate>
-
         <DataTemplate x:Key="EditPlayerDataTemplate" x:DataType="local:PlayerModel">
-            <Grid Width="125" Height="212" Background="Transparent" IsHitTestVisible="True"
+            <Grid Width="125" Height="178" Background="Transparent" IsHitTestVisible="True"
                 IsDoubleTapEnabled="True" IsRightTapEnabled="True"
                 DoubleTapped="OnImageDoubleTapped" RightTapped="OnImageRightTapped"
                 Tag="{x:Bind This}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="125" />
                     <RowDefinition Height="50" />
-                    <RowDefinition Height="36" />
                 </Grid.RowDefinitions>
                 <Rectangle Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
-                    Fill="{x:Bind FallbackValue=Blue, Mode=OneWay, Path=BackgroundBrush}" />
+                    Fill="{x:Bind FallbackValue=Blue, Mode=OneWay, Path=SolidBackgroupBrush}" />
                 <Rectangle Grid.Row="0" Fill="{x:Bind ImageBrush, Mode=OneWay}" CanDrag="False" />
                 <Viewbox Grid.Row="1" Margin="1" HorizontalAlignment="Center">
-                    <TextBox HorizontalAlignment="Center" Text="{x:Bind PlayerName, FallbackValue=Nameless, Mode=TwoWay}" FontSize="22" Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=ForegroundBrush}" />
+                    <TextBox HorizontalAlignment="Center" Text="{x:Bind PlayerName, FallbackValue=Nameless, Mode=TwoWay}" FontSize="18" Foreground="{x:Bind Path=ForegroundBrush, FallbackValue=White, Mode=OneWay}" />
                 </Viewbox>
-                <ComboBox Grid.Row="2" HorizontalAlignment="Stretch"
-                    ItemTemplate="{StaticResource ColorListDataTemplate}"
-                    ItemsSource="{x:Bind AvailableColors}"
-                    SelectedValue="{x:Bind Path=BackgroundBrush, Mode=OneWay}"
-                    SelectionChanged="OnPlayerColorChanged" />
-
                 <Grid Name="_gridSelected" Grid.RowSpan="3"
                     Visibility="{x:Bind GameData.IsCurrentPlayer, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"
                     Tag="{x:Bind This}"
@@ -49,10 +53,6 @@
                         <ColumnDefinition Width="100*" />
                         <ColumnDefinition Width="20" />
                     </Grid.ColumnDefinitions>
-                    <Rectangle Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="1"
-                        Fill="{StaticResource TransparentBrush}"
-                        Stroke="{x:Bind FallbackValue=White, Mode=OneWay, Path=BackgroundBrush}"
-                        StrokeDashArray="1" StrokeThickness="4" IsHitTestVisible="False" />
                     <Rectangle Grid.Column="1" Width="20" Height="20" Margin="-10,7,0,0"
                         VerticalAlignment="Top"
                         Fill="{x:Bind FallbackValue=Black, Mode=OneWay, Path=ForegroundBrush}"
@@ -60,11 +60,9 @@
                     <TextBlock Grid.Column="1" Margin="-5,2,0,0" Text="&#xE0E7;"
                         FontFamily="Segoe UI Symbol" FontSize="20" IsHitTestVisible="False"
                         Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=BackgroundBrush}" />
-
                 </Grid>
             </Grid>
         </DataTemplate>
-
         <Style TargetType="Button">
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="FontSize" Value="13.6" />
@@ -79,7 +77,6 @@
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="FontSize" Value="50" />
-
             <Setter Property="Visibility" Value="Visible" />
             <Setter Property="FontFamily" Value="Segoe UI Symbol" />
             <Setter Property="Foreground" Value="White" />
@@ -87,7 +84,6 @@
             <Setter Property="Margin" Value="5,0,0,0" />
             <Setter Property="Background" Value="{StaticResource bmCherry}" />
         </Style>
-
         <Style x:Key="PlayerManagmentTextBlock" TargetType="TextBlock">
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -96,79 +92,92 @@
             <Setter Property="Visibility" Value="Visible" />
             <Setter Property="RenderTransformOrigin" Value=".5 .5" />
             <Setter Property="FontSize" Value="20" />
-
         </Style>
-
-
     </ContentDialog.Resources>
-
-
-
-    <Grid Name="ContentRoot" Height="500" Margin="0">
+    <Grid Name="ContentRoot" Width="1300" Height="600" Margin="10"
+        HorizontalAlignment="Center">
         <Grid.RowDefinitions>
             <RowDefinition Height="6" />
             <RowDefinition Height="100*" />
             <RowDefinition Height="6" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" />
-
-            <ColumnDefinition Width="*" />
-
-            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="550" />
+            <ColumnDefinition Width="550" />
+            <ColumnDefinition Width="100" />
         </Grid.ColumnDefinitions>
-
-        <Rectangle Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="4" RadiusX="168.5"
-            RadiusY="168.5"
+        <Rectangle Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="0"
+            RadiusX="168.5" RadiusY="168.5"
             Fill="{StaticResource bmCherry}"
             Stroke="{StaticResource bmMaple}"
             StrokeThickness="5" />
-
-
-
         <Grid Name="CentralGrid" Grid.Row="1" Grid.RowSpan="1" Grid.Column="1"
-            Grid.ColumnSpan="1" Margin="0,5,0,12" Canvas.ZIndex="100"
+            Grid.ColumnSpan="1" Margin="130,5,0,12" Canvas.ZIndex="100"
             Background="{StaticResource bmMaple}"
             IsHitTestVisible="True">
             <Grid.RowDefinitions>
-
                 <RowDefinition Height="100*" />
                 <RowDefinition Height="100" />
-
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="425" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="0" />
+                <ColumnDefinition Width="0" />
+                <ColumnDefinition Width="420" />
+                <ColumnDefinition Width="0" />
+                <ColumnDefinition Width="0" />
             </Grid.ColumnDefinitions>
-
             <GridView Name="_gvPlayers" Grid.Row="0" Grid.RowSpan="1" Grid.Column="2"
                 Grid.ColumnSpan="1" Margin="5"
                 BorderBrush="{StaticResource bmCherry}"
                 BorderThickness="2" Background="Transparent"
                 ItemsSource="{x:Bind Path=PlayerDataList, Mode=OneWay}"
-                IsSynchronizedWithCurrentItem="False" SelectionMode="Single"
+                SelectionMode="Single"
                 ItemTemplate="{StaticResource EditPlayerDataTemplate}"
+                SelectedItem="{x:Bind SelectedPlayer, Mode=TwoWay}"
                 SelectionChanged="OnCurrentPlayerChanged" />
-
             <Grid Name="CommandGrid" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="10*" />
                     <ColumnDefinition Width="10*" />
                     <ColumnDefinition Width="10*" />
                 </Grid.ColumnDefinitions>
-
                 <Button Grid.Column="0" Style="{StaticResource PlayerDlgButton}" Content="&#xE109;" Click="OnAddPlayer" />
                 <Button Grid.Column="1" Style="{StaticResource PlayerDlgButton}" Content="&#xE107;" Click="OnDeletePlayer" />
                 <Button Grid.Column="2" Style="{StaticResource PlayerDlgButton}" Content="&#xE105;" Click="OnSavePlayer" />
             </Grid>
-
-
-
         </Grid>
-
+        <Viewbox Grid.Row="1" Grid.RowSpan="1" Grid.Column="2" Margin="30,50,60,0"
+            HorizontalAlignment="Center" VerticalAlignment="Top">
+            <StackPanel>
+                <local:PublicDataCtrl Player="{x:Bind SelectedPlayer, Mode=OneWay}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="10,10,60,10" VerticalAlignment="Center" Text="Primary:" FontSize="28" />
+                    <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        ScrollViewer.IsVerticalRailEnabled="True"
+                        ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
+                        ItemsSource="{x:Bind PrimaryColors, Mode=OneTime}"
+                        SelectedItem="{x:Bind PrimaryColor, Mode=TwoWay}">                      
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="10,10,25,0" VerticalAlignment="Center" Text="Secondary:" FontSize="28" />
+                    <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
+                        AllowFocusOnInteraction="True"
+                        ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
+                        ItemsSource="{x:Bind SecondaryColors, Mode=OneTime}"
+                        SelectedItem="{x:Bind SecondaryColor, Mode=TwoWay}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="10" VerticalAlignment="Center" Text="Foreground: " FontSize="28" />
+                    <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
+                        ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
+                        ItemsSource="{x:Bind ForegroundColors, Mode=OneTime}"
+                        SelectedItem="{x:Bind ForegroundColor, Mode=TwoWay}" />
+                </StackPanel>
+            </StackPanel>
+        </Viewbox>
     </Grid>
 </ContentDialog>
 

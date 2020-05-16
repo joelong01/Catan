@@ -82,7 +82,7 @@ namespace Catan10
                                ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black, 
                                PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC5}")},
             new PlayerModel() {PlayerName = "Dodgy", ImageFileName = "ms-appx:Assets/DefaultPlayers/dodgy.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Red, SecondaryBackgroundColor = Colors.Black , PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC6}")},
-            new PlayerModel() {PlayerName = "Doug", ImageFileName = "ms-appx:Assets/DefaultPlayers/doug.jpg", ForegroundColor=Colors.Black, PrimaryBackgroundColor=Colors.White, SecondaryBackgroundColor = Colors.Wheat, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC7}") },
+            new PlayerModel() {PlayerName = "Doug", ImageFileName = "ms-appx:Assets/DefaultPlayers/doug.jpg", ForegroundColor=Colors.Black, PrimaryBackgroundColor=Colors.DarkGray, SecondaryBackgroundColor = Colors.LightGray, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC7}") },
             new PlayerModel() {PlayerName = "Robert", ImageFileName = "ms-appx:Assets/DefaultPlayers/robert.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Black, SecondaryBackgroundColor = Colors.DarkGray, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC8}")},
             new PlayerModel() {PlayerName = "Chris", ImageFileName = "ms-appx:Assets/DefaultPlayers/chris.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Teal, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC9}") },
             new PlayerModel() {PlayerName = "Cort", ImageFileName = "ms-appx:Assets/DefaultPlayers/cort.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Green, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACA}") },
@@ -658,6 +658,7 @@ namespace Catan10
             }
 
 
+
             foreach (var kvp in CatanColors.NameToColorDictionary)
             {
                 ToggleMenuFlyoutItem item = new ToggleMenuFlyoutItem
@@ -666,18 +667,21 @@ namespace Catan10
                     Tag = kvp.Value
                 };
 
-                item.Click += PlayerColor_Clicked;
-                Menu_Colors.Items.Add(item);
+                item.Click += PlayerPrimaryColor_Clicked;
+                Menu_Primary_Color.Items.Add(item);
+
+                item = new ToggleMenuFlyoutItem
+                {
+                    Text = kvp.Key,
+                    Tag = kvp.Value
+                };
+                item.Click += PlayerSecondaryColor_Clicked;
+                Menu_Secondary_Color.Items.Add(item);
             }
 
         }
 
-        /// <summary>
-        /// this is called when the color menu item is clicked to change the color of the current player
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void PlayerColor_Clicked(object sender, RoutedEventArgs e)
+        private async void PlayerSecondaryColor_Clicked(object sender, RoutedEventArgs e)
         {
             if (CurrentPlayer == null)
             {
@@ -685,7 +689,7 @@ namespace Catan10
             }
 
             ToggleMenuFlyoutItem item = sender as ToggleMenuFlyoutItem;
-            foreach (ToggleMenuFlyoutItem subItem in Menu_Colors.Items)
+            foreach (ToggleMenuFlyoutItem subItem in Menu_Secondary_Color.Items)
             {
                 if (subItem != item)
                 {
@@ -693,7 +697,36 @@ namespace Catan10
                 }
             }
 
-            //   CurrentPlayer.ColorAsString = item.Text;
+             CurrentPlayer.SecondaryBackgroundColor = (Color)item.Tag;
+
+
+
+
+            await SaveSettings();
+        }
+
+        /// <summary>
+        /// this is called when the color menu item is clicked to change the color of the current player
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void PlayerPrimaryColor_Clicked(object sender, RoutedEventArgs e)
+        {
+            if (CurrentPlayer == null)
+            {
+                return;
+            }
+
+            ToggleMenuFlyoutItem item = sender as ToggleMenuFlyoutItem;
+            foreach (ToggleMenuFlyoutItem subItem in Menu_Primary_Color.Items)
+            {
+                if (subItem != item)
+                {
+                    subItem.IsChecked = false;
+                }
+            }
+
+            CurrentPlayer.PrimaryBackgroundColor = (Color)item.Tag;
 
 
 

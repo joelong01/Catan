@@ -31,7 +31,7 @@ namespace Catan10
 
         }
 
-        
+
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
@@ -56,18 +56,19 @@ namespace Catan10
                 }
             });
 
-           
+
 
             // create a new session
             SessionInfo sessionInfo = new SessionInfo() { Id = Guid.NewGuid().ToString(), Description = "OnTest", Creator = CurrentPlayer.PlayerName };
-            
-
             sessions = await Proxy.CreateSession(sessionInfo);
             Contract.Assert(sessions != null);
-
             MainPageModel.ServiceData.SessionInfo = sessionInfo;
+            //
+            //  start the game
+            await StartGameLog.StartGame(this, "Joe", 0, true);
 
-           await StartGameLog.StartGame(this, "Joe", 0, true);
+            //
+            //  add players
             foreach (var p in SavedAppState.AllPlayers)
             {
                 await Proxy.JoinSession(sessionInfo.Id, p.PlayerName);
@@ -83,7 +84,7 @@ namespace Catan10
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
 
-            
+
             List<SyncronizedPlayerRolls> playerRolls = new List<SyncronizedPlayerRolls>();
             playerRolls.Add(new SyncronizedPlayerRolls() { Rolls = new List<int> { 3 } });
             playerRolls.Add(new SyncronizedPlayerRolls() { Rolls = new List<int> { 7 } });
@@ -129,11 +130,11 @@ namespace Catan10
             playerRolls.Sort();
             playerRolls.ForEach((p) =>
             {
-                string s="";
-                p.Rolls.ForEach( (r) => s += $"{r},");
+                string s = "";
+                p.Rolls.ForEach((r) => s += $"{r},");
 
                 Debug.WriteLine($"{s}");
-             });
+            });
 
             this.TraceMessage($"done={done}");
         }
@@ -157,7 +158,7 @@ namespace Catan10
 
         readonly Random testRandom = new Random();
 
-        private  void OnTestRegularGame(object sender, RoutedEventArgs e)
+        private void OnTestRegularGame(object sender, RoutedEventArgs e)
         {
             //AnimationSpeedBase = 10; // speed up the animations
 

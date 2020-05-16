@@ -4,17 +4,18 @@
     xmlns:local="using:Catan10" xmlns:proxy="using:Catan.Proxy"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="userControl" d:DesignHeight="265" d:DesignWidth="605" mc:Ignorable="d">
+    x:Name="userControl" d:DesignHeight="265" d:DesignWidth="605" mc:Ignorable="d"
+             >
     <Control.Resources>
         <!--<Style TargetType="Grid" x:Key="FlippableGridStyle">
             <Style.
         </Style>-->
-        <Storyboard x:Name="ShowPlayerPicture">
+        <Storyboard x:Name="ShowStats">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_Roll" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
                 <EasingDoubleKeyFrame KeyTime="0" Value="0" />
                 <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="90" />
             </DoubleAnimationUsingKeyFrames>
-            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FacePic" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_Stats" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
                 <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="-90" />
                 <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0" />
             </DoubleAnimationUsingKeyFrames>
@@ -24,7 +25,7 @@
                 <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="90" />
                 <SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="0" />
             </DoubleAnimationUsingKeyFrames>
-            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FacePic" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_Stats" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
                 <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="-90" />
                 <SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="-90" />
             </DoubleAnimationUsingKeyFrames>
@@ -67,7 +68,7 @@
             <Ellipse Margin="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 Stroke="White"
                 Tag="{x:Bind Player, Mode=OneTime}"
-                IsTapEnabled="True"
+                IsTapEnabled="True" IsRightTapEnabled="True"
                 Fill="{x:Bind Player.ImageBrush, Mode=OneWay, FallbackValue=Blue}"
                 PointerPressed="Picture_PointerPressed" />
 
@@ -149,9 +150,10 @@
                     FontFamily="Century Schoolbook" FontSize="28" />
                 <!--  Settlements  -->
                 <Viewbox Margin="0,0,0,0">
-                    
-                    <local:SettlementCtrl Width="30" Height="30" Margin="5,0,0,0" CastleColor="{x:Bind Player.SolidBackgroupBrush, Mode=OneWay}" 
-                                          PlayerColor="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+
+                    <local:SettlementCtrl Width="30" Height="30" Margin="5,0,0,0"
+                        CastleColor="{x:Bind Player.SolidBackgroupBrush, Mode=OneWay}"
+                        PlayerColor="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                 </Viewbox>
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind Player.GameData.SettlementsPlayed, Mode=OneWay, FallbackValue=7}"
@@ -318,16 +320,11 @@
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" />
             </StackPanel>
-            <!--  ScoreView stuff  -->
-            <Grid Grid.RowSpan="1" Grid.ColumnSpan="1" HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch" Background="Transparent">
-                <!--  Equivalent of "face down"  eg. picture is hidden  -->
-
-
-            </Grid>
+            
+            
             <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="2" Margin="0,1,0,0"
                 HorizontalAlignment="Left">
-                <Grid Name="Grid_FacePic" Margin="0,1,0,0" HorizontalAlignment="Left">
+                <Grid Name="Grid_Stats" Margin="0,1,0,0" HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50" />
                         <ColumnDefinition Width="125" />
@@ -360,7 +357,7 @@
                                 Source="ms-appx:///Assets/monopoly_light.svg" />
                             <Image Width="30" Height="30" Margin="-30,0,0,0" HorizontalAlignment="Left"
                                 VerticalAlignment="Center" Source="ms-appx:///Assets/monopoly_dark.svg"
-                                Visibility="{x:Bind local:PlayerBindingFunctions.UseLightFiles(Player, x:True), Mode=OneWay, FallbackValue=Visible}"  />
+                                Visibility="{x:Bind local:PlayerBindingFunctions.UseLightFiles(Player, x:True), Mode=OneWay, FallbackValue=Visible}" />
                             <TextBlock Grid.Row="1" Grid.Column="2" Margin="30,0,0,0" VerticalAlignment="Center"
                                 FontSize="32"
                                 Text="{x:Bind Player.GameData.CardsLostToMonopoly, Mode=TwoWay, FallbackValue=20, Converter={StaticResource ResourceKey=IntToStringConverter}}"

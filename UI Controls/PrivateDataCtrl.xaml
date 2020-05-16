@@ -8,16 +8,16 @@
 
     <Control.Resources>
         <LinearGradientBrush x:Key="lgbTest" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="Blue" />
-            <GradientStop Offset="1" Color="Purple" />
+            <GradientStop Color="White" />
+            <GradientStop Offset="1" Color="DarkSalmon" />
             <GradientStop Offset="1" Color="Black" />
         </LinearGradientBrush>
         <Style x:Key="ButtonTextStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="{x:Bind Player.ForegroundBrush}"/>
-            <Setter Property="HorizontalAlignment" Value="Center"   />
-            
+            <Setter Property="Foreground" Value="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+
         </Style>
     </Control.Resources>
 
@@ -47,7 +47,7 @@
                 <local:ResourceCardCtrl Margin="39,0,0,0" ResourceType="GoldMine" Orientation="FaceUp" ReadOnly="True"
                     Count="{x:Bind Player.GameData.PlayerResources.GoldMine, Mode=OneWay}" />
             </StackPanel>
-            <StackPanel Margin="0,5,0,0" Orientation="Horizontal" >
+            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                 <Button Padding="0">
                     <Button.Content>
                         <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Knight" Orientation="FaceUp" ReadOnly="True"
@@ -73,8 +73,9 @@
             <Rectangle Width="465" Height="4" Margin="0,5,0,5" Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
 
             <StackPanel Margin="0,-4,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
-                Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}" BorderBrush="{x:Bind Player.BackgroundBrush, Mode=OneWay}" BorderThickness="2"
-                CornerRadius="10">
+                Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
+                BorderBrush="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
+                BorderThickness="2" CornerRadius="10">
                 <Button Margin="5,0,5,0" Padding="0" Background="Transparent" ToolTipService.ToolTip="Buy Settlement">
                     <Button.Content>
                         <StackPanel Padding="0" CornerRadius="10">
@@ -83,7 +84,7 @@
                                     PlayerColor="{x:Bind Player.SolidBackgroupBrush, FallbackValue=Black, Mode=OneWay}"
                                     CastleColor="{x:Bind Player.ForegroundBrush, FallbackValue=Black, Mode=OneWay}" />
                             </Viewbox>
-                            <TextBlock Text="Settlement" Style="{StaticResource ButtonTextStyle}"  />
+                            <TextBlock Text="Settlement" Style="{StaticResource ButtonTextStyle}" />
                         </StackPanel>
                     </Button.Content>
                 </Button>
@@ -95,14 +96,13 @@
                                     CircleColor="{x:Bind Player.SolidBackgroupBrush, FallbackValue=Black, Mode=OneWay}"
                                     CastleColor="{x:Bind Player.ForegroundBrush, FallbackValue=Black, Mode=OneWay}" />
                             </Viewbox>
-                            <TextBlock Margin="5,0,0,0" HorizontalAlignment="Center" Text="City"
-                                Style="{StaticResource ButtonTextStyle}"/>
+                            <TextBlock Margin="5,0,0,0" HorizontalAlignment="Center" Text="City" Style="{StaticResource ButtonTextStyle}" />
                         </StackPanel>
                     </Button.Content>
                 </Button>
                 <Button Margin="5,0,5,0" Padding="0" Background="Transparent" ToolTipService.ToolTip="Buy Road">
                     <Button.Content>
-                        <StackPanel Background="{x:Bind Player.BackgroundBrush}">
+                        <StackPanel Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
                             <TextBlock Grid.Column="0" Margin="0" HorizontalAlignment="Center"
                                 VerticalAlignment="Center" Text="⛙" FontFamily="Segoe UI Symbol" FontSize="38"
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}">
@@ -119,10 +119,10 @@
                     ToolTipService.ToolTip="Buy Dev Card" ToolTipService.Placement="Left">
                     <Button.Content>
                         <Viewbox>
-                            <StackPanel Width="50" Height="60" >
-                                <Rectangle RadiusX="5" RadiusY="5" Width="30" Height="45" 
+                            <StackPanel Width="50" Height="60">
+                                <Rectangle Width="30" Height="45" RadiusX="5" RadiusY="5"
                                     Fill="{StaticResource bmDevCardBack}" />
-                                <TextBlock Text="Dev Card" Style="{StaticResource ButtonTextStyle}"  />
+                                <TextBlock Text="Dev Card" Style="{StaticResource ButtonTextStyle}" />
                             </StackPanel>
                         </Viewbox>
                     </Button.Content>
@@ -139,7 +139,7 @@
                                     <CompositeTransform TranslateY="-5" />
                                 </TextBlock.RenderTransform>
                             </TextBlock>
-                            <TextBlock HorizontalAlignment="Center" Text="Trade" Style="{StaticResource ButtonTextStyle}"  />
+                            <TextBlock HorizontalAlignment="Center" Text="Trade" Style="{StaticResource ButtonTextStyle}" />
                         </StackPanel>
                     </Button.Content>
                 </Button>

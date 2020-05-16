@@ -1,8 +1,10 @@
 ﻿using Catan.Proxy;
 using System.Collections.ObjectModel;
 using Windows.UI;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -12,6 +14,7 @@ namespace Catan10
     public sealed partial class PublicDataCtrl : UserControl
     {
         private ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
+        
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PublicDataCtrl), new PropertyMetadata(GameState.WaitingForNewGame, GameStateChanged));
         public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
@@ -40,8 +43,10 @@ namespace Catan10
         }
         private void SetRollOrientation(TileOrientation orientation)
         {
+            if (Player == null) return;
+
             if (orientation == TileOrientation.FaceDown) 
-                ShowPlayerPicture.Begin();
+                ShowStats.Begin();
             else
                 ShowLatestRoll.Begin();
         }
@@ -65,7 +70,7 @@ namespace Catan10
             }
             else
             {
-                ShowPlayerPicture.Begin();
+                ShowStats.Begin();
             }
         }
 
@@ -83,6 +88,7 @@ namespace Catan10
        
         private void SetPlayer(PlayerModel value)
         {
+            if (value == null) return;
             PlayedDevCards.Clear();
             PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);            
             //
@@ -100,26 +106,27 @@ namespace Catan10
         public PublicDataCtrl()
         {
             this.InitializeComponent();
-            ShowPlayerPicture.Begin();
-        }
-
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!(sender is TextBox tb))
-            {
-                return;
-            }
-
-            tb.SelectAll();
+            
         }
 
 
-        private async void Picture_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        private async void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             Ellipse ellipse = sender as Ellipse;
             ellipse.IsTapEnabled = false;
             try
             {
+                Pointer ptr = e.Pointer;
+                if (ptr.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+                {
+                    PointerPoint ptrPt = e.GetCurrentPoint(this);
+                    if (ptrPt.Properties.IsRightButtonPressed)
+                    {
+                        MainPage.Current.TheHuman = Player;
+                        MainPage.Current.CurrentPlayer = Player;
+                        return;
+                    }
+                }
 
                 PlayerModel player = ((Ellipse)sender).Tag as PlayerModel;
 

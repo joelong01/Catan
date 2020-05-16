@@ -26,6 +26,8 @@ namespace Catan10
         private readonly bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
 
         public CardsLostUpdatedHandler OnCardsLost;
+        [JsonIgnore]
+        public bool NotificationsEnabled {get;set;} = false;
 
         [JsonIgnore]
         public ObservableCollection<RoadCtrl> Roads { get; private set; } = new ObservableCollection<RoadCtrl>();
@@ -914,6 +916,7 @@ namespace Catan10
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
+            if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         }

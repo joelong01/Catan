@@ -14,7 +14,11 @@ namespace Catan10
     {
         public AddPlayerLog() : base()
         {
-            Action = CatanAction.AddPlayer;
+            Action = CatanAction.AddPlayer;        
+        }
+        public override string ToString()
+        {
+            return $"{PlayerName} [Local={LocallyCreated}]";
         }
 
         public static async Task<AddPlayerLog> AddPlayer(IGameController gameController, PlayerModel playerModel)

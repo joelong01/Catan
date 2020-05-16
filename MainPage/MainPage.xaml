@@ -103,7 +103,10 @@
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem x:Name="Menu_Games" Text="Games" />
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutSubItem x:Name="Menu_Colors" Text="Color" />
+                    <MenuFlyoutSubItem x:Name="Menu_Colors" Text="Color">
+                        <MenuFlyoutSubItem x:Name="Menu_Primary_Color" Text="Primary" />
+                        <MenuFlyoutSubItem x:Name="Menu_Secondary_Color" Text="Secondary" />
+                    </MenuFlyoutSubItem>
                     <MenuFlyoutSeparator />
                     <MenuFlyoutItem Text="Cancel" Click="OnCancelClicked" />
                 </MenuFlyout>

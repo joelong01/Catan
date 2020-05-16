@@ -394,16 +394,21 @@ namespace Catan10
         {
             _gameView.Reset();
             _gameView.SetCallbacks(this, this);
-
+            
+            
             foreach (PlayerModel p in MainPageModel.PlayingPlayers)
             {
                 p.GameData.OnCardsLost -= OnPlayerLostCards;
+                p.Reset();
             }
             MainPageModel.PlayingPlayers.Clear();
             _currentPlayerIndex = 0;
             Rolls.Clear();
-
-
+            if (TheHuman != null)
+            {
+                CurrentPlayer = TheHuman;
+            }
+            
 
         }
 
@@ -1460,7 +1465,7 @@ namespace Catan10
 
         private async void OnManagePlayers(object sender, RoutedEventArgs e)
         {
-            PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.AllPlayers, this);
+            PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.AllPlayers);
             if (await dlg.ShowAsync() == ContentDialogResult.Primary)
             {
                 SavedAppState.AllPlayers.Clear();

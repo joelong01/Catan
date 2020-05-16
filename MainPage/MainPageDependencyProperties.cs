@@ -49,6 +49,8 @@ namespace Catan10
         }
         private void SetCurrentPlayer(PlayerModel player)
         {
+            if (player == null) return;
+
             //
             //  the next player can always play a baron once
             player.GameData.PlayedKnightThisTurn = false;

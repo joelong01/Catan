@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
+using Windows.Media.PlayTo;
 using Windows.Networking.Sockets;
 using Windows.Storage;
 using Windows.Storage.Search;
@@ -160,12 +161,14 @@ namespace Catan10
         }
         /// <summary>
         ///     Called when a Player is added to a Service game
-        ///     we want to keep all games with identical state, so we have a race condition where each person joins a session, which creates a new game
-        ///     and adds a user.  so each person would be the first user to join the game and order isn't served.
         ///     
-        ///     to fix this, we go to the service and get the list of users and add it in the service order.
+        ///     this can also be called directly by the user via UI interaction, so we need to make sure that works idenitically as if
+        ///     the message came from another machine.
         ///     
-        ///     this can also be called directly by the user, so we need to make sure that it works even if the AddPlayer() hasn't been logged
+        ///     5/16/2020
+        ///                 - Let the players be out of order. Each client will see 'TheHuman' as the first player in the list
+        ///                 - Make the CurrentPlayer be whoever created the game (so the Next button is correctly updated)
+        ///                 - when we transition out of Rolling for first, we'll sync the list order
         ///     
         /// </summary>
         /// <param name="playerLogHeader"></param>
@@ -174,48 +177,24 @@ namespace Catan10
         {
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
-            var proxy = MainPageModel.ServiceData.Proxy;
-            Contract.Assert(proxy != null);
-
-            var players = await proxy.GetPlayers(MainPageModel.ServiceData.SessionInfo.Id);
-            Contract.Assert(players != null);
-            if (!players.Contains(playerLogHeader.PlayerName))
+            var player = NameToPlayer(playerLogHeader.PlayerName);
+            Contract.Assert(player != null);
+            if (MainPageModel.PlayingPlayers.Contains(player) == false)
             {
-                players.Add(playerLogHeader.PlayerName);
+                
+                player.GameData.OnCardsLost += OnPlayerLostCards;
+                AddPlayerMenu(player);
+                //
+                //  need to give the players some data about the game
+                player.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
+                player.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
+                player.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
+                player.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
+
+                MainPageModel.PlayingPlayers.Add(player);
             }
-
-            List<PlayerModel> playingPlayers = new List<PlayerModel>();
-            //
-            //  we go through and figure out what the playing player list looks like
-            players.ForEach((name) =>
-            {
-
-                var player = NameToPlayer(name);
-                Contract.Assert(player != null, "Player Can't Be Null");
-                if (MainPageModel.PlayingPlayers.Contains(player))
-                {
-                    playingPlayers.Add(player);
-                }
-                else
-                {
-                    player.Reset();
-                    player.GameData.OnCardsLost += OnPlayerLostCards;
-                    AddPlayerMenu(player);
-                    //
-                    //  need to give the players some data about the game
-                    player.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
-                    player.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
-                    player.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
-                    player.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
-
-                    playingPlayers.Add(player);
-                }
-            });
-
-            MainPageModel.PlayingPlayers.Clear();
-            playingPlayers.ForEach((player) => MainPageModel.PlayingPlayers.Add(player));
-
-            CurrentPlayer = MainPageModel.PlayingPlayers[0];
+            
+            CurrentPlayer = MainPageModel.GameStartedBy;
             await MainPageModel.Log.PushAction(playerLogHeader);
         }
         /// <summary>
@@ -409,7 +388,13 @@ namespace Catan10
                     //  when leaving PickingBoard, WaitingForRollOrder is next
                     Contract.Assert(log.NewState == GameState.WaitingForRollForOrder);
                     await _rollControl.Reset();
-                    MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceUp); // I hate this hack but I couldn't figure out how to do it with DataBinding
+                    
+                    MainPageModel.PlayingPlayers.ForEach((p) =>
+                    {
+                        p.GameData.NotificationsEnabled = true;
+                        p.GameData.RollOrientation = TileOrientation.FaceUp;
+
+                    }); // I hate this hack but I couldn't figure out how to do it with DataBinding
                     break;
                 case GameState.WaitingForRollForOrder:
                     //
