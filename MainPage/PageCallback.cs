@@ -193,9 +193,10 @@ namespace Catan10
 
         }
 
-        internal PlayerModel PlayerNameToPlayer(string name)
+        internal PlayerModel PlayerNameToPlayer(string name, ICollection<PlayerModel> players)
         {
-            foreach (var player in MainPageModel.PlayingPlayers)
+          
+            foreach (var player in players)
             {
                 if (player.PlayerName == name)
                     return player;

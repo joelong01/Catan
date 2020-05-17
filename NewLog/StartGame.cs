@@ -16,7 +16,11 @@ namespace Catan10
             Action = CatanAction.StartGame;
         }
         public int GameIndex { get; set; }
-        
+        public override string ToString()
+        {
+            return $"StartGame: [StartedBy={PlayerName}]";
+        }
+
         public bool ServiceGame { get; set; } = true;
         public static async Task<StartGameLog> StartGame(IGameController gameController, string startingPlayer, int gameIndex, bool serviceGame)
         {
@@ -46,7 +50,7 @@ namespace Catan10
         public Task Redo(IGameController gameController, LogHeader logHeader)
         {
 
-            return Task.CompletedTask;
+            return gameController.StartGame(logHeader as StartGameLog);
         }
 
         public Task Undo(IGameController gameController, LogHeader logHeader)

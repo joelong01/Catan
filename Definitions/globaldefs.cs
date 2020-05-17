@@ -51,7 +51,7 @@ namespace Catan10
     {
         public LogType LogType { get; set; } = LogType.Normal;
         public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer?.PlayerName;
-        public string TheHuman { get; set; } = MainPage.Current.TheHuman.PlayerName;
+        public string TheHuman { get; set; } = MainPage.Current.TheHuman?.PlayerName;
         public GameState OldState { get; set; } = MainPage.Current.CurrentGameState;
         public GameState NewState { get; set; } = MainPage.Current.CurrentGameState; // if state changes, you have to set this
         public CatanAction Action { get; set; }

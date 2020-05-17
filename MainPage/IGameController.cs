@@ -477,7 +477,7 @@ namespace Catan10
 
             Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
 
-            PlayerModel theHuman = PlayerNameToPlayer(logEntry.TheHuman);
+            PlayerModel theHuman = PlayerNameToPlayer(logEntry.TheHuman, SavedAppState.AllPlayers);
 
             Contract.Assert(theHuman != null);
             Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);

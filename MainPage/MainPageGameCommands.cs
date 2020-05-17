@@ -152,7 +152,8 @@ namespace Catan10
             }
 
             TheHuman = picker.Player;
-            SavedAppState.DefaultPlayerName = TheHuman.PlayerName;
+            SavedAppState.TheHuman = TheHuman.PlayerName;
+            SavedAppState.ServiceState.DefaultUser = TheHuman.PlayerName;
             await SaveGameState(SavedAppState);
 
         }

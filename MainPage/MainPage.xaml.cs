@@ -232,15 +232,21 @@ namespace Catan10
                 {
                     AllPlayers = list,
                     Settings = new Settings(),
-                    ServiceState = new ServiceState() { HostName = "http://192.168.1.128:5000" }
+                    ServiceState = new ServiceState() { HostName = "http://192.168.1.128:5000" },
+                    TheHuman="",
+                    
 
                 };
+
                 await SaveGameState(SavedAppState);
                 SavedAppState = await LoadGameState(); // just verifying round trip...
                 Debug.Assert(SavedAppState != null);
             }
 
-
+            if (SavedAppState.TheHuman != "")
+            {
+             TheHuman = PlayerNameToPlayer(SavedAppState.TheHuman, SavedAppState.AllPlayers);
+            }
 
             foreach (var player in SavedAppState.AllPlayers)
             {
@@ -251,7 +257,7 @@ namespace Catan10
                
                 await player.LoadImage();
               
-                if (SavedAppState.DefaultPlayerName == player.PlayerName)
+                if (SavedAppState.TheHuman == player.PlayerName)
                 {
                     TheHuman = player;
                 }
