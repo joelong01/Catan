@@ -1919,6 +1919,8 @@ namespace Catan10
 
             await SynchronizedRollLog.StartSyncronizedRoll(this, dice1, dice2);
         }
+
+       
     }
 }
 

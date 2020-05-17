@@ -10,13 +10,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using Windows.ApplicationModel.Contacts;
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 
@@ -1042,7 +1043,76 @@ namespace Catan10
 
             StartMonitoring();
 
+        }
 
+        private async void OnStartDefaultNetworkGame(object sender, RoutedEventArgs e)
+        {
+            if (TheHuman == null)
+            {
+                await PickDefaultUser();                 
+            }
+            if (TheHuman == null) return;
+
+
+            MainPageModel.PlayingPlayers.Clear();
+
+            string sessionName = "OnStartDefaultNetworkGame";
+
+
+
+            CurrentPlayer = TheHuman;
+            bool sessionExists = false;
+            SessionInfo sessionInfo = null;
+            //
+            //  delete alls sessions
+            List<SessionInfo> sessions = await Proxy.GetSessions();
+            foreach (var session in sessions)
+            {
+                if (session.Description == sessionName)
+                {
+                    sessionInfo = session;
+                    // session exists
+                    sessionExists = true;
+                    break;                    
+                }                
+            };
+
+            if (!sessionExists)
+            {
+
+                // create a new session
+                sessionInfo = new SessionInfo() { Id = Guid.NewGuid().ToString(), Description = sessionName, Creator = CurrentPlayer.PlayerName };
+                sessions = await Proxy.CreateSession(sessionInfo);
+                Contract.Assert(sessions != null);
+                MainPageModel.ServiceData.SessionInfo = sessionInfo;
+            }
+            //
+            //  start the game
+            await StartGameLog.StartGame(this, TheHuman.PlayerName, 0, true);
+
+            //
+            //  add players
+           
+                await Proxy.JoinSession(sessionInfo.Id, TheHuman.PlayerName);
+                await AddPlayerLog.AddPlayer(this, TheHuman);
+
+           
+
+            StartMonitoring();
+        }
+
+        private async void OnDeleteAllSessions(object sender, RoutedEventArgs e)
+        {
+            List<SessionInfo> sessions = await Proxy.GetSessions();
+            sessions.ForEach(async (session) =>
+            {
+                var s = await Proxy.DeleteSession(session.Id);
+                if (s == null)
+                {
+                    var ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+                    this.TraceMessage(ErrorMessage);
+                }
+            });
         }
         private PlayerModel FindPlayerByName(ICollection<PlayerModel> playerList, string playerName)
         {
