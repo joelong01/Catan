@@ -80,8 +80,8 @@ namespace Catan10
     {
         private readonly List<PlayerModel> defaultPlayers = new List<PlayerModel>()
         {
-            new PlayerModel() {PlayerName = "Joe", ImageFileName = "ms-appx:Assets/DefaultPlayers/joe.jpg", 
-                               ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black, 
+            new PlayerModel() {PlayerName = "Joe", ImageFileName = "ms-appx:Assets/DefaultPlayers/joe.jpg",
+                               ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black,
                                PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC5}")},
             new PlayerModel() {PlayerName = "Dodgy", ImageFileName = "ms-appx:Assets/DefaultPlayers/dodgy.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Red, SecondaryBackgroundColor = Colors.Black , PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC6}")},
             new PlayerModel() {PlayerName = "Doug", ImageFileName = "ms-appx:Assets/DefaultPlayers/doug.jpg", ForegroundColor=Colors.Black, PrimaryBackgroundColor=Colors.DarkGray, SecondaryBackgroundColor = Colors.LightGray, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC7}") },
@@ -109,7 +109,7 @@ namespace Catan10
 
             };
 
-            
+
             return defaultPlayers;
         }
 
@@ -360,6 +360,7 @@ namespace Catan10
                 return;
             }
             MainPageModel.EnableUiInteraction = false;
+            this.TraceMessage($"{MainPageModel.EnableNextButton} ");
             NextState().ContinueWith((b) =>
                {
                    //
@@ -700,7 +701,7 @@ namespace Catan10
                 }
             }
 
-             CurrentPlayer.SecondaryBackgroundColor = (Color)item.Tag;
+            CurrentPlayer.SecondaryBackgroundColor = (Color)item.Tag;
 
 
 
@@ -1061,7 +1062,7 @@ namespace Catan10
         {
             if (TheHuman == null)
             {
-                await PickDefaultUser();                 
+                await PickDefaultUser();
             }
             if (TheHuman == null) return;
 
@@ -1085,8 +1086,8 @@ namespace Catan10
                     sessionInfo = session;
                     // session exists
                     sessionExists = true;
-                    break;                    
-                }                
+                    break;
+                }
             };
 
             if (!sessionExists)
@@ -1096,19 +1097,21 @@ namespace Catan10
                 sessionInfo = new SessionInfo() { Id = Guid.NewGuid().ToString(), Description = sessionName, Creator = CurrentPlayer.PlayerName };
                 sessions = await Proxy.CreateSession(sessionInfo);
                 Contract.Assert(sessions != null);
-                MainPageModel.ServiceData.SessionInfo = sessionInfo;
+
             }
+
+            MainPageModel.ServiceData.SessionInfo = sessionInfo;
             //
             //  start the game
-            await StartGameLog.StartGame(this, TheHuman.PlayerName, 0, true);
+            await StartGameLog.StartGame(this, MainPageModel.ServiceData.SessionInfo.Creator, 0, true);
 
             //
             //  add players
-           
-                await Proxy.JoinSession(sessionInfo.Id, TheHuman.PlayerName);
-                await AddPlayerLog.AddPlayer(this, TheHuman);
 
-           
+            await Proxy.JoinSession(sessionInfo.Id, TheHuman.PlayerName);
+            await AddPlayerLog.AddPlayer(this, TheHuman);
+
+
 
             StartMonitoring();
         }
