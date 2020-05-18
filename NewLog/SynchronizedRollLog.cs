@@ -24,7 +24,7 @@ namespace Catan10
 
         public static async Task<SynchronizedRollLog> StartSyncronizedRoll(IGameController gameController, int dice1, int dice2)
         {
-            SynchronizedRollLog log = new SynchronizedRollLog()
+            SynchronizedRollLog logEntry = new SynchronizedRollLog()
             {
                 CanUndo = false,
                 Action = CatanAction.RollToSeeWhoGoesFirst,
@@ -33,8 +33,8 @@ namespace Catan10
                 DiceTwo = dice2,
                 
             };
-            await gameController.SynchronizedRoll(log);
-            return log;
+            await gameController.Log.PushAction(logEntry);
+            return logEntry;
         }
         public Task Do(IGameController gameController, LogHeader logHeader)
         {

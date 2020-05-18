@@ -113,7 +113,7 @@
                 <GridView Name="_gvPlayers" Grid.Row="0" Height="495" Margin="5"
                     VerticalAlignment="Center"
                     BorderBrush="{StaticResource bmCherry}"
-                    BorderThickness="2" Background="Transparent"                        
+                    BorderThickness="2" Background="Transparent"
                     ItemsSource="{x:Bind Path=PlayerDataList, Mode=OneWay}"
                     SelectionMode="Single"
                     ItemTemplate="{StaticResource EditPlayerDataTemplate}"

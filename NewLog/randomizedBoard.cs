@@ -25,7 +25,7 @@ namespace Catan10
                 PreviousRandomBoard = gameController.CurrentRandomBoard(),
                 GameIndex = gameIndex                
             };
-            await gameController.SetRandomBoard(model);
+            await gameController.Log.PushAction(model);
             return model;
 
         }

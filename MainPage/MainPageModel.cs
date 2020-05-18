@@ -100,7 +100,7 @@ namespace Catan10
         }
         public MainPageModel()
         {
-
+           Log = new NewLog();
         }
         /// <summary>
         ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI

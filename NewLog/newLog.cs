@@ -131,7 +131,7 @@ namespace Catan10
         
         private ConcurrentQueue<CatanMessage> MessageLog{ get; } = new ConcurrentQueue<CatanMessage>();
 
-        public MainPage Page { get; internal set; }
+        public MainPage Page => MainPage.Current;
         public GameState GameState
         {
             get
@@ -150,7 +150,7 @@ namespace Catan10
 
         public NewLog()
         {
-            Page = MainPage.Current;
+            
             Stacks.PropertyChanged += Stacks_PropertyChanged;
             DateTime dt = DateTime.Now;
 

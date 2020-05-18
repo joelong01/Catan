@@ -37,14 +37,14 @@ namespace Catan10
                 CanUndo = false
 
             };
-            await gameController.StartGame(model);
+            await gameController.Log.PushAction(model);            
             return model;
 
         }
 
         public Task Do(IGameController gameController, LogHeader logHeader)
         {
-            return Task.CompletedTask;
+            return gameController.StartGame(logHeader as StartGameLog);
         }
 
         public Task Redo(IGameController gameController, LogHeader logHeader)

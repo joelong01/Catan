@@ -363,8 +363,8 @@
                             </Viewbox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="⚃⚁&#xE007;" FontFamily="Segoe UI Symbol"
-                                FontSize="32"
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="⚃⚁&#xE007;"
+                                FontFamily="Segoe UI Symbol" FontSize="32"
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                             <TextBlock Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
                                 FontSize="32"
@@ -372,8 +372,8 @@
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="⚃⚁&#xE00B;" FontFamily="Segoe UI Symbol"
-                                FontSize="30"
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="⚃⚁&#xE00B;"
+                                FontFamily="Segoe UI Symbol" FontSize="30"
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                             <TextBlock Grid.Row="3" Grid.Column="2" Margin="46,0,0,0" VerticalAlignment="Center"
                                 FontSize="32"

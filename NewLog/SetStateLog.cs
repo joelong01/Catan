@@ -17,7 +17,7 @@ namespace Catan10
 
         public static async Task<SetStateLog> SetState(IGameController gameController, GameState newState)
         {
-            SetStateLog log = new SetStateLog()
+            SetStateLog logEntry = new SetStateLog()
             {
                  Action = CatanAction.ChangedState,
                  NewState = newState, 
@@ -25,8 +25,8 @@ namespace Catan10
 
             };
 
-            await gameController.SetState(log);
-            return log;
+            await gameController.Log.PushAction(logEntry);
+            return logEntry;
 
         }
         public Task Do(IGameController gameController, LogHeader logHeader)

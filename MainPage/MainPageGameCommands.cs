@@ -1037,6 +1037,8 @@ namespace Catan10
 
 
             MainPageModel.ServiceData.SessionInfo = dlg.SelectedSession;
+            MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedSession.Creator);
+
             this.TraceMessage($"Game: {dlg.SelectedSession.Description}");
 
             //
@@ -1050,7 +1052,7 @@ namespace Catan10
             //  add the player
             var addPlayerLog = await AddPlayerLog.AddPlayer(this, TheHuman);
             Contract.Assert(addPlayerLog != null);
-            MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedSession.Creator);
+
 
 
 
@@ -1173,9 +1175,11 @@ namespace Catan10
                     message.Data = logHeader;
                     MainPageModel.Log.RecordMessage(message);
                     Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
-                    if (logHeader.TheHuman != TheHuman.PlayerName)
+                    //
+                    //  since we are sending all messages to the service, we don't need this check ehre
+                    // if (logHeader.CreatedBy != TheHuman.PlayerName)
                     {
-                        logHeader.LocallyCreated = false;
+
                         ILogController logController = logHeader as ILogController;
                         Contract.Assert(logController != null, "every LogEntry is a LogController!");
                         switch (logHeader.LogType)

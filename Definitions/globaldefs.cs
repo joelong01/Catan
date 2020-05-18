@@ -51,7 +51,7 @@ namespace Catan10
     {
         public LogType LogType { get; set; } = LogType.Normal;
         public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer?.PlayerName;
-        public string TheHuman { get; set; } = MainPage.Current.TheHuman?.PlayerName;
+        public string CreatedBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
         public GameState OldState { get; set; } = MainPage.Current.CurrentGameState;
         public GameState NewState { get; set; } = MainPage.Current.CurrentGameState; // if state changes, you have to set this
         public CatanAction Action { get; set; }
@@ -59,7 +59,17 @@ namespace Catan10
         public Guid LogId { get; set; } = Guid.NewGuid();
         public DateTime Time { get; set; } = DateTime.Now;
         public string TypeName { get; set; }
-        public bool LocallyCreated { get; set; } = true;
+        [JsonIgnore]
+        public bool LocallyCreated
+        {
+            get
+            {
+                Contract.Assert(String.IsNullOrEmpty(CreatedBy) == false);
+                Contract.Assert(MainPage.Current.TheHuman != null);
+                return (MainPage.Current.TheHuman.PlayerName == CreatedBy);
+            }
+        }
+                
         public bool CanUndo { get; set; } = true;
         
 

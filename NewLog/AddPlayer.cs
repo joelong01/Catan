@@ -30,8 +30,7 @@ namespace Catan10
                 CanUndo = false
             };
 
-
-            await gameController.AddPlayer(logEntry);
+            await gameController.Log.PushAction(logEntry);            
             return logEntry; 
 
         }

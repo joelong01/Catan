@@ -79,6 +79,7 @@ namespace Catan10
         Task ChangePlayer(ChangePlayerLog log);
         Task UndoChangePlayer(ChangePlayerLog log);
         Task SetState(SetStateLog log);
+        NewLog Log { get; }
         PlayerModel TheHuman { get; }
     }
 
@@ -98,7 +99,7 @@ namespace Catan10
         public CatanProxy Proxy => MainPageModel.ServiceData.Proxy;
         public SessionInfo SessionInfo => MainPageModel.ServiceData.SessionInfo;
 
-
+        public NewLog Log => MainPageModel.Log;
 
         public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
 
@@ -195,7 +196,10 @@ namespace Catan10
             }
             
             CurrentPlayer = MainPageModel.GameStartedBy;
-            await MainPageModel.Log.PushAction(playerLogHeader);
+            if (playerLogHeader.LocallyCreated == false)
+            {
+                await MainPageModel.Log.PushAction(playerLogHeader);
+            }
         }
         /// <summary>
         ///     we don't call the Log to push the undo action -- that is done by the log since the log
@@ -252,7 +256,7 @@ namespace Catan10
         public Task StartGame(StartGameLog logHeader)
         {
 
-            MainPageModel.Log = new NewLog();
+            if (logHeader.LocallyCreated == false) return Task.CompletedTask; // we only start local games around these parts!
 
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
@@ -265,12 +269,13 @@ namespace Catan10
 
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
 
+            return Task.CompletedTask;
 
             //
             //   5/12/2020: You have to log so that the GameState is set correctly.  the function is protected at the top by looking at the state
             //              and not starting unless we need to start                            
 
-            return MainPageModel.Log.PushAction(logHeader);
+           //   return MainPageModel.Log.PushAction(logHeader);
 
 
         }
@@ -477,7 +482,7 @@ namespace Catan10
 
             Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
 
-            PlayerModel theHuman = PlayerNameToPlayer(logEntry.TheHuman, SavedAppState.AllPlayers);
+            PlayerModel theHuman = PlayerNameToPlayer(logEntry.CreatedBy, SavedAppState.AllPlayers);
 
             Contract.Assert(theHuman != null);
             Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);

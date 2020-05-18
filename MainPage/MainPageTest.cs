@@ -108,7 +108,7 @@ namespace Catan10
                 LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
                 message.Data = logHeader;
                 Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
-                logHeader.LocallyCreated = false;
+                
                 ILogController logController = logHeader as ILogController;
                 Contract.Assert(logController != null, "every LogEntry is a LogController!");
                 switch (logHeader.LogType)
