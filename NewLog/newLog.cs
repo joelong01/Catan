@@ -54,6 +54,9 @@ namespace Catan10
         public void InsertAction(LogHeader logHeader)
         {
             ActionStack.Insert(0, logHeader);
+            NotifyPropertyChanged("GameState");
+            NotifyPropertyChanged("RedoPossible"); // because it is no longer possible
+            NotifyPropertyChanged("ActionStack");
         }
         public LogHeader PeekAction
         {
@@ -128,8 +131,8 @@ namespace Catan10
 
         public event PropertyChangedEventHandler LogChanged;
         private string SaveFileName { get; set; }
-        
-        private ConcurrentQueue<CatanMessage> MessageLog{ get; } = new ConcurrentQueue<CatanMessage>();
+
+        private ConcurrentQueue<CatanMessage> MessageLog { get; } = new ConcurrentQueue<CatanMessage>();
 
         public MainPage Page => MainPage.Current;
         public GameState GameState
@@ -150,7 +153,7 @@ namespace Catan10
 
         public NewLog()
         {
-            
+
             Stacks.PropertyChanged += Stacks_PropertyChanged;
             DateTime dt = DateTime.Now;
 
@@ -158,7 +161,7 @@ namespace Catan10
             string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
 
             SaveFileName = String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm}{MainPage.SAVED_GAME_EXTENSION}");
-            
+
         }
 
         /// <summary>
@@ -180,14 +183,8 @@ namespace Catan10
                 {
                     Stacks.ClearUndo();
                 }
-                if (logHeader.CanUndo)
-                {
-                    Stacks.PushAction(logHeader);
-                }
-                else
-                {
-                    Stacks.InsertAction(logHeader);
-                }
+
+                Stacks.PushAction(logHeader);
 
                 if (logHeader.LocallyCreated)
                 {
@@ -205,7 +202,7 @@ namespace Catan10
             }
             finally
             {
-               
+
                 // PrintLog();
             }
         }
@@ -263,7 +260,7 @@ namespace Catan10
             finally
             {
                 //   PrintLog();
-               
+
 
             }
 
@@ -325,7 +322,7 @@ namespace Catan10
             finally
             {
                 //  PrintLog();
-             
+
 
             }
 
@@ -346,15 +343,15 @@ namespace Catan10
 
         private async void SaveLogAsync()
         {
-            
-            await Task.Run(() => 
+
+            await Task.Run(() =>
             {
 
                 WriteToDisk();
-                
+
             });
         }
-        
+
         private void WriteToDisk()
         {
             try
@@ -365,11 +362,11 @@ namespace Catan10
                 var file = folder.CreateFileAsync(SaveFileName, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
                 FileIO.WriteTextAsync(file, json).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.TraceMessage($"{e}");
             }
-            
+
         }
 
 
