@@ -45,28 +45,25 @@ namespace Catan10
         {
             if (owner != null)
             {
-                return owner.SolidBackgroupBrush;
+                return owner.SolidPrimaryBrush;
             }
             if (current != null)
             {
-                return current.SolidBackgroupBrush;
+                return current.SolidPrimaryBrush;
             }
 
             var brush = ConverterGlobals.GetBrush(Colors.Purple);
             return brush;
         }
 
-        public static Visibility UseLightFiles (PlayerModel player, bool dark)
+        public static int PerceivedBrightness(Color c)
         {
-            if (player == null && dark) return Visibility.Collapsed;
-
-            if (player.ForegroundColor == Colors.White)
-            {
-                return dark ? Visibility.Collapsed : Visibility.Visible;
-            }
-
-            return dark ? Visibility.Visible : Visibility.Collapsed;
-            
+            return (int)Math.Sqrt(
+            c.R * c.R * .299 +
+            c.G * c.G * .587 +
+            c.B * c.B * .114);
         }
+
+        
     }
 }

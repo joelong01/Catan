@@ -287,8 +287,6 @@
     <Content Include="Assets\DevCards\RoadBuilding.jpg" />
     <Content Include="Assets\DevCards\VictoryPoint.jpg" />
     <Content Include="Assets\DevCards\YearOfPlenty.jpg" />
-    <Content Include="Assets\dice_dark.svg" />
-    <Content Include="Assets\dice_light.svg" />
     <Content Include="Assets\guest.jpg" />
     <Content Include="Assets\maple.jpg" />
     <Content Include="Assets\monopoly_dark.svg" />
@@ -492,8 +490,11 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.10</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.UI.Xaml">
+      <Version>2.4.0</Version>
+    </PackageReference>
     <PackageReference Include="System.Text.Json">
-      <Version>4.7.1</Version>
+      <Version>4.7.2</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

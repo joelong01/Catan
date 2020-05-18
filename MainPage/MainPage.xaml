@@ -59,7 +59,6 @@
                     <MenuFlyoutItem Text="Show Roll UI" Click="OnShowRolls" />
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Network Game">
-                        <MenuFlyoutItem Text="Set User" Click="OnSetUser" />
                         <MenuFlyoutItem Text="Start Default Network Game" Click="OnStartDefaultNetworkGame" />
                         <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
                         <MenuFlyoutSeparator />
@@ -95,7 +94,11 @@
                                             <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
                                         </MenuFlyoutSubItem>-->
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
+                    <MenuFlyoutSubItem Text="Players">
+                        <MenuFlyoutItem Text="Set Default User" Click="OnSetUser" />
+                        <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
+                        <MenuFlyoutItem Text="Reset To Default" Click="OnSetDefaultState" />
+                    </MenuFlyoutSubItem>
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Options">
                         <ToggleMenuFlyoutItem Text="Hide Players On Next" IsChecked="False" />

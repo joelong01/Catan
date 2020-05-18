@@ -4,8 +4,7 @@
     xmlns:local="using:Catan10" xmlns:proxy="using:Catan.Proxy"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="userControl" d:DesignHeight="265" d:DesignWidth="605" mc:Ignorable="d"
-             >
+    x:Name="userControl" d:DesignHeight="265" d:DesignWidth="605" mc:Ignorable="d">
     <Control.Resources>
         <!--<Style TargetType="Grid" x:Key="FlippableGridStyle">
             <Style.
@@ -152,7 +151,7 @@
                 <Viewbox Margin="0,0,0,0">
 
                     <local:SettlementCtrl Width="30" Height="30" Margin="5,0,0,0"
-                        CastleColor="{x:Bind Player.SolidBackgroupBrush, Mode=OneWay}"
+                        CastleColor="{x:Bind Player.SolidPrimaryBrush, Mode=OneWay}"
                         PlayerColor="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                 </Viewbox>
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -168,7 +167,7 @@
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <!--  Cities  -->
                 <Viewbox Margin="0,0,0,0">
-                    <local:CityCtrl Margin="0,0,0,0" CircleColor="{x:Bind Player.SolidBackgroupBrush, FallbackValue=Black, Mode=OneWay}" CastleColor="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+                    <local:CityCtrl Margin="0,0,0,0" CircleColor="{x:Bind Player.SolidPrimaryBrush, FallbackValue=Black, Mode=OneWay}" CastleColor="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                 </Viewbox>
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind Player.GameData.CitiesPlayed, Mode=OneWay, FallbackValue=7}"
@@ -287,15 +286,21 @@
                     Text="{x:Bind Player.GameData.CardsLostToBaron, Mode=OneWay, FallbackValue=9}"
                     FontFamily="Century Schoolbook"
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                <!--  No ResourceCount (Bad Rolls)  -->
-                <Viewbox>
-                    <Image Width="40" Height="40" Margin="5,0,0,0"
-                        Source="ms-appx:///Assets/dice_stop_light.svg"
-                        Visibility="{x:Bind local:PlayerBindingFunctions.UseLightFiles(Player, x:False), Mode=OneWay, FallbackValue=Visible}" />
-                </Viewbox>
-                <Image Width="40" Height="40" Margin="5,0,0,0"
-                    Source="ms-appx:///Assets/dice_stop_dark.svg"
-                    Visibility="{x:Bind local:PlayerBindingFunctions.UseLightFiles(Player, x:True), Mode=OneWay, FallbackValue=Visible}" />
+                <!--  No ResourceCount (Bad Rolls)  <Ellipse Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" />-->
+                <Grid Width="40" Height="40">
+                    <local:DiceCtrl Width="18" Height="18" Margin="8,5,5,5" HorizontalAlignment="Left"
+                        VerticalAlignment="Top" Number="4"
+                        FillColor="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+                    <local:DiceCtrl Width="18" Height="18" Margin="5,5,8,3" HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom" Number="5"
+                        FillColor="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                        Thickness="4" />
+                    <Ellipse Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="1" />
+                    <Line X1="6" Y1="6" X2="34" Y2="34"
+                        Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                        StrokeThickness="1" />
+
+                </Grid>
                 <TextBlock Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     FontSize="35"
                     Text="{x:Bind Player.GameData.NoResourceCount, Mode=OneWay, FallbackValue=7}"
@@ -320,8 +325,8 @@
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" />
             </StackPanel>
-            
-            
+
+
             <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="2" Margin="0,1,0,0"
                 HorizontalAlignment="Left">
                 <Grid Name="Grid_Stats" Margin="0,1,0,0" HorizontalAlignment="Left">
@@ -352,19 +357,13 @@
                                 Text="{x:Bind Player.GameData.CardsLostToSeven, Mode=TwoWay, FallbackValue=88, Converter={StaticResource ResourceKey=IntToStringConverter}}"
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                         </StackPanel>
-                        <StackPanel Margin="30,0,0,0" Orientation="Horizontal">
-                            <Image Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Source="ms-appx:///Assets/monopoly_light.svg" />
-                            <Image Width="30" Height="30" Margin="-30,0,0,0" HorizontalAlignment="Left"
-                                VerticalAlignment="Center" Source="ms-appx:///Assets/monopoly_dark.svg"
-                                Visibility="{x:Bind local:PlayerBindingFunctions.UseLightFiles(Player, x:True), Mode=OneWay, FallbackValue=Visible}" />
-                            <TextBlock Grid.Row="1" Grid.Column="2" Margin="30,0,0,0" VerticalAlignment="Center"
-                                FontSize="32"
-                                Text="{x:Bind Player.GameData.CardsLostToMonopoly, Mode=TwoWay, FallbackValue=20, Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <Viewbox Height="40" Margin="25,0,0,0">
+                                <local:ResourceCardCtrl DevCardType="Monopoly" Count="{x:Bind Player.GameData.CardsLostToMonopoly, Mode=OneWay}" />
+                            </Viewbox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="⚃⚁☠" FontFamily="Segoe UI Symbol"
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="⚃⚁&#xE007;" FontFamily="Segoe UI Symbol"
                                 FontSize="32"
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                             <TextBlock Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
@@ -373,15 +372,16 @@
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="⚃⚁☻" FontFamily="Segoe UI Symbol"
-                                FontSize="32"
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="⚃⚁&#xE00B;" FontFamily="Segoe UI Symbol"
+                                FontSize="30"
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                            <TextBlock Grid.Row="3" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
+                            <TextBlock Grid.Row="3" Grid.Column="2" Margin="46,0,0,0" VerticalAlignment="Center"
                                 FontSize="32"
                                 Text="{x:Bind Player.GameData.RollsWithResource, Mode=OneWay, FallbackValue=5}"
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                         </StackPanel>
                     </StackPanel>
+
                 </Grid>
                 <Grid Name="Grid_Roll" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Grid.Projection>

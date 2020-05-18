@@ -97,6 +97,7 @@ namespace Catan10
             picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
             picker.FileTypeFilter.Add(".log");
             Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            if (file == null) return;
 
             string json = await FileIO.ReadTextAsync(file);
             List<CatanMessage> messages = CatanProxy.Deserialize<List<CatanMessage>>(json);

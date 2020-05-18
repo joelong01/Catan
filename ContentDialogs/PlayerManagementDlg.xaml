@@ -1,34 +1,16 @@
 ﻿<ContentDialog x:Class="Catan10.PlayerManagementDlg"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10"
+    xmlns:local="using:Catan10" xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Width="1500" Height="801" HorizontalAlignment="Center"
+    x:Name="Dlg_PlayerPicker" Width="1500" HorizontalAlignment="Center"
     PrimaryButtonText="Save and Close" SecondaryButtonText="Cancel"
     PrimaryButtonClick="OnSaveAndclose"
     Background="{StaticResource BlackBrush}"
     mc:Ignorable="d">
     <ContentDialog.Resources>
-        <DataTemplate x:Key="ColorChoiceDataTemplate" x:DataType="local:ColorChoice">
-            <Grid Width="550" Height="25" HorizontalAlignment="Left" AllowFocusOnInteraction="True">
-                <Grid.RenderTransform>
-                    <RotateTransform Angle="0.001"/>
-                </Grid.RenderTransform>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180" />
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="50" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Margin="0,-4,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"
-                    Text="{x:Bind Description}"
-                    FontSize="18" LineStackingStrategy="BaselineToBaseline" />
 
-                <Rectangle Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Fill="{x:Bind local:BrushDependecyFunctions.ColorToBrush(Color)}"
-                    Stroke="Black" StrokeThickness="1" />
-            </Grid>
-        </DataTemplate>
         <DataTemplate x:Key="EditPlayerDataTemplate" x:DataType="local:PlayerModel">
             <Grid Width="125" Height="178" Background="Transparent" IsHitTestVisible="True"
                 IsDoubleTapEnabled="True" IsRightTapEnabled="True"
@@ -40,7 +22,7 @@
                 </Grid.RowDefinitions>
                 <Rectangle Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
-                    Fill="{x:Bind FallbackValue=Blue, Mode=OneWay, Path=SolidBackgroupBrush}" />
+                    Fill="{x:Bind FallbackValue=Blue, Mode=OneWay, Path=SolidPrimaryBrush}" />
                 <Rectangle Grid.Row="0" Fill="{x:Bind ImageBrush, Mode=OneWay}" CanDrag="False" />
                 <Viewbox Grid.Row="1" Margin="1" HorizontalAlignment="Center">
                     <TextBox HorizontalAlignment="Center" Text="{x:Bind PlayerName, FallbackValue=Nameless, Mode=TwoWay}" FontSize="18" Foreground="{x:Bind Path=ForegroundBrush, FallbackValue=White, Mode=OneWay}" />
@@ -84,6 +66,22 @@
             <Setter Property="Margin" Value="5,0,0,0" />
             <Setter Property="Background" Value="{StaticResource bmCherry}" />
         </Style>
+
+        <!--
+            Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="Primary:"
+            FontSize="18"
+        -->
+
+        <Style x:Key="ColorTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Canvas.ZIndex" Value="-1" />
+            <Setter Property="Visibility" Value="Visible" />
+            <Setter Property="RenderTransformOrigin" Value=".5 .5" />
+            <Setter Property="FontSize" Value="18" />
+        </Style>
+
         <Style x:Key="PlayerManagmentTextBlock" TargetType="TextBlock">
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -94,90 +92,135 @@
             <Setter Property="FontSize" Value="20" />
         </Style>
     </ContentDialog.Resources>
-    <Grid Name="ContentRoot" Width="1300" Height="600" Margin="10"
-        HorizontalAlignment="Center">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="6" />
-            <RowDefinition Height="100*" />
-            <RowDefinition Height="6" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100" />
-            <ColumnDefinition Width="550" />
-            <ColumnDefinition Width="550" />
-            <ColumnDefinition Width="100" />
-        </Grid.ColumnDefinitions>
-        <Rectangle Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="0"
-            RadiusX="168.5" RadiusY="168.5"
-            Fill="{StaticResource bmCherry}"
-            Stroke="{StaticResource bmMaple}"
-            StrokeThickness="5" />
-        <Grid Name="CentralGrid" Grid.Row="1" Grid.RowSpan="1" Grid.Column="1"
-            Grid.ColumnSpan="1" Margin="130,5,0,12" Canvas.ZIndex="100"
-            Background="{StaticResource bmMaple}"
-            IsHitTestVisible="True">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="100*" />
-                <RowDefinition Height="100" />
-            </Grid.RowDefinitions>
+    <Viewbox>
+        <Grid Name="ContentRoot" Margin="0" HorizontalAlignment="Center"
+            Background="{StaticResource bmCherry}"
+            BorderBrush="{StaticResource bmMaple}"
+            BorderThickness="5" CornerRadius="0">
+
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0" />
-                <ColumnDefinition Width="0" />
-                <ColumnDefinition Width="420" />
-                <ColumnDefinition Width="0" />
-                <ColumnDefinition Width="0" />
+
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="*" />
+
             </Grid.ColumnDefinitions>
-            <GridView Name="_gvPlayers" Grid.Row="0" Grid.RowSpan="1" Grid.Column="2"
-                Grid.ColumnSpan="1" Margin="5"
-                BorderBrush="{StaticResource bmCherry}"
-                BorderThickness="2" Background="Transparent"
-                ItemsSource="{x:Bind Path=PlayerDataList, Mode=OneWay}"
-                SelectionMode="Single"
-                ItemTemplate="{StaticResource EditPlayerDataTemplate}"
-                SelectedItem="{x:Bind SelectedPlayer, Mode=TwoWay}"
-                SelectionChanged="OnCurrentPlayerChanged" />
-            <Grid Name="CommandGrid" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="10*" />
-                    <ColumnDefinition Width="10*" />
-                    <ColumnDefinition Width="10*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Style="{StaticResource PlayerDlgButton}" Content="&#xE109;" Click="OnAddPlayer" />
-                <Button Grid.Column="1" Style="{StaticResource PlayerDlgButton}" Content="&#xE107;" Click="OnDeletePlayer" />
-                <Button Grid.Column="2" Style="{StaticResource PlayerDlgButton}" Content="&#xE105;" Click="OnSavePlayer" />
-            </Grid>
-        </Grid>
-        <Viewbox Grid.Row="1" Grid.RowSpan="1" Grid.Column="2" Margin="30,50,60,0"
-            HorizontalAlignment="Center" VerticalAlignment="Top">
-            <StackPanel>
-                <local:PublicDataCtrl Player="{x:Bind SelectedPlayer, Mode=OneWay}" />
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="10,10,60,10" VerticalAlignment="Center" Text="Primary:" FontSize="28" />
-                    <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
-                        ScrollViewer.VerticalScrollBarVisibility="Visible"
-                        ScrollViewer.IsVerticalRailEnabled="True"
-                        ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
-                        ItemsSource="{x:Bind PrimaryColors, Mode=OneTime}"
-                        SelectedItem="{x:Bind PrimaryColor, Mode=TwoWay}">                      
-                    </ComboBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="10,10,25,0" VerticalAlignment="Center" Text="Secondary:" FontSize="28" />
-                    <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
-                        AllowFocusOnInteraction="True"
-                        ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
-                        ItemsSource="{x:Bind SecondaryColors, Mode=OneTime}"
-                        SelectedItem="{x:Bind SecondaryColor, Mode=TwoWay}" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="10" VerticalAlignment="Center" Text="Foreground: " FontSize="28" />
-                    <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
-                        ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
-                        ItemsSource="{x:Bind ForegroundColors, Mode=OneTime}"
-                        SelectedItem="{x:Bind ForegroundColor, Mode=TwoWay}" />
+
+
+            <StackPanel Grid.Column="0" Margin="10" HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                Background="{StaticResource bmMaple}">
+
+                <GridView Name="_gvPlayers" Grid.Row="0" Height="495" Margin="5"
+                    VerticalAlignment="Center"
+                    BorderBrush="{StaticResource bmCherry}"
+                    BorderThickness="2" Background="Transparent"                        
+                    ItemsSource="{x:Bind Path=PlayerDataList, Mode=OneWay}"
+                    SelectionMode="Single"
+                    ItemTemplate="{StaticResource EditPlayerDataTemplate}"
+                    SelectedItem="{x:Bind SelectedPlayer, Mode=TwoWay}" />
+
+
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Grid.Column="0" Style="{StaticResource PlayerDlgButton}" Content="&#xE109;" Click="OnAddPlayer" />
+                    <Button Grid.Column="1" Style="{StaticResource PlayerDlgButton}" Content="&#xE107;" Click="OnDeletePlayer" />
+                    <Button Grid.Column="2" Style="{StaticResource PlayerDlgButton}" Content="&#xE105;" Click="OnSavePlayer" />
                 </StackPanel>
             </StackPanel>
-        </Viewbox>
-    </Grid>
+
+            <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
+                <Viewbox>
+                    <local:PublicDataCtrl Player="{x:Bind SelectedPlayer, Mode=OneWay}" />
+                </Viewbox>
+                <Grid Margin="10" Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Background="Transparent">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <RadioButton Grid.Row="0" Grid.Column="0" Margin="10" HorizontalAlignment="Left"
+                            VerticalAlignment="Center" Content="Primary"
+                            IsChecked="{x:Bind IsPrimaryChecked, Mode=TwoWay}" />
+                        <RadioButton Grid.Row="1" Grid.Column="0" Margin="10" HorizontalAlignment="Left"
+                            VerticalAlignment="Center" Content="Secondary"
+                            IsChecked="{x:Bind IsSecondaryChecked, Mode=TwoWay}" />
+                        <RadioButton Grid.Row="2" Grid.Column="0" Margin="10" HorizontalAlignment="Left"
+                            VerticalAlignment="Center" Content="Foreground"
+                            IsChecked="{x:Bind IsForegroundChecked, Mode=TwoWay}" />
+                        <Rectangle Grid.Row="0" Grid.Column="1" Width="100" Margin="10"
+                            Fill="{x:Bind SelectedPlayer.SolidPrimaryBrush, Mode=OneWay}" />
+                        <Rectangle Grid.Row="1" Grid.Column="1" Width="100" Margin="10"
+                            Fill="{x:Bind Path=SelectedPlayer.SolidSecondaryBrush, Mode=OneWay}" />
+                        <Rectangle Grid.Row="2" Grid.Column="1" Width="100" Margin="10"
+                            Fill="{x:Bind SelectedPlayer.ForegroundBrush, Mode=OneWay}" />
+
+
+                    </Grid>
+
+                    <Viewbox Grid.Column="1">
+                        <muxc:ColorPicker x:Name="ColorPicker" Grid.Column="1" Margin="10" IsMoreButtonVisible="True"
+                            IsColorSliderVisible="True" IsColorChannelTextInputVisible="True"
+                            IsHexInputVisible="False" IsAlphaEnabled="False" IsAlphaSliderVisible="False"
+                            IsAlphaTextInputVisible="True"
+                            Color="{x:Bind Path=GetCurrentColor(), BindBack=SetCurrentColor, Mode=TwoWay}" />
+                    </Viewbox>
+
+                </Grid>
+                <!--<Viewbox Grid.Row="1" Grid.RowSpan="1" Grid.Column="2" Margin="30,50,60,0"
+                HorizontalAlignment="Center" VerticalAlignment="Top">
+                <StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="10,10,60,10" VerticalAlignment="Center" Text="Primary:" FontSize="28" />
+                        <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
+                            ScrollViewer.VerticalScrollBarVisibility="Visible"
+                            ScrollViewer.IsVerticalRailEnabled="True"
+                            ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
+                            ItemsSource="{x:Bind PrimaryColors, Mode=OneTime}"
+                            SelectedItem="{x:Bind PrimaryColor, Mode=TwoWay}">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="Padding" Value="0" />
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsWrapGrid />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="10,10,25,0" VerticalAlignment="Center" Text="Secondary:" FontSize="28" />
+                        <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
+                            AllowFocusOnInteraction="True"
+                            ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
+                            ItemsSource="{x:Bind SecondaryColors, Mode=OneTime}"
+                            SelectedItem="{x:Bind SecondaryColor, Mode=TwoWay}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="10" VerticalAlignment="Center" Text="Foreground: " FontSize="28" />
+                        <ComboBox Width="300" Margin="0,4,0,0" VerticalAlignment="Center"
+                            ItemTemplate="{StaticResource ColorChoiceDataTemplate}"
+                            ItemsSource="{x:Bind ForegroundColors, Mode=OneTime}"
+                            SelectedItem="{x:Bind ForegroundColor, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </Viewbox>-->
+            </StackPanel>
+        </Grid>
+    </Viewbox>
 </ContentDialog>
 

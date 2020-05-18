@@ -106,6 +106,23 @@ namespace Catan10
                 return ConverterGlobals.GetBrush(this.ForegroundColor);
             }
         }
+        private int PerceivedBrightness(Color c)
+        {
+            return (int)Math.Sqrt(
+            c.R * c.R * .299 +
+            c.G * c.G * .587 +
+            c.B * c.B * .114);
+        }
+        [JsonIgnore]
+        
+        public bool UseWhiteImages
+        {
+            get
+            {
+
+                return PerceivedBrightness(PrimaryBackgroundColor) > 130 ? true : false;
+            }
+        }
 
         public Color SecondaryBackgroundColor
         {
@@ -120,6 +137,7 @@ namespace Catan10
                     _secondaryBackgroundColor = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("BackgroundBrush");
+                    NotifyPropertyChanged("SolidSecondaryBrush");
                 }
             }
         }
@@ -136,6 +154,8 @@ namespace Catan10
                     _primaryBackgroundColor = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("BackgroundBrush");
+                    NotifyPropertyChanged("SolidPrimaryBrush");
+                    NotifyPropertyChanged("UseWhiteImages");
                 }
             }
         }
@@ -149,11 +169,19 @@ namespace Catan10
         }
 
         [JsonIgnore]
-        public SolidColorBrush SolidBackgroupBrush
+        public SolidColorBrush SolidPrimaryBrush
         {
             get
             {
                 return ConverterGlobals.GetBrush(PrimaryBackgroundColor);
+            }
+        }
+        [JsonIgnore]
+        public SolidColorBrush SolidSecondaryBrush
+        {
+            get
+            {
+                return ConverterGlobals.GetBrush(SecondaryBackgroundColor);
             }
         }
 

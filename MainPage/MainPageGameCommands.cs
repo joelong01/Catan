@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Contacts;
 using Windows.Foundation;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -741,6 +742,17 @@ namespace Catan10
 
 
 
+        }
+
+        private async void OnSetDefaultState(object sender, RoutedEventArgs e)
+        {
+            if (SaveFolder == null)
+            {
+                SaveFolder = await StaticHelpers.GetSaveFolder();
+            }
+            StorageFile file = await SaveFolder.GetFileAsync(PlayerDataFile);
+            await file.DeleteAsync(StorageDeleteOption.Default);
+            await LoadGameData();
         }
 
         private void ToggleShowTile(object sender, RoutedEventArgs e)

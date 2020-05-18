@@ -27,7 +27,7 @@ namespace Catan10
 
         public CardsLostUpdatedHandler OnCardsLost;
         [JsonIgnore]
-        public bool NotificationsEnabled {get;set;} = false;
+        public bool NotificationsEnabled { get; set; } = false;
 
         [JsonIgnore]
         public ObservableCollection<RoadCtrl> Roads { get; private set; } = new ObservableCollection<RoadCtrl>();
@@ -76,7 +76,7 @@ namespace Catan10
             PlayerModel = pData;
             PlayerTurnResourceCount = new PlayerResourceModel(pData);
             PlayerTurnResourceCount.OnPlayerResourceUpdate += OnGameModelResourceUpdate; // currently only logs that a resource was allocated
-            
+
         }
 
 
@@ -358,20 +358,17 @@ namespace Catan10
         private bool? _MovedBaronAfterRollingSeven = null;
         private bool _PlayedKnightThisTurn = false;
         private int _CardsLostToBaron = 0;
-        
-
         private int _IslandsPlayed = 0;
         private bool _isCurrentPlayer = false;
         private int _MaxShips = 0;
         private int _MaxRoads = 0;
         private int _MaxCities = 0;
         private int _MaxSettlements = 0;
-        private bool _useLightFile = true;
         List<List<int>> _GoldRolls = new List<List<int>>();
         PlayerResources _PlayerResources = new PlayerResources();
         TileOrientation _RollOrientation = TileOrientation.FaceDown;
 
-       
+
 
         public SyncronizedPlayerRolls SyncronizedPlayerRolls { get; } = new SyncronizedPlayerRolls();
 
@@ -392,7 +389,7 @@ namespace Catan10
         }
 
 
-       
+
 
         public PlayerResources PlayerResources
         {
@@ -426,24 +423,8 @@ namespace Catan10
             }
         }
 
-        public bool UseLightFile
-        {
-            get => _useLightFile;
-            set
-            {
-                if (_useLightFile != value)
-                {
 
-                    _useLightFile = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("BadRollImageSource");
-                }
-            }
-        }
 
-        
-        
-        
 
         private int pips = 0;
         public int Pips
@@ -524,20 +505,7 @@ namespace Catan10
                 return (MaxShips > 0 ? Visibility.Visible : Visibility.Collapsed);
             }
         }
-        public ImageSource BadRollImageSource
-        {
-            get
-            {
-                string bitmapPath = "ms-appx:///Assets/dice_stop_dark.svg";
-                if (UseLightFile)
-                {
-                    bitmapPath = "ms-appx:///Assets/dice_stop_light.svg";
-                }
-                BitmapImage bitmapImage = new BitmapImage(new Uri(bitmapPath, UriKind.RelativeOrAbsolute));
-                return bitmapImage;
 
-            }
-        }
         public bool IsCurrentPlayer
         {
             get => _isCurrentPlayer;
@@ -904,7 +872,7 @@ namespace Catan10
             {
                 if (_GoldTotal != value)
                 {
-        
+
                     _GoldTotal = value;
                     NotifyPropertyChanged();
                 }
@@ -1152,7 +1120,7 @@ namespace Catan10
 
 
     }
-   
+
     /// <summary>
     ///     this class has 
     ///         1. the list of the rolls a player has made
@@ -1165,7 +1133,7 @@ namespace Catan10
 
     public class SyncronizedPlayerRolls : IComparable<SyncronizedPlayerRolls>, INotifyPropertyChanged
     {
-        
+
         public List<int> Rolls { get; set; } = new List<int>();
         int _DiceOne = -1;
         int _DiceTwo = -1;
@@ -1200,13 +1168,13 @@ namespace Catan10
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("LatestRoll");
                     NotifyPropertyChanged("ShowLatestRoll");
-                    
+
                 }
             }
         }
 
 
-        
+
 
         public void AddRoll(int d1, int d2)
         {
@@ -1235,7 +1203,7 @@ namespace Catan10
             if (Math.Abs(rolls.Count - Rolls.Count) > 1) return false; // 
 
             int count = Math.Min(rolls.Count, Rolls.Count);
-            for (int i=0; i<count; i++)
+            for (int i = 0; i < count; i++)
             {
                 if (rolls[i] != Rolls[i])
                     return false;
@@ -1280,7 +1248,7 @@ namespace Catan10
 
         public int CompareTo(SyncronizedPlayerRolls other)
         {
-            
+
 
             if (this.Rolls.Count == 0)
             {
@@ -1288,7 +1256,7 @@ namespace Catan10
             }
 
             int max = Math.Max(this.Rolls.Count, other.Rolls.Count);
-            
+
 
 
             for (int i = 0; i < max; i++)
