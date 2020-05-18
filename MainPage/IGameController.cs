@@ -196,10 +196,7 @@ namespace Catan10
             }
             
             CurrentPlayer = MainPageModel.GameStartedBy;
-            if (playerLogHeader.LocallyCreated == false)
-            {
-                await MainPageModel.Log.PushAction(playerLogHeader);
-            }
+           
         }
         /// <summary>
         ///     we don't call the Log to push the undo action -- that is done by the log since the log
@@ -216,7 +213,16 @@ namespace Catan10
             return Task.CompletedTask;
 
         }
-
+        /// <summary>
+        ///     Set a random board.  Only the creator can set a random board.  First they log the action, and then call ILogController.Do() from the MonitorService method.
+        ///     we don't want to recurse, so we don't log if the actions come from the current machine.  but they *always* come from the current machine because the UI won't
+        ///     let anybody but the creator set a random board. so we don't ever *need) to log from this method.  but...
+        ///     
+        ///     we want the the logs to be consistent across the machine.  so we'll log the board changes.
+        ///     
+        /// </summary>
+        /// <param name="randomBoard"></param>
+        /// <returns></returns>
         public async Task SetRandomBoard(RandomBoardLog randomBoard)
         {
             Contract.Assert(CurrentGameState == GameState.PickingBoard); // the first is true the first time through then it is the second
@@ -230,7 +236,7 @@ namespace Catan10
             {
                 await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
             }
-            await MainPageModel.Log.PushAction(randomBoard);
+            
             UpdateBoardMeasurements();
         }
 
@@ -267,22 +273,11 @@ namespace Catan10
 
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
-
-
             MainPageModel.IsServiceGame = true;
             MainPageModel.GameStartedBy = FindPlayerByName(SavedAppState.AllPlayers, logHeader.PlayerName);
-
-
-
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
+            return MainPageModel.Log.PushAction(logHeader); // this won't get called again because the state won't be right on this machien
 
-            return MainPageModel.Log.PushAction(logHeader);
-
-            //
-            //   5/12/2020: You have to log so that the GameState is set correctly.  the function is protected at the top by looking at the state
-            //              and not starting unless we need to start                            
-
-           //   return MainPageModel.Log.PushAction(logHeader);
 
 
         }
@@ -449,8 +444,7 @@ namespace Catan10
                 default:
                     break;
             }
-
-            await MainPageModel.Log.PushAction(log);
+          
 
         }
         //
@@ -509,15 +503,6 @@ namespace Catan10
 
                 }
             }
-
-
-            //
-            //  this will eitehr be the logEntry passed in for another player or the one that we generated
-            //  and filled out from this machine.
-            //
-
-            await MainPageModel.Log.PushAction(logEntry);
-
 
             //
             //  TODO how do we know to stop? - go through PlayingPlayers and ask if any are tied and if any need to roll

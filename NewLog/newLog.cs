@@ -18,6 +18,8 @@ namespace Catan10
     {
         private readonly List<LogHeader> ActionStack = new List<LogHeader>();
         private readonly List<LogHeader> UndoStack = new List<LogHeader>();
+        private HashSet<LogHeader> HashSet { get; } = new HashSet<LogHeader>();
+
         public event PropertyChangedEventHandler PropertyChanged;
         public Stacks() { }
         public bool CanUndo => UndoStack.Count > 0;
@@ -27,18 +29,16 @@ namespace Catan10
 
             try
             {
+                Contract.Assert(HashSet.Contains(logHeader) == false);
+
                 if (logHeader.LogType != LogType.Replay)
                 {
                     UndoStack.Clear();
                 }
-                if (logHeader.CanUndo)
-                {
-                    ActionStack.Add(logHeader);
-                }
-                else
-                {
-                    ActionStack.Insert(0, logHeader);
-                }
+
+                ActionStack.Add(logHeader);
+                HashSet.Add(logHeader);
+
 
 
             }
@@ -47,17 +47,11 @@ namespace Catan10
                 NotifyPropertyChanged("GameState");
                 NotifyPropertyChanged("RedoPossible"); // because it is no longer possible
                 NotifyPropertyChanged("ActionStack");
-                // PrintLog();
+                //PrintLog();
 
             }
         }
-        public void InsertAction(LogHeader logHeader)
-        {
-            ActionStack.Insert(0, logHeader);
-            NotifyPropertyChanged("GameState");
-            NotifyPropertyChanged("RedoPossible"); // because it is no longer possible
-            NotifyPropertyChanged("ActionStack");
-        }
+       
         public LogHeader PeekAction
         {
             get
@@ -82,6 +76,7 @@ namespace Catan10
 
             LogHeader lh = ActionStack.Last();
             ActionStack.Remove(lh);
+            HashSet.Remove(lh);
             NotifyPropertyChanged("GameState");
             NotifyPropertyChanged("ActionStack");
             return lh;
@@ -102,6 +97,7 @@ namespace Catan10
         {
             UndoStack.Add(lh);
             NotifyPropertyChanged("RedoPossible");
+            ///PrintLog();
 
         }
         //
@@ -176,15 +172,17 @@ namespace Catan10
 
         public Task PushAction(LogHeader logHeader)
         {
-            GameState currentState = GameState;
+            
             try
             {
+
                 if (logHeader.LogType != LogType.Replay)
                 {
                     Stacks.ClearUndo();
                 }
 
                 Stacks.PushAction(logHeader);
+
 
                 if (logHeader.LocallyCreated)
                 {
@@ -252,10 +250,11 @@ namespace Catan10
 
                 ILogController logController = logHeader as ILogController;
                 Contract.Assert(logController != null, "Every LogHeader is a LogController!");
-
+                Stacks.PushAction(logHeader);
                 //
                 //  this will push the action onto the ActionStack
                 return logController.Redo(Page, logHeader);
+
             }
             finally
             {

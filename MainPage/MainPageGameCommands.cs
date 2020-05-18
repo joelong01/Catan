@@ -1167,7 +1167,16 @@ namespace Catan10
 
             while (true)
             {
-                List<CatanMessage> messages = await proxy.Monitor(sessionId, TheHuman.PlayerName);
+                List<CatanMessage> messages;
+                try
+                {
+                    messages = await proxy.Monitor(sessionId, TheHuman.PlayerName);
+                }
+                catch (Exception e)
+                {
+                    this.TraceMessage($"{e}");
+                    return;
+                }
                 foreach (var message in messages)
                 {
                     Type type = CurrentAssembly.GetType(message.TypeName);
@@ -1176,31 +1185,36 @@ namespace Catan10
                     message.Data = logHeader;
                     MainPageModel.Log.RecordMessage(message);
                     Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
-                    //
-                    //  since we are sending all messages to the service, we don't need this check ehre
-                    // if (logHeader.CreatedBy != TheHuman.PlayerName)
+
+                    
+
+                    ILogController logController = logHeader as ILogController;
+                    Contract.Assert(logController != null, "every LogEntry is a LogController!");
+                    switch (logHeader.LogType)
                     {
-
-                        ILogController logController = logHeader as ILogController;
-                        Contract.Assert(logController != null, "every LogEntry is a LogController!");
-                        switch (logHeader.LogType)
-                        {
-                            case LogType.Normal:
-                                await logController.Do(this, logHeader);
-                                break;
-                            case LogType.Undo:
+                        case LogType.Normal:
+                            if (logHeader.LocallyCreated == false) // Not created by the current machine
+                            {
+                                await MainPageModel.Log.PushAction(logHeader);
+                            }
+                            await logController.Do(this, logHeader);
+                            break;
+                        case LogType.Undo:
+                            if (logHeader.LocallyCreated == false)
+                            {
                                 await MainPageModel.Log.Undo(message);
-                                break;
-                            case LogType.Replay:
+                            }
+                            break;
+                        case LogType.Replay:
 
-                                await MainPageModel.Log.Redo(message);
-                                break;
-                            case LogType.DoNotLog:
-                            case LogType.DoNotUndo:
-                            default:
-                                throw new InvalidDataException("These Logtypes shouldn't be set in a service game");
-                        }
+                            await MainPageModel.Log.Redo(message);
+                            break;
+                        case LogType.DoNotLog:
+                        case LogType.DoNotUndo:
+                        default:
+                            throw new InvalidDataException("These Logtypes shouldn't be set in a service game");
                     }
+
                 }
 
             }

@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-
+using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Storage;
 using Windows.UI.Xaml.Input;
 
@@ -78,6 +78,16 @@ namespace Catan10
             TypeName = this.GetType().FullName;
 
         }
+
+        /// <summary>
+        ///     we have a unique GUID for each 
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return LogId.GetHashCode();
+        }
+
         public string Serialize()
         {
             return CatanProxy.Serialize<object>(this);

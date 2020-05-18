@@ -38,7 +38,7 @@ namespace Catan10
 
             };
             await gameController.StartGame(model as StartGameLog);
-            // await gameController.Log.PushAction(model);            
+                     
             return model;
 
         }

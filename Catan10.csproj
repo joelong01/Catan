@@ -143,6 +143,7 @@
     <Compile Include="NewLog\randomizedBoard.cs" />
     <Compile Include="NewLog\SetStateLog.cs" />
     <Compile Include="NewLog\SynchronizedRollLog.cs" />
+    <Compile Include="NewLog\UndoRedo.cs" />
     <Compile Include="Player\PlayerBindingFunctions.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
     <Compile Include="NewLog\AddPlayer.cs" />

@@ -44,7 +44,9 @@ namespace Catan10
         TradeResources,
         PlayedKnight,
         StartGame,
-        RollToSeeWhoGoesFirst
+        RollToSeeWhoGoesFirst,
+        Undo,
+        Redo
     };
     public enum CatanGames { Regular, Expansion, Seafarers, Seafarers4Player };
     public enum TileOrientation { FaceDown, FaceUp, None };
