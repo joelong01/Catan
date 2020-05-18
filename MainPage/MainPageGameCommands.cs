@@ -1070,6 +1070,7 @@ namespace Catan10
 
 
             MainPageModel.PlayingPlayers.Clear();
+            MainPageModel.Log = new NewLog();
 
             string sessionName = "OnStartDefaultNetworkGame";
 

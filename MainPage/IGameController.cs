@@ -256,7 +256,14 @@ namespace Catan10
         public Task StartGame(StartGameLog logHeader)
         {
 
-            if (logHeader.LocallyCreated == false) return Task.CompletedTask; // we only start local games around these parts!
+            //
+            //  the issue here is that we Log, Add Player, then Monitor under normal circumstances
+            //  So when the second player does the same thing, they get all the log records for the session,
+            //  including the StartGame and AddPlayers.  so you need to be careful to start the game only once -- which often
+            //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't 
+            //  in the game because this StartGame resets PlayingPlayers
+            //
+            if (CurrentGameState != GameState.WaitingForNewGame) return Task.CompletedTask;
 
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
@@ -269,7 +276,7 @@ namespace Catan10
 
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
 
-            return Task.CompletedTask;
+            return MainPageModel.Log.PushAction(logHeader);
 
             //
             //   5/12/2020: You have to log so that the GameState is set correctly.  the function is protected at the top by looking at the state
