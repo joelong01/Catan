@@ -15,6 +15,10 @@ namespace Catan10
         {
             Action = CatanAction.RandomizeBoard;
         }
+        public override string ToString()
+        {
+            return $"[Action={Action}][CreatedBy={CreatedBy}]";
+        }
 
         public static async Task<RandomBoardLog> RandomizeBoard(IGameController gameController, int gameIndex)
         {

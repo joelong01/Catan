@@ -17,6 +17,11 @@ namespace Catan10
             Action = CatanAction.Rolled;
         }
 
+        public override string ToString()
+        {
+            return $"[Action={Action}][CreatedBy={CreatedBy}][DiceOne={DiceOne}][DiceTwo={DiceTwo}]";
+        }
+
         public int DiceOne { get; set; } = -1;
         public int DiceTwo { get; set; } = -1;        
         [JsonIgnore]

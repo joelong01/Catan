@@ -18,7 +18,7 @@ namespace Catan10
         }
         public override string ToString()
         {
-            return $"[AddPlayer={PlayerName}] [Local={LocallyCreated}]";
+            return $"[CreatedBy={CreatedBy}][AddPlayer={PlayerName}] [Local={LocallyCreated}]";
         }
 
         public static async Task<AddPlayerLog> AddPlayer(IGameController gameController, PlayerModel playerModel)

@@ -11,7 +11,6 @@ namespace Catan10
     {
 
         
-
         public SetStateLog() : base() { }
         public List<int> RandomGoldTiles { get; set; } = new List<int>();
 
@@ -47,7 +46,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return $"{PlayerName}: [OldState={OldState}][NewState={NewState}]";
+            return $"[Action={Action}][CreatedBy={CreatedBy}][OldState={OldState}][NewState={NewState}]";
         }
     }
 }
