@@ -10,7 +10,10 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.Media.Audio;
+using Windows.Networking.Sockets;
 using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Shapes;
@@ -22,7 +25,11 @@ using Windows.UI.Xaml.Shapes;
 
 namespace Catan10
 {
-
+    public class WSConnectInfo
+    {
+        public string SessionId { get; set; }
+        public string PlayerName { get; set; }
+    }
 
 
     public sealed partial class MainPage : Page, ILog
@@ -84,11 +91,61 @@ namespace Catan10
 
 
         }
-        private void OnTest2(object sdr, RoutedEventArgs rea)
+        private MessageWebSocket messageWebSocket;
+        private DataWriter messageWriter;
+        private async void OnTest2(object sdr, RoutedEventArgs rea)
         {
+            Uri server = new Uri("ws://192.168.1.128:5000/catan/session/monitor/ws");
+            messageWebSocket = new MessageWebSocket();
+            messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
+            messageWebSocket.MessageReceived += MessageReceived;
+            messageWebSocket.Closed += OnClosed;
+            await messageWebSocket.ConnectAsync(server);
+            messageWriter = new DataWriter(messageWebSocket.OutputStream);
 
+            WSConnectInfo info = new WSConnectInfo()
+            {
+                SessionId = Guid.NewGuid().ToString(),
+                PlayerName = "Joe"
+            };
+            var json = CatanProxy.Serialize<WSConnectInfo>(info);
+            messageWriter.WriteString(json);
+            await messageWriter.StoreAsync();
 
+            messageWriter.DetachStream();
+            messageWriter.Dispose();
+            messageWebSocket.Close(1000, "Closed due to user request.");
+            
         }
+
+        private void OnClosed(IWebSocket sender, WebSocketClosedEventArgs args)
+        {
+            this.TraceMessage("closed");
+        }
+
+        private void MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
+        {
+            var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+               
+                using (DataReader reader = args.GetDataReader())
+                {
+                    reader.UnicodeEncoding = UnicodeEncoding.Utf8;
+
+                    try
+                    {
+                        string read = reader.ReadString(reader.UnconsumedBufferLength);
+                        this.TraceMessage(read);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.TraceMessage(ex.ToString());
+                        this.TraceMessage(ex.Message);
+                    }
+                }
+            });
+        }
+
         // Undo
         private async void OnTest3(object sdr, RoutedEventArgs rea)
         {
