@@ -120,7 +120,7 @@ namespace Catan10
             File = f;
         }
     }
-    public class GameInfo
+    public class CatanGameInfo
     {
         public int MaxRoads { get; set; } = 15;
         public int MaxCities { get; set; } = 4;
@@ -137,8 +137,8 @@ namespace Catan10
         public RandomBoardSettings BoardSettings { get; set; } = new RandomBoardSettings();
         public CatanGames GameName { get; set; } = CatanGames.Regular;
         public GameType GameType { get; set; } = GameType.Regular;
-        public GameInfo() { }
-        public GameInfo(GameInfo info)
+        public CatanGameInfo() { }
+        public CatanGameInfo(CatanGameInfo info)
         {
             MaxRoads = info.MaxRoads;
             MaxCities = info.MaxCities;
@@ -152,7 +152,7 @@ namespace Catan10
             Monopoly = info.Monopoly;
 
         }
-        public static bool operator ==(GameInfo a, GameInfo b)
+        public static bool operator ==(CatanGameInfo a, CatanGameInfo b)
         {
             if (a is null)
             {
@@ -187,13 +187,13 @@ namespace Catan10
 
 
         }
-        public static bool operator !=(GameInfo a, GameInfo b)
+        public static bool operator !=(CatanGameInfo a, CatanGameInfo b)
         {
             return !(a == b);
         }
         public override bool Equals(object obj)
         {
-            return (GameInfo)obj == this;
+            return (CatanGameInfo)obj == this;
         }
         public override int GetHashCode()
         {

@@ -223,7 +223,7 @@ namespace Catan10
         {
 
             var serviceData = Page.MainPageModel.ServiceData;
-            return serviceData.Proxy.PostLogMessage(serviceData.SessionInfo.Id, message);
+            return serviceData.Proxy.PostLogMessage(serviceData.GameInfo.Id, message);
         }
 
 

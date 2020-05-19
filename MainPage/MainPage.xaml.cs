@@ -21,9 +21,11 @@ using Windows.Storage.Search;
 using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Popups;
+using Windows.UI.Text.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
@@ -124,17 +126,7 @@ namespace Catan10
         {
             base.OnNavigatedTo(e);
 
-            if (e.Parameter is Windows.ApplicationModel.Activation.IActivatedEventArgs args)
-            {
-
-                if (args.Kind == Windows.ApplicationModel.Activation.ActivationKind.File)
-                {
-                    //var fileArgs = args as Windows.ApplicationModel.Activation.FileActivatedEventArgs;
-                    //string strFilePath = fileArgs.Files[0].Path;
-                    //var file = (StorageFile)fileArgs.Files[0];
-                    //await LoadCatanFile(file);
-                }
-            }
+            
 
             if (e.NavigationMode == NavigationMode.New)
             {
@@ -154,12 +146,15 @@ namespace Catan10
 
             InitTest();
             ResetDataForNewGame();
+            MonitorCatanGames();
         }
 
         private Task SaveSettings()
         {
             return SaveGameState(SavedAppState);
         }
+
+        
 
         private async Task SaveGameState(SavedState state)
         {
@@ -514,7 +509,7 @@ namespace Catan10
                         break;
                     case GameState.WaitingForPlayers:
                         //
-                        //  if the current player created the session, then we start the game
+                        //  if the current player created the game, then we start the game
                         //  otherwise we just listen to messages, which will have these messages in the queue
                         if (MainPageModel.GameStartedBy == TheHuman)
                         {
@@ -1741,7 +1736,7 @@ namespace Catan10
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
 
-            if (TheHuman.PlayerName != MainPageModel.ServiceData.SessionInfo.Creator) return;
+            if (TheHuman.PlayerName != MainPageModel.ServiceData.GameInfo.Creator) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {

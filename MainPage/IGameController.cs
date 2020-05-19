@@ -97,7 +97,7 @@ namespace Catan10
             }
         }
         public CatanProxy Proxy => MainPageModel.ServiceData.Proxy;
-        public SessionInfo SessionInfo => MainPageModel.ServiceData.SessionInfo;
+        public GameInfo GameInfo => MainPageModel.ServiceData.GameInfo;
 
         public NewLog Log => MainPageModel.Log;
 
@@ -174,7 +174,7 @@ namespace Catan10
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
-        public async Task AddPlayer(AddPlayerLog playerLogHeader)
+        public Task AddPlayer(AddPlayerLog playerLogHeader)
         {
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
@@ -196,6 +196,7 @@ namespace Catan10
             }
             
             CurrentPlayer = MainPageModel.GameStartedBy;
+            return Task.CompletedTask;
            
         }
         /// <summary>
@@ -264,7 +265,7 @@ namespace Catan10
 
             //
             //  the issue here is that we Log, Add Player, then Monitor under normal circumstances
-            //  So when the second player does the same thing, they get all the log records for the session,
+            //  So when the second player does the same thing, they get all the log records for the game,
             //  including the StartGame and AddPlayers.  so you need to be careful to start the game only once -- which often
             //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't 
             //  in the game because this StartGame resets PlayingPlayers

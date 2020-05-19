@@ -21,7 +21,7 @@ namespace Catan10
         {
             //Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
             //    Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
-            //    Microsoft.ApplicationInsights.WindowsCollectors.Session);
+            //    Microsoft.ApplicationInsights.WindowsCollectors.Game);
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.RequestedTheme = ApplicationTheme.Dark;

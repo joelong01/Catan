@@ -136,6 +136,7 @@
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
     <Compile Include="MainPage\IGameController.cs" />
+    <Compile Include="MainPage\NetworkGame.cs" />
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\SavedState.cs" />
     <Compile Include="MainPage\webSocket.cs" />
@@ -483,7 +484,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.5.17.192343</Version>
+      <Version>2020.5.18.203835</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>

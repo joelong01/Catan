@@ -25,7 +25,7 @@ namespace Catan10
             }
         }
 
-        public SessionInfo SessionInfo { get; set; }
+        public GameInfo GameInfo { get; set; }
 
 
         public ServiceData()
@@ -51,7 +51,7 @@ namespace Catan10
                {GameState.Supplemental, "Suplemental" }
         };
 
-
+        public bool AutoJoinGames { get; set; } = false;
 
         public string StateMessage
         {

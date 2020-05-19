@@ -186,7 +186,7 @@ namespace Catan10
             //if (this.State == LogState.ServiceUpdate) return;
             //var serviceData = MainPage.Current.MainPageModel.ServiceData;
             //if (serviceData.Proxy == null) return;
-            //var result = await serviceData.Proxy.PostLogMessage(serviceData.SessionId.Id, le);
+            //var result = await serviceData.Proxy.PostLogMessage(serviceData.GameId.Id, le);
             return Task.CompletedTask;
         }
         private void TraceServiceError(object response, LogEntry le)

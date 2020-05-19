@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Catan10" xmlns:proxy="using:Catan.Proxy"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Service Sessions" Width="1110" Height="750" MinWidth="1110"
+    Title="Service Games" Width="1110" Height="750" MinWidth="1110"
     MinHeight="750" PrimaryButtonClick="OnOk" PrimaryButtonText="Ok"
     IsSecondaryButtonEnabled="True" SecondaryButtonClick="OnCancel"
     SecondaryButtonText="Cancel" mc:Ignorable="d">
@@ -62,7 +62,7 @@
             Margin="0,10,0,10"
             Fill="{StaticResource bmMaple}" />
         <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,10,0,10" HorizontalAlignment="Center"
-            VerticalAlignment="Center" Text="Sessions" FontFamily="Segoe UI" FontSize="32"
+            VerticalAlignment="Center" Text="Games" FontFamily="Segoe UI" FontSize="32"
             Foreground="Black" />
         <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"
             VerticalAlignment="Center" Text="Players" FontFamily="Segoe UI" FontSize="32"
@@ -71,10 +71,10 @@
             HorizontalAlignment="Stretch">
             <StackPanel Margin="0,0,0,0" Orientation="Horizontal" BorderBrush="Black" BorderThickness="0">
                 <TextBlock Margin="5,0,15,0" VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="36"
-                    Text="Session Name: " Foreground="Black" />
+                    Text="Game Name: " Foreground="Black" />
                 <TextBox Width="250" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                     VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="52"
-                    Text="{x:Bind NewSessionName, Mode=TwoWay}"
+                    Text="{x:Bind NewGameName, Mode=TwoWay}"
                     Foreground="Black" BorderBrush="Black" />
                 <Button Margin="0,0,0,0" HorizontalAlignment="Left" Click="OnNew">
                     <Button.Content>
@@ -143,13 +143,13 @@
         </StackPanel>
         <ListBox Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="5"
             Background="Transparent"
-            ItemsSource="{x:Bind Sessions, Mode=OneWay}"
+            ItemsSource="{x:Bind Games, Mode=OneWay}"
             BorderBrush="{StaticResource bmCherry}"
-            SelectedItem="{x:Bind SelectedSession, Mode=TwoWay}"
-            SelectionChanged="List_SessionChanged">
+            SelectedItem="{x:Bind SelectedGame, Mode=TwoWay}"
+            SelectionChanged="List_GameChanged">
             <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="proxy:SessionInfo">
-                    <TextBlock Text="{x:Bind Description}" FontSize="33" Foreground="Black" />
+                <DataTemplate x:DataType="proxy:GameInfo">
+                    <TextBlock Text="{x:Bind Name}" FontSize="33" Foreground="Black" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

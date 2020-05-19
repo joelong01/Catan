@@ -27,7 +27,7 @@ namespace Catan10
 {
     public class WSConnectInfo
     {
-        public string SessionId { get; set; }
+        public string GameId { get; set; }
         public string PlayerName { get; set; }
     }
 
@@ -54,11 +54,11 @@ namespace Catan10
             SavedAppState.AllPlayers.Remove(joe);
             SavedAppState.AllPlayers.Insert(0, joe);
             //
-            //  delete alls sessions
-            List<SessionInfo> sessions = await Proxy.GetSessions();
-            sessions.ForEach(async (session) =>
+            //  delete alls games
+            List<GameInfo> games = await Proxy.GetGames();
+            games.ForEach(async (game) =>
             {
-                var s = await Proxy.DeleteSession(session.Id);
+                var s = await Proxy.DeleteGame(game.Id);
                 if (s == null)
                 {
                     var ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
@@ -68,11 +68,11 @@ namespace Catan10
 
 
 
-            // create a new session
-            SessionInfo sessionInfo = new SessionInfo() { Id = Guid.NewGuid().ToString(), Description = "OnTest", Creator = CurrentPlayer.PlayerName };
-            sessions = await Proxy.CreateSession(sessionInfo);
-            Contract.Assert(sessions != null);
-            MainPageModel.ServiceData.SessionInfo = sessionInfo;
+            // create a new game
+            GameInfo gameInfo = new GameInfo() { Id = Guid.NewGuid().ToString(), Name = "OnTest", Creator = CurrentPlayer.PlayerName };
+            games = await Proxy.CreateGame(gameInfo);
+            Contract.Assert(games != null);
+            MainPageModel.ServiceData.GameInfo = gameInfo;
             //
             //  start the game
             await StartGameLog.StartGame(this, "Joe", 0, true);
@@ -81,7 +81,7 @@ namespace Catan10
             //  add players
             foreach (var p in SavedAppState.AllPlayers)
             {
-                await Proxy.JoinSession(sessionInfo.Id, p.PlayerName);
+                await Proxy.JoinGame(gameInfo.Id, p.PlayerName);
                 await AddPlayerLog.AddPlayer(this, p);
 
             }
@@ -95,7 +95,7 @@ namespace Catan10
         private DataWriter messageWriter;
         private async void OnTest2(object sdr, RoutedEventArgs rea)
         {
-            Uri server = new Uri("ws://192.168.1.128:5000/catan/session/monitor/ws");
+            Uri server = new Uri("ws://192.168.1.128:5000/catan/game/monitor/ws");
             messageWebSocket = new MessageWebSocket();
             messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
             messageWebSocket.MessageReceived += MessageReceived;
@@ -105,7 +105,7 @@ namespace Catan10
 
             WSConnectInfo info = new WSConnectInfo()
             {
-                SessionId = Guid.NewGuid().ToString(),
+                GameId = Guid.NewGuid().ToString(),
                 PlayerName = "Joe"
             };
             var json = CatanProxy.Serialize<WSConnectInfo>(info);

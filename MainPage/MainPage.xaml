@@ -59,10 +59,11 @@
                     <MenuFlyoutItem Text="Show Roll UI" Click="OnShowRolls" />
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Network Game">
+                        <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.AutoJoinGames, Mode=TwoWay}" />
                         <MenuFlyoutItem Text="Start Default Network Game" Click="OnStartDefaultNetworkGame" />
                         <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Delete All Sessions" Click="OnDeleteAllSessions" />
+                        <MenuFlyoutItem Text="Delete All Games" Click="OnDeleteAllGames" />
                         <!--<MenuFlyoutItem Text="Join Game" Click="OnJoinGame" />-->
                     </MenuFlyoutSubItem>
                     <MenuFlyoutSeparator />
