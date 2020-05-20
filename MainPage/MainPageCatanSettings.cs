@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Catan.Proxy;
 using Windows.ApplicationModel.DataTransfer;
@@ -17,7 +18,7 @@ namespace Catan10
 
             set
             {
-                SavedAppState.Settings.Zoom = value;
+                MainPageModel.Settings.Zoom = value;
                 _transformGameView.ScaleX = value;
                 _transformGameView.ScaleY = value;
 
@@ -26,12 +27,12 @@ namespace Catan10
 
         public bool RotateTile
         {
-            get => SavedAppState.Settings.RotateTile;
+            get => MainPageModel.Settings.RotateTile;
 
             set
             {
 
-                SavedAppState.Settings.RotateTile = value;
+                MainPageModel.Settings.RotateTile = value;
                 if (value == false)
                 {
                     foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
@@ -45,27 +46,27 @@ namespace Catan10
 
         public bool AnimateFade
         {
-            get => SavedAppState.Settings.AnimateFade;
+            get => MainPageModel.Settings.AnimateFade;
 
-            set => SavedAppState.Settings.AnimateFade = value;
+            set => MainPageModel.Settings.AnimateFade = value;
         }
 
         public int FadeSeconds
         {
-            get => SavedAppState.Settings.FadeSeconds;
+            get => MainPageModel.Settings.FadeSeconds;
 
             set
             {
-                SavedAppState.Settings.FadeSeconds = value;
-               
+                MainPageModel.Settings.FadeSeconds = value;
+
             }
         }
 
         public bool ShowStopwatch
         {
-            get => SavedAppState.Settings.ShowStopwatch;
+            get => MainPageModel.Settings.ShowStopwatch;
 
-            set => SavedAppState.Settings.ShowStopwatch = value;
+            set => MainPageModel.Settings.ShowStopwatch = value;
         }
 
         public bool UseClassicTiles
@@ -82,22 +83,22 @@ namespace Catan10
         {
             get
             {
-                if (SavedAppState.Settings.AnimationSpeed > 10)
+                if (MainPageModel.Settings.AnimationSpeed > 10)
                 {
                     return 4;
                 }
                 else
                 {
-                    return SavedAppState.Settings.AnimationSpeed;
+                    return MainPageModel.Settings.AnimationSpeed;
                 }
             }
 
             set
             {
-                SavedAppState.Settings.AnimationSpeed = value;
+                MainPageModel.Settings.AnimationSpeed = value;
                 if (value >= 4)
                 {
-                    SavedAppState.Settings.AnimationSpeed = 10;
+                    MainPageModel.Settings.AnimationSpeed = 10;
                 }
             }
         }
@@ -124,9 +125,9 @@ namespace Catan10
 
         public bool ValidateBuilding
         {
-            get => SavedAppState.Settings.ValidateBuilding;
+            get => MainPageModel.Settings.ValidateBuilding;
 
-            set => SavedAppState.Settings.ValidateBuilding = value;
+            set => MainPageModel.Settings.ValidateBuilding = value;
         }
 
         public async Task Explorer()
@@ -206,16 +207,17 @@ namespace Catan10
                 return;
             }
 
-            await SaveSettings();
+            await SaveGameState();
         }
         public async Task ResetGridLayout()
         {
-            foreach (GridPosition pos in SavedAppState.Settings.GridPositions)
+            foreach (var kvp in MainPageModel.Settings.GridPositions)
             {
+                GridPosition pos = kvp.Value;                
                 pos.TranslateX = 0;
                 pos.TranslateY = 0;
                 pos.ScaleX = 1.0;
-                pos.ScaleY = 1.0;
+                pos.ScaleY = 1.0;                
             }
 
             UpdateGridLocations();

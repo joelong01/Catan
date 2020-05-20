@@ -3,11 +3,13 @@
 using System;
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Contacts;
@@ -25,29 +27,91 @@ using Windows.UI.Xaml.Media;
 namespace Catan10
 {
 
-    public class GridPosition
+    public class GridPosition : INotifyPropertyChanged
     {
-        public string Name { get; set; } = "";
-        public double TranslateX { get; set; } = 0.0;
-        public double TranslateY { get; set; } = 0.0;
-        public double ScaleX { get; set; } = 1.0;
-        public double ScaleY { get; set; } = 1.0;
-        public GridPosition(string n, double X, double Y)
+        #region properties
+        private double _translateX = 0.0;
+        private double _translateY = 0.0;
+        private double _scaleX = 1.0;
+        private double _scaleY = 1.0;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public double TranslateX
         {
-            Name = n;
+            get
+            {
+                return _translateX;
+            }
+            set
+            {
+                if (value != _translateX)
+                {
+                    _translateX = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public double TranslateY
+        {
+            get
+            {
+                return _translateY;
+            }
+            set
+            {
+                if (value != _translateY)
+                {
+                    _translateY = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public double ScaleX
+        {
+            get
+            {
+                return _scaleX;
+            }
+            set
+            {
+                if (value != _scaleX)
+                {
+                    _scaleX = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public double ScaleY
+        {
+            get
+            {
+                return _scaleY;
+            }
+            set
+            {
+                if (value != _scaleY)
+                {
+                    _scaleY = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        #endregion
+        public GridPosition(double X, double Y, double scaleX = 1.0, double scaleY = 1.0)
+        {
+            
             TranslateX = X;
             TranslateY = Y;
+            ScaleX = scaleX;
+            ScaleY = scaleY;
         }
-        public GridPosition(string s)
-        {
-            Deserialize(s);
-        }
+       
 
         public GridPosition() { }
 
-        public GridPosition(string s, CompositeTransform ct)
+        public GridPosition(CompositeTransform ct)
         {
-            Name = s;
             ScaleX = ct.ScaleX;
             ScaleY = ct.ScaleY;
             TranslateX = ct.TranslateX;
@@ -64,15 +128,9 @@ namespace Catan10
             return CatanProxy.Serialize(this);
         }
 
-        public void Deserialize(string s)
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
-            var newGP = CatanProxy.Deserialize<GridPosition>(s);
-            this.Name = newGP.Name;
-            this.TranslateX = newGP.TranslateX;
-            this.TranslateY = newGP.TranslateY;
-            this.ScaleX = newGP.ScaleX;
-            this.ScaleY = newGP.ScaleY;
-
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
@@ -91,14 +149,6 @@ namespace Catan10
             new PlayerModel() {PlayerName = "Adrian", ImageFileName = "ms-appx:Assets/DefaultPlayers/adrian.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Purple, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACB}") },
 
         };
-
-
-
-        //
-        //  this is the name of the grids in MainPage.xaml that we want to store and retrieve locations
-        private readonly string[] GridPositionName = new string[] { "RollGrid", "ControlGrid", "_savedGameGrid", "_gameView", "Grid_PrivateData", "Grid_BoardMeasurement", "Grid_Rolls" };
-
-
 
         private async Task<List<PlayerModel>> GetDefaultUsers()
         {
@@ -145,7 +195,7 @@ namespace Catan10
 
         private async Task PickDefaultUser()
         {
-            var picker = new PlayerPickerDlg(SavedAppState.AllPlayers);
+            var picker = new PlayerPickerDlg(MainPageModel.AllPlayers);
             _ = await picker.ShowAsync();
             if (picker.Player == null)
             {
@@ -154,9 +204,9 @@ namespace Catan10
             }
 
             TheHuman = picker.Player;
-            SavedAppState.TheHuman = TheHuman.PlayerName;
-            SavedAppState.ServiceState.DefaultUser = TheHuman.PlayerName;
-            await SaveGameState(SavedAppState);
+            MainPageModel.TheHuman = TheHuman.PlayerName;
+            MainPageModel.DefaultUser = TheHuman.PlayerName;
+            await SaveGameState();
 
         }
 
@@ -171,18 +221,7 @@ namespace Catan10
         {
             try
             {
-                SavedAppState.Settings.GridPositions.Clear();
-                foreach (string name in GridPositionName)
-                {
-                    UIElement el = (UIElement)this.FindName(name);
-                    CompositeTransform ct = (CompositeTransform)el.RenderTransform;
-                    GridPosition pos = new GridPosition(name, ct);
-
-                    SavedAppState.Settings.GridPositions.Add(pos);
-                }
-
-
-                await SaveSettings();
+                await SaveGameState();
             }
             catch (Exception e)
             {
@@ -196,17 +235,23 @@ namespace Catan10
             {
 
 
-                foreach (GridPosition pos in SavedAppState.Settings.GridPositions)
+                foreach (var kvp in MainPageModel.Settings.GridPositions)
                 {
-                    UIElement el = (UIElement)this.FindName(pos.Name);
-                    if (el != null)
+                    GridPosition pos = kvp.Value;
+                    string name = kvp.Key;
+                    if (this.FindName(name).GetType().FullName == "Catan10.GameContainerCtrl")
                     {
-                        CompositeTransform ct = (CompositeTransform)el.RenderTransform;
-                        ct.TranslateX = pos.TranslateX;
-                        ct.TranslateY = pos.TranslateY;
-                        ct.ScaleX = pos.ScaleX;
-                        ct.ScaleY = pos.ScaleY;
+                        _transformGameView.TranslateX = pos.TranslateX;
+                        _transformGameView.TranslateY = pos.TranslateY;
+                        
                     }
+                    else
+                    {
+                        DragableGridCtrl dGrid = (DragableGridCtrl)this.FindName(name);
+                        Contract.Assert(dGrid != null);
+                        dGrid.GridPosition = pos;
+                    }
+                    
                 }
             }
             catch (Exception e)
@@ -215,131 +260,7 @@ namespace Catan10
             }
         }
 
-        private void Border_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-
-            Border border = sender as Border;
-
-            Point position = e.GetCurrentPoint(border).Position;
-            double grabSize = 5;
-            bool mouseCaptured = false;
-            PointerEventHandler pointerMoved = null;
-            PointerEventHandler pointerExited = null;
-            PointerEventHandler pointerPressed = null;
-            PointerEventHandler pointerReleased = null;
-            bool sizeableX = false;
-            bool sizeableY = false;
-            double originalWidth = border.Width;
-            double originalHeight = border.Height;
-            Point pointMouseDown = position;
-            CompositeTransform ct = border.RenderTransform as CompositeTransform;
-
-
-            pointerPressed = (object s, PointerRoutedEventArgs eMove) =>
-            {
-                this.TraceMessage("PointerPressed");
-                border.PointerReleased += pointerReleased;
-                if (sizeableX == true)
-                {
-                    mouseCaptured = true;
-                    border.CapturePointer(e.Pointer);
-                    this.TraceMessage("resize X");
-                }
-                if (sizeableY == true)
-                {
-                    mouseCaptured = true;
-                    border.CapturePointer(e.Pointer);
-                    this.TraceMessage("resize Y");
-                }
-            };
-
-            pointerReleased = (object s, PointerRoutedEventArgs eMove) =>
-            {
-                this.TraceMessage($"PointerReleased");
-                border.PointerPressed -= pointerPressed;
-                border.PointerReleased -= pointerReleased;
-                border.PointerMoved -= pointerMoved;
-                if (mouseCaptured)
-                {
-                    border.ReleasePointerCapture(e.Pointer);
-                }
-            };
-
-            pointerMoved = (object s, PointerRoutedEventArgs eMove) =>
-            {
-
-                position = eMove.GetCurrentPoint(border).Position;
-                if (mouseCaptured)
-                {
-                    double ratioX = position.X / originalWidth;
-                    double ratioY = position.Y / originalHeight;
-                    this.TraceMessage($"pointerMoved: {position} RatioX:{ratioX} RatioY:{ratioY}");
-
-                    //
-                    //  find how much the mouse has moved and resize the window as appropriate..I think this should be a trasnform, not a width
-
-                    //
-                    //  this is the money clause -- resize the window!
-                    if (sizeableX)
-                    {
-                        if (ratioX > .5)
-                        {
-                            ct.ScaleX = ratioX;
-                        }
-                    }
-                    if (sizeableY)
-                    {
-                        if (ratioY > .5)
-                        {
-                            ct.ScaleY = ratioY;
-                        }
-                    }
-
-                    return;
-                }
-
-                if (position.Y < grabSize || position.Y > border.Height - grabSize)
-                {
-                    sizeableY = true;
-                    sizeableX = false;
-                    Window.Current.CoreWindow.PointerCursor =
-                        new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.SizeNorthSouth, 1);
-                }
-                else if (position.X < grabSize || position.X > border.Width - grabSize)
-                {
-                    sizeableX = true;
-                    sizeableY = false;
-                    Window.Current.CoreWindow.PointerCursor =
-                        new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.SizeWestEast, 1);
-                }
-
-                else
-                {
-                    sizeableX = false;
-                    sizeableY = false;
-                    Window.Current.CoreWindow.PointerCursor =
-                                  new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 1);
-                }
-
-
-            };
-
-            pointerExited = (s, eExit) =>
-            {
-                this.TraceMessage($"pointerMoved");
-                Window.Current.CoreWindow.PointerCursor =
-                    new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 1);
-                border.PointerMoved -= pointerMoved;
-                border.PointerExited -= pointerExited;
-                border.PointerPressed -= pointerPressed;
-            };
-
-            border.PointerMoved += pointerMoved;
-            border.PointerExited += pointerExited;
-            border.PointerPressed += pointerPressed;
-
-        }
-
+      
         /// <summary>
         ///     this function is executed when the user clicks on the Next button in the UI. there are some "challenges" here with the user clicking Next multiple times before
         ///     the functions complete.  This is becuase the function returns void, so control is returned to the user before any Tasks are completed.  to guard against this,
@@ -504,7 +425,7 @@ namespace Catan10
         {
 
             _initializeSettings = true;
-            SettingsDlg dlg = new SettingsDlg(this, SavedAppState.Settings);
+            SettingsDlg dlg = new SettingsDlg(this, MainPageModel.Settings);
             _initializeSettings = false;
             await dlg.ShowAsync();
 
@@ -706,7 +627,7 @@ namespace Catan10
 
 
 
-            await SaveSettings();
+            await SaveGameState();
         }
 
         /// <summary>
@@ -735,7 +656,7 @@ namespace Catan10
 
 
 
-            await SaveSettings();
+            await SaveGameState();
         }
 
         internal void AddPlayerMenu(PlayerModel player)
@@ -753,7 +674,7 @@ namespace Catan10
             }
             StorageFile file = await SaveFolder.GetFileAsync(PlayerDataFile);
             await file.DeleteAsync(StorageDeleteOption.Default);
-            await LoadGameData();
+            await LoadMainPageModel();
         }
 
         private void ToggleShowTile(object sender, RoutedEventArgs e)
@@ -804,7 +725,7 @@ namespace Catan10
             //  we assume that if the high score is < 6 then we are in the expansion phase of the game
 
             int highScore = 0;
-            foreach (var p in SavedAppState.AllPlayers)
+            foreach (var p in MainPageModel.AllPlayers)
             {
                 if (p.GameData.Score > highScore)
                 {

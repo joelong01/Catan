@@ -193,8 +193,8 @@ namespace Catan10
         {
             if (response is null)
             {
-                var serviceData = MainPage.Current.MainPageModel.ServiceData;
-                this.TraceMessage($"Call to service failed. LastError={serviceData.Proxy.LastError} LogEntry: {le}");
+                
+                this.TraceMessage($"Call to service failed. LastError={ MainPage.Current.MainPageModel.Proxy.LastError} LogEntry: {le}");
             }
         }
         public async Task AppendLogLine(LogEntry le, bool save = true)

@@ -222,9 +222,8 @@ namespace Catan10
 
         private Task PostLogMessage(CatanMessage message)
         {
-
-            var serviceData = Page.MainPageModel.ServiceData;
-            return serviceData.Proxy.PostLogMessage(serviceData.GameInfo.Id, message);
+            
+            return Page.MainPageModel.Proxy.PostLogMessage(Page.MainPageModel.GameInfo.Id, message);
         }
 
 

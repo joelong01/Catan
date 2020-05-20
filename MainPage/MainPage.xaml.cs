@@ -40,7 +40,7 @@ namespace Catan10
     public sealed partial class MainPage : Page, ILog
     {
 
-        public SavedState SavedAppState { get; set; } = null;
+
         private int _supplementalStartIndex = -1;
         public static readonly string SAVED_GAME_EXTENSION = ".log";
         public const string PlayerDataFile = "catansettings.json";
@@ -126,7 +126,7 @@ namespace Catan10
         {
             base.OnNavigatedTo(e);
 
-            
+
 
             if (e.NavigationMode == NavigationMode.New)
             {
@@ -136,7 +136,7 @@ namespace Catan10
                 _gameView.Init(this, this);
                 CreateMenuItems();
 
-                await LoadGameData();
+                await LoadMainPageModel();
                 UpdateGridLocations();
                 _progress.Visibility = Visibility.Collapsed;
                 _progress.IsActive = false;
@@ -151,23 +151,18 @@ namespace Catan10
 
         }
 
-        private Task SaveSettings()
-        {
-            return SaveGameState(SavedAppState);
-        }
 
-        
 
-        private async Task SaveGameState(SavedState state)
+        private async Task SaveGameState()
         {
             try
             {
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
-                var content = CatanProxy.Serialize<SavedState>(state, true);
+                var content = CatanProxy.Serialize<MainPageModel>(MainPageModel, true);
                 StorageFile file = await folder.CreateFileAsync(PlayerDataFile, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(file, content);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.TraceMessage($"eating exception: {e}");
             }
@@ -175,17 +170,17 @@ namespace Catan10
 
         public StorageFolder SaveFolder { get; set; } = null;
 
-        
 
-        private async Task<SavedState> LoadGameState()
+
+        private async Task<MainPageModel> ReadMainPageModelOffDisk()
         {
             if (SaveFolder == null)
             {
                 SaveFolder = await StaticHelpers.GetSaveFolder();
             }
-            
+
             string content = await StaticHelpers.ReadWholeFile(SaveFolder, PlayerDataFile);
-            SavedState state;
+            MainPageModel mainPageModel;
 
             if (String.IsNullOrEmpty(content))
             {
@@ -194,11 +189,11 @@ namespace Catan10
             try
             {
 
-                state = CatanProxy.Deserialize<SavedState>(content);
+                mainPageModel = CatanProxy.Deserialize<MainPageModel>(content);
 
-               
 
-                return state;
+
+                return mainPageModel;
             }
             catch (JsonException j)
             {
@@ -216,45 +211,45 @@ namespace Catan10
         ///     3. Service settings
         /// </summary>
         /// <returns></returns>
-        private async Task LoadGameData()
+        private async Task LoadMainPageModel()
         {
 
 
-            SavedAppState = await LoadGameState();
-            if (SavedAppState == null || SavedAppState.AllPlayers.Count == 0)
+            this.MainPageModel = await ReadMainPageModelOffDisk();
+            if (MainPageModel == null || MainPageModel.AllPlayers.Count == 0)
             {
                 var list = await GetDefaultUsers();
 
-                SavedAppState = new SavedState()
+                MainPageModel = new MainPageModel()
                 {
                     AllPlayers = list,
                     Settings = new Settings(),
-                    ServiceState = new ServiceState() { HostName = "http://192.168.1.128:5000" },
-                    TheHuman="",
-                    
+                    HostName = "http://192.168.1.128:5000",
+                    TheHuman = "",
 
                 };
 
-                await SaveGameState(SavedAppState);
-                SavedAppState = await LoadGameState(); // just verifying round trip...
-                Debug.Assert(SavedAppState != null);
+                await SaveGameState();
+                MainPageModel = await ReadMainPageModelOffDisk(); // just verifying round trip...
+                Contract.Assert(MainPageModel != null);
             }
 
-            if (SavedAppState.TheHuman != "")
+            if (MainPageModel.TheHuman != "")
             {
-             TheHuman = PlayerNameToPlayer(SavedAppState.TheHuman, SavedAppState.AllPlayers);
+                TheHuman = PlayerNameToPlayer(MainPageModel.TheHuman, MainPageModel.AllPlayers);
+                CurrentPlayer = TheHuman;
             }
 
-            foreach (var player in SavedAppState.AllPlayers)
+            foreach (var player in MainPageModel.AllPlayers)
             {
                 if (player.PlayerIdentifier == Guid.Empty)
                 {
                     player.PlayerIdentifier = Guid.NewGuid();
                 }
-               
+
                 await player.LoadImage();
-              
-                if (SavedAppState.TheHuman == player.PlayerName)
+
+                if (MainPageModel.TheHuman == player.PlayerName)
                 {
                     TheHuman = player;
                 }
@@ -311,7 +306,7 @@ namespace Catan10
 
 
 
-       
+
 
 
 
@@ -339,7 +334,7 @@ namespace Catan10
             }
 
             MainPageModel = new MainPageModel();
-            
+
 
 
             // _lbGames.SelectedValue = MainPageModel.Log;
@@ -347,7 +342,7 @@ namespace Catan10
             Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.TurnReset();
             _stateStack.Clear();
 
-            foreach (PlayerModel player in SavedAppState.AllPlayers)
+            foreach (PlayerModel player in MainPageModel.AllPlayers)
             {
                 player.Reset();
             }
@@ -397,8 +392,8 @@ namespace Catan10
         {
             _gameView.Reset();
             _gameView.SetCallbacks(this, this);
-            
-            
+
+
             foreach (PlayerModel p in MainPageModel.PlayingPlayers)
             {
                 p.GameData.OnCardsLost -= OnPlayerLostCards;
@@ -411,7 +406,7 @@ namespace Catan10
             {
                 CurrentPlayer = TheHuman;
             }
-            
+
 
         }
 
@@ -432,7 +427,7 @@ namespace Catan10
         }
 
 
-        private  Task AddPlayer(PlayerModel pData, LogType logType)
+        private Task AddPlayer(PlayerModel pData, LogType logType)
         {
 
             MainPageModel.PlayingPlayers.Add(pData);
@@ -505,7 +500,7 @@ namespace Catan10
             {
                 switch (CurrentGameState) // this is actually better thought of as the state we are about to change or that we need to do something and the user takes care of hitting the Next button
                 {
-                  
+
                     case GameState.WaitingForNewGame:
                         OnNewNetworkGame(null, null);
                         break;
@@ -522,13 +517,13 @@ namespace Catan10
                             Contract.Assert(randomBoardLog != null);
                         }
                         await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
-                        
+
                         break;
                     case GameState.WaitingForRollForOrder:
                         //
                         // hide board measurement UI as we've now picked out poison
-                      
-                        break;                   
+
+                        break;
                     case GameState.WaitingForStart:
                         MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceDown);
                         await CopyScreenShotToClipboard(_gameView);
@@ -833,7 +828,7 @@ namespace Catan10
             //
             //  we are on the right person, now set the state
 
-       
+
             if (logType == LogType.Normal || logType == LogType.Replay)
             {
                 await AddLogEntry(CurrentPlayer, newState, CatanAction.ChangePlayerAndSetState, true, logType, -1, new LogChangePlayer(from, to, oldState, currentRandomGoldTiles, newRandomGoldTiles));
@@ -960,20 +955,20 @@ namespace Catan10
 
                 {
                     tilesWithNumber.Add(t);
-                    if (SavedAppState.Settings.AnimateFade)
+                    if (MainPageModel.Settings.AnimateFade)
                     {
 
                         t.AnimateFadeAsync(1.0);
 
                     }
-                    if (SavedAppState.Settings.RotateTile)
+                    if (MainPageModel.Settings.RotateTile)
                     {
                         t.Rotate(180, tasks, true);
                     }
                 }
                 else
                 {
-                    if (SavedAppState.Settings.AnimateFade)
+                    if (MainPageModel.Settings.AnimateFade)
                     {
                         t.AnimateFadeAsync(.25);
                     }
@@ -987,7 +982,7 @@ namespace Catan10
 
             //
             // now make sure we reverse the fade
-          
+
             return tilesWithNumber;
         }
 
@@ -1123,6 +1118,7 @@ namespace Catan10
             if (_doDragDrop)
             {
                 await StaticHelpers.DragAsync((UIElement)sender, pRoutedEvents);
+                OnGridPositionChanged("_gameView", new GridPosition(_transformGameView));
             }
 
         }
@@ -1220,12 +1216,12 @@ namespace Catan10
                             LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
                             if (roadUpdate.NewRoadState != RoadState.Unowned)
                             {
-                               
-                             //   roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
+
+                                //   roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
                             }
                             else
                             {
-                              //  roadUpdate.Road.Color = Colors.Transparent;
+                                //  roadUpdate.Road.Color = Colors.Transparent;
                             }
 
                             await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
@@ -1298,20 +1294,20 @@ namespace Catan10
 
                 {
                     tilesWithNumber.Add(t);
-                    if (SavedAppState.Settings.AnimateFade)
+                    if (MainPageModel.Settings.AnimateFade)
                     {
 
                         t.AnimateFadeAsync(1.0);
 
                     }
-                    if (SavedAppState.Settings.RotateTile)
+                    if (MainPageModel.Settings.RotateTile)
                     {
                         t.Rotate(180, tasks, true);
                     }
                 }
                 else
                 {
-                    if (SavedAppState.Settings.AnimateFade)
+                    if (MainPageModel.Settings.AnimateFade)
                     {
                         t.AnimateFadeAsync(0.25);
                     }
@@ -1323,12 +1319,12 @@ namespace Catan10
                 await Task.WhenAll(tasks.ToArray());
             }
 
-          
+
 
             return tilesWithNumber;
         }
 
-       
+
 
         private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
@@ -1401,12 +1397,12 @@ namespace Catan10
 
         private async void OnManagePlayers(object sender, RoutedEventArgs e)
         {
-            PlayerManagementDlg dlg = new PlayerManagementDlg(SavedAppState.AllPlayers);
+            PlayerManagementDlg dlg = new PlayerManagementDlg(MainPageModel.AllPlayers);
             if (await dlg.ShowAsync() == ContentDialogResult.Primary)
             {
-                SavedAppState.AllPlayers.Clear();
-                SavedAppState.AllPlayers.AddRange(dlg.PlayerDataList);
-                await SaveGameState(SavedAppState);
+                MainPageModel.AllPlayers.Clear();
+                MainPageModel.AllPlayers.AddRange(dlg.PlayerDataList);
+                await SaveGameState();
             }
         }
 
@@ -1509,7 +1505,7 @@ namespace Catan10
             //
             //  5/15/2020: moved to passying CurrentPlayer pointer around and binding to its colors
             road.CurrentPlayer = CurrentPlayer;
-            
+
             await UpdateRoadState(road, road.RoadState, RoadState.Road, LogType.Normal);
         }
 
@@ -1671,7 +1667,7 @@ namespace Catan10
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
 
-            if (TheHuman.PlayerName != MainPageModel.ServiceData.GameInfo.Creator) return;
+            if (TheHuman.PlayerName != MainPageModel.GameInfo.Creator) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
@@ -1701,13 +1697,13 @@ namespace Catan10
                 }
             }
 
-            
+
 
         }
 
         public void UpdateBoardMeasurements()
         {
-           
+
             PipCount = GetPipCount();
             List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
             buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
@@ -1731,7 +1727,7 @@ namespace Catan10
             TimeSpan diff = DateTime.Now - _dt;
             if (diff.TotalSeconds < 0.1)
             {
-              //  this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
+                //  this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
                 return;
             }
 
@@ -1842,7 +1838,7 @@ namespace Catan10
             await PickSettlementsAndRoads();
         }
 
-       
+
         private async void OnRolled(int dice1, int dice2)
         {
             if (!MainPageModel.EnableRolls) return;
@@ -1850,7 +1846,27 @@ namespace Catan10
             await SynchronizedRollLog.StartSyncronizedRoll(this, dice1, dice2);
         }
 
-       
+        /// <summary>
+        ///     The DraggableGridCtrl calls this whenever the window is moved or resized
+        /// </summary>
+        /// <param name="gridPosition"></param>
+        private async void OnGridPositionChanged(string name, GridPosition gridPosition)
+        {
+            MainPageModel.Settings.GridPositions.TryGetValue(name, out GridPosition gp);
+            if (gp != null)
+            {
+                gp.TranslateX = gridPosition.TranslateX;
+                gp.TranslateY = gridPosition.TranslateY;
+                gp.ScaleX = gridPosition.ScaleX;
+                gp.ScaleY = gridPosition.ScaleY;
+            }
+            else
+            {
+                MainPageModel.Settings.GridPositions[name] = gridPosition;
+            }
+
+            await SaveGameState();
+        }
     }
 }
 

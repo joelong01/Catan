@@ -19,7 +19,7 @@ namespace Catan10
         public bool ResourceTracking { get; set; } = true;
         public bool UseRandomNumbers { get; set; } = true;
         public bool ValidateBuilding { get; set; } = true;
-        public List<GridPosition> GridPositions { get; set; } = new List<GridPosition>();
+        public Dictionary<string, GridPosition> GridPositions { get; set; } = new Dictionary<string, GridPosition>();
 
 
 

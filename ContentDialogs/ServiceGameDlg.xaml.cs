@@ -27,7 +27,7 @@ namespace Catan10
     {
         #region properties
 
-        private CatanProxy Proxy { get; } = MainPage.Current.MainPageModel.ServiceData.Proxy;
+        private CatanProxy Proxy { get; } = MainPage.Current.MainPageModel.Proxy;
         private PlayerModel CurrentPlayer { get; set; } = null;
         private List<PlayerModel> AllPlayers { get; set; } = null;
         private TaskCompletionSource<bool> _tcs = null;

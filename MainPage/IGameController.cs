@@ -96,8 +96,8 @@ namespace Catan10
                 return MainPageModel.Log.GameState;
             }
         }
-        public CatanProxy Proxy => MainPageModel.ServiceData.Proxy;
-        public GameInfo GameInfo => MainPageModel.ServiceData.GameInfo;
+        public CatanProxy Proxy => MainPageModel.Proxy;
+        public GameInfo GameInfo => MainPageModel.GameInfo;
 
         public NewLog Log => MainPageModel.Log;
 
@@ -151,7 +151,7 @@ namespace Catan10
         public PlayerModel NameToPlayer(string playerName)
         {
 
-            foreach (var player in SavedAppState.AllPlayers)
+            foreach (var player in MainPageModel.AllPlayers)
             {
                 if (player.PlayerName == playerName)
                 {
@@ -275,7 +275,7 @@ namespace Catan10
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
             MainPageModel.IsServiceGame = true;
-            MainPageModel.GameStartedBy = FindPlayerByName(SavedAppState.AllPlayers, logHeader.PlayerName);
+            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.PlayerName);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
             return MainPageModel.Log.PushAction(logHeader); // this won't get called again because the state won't be right on this machien
 
@@ -484,7 +484,7 @@ namespace Catan10
 
             Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
 
-            PlayerModel theHuman = PlayerNameToPlayer(logEntry.CreatedBy, SavedAppState.AllPlayers);
+            PlayerModel theHuman = PlayerNameToPlayer(logEntry.CreatedBy, MainPageModel.AllPlayers);
 
             Contract.Assert(theHuman != null);
             Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);

@@ -8,34 +8,12 @@ using Windows.UI.Xaml;
 
 namespace Catan10
 {
-    public class ServiceData
-    {
-        public CatanProxy Proxy { get; } = new CatanProxy() { HostName = "http://192.168.1.128:5000" };
-        public string HostName
-        {
-            get
-            {
-                return Proxy.HostName;
-            }
-            set
-            {
+   
 
-                Proxy.HostName = value;
-
-            }
-        }
-
-        public GameInfo GameInfo { get; set; }
-
-
-        public ServiceData()
-        {
-            Proxy.HostName = HostName;
-        }
-    }
 
     public class MainPageModel : INotifyPropertyChanged
     {
+        [JsonIgnore]
         private Dictionary<GameState, string> StateMessages { get; } = new Dictionary<GameState, string>()
         {
                {GameState.Uninitialized, "" },
@@ -45,74 +23,15 @@ namespace Catan10
                {GameState.WaitingForRollForOrder, "Start" },
                {GameState.WaitingForStart, "Pick Resource" },
                {GameState.AllocateResourceForward, "Pick Resource" },
-               {GameState.AllocateResourceReverse, "Pick Resource" },               
+               {GameState.AllocateResourceReverse, "Pick Resource" },
                {GameState.WaitingForRoll, "Select Roll" },
                {GameState.WaitingForNext, "Done" },
                {GameState.Supplemental, "Suplemental" }
         };
-
-      
-
-        public string StateMessage
-        {
-            get
-            {
-                if (Log == null) return "New Game";
-
-                if (StateMessages.TryGetValue(Log.GameState, out string msg))
-                {
-                    return msg;
-                }
-
-                return $"GameStart.{Log.GameState}";
-            }
-        }
-
-
-
-        public ServiceData ServiceData { get; } = new ServiceData();
-        bool _EnableUiInteraction = true;
-
-        public void SetPipCount(int[] value)
-        {
-            FiveStarPositions = value[0];
-            FourStarPositions = value[1];
-            ThreeStarPositions = value[2];
-            TwoStarPositions = value[3];
-
-        }
-
-
-
-        private bool _isServiceGame = false;
-
-        public bool IsServiceGame
-        {
-            get => _isServiceGame;
-            set
-            {
-                if (value != _isServiceGame)
-                {
-                    _isServiceGame = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        public MainPageModel()
-        {
-           Log = new NewLog();
-        }
-        /// <summary>
-        ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
-        ///     if we add one of these properties (which are usually the get'ers only)
-        /// </summary>
-        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton" , "EnableRedo" , "StateMessage", "ShowBoardMeasurements", "ShowRolls" };
-        private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-
-            DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-
-        }
+        [JsonIgnore]
+        public CatanProxy Proxy { get; } = new CatanProxy() { HostName = "http://192.168.1.128:5000" };
+        [JsonIgnore]
+        public GameInfo GameInfo { get; set; }
 
 
         bool _AutoJoinGames = false;
@@ -131,7 +50,96 @@ namespace Catan10
                 }
             }
         }
+
+
+        string _HostName = "http://192.168.1.128:5000";
+        public string HostName
+        {
+            get
+            {
+                return _HostName;
+            }
+            set
+            {
+                if (_HostName != value)
+                {
+                    _HostName = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public string DefaultUser { get; set; } = "";
+        public string TheHuman { get; set; } = "";
+        public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
+        public Settings Settings { get; set; } = new Settings();
+
+
+        [JsonIgnore]
+        public string StateMessage
+        {
+            get
+            {
+                if (Log == null) return "New Game";
+
+                if (StateMessages.TryGetValue(Log.GameState, out string msg))
+                {
+                    return msg;
+                }
+
+                return $"GameStart.{Log.GameState}";
+            }
+        }
+
+
+
+        
+        bool _EnableUiInteraction = true;
+
+        public void SetPipCount(int[] value)
+        {
+            FiveStarPositions = value[0];
+            FourStarPositions = value[1];
+            ThreeStarPositions = value[2];
+            TwoStarPositions = value[3];
+
+        }
+
+
+
+        private bool _isServiceGame = false;
+
+        [JsonIgnore]
+        public bool IsServiceGame
+        {
+            get => _isServiceGame;
+            set
+            {
+                if (value != _isServiceGame)
+                {
+                    _isServiceGame = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public MainPageModel()
+        {
+            Log = new NewLog();
+        }
+        /// <summary>
+        ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
+        ///     if we add one of these properties (which are usually the get'ers only)
+        /// </summary>
+
+        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls" };
+        private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+
+            DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
+
+        }
+
         bool _WebSocketConnected = false;
+        [JsonIgnore]
         public bool WebSocketConnected
         {
             get
@@ -147,6 +155,7 @@ namespace Catan10
                 }
             }
         }
+        [JsonIgnore]
         public bool EnableRolls
         {
             get
@@ -154,22 +163,22 @@ namespace Catan10
                 if (Log == null) return false;
                 if ((Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder)) return true;
                 return false;
-                
+
 
             }
         }
-
+        [JsonIgnore]
         public Visibility ShowRolls
         {
             get
             {
                 if (Log == null) return Visibility.Collapsed;
 
-                if ( (Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder) || (Log.GameState == GameState.WaitingForStart)) return Visibility.Visible;
+                if ((Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder) || (Log.GameState == GameState.WaitingForStart)) return Visibility.Visible;
                 return Visibility.Collapsed;
             }
         }
-
+        [JsonIgnore]
         public Visibility ShowBoardMeasurements
         {
             get
@@ -197,10 +206,10 @@ namespace Catan10
                 }
             }
         }
-
+        [JsonIgnore]
         public PlayerModel GameStartedBy { get; internal set; }
 
-
+        [JsonIgnore]
         public bool EnableUiInteraction
         {
             get
@@ -219,7 +228,7 @@ namespace Catan10
             }
         }
 
-
+        [JsonIgnore]
         public bool EnableNextButton
         {
             get
@@ -227,7 +236,7 @@ namespace Catan10
                 if (Log == null) return true;
                 GameState state = Log.GameState;
 
-                
+
 
                 if (state == GameState.PickingBoard || state == GameState.WaitingForRollForOrder || state == GameState.WaitingForPlayers)
                 {
@@ -245,7 +254,7 @@ namespace Catan10
 
             }
         }
-
+        [JsonIgnore]
         public bool RollGridEnabled
         {
             get
@@ -256,7 +265,7 @@ namespace Catan10
                 return false;
             }
         }
-
+        [JsonIgnore]
         public Visibility RollGridVisible
         {
             get
@@ -268,7 +277,7 @@ namespace Catan10
             }
         }
 
-
+        [JsonIgnore]
         public bool EnableRedo
         {
             get
@@ -297,8 +306,8 @@ namespace Catan10
                 }
             }
         }
-
         int _FiveStarPositions = 0;
+        [JsonIgnore]
         public int FiveStarPositions
         {
             get
@@ -315,6 +324,7 @@ namespace Catan10
             }
         }
         int _FourStarPosition = 0;
+        [JsonIgnore]
         public int FourStarPositions
         {
             get
@@ -331,6 +341,7 @@ namespace Catan10
             }
         }
         int _ThreeStarPosition = 0;
+        [JsonIgnore]
         public int ThreeStarPositions
         {
             get
@@ -348,6 +359,7 @@ namespace Catan10
         }
 
         int _TwoStarPosition = 0;
+        [JsonIgnore]
         public int TwoStarPositions
         {
             get

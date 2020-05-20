@@ -51,8 +51,8 @@ namespace Catan10
             Contract.Assert(joe != null);
             TheHuman = joe;
             CurrentPlayer = joe;
-            SavedAppState.AllPlayers.Remove(joe);
-            SavedAppState.AllPlayers.Insert(0, joe);
+            MainPageModel.AllPlayers.Remove(joe);
+            MainPageModel.AllPlayers.Insert(0, joe);
             //
             //  delete alls games
             List<GameInfo> games = await Proxy.GetGames();
@@ -72,14 +72,14 @@ namespace Catan10
             GameInfo gameInfo = new GameInfo() { Id = Guid.NewGuid().ToString(), Name = "OnTest", Creator = CurrentPlayer.PlayerName };
             games = await Proxy.CreateGame(gameInfo);
             Contract.Assert(games != null);
-            MainPageModel.ServiceData.GameInfo = gameInfo;
+            MainPageModel.GameInfo = gameInfo;
             //
             //  start the game
             await StartGameLog.StartGame(this, "Joe", 0, true);
 
             //
             //  add players
-            foreach (var p in SavedAppState.AllPlayers)
+            foreach (var p in MainPageModel.AllPlayers)
             {
                 await Proxy.JoinGame(gameInfo.Id, p.PlayerName);
                 await AddPlayerLog.AddPlayer(this, p);
@@ -175,10 +175,10 @@ namespace Catan10
             //await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
             //List<PlayerModel> PlayerDataList = new List<PlayerModel>
             //{
-            //    SavedAppState.AllPlayers[0],
-            //    SavedAppState.AllPlayers[1],
-            //    SavedAppState.AllPlayers[2],
-            //    SavedAppState.AllPlayers[3]
+            //    MainPageModel.AllPlayers[0],
+            //    MainPageModel.AllPlayers[1],
+            //    MainPageModel.AllPlayers[2],
+            //    MainPageModel.AllPlayers[3]
             //};
             //await StartGame(PlayerDataList, 0);
             //await NextState(); // simluates pushing "Start"
@@ -200,11 +200,11 @@ namespace Catan10
             //   await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
             List<PlayerModel> PlayerDataList = new List<PlayerModel>
             {
-                SavedAppState.AllPlayers[0],
-                SavedAppState.AllPlayers[1],
-                SavedAppState.AllPlayers[2],
-                SavedAppState.AllPlayers[3],
-                SavedAppState.AllPlayers[4],
+                MainPageModel.AllPlayers[0],
+                MainPageModel.AllPlayers[1],
+                MainPageModel.AllPlayers[2],
+                MainPageModel.AllPlayers[3],
+                MainPageModel.AllPlayers[4],
             };
             await StartGame(PlayerDataList, 1);
             await NextState(); // simluates pushing "Start"

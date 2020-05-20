@@ -83,7 +83,7 @@ namespace Catan10
                         {
                             await this.Reset();
                             await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
-                            this.MainPageModel.ServiceData.GameInfo = gameMessage.GameInfo;
+                            this.MainPageModel.GameInfo = gameMessage.GameInfo;
                             await StartGameLog.StartGame(this, gameMessage.GameInfo.Creator, 0, true);
                             await AddPlayerLog.AddPlayer(this, TheHuman);
                             
@@ -118,10 +118,10 @@ namespace Catan10
                 return;
             }
 
-            var proxy = MainPageModel.ServiceData.Proxy;
+            var proxy = MainPageModel.Proxy;
 
             var existingGames = await proxy.GetGames();
-            ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, SavedAppState.AllPlayers, existingGames)
+            ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, MainPageModel.AllPlayers, existingGames)
             {
                 HostName = proxy.HostName
             };
@@ -136,7 +136,7 @@ namespace Catan10
             }
 
 
-            MainPageModel.ServiceData.GameInfo = dlg.SelectedGame;
+            MainPageModel.GameInfo = dlg.SelectedGame;
             MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedGame.Creator);
 
             this.TraceMessage($"Game: {dlg.SelectedGame.Name}");
@@ -203,10 +203,10 @@ namespace Catan10
 
             }
 
-            MainPageModel.ServiceData.GameInfo = gameInfo;
+            MainPageModel.GameInfo = gameInfo;
             //
             //  start the game
-            await StartGameLog.StartGame(this, MainPageModel.ServiceData.GameInfo.Creator, 0, true);
+            await StartGameLog.StartGame(this, MainPageModel.GameInfo.Creator, 0, true);
 
             //
             //  add players
@@ -247,7 +247,7 @@ namespace Catan10
 
         private Task ReplayGame(GameInfo game, string playerName)
         {
-            var Proxy = MainPageModel.ServiceData.Proxy;
+            var Proxy = MainPageModel.Proxy;
             Contract.Assert(Proxy != null);
             return Task.CompletedTask;
             //   var messages = await Proxy.
@@ -259,8 +259,8 @@ namespace Catan10
         {
 
 
-            var proxy = MainPageModel.ServiceData.Proxy;
-            var gameId = MainPageModel.ServiceData.GameInfo.Id;
+            var proxy = MainPageModel.Proxy;
+            var gameId = MainPageModel.GameInfo.Id;
 
             var players = await proxy.GetPlayers(gameId);
             Contract.Assert(players.Contains(TheHuman.PlayerName));

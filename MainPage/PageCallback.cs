@@ -342,14 +342,14 @@ namespace Catan10
 
 
 
-            //    if (SavedAppState.AllPlayers.Count == 0)
+            //    if (MainPageModel.AllPlayers.Count == 0)
             //    {
             //        await LoadGameData();
             //    }
 
-            //    Debug.Assert(SavedAppState.AllPlayers.Count > 0);
+            //    Debug.Assert(MainPageModel.AllPlayers.Count > 0);
 
-            //    NewGameDlg dlg = new NewGameDlg(SavedAppState.AllPlayers, _gameView.Games);
+            //    NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
 
             //    ContentDialogResult result = await dlg.ShowAsync();
             //    if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
@@ -1602,7 +1602,7 @@ namespace Catan10
 
         public PlayerModel GetPlayerData(int playerIndex)
         {
-            return SavedAppState.AllPlayers[playerIndex];
+            return MainPageModel.AllPlayers[playerIndex];
         }
 
 

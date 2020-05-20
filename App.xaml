@@ -94,6 +94,7 @@
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+                <Setter Property="Foreground" Value="White" />
                 <Setter Property="FontSize" Value="48" />
                 <Setter Property="CharacterSpacing" Value="0" />
                 <Setter Property="Margin" Value="20,0,20,0" />
