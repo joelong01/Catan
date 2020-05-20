@@ -251,8 +251,9 @@ namespace Catan10
 
     internal class Stacks : INotifyPropertyChanged
     {
-        private readonly List<LogHeader> ActionStack = new List<LogHeader>();
-        private readonly List<LogHeader> UndoStack = new List<LogHeader>();
+        private readonly Stack<LogHeader> DoneStack = new Stack<LogHeader>();
+        private readonly Stack<LogHeader> UndoneStack = new Stack<LogHeader>();
+        private readonly Queue<LogHeader> PendingQueue = new Queue<LogHeader>();
 
         public Stacks()
         {
@@ -260,14 +261,14 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public int ActionCount => ActionStack.Count;
-        public bool CanUndo => UndoStack.Count > 0;
+        public int ActionCount => DoneStack.Count;
+        public bool CanUndo => UndoneStack.Count > 0;
 
         public LogHeader PeekAction
         {
             get
             {
-                if (ActionStack.Count > 0) return ActionStack.Last();
+                if (DoneStack.Count > 0) return DoneStack.Peek();
 
                 return null;
             }
@@ -277,26 +278,23 @@ namespace Catan10
         {
             get
             {
-                if (UndoStack.Count > 0) return UndoStack.Last();
+                if (UndoneStack.Count > 0) return UndoneStack.Peek();
 
                 return null;
             }
         }
 
-        private HashSet<LogHeader> HashSet { get; } = new HashSet<LogHeader>();
-
+        
         public void ClearUndo()
         {
-            UndoStack.Clear();
+            UndoneStack.Clear();
         }
 
         public LogHeader PopAction()
         {
-            if (ActionStack.Count == 0) return null;
+            if (DoneStack.Count == 0) return null;
 
-            LogHeader lh = ActionStack.Last();
-            ActionStack.Remove(lh);
-            HashSet.Remove(lh);
+            LogHeader lh = DoneStack.Pop();                        
             NotifyPropertyChanged("GameState");
             NotifyPropertyChanged("ActionStack");
             return lh;
@@ -304,9 +302,8 @@ namespace Catan10
 
         public LogHeader PopUndo()
         {
-            if (UndoStack.Count == 0) return null;
-            var lh = UndoStack.Last();
-            UndoStack.Remove(lh);
+            if (UndoneStack.Count == 0) return null;
+            var lh = UndoneStack.Pop();            
             NotifyPropertyChanged("RedoPossible");
             return lh;
         }
@@ -315,15 +312,14 @@ namespace Catan10
         {
             try
             {
-                Contract.Assert(HashSet.Contains(logHeader) == false);
-
+             
                 if (logHeader.LogType != LogType.Replay)
                 {
-                    UndoStack.Clear();
+                    UndoneStack.Clear();
                 }
 
-                ActionStack.Add(logHeader);
-                HashSet.Add(logHeader);
+                DoneStack.Push(logHeader);
+                
             }
             finally
             {
@@ -336,7 +332,7 @@ namespace Catan10
 
         public void PushUndo(LogHeader lh)
         {
-            UndoStack.Add(lh);
+            UndoneStack.Push(lh);
             NotifyPropertyChanged("RedoPossible");
             PrintLog();
         }
@@ -344,19 +340,19 @@ namespace Catan10
         internal void PrintLog([CallerMemberName] string caller = "")
         {
             int lines = 0;
-            string actionLine = $"[CallerFilePath={caller}][Actions={ActionStack.Count}]";
-            string undoLine = $"[CallerFilePath={caller}][Undo={UndoStack.Count}]";
-            for (int i = ActionStack.Count - 1; i >= 0; i--)
+            string actionLine = $"[CallerFilePath={caller}][Actions={DoneStack.Count}]";
+            string undoLine = $"[CallerFilePath={caller}][Undo={UndoneStack.Count}]";
+            
+            foreach (var lh in DoneStack)            
             {
-                LogHeader lh = ActionStack[i];
+            
                 actionLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
                 lines++;
                 if (lines == 3) break;
 
             }
-            for (int i = UndoStack.Count - 1; i >= 0; i--)
-            {
-                LogHeader lh = UndoStack[i];
+            foreach (var lh in UndoneStack)               
+            {                
                 undoLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
                 lines++;
                 if (lines == 3) break;
