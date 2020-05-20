@@ -73,18 +73,26 @@ namespace Catan10
                         var gameMessage = CatanProxy.Deserialize<WsGameMessage>(message.Data.ToString());
                         //
                         //  ack back to the service
-                        message = new WsMessage() { MessageType = WebSocketMessage.Ack };
-                        json = CatanProxy.Serialize<WsMessage>(message);
+                        var ack= new WsMessage() { MessageType = WebSocketMessage.Ack };
+                        json = CatanProxy.Serialize<WsMessage>(ack);
                         MessageWriter.WriteString(json);
                         await MessageWriter.StoreAsync();
 
-                        if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("Test") && TheHuman != null && gameMessage.GameInfo.Creator != TheHuman.PlayerName)
+                        if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("Test") && TheHuman != null &&
+                            gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == WebSocketMessage.GameAdded)
                         {
                             await this.Reset();
                             await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
+                            this.MainPageModel.ServiceData.GameInfo = gameMessage.GameInfo;
                             await StartGameLog.StartGame(this, gameMessage.GameInfo.Creator, 0, true);
                             await AddPlayerLog.AddPlayer(this, TheHuman);
+                            
                             StartMonitoring();
+                        }
+
+                        if (message.MessageType == WebSocketMessage.GameDeleted && gameMessage.GameInfo.Id == this.GameInfo.Id) // deleting the game I'm playing!
+                        {
+                            await this.Reset();
                         }
 
                     }
@@ -97,41 +105,7 @@ namespace Catan10
             });
         }
 
-        /// <summary>
-        ///     Monitor a game until you autojoin one - when a game ends, we should call this again
-        /// </summary>
-        private async void MonitorCatanGames()
-        {
-
-            List<GameInfo> games = await MainPageModel.ServiceData.Proxy.MonitorGames();
-            if (games==null)
-            {
-                this.TraceMessage("Null games in MonitorGames!");
-            }
-            foreach (var game in games)
-            {
-                if (KnownGames.TryGetValue(game.Id, out GameInfo gameInfo)) continue;
-                KnownGames[game.Id] = gameInfo;
-
-                if (CurrentGameState == GameState.WaitingForNewGame && game.RequestAutoJoin && game.Name.Contains("Test"))
-                {
-                    
-                    while (TheHuman == null)
-                    {
-                        await PickDefaultUser();
-                    }
-                    if (TheHuman.PlayerName != gameInfo.Creator)
-                    {
-                        this.MainPageModel.ServiceData.GameInfo = gameInfo;
-                        await StartGameLog.StartGame(this, gameInfo.Creator, 0, true);
-                        await AddPlayerLog.AddPlayer(this, TheHuman);
-                        StartMonitoring();
-                    }
-                }
-            }
-
-
-        }
+        
         private async void OnNewNetworkGame(object sender, RoutedEventArgs e)
         {
             await PickDefaultUser();
