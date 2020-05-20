@@ -91,60 +91,14 @@ namespace Catan10
 
 
         }
-        private MessageWebSocket messageWebSocket;
-        private DataWriter messageWriter;
-        private async void OnTest2(object sdr, RoutedEventArgs rea)
+       
+        private void OnTest2(object sdr, RoutedEventArgs rea)
         {
-            Uri server = new Uri("ws://192.168.1.128:5000/catan/game/monitor/ws");
-            messageWebSocket = new MessageWebSocket();
-            messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
-            messageWebSocket.MessageReceived += MessageReceived;
-            messageWebSocket.Closed += OnClosed;
-            await messageWebSocket.ConnectAsync(server);
-            messageWriter = new DataWriter(messageWebSocket.OutputStream);
-
-            WSConnectInfo info = new WSConnectInfo()
-            {
-                GameId = Guid.NewGuid().ToString(),
-                PlayerName = "Joe"
-            };
-            var json = CatanProxy.Serialize<WSConnectInfo>(info);
-            messageWriter.WriteString(json);
-            await messageWriter.StoreAsync();
-
-            messageWriter.DetachStream();
-            messageWriter.Dispose();
-            messageWebSocket.Close(1000, "Closed due to user request.");
+           
             
         }
 
-        private void OnClosed(IWebSocket sender, WebSocketClosedEventArgs args)
-        {
-            this.TraceMessage("closed");
-        }
-
-        private void MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
-        {
-            var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-               
-                using (DataReader reader = args.GetDataReader())
-                {
-                    reader.UnicodeEncoding = UnicodeEncoding.Utf8;
-
-                    try
-                    {
-                        string read = reader.ReadString(reader.UnconsumedBufferLength);
-                        this.TraceMessage(read);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.TraceMessage(ex.ToString());
-                        this.TraceMessage(ex.Message);
-                    }
-                }
-            });
-        }
+       
 
         // Undo
         private async void OnTest3(object sdr, RoutedEventArgs rea)

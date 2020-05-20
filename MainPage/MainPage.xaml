@@ -60,6 +60,7 @@
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Network Game">
                         <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.AutoJoinGames, Mode=TwoWay}" />
+                        <ToggleMenuFlyoutItem Text="Connect to WebSocket" IsChecked="{x:Bind MainPageModel.WebSocketConnected, Mode=TwoWay}" Click="OnWebSocketConnect" />
                         <MenuFlyoutItem Text="Start Default Network Game" Click="OnStartDefaultNetworkGame" />
                         <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
                         <MenuFlyoutSeparator />
@@ -88,12 +89,7 @@
                     <MenuFlyoutSubItem Text="Baron">
                         <MenuFlyoutItem Text="Optimal" Click="OnPickOptimalBaron" />
                         <MenuFlyoutItem Text="Random" Click="OnPickRandomBaron" />
-                    </MenuFlyoutSubItem>
-                    <!--<MenuFlyoutSeparator />
-                                        <MenuFlyoutSubItem Text="Pips">
-                                            <MenuFlyoutItem Text="Show highest pips" Click="OnShowPips" />
-                                            <MenuFlyoutItem Text="Clear pip view" Click="OnClearPips" />
-                                        </MenuFlyoutSubItem>-->
+                    </MenuFlyoutSubItem>                  
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Players">
                         <MenuFlyoutItem Text="Set Default User" Click="OnSetUser" />

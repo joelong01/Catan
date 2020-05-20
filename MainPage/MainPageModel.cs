@@ -51,7 +51,7 @@ namespace Catan10
                {GameState.Supplemental, "Suplemental" }
         };
 
-        public bool AutoJoinGames { get; set; } = false;
+      
 
         public string StateMessage
         {
@@ -114,6 +114,39 @@ namespace Catan10
 
         }
 
+
+        bool _AutoJoinGames = false;
+        public bool AutoJoinGames
+        {
+            get
+            {
+                return _AutoJoinGames;
+            }
+            set
+            {
+                if (_AutoJoinGames != value)
+                {
+                    _AutoJoinGames = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        bool _WebSocketConnected = false;
+        public bool WebSocketConnected
+        {
+            get
+            {
+                return _WebSocketConnected;
+            }
+            set
+            {
+                if (_WebSocketConnected != value)
+                {
+                    _WebSocketConnected = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         public bool EnableRolls
         {
             get
@@ -330,7 +363,6 @@ namespace Catan10
                 }
             }
         }
-
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {

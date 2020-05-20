@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System.Diagnostics;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace Catan10
 {
@@ -350,20 +351,28 @@ namespace Catan10
 
             });
         }
+        bool _writing = false;
 
         private void WriteToDisk()
         {
             try
             {
+                if (_writing) return;
+                _writing = true;
 
                 string json = CatanProxy.Serialize(MessageLog, true);
                 var folder = MainPage.Current.SaveFolder;
                 var file = folder.CreateFileAsync(SaveFileName, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
                 FileIO.WriteTextAsync(file, json).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+                
             }
             catch (Exception e)
             {
                 this.TraceMessage($"{e}");
+            }
+            finally
+            {
+                _writing = false;
             }
 
         }

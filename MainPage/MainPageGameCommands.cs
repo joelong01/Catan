@@ -1007,6 +1007,11 @@ namespace Catan10
             return targetList;
         }
 
+        private async void OnWebSocketConnect(object sender, RoutedEventArgs e)
+        {
+            await WsConnect();
+        }
+
     }
 
 

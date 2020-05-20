@@ -146,7 +146,9 @@ namespace Catan10
 
             InitTest();
             ResetDataForNewGame();
-            MonitorCatanGames();
+            await WsConnect();
+
+
         }
 
         private Task SaveSettings()
@@ -1326,74 +1328,7 @@ namespace Catan10
             return tilesWithNumber;
         }
 
-        private async void OnWebSocketTest(object sdr, RoutedEventArgs rea)
-        {
-            /* using (var client = new HttpClient())
-             {
-                 client.BaseAddress = new Uri("http://localhost:8080/");
-                 client.DefaultRequestHeaders.Accept.Clear();
-                 //GET Method  
-                 HttpResponseMessage response = await client.GetAsync("/roll/");
-                 if (response.IsSuccessStatusCode)
-                 {
-                     var resp = await response.Content.ReadAsStringAsync();
-                     Debug.WriteLine(resp);
-                 }
-                 else
-                 {
-                     Debug.WriteLine("Internal server Error");
-                 }
-             }
-    */
-
-
-            MessageWebSocket messageWebSocket = new MessageWebSocket();
-            Uri catanRelay = new Uri("ws://localhost/ws");
-
-
-            // In this example, we send/receive a string, so we need to set the MessageType to Utf8.
-            messageWebSocket.Control.MessageType = SocketMessageType.Utf8;
-
-            messageWebSocket.MessageReceived += (sender, args) =>
-            {
-                try
-                {
-                    using (DataReader dataReader = args.GetDataReader())
-                    {
-                        dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
-                        string message = dataReader.ReadString(dataReader.UnconsumedBufferLength);
-                        Debug.WriteLine("Message received from MessageWebSocket: " + message);
-                        messageWebSocket.Dispose();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Windows.Web.WebErrorStatus webErrorStatus = Windows.Networking.Sockets.WebSocketError.GetStatus(ex.GetBaseException().HResult);
-                    // Add additional code here to handle exceptions.
-                }
-            };
-            messageWebSocket.Closed += (s, a) =>
-            {
-                Debug.WriteLine("Socket closed");
-            };
-
-            try
-            {
-                await messageWebSocket.ConnectAsync(catanRelay);
-                using (var dataWriter = new DataWriter(messageWebSocket.OutputStream))
-                {
-                    dataWriter.WriteString("This is the first fucking message!");
-                    await dataWriter.StoreAsync();
-                    dataWriter.DetachStream();
-                }
-            }
-            catch (Exception ex)
-            {
-                Windows.Web.WebErrorStatus webErrorStatus = Windows.Networking.Sockets.WebSocketError.GetStatus(ex.GetBaseException().HResult);
-                // Add additional code here to handle exceptions.
-            }
-
-        }
+       
 
         private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
@@ -1915,7 +1850,7 @@ namespace Catan10
             await SynchronizedRollLog.StartSyncronizedRoll(this, dice1, dice2);
         }
 
-        
+       
     }
 }
 

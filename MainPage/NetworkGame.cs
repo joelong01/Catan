@@ -6,6 +6,9 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -18,7 +21,82 @@ namespace Catan10
     {
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
-        
+
+        private MessageWebSocket MessageWebSocket { get; set; }
+        private DataWriter MessageWriter { get; set; }
+
+        private async Task WsConnect()
+        {
+            try
+            {
+
+                Uri server = new Uri("ws://192.168.1.128:5000/catan/game/monitor/ws");
+                MessageWebSocket = new MessageWebSocket();
+                MessageWebSocket.Control.MessageType = SocketMessageType.Utf8;
+                MessageWebSocket.MessageReceived += MessageReceived;
+                MessageWebSocket.Closed += OnClosed;
+                await MessageWebSocket.ConnectAsync(server);
+                MessageWriter = new DataWriter(MessageWebSocket.OutputStream);
+
+                WsMessage message = new WsMessage() { MessageType = WebSocketMessage.RegisterForGameNotifications };
+                var json = CatanProxy.Serialize<WsMessage>(message);
+                MessageWriter.WriteString(json);
+                await MessageWriter.StoreAsync();
+                MainPageModel.WebSocketConnected = true;
+            }
+            catch(Exception e)
+            {
+                await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message);
+            }
+        }
+        private void OnClosed(IWebSocket sender, WebSocketClosedEventArgs args)
+        {
+            MainPageModel.WebSocketConnected = true;
+            this.TraceMessage("closed");
+        }
+
+        private void MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
+        {
+            var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+
+                using (DataReader reader = args.GetDataReader())
+                {
+                    reader.UnicodeEncoding = UnicodeEncoding.Utf8;
+
+                    try
+                    {
+                        string json = reader.ReadString(reader.UnconsumedBufferLength);
+                        //
+                        //  get our message, which now is only a WsGameMessage
+                        WsMessage message = CatanProxy.Deserialize<WsMessage>(json);
+                        var gameMessage = CatanProxy.Deserialize<WsGameMessage>(message.Data.ToString());
+                        //
+                        //  ack back to the service
+                        message = new WsMessage() { MessageType = WebSocketMessage.Ack };
+                        json = CatanProxy.Serialize<WsMessage>(message);
+                        MessageWriter.WriteString(json);
+                        await MessageWriter.StoreAsync();
+
+                        if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("Test") && TheHuman != null && gameMessage.GameInfo.Creator != TheHuman.PlayerName)
+                        {
+                            await this.Reset();
+                            await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
+                            await StartGameLog.StartGame(this, gameMessage.GameInfo.Creator, 0, true);
+                            await AddPlayerLog.AddPlayer(this, TheHuman);
+                            StartMonitoring();
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        this.TraceMessage(ex.ToString());
+                        this.TraceMessage(ex.Message);
+                    }
+                }
+            });
+        }
+
         /// <summary>
         ///     Monitor a game until you autojoin one - when a game ends, we should call this again
         /// </summary>
@@ -145,7 +223,7 @@ namespace Catan10
             {
 
                 // create a new game
-                gameInfo = new GameInfo() { Id = Guid.NewGuid().ToString(), Name = gameName, Creator = CurrentPlayer.PlayerName };
+                gameInfo = new GameInfo() { Id = Guid.NewGuid().ToString(), Name = gameName, Creator = CurrentPlayer.PlayerName, RequestAutoJoin=true };
                 games = await Proxy.CreateGame(gameInfo);
                 Contract.Assert(games != null);
 

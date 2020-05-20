@@ -484,7 +484,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.5.18.203835</Version>
+      <Version>2020.5.19.103526</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>
@@ -493,7 +493,7 @@
       <Version>6.2.10</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.4.0</Version>
+      <Version>2.4.2</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
       <Version>5.0.0-preview.3.20214.6</Version>
