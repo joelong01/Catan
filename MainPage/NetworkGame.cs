@@ -263,7 +263,7 @@ namespace Catan10
             var gameId = MainPageModel.GameInfo.Id;
 
             var players = await proxy.GetPlayers(gameId);
-            Contract.Assert(players.Contains(TheHuman.PlayerName));
+            Contract.Assert(players.Contains(TheHuman.PlayerName), "You need to join the game before you can monitor it!");
 
             while (true)
             {
