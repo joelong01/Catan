@@ -48,7 +48,7 @@ namespace Catan10
                 NotifyPropertyChanged("GameState");
                 NotifyPropertyChanged("RedoPossible"); // because it is no longer possible
                 NotifyPropertyChanged("ActionStack");
-                //PrintLog();
+                PrintLog();
 
             }
         }
@@ -98,7 +98,7 @@ namespace Catan10
         {
             UndoStack.Add(lh);
             NotifyPropertyChanged("RedoPossible");
-            ///PrintLog();
+            PrintLog();
 
         }
         //
@@ -110,10 +110,10 @@ namespace Catan10
         internal void PrintLog([CallerMemberName] string caller = "")
         {
             string s = "";
-            ActionStack.ForEach((lh) => s += $"{lh.Action},");
+            ActionStack.ForEach((lh) => s += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)},");
             this.TraceMessage($"{caller}: {s}");
             s = "";
-            UndoStack.ForEach((lh) => s += $"{lh.Action},");
+            UndoStack.ForEach((lh) => s += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)},");
             this.TraceMessage($"{caller}: {s}");
         }
     }
