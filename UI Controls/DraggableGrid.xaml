@@ -36,7 +36,7 @@
         <Rectangle Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
         <Viewbox Grid.Row="0">
             <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                Foreground="{Binding FallbackValue=White, Mode=OneWay, Path=Player.ForegroundBrush, TargetNullValue=Colors.Blue}"
+                Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=Player.ForegroundBrush, TargetNullValue=Colors.Blue}"
                 Style="{StaticResource HeaderTextBlockStyle}"
                 Text="{x:Bind Caption, Mode=OneWay}" />
         </Viewbox>

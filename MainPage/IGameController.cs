@@ -276,7 +276,9 @@ namespace Catan10
             MainPageModel.PlayingPlayers.Clear();
             MainPageModel.IsServiceGame = true;
             MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.PlayerName);
+            Contract.Assert(MainPageModel.GameStartedBy != null);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
+            CurrentPlayer = MainPageModel.GameStartedBy;
             return MainPageModel.Log.PushAction(logHeader); // this won't get called again because the state won't be right on this machien
 
 
