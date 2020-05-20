@@ -333,7 +333,7 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.RemoveAt(0); // the clear doesn't trigger the unsubscribe because the NewItems and the OldItems are both null
             }
 
-            MainPageModel = new MainPageModel();
+            MainPageModel.Log = new NewLog();
 
 
 

@@ -341,10 +341,10 @@ namespace Catan10
         internal void PrintLog([CallerMemberName] string caller = "")
         {
             string s = "";
-            ActionStack.ForEach((lh) => s += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)},");
+            ActionStack.ForEach((lh) => s += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],");
             Debug.WriteLine($"{caller}: {s}");
             s = "";
-            UndoStack.ForEach((lh) => s += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)},");
+            UndoStack.ForEach((lh) => s += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],");
             Debug.Write($"{caller}: {s}");
         }
 

@@ -150,7 +150,7 @@ namespace Catan10
 
         public PlayerModel NameToPlayer(string playerName)
         {
-
+            Contract.Assert(MainPageModel.AllPlayers.Count > 0);
             foreach (var player in MainPageModel.AllPlayers)
             {
                 if (player.PlayerName == playerName)
