@@ -78,8 +78,8 @@ namespace Catan10
                         MessageWriter.WriteString(json);
                         await MessageWriter.StoreAsync();
 
-                        if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("Test") && TheHuman != null &&
-                            gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == WebSocketMessage.GameAdded)
+                        if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("OnStartDefault") && TheHuman != null &&
+                            gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == WebSocketMessage.GameAdded && MainPageModel.AutoJoinGames)
                         {
                             await this.Reset();
                             await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);

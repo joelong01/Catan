@@ -391,7 +391,7 @@ namespace Catan10
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            
         }
     }
 
