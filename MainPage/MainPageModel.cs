@@ -293,7 +293,7 @@ namespace Catan10
             get
             {
                 if (Log == null) return Visibility.Visible;
-                if (Log.GameState == GameState.WaitingForNewGame || Log.GameState == GameState.WaitingForRoll) return Visibility.Visible;
+                if (Log.GameState == GameState.WaitingForNewGame || Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForRollForOrder) return Visibility.Visible;
 
                 return Visibility.Collapsed;
             }
