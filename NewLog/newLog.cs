@@ -343,12 +343,29 @@ namespace Catan10
 
         internal void PrintLog([CallerMemberName] string caller = "")
         {
-            string s = "";
-            ActionStack.ForEach((lh) => s += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],");
-            Debug.WriteLine($"{caller}: {s}");
-            s = "";
-            UndoStack.ForEach((lh) => s += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],");
-            Debug.Write($"{caller}: {s}");
+            int lines = 0;
+            string actionLine = $"[CallerFilePath={caller}][Actions={ActionStack.Count}]";
+            string undoLine = $"[CallerFilePath={caller}][Undo={UndoStack.Count}]";
+            for (int i = ActionStack.Count - 1; i >= 0; i--)
+            {
+                LogHeader lh = ActionStack[i];
+                actionLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
+                lines++;
+                if (lines == 3) break;
+
+            }
+            for (int i = UndoStack.Count - 1; i >= 0; i--)
+            {
+                LogHeader lh = UndoStack[i];
+                undoLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
+                lines++;
+                if (lines == 3) break;
+
+            }
+
+
+            Debug.WriteLine(actionLine);
+            Debug.WriteLine(undoLine + "\n");
         }
 
         //

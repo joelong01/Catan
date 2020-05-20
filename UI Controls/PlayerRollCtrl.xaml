@@ -16,18 +16,18 @@
                 <local:RollCtrl x:Name="RollCtrl_Three" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
                 <local:RollCtrl x:Name="RollCtrl_Four" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button Width="100" Content="Reset" Click="OnReset" Foreground="White" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Width="100" Content="Reset" Click="OnReset" Foreground="White" Visibility="Collapsed" />
                 <Button Width="100" Content="FaceUp" Click="OnFaceUp" Foreground="White"
                     Visibility="Collapsed" />
                 <Button Width="100" Content="FaceDown" Click="OnFaceDown" Foreground="White"
                     Visibility="Collapsed" />
-                <Button Width="100" Height="30" Margin="10,0,0,0" HorizontalAlignment="Right"
+                <Button Width="100" Height="30" Margin="10,0,0,0" HorizontalAlignment="Center" Background="{StaticResource bmCherry}"
                     VerticalAlignment="Bottom" Click="OnShowAll">
                     <Button.Content>
-                        <TextBlock Text="Show" LineStackingStrategy="BaselineToBaseline" TextLineBounds="Tight"
+                        <TextBlock Text="Show" LineStackingStrategy="BaselineToBaseline" TextLineBounds="Tight" HorizontalAlignment="Center"
                             FontSize="22"
-                            Foreground="{StaticResource BlackBrush}" />
+                            Foreground="{StaticResource WhiteBrush}" />
                     </Button.Content>
                 </Button>
             </StackPanel>

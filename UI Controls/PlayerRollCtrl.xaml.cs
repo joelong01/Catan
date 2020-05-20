@@ -36,6 +36,7 @@ namespace Catan10
             _rollControls.Add(RollCtrl_Two);
             _rollControls.Add(RollCtrl_Three);
             _rollControls.Add(RollCtrl_Four);
+            Randomize();
         }
 
         private void Roll_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -80,8 +81,13 @@ namespace Catan10
             _rollControls.ForEach((ctrl) => ctrl.Randomize());
         }
         private bool clicked = false;
+        
         private async void OnShowAll(object sender, RoutedEventArgs e)
         {
+            
+
+            if (!_rolled) return;
+
             if (clicked) return;
             clicked = true;
 

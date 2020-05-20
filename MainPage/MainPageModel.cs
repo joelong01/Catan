@@ -172,7 +172,8 @@ namespace Catan10
         {
             get
             {
-                if (Log == null) return Visibility.Collapsed;
+                if (Log == null) return Visibility.Visible;
+                if (Log.GameState == GameState.WaitingForNewGame) return Visibility.Visible;
 
                 if ((Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder) || (Log.GameState == GameState.WaitingForStart)) return Visibility.Visible;
                 return Visibility.Collapsed;
@@ -183,7 +184,8 @@ namespace Catan10
         {
             get
             {
-                if (Log == null) return Visibility.Collapsed;
+                if (Log == null) return Visibility.Visible;
+                if (Log.GameState == GameState.WaitingForNewGame) return Visibility.Visible;
                 if (Log.GameState == GameState.PickingBoard) return Visibility.Visible;
                 return Visibility.Collapsed;
             }
@@ -271,6 +273,8 @@ namespace Catan10
             get
             {
                 if (Log == null) return Visibility.Visible;
+                if (Log.GameState == GameState.WaitingForNewGame) return Visibility.Visible;
+                
                 GameState state = Log.GameState;
                 if (EnableUiInteraction && (state == GameState.WaitingForRoll || state == GameState.WaitingForPlayers)) return Visibility.Visible;
                 return Visibility.Collapsed;
