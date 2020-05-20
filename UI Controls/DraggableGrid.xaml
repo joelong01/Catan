@@ -27,7 +27,7 @@
         CornerRadius="{Binding CornerRadius, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
         PointerPressed="OnPointerPressed">
         <Grid.RenderTransform>
-            <CompositeTransform/>
+            <CompositeTransform />
         </Grid.RenderTransform>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />

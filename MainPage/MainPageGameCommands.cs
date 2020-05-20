@@ -47,7 +47,7 @@ namespace Catan10
             {
                 if (value != _translateX)
                 {
-                    _translateX = value;
+                    _translateX = Math.Round(value, 1, MidpointRounding.AwayFromZero);
                     NotifyPropertyChanged();
                 }
             }
@@ -62,7 +62,7 @@ namespace Catan10
             {
                 if (value != _translateY)
                 {
-                    _translateY = value;
+                    _translateY = Math.Round(value, 1, MidpointRounding.AwayFromZero);
                     NotifyPropertyChanged();
                 }
             }

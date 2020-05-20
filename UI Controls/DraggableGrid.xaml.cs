@@ -102,9 +102,11 @@ namespace Catan10
             //
             //  the drag operation happens in "Visual Space", not "Animation Space" - so we need to update our animation to say where the grid really is
 
+
             GridPosition.TranslateX = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateX;
             GridPosition.TranslateY = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateY;
 
+           
             OnGridPositionChanged?.Invoke(userControl.Name, GridPosition);
            
         }
