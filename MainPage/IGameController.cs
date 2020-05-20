@@ -456,7 +456,7 @@ namespace Catan10
         //  to the Undo stack
         public Task UndoSetState(SetStateLog setStateLog)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
         /// <summary>
         ///     this is where we do the work to synchronize a roll across devices.  

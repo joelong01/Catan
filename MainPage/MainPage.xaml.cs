@@ -1678,7 +1678,7 @@ namespace Catan10
                 {
                     if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
                     {
-                        await MainPageModel.Log.Redo();
+                        await MainPageModel.Log.Redo(MainPageModel.Log.PeekUndo);
                     }
                     else
                     {
@@ -1692,7 +1692,7 @@ namespace Catan10
                 {
                     if (MainPageModel.Log.PeekAction.Action == CatanAction.RandomizeBoard)
                     {
-                        await MainPageModel.Log.Undo();
+                        await MainPageModel.Log.Undo(MainPageModel.Log.PeekAction);
                     }
                 }
             }

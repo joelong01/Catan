@@ -90,7 +90,7 @@ namespace Catan10
                             StartMonitoring();
                         }
 
-                        if (message.MessageType == WebSocketMessage.GameDeleted && gameMessage.GameInfo.Id == this.GameInfo.Id) // deleting the game I'm playing!
+                        if (message.MessageType == WebSocketMessage.GameDeleted && gameMessage.GameInfo.Id == this.GameInfo?.Id) // deleting the game I'm playing!
                         {
                             await this.Reset();
                         }
@@ -302,17 +302,23 @@ namespace Catan10
                         case LogType.Undo:
                             if (logHeader.LocallyCreated == false)
                             {
-                                await MainPageModel.Log.Undo(message);
+                                await MainPageModel.Log.Undo(logHeader);
                             }
+                            await logController.Undo(this, logHeader);
                             break;
                         case LogType.Replay:
-
-                            await MainPageModel.Log.Redo(message);
+                        case LogType.Redo:
+                            if (logHeader.LocallyCreated == false) // Not created by the current machine
+                            {
+                                await MainPageModel.Log.Redo(logHeader);
+                            }
+                            await logController.Redo(this, logHeader);
                             break;
                         case LogType.DoNotLog:
                         case LogType.DoNotUndo:
                         default:
-                            throw new InvalidDataException("These Logtypes shouldn't be set in a service game");
+                            Contract.Assert(false, "These Logtypes shouldn't be set in a service game");
+                            return;
                     }
 
                 }

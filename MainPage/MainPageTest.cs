@@ -128,11 +128,11 @@ namespace Catan10
                          await logController.Redo(this, (LogHeader)message.Data);
                         break;
                     case LogType.Undo:
-                        await MainPageModel.Log.Undo(message);
+                      //  await MainPageModel.Log.Undo(message);
                         break;
                     case LogType.Replay:
 
-                        await MainPageModel.Log.Redo(message);
+                      //  await MainPageModel.Log.Redo(message);
                         break;
                     case LogType.DoNotLog:
                     case LogType.DoNotUndo:

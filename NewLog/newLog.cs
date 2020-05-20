@@ -34,7 +34,9 @@ namespace Catan10
         public event PropertyChangedEventHandler LogChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         public bool CanRedo => Stacks.CanUndo;
+
         public GameState GameState
         {
             get
@@ -53,6 +55,7 @@ namespace Catan10
         public LogHeader PeekUndo => Stacks.PeekUndo;
         private ConcurrentQueue<CatanMessage> MessageLog { get; } = new ConcurrentQueue<CatanMessage>();
         private string SaveFileName { get; set; }
+
         public void Dispose()
         {
         }
@@ -72,14 +75,14 @@ namespace Catan10
         {
             try
             {
-                if (logHeader.LogType != LogType.Replay)
+                if (logHeader.LogType == LogType.Normal)
                 {
                     Stacks.ClearUndo();
                 }
-
+                logHeader.LogType = LogType.Normal;
                 Stacks.PushAction(logHeader);
 
-                if (logHeader.LocallyCreated)
+                if (logHeader.LocallyCreated && logHeader.LogType != LogType.Redo)
                 {
                     CatanMessage message = new CatanMessage()
                     {
@@ -99,31 +102,33 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     Redo is called in two cases -- if the user clicks Redo from the UI or if a message comes from another machine
+        ///
         /// </summary>
         /// <returns></returns>
-        public Task Redo(CatanMessage message = null)
+        public Task Redo(LogHeader incomingLogHeader)
         {
             try
             {
                 var logHeader = Stacks.PopUndo();
                 Contract.Assert(logHeader.LogType == LogType.Undo);
-                logHeader.LogType = LogType.Replay;
+                Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
 
-                if (message != null)
+                logHeader.LogType = LogType.Redo;
+
+                Stacks.PushAction(logHeader);
+
+                if (logHeader.LocallyCreated)
                 {
-                    //
-                    //  when we get an Redo command, we treat it as if somebody clicked on Redo in the UI
-                    //  but that means we rely on the Undo stack being identical -- assert it.
-                    Contract.Assert(logHeader.LogId == ((LogHeader)message.Data).LogId);
+                    CatanMessage message = new CatanMessage()
+                    {
+                        Data = logHeader,
+                        Origin = Page.TheHuman.PlayerName
+                    };
+
+                    return PostLogMessage(message);
                 }
 
-                ILogController logController = logHeader as ILogController;
-                Contract.Assert(logController != null, "Every LogHeader is a LogController!");
-                Stacks.PushAction(logHeader);
-                //
-                //  this will push the action onto the ActionStack
-                return logController.Redo(Page, logHeader);
+                return Task.CompletedTask;
             }
             finally
             {
@@ -145,40 +150,33 @@ namespace Catan10
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task Undo(CatanMessage message = null)
+        public Task Undo(LogHeader incomingLogHeader)
         {
             try
             {
-                var undoneLogHeader = Stacks.PeekAction;
-                if (!undoneLogHeader.CanUndo)
+                var logHeader = Stacks.PeekAction;
+                Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
+                if (!logHeader.CanUndo)
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 Stacks.PopAction();
+                logHeader.LogType = LogType.Undo;
 
-                if (message != null)
+                Stacks.PushUndo(logHeader);
+
+                if (logHeader.LocallyCreated)
                 {
-                    LogHeader logHeader = message.Data as LogHeader;
-                    Contract.Assert(logHeader != null);
-                    Contract.Assert(undoneLogHeader.LogId == logHeader.LogId);
-                }
-                ILogController logController = undoneLogHeader as ILogController;
-                Contract.Assert(logController != null, "all log entries must also be log controllers!");
-                await logController.Undo(this.Page, undoneLogHeader);
-                undoneLogHeader.LogType = LogType.Undo;
-
-                Stacks.PushUndo(undoneLogHeader);
-
-                if (message == null)
-                {
-                    message = new CatanMessage()
+                    CatanMessage message = new CatanMessage()
                     {
-                        Data = undoneLogHeader,
+                        Data = logHeader,
                         Origin = Page.TheHuman.PlayerName
                     };
-                    await PostLogMessage(message);
+
+                    return PostLogMessage(message);
                 }
+                return Task.CompletedTask;
             }
             finally
             {
@@ -227,6 +225,7 @@ namespace Catan10
         {
             NotifyPropertyChanged(e.PropertyName);
         }
+
         private void WriteToDisk()
         {
             try
@@ -254,6 +253,7 @@ namespace Catan10
     {
         private readonly List<LogHeader> ActionStack = new List<LogHeader>();
         private readonly List<LogHeader> UndoStack = new List<LogHeader>();
+
         public Stacks()
         {
         }
@@ -262,6 +262,7 @@ namespace Catan10
 
         public int ActionCount => ActionStack.Count;
         public bool CanUndo => UndoStack.Count > 0;
+
         public LogHeader PeekAction
         {
             get
@@ -283,6 +284,7 @@ namespace Catan10
         }
 
         private HashSet<LogHeader> HashSet { get; } = new HashSet<LogHeader>();
+
         public void ClearUndo()
         {
             UndoStack.Clear();
@@ -331,6 +333,7 @@ namespace Catan10
                 PrintLog();
             }
         }
+
         public void PushUndo(LogHeader lh)
         {
             UndoStack.Add(lh);

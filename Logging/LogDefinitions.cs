@@ -26,7 +26,7 @@ namespace Catan10
         void PostLogEntry(PlayerModel player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
     }
 
-    public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo };
+    public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo, Redo };
     public delegate void RedoPossibleHandler(bool redo);
     public delegate void StateChangedHandler(GameState oldState, GameState newState);
 

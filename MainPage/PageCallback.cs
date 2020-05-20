@@ -206,7 +206,7 @@ namespace Catan10
 
         public Task OnRedo(bool saveToDisk = true)
         {
-            return MainPageModel.Log.Redo();
+            return MainPageModel.Log.Redo(Log.PeekUndo);
             //if (MainPageModel.Log.UndoCount == 0) return;
             //try
             //{
@@ -258,7 +258,8 @@ namespace Catan10
 
         public  Task OnUndo(bool saveToDisk = true)
         {
-            return MainPageModel.Log.Undo();
+            
+            return MainPageModel.Log.Undo(Log.PeekAction);
             //if (MainPageModel.Log.ActionCount < SMALLEST_STATE_COUNT) // the games starts with 5 states that can't be undone
             //{
             //    return;
