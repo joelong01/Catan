@@ -364,6 +364,7 @@
             Visibility="{x:Bind MainPageModel.ShowBoardMeasurements, Mode=OneWay}"
             BorderBrush="{StaticResource bmMaple}"
             Background="{StaticResource bmKnight}"
+            Player="{x:Bind TheHuman, Mode=OneWay}"                    
             CornerRadius="10" BorderThickness="4">
             <local:DragableGridCtrl.Child>
                 <local:BoardMeasurementCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -390,7 +391,7 @@
             Foreground="Black"
             Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
             CornerRadius="10"
-            Player="{x:Bind CurrentPlayer, Mode=OneWay}"
+            Player="{x:Bind TheHuman, Mode=OneWay}"
             Caption="{x:Bind TheHuman.PlayerName, Mode=OneWay}"
             BorderBrush="{StaticResource WhiteBrush}">
             <local:DragableGridCtrl.Child>
