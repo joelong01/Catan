@@ -51,7 +51,7 @@
         </Style>
         <Style x:Key="NumberButtonKey" TargetType="Button">
             <Setter Property="Background" Value="Black" />
-            <Setter Property="IsEnabled" Value="{x:Bind MainPageModel.Log.GameState, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToBooleanConverter}, FallbackValue=true, ConverterParameter=WaitingForRoll}" />
+            <Setter Property="IsEnabled" Value="False" />
         </Style>
     </Page.Resources>
     <Grid x:Name="ContentRoot"
@@ -74,8 +74,7 @@
             </Button.Content>
             <Button.Flyout>
                 <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
-                    <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
-                    <MenuFlyoutItem Text="Show Roll UI" Click="OnShowRolls" />
+                    <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />                    
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Network Game">
                         <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.AutoJoinGames, Mode=TwoWay}" />
@@ -181,7 +180,7 @@
                             <Button x:Name="_btnUndo" Content="&#xE10E;"
                                 Style="{StaticResource GameControllerStyle}"
                                 Click="OnUndo"
-                                IsEnabled="{x:Bind MainPageModel.EnableUiInteraction, Mode=OneWay}" />
+                                IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}" />
                             <TextBlock Text="Undo" Style="{StaticResource ControlGridTextStyle}" />
                         </StackPanel>
                         <StackPanel Orientation="Vertical">
@@ -224,17 +223,18 @@
                 </StackPanel>
             </local:DragableGridCtrl.Child>
         </local:DragableGridCtrl>
-        <!--  Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"  -->
-        <local:DragableGridCtrl x:Name="RollGrid" Width="300" Height="450" HorizontalAlignment="Center"
-            VerticalAlignment="Bottom" OnGridPositionChanged="OnGridPositionChanged"
+        
+        <local:DragableGridCtrl x:Name="Grid_RollStats" Width="300" Height="450" HorizontalAlignment="Center"
+            VerticalAlignment="Bottom" OnGridPositionChanged="OnGridPositionChanged"            
             Background="{StaticResource bmMaple}"
             CornerRadius="10"
+            Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
             Player="{x:Bind CurrentPlayer, Mode=OneWay}"
             Caption="{x:Bind CurrentPlayer.PlayerName, Mode=OneWay}"
             BorderBrush="{StaticResource WhiteBrush}">
             <local:DragableGridCtrl.Child>
 
-                <Viewbox Grid.Row="1" Height="400" Margin="0" HorizontalAlignment="Stretch">
+                <Viewbox Grid.Row="1" Height="400" Margin="0" HorizontalAlignment="Stretch" >
                     <StackPanel>
                         <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
                             <StackPanel Orientation="Vertical">
@@ -384,14 +384,14 @@
         </local:DragableGridCtrl>
         <!--  Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"  -->
 
-        <local:DragableGridCtrl x:Name="Grid_Rolls" Width="530" Height="260" HorizontalAlignment="Left"
+        <local:DragableGridCtrl x:Name="SynchronizedRolls" Width="530" Height="260" HorizontalAlignment="Left"
             VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
             Background="{StaticResource bmMaple}"
             Foreground="Black"
             Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
             CornerRadius="10"
             Player="{x:Bind CurrentPlayer, Mode=OneWay}"
-            Caption="{x:Bind CurrentPlayer.PlayerName, Mode=OneWay}"
+            Caption="{x:Bind TheHuman.PlayerName, Mode=OneWay}"
             BorderBrush="{StaticResource WhiteBrush}">
             <local:DragableGridCtrl.Child>
                 <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" />

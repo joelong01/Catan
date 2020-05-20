@@ -239,7 +239,9 @@ namespace Catan10
                 {
                     GridPosition pos = kvp.Value;
                     string name = kvp.Key;
-                    if (this.FindName(name).GetType().FullName == "Catan10.GameContainerCtrl")
+                    var ctrl = this.FindName(name);
+                    if (ctrl == null) continue; // the dev renamed the control!!
+                    if (ctrl.GetType().FullName == "Catan10.GameContainerCtrl")
                     {
                         _transformGameView.TranslateX = pos.TranslateX;
                         _transformGameView.TranslateY = pos.TranslateY;
@@ -439,21 +441,7 @@ namespace Catan10
             //  await OnWin();
         }
 
-        private async void OnNumberTapped(object sender, TappedRoutedEventArgs e)
-        {
-            Button button = sender as Button;
-            CatanNumber number = button.Content as CatanNumber;
-
-            if (CurrentGameState != GameState.WaitingForRoll)
-            {
-                HideNumberUi();
-                return;
-            }
-
-            await ProcessRoll(number.Number);
-
-
-        }
+       
 
 
         private void OnShowMenu(object sender, RoutedEventArgs e)
@@ -825,10 +813,7 @@ namespace Catan10
                 // not setting the gold tiles to be the new value for now becaues of Undo problems...instead hit Next and then Undo
             }
         }
-        private void OnShowRolls(object sender, RoutedEventArgs e)
-        {
-            ToggleNumberUi();
-        }
+       
 
         /// <summary>
         ///     Picks a random place for the Baron that

@@ -35,7 +35,8 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public bool CanRedo => Stacks.CanUndo;
+        public bool CanRedo => Stacks.CanRedo;
+        public bool CanUndo => Stacks.CanUndo;
 
         public GameState GameState
         {
@@ -262,7 +263,16 @@ namespace Catan10
         public event PropertyChangedEventHandler PropertyChanged;
 
         public int ActionCount => DoneStack.Count;
-        public bool CanUndo => UndoneStack.Count > 0;
+        public bool CanRedo => UndoneStack.Count > 0;
+        public bool CanUndo
+        {
+            get
+            {
+                if (DoneStack.Count == 0) return false;
+
+                return DoneStack.Peek().CanUndo;
+            }
+        }
 
         public LogHeader PeekAction
         {

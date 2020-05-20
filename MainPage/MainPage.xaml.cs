@@ -96,32 +96,7 @@ namespace Catan10
 
         }
 
-        private void ShowNumberUi()
-        {
-            _daNumberOpacity.To = 1.0;
-            _sbNumberOpacity.Begin();
-            RollGrid.IsHitTestVisible = true;
-        }
-
-        private void HideNumberUi()
-        {
-            _daNumberOpacity.To = 0;
-            _sbNumberOpacity.Begin();
-            RollGrid.IsHitTestVisible = false;
-        }
-
-        private void ToggleNumberUi()
-        {
-            if (_daNumberOpacity.To == 1.0)
-            {
-                HideNumberUi();
-            }
-            else
-            {
-                ShowNumberUi();
-            }
-        }
-
+     
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -1350,10 +1325,7 @@ namespace Catan10
             await SaveGridLocations();
         }
 
-        private async void OnGrowOrShrinkRolls(object sender, RoutedEventArgs e)
-        {
-            await GrowOrShrink(RollGrid);
-        }
+       
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
         {
@@ -1866,6 +1838,11 @@ namespace Catan10
             }
 
             await SaveGameState();
+        }
+
+        private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
+        {
+
         }
     }
 }

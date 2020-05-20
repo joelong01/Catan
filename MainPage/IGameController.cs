@@ -543,6 +543,13 @@ namespace Catan10
 
             if (allPlayersRolled && !tie)
             {
+                var newList = new List<PlayerModel>(MainPageModel.PlayingPlayers);
+                newList.Sort((x, y) => x.GameData.SyncronizedPlayerRolls.CompareTo(y.GameData.SyncronizedPlayerRolls));
+                for (int i=0; i< newList.Count; i++)
+                {
+                    MainPageModel.PlayingPlayers[i] = newList[i];
+                }
+
                 await SetStateLog.SetState(this, GameState.WaitingForStart);
             }
 
