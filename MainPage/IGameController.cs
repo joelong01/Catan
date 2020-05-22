@@ -117,22 +117,18 @@ namespace Catan10
                 case GameState.WaitingForNewGame:
                     break;
                 case GameState.WaitingForStart:
-                    //
-                    //  leave the Synchronized roll UI visible so that they players can lament their poor choices...
-                    //
-                    //MainPageModel.PlayingPlayers.ForEach((p) =>
-                    //{
-                    //    p.GameData.RollOrientation = TileOrientation.FaceDown;
-                    //    p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
-                    //    p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
-
-                    //}); // I hate this hack but I couldn't figure out how to do it with DataBinding
-
+                    await SetStateLog.SetState(this, GameState.AllocateResourceForward);
                     break;
                 case GameState.WaitingForPlayers:
                     //
                     //   if you go back to waiting for players, put the tiles facedown
                     GameContainer.CurrentGame.Tiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceDown);
+                    if (MainPageModel.Settings.AutoRespond)
+                    {
+                        //
+                        //  simulate clicking on Next
+                        await SetStateLog.SetState(this, GameState.PickingBoard);
+                    }
                     break;
                 case GameState.PickingBoard:
 
@@ -147,10 +143,24 @@ namespace Catan10
                     }); // I hate this hack but I couldn't figure out how to do it with DataBinding
 
                     await RandomBoardLog.RandomizeBoard(this, 0);
+                    if (MainPageModel.Settings.AutoRespond)
+                    {
+                        //
+                        //  simulate clicking on Next
+                        await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
+                    }
                     break;
                 case GameState.WaitingForRollForOrder:
+                    
+                    if (MainPageModel.Settings.AutoRespond)
+                    {
+                        Random rand = new Random();
+                        await SynchronizedRollLog.StartSyncronizedRoll(this, rand.Next(1, 7), rand.Next(1, 7));
+                    }
+                    
                     //
-                    //  When leaving WaitingForRollOrder, next state is going to be AllocationResorucesForward -- get rid of the UI that shows all the player rolls
+                    //  When leaving WaitingForRollOrder, next state is going to be AllocationResourcesForward -- get rid of the UI that shows all the player rolls
+
 
 
                     break;

@@ -12,26 +12,16 @@ namespace Catan10
 {
     public class MainPageModel : INotifyPropertyChanged
     {
-        private bool _AutoJoinGames = false;
-
+       
         private bool _EnableUiInteraction = true;
-
         private int _FiveStarPositions = 0;
-
         private int _FourStarPosition = 0;
-
         private string _HostName = "http://192.168.1.128:5000";
-
         private bool _isServiceGame = false;
-
         private NewLog _newLog = null;
-
         private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
-
         private int _ThreeStarPosition = 0;
-
         private int _TwoStarPosition = 0;
-
         private bool _WebSocketConnected = false;
 
         public MainPageModel()
@@ -41,23 +31,26 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
+        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
 
-        public bool AutoJoinGames
+        [JsonIgnore]
+        private Dictionary<GameState, string> StateMessages { get; } = new Dictionary<GameState, string>()
         {
-            get
-            {
-                return _AutoJoinGames;
-            }
-            set
-            {
-                if (_AutoJoinGames != value)
-                {
-                    _AutoJoinGames = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+               {GameState.Uninitialized, "" },
+               {GameState.WaitingForNewGame, "New Game" },
+               {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
+               {GameState.PickingBoard, "Roll for Order" },
+               {GameState.WaitingForRollForOrder, "Start" },
+               {GameState.WaitingForStart, "Pick Resource" },
+               {GameState.AllocateResourceForward, "Pick Resource" },
+               {GameState.AllocateResourceReverse, "Pick Resource" },
+               {GameState.WaitingForRoll, "Select Roll" },
+               {GameState.WaitingForNext, "Done" },
+               {GameState.Supplemental, "Suplemental" }
+        };
+
+        public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
+      
 
         public string DefaultUser { get; set; } = "";
 
@@ -70,13 +63,11 @@ namespace Catan10
                 GameState state = Log.GameState;
                 try
                 {
-                    
                     if (!EnableUiInteraction) return ret;
 
                     if (Log == null) return true;
-                    
 
-                    if (state == GameState.PickingBoard ||  state == GameState.WaitingForPlayers)
+                    if (state == GameState.PickingBoard || state == GameState.WaitingForPlayers)
                     {
                         ret = (MainPage.Current.TheHuman == this.GameStartedBy);
                         return ret;
@@ -95,10 +86,11 @@ namespace Catan10
                 }
                 finally
                 {
-                   // this.TraceMessage($"[State={state}][EnableNextButton={ret}]");
+                    // this.TraceMessage($"[State={state}][EnableNextButton={ret}]");
                 }
             }
         }
+
         //[JsonIgnore]
         //public Visibility CommandGridVisible
         //{
@@ -172,7 +164,6 @@ namespace Catan10
             get
             {
                 if (Log == null) return false;
-                
 
                 return (Log.CanUndo && MainPage.Current.CurrentPlayer.PlayerName == TheHuman);
             }
@@ -334,7 +325,6 @@ namespace Catan10
                 Visibility visibility = Visibility.Visible;
                 try
                 {
-
                     if (Log == null) return visibility;
                     if (Log.GameState == GameState.WaitingForNewGame || Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForStart ||
                         Log.GameState == GameState.WaitingForRollForOrder || Log.GameState == GameState.WaitingForNext) return visibility;
@@ -344,9 +334,8 @@ namespace Catan10
                 }
                 finally
                 {
-                   // this.TraceMessage($"ShowRolls:[State={Log.GameState}] [Visibility={visibility}]");
+                    // this.TraceMessage($"ShowRolls:[State={Log.GameState}] [Visibility={visibility}]");
                 }
-                
             }
         }
 
@@ -359,7 +348,7 @@ namespace Catan10
 
                 if (StateMessages.TryGetValue(Log.GameState, out string msg))
                 {
-                   // this.TraceMessage($"[State={Log.GameState}][StateMessage={msg}]");
+                    // this.TraceMessage($"[State={Log.GameState}][StateMessage={msg}]");
                     return msg;
                 }
 
@@ -420,30 +409,6 @@ namespace Catan10
             }
         }
 
-        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
-
-        [JsonIgnore]
-        private Dictionary<GameState, string> StateMessages { get; } = new Dictionary<GameState, string>()
-        {
-               {GameState.Uninitialized, "" },
-               {GameState.WaitingForNewGame, "New Game" },
-               {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
-               {GameState.PickingBoard, "Roll for Order" },
-               {GameState.WaitingForRollForOrder, "Start" },
-               {GameState.WaitingForStart, "Pick Resource" },
-               {GameState.AllocateResourceForward, "Pick Resource" },
-               {GameState.AllocateResourceReverse, "Pick Resource" },
-               {GameState.WaitingForRoll, "Select Roll" },
-               {GameState.WaitingForNext, "Done" },
-               {GameState.Supplemental, "Suplemental" }
-        };
-        public void SetPipCount(int[] value)
-        {
-            FiveStarPositions = value[0];
-            FourStarPositions = value[1];
-            ThreeStarPositions = value[2];
-            TwoStarPositions = value[3];
-        }
         /// <summary>
         ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
         ///     if we add one of these properties (which are usually the get'ers only)
@@ -452,9 +417,18 @@ namespace Catan10
         {
             DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
         }
+
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void SetPipCount(int[] value)
+        {
+            FiveStarPositions = value[0];
+            FourStarPositions = value[1];
+            ThreeStarPositions = value[2];
+            TwoStarPositions = value[3];
         }
     }
 }

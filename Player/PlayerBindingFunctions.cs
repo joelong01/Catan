@@ -12,7 +12,7 @@ namespace Catan10
 {
     public static class PlayerBindingFunctions
     {
-        public static Brush GetForegroundBush(PlayerModel current, PlayerModel owner)
+        public static Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
             {
@@ -31,7 +31,7 @@ namespace Catan10
 
             return ConverterGlobals.GetBrush(Colors.White);
         }
-        public static LinearGradientBrush GetBackgroundBush(PlayerModel current, PlayerModel owner)
+        public static LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
             {

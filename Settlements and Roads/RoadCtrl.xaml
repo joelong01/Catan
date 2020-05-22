@@ -15,8 +15,15 @@
     </UserControl.RenderTransform>
     <Control.Resources>
         <Style x:Key="RoadPolyStyle" TargetType="Polygon">
-            <Setter Property="Fill" Value="{x:Bind GetFillColor(Owner, CurrentPlayer), Mode=OneWay}" />
-            <Setter Property="Stroke" Value="White" />
+            <Setter Property="Fill" Value="{x:Bind GetBackgroundBrush(Owner, CurrentPlayer), Mode=OneWay, TargetNullValue=Purple, FallbackValue=Purple}" />
+            <Setter Property="Stroke" Value="{x:Bind GetForegroundBrush(Owner, CurrentPlayer), Mode=OneWay, TargetNullValue=White, FallbackValue=White}" />
+            <Setter Property="StrokeThickness" Value="0" />
+        </Style>
+        <Style x:Key="RoadLineStyle" TargetType="Line">            
+            <Setter Property="Stroke" Value="{x:Bind GetForegroundBrush(Owner, CurrentPlayer), Mode=OneWay, TargetNullValue=White, FallbackValue=White}" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="StrokeEndLineCap" Value="Triangle"/>
+            <Setter Property="StrokeStartLineCap" Value="Triangle"/>
         </Style>
         <Storyboard x:Name="_sbMove">
             <DoubleAnimation x:Name="_daToX" d:IsOptimized="True"
@@ -41,8 +48,8 @@
 
 
     <Grid Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-        Background="Transparent" Visibility="Visible" SizeChanged="OnSizeChanged">
-        <Grid Name="_gridRoads" Visibility="Collapsed">
+        Background="Transparent" SizeChanged="OnSizeChanged">
+        <Grid Name="_gridRoads"  Visibility="{x:Bind GetStateBasedVisibility(RoadState, 'road'),Mode=OneWay}">
             <!--  0    1    2       3    4       5  -->
             <!--<Polygon Name="_doublePolygon" Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,15" Stroke="BurlyWood" Fill="Blue" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" StrokeThickness="0" />
             <Line Name="_lineTop" X1="4.5" Y1="2" X2="63.5" Y2="2" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle"/>
@@ -50,26 +57,21 @@
             <Line Name="_doubleBottomLine" X1="4.5" Y1="14" X2="63.5" Y2="14" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle"/>-->
 
             <Polygon Name="_doublePolygon" Grid.Column="1" Margin="0" HorizontalAlignment="Left"
-                VerticalAlignment="Top" Points=".5,8 68,8 63.5,16 4,16" Stroke="BurlyWood"
-                Style="{StaticResource RoadPolyStyle}"
-                StrokeThickness="0" />
+                VerticalAlignment="Top" Points=".5,8 68,8 63.5,16 4,16" 
+                Style="{StaticResource RoadPolyStyle}" />
             <Line Name="_lineTop" X1="4.5" Y1="10" X2="63.5"
-                Y2="10" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle"
-                StrokeStartLineCap="Triangle" />
+                Y2="10" Style="{StaticResource RoadLineStyle}"/>
             <Line Name="_lineMiddle" X1="4.5" Y1="12" X2="63.5"
-                Y2="12" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle"
-                StrokeStartLineCap="Triangle" StrokeDashArray="4" />
+                Y2="12" StrokeThickness="1" Style="{StaticResource RoadLineStyle}" StrokeDashArray="4" />
             <Line Name="_lineBottom" X1="4.5" Y1="14" X2="63.5"
-                Y2="14" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle"
-                StrokeStartLineCap="Triangle" />
+                Y2="14" StrokeThickness="1" Style="{StaticResource RoadLineStyle}" />
         </Grid>
 
-        <Grid Name="_gridShip" Background="Transparent">
+        <Grid Name="_gridShip" Background="Transparent"  Visibility="{x:Bind GetStateBasedVisibility(RoadState, 'ship'),Mode=OneWay}">
             <Polygon Name="_shipPolygon" Grid.Column="1" Margin="0" HorizontalAlignment="Left"
                 VerticalAlignment="Top" Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,15"
-                Stroke="White" StrokeThickness="1" />
-            <!--<local:Ship x:Name="_ship" RenderTransformOrigin=".5 .5" Margin="2"/>-->
-
+                 Style="{StaticResource RoadPolyStyle}" StrokeThickness="1" />
+            
 
         </Grid>
 

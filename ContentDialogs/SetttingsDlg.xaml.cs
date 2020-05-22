@@ -1,5 +1,9 @@
-﻿using Catan.Proxy;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+using Catan.Proxy;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -7,271 +11,344 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-    public class Settings
+    public class Settings : INotifyPropertyChanged
     {
-        public bool RotateTile { get; set; } = false;
-        public bool AnimateFade { get; set; } = true;
-        public int FadeSeconds { get; set; } = 3;
-        public double Zoom { get; set; } = 1.0;
-        public bool ShowStopwatch { get; set; } = true;
-        public bool UseClassicTiles { get; set; } = true;
-        public int AnimationSpeed { get; set; } = 3;
-        public bool ResourceTracking { get; set; } = true;
-        public bool UseRandomNumbers { get; set; } = true;
-        public bool ValidateBuilding { get; set; } = true;
-        public Dictionary<string, GridPosition> GridPositions { get; set; } = new Dictionary<string, GridPosition>();
+        #region properties
 
+        private bool _animateFade = true;
+        private bool _AnimateFadeTiles = true;
+        private int _animationSpeed = 3;
+        private bool _AutoJoinGames = false;
+        private bool _AutoRespond = false;
+        private int _fadeSeconds = 3;
+        private int _FadeTime = 0;
+        private Dictionary<string, GridPosition> _gridPosition = new Dictionary<string, GridPosition>();
+        bool _RandomizeNumbers = true;
+        private bool _resourceTracking = true;
+        private bool _rotateTile = false;
+        private bool _showStopwatch = true;
+        private bool _useClassicTiles = true;
+        private bool _useRandomNumbers = true;
+        private bool _validateBuilding = true;
+        private double _zoom = 1.0;
+        public bool AnimateFade
+        {
+            get
+            {
+                return _animateFade;
+            }
+            set
+            {
+                if (value != _animateFade)
+                {
+                    _animateFade = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
+        public bool AnimateFadeTiles
+        {
+            get
+            {
+                return _AnimateFadeTiles;
+            }
+            set
+            {
+                if (_AnimateFadeTiles != value)
+                {
+                    _AnimateFadeTiles = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int AnimationSpeed
+        {
+            get
+            {
+                return _animationSpeed;
+            }
+            set
+            {
+                if (value != _animationSpeed)
+                {
+                    _animationSpeed = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
+        public bool AutoJoinGames
+        {
+            get
+            {
+                return _AutoJoinGames;
+            }
+            set
+            {
+                if (value != _AutoJoinGames)
+                {
+                    _AutoJoinGames = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool AutoRespond
+        {
+            get
+            {
+                return _AutoRespond;
+            }
+            set
+            {
+                if (value != _AutoRespond)
+                {
+                    _AutoRespond = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int FadeSeconds
+        {
+            get
+            {
+                return _fadeSeconds;
+            }
+            set
+            {
+                if (value != _fadeSeconds)
+                {
+                    _fadeSeconds = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int FadeTime
+        {
+            get
+            {
+                return _FadeTime;
+            }
+            set
+            {
+                if (_FadeTime != value)
+                {
+                    _FadeTime = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public Dictionary<string, GridPosition> GridPositions
+        {
+            get
+            {
+                return _gridPosition;
+            }
+            set
+            {
+                if (value != _gridPosition)
+                {
+                    _gridPosition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool RandomizeNumbers
+        {
+            get
+            {
+                return _RandomizeNumbers;
+            }
+            set
+            {
+                if (_RandomizeNumbers != value)
+                {
+                    _RandomizeNumbers = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool ResourceTracking
+        {
+            get
+            {
+                return _resourceTracking;
+            }
+            set
+            {
+                if (value != _resourceTracking)
+                {
+                    _resourceTracking = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool RotateTile
+        {
+            get
+            {
+                return _rotateTile;
+            }
+            set
+            {
+                if (value != _rotateTile)
+                {
+                    _rotateTile = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool ShowStopwatch
+        {
+            get
+            {
+                return _showStopwatch;
+            }
+            set
+            {
+                if (value != _showStopwatch)
+                {
+                    _showStopwatch = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool UseClassicTiles
+        {
+            get
+            {
+                return _useClassicTiles;
+            }
+            set
+            {
+                if (value != _useClassicTiles)
+                {
+                    _useClassicTiles = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool UseRandomNumbers
+        {
+            get
+            {
+                return _useRandomNumbers;
+            }
+            set
+            {
+                if (value != _useRandomNumbers)
+                {
+                    _useRandomNumbers = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool ValidateBuilding
+        {
+            get
+            {
+                return _validateBuilding;
+            }
+            set
+            {
+                if (value != _validateBuilding)
+                {
+                    _validateBuilding = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public double Zoom
+        {
+            get
+            {
+                return _zoom;
+            }
+            set
+            {
+                if (value != _zoom)
+                {
+                    _zoom = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        #endregion properties
 
         public Settings()
         {
-
         }
-        public string Serialize()
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            return CatanProxy.Serialize(this);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public static Settings Deserialize(string s)
         {
-
             return CatanProxy.Deserialize<Settings>(s);
         }
 
+        public string Serialize()
+        {
+            return CatanProxy.Serialize(this);
+        }
     }
-
 
     public sealed partial class SettingsDlg : ContentDialog
     {
-        public ICatanSettings CatanSettingsCallback { get; set; }
-
         public SettingsDlg()
         {
             this.InitializeComponent();
         }
 
-        public SettingsDlg(ICatanSettings pCb, Settings settings)
+        public SettingsDlg(Settings settings)
         {
-            this.InitializeComponent();
-            CatanSettingsCallback = pCb;
-            if (!Windows.ApplicationModel.DesignMode.DesignModeEnabled)
-            {
-                UpdateUi(settings);
-
-
-            }
+            this.InitializeComponent();            
+            this.Settings = settings;
+            
         }
+
+        public ICatanSettings CatanSettingsCallback { get; set; }
 
         #region Properties
 
-        public static readonly DependencyProperty ZoomProperty = DependencyProperty.Register("Zoom", typeof(double), typeof(SettingsDlg), new PropertyMetadata(1, ZoomChanged));
-        public static readonly DependencyProperty AnimationSpeedProperty = DependencyProperty.Register("AnimationSpeed", typeof(double), typeof(SettingsDlg), new PropertyMetadata(3, AnimationSpeedChanged));
-        public static readonly DependencyProperty ResourceTrackingProperty = DependencyProperty.Register("ResourceTracking", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(true, ResourceTrackingChanged));
-        public static readonly DependencyProperty RotateTileProperty = DependencyProperty.Register("RotateTile", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(false, RotateTileChanged));
-        public static readonly DependencyProperty ShowStopWatchProperty = DependencyProperty.Register("ShowStopWatch", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(true, ShowStopWatchChanged));
-        public static readonly DependencyProperty RandomizeNumbersProperty = DependencyProperty.Register("RandomizeNumbers", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(true, RandomizeNumbersChanged));
-        public static readonly DependencyProperty ValidateBuildingProperty = DependencyProperty.Register("ValidateBuilding", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(true, ValidateBuildingChanged));
-        public static readonly DependencyProperty AnimateFadeTilesProperty = DependencyProperty.Register("AnimateFadeTiles", typeof(bool?), typeof(SettingsDlg), new PropertyMetadata(true, AnimateFadeTilesChanged));
-        public static readonly DependencyProperty FadeTimeProperty = DependencyProperty.Register("FadeTime", typeof(double), typeof(SettingsDlg), new PropertyMetadata(3, FadeTimeChanged));
-        public double FadeTime
-        {
-            get => (double)GetValue(FadeTimeProperty);
-            set => SetValue(FadeTimeProperty, value);
-        }
-        private static void FadeTimeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            double depPropValue = (double)e.NewValue;
-            depPropClass.SetFadeTime(depPropValue);
-        }
-        private async void SetFadeTime(double value)
-        {
+        public static readonly DependencyProperty SettingsProperty = DependencyProperty.Register("Settings", typeof(Settings), typeof(SettingsDlg), new PropertyMetadata(new Settings()));
 
-            CatanSettingsCallback.FadeSeconds = (int)value;
-            await CatanSettingsCallback.SettingChanged();
+        public Settings Settings
+        {
+            get => (Settings)GetValue(SettingsProperty);
+            set => SetValue(SettingsProperty, value);
         }
 
-
-
-
-        public bool? AnimateFadeTiles
-        {
-            get => (bool?)GetValue(AnimateFadeTilesProperty);
-            set => SetValue(AnimateFadeTilesProperty, value);
-        }
-        private static void AnimateFadeTilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            bool? depPropValue = (bool?)e.NewValue;
-            depPropClass.SetAnimateFadeTiles(depPropValue);
-        }
-        private async void SetAnimateFadeTiles(bool? value)
-        {
-            CatanSettingsCallback.AnimateFade = (bool)value;
-            await CatanSettingsCallback.SettingChanged();
-
-        }
-
-        public bool? ValidateBuilding
-        {
-            get => (bool?)GetValue(ValidateBuildingProperty);
-            set => SetValue(ValidateBuildingProperty, value);
-        }
-        private static void ValidateBuildingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            bool? depPropValue = (bool?)e.NewValue;
-            depPropClass.SetValidateBuilding(depPropValue);
-        }
-        private async void SetValidateBuilding(bool? value)
-        {
-            CatanSettingsCallback.ValidateBuilding = (bool)value;
-            await CatanSettingsCallback.SettingChanged();
-
-        }
-
-        public bool? RandomizeNumbers
-        {
-            get => (bool?)GetValue(RandomizeNumbersProperty);
-            set => SetValue(RandomizeNumbersProperty, value);
-        }
-        private static void RandomizeNumbersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            bool? depPropValue = (bool?)e.NewValue;
-            depPropClass.SetRandomizeNumbers(depPropValue);
-        }
-        private async void SetRandomizeNumbers(bool? value)
-        {
-            CatanSettingsCallback.UseRandomNumbers = (bool)value;
-            await CatanSettingsCallback.SettingChanged();
-
-        }
-
-        public bool? ShowStopWatch
-        {
-            get => (bool?)GetValue(ShowStopWatchProperty);
-            set => SetValue(ShowStopWatchProperty, value);
-        }
-        private static void ShowStopWatchChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            bool? depPropValue = (bool?)e.NewValue;
-            depPropClass.SetShowStopWatch(depPropValue);
-        }
-        private async void SetShowStopWatch(bool? value)
-        {
-            CatanSettingsCallback.ShowStopwatch = (bool)value;
-            await CatanSettingsCallback.SettingChanged();
-
-        }
-
-        public bool? RotateTile
-        {
-            get => (bool?)GetValue(RotateTileProperty);
-            set => SetValue(RotateTileProperty, value);
-        }
-        private static void RotateTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            bool? depPropValue = (bool?)e.NewValue;
-            depPropClass.SetRotateTile(depPropValue);
-        }
-        private async void SetRotateTile(bool? value)
-        {
-            CatanSettingsCallback.RotateTile = (bool)value;
-            await CatanSettingsCallback.SettingChanged();
-
-        }
-
-        public bool? ResourceTracking
-        {
-            get => (bool?)GetValue(ResourceTrackingProperty);
-            set => SetValue(ResourceTrackingProperty, value);
-        }
-        private static void ResourceTrackingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            bool? depPropValue = (bool?)e.NewValue;
-            depPropClass.SetResourceTracking(depPropValue);
-        }
-        private async void SetResourceTracking(bool? value)
-        {
-            CatanSettingsCallback.ResourceTracking = (bool)value;
-            await CatanSettingsCallback.SettingChanged();
-
-        }
-
-
-        public double AnimationSpeed
-        {
-            get => (double)GetValue(AnimationSpeedProperty);
-            set => SetValue(AnimationSpeedProperty, value);
-        }
-        private static void AnimationSpeedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            double depPropValue = (double)e.NewValue;
-            depPropClass.SetAnimationSpeed(depPropValue);
-        }
-        private async void SetAnimationSpeed(double value)
-        {
-            CatanSettingsCallback.AnimationSpeedBase = (int)value;
-            await CatanSettingsCallback.SettingChanged();
-
-        }
-
-        public double Zoom
-        {
-            get => (double)GetValue(ZoomProperty);
-            set => SetValue(ZoomProperty, value);
-        }
-        private static void ZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SettingsDlg depPropClass = d as SettingsDlg;
-            double depPropValue = (double)e.NewValue;
-            depPropClass.SetZoom(depPropValue);
-        }
-        private async void SetZoom(double value)
-        {
-            CatanSettingsCallback.Zoom = value;
-            await CatanSettingsCallback.SettingChanged();
-
-        }
-
-
-
-
-        #endregion
-
-
-        private void UpdateUi(Settings settings)
-        {
-            AnimateFadeTiles = settings.AnimateFade;
-            RotateTile = settings.RotateTile;
-            FadeTime = settings.FadeSeconds;
-            Zoom = settings.Zoom;
-            ShowStopWatch = settings.ShowStopwatch;
-            AnimationSpeed = settings.AnimationSpeed;
-
-
-        }
-
-
-        private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-
-        }
+        #endregion Properties
 
         private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+        }
 
+        private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
         }
 
         private async void OnResetGridLayout(object sender, RoutedEventArgs e)
         {
             await CatanSettingsCallback.ResetGridLayout();
         }
+
     }
 }

@@ -94,6 +94,7 @@ namespace Catan10
                     _Foreground = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("ForegroundBrush");
+                    NotifyPropertyChanged("GetForegroundBrush");    // this is the binding function name that the roads and buildings use                
                 }
             }
         }
@@ -138,6 +139,7 @@ namespace Catan10
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("BackgroundBrush");
                     NotifyPropertyChanged("SolidSecondaryBrush");
+                    NotifyPropertyChanged("GetBackgroundBrush");    // this is the binding function name that the roads and buildings use
                 }
             }
         }
@@ -156,6 +158,7 @@ namespace Catan10
                     NotifyPropertyChanged("BackgroundBrush");
                     NotifyPropertyChanged("SolidPrimaryBrush");
                     NotifyPropertyChanged("UseWhiteImages");
+                    NotifyPropertyChanged("GetBackgroundBrush"); // this is the binding function name that the roads and buildings use
                 }
             }
         }

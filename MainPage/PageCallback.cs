@@ -350,6 +350,7 @@ namespace Catan10
         {
             get
             {
+                if (ValidateBuilding == false) return true;
                 if (MainPageModel.Log == null)
                 {
                     return false;
@@ -1337,8 +1338,9 @@ namespace Catan10
         //  returns True if it is OK to build this settlement - this is basically a Road check
         bool ValidateBuildingLocation(BuildingCtrl building, out bool showErrorUI)
         {
+            
             showErrorUI = true;
-            if (GameStateFromOldLog == GameState.WaitingForNewGame || GameStateFromOldLog == GameState.WaitingForStart)
+            if ((GameStateFromOldLog == GameState.WaitingForNewGame || GameStateFromOldLog == GameState.WaitingForStart)  && ValidateBuilding)
             {
                 showErrorUI = false;
                 return false;
@@ -1464,6 +1466,7 @@ namespace Catan10
         /// <returns></returns>
         public bool BuildingStateChangeOk(BuildingCtrl building)
         {
+            if (!ValidateBuilding) return true;
             if (building.Owner != null)
             {
                 if (building.Owner != CurrentPlayer) // you can only click on your own stuff and when it is your turn

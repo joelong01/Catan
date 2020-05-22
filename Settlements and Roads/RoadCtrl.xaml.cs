@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,43 +8,52 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Catan10
 {
-    public sealed partial class RoadCtrl : UserControl
+    public enum RoadType { Single, Double };
+
+    public class RoadCloneComparer : IEqualityComparer<RoadCtrl>
     {
-        readonly Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
+        private readonly RoadKeyComparer roadKeyComparer = new RoadKeyComparer();
 
-        public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
-
-        public List<RoadKey> Keys { get; set; } = new List<RoadKey>();
-        public IGameCallback Callback { get; internal set; }
-        public int Number { get; internal set; } = 0; // number of roads that have been created for this player
-        public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
-        Ship _ship = null;
-
-        public Brush GetFillColor(PlayerModel owner, PlayerModel current)
+        //
+        //  when are two Roads "equal"?  When they have at least one clone that matches
+        public bool Equals(RoadCtrl x, RoadCtrl y)
         {
-
-            if (owner != null)
+            foreach (RoadKey key in x.Keys)
             {
-                return owner.BackgroundBrush;
-            }
-            if (current != null)
-            {
-                return current.BackgroundBrush;
+                if (y.Keys.Contains(key, roadKeyComparer) == true)
+                {
+                    return true;
+                }
             }
 
-             return ConverterGlobals.GetLinearGradientBrush(Colors.Purple, Colors.Black);
-            
+            return false;
         }
 
+        public int GetHashCode(RoadCtrl obj)
+        {
+            return obj.GetHashCode();
+        }
+    }
+    /// <summary>
+    ///     5/21/2020:  CurrentPlayer is bound in code behind in the hexpanel!
+    /// </summary>
+    public sealed partial class RoadCtrl : UserControl
+    {
+        private readonly Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
 
-        public int Index { get; set; } = -1;
-
+        private Ship _ship = null;
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty LocationProperty = DependencyProperty.Register("Location", typeof(RoadLocation), typeof(RoadCtrl), new PropertyMetadata(RoadLocation.None, LocationChanged));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty RoadStateProperty = DependencyProperty.Register("RoadState", typeof(RoadState), typeof(RoadCtrl), new PropertyMetadata(RoadState.Unowned, RoadStateChanged));
+        public static readonly DependencyProperty RoadTypeProperty = DependencyProperty.Register("RoadType", typeof(RoadType), typeof(RoadCtrl), new PropertyMetadata(RoadType.Single, RoadTypeChanged));
+        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty TileZeroZeroProperty = DependencyProperty.Register("TileZeroZero", typeof(Point), typeof(RoadCtrl), new PropertyMetadata(new Point(double.NaN, double.NaN), TileZeroZeroChanged));
         public RoadCtrl()
         {
             this.InitializeComponent();
@@ -58,47 +66,66 @@ namespace Catan10
             _locationToRoadDataDict[RoadLocation.BottomLeft] = new RoadLocationData(-13.7, 66.8, 240.5);
             _locationToRoadDataDict[RoadLocation.TopLeft] = new RoadLocationData(-13.2, 18.2, -60.5);
 
-            Self = this;
-
+           
         }
 
+        public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
 
-        public static readonly DependencyProperty LocationProperty = DependencyProperty.Register("Location", typeof(RoadLocation), typeof(RoadCtrl), new PropertyMetadata(RoadLocation.None, LocationChanged));
-        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register("Background", typeof(Color), typeof(RoadCtrl), new PropertyMetadata(Colors.Black, ColorChanged));
-        public static readonly DependencyProperty TileZeroZeroProperty = DependencyProperty.Register("TileZeroZero", typeof(Point), typeof(RoadCtrl), new PropertyMetadata(new Point(double.NaN, double.NaN), TileZeroZeroChanged));
-        public static readonly DependencyProperty RoadTypeProperty = DependencyProperty.Register("RoadType", typeof(RoadType), typeof(RoadCtrl), new PropertyMetadata(RoadType.Single, RoadTypeChanged));
-        public static readonly DependencyProperty RoadStateProperty = DependencyProperty.Register("RoadState", typeof(RoadState), typeof(RoadCtrl), new PropertyMetadata(RoadState.Unowned, RoadStateChanged));
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty PlayerModelProperty = DependencyProperty.Register("PlayerModel", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
-        public PlayerModel PlayerModel
-        {
-            get => (PlayerModel)GetValue(PlayerModelProperty);
-            set => SetValue(PlayerModelProperty, value);
-        }
-        public RoadCtrl Self
-        {
-            get => (RoadCtrl)GetValue(SelfProperty);
-            set => SetValue(SelfProperty, value);
-        }
-
-
-        public PlayerModel Owner
-        {
-            get => (PlayerModel)GetValue(OwnerProperty);
-            set => SetValue(OwnerProperty, value);
-        }
+        public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
+        public IGameCallback Callback { get; internal set; }
+        
         public PlayerModel CurrentPlayer
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
         }
+
+        public int Index { get; set; } = -1;
+        public bool IsOwned => (RoadState != RoadState.Unowned);
+        public List<RoadKey> Keys { get; set; } = new List<RoadKey>();
+        public RoadLocation Location
+        {
+            get => (RoadLocation)GetValue(LocationProperty);
+            set => SetValue(LocationProperty, value);
+        }
+
+        public int Number { get; internal set; } = 0; // number of roads that have been created for this player
+        public PlayerModel Owner
+        {
+            get => (PlayerModel)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+
+
         public RoadState RoadState
         {
             get => (RoadState)GetValue(RoadStateProperty);
             set => SetValue(RoadStateProperty, value);
         }
+
+        public RoadType RoadType
+        {
+            get => (RoadType)GetValue(RoadTypeProperty);
+            set => SetValue(RoadTypeProperty, value);
+        }
+
+      
+
+        public Point TileZeroZero
+        {
+            get => (Point)GetValue(TileZeroZeroProperty);
+            set => SetValue(TileZeroZeroProperty, value);
+        }
+
+       
+
+        private static void LocationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RoadCtrl depPropClass = d as RoadCtrl;
+            RoadLocation depPropValue = (RoadLocation)e.NewValue;
+            depPropClass.SetLocation(depPropValue);
+        }
+
         private static void RoadStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             RoadCtrl depPropClass = d as RoadCtrl;
@@ -106,13 +133,57 @@ namespace Catan10
             depPropClass.SetRoadState(depPropValue);
         }
 
+        private static void RoadTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RoadCtrl depPropClass = d as RoadCtrl;
+            RoadType depPropValue = (RoadType)e.NewValue;
+            depPropClass.SetRoadType(depPropValue);
+        }
+
+        private static void TileZeroZeroChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            RoadCtrl depPropClass = d as RoadCtrl;
+            Point depPropValue = (Point)e.NewValue;
+            depPropClass.SetTileZeroZero(depPropValue);
+        }
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateVisuals(e.NewSize);
+        }
+
+        private void Road_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            Callback?.RoadEntered(this, e);
+        }
+
+        private void Road_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            Callback?.RoadExited(this, e);
+        }
+
+        private void Road_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            //  this.TraceMessage(this.ToString());
+            Callback?.RoadPressed(this, e);
+        }
+
+       
+
+        private void SetLocation(RoadLocation roadlocation)
+        {
+            RoadLocationData data = _locationToRoadDataDict[roadlocation];
+            _transform.TranslateX = data.Left;
+            _transform.TranslateY = data.Top;
+            _transform.Rotation = data.Angle;
+        }
 
         //
         //  the controls Opacity is what controls the user seeing a build shape
         //  so we can set the visibility of the grids inside the control
         private void SetRoadState(RoadState roadstate)
         {
-            SetColors(_gridRoads);
+            
             switch (roadstate)
             {
                 case RoadState.Unowned:
@@ -120,11 +191,13 @@ namespace Catan10
                     _gridShip.Visibility = Visibility.Collapsed;
                     Show(false);
                     break;
+
                 case RoadState.Road:
                     _gridRoads.Visibility = Visibility.Visible;
                     _gridShip.Visibility = Visibility.Collapsed;
                     Show(true);
                     break;
+
                 case RoadState.Ship:
                     _gridRoads.Visibility = Visibility.Collapsed;
                     _gridShip.Visibility = Visibility.Visible;
@@ -138,25 +211,52 @@ namespace Catan10
                     }
                     Show(true);
                     break;
+
                 default:
                     break;
             }
 
             UpdateVisuals(new Windows.Foundation.Size(this.ActualWidth, this.ActualHeight));
-
         }
 
-        public RoadType RoadType
+        private Visibility GetStateBasedVisibility(RoadState roadState, string gridName)
         {
-            get => (RoadType)GetValue(RoadTypeProperty);
-            set => SetValue(RoadTypeProperty, value);
+            Visibility visibility = Visibility.Visible;
+            switch (roadState)
+            {
+                case RoadState.Road:
+                case RoadState.Unowned:
+                    visibility = Visibility.Visible;                   
+                    break;
+                case RoadState.Ship:
+                    visibility = Visibility.Collapsed;
+                    if (_ship == null)
+                    {
+                        _ship = new Ship
+                        {
+                            Margin = new Thickness(2)
+                        };
+                        _gridShip.Children.Add(_ship);
+                    }
+                    
+                    break;
+
+                default:
+                    break;
+            }
+
+            Show(roadState != RoadState.Unowned);
+            if (gridName != "road")
+            {
+                visibility = (visibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            }
+
+
+            UpdateVisuals(new Windows.Foundation.Size(this.ActualWidth, this.ActualHeight));
+
+            return visibility;
         }
-        private static void RoadTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            RoadCtrl depPropClass = d as RoadCtrl;
-            RoadType depPropValue = (RoadType)e.NewValue;
-            depPropClass.SetRoadType(depPropValue);
-        }
+
         private void SetRoadType(RoadType roadtype)
         {
             if (this.ActualHeight * this.ActualWidth == 0)
@@ -169,17 +269,6 @@ namespace Catan10
             UpdateVisuals(size);
         }
 
-        public Point TileZeroZero
-        {
-            get => (Point)GetValue(TileZeroZeroProperty);
-            set => SetValue(TileZeroZeroProperty, value);
-        }
-        private static void TileZeroZeroChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            RoadCtrl depPropClass = d as RoadCtrl;
-            Point depPropValue = (Point)e.NewValue;
-            depPropClass.SetTileZeroZero(depPropValue);
-        }
         private void SetTileZeroZero(Point point)
         {
             //_transform.TranslateX = point.X + _locationToRoadDataDict[Location].Left;
@@ -196,83 +285,10 @@ namespace Catan10
 
             _daAnimateOpacity.To = 0;
             _sbAnimateOpacity.Begin();
-
-        }
-
-
-        public Color Color
-        {
-            get => (Color)GetValue(ColorProperty);
-            set => SetValue(ColorProperty, value);
-        }
-        private static void ColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            RoadCtrl depPropClass = d as RoadCtrl;
-            Color depPropValue = (Color)e.NewValue;
-            depPropClass.SetColor(depPropValue);
-        }
-        private void SetColor(Color color)
-        {
-
-            SetColors(_gridRoads);
-        }
-
-
-
-        public RoadLocation Location
-        {
-            get => (RoadLocation)GetValue(LocationProperty);
-            set => SetValue(LocationProperty, value);
-        }
-        private static void LocationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            RoadCtrl depPropClass = d as RoadCtrl;
-            RoadLocation depPropValue = (RoadLocation)e.NewValue;
-            depPropClass.SetLocation(depPropValue);
-        }
-        private void SetLocation(RoadLocation roadlocation)
-        {
-            RoadLocationData data = _locationToRoadDataDict[roadlocation];
-            _transform.TranslateX = data.Left;
-            _transform.TranslateY = data.Top;
-            _transform.Rotation = data.Angle;
-        }
-
-        private void SetColors(Grid grid)
-        {
-            //foreach (UIElement el in grid.Children)
-            //{
-            //    if (el.GetType() == typeof(Polygon))
-            //    {
-            //        ((Polygon)el).Stroke = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
-            //        ((Polygon)el).Fill = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
-
-            //    }
-            //    if (el.GetType() == typeof(Line))
-            //    {
-            //        ((Line)el).Stroke = MainPage.Current.CurrentPlayer?.GameData?.ForegroundBrush;
-            //    }
-            //}
-
-
-            //_shipPolygon.Fill = MainPage.Current.CurrentPlayer?.GameData?.BackgroundBrush;
-            //_shipPolygon.Stroke = MainPage.Current.CurrentPlayer?.GameData?.ForegroundBrush;
-
-        }
-
-
-
-
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-
-            UpdateVisuals(e.NewSize);
-
         }
 
         private void UpdateVisuals(Size newSize)
         {
-
             double thirtyDegrees = Math.PI / 180.0 * 30;
             double triangleHeight = Math.Tan(thirtyDegrees) * (newSize.Height) * 0.5; // we end in an equalateral triangle.  this is its height
             //double thickness = _doublePolygon.StrokeThickness;
@@ -292,7 +308,6 @@ namespace Catan10
                 _shipPolygon.Points.Add(new Point(newSize.Width - triangleHeight, newSize.Height - thickness * .5));
                 _shipPolygon.Points.Add(new Point(triangleHeight, newSize.Height - thickness * .5));
                 _ship.Width = newSize.Width;
-
             }
             else // a road or nothing
             {
@@ -320,13 +335,10 @@ namespace Catan10
                         _lineMiddle.Y1 = newSize.Height * .75;
                         _lineMiddle.Y2 = _lineMiddle.Y1;
 
-
                         _lineBottom.X1 = triangleHeight;
                         _lineBottom.X2 = newSize.Width - triangleHeight;
                         _lineBottom.Y1 = newSize.Height - 2;
                         _lineBottom.Y2 = _lineBottom.Y1;
-
-
 
                         //          0   1   2       3
                         //Points=".5,8 68,8 63.5,16 4,16"
@@ -336,6 +348,7 @@ namespace Catan10
                         _doublePolygon.Points.Add(new Point(newSize.Width - triangleHeight, newSize.Height));
                         _doublePolygon.Points.Add(new Point(triangleHeight, newSize.Height));
                         break;
+
                     case RoadType.Double:
                         height = newSize.Height;
                         _lineTop.X1 = triangleHeight;
@@ -353,11 +366,9 @@ namespace Catan10
                         _lineBottom.Y1 = newSize.Height - 2;
                         _lineBottom.Y2 = _lineBottom.Y1;
 
-
                         //
                         //  these are the points that depend on width and height
                         //Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,16"
-
 
                         _doublePolygon.Points.Add(new Point(thickness * .5, newSize.Height * .5));
                         _doublePolygon.Points.Add(new Point(triangleHeight, thickness * .5));
@@ -367,18 +378,15 @@ namespace Catan10
                         _doublePolygon.Points.Add(new Point(triangleHeight, newSize.Height - thickness * .5));
 
                         break;
+
                     default:
                         _gridShip.Visibility = Visibility.Collapsed;
                         _gridRoads.Visibility = Visibility.Collapsed;
                         break;
                 }
-
             }
         }
 
-
-
-        public bool IsOwned => (RoadState != RoadState.Unowned);
         internal List<RoadCtrl> OwnedAdjacentRoadsNotCounted(List<RoadCtrl> owned, RoadCtrl blockedFork, out bool adjacentFork)
         {
             List<RoadCtrl> list = new List<RoadCtrl>();
@@ -386,7 +394,6 @@ namespace Catan10
             {
                 if (r.IsOwned && r.Owner == this.Owner)
                 {
-
                     if (r.AdjacentBuildings[0].Owner != this.Owner && r.AdjacentBuildings[0].BuildingState != BuildingState.None)
                     {
                         continue;
@@ -414,9 +421,25 @@ namespace Catan10
             return list;
         }
 
+        internal void Reset()
+        {
+            this.Owner = null;
+            RoadState = RoadState.Unowned;
+            Show(false);
+        }
+
+        public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
+        {
+            LinearGradientBrush brush = PlayerBindingFunctions.GetBackgroundBrush(current, owner);
+            return brush;
+        }
+
+        public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
+        {
+            return PlayerBindingFunctions.GetForegroundBrush(current, owner);
+        }
         public void Show(bool show, bool valid = true)
         {
-
             double opacity = 1.0;
             if (show)
             {
@@ -433,25 +456,9 @@ namespace Catan10
             _daAnimateOpacity.To = opacity;
             _sbAnimateOpacity.SkipToFill();
         }
-
-
-        private void Road_PointerExited(object sender, PointerRoutedEventArgs e)
+        public override string ToString()
         {
-            Callback?.RoadExited(this, e);
-
-        }
-
-        private void Road_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            Callback?.RoadEntered(this, e);
-
-
-
-        }
-        private void Road_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            //  this.TraceMessage(this.ToString());
-            Callback?.RoadPressed(this, e);
+            return String.Format($"Index={Index} Owner={Owner}");
         }
 
         public string ToString2()
@@ -464,22 +471,23 @@ namespace Catan10
 
             return s + "\n";
         }
-
-        public override string ToString()
-        {
-            return String.Format($"Index={Index} Owner={Owner}");
-        }
-
-
-
-        internal void Reset()
-        {
-            this.Owner = null;
-            RoadState = RoadState.Unowned;
-            Show(false);
-        }
     }
 
+    public class RoadKey
+    {
+        public RoadKey(TileCtrl tile, RoadLocation loc)
+        {
+            Tile = tile;
+            RoadLocation = loc;
+        }
+
+        public RoadLocation RoadLocation { get; set; }
+        public TileCtrl Tile { get; set; }
+        public override string ToString()
+        {
+            return String.Format($"{Tile} {Tile.Index} {RoadLocation}");
+        }
+    }
 
     public class RoadKeyComparer : IEqualityComparer<RoadKey>
     {
@@ -500,53 +508,11 @@ namespace Catan10
             return obj.Tile.GetHashCode() * 17 + obj.RoadLocation.GetHashCode();
         }
     }
-
-    public class RoadCloneComparer : IEqualityComparer<RoadCtrl>
-    {
-        readonly RoadKeyComparer roadKeyComparer = new RoadKeyComparer();
-        //
-        //  when are two Roads "equal"?  When they have at least one clone that matches
-        public bool Equals(RoadCtrl x, RoadCtrl y)
-        {
-
-
-            foreach (RoadKey key in x.Keys)
-            {
-                if (y.Keys.Contains(key, roadKeyComparer) == true)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public int GetHashCode(RoadCtrl obj)
-        {
-            return obj.GetHashCode();
-        }
-    }
-
-    public class RoadKey
-    {
-        public TileCtrl Tile { get; set; }
-        public RoadLocation RoadLocation { get; set; }
-        public RoadKey(TileCtrl tile, RoadLocation loc)
-        {
-            Tile = tile;
-            RoadLocation = loc;
-        }
-
-        public override string ToString()
-        {
-            return String.Format($"{Tile} {Tile.Index} {RoadLocation}");
-        }
-    }
     public class RoadLocationData
     {
+        public double Angle;
         public double Left;
         public double Top;
-        public double Angle;
         public RoadLocationData(double left, double top, double angle)
         {
             Left = left;
@@ -558,8 +524,5 @@ namespace Catan10
         {
             return String.Format($"Left={Left} Top={Top} Angle={Angle}");
         }
-
     }
-
-    public enum RoadType { Single, Double };
 }

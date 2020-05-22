@@ -1,75 +1,94 @@
-﻿using Catan.Proxy;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
+
+using Catan.Proxy;
 
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
-using Windows.Networking.Sockets;
 using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.Storage.Streams;
-using Windows.UI;
-using Windows.UI.Input;
 using Windows.UI.Popups;
-using Windows.UI.Text.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
-
-
     public sealed partial class MainPage : Page, ILog
     {
-
-
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
         private readonly RoadRaceTracking _raceTracking = null;
         private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
         private int _currentPlayerIndex = 0;
         private bool _doDragDrop = false;
-        DateTime _dt = DateTime.Now;
-        int _randomBoardListIndex = 0;
+        private DateTime _dt = DateTime.Now;
+        private int _randomBoardListIndex = 0;
+
         /// <summary>
         ///     This will go through all the buildings and find the ones that are
         ///        1. Buildable
-        ///        2. in the "none" state (e.g. not already shown in some way) 
-        ///      and then have them show the PipGroup.  
+        ///        2. in the "none" state (e.g. not already shown in some way)
+        ///      and then have them show the PipGroup.
         ///      you have to do this every time because people might have built in locations that change the PipGroup
         /// </summary>
         private int _showPipGroupIndex = 0;
 
         private int _supplementalStartIndex = -1;
         private bool _undoingCardLostHack = false;
+        private TaskCompletionSource<object> fileGuard = null;
         public const string PlayerDataFile = "catansettings.json";
+
         // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
         //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel()));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(), MainPageModelChanged));
+
+        private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as MainPage;
+            var depPropValue = (MainPageModel)e.NewValue;
+            depPropClass?.SetMainPageModel((MainPageModel)e.OldValue, (MainPageModel)e.NewValue);
+        }
+        private void SetMainPageModel(MainPageModel oldModel, MainPageModel newModel)
+        {
+            if (oldModel != null)
+            {
+                oldModel.Settings.PropertyChanged -= Settings_PropertyChanged;
+            }
+            if (newModel != null)
+            {
+                newModel.Settings.PropertyChanged += Settings_PropertyChanged;
+            }
+
+        }
+        /// <summary>
+        ///     When a setting changes, write the changes to disk
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            await SaveGameState();
+        }
 
         public static readonly string SAVED_GAME_EXTENSION = ".log";
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
+
         public MainPage()
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
@@ -85,16 +104,17 @@ namespace Catan10
         public static MainPage Current { get; private set; }
 
         public GameState GameStateFromOldLog => CurrentGameState;
+
         public GameType GameType
         {
             get => _gameView.CurrentGame.GameType;
             set
             {
-
             }
         }
 
         public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
+
         public MainPageModel MainPageModel
         {
             get => (MainPageModel)GetValue(MainPageModelProperty);
@@ -102,7 +122,6 @@ namespace Catan10
         }
 
         public ObservableCollection<DeprecatedLog> SavedGames { get; set; } = new ObservableCollection<DeprecatedLog>();
-
 
         public StorageFolder SaveFolder { get; set; } = null;
 
@@ -112,9 +131,9 @@ namespace Catan10
             get => (PlayerModel)GetValue(TheHumanProperty);
             set => SetValue(TheHumanProperty, value);
         }
+
         private Task AddPlayer(PlayerModel pData, LogType logType)
         {
-
             MainPageModel.PlayingPlayers.Add(pData);
             pData.GameData.OnCardsLost += OnPlayerLostCards;
             AddPlayerMenu(pData);
@@ -126,19 +145,14 @@ namespace Catan10
             pData.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
             pData.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
 
-
-
             //  _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
             // await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, MainPageModel.PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
             return Task.CompletedTask;
-
         }
 
         private async Task AddPlayer(LogEntry le, LogType logType)
         {
-
             await AddPlayer(le.PlayerData, logType);
-
         }
 
         //
@@ -155,7 +169,7 @@ namespace Catan10
         }
 
         //
-        //  these need to be combined together because we need to know what the state is both before and *after* we move -- and 
+        //  these need to be combined together because we need to know what the state is both before and *after* we move -- and
         //  it used to be that we'd move and then set state.  this way we can do the Gold tile(s) correctly when moving to the next
         //  player only gets gold when it is their turn to roll (e.g. not when it is supplemental)
         //
@@ -169,9 +183,6 @@ namespace Catan10
             var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
             List<int> newRandomGoldTiles = null;
 
-
-
-
             // this is the one spot where the CurrentPlayer is changed.  it should update all the bindings
             // the setter will update all the associated state changes that happen when the CurrentPlayer
             // changes
@@ -184,7 +195,6 @@ namespace Catan10
             {
                 await _gameView.ResetRandomGoldTiles();
             }
-
 
             //
             // when we change player we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
@@ -220,7 +230,6 @@ namespace Catan10
             //
             //  we are on the right person, now set the state
 
-
             if (logType == LogType.Normal || logType == LogType.Replay)
             {
                 await AddLogEntry(CurrentPlayer, newState, CatanAction.ChangePlayerAndSetState, true, logType, -1, new LogChangePlayer(from, to, oldState, currentRandomGoldTiles, newRandomGoldTiles));
@@ -231,7 +240,6 @@ namespace Catan10
                 t.ResetOpacity();
                 t.ResetTileRotation();
                 t.StopHighlightingTile();
-
             }
             //
             //  on next, reset the resources for the turn to 0
@@ -239,7 +247,6 @@ namespace Catan10
             {
                 player.GameData.PlayerTurnResourceCount.TurnReset();
             }
-
         }
 
         private async Task CopyScreenShotToClipboard(FrameworkElement element)
@@ -282,7 +289,6 @@ namespace Catan10
                 await StaticHelpers.DragAsync((UIElement)sender, pRoutedEvents);
                 OnGridPositionChanged("_gameView", new GridPosition(_transformGameView));
             }
-
         }
 
         //
@@ -313,10 +319,8 @@ namespace Catan10
             {
                 if (!dictPipsToBuildings.TryGetValue(building.Pips, out List<BuildingCtrl> list))
                 {
-
                     list = new List<BuildingCtrl>();
                     dictPipsToBuildings[building.Pips] = list;
-
                 }
                 list.Add(building);
             }
@@ -334,7 +338,6 @@ namespace Catan10
             }
 
             return pipGroupToBuildings;
-
         }
 
         private BuildingCtrl GetHighestPipsBuilding()
@@ -368,28 +371,38 @@ namespace Catan10
                     case ResourceType.Sheep:
                         tr.Sheep += tile.Pips;
                         break;
+
                     case ResourceType.Wood:
                         tr.Wood += tile.Pips;
                         break;
+
                     case ResourceType.Ore:
                         tr.Ore += tile.Pips;
                         break;
+
                     case ResourceType.Wheat:
                         tr.Wheat += tile.Pips;
                         break;
+
                     case ResourceType.Brick:
                         tr.Brick += tile.Pips;
                         break;
+
                     case ResourceType.GoldMine:
                         break;
+
                     case ResourceType.Desert:
                         break;
+
                     case ResourceType.Back:
                         break;
+
                     case ResourceType.None:
                         break;
+
                     case ResourceType.Sea:
                         break;
+
                     default:
                         break;
                 }
@@ -403,20 +416,17 @@ namespace Catan10
             List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
             foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
             {
-
                 if (t.Number == number)
 
                 {
                     tilesWithNumber.Add(t);
                 }
-
             }
             return tilesWithNumber;
         }
 
         private async Task GrowOrShrink(UIElement el)
         {
-
             CompositeTransform ct = el.RenderTransform as CompositeTransform;
             if (ct.ScaleX == .5)
             {
@@ -437,9 +447,6 @@ namespace Catan10
         //  this adds a number to the list we use to keep track of what is rolled and updates all the statistics
         private async Task HandleNumber(int roll)
         {
-
-
-
             bool ret = this.PushRoll(roll); // only returns false on a number outside the range...
             if (!ret)
             {
@@ -449,7 +456,7 @@ namespace Catan10
             List<TileCtrl> tilesWithNumber = await HighlightRolledTiles(roll);
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                tile.HighlightTile(CurrentPlayer.BackgroundBrush); // shows what was rolled                                
+                tile.HighlightTile(CurrentPlayer.BackgroundBrush); // shows what was rolled
             }
 
             if (roll == 7)
@@ -466,14 +473,7 @@ namespace Catan10
                 CountResourcesForRoll(tilesWithNumber, false);
                 CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null;
                 await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false);
-
-
             }
-
-
-
-
-
         }
 
         private async Task HideAllPipEllipses()
@@ -488,22 +488,18 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     Load Data that is global to the game 
+        ///     Load Data that is global to the game
         ///     1. Players
         ///     2. Settings
         ///     3. Service settings
         /// </summary>
         /// <returns></returns>
-        /// 
-
-        
+        ///
 
         private async Task LoadMainPageModel()
         {
-
             try
             {
-
                 this.MainPageModel = await ReadMainPageModelOffDisk();
                 if (MainPageModel == null || MainPageModel.AllPlayers.Count == 0)
                 {
@@ -515,17 +511,13 @@ namespace Catan10
                         Settings = new Settings(),
                         HostName = "http://192.168.1.128:5000",
                         TheHuman = "",
-
                     };
 
                     await SaveGameState();
                     MainPageModel = await ReadMainPageModelOffDisk(); // just verifying round trip...
                     Contract.Assert(MainPageModel != null);
                     await ResetGridLayout();
-                    
                 }
-
-               
 
                 foreach (var player in MainPageModel.AllPlayers)
                 {
@@ -536,31 +528,25 @@ namespace Catan10
 
                     await player.LoadImage();
 
-                  
                     if (MainPageModel.TheHuman == player.PlayerName)
                     {
                         TheHuman = player;
                     }
-
                 }
 
                 if (MainPageModel.TheHuman == "")
                 {
                     await PickDefaultUser();
                     CurrentPlayer = TheHuman;
-
                 }
             }
             finally
             {
             }
-
-
         }
 
         private async Task LoadSavedGames()
         {
-
             IReadOnlyList<StorageFile> files = await GetSavedFilesInternal();
             List<StorageFile> fList = new List<StorageFile>();
             fList.AddRange(files);
@@ -572,7 +558,6 @@ namespace Catan10
                 DeprecatedLog log = new DeprecatedLog(f);
                 SavedGames.Add(log);
             }
-
         }
 
         private async Task LogPlayerLostCards(PlayerModel player, int oldVal, int newVal, LogType logType)
@@ -595,15 +580,12 @@ namespace Catan10
 
             await _gameView.SetRandomCatanBoard(true);
             _randomBoardList.Add(_gameView.RandomBoardSettings);
-
         }
 
         private async void OnClearPips(object sender, RoutedEventArgs e)
         {
-
             await HideAllPipEllipses();
             _showPipGroupIndex = 0;
-
         }
 
         private void OnCloseSavedGames(object sender, RoutedEventArgs e)
@@ -617,21 +599,19 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     The DraggableGridCtrl calls this whenever the window is moved or resized - the data should already 
+        ///     The DraggableGridCtrl calls this whenever the window is moved or resized - the data should already
         ///     be up to date in the model via data binding.
         /// </summary>
         /// <param name="gridPosition"></param>
         private async void OnGridPositionChanged(string name, GridPosition gridPosition)
         {
-           // this.TraceMessage($"name={name}={MainPageModel.Settings.GridPositions[name]}");
-            await SaveGameState();            
-
+            // this.TraceMessage($"name={name}={MainPageModel.Settings.GridPositions[name]}");
+            await SaveGameState();
         }
 
         private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
             await GrowOrShrink(ControlGrid);
-
         }
 
         private async void OnManagePlayers(object sender, RoutedEventArgs e)
@@ -653,17 +633,13 @@ namespace Catan10
         /// <returns></returns>
         private async Task OnNext(int playersToMove = 1, LogType logType = LogType.Normal)
         {
-
-
             await AnimatePlayers(playersToMove, logType);
-
 
             UpdateGlobalRollStats();
             foreach (TileCtrl t in _gameView.AllTiles)
             {
                 t.ResetOpacity();
                 t.ResetTileRotation();
-
             }
             //
             //  on next, reset the resources for the turn to 0
@@ -671,14 +647,10 @@ namespace Catan10
             {
                 player.GameData.PlayerTurnResourceCount.TurnReset();
             }
-
-
-
         }
 
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
-
         }
 
         private async Task OnOpenSavedGame()
@@ -693,7 +665,6 @@ namespace Catan10
                 string savedGame = dlg.SavedGame;
                 //  await this.ParseAndLoadGame(savedGame);
             }
-
         }
 
         private async void OnPlayerLostCards(PlayerModel player, int oldVal, int newVal)
@@ -742,8 +713,6 @@ namespace Catan10
                 return;
             }
 
-
-
             int showPipGroupIndex = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
 
             if (showPipGroupIndex >= 0)
@@ -757,12 +726,9 @@ namespace Catan10
 
             _showPipGroupIndex += showPipGroupIndex;
 
-
             if (_showPipGroupIndex <= 0)
             {
-
                 _showPipGroupIndex = 0;
-
             }
             Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = GetBuildingByPips();
             if (showPipGroupIndex < 0)
@@ -802,7 +768,6 @@ namespace Catan10
                 }
                 foreach (BuildingCtrl building in list)
                 {
-
                     if (building.Pips == 0)  // throw out the ones that have no pips
                     {
                         Debug.WriteLine("Buildings.pips == 0");
@@ -828,15 +793,10 @@ namespace Catan10
 
         private void OnShowPips(object sender, RoutedEventArgs e)
         {
-
-
-
-
         }
 
         private async Task OnWin()
         {
-
             bool ret = await StaticHelpers.AskUserYesNoQuestion(string.Format($"Did {CurrentPlayer.PlayerName} really win?"), "Yes", "No");
             if (ret == true)
             {
@@ -855,15 +815,11 @@ namespace Catan10
 
         private async void PickAGoodBoard(PointerRoutedEventArgs e)
         {
-
-
             if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
             {
                 _randomBoardListIndex++;
                 if (_randomBoardListIndex >= _randomBoardList.Count)
                 {
-
-
                     //
                     //  get new ones
                     await _gameView.SetRandomCatanBoard(true);
@@ -872,10 +828,7 @@ namespace Catan10
                     //  save the existing settings
                     _randomBoardList.Add(_gameView.RandomBoardSettings);
                     _randomBoardListIndex = _randomBoardList.Count - 1;
-
-
                 }
-
             }
             else
             {
@@ -910,7 +863,6 @@ namespace Catan10
 
         private async void PickSettlementsAndRoads(object sender, RoutedEventArgs e)
         {
-
             await PickSettlementsAndRoads();
         }
 
@@ -933,41 +885,40 @@ namespace Catan10
         /// <returns></returns>
         private async Task ProcessState(PlayerModel player, string inputText)
         {
-
-
             try
             {
                 switch (CurrentGameState) // this is actually better thought of as the state we are about to change or that we need to do something and the user takes care of hitting the Next button
                 {
-
                     case GameState.WaitingForNewGame:
                         OnNewNetworkGame(null, null);
                         break;
+
                     case GameState.WaitingForPlayers:
                         //
                         //  if the current player created the game, then we start the game
                         //  otherwise we just listen to messages, which will have these messages in the queue
                         if (MainPageModel.GameStartedBy == TheHuman)
                         {
-
                             //
                             //  randomize the board
                             await RandomBoardLog.RandomizeBoard(this, 0);
-
                         }
                         await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
 
                         break;
+
                     case GameState.WaitingForRollForOrder:
                         //
                         // hide board measurement UI as we've now picked out poison
 
                         break;
+
                     case GameState.WaitingForStart:
                         MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceDown);
                         await CopyScreenShotToClipboard(_gameView);
                         await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, true);
                         break;
+
                     case GameState.AllocateResourceForward:
 
                         await OnNext();
@@ -979,6 +930,7 @@ namespace Catan10
                         }
 
                         break;
+
                     case GameState.AllocateResourceReverse:
 
                         if (MainPageModel.PlayingPlayers.IndexOf(MainPageModel.PlayingPlayers.Last()) != GetNextPlayerPosition(-1))
@@ -991,27 +943,29 @@ namespace Catan10
                         }
 
                         break;
+
                     case GameState.WaitingForRoll:
                         {
                             await ProcessRoll(inputText); // this will either succeed and change state to Waiting for Next, or fail and leave it in the current state...
                         }
                         break;
+
                     case GameState.MustMoveBaron:
                         await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, true);
                         break;
+
                     case GameState.WaitingForNext:
                         if (HasSupplementalBuild)
                         {
                             _supplementalStartIndex = _currentPlayerIndex;
                             await ChangePlayerAndSetState(1, GameState.Supplemental);
-
                         }
                         else
                         {
                             await ChangePlayerAndSetState(1, GameState.WaitingForRoll);
-
                         }
                         break;
+
                     case GameState.Supplemental:
                         //
                         //  look to see what the next spot is supposed to be
@@ -1020,9 +974,8 @@ namespace Catan10
                         {
                             await ChangePlayerAndSetState(2, GameState.WaitingForRoll);
 
-
                             ////
-                            ////  next spot is where we started -- skip over it 
+                            ////  next spot is where we started -- skip over it
                             //await OnNext(2);
                             ////
                             ////  log that we finished supplemental
@@ -1038,13 +991,13 @@ namespace Catan10
                             await OnNext();
                         }
                         break;
+
                     default:
                         break;
                 }
             }
             finally
             {
-
             }
         }
 
@@ -1064,7 +1017,6 @@ namespace Catan10
             }
             try
             {
-
                 mainPageModel = CatanProxy.Deserialize<MainPageModel>(content);
 
                 if (mainPageModel.Settings.GridPositions.Count == 0)
@@ -1074,11 +1026,10 @@ namespace Catan10
                         if (child.GetType() == typeof(DragableGridCtrl))
                         {
                             DragableGridCtrl ctrl = child as DragableGridCtrl;
-                            mainPageModel.Settings.GridPositions[child.Name] = ctrl.GridPosition; // the default 
+                            mainPageModel.Settings.GridPositions[child.Name] = ctrl.GridPosition; // the default
                         }
                     }
                 }
-
 
                 return mainPageModel;
             }
@@ -1088,7 +1039,6 @@ namespace Catan10
             }
 
             return null;
-
         }
 
         private async Task Reset()
@@ -1104,8 +1054,6 @@ namespace Catan10
 
             MainPageModel.Log = new NewLog();
 
-
-
             // _lbGames.SelectedValue = MainPageModel.Log;
             await ResetTiles(true);
             Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.TurnReset();
@@ -1119,14 +1067,12 @@ namespace Catan10
             _raceTracking.Reset();
 
             //  await LoadPlayerData();
-
         }
 
         private void ResetDataForNewGame()
         {
             _gameView.Reset();
             _gameView.SetCallbacks(this, this);
-
 
             foreach (PlayerModel p in MainPageModel.PlayingPlayers)
             {
@@ -1140,14 +1086,10 @@ namespace Catan10
             {
                 CurrentPlayer = TheHuman;
             }
-
-
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
         {
-
-
             //
             //  this should mean that we are launching for the first time
             if (_gameView.CurrentGame.Tiles[0].TileOrientation == TileOrientation.FaceDown)
@@ -1160,7 +1102,6 @@ namespace Catan10
             {
                 t.AnimateFadeAsync(1.0);
                 t.Rotate(0, tasks, false);
-
             }
             await Task.WhenAll(tasks.ToArray());
             foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
@@ -1171,7 +1112,6 @@ namespace Catan10
                 }
             }
             await Task.WhenAll(tasks.ToArray());
-
         }
 
         // can only undo to the first resource allocation
@@ -1200,20 +1140,13 @@ namespace Catan10
             //            _lbGames.SelectedItem = MainPageModel.Log;
             //        }
 
-
             //    }
             //}
             //catch (Exception exception)
             //{
             //    MessageDialog dlg = new MessageDialog($"Error loading file {e.AddedItems[0]}\nMessage:\n{exception.Message}");
             //}
-
-
         }
-
-
-        TaskCompletionSource<object> fileGuard = null;
-
         private async Task SaveGameState()
         {
             try
@@ -1221,9 +1154,8 @@ namespace Catan10
                 if (fileGuard != null)
                 {
                     await fileGuard.Task;
-                    
                 }
-
+                this.TraceMessage($"Saving GameState");                
                 fileGuard = new TaskCompletionSource<object>();
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
                 var content = CatanProxy.Serialize<MainPageModel>(MainPageModel, true);
@@ -1248,14 +1180,11 @@ namespace Catan10
         /// <returns></returns>
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
-
             if (TheHuman.PlayerName != MainPageModel.GameInfo.Creator) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
-
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
-
 
                 {
                     if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
@@ -1264,11 +1193,8 @@ namespace Catan10
                     }
                     else
                     {
-
                         await RandomBoardLog.RandomizeBoard(this, 0);
-
                     }
-
                 }
                 else
                 {
@@ -1278,9 +1204,6 @@ namespace Catan10
                     }
                 }
             }
-
-
-
         }
 
         private async Task SetBuildingAndRoad()
@@ -1300,9 +1223,6 @@ namespace Catan10
 
         private async Task StartGame(ICollection<PlayerModel> players, int selectedIndex)
         {
-
-
-
             ResetDataForNewGame();
 
             foreach (PlayerModel pData in players)
@@ -1310,9 +1230,7 @@ namespace Catan10
                 //
                 //  add it to the collection that all the views bind to
                 await AddPlayer(pData, LogType.Normal);
-
             }
-
 
             await VisualShuffle();
             await SetStateAsync(null, GameState.WaitingForStart, true);
@@ -1335,14 +1253,11 @@ namespace Catan10
             _randomBoardList.Clear();
             _randomBoardList.Add(_gameView.RandomBoardSettings);
             _randomBoardListIndex = 0;
-
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-
-
 
             if (e.NavigationMode == NavigationMode.New)
             {
@@ -1363,8 +1278,6 @@ namespace Catan10
             InitTest();
             ResetDataForNewGame();
             await WsConnect();
-
-
         }
 
         public static string CreateSaveFileName(string Description)
@@ -1392,20 +1305,16 @@ namespace Catan10
             // AnimationSpeedFactor is a value of 1...4
             double d = (double)speed / (baseSpeed + 2);
             return d;
-
         }
+
         public Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
         {
-
             //  await MainPageModel.Log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
             return Task.CompletedTask;
-
         }
 
         public void CountResourcesForRoll(IReadOnlyCollection<TileCtrl> tilesWithNumber, bool undo)
         {
-
-
             foreach (TileCtrl tile in tilesWithNumber)
             {
                 foreach (BuildingCtrl building in tile.OwnedBuilding)
@@ -1414,7 +1323,6 @@ namespace Catan10
                     {
                         continue;
                         //System.Diagnostics.Debug.Assert(false);
-
                     }
 
                     //
@@ -1423,8 +1331,6 @@ namespace Catan10
                     //
                     //  need to look up the control given the player and add it to the right one
                     AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
-
-
                 }
             }
             if (!undo)
@@ -1446,8 +1352,6 @@ namespace Catan10
                     }
                 }
             }
-
-
         }
 
         public List<int> GetRandomGoldTiles()
@@ -1460,7 +1364,7 @@ namespace Catan10
         /// <summary>
         /// Update this because you did the sorting work in the dialog
         /// hide all positions and then loop through the array to make them visible
-        /// 
+        ///
         /// </summary>
         /// <param name="players"></param>
         /// <returns></returns>
@@ -1476,6 +1380,7 @@ namespace Catan10
 
             return files;
         }
+
         //
         //  we use the build ellipses during the allocation phase to see what settlements have the most pips
         //  when we move to the next player, hide the build ellipses
@@ -1483,20 +1388,16 @@ namespace Catan10
         {
             List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
 
-
             List<Task> tasks = new List<Task>();
             foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
             {
-
                 if (t.Number == rolledNumber)
 
                 {
                     tilesWithNumber.Add(t);
                     if (MainPageModel.Settings.AnimateFade)
                     {
-
                         t.AnimateFadeAsync(1.0);
-
                     }
                     if (MainPageModel.Settings.RotateTile)
                     {
@@ -1529,16 +1430,13 @@ namespace Catan10
             List<Task> tasks = new List<Task>();
             foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
             {
-
                 if (t.Number == rolledNumber)
 
                 {
                     tilesWithNumber.Add(t);
                     if (MainPageModel.Settings.AnimateFade)
                     {
-
                         t.AnimateFadeAsync(1.0);
-
                     }
                     if (MainPageModel.Settings.RotateTile)
                     {
@@ -1559,8 +1457,6 @@ namespace Catan10
                 await Task.WhenAll(tasks.ToArray());
             }
 
-
-
             return tilesWithNumber;
         }
 
@@ -1578,7 +1474,6 @@ namespace Catan10
             //    }
 
             //    MainPageModel.Log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
-
         }
 
         public async Task<bool> ProcessRoll(string inputText)
@@ -1586,13 +1481,10 @@ namespace Catan10
             if (int.TryParse(inputText, out int roll))
             {
                 return await ProcessRoll(roll);
-
             }
 
             return false;
         }
-
-
 
         public async Task<bool> ReplayLog(DeprecatedLog log)
         {
@@ -1612,8 +1504,6 @@ namespace Catan10
                 //  marking records as undone means we don't have to replay and then undo them
                 //
 
-
-
                 foreach (LogEntry logLine in log.Actions)
                 {
                     n++;
@@ -1622,13 +1512,12 @@ namespace Catan10
                         continue;
                     }
 
-
-
                     switch (logLine.Action)
                     {
                         case CatanAction.Rolled:
                             PushRoll(logLine.Number);
                             break;
+
                         case CatanAction.AddResourceCount:
                             LogResourceCount lrc = logLine.Tag as LogResourceCount;
                             if (logLine.PlayerData != null)
@@ -1641,26 +1530,35 @@ namespace Catan10
                             }
 
                             break;
+
                         case CatanAction.ChangedState:
                             break;
+
                         case CatanAction.ChangedPlayer:
                             LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
                             await AnimateToPlayerIndex(lcp.To, LogType.Replay);
                             break;
+
                         case CatanAction.Dealt:
                             break;
+
                         case CatanAction.CardsLost:
                             LogCardsLost lcl = logLine.Tag as LogCardsLost;
                             await LogPlayerLostCards(logLine.PlayerData, lcl.OldVal, lcl.NewVal, LogType.Replay);
                             break;
+
                         case CatanAction.CardsLostToSeven:
                             break;
+
                         case CatanAction.MissedOpportunity:
                             break;
+
                         case CatanAction.DoneSupplemental:
                             break;
+
                         case CatanAction.DoneResourceAllocation:
                             break;
+
                         case CatanAction.SetFirstPlayer:
                             if (logLine.Tag == null)
                             {
@@ -1670,17 +1568,18 @@ namespace Catan10
                             LogSetFirstPlayer lsfp = logLine.Tag as LogSetFirstPlayer;
                             await SetFirst(MainPageModel.PlayingPlayers[lsfp.FirstPlayerIndex]);
                             break;
+
                         case CatanAction.PlayedKnight:
                         case CatanAction.AssignedBaron:
                         case CatanAction.AssignedPirateShip:
                             LogBaronOrPirate lbp = logLine.Tag as LogBaronOrPirate;
                             await AssignBaronOrKnight(lbp.TargetPlayer, lbp.TargetTile, lbp.TargetWeapon, lbp.Action, LogType.Replay);
                             break;
+
                         case CatanAction.UpdatedRoadState:
                             LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
                             if (roadUpdate.NewRoadState != RoadState.Unowned)
                             {
-
                                 //   roadUpdate.Road.Color = CurrentPlayer.GameData.PlayerColor;
                             }
                             else
@@ -1690,6 +1589,7 @@ namespace Catan10
 
                             await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Replay);
                             break;
+
                         case CatanAction.UpdateBuildingState:
 
                             LogBuildingUpdate lsu = (LogBuildingUpdate)logLine.Tag;
@@ -1700,9 +1600,11 @@ namespace Catan10
 
                             await lsu.Building.UpdateBuildingState(lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
                             break;
+
                         case CatanAction.AddPlayer:
                             await AddPlayer(logLine, LogType.Replay);
                             break;
+
                         case CatanAction.RandomizeBoard:
                             RandomBoardSettings boardSetting = logLine.Tag as RandomBoardSettings;
                             await _gameView.SetRandomCatanBoard(true, boardSetting);
@@ -1711,26 +1613,26 @@ namespace Catan10
                         case CatanAction.InitialAssignBaron:
                             _gameView.BaronTile = _gameView.TilesInIndexOrder[logLine.Number];
                             break;
+
                         case CatanAction.SelectGame:
                             _gameView.CurrentGame = _gameView.Games[logLine.Number];
                             await Task.Delay(0);
                             break;
+
                         case CatanAction.RoadTrackingChanged:
                             //LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
                             //_raceTracking.Deserialize(lrtc.NewState, this);
                             break;
+
                         case CatanAction.ChangedPlayerProperty:
                             LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
                             logLine.PlayerData.GameData.SetKeyValue<PlayerGameModel>(lpc.PropertyName, lpc.NewVal);
                             break;
+
                         default:
                             break;
                     }
-
-
-
                 }
-
 
                 _gameView.FlipAllAsync(TileOrientation.FaceUp);
             }
@@ -1739,11 +1641,8 @@ namespace Catan10
                 _progress.IsActive = false;
                 _progress.Visibility = Visibility.Collapsed;
                 log.State = LogState.Normal;
-
             }
             return true;
-
-
         }
 
         public async Task SetRandomTileToGold(List<int> goldTilesIndices)
@@ -1753,7 +1652,6 @@ namespace Catan10
             {
                 await _gameView.SetRandomTilesToGold(goldTilesIndices);
             }
-
         }
 
         public Task SetStateAsync(PlayerModel playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
@@ -1768,14 +1666,10 @@ namespace Catan10
             //LogStateTranstion lst = new LogStateTranstion(GameStateFromOldLog, newState);
             //await MainPageModel.Log.AppendLogLine(new LogEntry(playerData, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, cmn, lineNumber, filePath));
             //UpdateUiForState(newState);
-
-
-
         }
 
         public void UpdateBoardMeasurements()
         {
-
             PipCount = GetPipCount();
             List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
             buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
@@ -1786,7 +1680,6 @@ namespace Catan10
             {
                 if (13 - building.Pips > pipCount.Length - 1) break;
                 pipCount[13 - building.Pips]++;
-
             }
 
             MainPageModel.SetPipCount(pipCount);
@@ -1796,7 +1689,6 @@ namespace Catan10
         {
             int[] roals = RollCount(Rolls);
             double[] percent = RollPercents(Rolls, roals);
-
 
             //String.Format("{0:0.#}%", percent * 100)
             TotalRolls = Rolls.Count();
@@ -1812,22 +1704,18 @@ namespace Catan10
             TenPercent = string.Format($"{roals[8]} ({percent[8] * 100:0.#}%)");
             ElevenPercent = string.Format($"{roals[9]} ({percent[9] * 100:0.#}%)");
             TwelvePercent = string.Format($"{roals[10]} ({percent[10] * 100:0.#}%)");
-
-
         }
 
-
+        
 
         /**
          *  this feature will take one tile and randomly turn it into the gold tile
          *  it happens *before* the user rolls so that the player can decide to (say)
          *  put a knight on the Gold tile, or move the knight off the gold tile.
-         *  
+         *
          *  based on game play experience, it also makes sure that it doesn't pick the same tile
          *  twice in a row
-         *  
+         *
          */
     }
 }
-
-

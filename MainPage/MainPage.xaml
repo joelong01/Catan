@@ -77,7 +77,7 @@
                     <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Network Game">
-                        <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.AutoJoinGames, Mode=TwoWay}" />
+                        <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}" />
                         <ToggleMenuFlyoutItem Text="Connect to WebSocket" IsChecked="{x:Bind MainPageModel.WebSocketConnected, Mode=TwoWay}" Click="OnWebSocketConnect" />
                         <MenuFlyoutItem Text="Start Default Network Game" Click="OnStartDefaultNetworkGame" />
                         <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
@@ -92,6 +92,9 @@
                     </MenuFlyoutSubItem>
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Development">
+                        <ToggleMenuFlyoutItem Text="Auto Respond Mode" IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}" />
+                        <MenuFlyoutItem Text="Save Settings" Click="OnSaveSettings" />
+                        <MenuFlyoutSeparator />
                         <MenuFlyoutItem Text="Test 1" Click="OnTest1" />
                         <MenuFlyoutItem Text="Test 2" Click="OnTest2" />
                         <MenuFlyoutItem Text="Test 3" Click="OnTest3" />

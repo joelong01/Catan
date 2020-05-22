@@ -33,7 +33,7 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Rectangle Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}"/>
+        <Rectangle Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
         <!--<Rectangle>
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0 0" EndPoint="1 1">

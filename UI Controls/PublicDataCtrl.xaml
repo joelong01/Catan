@@ -150,7 +150,7 @@
                 <!--  Settlements  -->
                 <Viewbox Margin="0,0,0,0">
 
-                    <local:SettlementCtrl Width="30" Height="30" Margin="5,0,0,0"  Owner="{x:Bind Player, Mode=OneWay}"  />
+                    <local:SettlementCtrl Width="30" Height="30" Margin="5,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
                 </Viewbox>
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind Player.GameData.SettlementsPlayed, Mode=OneWay, FallbackValue=7}"
@@ -165,7 +165,7 @@
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <!--  Cities  -->
                 <Viewbox Margin="0,0,0,0">
-                    <local:CityCtrl Margin="0,0,0,0" Owner="{x:Bind Player, Mode=OneWay}"/>
+                    <local:CityCtrl Margin="0,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
                 </Viewbox>
                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
                     Text="{x:Bind Player.GameData.CitiesPlayed, Mode=OneWay, FallbackValue=7}"

@@ -95,7 +95,9 @@ namespace Catan10
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
 
-            MainPageModel.EnableUiInteraction = !MainPageModel.EnableUiInteraction;
+            _gameView.AllTiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceUp);
+            ValidateBuilding = false;
+           
         }
 
        

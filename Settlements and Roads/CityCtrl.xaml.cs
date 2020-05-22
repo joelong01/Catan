@@ -30,13 +30,13 @@ namespace Catan10
             set => SetValue(CurrentPlayerProperty, value);
         }
 
-        public Brush GetForegroundBush(PlayerModel current, PlayerModel owner)
+        public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
         {
-            return PlayerBindingFunctions.GetForegroundBush(current, owner);
+            return PlayerBindingFunctions.GetForegroundBrush(current, owner);
         }
-        public LinearGradientBrush GetBackgroundBush(PlayerModel current, PlayerModel owner)
+        public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
-            return PlayerBindingFunctions.GetBackgroundBush(current, owner);
+            return PlayerBindingFunctions.GetBackgroundBrush(current, owner);
         }
     }
 }

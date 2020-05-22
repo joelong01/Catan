@@ -59,7 +59,7 @@ namespace Catan10
                         await MessageWriter.StoreAsync();
 
                         if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("OnStartDefault") && TheHuman != null &&
-                            gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == CatanWsMessageType.GameAdded && MainPageModel.AutoJoinGames)
+                            gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == CatanWsMessageType.GameAdded && MainPageModel.Settings.AutoJoinGames)
                         {
                             await this.Reset();
                             await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);

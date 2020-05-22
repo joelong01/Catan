@@ -104,7 +104,7 @@
             Background="Transparent"
             Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'Settlement'), Mode=OneWay}">
             <Viewbox Name="_vbSettlement" Width="30" Height="30" Stretch="Uniform">
-                <local:SettlementCtrl Width="30" Height="30"  Owner="{x:Bind Owner, Mode=OneWay}" />
+                <local:SettlementCtrl Width="30" Height="30" Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
         </Canvas>
 
