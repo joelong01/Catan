@@ -80,9 +80,7 @@
                     <Button.Content>
                         <StackPanel Padding="0" CornerRadius="10">
                             <Viewbox Margin="0,0,0,0">
-                                <local:SettlementCtrl Width="50" Height="50" Margin="5,0,0,0"
-                                    PlayerColor="{x:Bind Player.SolidPrimaryBrush, FallbackValue=Black, Mode=OneWay}"
-                                    CastleColor="{x:Bind Player.ForegroundBrush, FallbackValue=Black, Mode=OneWay}" />
+                                <local:SettlementCtrl Width="50" Height="50" Margin="5,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
                             </Viewbox>
                             <TextBlock Text="Settlement" Style="{StaticResource ButtonTextStyle}" />
                         </StackPanel>
@@ -92,9 +90,7 @@
                     <Button.Content>
                         <StackPanel>
                             <Viewbox Margin="0,0,0,0">
-                                <local:CityCtrl Width="50" Height="50" Margin="5,0,0,0"
-                                    CircleColor="{x:Bind Player.SolidPrimaryBrush, FallbackValue=Black, Mode=OneWay}"
-                                    CastleColor="{x:Bind Player.ForegroundBrush, FallbackValue=Black, Mode=OneWay}" />
+                                <local:CityCtrl Width="50" Height="50" Margin="5,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
                             </Viewbox>
                             <TextBlock Margin="5,0,0,0" HorizontalAlignment="Center" Text="City" Style="{StaticResource ButtonTextStyle}" />
                         </StackPanel>

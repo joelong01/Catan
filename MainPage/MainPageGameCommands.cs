@@ -99,6 +99,7 @@ namespace Catan10
             }
 
             TheHuman = picker.Player;
+           // CurrentPlayer = TheHuman;
             MainPageModel.TheHuman = TheHuman.PlayerName;
             MainPageModel.DefaultUser = TheHuman.PlayerName;
             await SaveGameState();

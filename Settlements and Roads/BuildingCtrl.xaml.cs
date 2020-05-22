@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Windows.Foundation;
+using Windows.Media;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -41,6 +43,26 @@ namespace Catan10
 
         public IGameCallback Callback { get; internal set; }
 
+        public Visibility BuildingStateToVisibility(BuildingState state, string match)
+        {
+            var controlState = (BuildingState)Enum.Parse(typeof(BuildingState), match, true);
+            Contract.Assert(controlState != BuildingState.None);
+            return (state == controlState) ? Visibility.Visible : Visibility.Collapsed;
+        }
+        public Brush PickPlayerBackground(PlayerModel owner, PlayerModel current)
+        {
+            if (owner != null)
+            {
+                return owner.BackgroundBrush;
+            }
+            if (current != null)
+            {
+                return current.BackgroundBrush;
+            }
+
+            var brush = ConverterGlobals.GetLinearGradientBrush(Colors.Purple, Colors.Black);
+            return brush;
+        }
 
         public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
@@ -108,7 +130,7 @@ namespace Catan10
         }
         private void SetCurrentPlayer(PlayerModel value)
         {
-            this.TraceMessage($"Building current player: {value}");
+            
         }
 
         public BuildingState BuildingState

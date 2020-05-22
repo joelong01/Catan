@@ -12,33 +12,49 @@ namespace Catan10
 {
     public static class PlayerBindingFunctions
     {
-        public static Brush PickPlayerBackground(PlayerModel owner, PlayerModel current)
+        public static Brush GetForegroundBush(PlayerModel current, PlayerModel owner)
         {
-            if (owner != null)
+            if (StaticHelpers.IsInVisualStudioDesignMode)
             {
-                return owner.BackgroundBrush;
-            }
-            if (current != null)
-            {
-                return current.BackgroundBrush;
+                return new SolidColorBrush(Colors.White);
             }
 
-            var brush = ConverterGlobals.GetLinearGradientBrush(Colors.Purple, Colors.Black);
-            return brush;
-        }
-        public static Brush PickPlayerForegroundBrush(PlayerModel owner, PlayerModel current)
-        {
             if (owner != null)
             {
                 return owner.ForegroundBrush;
             }
+
             if (current != null)
             {
                 return current.ForegroundBrush;
             }
 
-            var brush = ConverterGlobals.GetBrush(Colors.HotPink);
-            return brush;
+            return ConverterGlobals.GetBrush(Colors.White);
+        }
+        public static LinearGradientBrush GetBackgroundBush(PlayerModel current, PlayerModel owner)
+        {
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+
+                var gradientStopCollection = new GradientStopCollection();
+                gradientStopCollection.Add(new GradientStop() { Color = Colors.Black }); ;
+                gradientStopCollection.Add(new GradientStop() { Color = Colors.DarkGray });
+                var brush = new LinearGradientBrush(gradientStopCollection, 45);
+                brush.StartPoint = new Windows.Foundation.Point(0.5, 0);
+                brush.EndPoint = new Windows.Foundation.Point(0.5, 1.0);
+                return brush;
+            }
+            if (owner != null)
+            {
+                return owner.BackgroundBrush;
+            }
+
+            if (current != null)
+            {
+                return current.BackgroundBrush;
+            }
+
+            return ConverterGlobals.GetLinearGradientBrush(Colors.Black, Colors.Red);
         }
 
         public static Brush PickPlayerSolidBackground(PlayerModel owner, PlayerModel current)

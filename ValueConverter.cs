@@ -37,16 +37,26 @@ namespace Catan10
         }
         public static LinearGradientBrush GetLinearGradientBrush(Color color1, Color color2)
         {
-            
-            
+            //< LinearGradientBrush EndPoint = "0.5,1" StartPoint = "0.5,0" >
+   
+            //               < GradientStop Color = "Black" />
+    
+            //                < GradientStop Color = "Purple" Offset = "1" />
+       
+            //               </ LinearGradientBrush >
+
+
             if (!StaticHelpers.IsInVisualStudioDesignMode && ConverterGlobals.LinearGradientBrushCache.TryGetValue( (color1, color2), out LinearGradientBrush brush))
             {
                 return brush;
             }
             var gradientStopCollection = new GradientStopCollection();
-            gradientStopCollection.Add(new GradientStop() { Color = color1 });
-            gradientStopCollection.Add(new GradientStop() { Color = color2, Offset=0.5 });
+            gradientStopCollection.Add(new GradientStop() { Color = color1, Offset=0 });
+            gradientStopCollection.Add(new GradientStop() { Color = color2, Offset=1});
             brush = new LinearGradientBrush(gradientStopCollection, 45);
+            brush.StartPoint = new Windows.Foundation.Point(0, 0);
+            brush.EndPoint = new Windows.Foundation.Point(1.0, 1.0);
+            
             if (!StaticHelpers.IsInVisualStudioDesignMode)
             {
                 ConverterGlobals.LinearGradientBrushCache[(color1, color2)] = brush;

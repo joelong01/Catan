@@ -17,19 +17,26 @@ namespace Catan10
             this.DataContext = this;
             this.InitializeComponent();
         }
-        public static readonly DependencyProperty CircleColorProperty = DependencyProperty.Register("CircleColor", typeof(Brush), typeof(CityCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
-        public static readonly DependencyProperty CastleColorProperty = DependencyProperty.Register("CastleColor", typeof(Brush), typeof(CityCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
-        public Brush CastleColor
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(new PlayerModel()));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
+        public PlayerModel Owner
         {
-            get => (Brush)GetValue(CastleColorProperty);
-            set => SetValue(CastleColorProperty, value);
+            get => (PlayerModel)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+        public PlayerModel CurrentPlayer
+        {
+            get => (PlayerModel)GetValue(CurrentPlayerProperty);
+            set => SetValue(CurrentPlayerProperty, value);
         }
 
-        public Brush CircleColor
+        public Brush GetForegroundBush(PlayerModel current, PlayerModel owner)
         {
-            get => (Brush)GetValue(CircleColorProperty);
-            set => SetValue(CircleColorProperty, value);
+            return PlayerBindingFunctions.GetForegroundBush(current, owner);
         }
-       
+        public LinearGradientBrush GetBackgroundBush(PlayerModel current, PlayerModel owner)
+        {
+            return PlayerBindingFunctions.GetBackgroundBush(current, owner);
+        }
     }
 }
