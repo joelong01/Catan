@@ -123,7 +123,7 @@ namespace Catan10
                     //
                     //   if you go back to waiting for players, put the tiles facedown
                     GameContainer.CurrentGame.Tiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceDown);
-                    if (MainPageModel.Settings.AutoRespond)
+                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
                     {
                         //
                         //  simulate clicking on Next
@@ -143,7 +143,7 @@ namespace Catan10
                     }); // I hate this hack but I couldn't figure out how to do it with DataBinding
 
                     await RandomBoardLog.RandomizeBoard(this, 0);
-                    if (MainPageModel.Settings.AutoRespond)
+                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
                     {
                         //
                         //  simulate clicking on Next
