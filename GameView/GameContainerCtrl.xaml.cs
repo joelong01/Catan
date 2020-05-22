@@ -23,7 +23,7 @@ namespace Catan10
     {
 
         public Type ControlType { get; set; } = typeof(RegularGameCtrl);
-        
+
         public string Description { get; set; } = "Regular";
         public int Index { get; set; } = -1;
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
@@ -37,7 +37,7 @@ namespace Catan10
         }
 
 
-        
+
 
         public UserControl Control { get; set; } = null;
 
@@ -77,7 +77,7 @@ namespace Catan10
 
         public List<TileCtrl> DesertTiles => ChildControl.DesertTiles;
 
-       
+
 
         #endregion
         public override string ToString()
@@ -359,13 +359,13 @@ namespace Catan10
                 tileGroup.Reset();
 
                 tileGroup.TileAndNumberLists = randomList;
-             //   this.TraceMessage($"Tiles Before Shuffle: {DumpTileList(tileGroup.TilesToRandomize)}");
+                //   this.TraceMessage($"Tiles Before Shuffle: {DumpTileList(tileGroup.TilesToRandomize)}");
                 game.HexPanel.ShuffleTileGroup(tileGroup, randomList.TileList); // put the Tiles where they go
-            //    this.TraceMessage($"Tiles After Shuffle: {DumpTileList(tileGroup.TilesToRandomize)}");
+                                                                                //    this.TraceMessage($"Tiles After Shuffle: {DumpTileList(tileGroup.TilesToRandomize)}");
                 randomList.NumberList = RandomAndValidNumberList(tileGroup); // since the tiles are where they go, we can now assign numbers
 
                 rbs.TileGroupToRandomListsDictionary[index.ToString()] = randomList; // this is just the 
-              //  this.TraceMessage($"RBS: {rbs}");
+                                                                                     //  this.TraceMessage($"RBS: {rbs}");
             }
 
             rbs.RandomHarborTypeList = GetRandomList(_currentHexPanel.Harbors.Count - 1);
@@ -394,10 +394,10 @@ namespace Catan10
             bool valid = false;
             int iterations = 0;
             List<int> randomNumberSequence = new List<int>();
-            
+
             while (!valid)
             {
-                
+
                 randomNumberSequence = GetRandomList(tileGroup.StartingTileNumbers.Count - 1); // this is the index *into* TileGroup.StartingTileNumbers
                 _currentHexPanel.DesertTiles.Clear();
                 _currentHexPanel.DesertTiles.AddRange(tileGroup.TilesToRandomize.FindAll(t => t.ResourceType == ResourceType.Desert));
@@ -446,8 +446,8 @@ namespace Catan10
                 valid = IsValidNumberLayout();
 
             }
-            
-          //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanProxy.Serialize(randomNumberSequence)}");
+
+            //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanProxy.Serialize(randomNumberSequence)}");
             return randomNumberSequence;
         }
 
@@ -463,8 +463,8 @@ namespace Catan10
 
             _currentHexPanel.DesertTiles.Clear();
             _probabilities.Clear();
-            
-            
+
+
 
             if (randomBoard == null)
             {
@@ -678,7 +678,8 @@ namespace Catan10
         public async Task FancyHarborDistribution()
         {
             List<Task> list = new List<Task>();
-            double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            AnimationSpeed harborAnimationSpeed = AnimationSpeed.Ultra;
+            double ms = MainPage.GetAnimationSpeed(harborAnimationSpeed);
             int i = 0;
             int middleIndex = _currentHexPanel.Tiles.Count / 2;
             TileCtrl animationMiddle = _currentHexPanel.TilesInIndexOrder[middleIndex];
@@ -696,7 +697,7 @@ namespace Catan10
             list.Clear();
             i = 0;
             Random r = new Random(DateTime.Now.Millisecond);
-            ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            ms = MainPage.GetAnimationSpeed(harborAnimationSpeed);
 
             foreach (Harbor h in _currentHexPanel.Harbors)
             {
@@ -707,7 +708,7 @@ namespace Catan10
             await Task.WhenAll(list);
             list.Clear();
             i = 0;
-            ms = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
+            ms = MainPage.GetAnimationSpeed(harborAnimationSpeed);
             foreach (Harbor h in _currentHexPanel.Harbors)
             {
                 Task task = h.AnimateMoveTask(new Point(0, 0), ms, i * ms);
@@ -718,7 +719,7 @@ namespace Catan10
             await Task.WhenAll(list);
             list.Clear();
             i = 0;
-            ms = ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            ms = ms = MainPage.GetAnimationSpeed(harborAnimationSpeed);
 
             foreach (Harbor h in _currentHexPanel.Harbors)
             {

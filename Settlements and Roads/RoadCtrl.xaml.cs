@@ -27,21 +27,20 @@ namespace Catan10
         public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
         Ship _ship = null;
 
-        public static Color GetFillColor(PlayerModel owner, PlayerModel current)
+        public Brush GetFillColor(PlayerModel owner, PlayerModel current)
         {
-            return Colors.HotPink;
 
-            //if (owner != null)
-            //{
-            //    return owner.BackgroundBrush;
-            //}
-            //if (current != null)
-            //{
-            //    return current.BackgroundBrush;
-            //}
+            if (owner != null)
+            {
+                return owner.BackgroundBrush;
+            }
+            if (current != null)
+            {
+                return current.BackgroundBrush;
+            }
 
-            //// var brush = ConverterGlobals.GetLinearGradientBrush(Colors.Purple, Colors.Black);
-            //return ConverterGlobals.GetBrush(Colors.HotPink);
+             return ConverterGlobals.GetLinearGradientBrush(Colors.Purple, Colors.Black);
+            
         }
 
 

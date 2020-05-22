@@ -21,33 +21,33 @@ namespace Catan10
             return $"[CreatedBy={CreatedBy}][AddPlayer={PlayerName}] [Local={LocallyCreated}]";
         }
 
-        public static async Task<AddPlayerLog> AddPlayer(IGameController gameController, PlayerModel playerModel)
+        public static async Task AddPlayer(IGameController gameController, PlayerModel playerModel)
         {
 
-            AddPlayerLog logEntry = new AddPlayerLog
+            AddPlayerLog logHeader = new AddPlayerLog
             {
                 PlayerName = playerModel.PlayerName,
                 CanUndo = false
             };
-
-            await gameController.Log.PushAction(logEntry);            
-            return logEntry; 
-
+            bool serviceGame = await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            
+            
+            
         }
 
-        public Task Do(IGameController gameController, LogHeader logHeader)
+        public Task Do(IGameController gameController)
         {
-            return gameController.AddPlayer(logHeader as AddPlayerLog);
+            return gameController.AddPlayer(this);
         }
 
-        public Task Redo(IGameController gameController, LogHeader logHeader)
+        public Task Redo(IGameController gameController)
         {
-            return gameController.AddPlayer(logHeader as AddPlayerLog);
+            return gameController.AddPlayer(this);
         }
 
-        public Task Undo(IGameController gameController, LogHeader logHeader)
+        public Task Undo(IGameController gameController)
         {
-            return gameController.UndoAddPlayer(logHeader as AddPlayerLog);
+            return gameController.UndoAddPlayer(this);
         }
 
     }

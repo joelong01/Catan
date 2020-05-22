@@ -53,7 +53,7 @@ namespace Catan10
                 RollTcs.SetResult(Roll);
                 RollTcs = null;
             }
-
+            _rollControls.ForEach((ctrl) => ctrl.IsHitTestVisible = false);
             OnRolled?.Invoke(DiceOne, DiceTwo);
 
         }
@@ -67,11 +67,13 @@ namespace Catan10
             var list = new List<Task>();
             _rollControls.ForEach((ctrl) =>
             {
+                ctrl.IsHitTestVisible = true;
                 var task = ctrl.GetFlipTask(TileOrientation.FaceDown);
                 list.Add(task);
             });
             await Task.WhenAll(list);
             _rolled = false;
+            
             Randomize();
 
         }

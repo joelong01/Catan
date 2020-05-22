@@ -19,12 +19,7 @@ namespace Catan10
             set => SetValue(PipCountProperty, value);
         }
 
-        public static readonly DependencyProperty EnableRedoProperty = DependencyProperty.Register("EnableRedo", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
-        public bool EnableRedo
-        {
-            get => (bool)GetValue(EnableRedoProperty);
-            set => SetValue(EnableRedoProperty, value);
-        }
+      
 
         public static readonly DependencyProperty CanMoveBaronBeforeRollProperty = DependencyProperty.Register("CanMoveBaronBeforeRoll", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
         public bool CanMoveBaronBeforeRoll

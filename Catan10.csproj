@@ -143,7 +143,6 @@
     <Compile Include="NewLog\randomizedBoard.cs" />
     <Compile Include="NewLog\SetStateLog.cs" />
     <Compile Include="NewLog\SynchronizedRollLog.cs" />
-    <Compile Include="NewLog\UndoRedo.cs" />
     <Compile Include="Player\PlayerBindingFunctions.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
     <Compile Include="NewLog\AddPlayer.cs" />
@@ -151,6 +150,7 @@
     <Compile Include="NewLog\newLog.cs" />
     <Compile Include="NewLog\Rolled.cs" />
     <Compile Include="NewLog\StartGame.cs" />
+    <Compile Include="State\GridPosition.cs" />
     <Compile Include="State\TargetTracking.cs" />
     <Compile Include="NewLog\UpdateRoadState.cs" />
     <Compile Include="UI Controls\BoardMeasurementCtrl.xaml.cs">
@@ -490,7 +490,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.5.19.103526</Version>
+      <Version>2020.5.21.62105</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>

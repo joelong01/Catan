@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
+using Catan.Proxy;
+
 namespace Catan10
 {
     public class RandomBoardLog : LogHeader, ILogController
@@ -22,6 +24,7 @@ namespace Catan10
 
             return log.Redo(logRecord);
         }
+
         public static Task LogUndoAction(IGameController gameController)
         {
             var log = gameController.Log;
@@ -31,27 +34,28 @@ namespace Catan10
             return log.Undo(logRecord);
         }
 
-        public static async Task<RandomBoardLog> RandomizeBoard(IGameController gameController, int gameIndex)
+        public static async Task RandomizeBoard(IGameController gameController, int gameIndex)
         {
-            RandomBoardLog model = new RandomBoardLog()
+            RandomBoardLog logHeader = new RandomBoardLog()
             {
                 NewState = GameState.PickingBoard,
                 NewRandomBoard = gameController.GetRandomBoard(),
                 PreviousRandomBoard = gameController.CurrentRandomBoard(),
                 GameIndex = gameIndex
             };
-            await gameController.Log.PushAction(model);
-            return model;
+           
+            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+           
         }
 
-        public Task Do(IGameController gameController, LogHeader logHeader)
+        public Task Do(IGameController gameController)
         {
-            return gameController.SetRandomBoard(logHeader as RandomBoardLog);
+            return gameController.SetRandomBoard(this);
         }
 
-        public Task Redo(IGameController gameController, LogHeader logHeader)
+        public Task Redo(IGameController gameController)
         {
-            return gameController.SetRandomBoard(logHeader as RandomBoardLog);
+            return gameController.SetRandomBoard(this);
         }
 
         // this to just double check
@@ -60,9 +64,9 @@ namespace Catan10
             return $"[Action={Action}][CreatedBy={CreatedBy}]";
         }
 
-        public Task Undo(IGameController gameController, LogHeader logHeader)
+        public Task Undo(IGameController gameController)
         {
-            return gameController.UndoSetRandomBoard(logHeader as RandomBoardLog);
+            return gameController.UndoSetRandomBoard(this);
         }
     }
 }

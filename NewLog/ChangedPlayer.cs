@@ -13,15 +13,12 @@ namespace Catan10
     /// </summary>
     public class ChangePlayerLog : LogHeader, ILogController
     {
-        public int Move { get; set; } = -1;
-        public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
-        public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
-        public List<int> HighlightedTiles { get; set; } = new List<int>();
-       
         public ChangePlayerLog() { }
-        
-        
 
+        public List<int> HighlightedTiles { get; set; } = new List<int>();
+        public int Move { get; set; } = -1;
+        public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
+        public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
         private bool ListsEqual(List<int> l1, List<int> l2)
         {
             if (l1.Count != l2.Count)
@@ -37,10 +34,10 @@ namespace Catan10
 
             return true;
         }
-        public static async Task<ChangePlayerLog> ChangePlayer(IGameController gameController,  int numberofPositions, GameState newState)
+        public static async Task ChangePlayer(IGameController gameController,  int numberofPositions, GameState newState)
         {
             
-            ChangePlayerLog changePlayerLog = new ChangePlayerLog
+            ChangePlayerLog logHeader = new ChangePlayerLog
             {
 
                 PlayerName = gameController.CurrentPlayer.PlayerName, // the value before we change -- e.g. where we go when we Undo
@@ -54,8 +51,7 @@ namespace Catan10
               
             };
 
-            await gameController.ChangePlayer(changePlayerLog);
-            return changePlayerLog;
+            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
 
         }
         /// <summary>
@@ -65,22 +61,21 @@ namespace Catan10
         /// <param name="logHeader"></param>
         /// <returns></returns>
 
-        public Task Undo(IGameController gameController, LogHeader logHeader)
+        public Task Do(IGameController gameController)
         {
-            ChangePlayerLog log = logHeader as ChangePlayerLog;
-            return gameController.UndoChangePlayer(log);
+            return gameController.ChangePlayer(this);
         }
 
-        public Task Redo(IGameController gameController, LogHeader logHeader)
+        public Task Redo(IGameController gameController)
         {
-            ChangePlayerLog log = logHeader as ChangePlayerLog;
-            return gameController.ChangePlayer(log);            
+
+            return gameController.ChangePlayer(this);
 
         }
 
-        public Task Do(IGameController gameController, LogHeader logHeader)
+        public Task Undo(IGameController gameController)
         {
-            return gameController.ChangePlayer(logHeader as ChangePlayerLog);
+            return gameController.UndoChangePlayer(this);
         }
     }
 

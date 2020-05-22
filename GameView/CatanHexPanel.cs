@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Windows.Foundation;
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 
 namespace Catan10
@@ -69,7 +69,7 @@ namespace Catan10
         private double _normalWidth = 110;
         private double _normalHeight = 96;
         private readonly List<int> RowCounts = new List<int>(); // RowCounts[0] tells you how many rows there are in the 0th Column
-        
+
         private TileCtrl _pirateTile = null;
         private TileCtrl _baronTile = null;
         private readonly Dictionary<int, int> BuildingIndexToHarborIndexDict = new Dictionary<int, int>();
@@ -465,7 +465,7 @@ namespace Catan10
         }
         public List<TileCtrl> DesertTiles => _desertTiles;
 
-      
+
         public int Columns => RowCounts.Count();
 
 
@@ -566,7 +566,7 @@ namespace Catan10
             }
         }
 
-        
+
 
         #endregion
         public CatanHexPanel()
@@ -664,8 +664,8 @@ namespace Catan10
                 tile.Reset();
                 if (tile.ResourceType != ResourceType.Sea)
                 {
-                   // tile.TileOrientation = TileOrientation.FaceUp;
-                    tile.TileOrientation = TileOrientation.FaceDown;                    
+                    // tile.TileOrientation = TileOrientation.FaceUp;
+                    tile.TileOrientation = TileOrientation.FaceDown;
                 }
 
             }
@@ -900,6 +900,19 @@ namespace Catan10
                 {
                     building.Opacity = 0.5;
                 }
+
+                Binding binding = new Binding()
+                {
+                    Path = new PropertyPath("CurrentPlayer"),
+                    Mode = BindingMode.OneWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                    Source = MainPage.Current
+                };
+
+
+                building.SetBinding(BuildingCtrl.CurrentPlayerProperty, binding);
+
+
                 building.Index = Buildings.Count;
                 Buildings.Add(building);
 
@@ -1730,6 +1743,19 @@ namespace Catan10
                                 Location = loc,
                                 TileZeroZero = new Point(0, 0) // force the update trigger to fire... bug?
                             };
+
+
+                            Binding binding = new Binding()
+                            {
+                                Path = new PropertyPath("CurrentPlayer"),
+                                Mode = BindingMode.OneWay,
+                                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                                Source = MainPage.Current
+                            };
+
+
+                            road.SetBinding(RoadCtrl.CurrentPlayerProperty, binding);
+
                             road.TileZeroZero = tileZeroZero;
                             road.Callback = _gameCallback;
 
@@ -1886,6 +1912,6 @@ namespace Catan10
 
     }
 
-   
+
 
 }

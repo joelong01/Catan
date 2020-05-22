@@ -4,49 +4,57 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Catan.Proxy;
 
 namespace Catan10
 {
     public class SetStateLog : LogHeader, ILogController
     {
 
-        
+
         public SetStateLog() : base() { }
         public List<int> RandomGoldTiles { get; set; } = new List<int>();
 
-        public static async Task<SetStateLog> SetState(IGameController gameController, GameState newState)
+        public static async Task SetState(IGameController gameController, GameState newState)
         {
-            SetStateLog logEntry = new SetStateLog()
+            GameState oldState = gameController.CurrentGameState;
+            bool canUndo = true;
+            if (oldState == GameState.WaitingForRollForOrder || oldState == GameState.WaitingForRoll)
             {
-                 Action = CatanAction.ChangedState,
-                 NewState = newState, 
-                 RandomGoldTiles = gameController.CurrentRandomGoldTiles
+                canUndo = false;
+            }
+            SetStateLog logHeader = new SetStateLog()
+            {
+                CanUndo = canUndo,
+                Action = CatanAction.ChangedState,
+                OldState = oldState,
+                NewState = newState,
+                RandomGoldTiles = gameController.CurrentRandomGoldTiles
 
             };
 
-            await gameController.Log.PushAction(logEntry);
-            return logEntry;
+            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
 
         }
-        public Task Do(IGameController gameController, LogHeader logHeader)
+        public Task Do(IGameController gameController)
         {
-            return gameController.SetState(logHeader as SetStateLog);
-            
+            return gameController.SetState(this);
+
         }
 
-        public Task Redo(IGameController gameController, LogHeader logHeader)
+        public Task Redo(IGameController gameController)
         {
-            return gameController.SetState(logHeader as SetStateLog);
-        }
-
-        public Task Undo(IGameController gameController, LogHeader logHeader)
-        {
-            return gameController.UndoSetState(logHeader as SetStateLog);
+            return gameController.SetState(this);
         }
 
         public override string ToString()
         {
             return $"[Action={Action}][CreatedBy={CreatedBy}][OldState={OldState}][NewState={NewState}]";
+        }
+
+        public Task Undo(IGameController gameController)
+        {
+            return gameController.UndoSetState(this);
         }
     }
 }

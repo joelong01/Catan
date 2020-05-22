@@ -27,112 +27,7 @@ using Windows.UI.Xaml.Media;
 namespace Catan10
 {
 
-    public class GridPosition : INotifyPropertyChanged
-    {
-        #region properties
-        private double _translateX = 0.0;
-        private double _translateY = 0.0;
-        private double _scaleX = 1.0;
-        private double _scaleY = 1.0;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public double TranslateX
-        {
-            get
-            {
-                return _translateX;
-            }
-            set
-            {
-                if (value != _translateX)
-                {
-                    _translateX = Math.Round(value, 1, MidpointRounding.AwayFromZero);
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        public double TranslateY
-        {
-            get
-            {
-                return _translateY;
-            }
-            set
-            {
-                if (value != _translateY)
-                {
-                    _translateY = Math.Round(value, 1, MidpointRounding.AwayFromZero);
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        public double ScaleX
-        {
-            get
-            {
-                return _scaleX;
-            }
-            set
-            {
-                if (value != _scaleX)
-                {
-                    _scaleX = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        public double ScaleY
-        {
-            get
-            {
-                return _scaleY;
-            }
-            set
-            {
-                if (value != _scaleY)
-                {
-                    _scaleY = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        #endregion
-        public GridPosition(double X, double Y, double scaleX = 1.0, double scaleY = 1.0)
-        {
-            
-            TranslateX = X;
-            TranslateY = Y;
-            ScaleX = scaleX;
-            ScaleY = scaleY;
-        }
-       
-
-        public GridPosition() { }
-
-        public GridPosition(CompositeTransform ct)
-        {
-            ScaleX = ct.ScaleX;
-            ScaleY = ct.ScaleY;
-            TranslateX = ct.TranslateX;
-            TranslateY = ct.TranslateY;
-        }
-
-        public override string ToString()
-        {
-            return Serialize();
-        }
-
-        public string Serialize()
-        {
-            return CatanProxy.Serialize(this);
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
+ 
 
     public sealed partial class MainPage : Page
     {
@@ -274,29 +169,23 @@ namespace Catan10
         ///     
         ///     
         /// </summary>        
-        private void OnNextStep(object sender, RoutedEventArgs e)
+        private async void OnNextStep(object sender, RoutedEventArgs e)
         {
-
-            if (!MainPageModel.EnableUiInteraction)
+            try
             {
-                this.TraceMessage("rejecting call to OnNextStep");
-                return;
+              //  this.TraceMessage("NextStep");
+                if (!MainPageModel.EnableUiInteraction)
+                {
+                 //   this.TraceMessage("CallRejected");
+                    return;
+                }
+                await NextState();
+               // this.TraceMessage("Finished NextState");
             }
-            MainPageModel.EnableUiInteraction = false;
-            this.TraceMessage($"{MainPageModel.EnableNextButton} ");
-            NextState().ContinueWith((b) =>
-               {
-                   //
-                   //   need to switch back to the UI thread
-                   _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                 {
-
-
-                     MainPageModel.EnableUiInteraction = true;
-
-                 });
-
-               });
+            finally
+            {
+             //   this.TraceMessage("leaving NextStep");
+            }
         }
         /// <summary>
         ///     This is called when the user clicks on the "Next" button.
@@ -316,106 +205,124 @@ namespace Catan10
                 await OnNewGame();
                 return false;
             }
-
-            switch (CurrentGameState)
+            try
             {
 
-
-                case GameState.WaitingForNewGame:
-                    return false;
-
-                case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
-                    await SetStateLog.SetState(this, GameState.PickingBoard);
-                    await RandomBoardLog.RandomizeBoard(this, 0);
-                    break;
-                case GameState.PickingBoard:  // you get here by clicking the "=>" button                   
-                    await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
-                    break;
-                case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
-                    await SetStateLog.SetState(this, GameState.WaitingForStart);
-                    break;
-                case GameState.WaitingForStart:
-                    await SetStateLog.SetState(this, GameState.AllocateResourceForward);
-                    break;
-                case GameState.AllocateResourceForward:
-                    break;
-                case GameState.AllocateResourceReverse:
-                    break;
-                case GameState.DoneResourceAllocation:
-                    break;
-                case GameState.WaitingForRoll:
-                    break;
-                case GameState.Targeted:
-                    break;
-                case GameState.LostToCardsLikeMonopoly:
-                    break;
-                case GameState.Supplemental:
-                    break;
-                case GameState.DoneSupplemental:
-                    break;
-                case GameState.WaitingForNext:
-                    break;
-                case GameState.LostCardsToSeven:
-                    break;
-                case GameState.MissedOpportunity:
-                    break;
-                case GameState.GamePicked:
-                    break;
-                case GameState.MustMoveBaron:
-                    break;
-                case GameState.Unknown:
-                    break;
-
-
-                //
-                //  these don't ever get called when Next is hit
-                case GameState.Uninitialized:
-                default:
-                    Contract.Assert(false, "Next should not have been anabled for this state!");
-                    break;
-            }
-            return true;
-        }
-
-
-        private void OnUndo(object sender, RoutedEventArgs e)
-        {
-            if (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
-            {
-                return;
-            }
-            MainPageModel.EnableUiInteraction = false;
-
-            OnUndo(true).ContinueWith((b) =>
-           {
-               _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-               {
-                   MainPageModel.EnableUiInteraction = true;
-
-               });
-           });
-
-        }
-        private void OnRedo(object sender, RoutedEventArgs e)
-        {
-            if (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
-            {
-                return;
-            }
-            MainPageModel.EnableUiInteraction = false;
-
-            OnRedo(true).ContinueWith((o) =>
-            {
-                _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+               // this.TraceMessage("starting NextStep");
+                MainPageModel.EnableUiInteraction = false;
+                switch (CurrentGameState)
                 {
-                    // DO NOT call button.IsEnabled = true; -- this is set
-                    // via notification from the log on the undo stack depth
 
-                    MainPageModel.EnableUiInteraction = true;
 
-                });
-            });
+                    case GameState.WaitingForNewGame:
+                        return false;
 
+                    case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
+                        await SetStateLog.SetState(this, GameState.PickingBoard);
+                        break;
+                    case GameState.PickingBoard:  // you get here by clicking the "=>" button                   
+                        await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
+                        break;
+                    case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
+                        await SetStateLog.SetState(this, GameState.WaitingForStart);
+                        break;
+                    case GameState.WaitingForStart:
+                        await SetStateLog.SetState(this, GameState.AllocateResourceForward);
+                        break;
+                    case GameState.AllocateResourceForward:
+                        break;
+                    case GameState.AllocateResourceReverse:
+                        break;
+                    case GameState.DoneResourceAllocation:
+                        break;
+                    case GameState.WaitingForRoll:
+                        break;
+                    case GameState.Targeted:
+                        break;
+                    case GameState.LostToCardsLikeMonopoly:
+                        break;
+                    case GameState.Supplemental:
+                        break;
+                    case GameState.DoneSupplemental:
+                        break;
+                    case GameState.WaitingForNext:
+                        break;
+                    case GameState.LostCardsToSeven:
+                        break;
+                    case GameState.MissedOpportunity:
+                        break;
+                    case GameState.GamePicked:
+                        break;
+                    case GameState.MustMoveBaron:
+                        break;
+                    case GameState.Unknown:
+                        break;
+
+
+                    //
+                    //  these don't ever get called when Next is hit
+                    case GameState.Uninitialized:
+                    default:
+                        Contract.Assert(false, "Next should not have been anabled for this state!");
+                        break;
+                }
+
+                return true;
+
+            }
+            finally
+            {
+                MainPageModel.EnableUiInteraction = true;
+            }
+            
+        }
+
+        // DO NOT call button.IsEnabled = true; -- this is set via notification 
+        private async void OnUndo(object sender, RoutedEventArgs e)
+        {
+            if (!MainPageModel.EnableUiInteraction) return;
+            await DoUndo();
+        }
+        public async Task DoUndo()
+        {
+            if (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
+            {
+                return;
+            }
+            try
+            {
+                MainPageModel.EnableUiInteraction = false;
+                bool ret = await UndoAsync();
+            }
+            finally
+            {
+                MainPageModel.EnableUiInteraction = true;
+            }
+        }
+        // DO NOT call button.IsEnabled = true; -- this is set via notification 
+        private async void OnRedo(object sender, RoutedEventArgs e)
+        {
+            if (!MainPageModel.EnableUiInteraction) return;
+            await DoRedo();
+
+        }
+        private async Task DoRedo()
+        {
+            if (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
+            {
+                return;
+            }
+            try
+            {
+                MainPageModel.EnableUiInteraction = false;
+                this.TraceMessage("starting redo");
+                bool ret = await RedoAsync();
+                this.TraceMessage("done redo");
+            }
+            finally
+            {
+                MainPageModel.EnableUiInteraction = true;
+            }
         }
 
         private async void OnNewGame(object sender, RoutedEventArgs e)
@@ -517,19 +424,7 @@ namespace Catan10
 
         }
 
-        private async void OnUndoClicked(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ((MenuFlyoutItem)sender).IsEnabled = false;
-                MenuFlyoutItem itm = sender as MenuFlyoutItem;
-                await OnUndo();
-            }
-            finally
-            {
-                ((MenuFlyoutItem)sender).IsEnabled = true;
-            }
-        }
+      
 
 
 

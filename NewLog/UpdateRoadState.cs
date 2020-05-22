@@ -207,7 +207,7 @@ namespace Catan10
                 //
                 //  this pattern makes it so we can change race tracking multiple times but only end up with 
                 //  one log write
-                raceTracking.EndChanges(page.CurrentPlayer, page.GameStateFromOldLog, LogType.Normal);
+                raceTracking.EndChanges(page.CurrentPlayer, page.GameStateFromOldLog);
             }
 
         }

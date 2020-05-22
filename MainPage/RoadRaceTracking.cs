@@ -17,28 +17,30 @@ namespace Catan10
         //  given a road count, get the ordered list of players that have that many roads
         //  First() will be the one that got their first.
         //
-        private readonly Dictionary<string, List<PlayerModel>> raceDictionary = new Dictionary<string, List<PlayerModel>>();
+        public Dictionary<string, List<PlayerModel>> RaceDictionary { get; set; } = new Dictionary<string, List<PlayerModel>>();
 
         //
         //  i'm trying to have the class take care of its own logging when state changes
 
-        readonly ILog _log = null;
+        IGameController GameController = null;
         // we can make lots of little changes - instead of logging all of them, we log at the end of them
         private string _beginState = "";
 
-        public RoadRaceTracking(ILog log)
+        private NewLog Log => GameController.Log;
+
+        public RoadRaceTracking(IGameController gameController)
         {
-            _log = log;
+            GameController = gameController;
         }
         public RoadRaceTracking() { }
 
         public void AddPlayer(PlayerModel player, int roadCount)
         {
 
-            if (!raceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
+            if (!RaceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
             {
                 list = new List<PlayerModel>();
-                raceDictionary[roadCount.ToString()] = list;
+                RaceDictionary[roadCount.ToString()] = list;
 
             }
 
@@ -51,12 +53,6 @@ namespace Catan10
 
         }
 
-        public void Undo(string oldVal, string newVal, PlayerModel player, ILogParserHelper logHelper, GameState state)
-        {
-            //  this.TraceMessage($"RoadRace Undo - setting To: {oldVal} from: {newVal}");
-            this.Deserialize(oldVal, logHelper);
-           // _log.PostLogEntry(player, state, CatanAction.RoadTrackingChanged, false, LogType.Undo, -1, new LogRoadTrackingChanged(newVal, oldVal)); // note: new and old switched!
-        }
 
         //
         //  Removes the player from the list and returns the old value it had
@@ -65,7 +61,7 @@ namespace Catan10
         {
             int oldIndex = -1;
 
-            if (raceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
+            if (RaceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
             {
 
                 if (list != null)
@@ -76,7 +72,7 @@ namespace Catan10
 
                     if (list.Count == 0)
                     {
-                        raceDictionary.Remove(roadCount.ToString());
+                        RaceDictionary.Remove(roadCount.ToString());
 
                     }
                 }
@@ -87,7 +83,7 @@ namespace Catan10
 
         public PlayerModel GetRaceWinner(int roadCount)
         {
-            if (raceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
+            if (RaceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
             {
                 Debug.Assert(list != null, "we shouldn't have added a null list");
                 return list.First();
@@ -100,68 +96,22 @@ namespace Catan10
         //  5=3,2,1;6=2,1
         //
         //  
-        public string Serialize(bool useNames = false, string keySep = "/", string listSep = ",")
+        public string Serialize(bool indent = false)
         {
-            throw new NotImplementedException();
-            //string s = "";
-            //foreach (KeyValuePair<string, List<PlayerModel>> kvp in raceDictionary)
-            //{
-            //    if (kvp.Value == null)
-            //    {
-            //        continue;
-            //    }
-
-            //    s += kvp.Key + "=";
-            //    foreach (PlayerModel v in kvp.Value)
-            //    {
-
-            //        s += useNames ? v.PlayerName : v.AllPlayerIndex.ToString();
-            //        s += listSep;
-
-
-            //    }
-
-            //    s += keySep;
-            //}
-
-
-           // return s;
+            return CatanProxy.Serialize(this, indent);
+           
         }
         public override string ToString()
         {
-            return this.Serialize(true);
+            return this.Serialize(false);
         }
         public void Reset()
         {
-            raceDictionary.Clear();
+            RaceDictionary.Clear();
         }
-        public void Deserialize(string s, ILogParserHelper logParser, string keySep = "/", string listSep = ",")
+        public static RoadRaceTracking Deserialize(string json)
         {
-            Reset();
-            string[] tokens = s.Split(keySep.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Count() < 1)
-            {
-                return;
-            }
-
-            foreach (string token in tokens)
-            {
-                // 5=1,2,3
-
-                string[] ts = token.Split(new char[] { '=', listSep.ToCharArray()[0] }, StringSplitOptions.RemoveEmptyEntries);
-                int roadCount = Int32.Parse(ts[0]);
-                List<PlayerModel> list = new List<PlayerModel>();
-                for (int i = 1; i < ts.Count(); i++) // yes 1, ts[0] is the roadCount
-                {
-                    int playerIndex = Int32.Parse(ts[i]);
-                    PlayerModel player = logParser.GetPlayerData(playerIndex);
-                    list.Add(player);
-                }
-
-                raceDictionary[roadCount.ToString()] = list;
-
-
-            }
+            return CatanProxy.Deserialize<RoadRaceTracking>(json);
 
         }
 
@@ -170,15 +120,8 @@ namespace Catan10
             _beginState = this.Serialize();
         }
 
-        internal void EndChanges(PlayerModel player, GameState gameState, LogType logType = LogType.Normal)
+        internal void EndChanges(PlayerModel player, GameState gameState)
         {
-            //
-            //  we put things back the way they were in the Undo function - this is only called because we are recalculating who we think should 
-            //  get the longest road
-            if (logType == LogType.Undo)
-            {
-                return;
-            }
 
             string newState = this.Serialize();
             if (newState == _beginState) // no changes == don't log
@@ -186,7 +129,7 @@ namespace Catan10
                 return;
             }
 
-            if (_log != null)
+            if (Log != null)
             {
               //  _log.PostLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
             }

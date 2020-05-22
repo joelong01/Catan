@@ -34,57 +34,12 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
-    public interface IGameController
-    {
-        /// <summary>
-        ///     The current player in the game
-        /// </summary>
-        PlayerModel CurrentPlayer { get; }
 
-        Task UndoSetRandomBoard(RandomBoardLog logHeader);
-
-        /// <summary>
-        ///     Adds a player to the game.  if the Player is already in the game, return false.
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns></returns>
-        Task AddPlayer(AddPlayerLog playerLogHeader);
-        Task UndoSetState(SetStateLog setStateLog);
-
-        /// <summary>
-        ///     Given a playerName, return the Model by looking up in the AllPlayers collection
-        /// </summary>
-        /// <param name="playerName"></param>
-        /// <returns></returns>
-        PlayerModel NameToPlayer(string playerName);
-
-        Task UndoAddPlayer(AddPlayerLog playerLogHeader);
-
-        /// <summary>
-        ///     The current state of the game
-        /// </summary>
-        GameState CurrentGameState { get; }
-        CatanGames CatanGame { get; set; }
-
-        List<int> CurrentRandomGoldTiles { get; }
-
-        List<int> NextRandomGoldTiles { get; }
-        List<int> HighlightedTiles { get; }
-
-        Task StartGame(StartGameLog model);
-        RandomBoardSettings GetRandomBoard();
-        Task SetRandomBoard(RandomBoardLog randomBoard);
-        RandomBoardSettings CurrentRandomBoard();
-        Task SynchronizedRoll(SynchronizedRollLog log);
-        Task ChangePlayer(ChangePlayerLog log);
-        Task UndoChangePlayer(ChangePlayerLog log);
-        Task SetState(SetStateLog log);
-        NewLog Log { get; }
-        PlayerModel TheHuman { get; }
-    }
 
     public sealed partial class MainPage : Page, ILog, IGameController
     {
+        private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
+        private TaskCompletionSource<bool> ActionTcs { get; set; }
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
         public GameState CurrentGameState
@@ -96,13 +51,27 @@ namespace Catan10
                 return MainPageModel.Log.GameState;
             }
         }
-        public CatanProxy Proxy => MainPageModel.Proxy;
-        public GameInfo GameInfo => MainPageModel.GameInfo;
-
-        public NewLog Log => MainPageModel.Log;
-
         public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
+        public GameInfo GameInfo => MainPageModel.GameInfo;
+        public List<int> HighlightedTiles
+        {
+            get
+            {
+                var list = new List<int>();
+                foreach (var tile in GameContainer.AllTiles)
+                {
+                    if (tile.Highlighted)
+                    {
+                        list.Add(tile.Index);
+                    }
 
+                }
+                return list;
+            }
+        }
+
+        public bool IsServiceGame => MainPageModel.IsServiceGame;
+        public NewLog Log => MainPageModel.Log;
         public List<int> NextRandomGoldTiles
         {
             get
@@ -126,40 +95,107 @@ namespace Catan10
 
         }
 
-        public List<int> HighlightedTiles
+        public CatanProxy Proxy => MainPageModel.Proxy;
+        private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
         {
-            get
+            int index = 0;
+            foreach (var player in players)
             {
-                var list = new List<int>();
-                foreach (var tile in GameContainer.AllTiles)
-                {
-                    if (tile.Highlighted)
+                if (player.PlayerName == playerName) return index;
+                index++;
+            };
+            return -1;
+        }
+
+        private async Task UpdateUiForState(GameState currentState)
+        {
+
+            switch (currentState)
+            {
+                case GameState.Uninitialized:
+                    break;
+                case GameState.WaitingForNewGame:
+                    break;
+                case GameState.WaitingForStart:
+                    //
+                    //  leave the Synchronized roll UI visible so that they players can lament their poor choices...
+                    //
+                    //MainPageModel.PlayingPlayers.ForEach((p) =>
+                    //{
+                    //    p.GameData.RollOrientation = TileOrientation.FaceDown;
+                    //    p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
+                    //    p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
+
+                    //}); // I hate this hack but I couldn't figure out how to do it with DataBinding
+
+                    break;
+                case GameState.WaitingForPlayers:
+                    //
+                    //   if you go back to waiting for players, put the tiles facedown
+                    GameContainer.CurrentGame.Tiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceDown);
+                    break;
+                case GameState.PickingBoard:
+
+
+                    await _rollControl.Reset();
+
+                    MainPageModel.PlayingPlayers.ForEach((p) =>
                     {
-                        list.Add(tile.Index);
-                    }
+                        p.GameData.NotificationsEnabled = true;
+                        p.GameData.RollOrientation = TileOrientation.FaceUp;
 
-                }
-                return list;
+                    }); // I hate this hack but I couldn't figure out how to do it with DataBinding
+
+                    await RandomBoardLog.RandomizeBoard(this, 0);
+                    break;
+                case GameState.WaitingForRollForOrder:
+                    //
+                    //  When leaving WaitingForRollOrder, next state is going to be AllocationResorucesForward -- get rid of the UI that shows all the player rolls
+
+
+                    break;
+                case GameState.AllocateResourceForward:
+                    MainPageModel.PlayingPlayers.ForEach((p) =>
+                    {
+                        p.GameData.RollOrientation = TileOrientation.FaceDown;
+                        p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
+                        p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
+                    });
+                    break;
+                case GameState.AllocateResourceReverse:
+                    break;
+                case GameState.DoneResourceAllocation:
+                    break;
+                case GameState.WaitingForRoll:
+                    break;
+                case GameState.WaitingForNext:
+
+
+                    break;
+                case GameState.Supplemental:
+                    break;
+                case GameState.Targeted:
+                    break;
+                case GameState.LostToCardsLikeMonopoly:
+                    break;
+                case GameState.DoneSupplemental:
+                    break;
+                case GameState.LostCardsToSeven:
+                    break;
+                case GameState.MissedOpportunity:
+                    break;
+                case GameState.GamePicked:
+                    break;
+                case GameState.MustMoveBaron:
+                    break;
+                case GameState.Unknown:
+                    break;
+
+                default:
+                    break;
             }
         }
 
-        public RandomBoardSettings GetRandomBoard()
-        {
-            return _gameView.GetRandomBoard();
-        }
-
-        public PlayerModel NameToPlayer(string playerName)
-        {
-            Contract.Assert(MainPageModel.AllPlayers.Count > 0);
-            foreach (var player in MainPageModel.AllPlayers)
-            {
-                if (player.PlayerName == playerName)
-                {
-                    return player;
-                }
-            }
-            return null;
-        }
         /// <summary>
         ///     Called when a Player is added to a Service game
         ///     
@@ -182,7 +218,7 @@ namespace Catan10
             Contract.Assert(player != null);
             if (MainPageModel.PlayingPlayers.Contains(player) == false)
             {
-                
+
                 player.GameData.OnCardsLost += OnPlayerLostCards;
                 AddPlayerMenu(player);
                 //
@@ -194,105 +230,11 @@ namespace Catan10
 
                 MainPageModel.PlayingPlayers.Add(player);
             }
-            
-            CurrentPlayer = MainPageModel.GameStartedBy;
-            return Task.CompletedTask;
-           
-        }
-        /// <summary>
-        ///     we don't call the Log to push the undo action -- that is done by the log since the log
-        ///     initiates all Undo
-        /// </summary>
-        /// <param name="playerLogHeader"></param>
-        /// <returns></returns>
-        public Task UndoAddPlayer(AddPlayerLog playerLogHeader)
-        {
 
-            var player = NameToPlayer(playerLogHeader.PlayerName);
-            Contract.Assert(player != null, "Player Can't Be Null");
-            MainPageModel.PlayingPlayers.Remove(player);
+            CurrentPlayer = MainPageModel.GameStartedBy;
+
             return Task.CompletedTask;
 
-        }
-        /// <summary>
-        ///     Set a random board.  Only the creator can set a random board.  First they log the action, and then call ILogController.Do() from the MonitorService method.
-        ///     we don't want to recurse, so we don't log if the actions come from the current machine.  but they *always* come from the current machine because the UI won't
-        ///     let anybody but the creator set a random board. so we don't ever *need) to log from this method.  but...
-        ///     
-        ///     we want the the logs to be consistent across the machine.  so we'll log the board changes.
-        ///     
-        /// </summary>
-        /// <param name="randomBoard"></param>
-        /// <returns></returns>
-        public async Task SetRandomBoard(RandomBoardLog randomBoard)
-        {
-            Contract.Assert(CurrentGameState == GameState.PickingBoard); // the first is true the first time through then it is the second
-            Contract.Assert(randomBoard.NewState == GameState.PickingBoard);
-
-            if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
-            {
-                await VisualShuffle(randomBoard.NewRandomBoard);
-            }
-            else
-            {
-                await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
-            }
-            
-            UpdateBoardMeasurements();
-        }
-
-        public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
-        {
-
-            if (logHeader.PreviousRandomBoard == null) return;
-
-            await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
-            UpdateBoardMeasurements();
-            //
-            //  DO NOT LOG UNDO
-            //
-        }
-
-        /// <summary>
-        ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
-        ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition 
-        ///     of new players.
-        /// </summary>
-        /// <param name="logHeader"></param>
-        /// <returns></returns>
-        public Task StartGame(StartGameLog logHeader)
-        {
-
-            //
-            //  the issue here is that we Log, Add Player, then Monitor under normal circumstances
-            //  So when the second player does the same thing, they get all the log records for the game,
-            //  including the StartGame and AddPlayers.  so you need to be careful to start the game only once -- which often
-            //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't 
-            //  in the game because this StartGame resets PlayingPlayers
-            //
-            if (CurrentGameState != GameState.WaitingForNewGame) return Task.CompletedTask;
-
-            ResetDataForNewGame();
-            MainPageModel.PlayingPlayers.Clear();
-            MainPageModel.IsServiceGame = true;
-            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.PlayerName);
-            Contract.Assert(MainPageModel.GameStartedBy != null);
-            _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
-            CurrentPlayer = MainPageModel.GameStartedBy;
-            return MainPageModel.Log.PushAction(logHeader); // this won't get called again because the state won't be right on this machien
-
-
-
-        }
-        private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
-        {
-            int index = 0;
-            foreach (var player in players)
-            {
-                if (player.PlayerName == playerName) return index;
-                index++;
-            };
-            return -1;
         }
 
         public async Task ChangePlayer(ChangePlayerLog log)
@@ -338,25 +280,17 @@ namespace Catan10
                 await SetRandomTileToGold(log.NewRandomGoldTiles);
             }
 
-            await MainPageModel.Log.PushAction(log);
+
         }
 
-        public async Task UndoChangePlayer(ChangePlayerLog logHeader)
+        public void CompleteRedo()
         {
+            UndoRedoTcs.SetResult(true);
+        }
 
-            CurrentPlayer = NameToPlayer(logHeader.PlayerName);
-
-            if (logHeader.OldState == GameState.WaitingForNext)
-            {
-                if (logHeader.OldRandomGoldTiles != null)
-                {
-                    await SetRandomTileToGold(logHeader.OldRandomGoldTiles);
-                }
-
-                logHeader.HighlightedTiles.ForEach((idx) => GameContainer.AllTiles[idx].HighlightTile(CurrentPlayer.BackgroundBrush));
-
-            }
-
+        public void CompleteUndo()
+        {
+            UndoRedoTcs.SetResult(true);
         }
 
         public RandomBoardSettings CurrentRandomBoard()
@@ -364,100 +298,158 @@ namespace Catan10
             return _gameView.RandomBoardSettings;
         }
 
+        public RandomBoardSettings GetRandomBoard()
+        {
+            return _gameView.GetRandomBoard();
+        }
+
+        public PlayerModel NameToPlayer(string playerName)
+        {
+            Contract.Assert(MainPageModel.AllPlayers.Count > 0);
+            foreach (var player in MainPageModel.AllPlayers)
+            {
+                if (player.PlayerName == playerName)
+                {
+                    return player;
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        ///     Checks to see if it is a service game.  if it is, post a message to the service.
+        ///     if not, process the message immediately
+        /// </summary>
+        /// <param name="logHeader"></param>
+        /// <param name="normal"></param>
+        /// <returns>False if the IGameController.Do() should be executed locally </returns>
+        public async Task<bool> PostMessage(LogHeader logHeader, CatanMessageType msgType)
+        {
+
+            CatanMessage message = new CatanMessage()
+            {
+                Data = logHeader,
+                Origin = TheHuman.PlayerName,
+                CatanMessageType = msgType
+
+            };
+            if (MainPageModel.IsServiceGame)
+            {
+                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
+              //  this.TraceMessage($"Sending {message}");
+                if (!ret)
+                {
+                    await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}");
+                }
+            }
+            else
+            {
+                await ProcessMessage(message);
+            }
+
+            return MainPageModel.IsServiceGame;
+        }
+
+        public async Task<bool> RedoAsync()
+        {
+            LogHeader logHeader = Log.PeekUndo;
+            if (logHeader == null) return false;
+            UndoRedoTcs = new TaskCompletionSource<bool>();
+            if (MainPageModel.IsServiceGame)
+            {
+                CatanMessage message = new CatanMessage()
+                {
+                    Data = logHeader,
+                    Origin = TheHuman.PlayerName,
+                    CatanMessageType = CatanMessageType.Redo
+
+                };
+
+                await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
+            }
+            else
+            {
+
+                //
+                // not a service game -- do the actual undo
+
+                ILogController logController = logHeader as ILogController;
+                await logController.Redo(this);
+            }
+
+            return await UndoRedoTcs.Task;
+
+        }
+
+        /// <summary>
+        ///     Set a random board.  Only the creator can set a random board. 
+        ///     
+        ///     
+        /// </summary>
+        /// <param name="randomBoard"></param>
+        /// <returns></returns>
+        public async Task SetRandomBoard(RandomBoardLog randomBoard)
+        {
+            Contract.Assert(CurrentGameState == GameState.PickingBoard); // the first is true the first time through then it is the second
+            Contract.Assert(randomBoard.NewState == GameState.PickingBoard);
+
+            if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
+            {
+                await VisualShuffle(randomBoard.NewRandomBoard);
+            }
+            else
+            {
+                await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
+            }
+
+            UpdateBoardMeasurements();
+
+        }
+
         /// <summary>
         ///     Need to clean up any UI actions  -- e.g. if the GameStarter clicks on "Roll to See who goes first", then that will cause
         ///     messages to be Posted to the other clients.  They end up calling this function.  it needs to be exactly the same as if the
         ///     button was clicked on.
         /// </summary>
-        /// <param name="log"></param>
+        /// <param name="logHeader"></param>
         /// <returns></returns>
-        public async Task SetState(SetStateLog log)
+        public async Task SetState(SetStateLog logHeader)
         {
-            var stateLeaving = log.OldState;
-            switch (stateLeaving)
-            {
-                case GameState.Uninitialized:
-                    break;
-                case GameState.WaitingForNewGame:
-                    break;
-                case GameState.WaitingForStart:
-                    MainPageModel.PlayingPlayers.ForEach((p) =>
-                    {
-                        p.GameData.RollOrientation = TileOrientation.FaceDown;
-                        p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
-                        p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
-
-                    }); // I hate this hack but I couldn't figure out how to do it with DataBinding
-
-                    break;
-                case GameState.WaitingForPlayers:
-                    break;
-                case GameState.PickingBoard:
-
-                    //
-                    //  when leaving PickingBoard, WaitingForRollOrder is next
-                    Contract.Assert(log.NewState == GameState.WaitingForRollForOrder);
-                    await _rollControl.Reset();
-                    
-                    MainPageModel.PlayingPlayers.ForEach((p) =>
-                    {
-                        p.GameData.NotificationsEnabled = true;
-                        p.GameData.RollOrientation = TileOrientation.FaceUp;
-
-                    }); // I hate this hack but I couldn't figure out how to do it with DataBinding
-                    break;
-                case GameState.WaitingForRollForOrder:
-                    //
-                    //  When leaving WaitingForRollOrder, next state is going to be AllocationResorucesForward -- get rid of the UI that shows all the player rolls
-
-
-                    break;
-                case GameState.AllocateResourceForward:
-
-                    break;
-                case GameState.AllocateResourceReverse:
-                    break;
-                case GameState.DoneResourceAllocation:
-                    break;
-                case GameState.WaitingForRoll:
-                    break;
-                case GameState.WaitingForNext:
-
-
-                    break;
-                case GameState.Supplemental:
-                    break;
-                case GameState.Targeted:
-                    break;
-                case GameState.LostToCardsLikeMonopoly:
-                    break;
-                case GameState.DoneSupplemental:
-                    break;
-                case GameState.LostCardsToSeven:
-                    break;
-                case GameState.MissedOpportunity:
-                    break;
-                case GameState.GamePicked:
-                    break;
-                case GameState.MustMoveBaron:
-                    break;
-                case GameState.Unknown:
-                    break;
-
-                default:
-                    break;
-            }
-          
-
+            await UpdateUiForState(logHeader.NewState);
         }
-        //
-        //  State in the game is stored at the top of the NewLog.ActionStack
-        //  so "Undoing" state is just moving the record from the ActionStack
-        //  to the Undo stack
-        public Task UndoSetState(SetStateLog setStateLog)
+
+        /// <summary>
+        ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
+        ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition 
+        ///     of new players.
+        /// </summary>
+        /// <param name="logHeader"></param>
+        /// <returns></returns>
+        public Task StartGame(StartGameLog logHeader)
         {
+            if (Log.PeekAction?.LogId == logHeader.LogId) return Task.CompletedTask; // this happens on the machine that starts the game.
+
+            //
+            //  the issue here is that we Log StartGame, Add Player, then Monitor under normal circumstances
+            //  So when the second player does the same thing, they get all the log records for the game,
+            //  including the StartGame and AddPlayers.  so you need to be careful to start the game only once -- which often
+            //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't 
+            //  in the game because this StartGame resets PlayingPlayers
+            //
+            if (CurrentGameState != GameState.WaitingForNewGame) return Task.CompletedTask;
+
+            ResetDataForNewGame();
+            MainPageModel.PlayingPlayers.Clear();
+            MainPageModel.IsServiceGame = true;
+            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.PlayerName);
+            Contract.Assert(MainPageModel.GameStartedBy != null);
+            _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
+            CurrentPlayer = MainPageModel.GameStartedBy;
             return Task.CompletedTask;
+
+
+
         }
+
         /// <summary>
         ///     this is where we do the work to synchronize a roll across devices.  
         ///     
@@ -491,7 +483,7 @@ namespace Catan10
             Contract.Assert(theHuman != null);
             Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);
             Contract.Assert(logEntry.DiceTwo > 0 && logEntry.DiceTwo < 7);
-            
+
             theHuman.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.DiceOne, logEntry.DiceTwo);
 
 
@@ -545,13 +537,99 @@ namespace Catan10
             {
                 var newList = new List<PlayerModel>(MainPageModel.PlayingPlayers);
                 newList.Sort((x, y) => x.GameData.SyncronizedPlayerRolls.CompareTo(y.GameData.SyncronizedPlayerRolls));
-                for (int i=0; i< newList.Count; i++)
+                for (int i = 0; i < newList.Count; i++)
                 {
                     MainPageModel.PlayingPlayers[i] = newList[i];
                 }
 
                 await SetStateLog.SetState(this, GameState.WaitingForStart);
             }
+
+        }
+
+        /// <summary>
+        ///     we don't call the Log to push the undo action -- that is done by the log since the log
+        ///     initiates all Undo
+        /// </summary>
+        /// <param name="playerLogHeader"></param>
+        /// <returns></returns>
+        public Task UndoAddPlayer(AddPlayerLog playerLogHeader)
+        {
+
+            var player = NameToPlayer(playerLogHeader.PlayerName);
+            Contract.Assert(player != null, "Player Can't Be Null");
+            MainPageModel.PlayingPlayers.Remove(player);
+            return Task.CompletedTask;
+
+        }
+        public async Task<bool> UndoAsync()
+        {
+            LogHeader logHeader = Log.PeekAction;
+            if (logHeader == null || logHeader.CanUndo == false) return false;
+            UndoRedoTcs = new TaskCompletionSource<bool>();
+            if (MainPageModel.IsServiceGame)
+            {
+                CatanMessage message = new CatanMessage()
+                {
+                    Data = logHeader,
+                    Origin = TheHuman.PlayerName,
+                    CatanMessageType = CatanMessageType.Undo
+
+                };
+
+                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
+                if (!ret) return false; // this is very bad! :(                
+            }
+            else
+            {
+
+                //
+                // not a service game -- do the actual undo
+
+                ILogController logController = logHeader as ILogController;
+                await logController.Undo(this);
+            }
+
+            return await UndoRedoTcs.Task;
+
+
+
+        }
+
+        public async Task UndoChangePlayer(ChangePlayerLog logHeader)
+        {
+
+            CurrentPlayer = NameToPlayer(logHeader.PlayerName);
+
+            if (logHeader.OldState == GameState.WaitingForNext)
+            {
+                if (logHeader.OldRandomGoldTiles != null)
+                {
+                    await SetRandomTileToGold(logHeader.OldRandomGoldTiles);
+                }
+
+                logHeader.HighlightedTiles.ForEach((idx) => GameContainer.AllTiles[idx].HighlightTile(CurrentPlayer.BackgroundBrush));
+
+            }
+
+        }
+
+        public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
+        {
+
+            if (logHeader.PreviousRandomBoard == null) return;
+
+            await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
+            UpdateBoardMeasurements();
+
+        }
+        //
+        //  State in the game is stored at the top of the NewLog.ActionStack
+        //  so "Undoing" state is just moving the record from the ActionStack
+        //  to the Undo stack
+        public async Task UndoSetState(SetStateLog setStateLog)
+        {
+            await UpdateUiForState(setStateLog.OldState);
 
         }
     }

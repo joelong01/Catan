@@ -75,7 +75,7 @@ namespace Catan10
             MainPageModel.GameInfo = gameInfo;
             //
             //  start the game
-            await StartGameLog.StartGame(this, "Joe", 0, true);
+            await StartGameLog.StartGame(this, "Joe", 0);
 
             //
             //  add players
@@ -94,8 +94,8 @@ namespace Catan10
        
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
-           
-            
+
+            MainPageModel.EnableUiInteraction = !MainPageModel.EnableUiInteraction;
         }
 
        
@@ -114,7 +114,7 @@ namespace Catan10
             List<CatanMessage> messages = CatanProxy.Deserialize<List<CatanMessage>>(json);
             foreach (var message in messages)
             {
-                Type type = CurrentAssembly.GetType(message.TypeName);
+                Type type = CurrentAssembly.GetType(message.DataTypeName);
                 if (type == null) throw new ArgumentException("Unknown type!");
                 LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
                 message.Data = logHeader;
@@ -125,7 +125,7 @@ namespace Catan10
                 switch (logHeader.LogType)
                 {
                     case LogType.Normal:
-                         await logController.Redo(this, (LogHeader)message.Data);
+                         await logController.Redo(this);
                         break;
                     case LogType.Undo:
                       //  await MainPageModel.Log.Undo(message);

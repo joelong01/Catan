@@ -74,7 +74,7 @@
             </Button.Content>
             <Button.Flyout>
                 <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
-                    <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />                    
+                    <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
                     <MenuFlyoutSeparator />
                     <MenuFlyoutSubItem Text="Network Game">
                         <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.AutoJoinGames, Mode=TwoWay}" />
@@ -143,6 +143,7 @@
             </local:GameContainerCtrl>
         </Viewbox>
         <local:DragableGridCtrl Name="Draggable_PrivateData" Width="500" Height="350"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
             OnGridPositionChanged="OnGridPositionChanged"
             Player="{x:Bind TheHuman, Mode=OneWay}"
             Background="{StaticResource bmKnight}"
@@ -157,7 +158,7 @@
             HorizontalAlignment="Right"
             PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
             GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" />
-        <local:DragableGridCtrl x:Name="ControlGrid" Width="200" Height="400" HorizontalAlignment="Left"
+        <local:DragableGridCtrl x:Name="ControlGrid" Width="200" Height="400" HorizontalAlignment="Center"
             VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
             Background="{StaticResource bmMaple}"
             Foreground="Black" Visibility="Visible" CornerRadius="10"
@@ -223,9 +224,9 @@
                 </StackPanel>
             </local:DragableGridCtrl.Child>
         </local:DragableGridCtrl>
-        
+
         <local:DragableGridCtrl x:Name="Grid_RollStats" Width="300" Height="450" HorizontalAlignment="Center"
-            VerticalAlignment="Bottom" OnGridPositionChanged="OnGridPositionChanged"            
+            VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
             Background="{StaticResource bmMaple}"
             CornerRadius="10"
             Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
@@ -234,7 +235,7 @@
             BorderBrush="{StaticResource WhiteBrush}">
             <local:DragableGridCtrl.Child>
 
-                <Viewbox Grid.Row="1" Height="400" Margin="0" HorizontalAlignment="Stretch" >
+                <Viewbox Grid.Row="1" Height="400" Margin="0" HorizontalAlignment="Stretch">
                     <StackPanel>
                         <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
                             <StackPanel Orientation="Vertical">
@@ -323,8 +324,8 @@
             </local:DragableGridCtrl.Child>
         </local:DragableGridCtrl>
         <Grid Name="_savedGameGrid" Grid.Row="1" Width="383" Height="280"
-            Margin="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" x:Load="False"
-            PointerPressed="OnPointerPressed" Visibility="Collapsed"
+            Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+            x:Load="False" PointerPressed="OnPointerPressed" Visibility="Collapsed"
             Background="{StaticResource bmCherry}"
             BorderBrush="{StaticResource bmMaple}"
             BorderThickness="4" CornerRadius="4">
@@ -359,12 +360,12 @@
             </ListBox>-->
         </Grid>
         <local:DragableGridCtrl Name="Grid_BoardMeasurement" Grid.Row="1" Grid.RowSpan="10" Width="500"
-            Height="300" HorizontalAlignment="Left" VerticalAlignment="Top"
+            Height="300" HorizontalAlignment="Center" VerticalAlignment="Center"
             OnGridPositionChanged="OnGridPositionChanged" Caption="Board Measurements"
             Visibility="{x:Bind MainPageModel.ShowBoardMeasurements, Mode=OneWay}"
             BorderBrush="{StaticResource bmMaple}"
             Background="{StaticResource bmKnight}"
-            Player="{x:Bind TheHuman, Mode=OneWay}"                    
+            Player="{x:Bind TheHuman, Mode=OneWay}"
             CornerRadius="10" BorderThickness="4">
             <local:DragableGridCtrl.Child>
                 <local:BoardMeasurementCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -385,7 +386,7 @@
         </local:DragableGridCtrl>
         <!--  Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"  -->
 
-        <local:DragableGridCtrl x:Name="SynchronizedRolls" Width="530" Height="260" HorizontalAlignment="Left"
+        <local:DragableGridCtrl x:Name="SynchronizedRolls" Width="530" Height="260" HorizontalAlignment="Center"
             VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
             Background="{StaticResource bmMaple}"
             Foreground="Black"

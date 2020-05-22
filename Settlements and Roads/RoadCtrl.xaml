@@ -15,7 +15,7 @@
     </UserControl.RenderTransform>
     <Control.Resources>
         <Style x:Key="RoadPolyStyle" TargetType="Polygon">
-            <Setter Property="Fill" Value="{x:Bind local:RoadCtrl.GetFillColor(Owner, CurrentPlayer), Mode=OneWay}" />
+            <Setter Property="Fill" Value="{x:Bind GetFillColor(Owner, CurrentPlayer), Mode=OneWay}" />
             <Setter Property="Stroke" Value="White" />
         </Style>
         <Storyboard x:Name="_sbMove">

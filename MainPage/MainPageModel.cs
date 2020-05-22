@@ -66,24 +66,63 @@ namespace Catan10
         {
             get
             {
-                if (Log == null) return true;
+                bool ret = false;
                 GameState state = Log.GameState;
-
-                if (state == GameState.PickingBoard || state == GameState.WaitingForRollForOrder || state == GameState.WaitingForPlayers)
+                try
                 {
-                    return (MainPage.Current.TheHuman == this.GameStartedBy);
-                }
+                    
+                    if (!EnableUiInteraction) return ret;
 
-                if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll)
+                    if (Log == null) return true;
+                    
+
+                    if (state == GameState.PickingBoard ||  state == GameState.WaitingForPlayers)
+                    {
+                        ret = (MainPage.Current.TheHuman == this.GameStartedBy);
+                        return ret;
+                    }
+
+                    if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll)
+                    {
+                        ret = (MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer); // only the person whose turn it is can hit "Next"
+                        return ret;
+                    }
+
+                    ret = (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
+                            state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
+                            state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers);
+                    return ret;
+                }
+                finally
                 {
-                    return (MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer); // only the person whose turn it is can hit "Next"
+                   // this.TraceMessage($"[State={state}][EnableNextButton={ret}]");
                 }
-
-                return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
-                        state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
-                        state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers));
             }
         }
+        //[JsonIgnore]
+        //public Visibility CommandGridVisible
+        //{
+        //    get
+        //    {
+        //        if (Log == null) return Visibility;
+        //        GameState state = Log.GameState;
+
+        //        if (state == GameState.PickingBoard || state == GameState.WaitingForRollForOrder || state == GameState.WaitingForPlayers)
+        //        {
+        //            return (MainPage.Current.TheHuman == this.GameStartedBy);
+        //        }
+
+        //        if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll)
+        //        {
+        //            return (MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer); // only the person whose turn it is can hit "Next"
+        //        }
+
+        //        return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
+        //                state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
+        //                state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers));
+
+        //    }
+        //}
 
         [JsonIgnore]
         public bool EnableRedo
@@ -292,10 +331,22 @@ namespace Catan10
         {
             get
             {
-                if (Log == null) return Visibility.Visible;
-                if (Log.GameState == GameState.WaitingForNewGame || Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForRollForOrder) return Visibility.Visible;
+                Visibility visibility = Visibility.Visible;
+                try
+                {
 
-                return Visibility.Collapsed;
+                    if (Log == null) return visibility;
+                    if (Log.GameState == GameState.WaitingForNewGame || Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForStart ||
+                        Log.GameState == GameState.WaitingForRollForOrder || Log.GameState == GameState.WaitingForNext) return visibility;
+
+                    visibility = Visibility.Collapsed;
+                    return visibility;
+                }
+                finally
+                {
+                   // this.TraceMessage($"ShowRolls:[State={Log.GameState}] [Visibility={visibility}]");
+                }
+                
             }
         }
 
@@ -308,6 +359,7 @@ namespace Catan10
 
                 if (StateMessages.TryGetValue(Log.GameState, out string msg))
                 {
+                   // this.TraceMessage($"[State={Log.GameState}][StateMessage={msg}]");
                     return msg;
                 }
 
@@ -368,7 +420,7 @@ namespace Catan10
             }
         }
 
-        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUdo" };
+        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
 
         [JsonIgnore]
         private Dictionary<GameState, string> StateMessages { get; } = new Dictionary<GameState, string>()

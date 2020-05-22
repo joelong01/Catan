@@ -108,7 +108,7 @@ namespace Catan10
         }
         private void SetCurrentPlayer(PlayerModel value)
         {
-           // this.TraceMessage($"Building current player: {value}");
+            this.TraceMessage($"Building current player: {value}");
         }
 
         public BuildingState BuildingState
