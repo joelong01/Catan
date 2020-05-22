@@ -196,6 +196,11 @@ namespace Catan10
             return _currentHexPanel.TilesInIndexOrder[tileIndex];
 
         }
+        public TileCtrl GetTile(int tileIndex)
+        {
+        
+            return _currentHexPanel.TilesInIndexOrder[tileIndex];
+        }
         public RoadCtrl GetRoad(int roadIndex, int gameIndex)
         {
             if (CurrentGame.Index != gameIndex)
@@ -203,6 +208,14 @@ namespace Catan10
                 CurrentGame = _games[gameIndex];
             }
             return _currentHexPanel.Roads[roadIndex];
+        }
+        public RoadCtrl GetRoad(int roadIndex)
+        {            
+            return _currentHexPanel.Roads[roadIndex];
+        }
+        public BuildingCtrl GetBuilding(int settlementIndex)
+        {
+            return _currentHexPanel.Buildings[settlementIndex];
         }
 
         public BuildingCtrl GetSettlement(int settlementIndex, int gameIndex)

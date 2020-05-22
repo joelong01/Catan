@@ -14,9 +14,9 @@ namespace Catan10
 
     public interface ILogParserHelper
     {
-        TileCtrl GetTile(int tileIndex, int gameIndex);
-        RoadCtrl GetRoad(int roadIndex, int gameIndex);
-        BuildingCtrl GetBuilding(int buildingIndex, int gameIndex);
+        TileCtrl GetTile(int tileIndex);
+        RoadCtrl GetRoad(int roadIndex);
+        BuildingCtrl GetBuilding(int buildingIndex);
         PlayerModel GetPlayerData(int playerIndex);
     }
 

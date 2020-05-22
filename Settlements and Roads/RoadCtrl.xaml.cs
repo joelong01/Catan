@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Windows.Foundation;
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -39,6 +38,7 @@ namespace Catan10
             return obj.GetHashCode();
         }
     }
+
     /// <summary>
     ///     5/21/2020:  CurrentPlayer is bound in code behind in the hexpanel!
     /// </summary>
@@ -54,6 +54,7 @@ namespace Catan10
         public static readonly DependencyProperty RoadTypeProperty = DependencyProperty.Register("RoadType", typeof(RoadType), typeof(RoadCtrl), new PropertyMetadata(RoadType.Single, RoadTypeChanged));
         public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty TileZeroZeroProperty = DependencyProperty.Register("TileZeroZero", typeof(Point), typeof(RoadCtrl), new PropertyMetadata(new Point(double.NaN, double.NaN), TileZeroZeroChanged));
+
         public RoadCtrl()
         {
             this.InitializeComponent();
@@ -65,15 +66,13 @@ namespace Catan10
             _locationToRoadDataDict[RoadLocation.Bottom] = new RoadLocationData(28, 90, 180);
             _locationToRoadDataDict[RoadLocation.BottomLeft] = new RoadLocationData(-13.7, 66.8, 240.5);
             _locationToRoadDataDict[RoadLocation.TopLeft] = new RoadLocationData(-13.2, 18.2, -60.5);
-
-           
         }
 
         public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
 
         public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
         public IGameCallback Callback { get; internal set; }
-        
+
         public PlayerModel CurrentPlayer
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
@@ -83,6 +82,7 @@ namespace Catan10
         public int Index { get; set; } = -1;
         public bool IsOwned => (RoadState != RoadState.Unowned);
         public List<RoadKey> Keys { get; set; } = new List<RoadKey>();
+
         public RoadLocation Location
         {
             get => (RoadLocation)GetValue(LocationProperty);
@@ -90,12 +90,12 @@ namespace Catan10
         }
 
         public int Number { get; internal set; } = 0; // number of roads that have been created for this player
+
         public PlayerModel Owner
         {
             get => (PlayerModel)GetValue(OwnerProperty);
             set => SetValue(OwnerProperty, value);
         }
-
 
         public RoadState RoadState
         {
@@ -109,15 +109,11 @@ namespace Catan10
             set => SetValue(RoadTypeProperty, value);
         }
 
-      
-
         public Point TileZeroZero
         {
             get => (Point)GetValue(TileZeroZeroProperty);
             set => SetValue(TileZeroZeroProperty, value);
         }
-
-       
 
         private static void LocationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -147,6 +143,44 @@ namespace Catan10
             depPropClass.SetTileZeroZero(depPropValue);
         }
 
+        private Visibility GetStateBasedVisibility(RoadState roadState, string gridName)
+        {
+            Visibility visibility = Visibility.Visible;
+            switch (roadState)
+            {
+                case RoadState.Road:
+                case RoadState.Unowned:
+                    visibility = Visibility.Visible;
+                    break;
+
+                case RoadState.Ship:
+                    visibility = Visibility.Collapsed;
+                    if (_ship == null)
+                    {
+                        _ship = new Ship
+                        {
+                            Margin = new Thickness(2)
+                        };
+                        _gridShip.Children.Add(_ship);
+                    }
+
+                    break;
+
+                default:
+                    break;
+            }
+
+            Show(roadState != RoadState.Unowned);
+            if (gridName != "road")
+            {
+                visibility = (visibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
+            }
+
+            UpdateVisuals(new Windows.Foundation.Size(this.ActualWidth, this.ActualHeight));
+
+            return visibility;
+        }
+
         private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateVisuals(e.NewSize);
@@ -168,8 +202,6 @@ namespace Catan10
             Callback?.RoadPressed(this, e);
         }
 
-       
-
         private void SetLocation(RoadLocation roadlocation)
         {
             RoadLocationData data = _locationToRoadDataDict[roadlocation];
@@ -183,7 +215,6 @@ namespace Catan10
         //  so we can set the visibility of the grids inside the control
         private void SetRoadState(RoadState roadstate)
         {
-            
             switch (roadstate)
             {
                 case RoadState.Unowned:
@@ -218,45 +249,6 @@ namespace Catan10
 
             UpdateVisuals(new Windows.Foundation.Size(this.ActualWidth, this.ActualHeight));
         }
-
-        private Visibility GetStateBasedVisibility(RoadState roadState, string gridName)
-        {
-            Visibility visibility = Visibility.Visible;
-            switch (roadState)
-            {
-                case RoadState.Road:
-                case RoadState.Unowned:
-                    visibility = Visibility.Visible;                   
-                    break;
-                case RoadState.Ship:
-                    visibility = Visibility.Collapsed;
-                    if (_ship == null)
-                    {
-                        _ship = new Ship
-                        {
-                            Margin = new Thickness(2)
-                        };
-                        _gridShip.Children.Add(_ship);
-                    }
-                    
-                    break;
-
-                default:
-                    break;
-            }
-
-            Show(roadState != RoadState.Unowned);
-            if (gridName != "road")
-            {
-                visibility = (visibility == Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
-            }
-
-
-            UpdateVisuals(new Windows.Foundation.Size(this.ActualWidth, this.ActualHeight));
-
-            return visibility;
-        }
-
         private void SetRoadType(RoadType roadtype)
         {
             if (this.ActualHeight * this.ActualWidth == 0)
@@ -438,6 +430,7 @@ namespace Catan10
         {
             return PlayerBindingFunctions.GetForegroundBrush(current, owner);
         }
+
         public void Show(bool show, bool valid = true)
         {
             double opacity = 1.0;
@@ -456,6 +449,7 @@ namespace Catan10
             _daAnimateOpacity.To = opacity;
             _sbAnimateOpacity.SkipToFill();
         }
+
         public override string ToString()
         {
             return String.Format($"Index={Index} Owner={Owner}");
@@ -483,6 +477,7 @@ namespace Catan10
 
         public RoadLocation RoadLocation { get; set; }
         public TileCtrl Tile { get; set; }
+
         public override string ToString()
         {
             return String.Format($"{Tile} {Tile.Index} {RoadLocation}");
@@ -508,11 +503,13 @@ namespace Catan10
             return obj.Tile.GetHashCode() * 17 + obj.RoadLocation.GetHashCode();
         }
     }
+
     public class RoadLocationData
     {
         public double Angle;
         public double Left;
         public double Top;
+
         public RoadLocationData(double left, double top, double angle)
         {
             Left = left;

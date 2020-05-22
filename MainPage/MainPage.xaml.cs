@@ -482,7 +482,7 @@ namespace Catan10
             {
                 if (s.BuildingState == BuildingState.Pips)
                 {
-                    await s.UpdateBuildingState(s.BuildingState, BuildingState.None, LogType.DoNotLog);
+                    await s.UpdateBuildingState(CurrentPlayer, s.BuildingState, BuildingState.None);
                 }
             }
         }
@@ -746,7 +746,7 @@ namespace Catan10
                     {
                         if (building.BuildingState == BuildingState.Pips)
                         {
-                            await building.UpdateBuildingState(building.BuildingState, BuildingState.None, LogType.DoNotLog);
+                            await building.UpdateBuildingState(CurrentPlayer, building.BuildingState, BuildingState.None);
                         }
                     }
                 }
@@ -786,7 +786,7 @@ namespace Catan10
                     }
 
                     building.PipGroup = i;
-                    await building.UpdateBuildingState(building.BuildingState, BuildingState.Pips, LogType.DoNotLog);
+                    await building.UpdateBuildingState(CurrentPlayer, building.BuildingState, BuildingState.Pips);
                 }
             }
         }
@@ -1210,7 +1210,7 @@ namespace Catan10
         {
             // pick a tile with the highest pips and put a settlement on it
             var building = GetHighestPipsBuilding();
-            await building.UpdateBuildingState(building.BuildingState, BuildingState.Settlement);
+            await building.UpdateBuildingState(CurrentPlayer, building.BuildingState, BuildingState.Settlement);
 
             // pick a Random Road
             var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
@@ -1598,7 +1598,7 @@ namespace Catan10
                                 lsu.Building.Owner = CurrentPlayer;
                             }
 
-                            await lsu.Building.UpdateBuildingState(lsu.OldBuildingState, lsu.NewBuildingState, LogType.Replay);
+                            await lsu.Building.UpdateBuildingState(CurrentPlayer, lsu.OldBuildingState, lsu.NewBuildingState);
                             break;
 
                         case CatanAction.AddPlayer:

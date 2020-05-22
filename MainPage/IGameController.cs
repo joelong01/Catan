@@ -151,13 +151,13 @@ namespace Catan10
                     }
                     break;
                 case GameState.WaitingForRollForOrder:
-                    
+
                     if (MainPageModel.Settings.AutoRespond)
                     {
                         Random rand = new Random();
                         await SynchronizedRollLog.StartSyncronizedRoll(this, rand.Next(1, 7), rand.Next(1, 7));
                     }
-                    
+
                     //
                     //  When leaving WaitingForRollOrder, next state is going to be AllocationResourcesForward -- get rid of the UI that shows all the player rolls
 
@@ -345,7 +345,7 @@ namespace Catan10
             if (MainPageModel.IsServiceGame)
             {
                 bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
-              //  this.TraceMessage($"Sending {message}");
+                //  this.TraceMessage($"Sending {message}");
                 if (!ret)
                 {
                     await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}");
@@ -641,6 +641,86 @@ namespace Catan10
         {
             await UpdateUiForState(setStateLog.OldState);
 
+        }
+
+        public Task SetRoadState(UpdateRoadLog updateRoadModel)
+        {
+            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
+            Contract.Assert(road != null);
+            var player = NameToPlayer(updateRoadModel.PlayerName);
+            Contract.Assert(player != null);         
+            string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
+            RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
+            Contract.Assert(newRaceTracker != null);
+
+            UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
+
+            return Task.CompletedTask;
+        }
+
+        public void UpdateRoadState(PlayerModel player, RoadCtrl road, RoadState oldState, RoadState newState, RoadRaceTracking raceTracking)
+        {
+            road.RoadState = newState;
+            switch (newState)
+            {
+                case RoadState.Unowned:
+                    if (oldState == RoadState.Ship)
+                    {
+                        player.GameData.Ships.Remove(road);
+                    }
+                    else
+                    {
+                        player.GameData.Roads.Remove(road);
+                    }
+
+                    road.Owner = null;
+                    road.Number = -1;
+                    break;
+                case RoadState.Road:
+                    road.Number = player.GameData.Roads.Count; // undo-able                    
+                    Contract.Assert(player.GameData != null);
+                    player.GameData.Roads.Add(road);
+                    road.Owner = player;
+                    break;
+                case RoadState.Ship:
+                    player.GameData.Roads.Remove(road); // can't be a ship if you aren't a road
+                    player.GameData.Ships.Add(road);
+                    break;
+                default:
+                    break;
+            }
+
+           
+            CalculateAndSetLongestRoad(raceTracking);
+        }
+
+        public Task UndoSetRoadState(UpdateRoadLog updateRoadModel)
+        {
+            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
+            Contract.Assert(road != null);
+            var player = NameToPlayer(updateRoadModel.PlayerName);
+            Contract.Assert(player != null);
+
+            UpdateRoadState(player, road, updateRoadModel.NewRoadState, updateRoadModel.OldRoadState, updateRoadModel.OldRaceTracking);
+            return Task.CompletedTask;
+        }
+
+        public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
+        {
+            BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
+            Contract.Assert(building != null);
+            PlayerModel player = NameToPlayer(updateBuildingLog.PlayerName);
+            Contract.Assert(player != null);
+            await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
+        }
+
+        public async Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog)
+        {
+            BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
+            Contract.Assert(building != null);
+            PlayerModel player = NameToPlayer(updateBuildingLog.PlayerName);
+            Contract.Assert(player != null);
+            await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
         }
     }
 }

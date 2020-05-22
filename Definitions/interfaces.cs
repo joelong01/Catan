@@ -62,7 +62,7 @@ namespace Catan10
 
         Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
 
-        Task BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState, LogType logType);
+        Task BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState);
 
         bool BuildingStateChangeOk(BuildingCtrl building);
 
@@ -119,6 +119,7 @@ namespace Catan10
         RandomBoardSettings CurrentRandomBoard();
 
         RandomBoardSettings GetRandomBoard();
+        Task SetRoadState(UpdateRoadLog updateRoadModel);
 
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection
@@ -126,7 +127,7 @@ namespace Catan10
         /// <param name="playerName"></param>
         /// <returns></returns>
         PlayerModel NameToPlayer(string playerName);
-
+        Task UndoSetRoadState(UpdateRoadLog updateRoadModel);
         Task<bool> PostMessage(LogHeader logHeader, CatanMessageType normal);
 
         Task<bool> RedoAsync();
@@ -147,6 +148,8 @@ namespace Catan10
 
         Task UndoSetRandomBoard(RandomBoardLog logHeader);
         Task UndoSetState(SetStateLog setStateLog);
+        Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
+        Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
     }
 
 

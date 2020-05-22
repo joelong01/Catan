@@ -631,7 +631,7 @@ namespace Catan10
 
         public async Task DoUndo()
         {
-            if (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
+            if ( (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction) && ValidateBuilding)
             {
                 return;
             }

@@ -424,8 +424,8 @@ namespace Catan10
         public LogBaronOrPirate(string serialized, ILogParserHelper parseHelper)
         {
             Deserialize(serialized);
-            StartTile = parseHelper.GetTile(StartTileIndex, GameIndex);
-            TargetTile = parseHelper.GetTile(TargetTileIndex, GameIndex);
+            StartTile = parseHelper.GetTile(StartTileIndex);
+            TargetTile = parseHelper.GetTile(TargetTileIndex);
             SourcePlayer = parseHelper.GetPlayerData(SourcePlayerIndex);
             if (TargetPlayerIndex != -1)
             {
@@ -486,7 +486,7 @@ namespace Catan10
         public LogRoadUpdate(string s, ILogParserHelper parseHelper)
         {
             Deserialize(s);
-            Road = parseHelper.GetRoad(Index, GameIndex);
+            Road = parseHelper.GetRoad(Index);
         }
         public LogRoadUpdate(int gameIndex, RoadCtrl road, RoadState oldState, RoadState newState)
         {
@@ -529,10 +529,10 @@ namespace Catan10
         public LogBuildingUpdate(string s, ILogParserHelper parseHelper)
         {
             Deserialize(s);
-            Building = parseHelper.GetBuilding(BuildingIndex, GameIndex);
+            Building = parseHelper.GetBuilding(BuildingIndex);
             if (TileIndex != -1)
             {
-                Tile = parseHelper.GetTile(TileIndex, GameIndex);
+                Tile = parseHelper.GetTile(TileIndex);
             }
         }
 
