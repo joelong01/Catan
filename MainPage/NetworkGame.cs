@@ -61,13 +61,18 @@ namespace Catan10
                         if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("OnStartDefault") && TheHuman != null &&
                             gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == CatanWsMessageType.GameAdded && MainPageModel.Settings.AutoJoinGames)
                         {
-                            await this.Reset();
-                            await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
-                            this.MainPageModel.GameInfo = gameMessage.GameInfo;
-                            await StartGameLog.StartGame(this, gameMessage.GameInfo.Creator, 0);
-                            await AddPlayerLog.AddPlayer(this, TheHuman);
 
-                            StartMonitoring();
+                            var players = await Proxy.GetPlayers(gameMessage.GameInfo.Id);
+                            if (players != null && players.Contains(TheHuman.PlayerName) == false)
+                            {
+                                await this.Reset();
+                                await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
+                                this.MainPageModel.GameInfo = gameMessage.GameInfo;
+                                await StartGameLog.StartGame(this, gameMessage.GameInfo.Creator, 0);
+                                await AddPlayerLog.AddPlayer(this, TheHuman);
+
+                                StartMonitoring();
+                            }
                         }
 
                         if (message.MessageType == CatanWsMessageType.GameDeleted && gameMessage.GameInfo.Id == this.GameInfo?.Id) // deleting the game I'm playing!
