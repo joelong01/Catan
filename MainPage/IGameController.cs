@@ -223,12 +223,17 @@ namespace Catan10
         ///                 - Let the players be out of order. Each client will see 'TheHuman' as the first player in the list
         ///                 - Make the CurrentPlayer be whoever created the game (so the Next button is correctly updated)
         ///                 - when we transition out of Rolling for first, we'll sync the list order
+        ///                 
+        ///     5/23/2020
+        ///                 - CreateGame adds the player
+        ///                 - we have a latent bug if the user adds themselves to an existing game instead of using the auto connect feature
         ///     
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
         public async Task AddPlayer(AddPlayerLog playerLogHeader)
         {
+
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
             var playerToAdd = NameToPlayer(playerLogHeader.PlayerToAdd);
@@ -430,9 +435,9 @@ namespace Catan10
         /// </summary>
         /// <param name="logHeader"></param>
         /// <returns></returns>
-        public Task StartGame(StartGameLog logHeader)
+        public async Task StartGame(StartGameLog logHeader)
         {
-            if (Log.PeekAction?.LogId == logHeader.LogId) return Task.CompletedTask; // this happens on the machine that starts the game.
+            if (Log.PeekAction?.LogId == logHeader.LogId) return ; // this happens on the machine that starts the game.
 
             //
             //  the issue here is that we Log StartGame, Add Player, then Monitor under normal circumstances
@@ -441,7 +446,7 @@ namespace Catan10
             //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't 
             //  in the game because this StartGame resets PlayingPlayers
             //
-            if (CurrentGameState != GameState.WaitingForNewGame) return Task.CompletedTask;
+            if (CurrentGameState != GameState.WaitingForNewGame) return;
 
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
@@ -450,9 +455,9 @@ namespace Catan10
             Contract.Assert(MainPageModel.GameStartedBy != null);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
 
-            return AddPlayerLog.AddPlayer(this, TheHuman);
 
-            
+            await AddPlayerLog.AddPlayer(this, TheHuman);
+                        
         }
 
         /// <summary>

@@ -40,14 +40,7 @@ namespace Catan10
             };
            
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
-            //
-            //  StartGame is a special thing because Monitor() listens based on the Game, so Monitor won't get the message
-            //  We post it so the WebSocket layer will send out the message, but since we are sending the message here, we
-            //  start the game locally.
-            //
-            await logHeader.Do(gameController);
-            await gameController.Log.PushAction(logHeader);
-                        
+             
         }
 
         public Task Do(IGameController gameController)

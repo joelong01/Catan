@@ -46,48 +46,7 @@ namespace Catan10
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
 
-            MainPageModel.PlayingPlayers.Clear();
-            var joe = NameToPlayer("Joe");
-            Contract.Assert(joe != null);
-            TheHuman = joe;
-            CurrentPlayer = joe;
-            MainPageModel.AllPlayers.Remove(joe);
-            MainPageModel.AllPlayers.Insert(0, joe);
-            //
-            //  delete alls games
-            List<GameInfo> games = await Proxy.GetGames();
-            games.ForEach(async (game) =>
-            {
-                var s = await Proxy.DeleteGame(game.Id);
-                if (s == null)
-                {
-                    var ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-                    this.TraceMessage(ErrorMessage);
-                }
-            });
-
-
-
-            // create a new game
-            GameInfo gameInfo = new GameInfo() { Id = Guid.NewGuid().ToString(), Name = "OnTest", Creator = CurrentPlayer.PlayerName };
-            games = await Proxy.CreateGame(gameInfo);
-            Contract.Assert(games != null);
-            MainPageModel.GameInfo = gameInfo;
-            //
-            //  start the game
-            await StartGameLog.StartGame(this, "Joe", 0);
-
-            //
-            //  add players
-            foreach (var p in MainPageModel.AllPlayers)
-            {
-                await Proxy.JoinGame(gameInfo.Id, p.PlayerName);
-                await AddPlayerLog.AddPlayer(this, p);
-
-            }
-
-            StartMonitoring();
-
+          
 
 
         }
