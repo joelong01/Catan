@@ -666,6 +666,8 @@ namespace Catan10
             }
             try
             {
+                if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
+
                 // this.TraceMessage("starting NextStep");
                 MainPageModel.EnableUiInteraction = false;
                 switch (CurrentGameState)

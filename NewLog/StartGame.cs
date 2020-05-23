@@ -27,8 +27,8 @@ namespace Catan10
 
             StartGameLog logHeader = new StartGameLog
             {
-
-                PlayerName = startingPlayer,                
+                CreatedBy = startingPlayer,
+                PlayerName = gameController.TheHuman.PlayerName,                
                 NewState = GameState.WaitingForPlayers,
                 OldState = GameState.WaitingForNewGame, // this is a lie -- you can start a new game whenever you want.  
                 Action = CatanAction.GameCreated,
