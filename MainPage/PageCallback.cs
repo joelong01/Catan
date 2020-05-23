@@ -1582,6 +1582,7 @@ namespace Catan10
         public bool BuildingStateChangeOk(BuildingCtrl building)
         {
             if (!ValidateBuilding) return true;
+            if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
             if (building.Owner != null)
             {
                 if (building.Owner != CurrentPlayer) // you can only click on your own stuff and when it is your turn
