@@ -18,7 +18,7 @@ namespace Catan10
         public int GameIndex { get; set; }
         public override string ToString()
         {
-            return $"StartGame: [StartedBy={PlayerName}]";
+            return $"StartGame: [StartedBy={CreatedBy}][SendBy={PlayerName}[id={LogId}";
         }
 
         
