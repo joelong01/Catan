@@ -95,8 +95,8 @@ namespace Catan10
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
 
-            _gameView.AllTiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceUp);
-            ValidateBuilding = false;
+            //_gameView.AllTiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceUp);
+            //ValidateBuilding = false;
            
         }
 
