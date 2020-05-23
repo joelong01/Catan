@@ -97,6 +97,11 @@ namespace Catan10
 
         private async void OnDeleteAllGames(object sender, RoutedEventArgs e)
         {
+            await DeleteAllGames();
+        }
+
+        private async Task DeleteAllGames()
+        {
             List<GameInfo> games = await Proxy.GetGames();
             games.ForEach(async (game) =>
             {
@@ -271,6 +276,10 @@ namespace Catan10
         {
             try
             {
+                if (TheHuman.PlayerName == "Joe")
+                {
+                    await DeleteAllGames();
+                }
                 Uri server = new Uri("ws://192.168.1.128:5000/catan/game/monitor/ws");
                 MessageWebSocket = new MessageWebSocket();
                 MessageWebSocket.Control.MessageType = SocketMessageType.Utf8;
