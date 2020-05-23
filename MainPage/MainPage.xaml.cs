@@ -606,6 +606,10 @@ namespace Catan10
         private async void OnGridPositionChanged(string name, GridPosition gridPosition)
         {
             // this.TraceMessage($"name={name}={MainPageModel.Settings.GridPositions[name]}");
+            if (!MainPageModel.Settings.GridPositions.TryGetValue(name, out GridPosition value))
+            {
+                MainPageModel.Settings.GridPositions[name] = gridPosition;
+            }
             await SaveGameState();
         }
 
@@ -1155,6 +1159,18 @@ namespace Catan10
                 {
                     await fileGuard.Task;
                 }
+                List<string> badGridNames = new List<string>();
+                foreach (var name in MainPageModel.Settings.GridPositions.Keys)
+                {
+                    var ctrl = this.FindName(name);
+                    if (ctrl == null)
+                    {
+                        badGridNames.Add(name);
+                    }
+                }
+
+                badGridNames.ForEach((name) => MainPageModel.Settings.GridPositions.Remove(name));
+
                 this.TraceMessage($"Saving GameState");                
                 fileGuard = new TaskCompletionSource<object>();
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();

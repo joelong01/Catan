@@ -13,11 +13,7 @@
                 Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
                 Storyboard.TargetName="_ctrlSettings" To="0" Duration="0:0:0.250" />
         </Storyboard>
-        <Storyboard x:Name="_sbShowHideNumbers">
-            <DoubleAnimation x:Name="_daShowHideNumbers" d:IsOptimized="True"
-                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
-                Storyboard.TargetName="RollGrid" To="0" Duration="0:0:0.500" />
-        </Storyboard>
+        
         <Storyboard x:Name="_sbNumberOpacity">
             <DoubleAnimation x:Name="_daNumberOpacity" d:IsOptimized="True" AutoReverse="False"
                 Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="RollGrid"
