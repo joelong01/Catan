@@ -1,45 +1,21 @@
-﻿using Catan.Proxy;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Graphics.Imaging;
-using Windows.Media.PlayTo;
-using Windows.Networking.Sockets;
-using Windows.Storage;
-using Windows.Storage.Search;
-using Windows.Storage.Streams;
-using Windows.UI;
-using Windows.UI.Popups;
-using Windows.UI.Text.Core;
-using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+using Catan.Proxy;
 
+using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
-
-
     public sealed partial class MainPage : Page, ILog, IGameController
     {
-        private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
         private TaskCompletionSource<bool> ActionTcs { get; set; }
+        private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
         public GameState CurrentGameState
@@ -51,8 +27,10 @@ namespace Catan10
                 return MainPageModel.Log.GameState;
             }
         }
+
         public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
         public GameInfo GameInfo => MainPageModel.GameInfo;
+
         public List<int> HighlightedTiles
         {
             get
@@ -64,7 +42,6 @@ namespace Catan10
                     {
                         list.Add(tile.Index);
                     }
-
                 }
                 return list;
             }
@@ -72,6 +49,7 @@ namespace Catan10
 
         public bool IsServiceGame => MainPageModel.IsServiceGame;
         public NewLog Log => MainPageModel.Log;
+
         public List<int> NextRandomGoldTiles
         {
             get
@@ -91,13 +69,10 @@ namespace Catan10
                     return CurrentPlayer.GameData.GoldRolls[playerRoll];
                 }
             }
-
-
         }
 
-        public CatanProxy Proxy => MainPageModel.Proxy;
-
         public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
+        public CatanProxy Proxy => MainPageModel.Proxy;
 
         private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
         {
@@ -112,16 +87,18 @@ namespace Catan10
 
         private async Task UpdateUiForState(GameState currentState)
         {
-
             switch (currentState)
             {
                 case GameState.Uninitialized:
                     break;
+
                 case GameState.WaitingForNewGame:
                     break;
+
                 case GameState.WaitingForStart:
                     await SetStateLog.SetState(this, GameState.AllocateResourceForward);
                     break;
+
                 case GameState.WaitingForPlayers:
                     //
                     //   if you go back to waiting for players, put the tiles facedown
@@ -133,8 +110,8 @@ namespace Catan10
                         await SetStateLog.SetState(this, GameState.PickingBoard);
                     }
                     break;
-                case GameState.PickingBoard:
 
+                case GameState.PickingBoard:
 
                     await _rollControl.Reset();
 
@@ -142,7 +119,6 @@ namespace Catan10
                     {
                         p.GameData.NotificationsEnabled = true;
                         p.GameData.RollOrientation = TileOrientation.FaceUp;
-
                     }); // I hate this hack but I couldn't figure out how to do it with DataBinding
 
                     await RandomBoardLog.RandomizeBoard(this, 0);
@@ -153,11 +129,12 @@ namespace Catan10
                         await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
                     }
                     break;
+
                 case GameState.WaitingForRollForOrder:
                     //
                     //  turn off pips
-                    
-                    _gameView.AllBuildings.ForEach( (building) => building.Reset()); // turn off pips on the local machine
+
+                    _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
 
                     if (MainPageModel.Settings.AutoRespond)
                     {
@@ -168,9 +145,8 @@ namespace Catan10
                     //
                     //  When leaving WaitingForRollOrder, next state is going to be AllocationResourcesForward -- get rid of the UI that shows all the player rolls
 
-
-
                     break;
+
                 case GameState.AllocateResourceForward:
                     MainPageModel.PlayingPlayers.ForEach((p) =>
                     {
@@ -179,32 +155,44 @@ namespace Catan10
                         p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
                     });
                     break;
+
                 case GameState.AllocateResourceReverse:
                     break;
+
                 case GameState.DoneResourceAllocation:
                     break;
+
                 case GameState.WaitingForRoll:
                     break;
+
                 case GameState.WaitingForNext:
 
-
                     break;
+
                 case GameState.Supplemental:
                     break;
+
                 case GameState.Targeted:
                     break;
+
                 case GameState.LostToCardsLikeMonopoly:
                     break;
+
                 case GameState.DoneSupplemental:
                     break;
+
                 case GameState.LostCardsToSeven:
                     break;
+
                 case GameState.MissedOpportunity:
                     break;
+
                 case GameState.GamePicked:
                     break;
+
                 case GameState.MustMoveBaron:
                     break;
+
                 case GameState.Unknown:
                     break;
 
@@ -215,32 +203,30 @@ namespace Catan10
 
         /// <summary>
         ///     Called when a Player is added to a Service game
-        ///     
+        ///
         ///     this can also be called directly by the user via UI interaction, so we need to make sure that works idenitically as if
         ///     the message came from another machine.
-        ///     
+        ///
         ///     5/16/2020
         ///                 - Let the players be out of order. Each client will see 'TheHuman' as the first player in the list
         ///                 - Make the CurrentPlayer be whoever created the game (so the Next button is correctly updated)
         ///                 - when we transition out of Rolling for first, we'll sync the list order
-        ///                 
+        ///
         ///     5/23/2020
         ///                 - CreateGame adds the player
         ///                 - we have a latent bug if the user adds themselves to an existing game instead of using the auto connect feature
-        ///     
+        ///
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
         public async Task AddPlayer(AddPlayerLog playerLogHeader)
         {
-
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
             var playerToAdd = NameToPlayer(playerLogHeader.PlayerToAdd);
             Contract.Assert(playerToAdd != null);
             if (MainPageModel.PlayingPlayers.Contains(playerToAdd) == false)
             {
-
                 playerToAdd.GameData.OnCardsLost += OnPlayerLostCards;
                 AddPlayerMenu(playerToAdd);
                 //
@@ -254,8 +240,6 @@ namespace Catan10
             }
 
             await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.GameStartedBy, CurrentGameState);
-                
-
         }
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
@@ -266,11 +250,9 @@ namespace Catan10
 
             CurrentPlayer = NameToPlayer(changePlayerLog.NewCurrentPlayer);
 
-
             //
             // always stop highlighted the roll when the player changes
             GameContainer.AllTiles.ForEach((tile) => tile.StopHighlightingTile());
-
 
             //
             //  in supplemental, we don't show random gold tiles
@@ -279,7 +261,6 @@ namespace Catan10
                 await GameContainer.ResetRandomGoldTiles();
             }
 
-
             //
             // when we change player we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
             // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
@@ -287,11 +268,8 @@ namespace Catan10
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
             if ((changePlayerLog.NewState == GameState.WaitingForRoll) || (changePlayerLog.NewState == GameState.WaitingForNext))
             {
-
                 await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
             }
-
-
         }
 
         public void CompleteRedo()
@@ -326,6 +304,7 @@ namespace Catan10
             }
             return null;
         }
+
         /// <summary>
         ///     Checks to see if it is a service game.  if it is, post a message to the service.
         ///     if not, process the message immediately
@@ -335,13 +314,11 @@ namespace Catan10
         /// <returns>False if the IGameController.Do() should be executed locally </returns>
         public async Task<bool> PostMessage(LogHeader logHeader, CatanMessageType msgType)
         {
-
             CatanMessage message = new CatanMessage()
             {
                 Data = logHeader,
                 Origin = TheHuman.PlayerName,
                 CatanMessageType = msgType
-
             };
             if (MainPageModel.IsServiceGame)
             {
@@ -372,14 +349,12 @@ namespace Catan10
                     Data = logHeader,
                     Origin = TheHuman.PlayerName,
                     CatanMessageType = CatanMessageType.Redo
-
                 };
 
                 await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
             }
             else
             {
-
                 //
                 // not a service game -- do the actual undo
 
@@ -388,13 +363,12 @@ namespace Catan10
             }
 
             return await UndoRedoTcs.Task;
-
         }
 
         /// <summary>
-        ///     Set a random board.  Only the creator can set a random board. 
-        ///     
-        ///     
+        ///     Set a random board.  Only the creator can set a random board.
+        ///
+        ///
         /// </summary>
         /// <param name="randomBoard"></param>
         /// <returns></returns>
@@ -413,7 +387,21 @@ namespace Catan10
             }
 
             UpdateBoardMeasurements();
+        }
 
+        public Task SetRoadState(UpdateRoadLog updateRoadModel)
+        {
+            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
+            Contract.Assert(road != null);
+            var player = NameToPlayer(updateRoadModel.SentBy);
+            Contract.Assert(player != null);
+            string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
+            RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
+            Contract.Assert(newRaceTracker != null);
+
+            UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -430,20 +418,20 @@ namespace Catan10
 
         /// <summary>
         ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
-        ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition 
+        ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition
         ///     of new players.
         /// </summary>
         /// <param name="logHeader"></param>
         /// <returns></returns>
         public async Task StartGame(StartGameLog logHeader)
         {
-            if (Log.PeekAction?.LogId == logHeader.LogId) return ; // this happens on the machine that starts the game.
+            if (Log.PeekAction?.LogId == logHeader.LogId) return; // this happens on the machine that starts the game.
 
             //
             //  the issue here is that we Log StartGame, Add Player, then Monitor under normal circumstances
             //  So when the second player does the same thing, they get all the log records for the game,
             //  including the StartGame and AddPlayers.  so you need to be careful to start the game only once -- which often
-            //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't 
+            //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't
             //  in the game because this StartGame resets PlayingPlayers
             //
             if (CurrentGameState != GameState.WaitingForNewGame) return;
@@ -455,16 +443,14 @@ namespace Catan10
             Contract.Assert(MainPageModel.GameStartedBy != null);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
 
-
             await AddPlayerLog.AddPlayer(this, TheHuman);
-                        
         }
 
         /// <summary>
-        ///     this is where we do the work to synchronize a roll across devices.  
-        ///     
+        ///     this is where we do the work to synchronize a roll across devices.
+        ///
         ///     General Algorythm:
-        ///     
+        ///
         ///     1. Store the rolls in PlayerData.GameData (they are rolls for the game)
         ///     2. When called, see if we've hit the terminating conditions
         ///         a) everybody has rolled
@@ -474,14 +460,12 @@ namespace Catan10
         ///         b) if so, wait for a roll
         ///         c) update GameData
         ///         d) log results
-        ///                 
+        ///
         /// </summary>
         /// <param name="logEntry"></param>
         /// <returns></returns>
         public async Task SynchronizedRoll(SynchronizedRollLog logEntry)
         {
-
-
             //
             // need to update the state first because data binding is used to show/hide roll UI and it is driven off of
             // GameState.  the end of this function changes the state to GameState.WaitingForRollForOrder as well
@@ -496,7 +480,6 @@ namespace Catan10
 
             theHuman.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.DiceOne, logEntry.DiceTwo);
 
-
             //
             //  look at all the rolls and see if the current player needs to roll again
             foreach (var p in MainPageModel.PlayingPlayers)
@@ -505,7 +488,6 @@ namespace Catan10
                 if (p.GameData.SyncronizedPlayerRolls.CompareTo(TheHuman.GameData.SyncronizedPlayerRolls) == 0)
                 {
                     await _rollControl.Reset();
-
                 }
             }
 
@@ -554,7 +536,6 @@ namespace Catan10
 
                 await SetStateLog.SetState(this, GameState.WaitingForStart);
             }
-
         }
 
         /// <summary>
@@ -565,13 +546,12 @@ namespace Catan10
         /// <returns></returns>
         public Task UndoAddPlayer(AddPlayerLog playerLogHeader)
         {
-
             var player = NameToPlayer(playerLogHeader.SentBy);
             Contract.Assert(player != null, "Player Can't Be Null");
             MainPageModel.PlayingPlayers.Remove(player);
             return Task.CompletedTask;
-
         }
+
         public async Task<bool> UndoAsync()
         {
             LogHeader logHeader = Log.PeekAction;
@@ -584,15 +564,13 @@ namespace Catan10
                     Data = logHeader,
                     Origin = TheHuman.PlayerName,
                     CatanMessageType = CatanMessageType.Undo
-
                 };
 
                 bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
-                if (!ret) return false; // this is very bad! :(                
+                if (!ret) return false; // this is very bad! :(
             }
             else
             {
-
                 //
                 // not a service game -- do the actual undo
 
@@ -601,14 +579,10 @@ namespace Catan10
             }
 
             return await UndoRedoTcs.Task;
-
-
-
         }
 
         public async Task UndoChangePlayer(ChangePlayerLog logHeader)
         {
-
             CurrentPlayer = NameToPlayer(logHeader.PreviousPlayer);
 
             if (logHeader.OldState == GameState.WaitingForNext)
@@ -619,20 +593,28 @@ namespace Catan10
                 }
 
                 logHeader.HighlightedTiles.ForEach((idx) => GameContainer.AllTiles[idx].HighlightTile(CurrentPlayer.BackgroundBrush));
-
             }
-
         }
 
         public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
         {
-
             if (logHeader.PreviousRandomBoard == null) return;
 
             await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
             UpdateBoardMeasurements();
-
         }
+
+        public Task UndoSetRoadState(UpdateRoadLog updateRoadModel)
+        {
+            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
+            Contract.Assert(road != null);
+            var player = NameToPlayer(updateRoadModel.SentBy);
+            Contract.Assert(player != null);
+
+            UpdateRoadState(player, road, updateRoadModel.NewRoadState, updateRoadModel.OldRoadState, updateRoadModel.OldRaceTracking);
+            return Task.CompletedTask;
+        }
+
         //
         //  State in the game is stored at the top of the NewLog.ActionStack
         //  so "Undoing" state is just moving the record from the ActionStack
@@ -640,22 +622,24 @@ namespace Catan10
         public async Task UndoSetState(SetStateLog setStateLog)
         {
             await UpdateUiForState(setStateLog.OldState);
-
         }
 
-        public Task SetRoadState(UpdateRoadLog updateRoadModel)
+        public async Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog)
         {
-            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
-            Contract.Assert(road != null);
-            var player = NameToPlayer(updateRoadModel.SentBy);
-            Contract.Assert(player != null);         
-            string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
-            RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
-            Contract.Assert(newRaceTracker != null);
+            BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
+            Contract.Assert(building != null);
+            PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
+            Contract.Assert(player != null);
+            await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
+        }
 
-            UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
-
-            return Task.CompletedTask;
+        public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
+        {
+            BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
+            Contract.Assert(building != null);
+            PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
+            Contract.Assert(player != null);
+            await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
         }
 
         public void UpdateRoadState(PlayerModel player, RoadCtrl road, RoadState oldState, RoadState newState, RoadRaceTracking raceTracking)
@@ -676,51 +660,24 @@ namespace Catan10
                     road.Owner = null;
                     road.Number = -1;
                     break;
+
                 case RoadState.Road:
-                    road.Number = player.GameData.Roads.Count; // undo-able                    
+                    road.Number = player.GameData.Roads.Count; // undo-able
                     Contract.Assert(player.GameData != null);
                     player.GameData.Roads.Add(road);
                     road.Owner = player;
                     break;
+
                 case RoadState.Ship:
                     player.GameData.Roads.Remove(road); // can't be a ship if you aren't a road
                     player.GameData.Ships.Add(road);
                     break;
+
                 default:
                     break;
             }
 
-           
             CalculateAndSetLongestRoad(raceTracking);
-        }
-
-        public Task UndoSetRoadState(UpdateRoadLog updateRoadModel)
-        {
-            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
-            Contract.Assert(road != null);
-            var player = NameToPlayer(updateRoadModel.SentBy);
-            Contract.Assert(player != null);
-
-            UpdateRoadState(player, road, updateRoadModel.NewRoadState, updateRoadModel.OldRoadState, updateRoadModel.OldRaceTracking);
-            return Task.CompletedTask;
-        }
-
-        public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
-        {
-            BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
-            Contract.Assert(building != null);
-            PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
-            Contract.Assert(player != null);
-            await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
-        }
-
-        public async Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog)
-        {
-            BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
-            Contract.Assert(building != null);
-            PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
-            Contract.Assert(player != null);
-            await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
         }
     }
 }
