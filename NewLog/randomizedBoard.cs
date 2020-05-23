@@ -61,7 +61,7 @@ namespace Catan10
         // this to just double check
         public override string ToString()
         {
-            return $"[Action={Action}][CreatedBy={CreatedBy}]";
+            return $"[Action={Action}][[SentBy={SentBy}]]";
         }
 
         public Task Undo(IGameController gameController)

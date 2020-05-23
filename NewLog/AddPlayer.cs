@@ -1,9 +1,6 @@
-﻿using Catan.Proxy;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
+using Catan.Proxy;
 
 namespace Catan10
 {
@@ -12,27 +9,22 @@ namespace Catan10
     /// </summary>
     public class AddPlayerLog : LogHeader, ILogController
     {
+        public string PlayerToAdd { get; set; }
         public AddPlayerLog() : base()
         {
-            Action = CatanAction.AddPlayer;        
-        }
-        public override string ToString()
-        {
-            return $"[CreatedBy={CreatedBy}][AddPlayer={PlayerName}] [Local={LocallyCreated}]";
+            Action = CatanAction.AddPlayer;
         }
 
-        public static async Task AddPlayer(IGameController gameController, PlayerModel playerModel)
+        public static async Task AddPlayer(IGameController gameController, PlayerModel playerToAdd)
         {
-
             AddPlayerLog logHeader = new AddPlayerLog
             {
-                PlayerName = playerModel.PlayerName,
+                PlayerToAdd = playerToAdd.PlayerName,
+                SentBy = gameController.TheHuman.PlayerName,
                 CanUndo = false
             };
-            bool serviceGame = await gameController.PostMessage(logHeader, CatanMessageType.Normal);
             
-            
-            
+            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
 
         public Task Do(IGameController gameController)
@@ -45,10 +37,14 @@ namespace Catan10
             return gameController.AddPlayer(this);
         }
 
+        public override string ToString()
+        {
+            return $"[AddedPlayer={PlayerToAdd}"  + base.ToString();
+        }
+
         public Task Undo(IGameController gameController)
         {
             return gameController.UndoAddPlayer(this);
         }
-
     }
 }

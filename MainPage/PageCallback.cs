@@ -46,7 +46,8 @@ namespace Catan10
 
                 if (state == GameState.WaitingForNext || // I can build after I roll
                     state == GameState.AllocateResourceForward || // I can build during the initial phase )
-                    state == GameState.AllocateResourceReverse || state == GameState.Supplemental)
+                    state == GameState.AllocateResourceReverse || state == GameState.Supplemental ||
+                    state == GameState.PickingBoard)
                 {
                     return true;
                 }
@@ -824,6 +825,11 @@ namespace Catan10
             {
                 showErrorUI = false;
                 return false;
+            }
+
+            if (CurrentGameState == GameState.PickingBoard)
+            {
+                return true; // I want to show pips when picking the board
             }
 
             bool allocationPhase = false;

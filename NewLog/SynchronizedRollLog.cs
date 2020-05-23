@@ -51,7 +51,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return $"[Action={Action}][CreatedBy={CreatedBy}][DiceOne={DiceOne}][DiceTwo={DiceTwo}]";
+            return $"[DiceOne={DiceOne}][DiceTwo={DiceTwo}]" + base.ToString();
         }
         public Task Undo(IGameController gameController)
         {

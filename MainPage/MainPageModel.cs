@@ -41,12 +41,12 @@ namespace Catan10
                {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
                {GameState.PickingBoard, "Roll for Order" },
                {GameState.WaitingForRollForOrder, "Start" },
-               {GameState.WaitingForStart, "Pick Resource" },
-               {GameState.AllocateResourceForward, "Pick Resource" },
-               {GameState.AllocateResourceReverse, "Pick Resource" },
+               {GameState.WaitingForStart, "Next (Pick Resources)" },
+               {GameState.AllocateResourceForward, "Next (Forward)" },
+               {GameState.AllocateResourceReverse, "Next (Back)" },
                {GameState.WaitingForRoll, "Select Roll" },
-               {GameState.WaitingForNext, "Done" },
-               {GameState.Supplemental, "Suplemental" }
+               {GameState.WaitingForNext, "End My Turn" },
+               {GameState.Supplemental, "Finished (Next)" }
         };
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();

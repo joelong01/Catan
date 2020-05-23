@@ -126,6 +126,7 @@
     </Compile>
     <Compile Include="Definitions\enums.cs" />
     <Compile Include="Definitions\interfaces.cs" />
+    <Compile Include="Definitions\oldDefinitions.cs" />
     <Compile Include="Games\ExpansionCtrl.xaml.cs">
       <DependentUpon>ExpansionCtrl.xaml</DependentUpon>
     </Compile>

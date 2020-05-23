@@ -17,6 +17,7 @@ using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.Storage.Streams;
+using Windows.System;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -175,6 +176,7 @@ namespace Catan10
         //
         private async Task ChangePlayerAndSetState(int numberofPositions, GameState newState, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
         {
+            Contract.Assert(false, "this code shouldn't be called!");
             int from = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer);
             int to = GetNextPlayerPosition(numberofPositions);
             _currentPlayerIndex = to;
@@ -537,7 +539,7 @@ namespace Catan10
                 if (MainPageModel.TheHuman == "")
                 {
                     await PickDefaultUser();
-                    CurrentPlayer = TheHuman;
+                    CurrentPlayer = TheHuman; // this means each client will start with CurrentPlayer being themselves so that all UI binding to current player will give decent colors
                 }
             }
             finally
@@ -705,18 +707,15 @@ namespace Catan10
 
             _dt = dt;
 
-            if (MainPageModel.IsServiceGame && CurrentGameState == GameState.PickingBoard)
+          
+
+            if (MainPageModel.IsServiceGame && CurrentGameState == GameState.PickingBoard && e.KeyModifiers == VirtualKeyModifiers.None)
             {
                 await ScrollMouseWheelInServiceGame(e);
                 return;
             }
 
-            if (GameStateFromOldLog == GameState.WaitingForStart)
-            {
-                PickAGoodBoard(e);
-                return;
-            }
-
+          
             int showPipGroupIndex = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
 
             if (showPipGroupIndex >= 0)
@@ -1088,7 +1087,7 @@ namespace Catan10
             Rolls.Clear();
             if (TheHuman != null)
             {
-                CurrentPlayer = TheHuman;
+                CurrentPlayer = TheHuman; // for color updates in UI
             }
         }
 
@@ -1197,12 +1196,12 @@ namespace Catan10
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
             if (TheHuman.PlayerName != MainPageModel.GameInfo.Creator) return;
-
+            
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
-
                 {
+                    _gameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
                     if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
                     {
                         await RedoAsync();

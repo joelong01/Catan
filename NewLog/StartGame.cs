@@ -16,9 +16,11 @@ namespace Catan10
             Action = CatanAction.StartGame;
         }
         public int GameIndex { get; set; }
+        public string CreatedBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
+
         public override string ToString()
         {
-            return $"StartGame: [StartedBy={CreatedBy}][SendBy={PlayerName}[id={LogId}";
+            return $"StartGame: [StartedBy={CreatedBy}][SendBy={SentBy}[id={LogId}]";
         }
 
         
@@ -28,7 +30,7 @@ namespace Catan10
             StartGameLog logHeader = new StartGameLog
             {
                 CreatedBy = startingPlayer,
-                PlayerName = gameController.TheHuman.PlayerName,                
+                SentBy = gameController.TheHuman.PlayerName,                
                 NewState = GameState.WaitingForPlayers,
                 OldState = GameState.WaitingForNewGame, // this is a lie -- you can start a new game whenever you want.  
                 Action = CatanAction.GameCreated,

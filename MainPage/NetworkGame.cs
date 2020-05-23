@@ -158,7 +158,7 @@ namespace Catan10
 
             string gameName = "OnStartDefaultNetworkGame";
 
-            CurrentPlayer = TheHuman;
+           // CurrentPlayer = TheHuman;
 
             GameInfo gameInfo = null;
             //

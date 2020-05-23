@@ -96,6 +96,9 @@ namespace Catan10
         }
 
         public CatanProxy Proxy => MainPageModel.Proxy;
+
+        public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
+
         private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
         {
             int index = 0;
@@ -151,6 +154,10 @@ namespace Catan10
                     }
                     break;
                 case GameState.WaitingForRollForOrder:
+                    //
+                    //  turn off pips
+                    
+                    _gameView.AllBuildings.ForEach( (building) => building.Reset()); // turn off pips on the local machine
 
                     if (MainPageModel.Settings.AutoRespond)
                     {
@@ -220,51 +227,40 @@ namespace Catan10
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
-        public Task AddPlayer(AddPlayerLog playerLogHeader)
+        public async Task AddPlayer(AddPlayerLog playerLogHeader)
         {
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
-            var player = NameToPlayer(playerLogHeader.PlayerName);
-            Contract.Assert(player != null);
-            if (MainPageModel.PlayingPlayers.Contains(player) == false)
+            var playerToAdd = NameToPlayer(playerLogHeader.PlayerToAdd);
+            Contract.Assert(playerToAdd != null);
+            if (MainPageModel.PlayingPlayers.Contains(playerToAdd) == false)
             {
 
-                player.GameData.OnCardsLost += OnPlayerLostCards;
-                AddPlayerMenu(player);
+                playerToAdd.GameData.OnCardsLost += OnPlayerLostCards;
+                AddPlayerMenu(playerToAdd);
                 //
                 //  need to give the players some data about the game
-                player.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
-                player.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
-                player.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
-                player.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
+                playerToAdd.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
+                playerToAdd.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
+                playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
+                playerToAdd.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
 
-                MainPageModel.PlayingPlayers.Add(player);
+                MainPageModel.PlayingPlayers.Add(playerToAdd);
             }
 
-            CurrentPlayer = MainPageModel.GameStartedBy;
-
-            return Task.CompletedTask;
+            await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.GameStartedBy, CurrentGameState);
+                
 
         }
 
-        public async Task ChangePlayer(ChangePlayerLog log)
+        public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
         {
-
-            PlayerModel player = NameToPlayer(log.PlayerName);
-
-            int idx = MainPageModel.PlayingPlayers.IndexOf(player);
-            Contract.Assert(idx != -1, "The player needs to be playing!");
-
-            idx += log.Move;
-            int count = MainPageModel.PlayingPlayers.Count;
-            if (idx >= count) idx -= count;
-            if (idx < 0) idx += count;
-
-            // this controller is the one spot where the CurrentPlayer is changed.  it should update all the bindings
+            // this controller is the one spot where the CurrentPlayer should be changed.  it should update all the bindings
             // the setter will update all the associated state changes that happen when the CurrentPlayer
             // changes
 
-            CurrentPlayer = MainPageModel.PlayingPlayers[idx];
+            CurrentPlayer = NameToPlayer(changePlayerLog.NewCurrentPlayer);
+
 
             //
             // always stop highlighted the roll when the player changes
@@ -284,10 +280,10 @@ namespace Catan10
             // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
             // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
-            if ((log.NewState == GameState.WaitingForRoll) || (log.NewState == GameState.WaitingForNext))
+            if ((changePlayerLog.NewState == GameState.WaitingForRoll) || (changePlayerLog.NewState == GameState.WaitingForNext))
             {
 
-                await SetRandomTileToGold(log.NewRandomGoldTiles);
+                await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
             }
 
 
@@ -450,10 +446,9 @@ namespace Catan10
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
             MainPageModel.IsServiceGame = true;
-            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.PlayerName);
+            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.SentBy);
             Contract.Assert(MainPageModel.GameStartedBy != null);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
-            CurrentPlayer = MainPageModel.GameStartedBy;
             return Task.CompletedTask;
 
 
@@ -488,7 +483,7 @@ namespace Catan10
 
             Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
 
-            PlayerModel theHuman = PlayerNameToPlayer(logEntry.CreatedBy, MainPageModel.AllPlayers);
+            PlayerModel theHuman = PlayerNameToPlayer(logEntry.SentBy, MainPageModel.AllPlayers);
 
             Contract.Assert(theHuman != null);
             Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);
@@ -566,7 +561,7 @@ namespace Catan10
         public Task UndoAddPlayer(AddPlayerLog playerLogHeader)
         {
 
-            var player = NameToPlayer(playerLogHeader.PlayerName);
+            var player = NameToPlayer(playerLogHeader.SentBy);
             Contract.Assert(player != null, "Player Can't Be Null");
             MainPageModel.PlayingPlayers.Remove(player);
             return Task.CompletedTask;
@@ -609,7 +604,7 @@ namespace Catan10
         public async Task UndoChangePlayer(ChangePlayerLog logHeader)
         {
 
-            CurrentPlayer = NameToPlayer(logHeader.PlayerName);
+            CurrentPlayer = NameToPlayer(logHeader.PreviousPlayer);
 
             if (logHeader.OldState == GameState.WaitingForNext)
             {
@@ -647,7 +642,7 @@ namespace Catan10
         {
             RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
             Contract.Assert(road != null);
-            var player = NameToPlayer(updateRoadModel.PlayerName);
+            var player = NameToPlayer(updateRoadModel.SentBy);
             Contract.Assert(player != null);         
             string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
             RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
@@ -698,7 +693,7 @@ namespace Catan10
         {
             RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
             Contract.Assert(road != null);
-            var player = NameToPlayer(updateRoadModel.PlayerName);
+            var player = NameToPlayer(updateRoadModel.SentBy);
             Contract.Assert(player != null);
 
             UpdateRoadState(player, road, updateRoadModel.NewRoadState, updateRoadModel.OldRoadState, updateRoadModel.OldRaceTracking);
@@ -709,7 +704,7 @@ namespace Catan10
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
             Contract.Assert(building != null);
-            PlayerModel player = NameToPlayer(updateBuildingLog.PlayerName);
+            PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
             Contract.Assert(player != null);
             await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
         }
@@ -718,7 +713,7 @@ namespace Catan10
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
             Contract.Assert(building != null);
-            PlayerModel player = NameToPlayer(updateBuildingLog.PlayerName);
+            PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
             Contract.Assert(player != null);
             await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
         }

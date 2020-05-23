@@ -49,7 +49,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return $"[Action={Action}][CreatedBy={CreatedBy}][OldState={OldState}][NewState={NewState}]";
+            return $"[Action={Action}][SentBy={SentBy}][OldState={OldState}][NewState={NewState}]";
         }
 
         public Task Undo(IGameController gameController)

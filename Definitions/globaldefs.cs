@@ -14,44 +14,10 @@ using Windows.UI.Xaml.Input;
 
 namespace Catan10
 {
-    public class LogStateTranstion
-    {
-        public GameState OldState { get; set; } = GameState.Uninitialized;
-        public GameState NewState { get; set; } = GameState.Uninitialized;
-        public List<int> RandomGoldTiles { get; set; } = new List<int>();
-
-        public LogStateTranstion() { }
-
-        public LogStateTranstion(GameState old, GameState newState)
-        {
-            OldState = old;
-            NewState = newState;
-
-        }
-
-        public LogStateTranstion(string saved)
-        {
-            Deserialize(saved);
-        }
-
-        public override string ToString()
-        {
-            return CatanProxy.Serialize(this);
-
-        }
-
-        public static LogStateTranstion Deserialize(string json)
-        {
-            return CatanProxy.Deserialize<LogStateTranstion>(json);
-        }
-
-    }
-
     public class LogHeader
     {
         public LogType LogType { get; set; } = LogType.Normal;
-        public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer?.PlayerName;
-        public string CreatedBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
+        public string SentBy { get; set; } = MainPage.Current.CurrentPlayer?.PlayerName;
         public GameState OldState { get; set; } = MainPage.Current.CurrentGameState;
         public GameState NewState { get; set; } = MainPage.Current.CurrentGameState; // if state changes, you have to set this
         public CatanAction Action { get; set; }
@@ -59,19 +25,23 @@ namespace Catan10
         public Guid LogId { get; set; } = Guid.NewGuid();
         public DateTime Time { get; set; } = DateTime.Now;
         public string TypeName { get; set; }
+        public override string ToString()
+        {
+            return $"[Type={TypeName}][Action={Action}][SentBy={SentBy}][OldState={OldState}][NewState={NewState}]";
+        }
         [JsonIgnore]
         public bool LocallyCreated
         {
             get
             {
-                Contract.Assert(String.IsNullOrEmpty(CreatedBy) == false);
+                Contract.Assert(String.IsNullOrEmpty(SentBy) == false);
                 Contract.Assert(MainPage.Current.TheHuman != null);
-                return (MainPage.Current.TheHuman.PlayerName == CreatedBy);
+                return (MainPage.Current.TheHuman.PlayerName == SentBy);
             }
         }
-                
+
         public bool CanUndo { get; set; } = true;
-        
+
 
         public LogHeader()
         {
@@ -93,7 +63,7 @@ namespace Catan10
             return CatanProxy.Serialize<object>(this);
         }
 
-        
+
         public static LogHeader Deserialize(JsonElement element)
         {
             var typeName = element.GetProperty("typeName").GetString();
@@ -102,24 +72,7 @@ namespace Catan10
             return JsonSerializer.Deserialize(element.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
         }
     }
-
-    public class UndoEventArgs
-    {
-        public UndoOrder UndoOrder { get; set; } = UndoOrder.None;
-    }
-
-    public enum LayoutDirection { ClockWise, CounterClockwise };
-
-
-
-    public class ChangeGameEventArgs
-    {
-        public StorageFile File { get; set; }
-        public ChangeGameEventArgs(StorageFile f)
-        {
-            File = f;
-        }
-    }
+   
     public class CatanGameInfo
     {
         public int MaxRoads { get; set; } = 15;

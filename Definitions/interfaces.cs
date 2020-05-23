@@ -150,6 +150,7 @@ namespace Catan10
         Task UndoSetState(SetStateLog setStateLog);
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
+        List<PlayerModel> PlayingPlayers { get; }
     }
 
 

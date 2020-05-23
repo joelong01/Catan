@@ -36,7 +36,7 @@ namespace Catan10
             UpdateRoadLog logHeader = new UpdateRoadLog()
             {
 
-                PlayerName = gameController.CurrentPlayer.PlayerName,
+                SentBy = gameController.CurrentPlayer.PlayerName,
                 OldState = gameController.CurrentGameState,
                 Action = CatanAction.UpdatedRoadState,
                 RoadIndex = road.Index,

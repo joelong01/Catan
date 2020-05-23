@@ -173,11 +173,6 @@ namespace Catan10
             //await dlg.ShowAsync();
         }
 
-        private async void OnSaveSettings(object sender, RoutedEventArgs e)
-        {
-            await SaveGameState();
-        }
-
         private void OnCancelClicked(object sender, RoutedEventArgs e)
         {
             _contextMenu.Hide();
@@ -403,6 +398,10 @@ namespace Catan10
             await DoRedo();
         }
 
+        private async void OnSaveSettings(object sender, RoutedEventArgs e)
+        {
+            await SaveGameState();
+        }
         private async void OnSetDefaultState(object sender, RoutedEventArgs e)
         {
             if (SaveFolder == null)
@@ -514,9 +513,9 @@ namespace Catan10
             }
 
             TheHuman = picker.Player;
-            if (!ValidateBuilding)
+            if (!ValidateBuilding && MainPageModel.PlayingPlayers.Count == 1)
             {
-                CurrentPlayer = TheHuman;
+                CurrentPlayer = TheHuman;  //  this is useful for debugging
             }
             MainPageModel.TheHuman = TheHuman.PlayerName;
             MainPageModel.DefaultUser = TheHuman.PlayerName;
@@ -631,7 +630,7 @@ namespace Catan10
 
         public async Task DoUndo()
         {
-            if ( (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction) && ValidateBuilding)
+            if ((GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction) && ValidateBuilding)
             {
                 return;
             }
@@ -689,12 +688,33 @@ namespace Catan10
 
                     case GameState.WaitingForStart:
                         await SetStateLog.SetState(this, GameState.AllocateResourceForward);
+                        await ChangePlayerLog.ChangePlayer(this, 0, GameState.AllocateResourceForward);
                         break;
 
                     case GameState.AllocateResourceForward:
+                       
+                        if (MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) + 1 == MainPageModel.PlayingPlayers.Count)
+                        {
+                            await ChangePlayerLog.ChangePlayer(this, 0, GameState.AllocateResourceReverse);
+                        }
+                        else
+                        {
+                            await ChangePlayerLog.ChangePlayer(this, 1, GameState.AllocateResourceForward);
+                        }
+
                         break;
 
                     case GameState.AllocateResourceReverse:
+                        if (MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1 == -1)
+                        {
+                            await SetStateLog.SetState(this, GameState.WaitingForRoll);
+                        }
+                        else
+                        {
+                            await ChangePlayerLog.ChangePlayer(this, -1, GameState.AllocateResourceForward);
+                        }
+
+                        break;
                         break;
 
                     case GameState.DoneResourceAllocation:

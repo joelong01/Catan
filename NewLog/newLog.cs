@@ -261,7 +261,7 @@ namespace Catan10
                 LogHeader logHeader = (LogHeader)m.Data;
 
                 this.TraceMessage($"Messages: [Sequence={m.Sequence}]\t[id={logHeader.LogId}][Origin={m.Origin}]\t" +
-                                  $"[Action={logHeader.Action}]\tPlayer=[{logHeader.PlayerName}]\t[LogType={logHeader.LogType}]");
+                                  $"[Action={logHeader.Action}]\tPlayer=[{logHeader.SentBy}]\t[LogType={logHeader.LogType}]");
             });
         }
 
