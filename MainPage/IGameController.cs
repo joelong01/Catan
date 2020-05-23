@@ -449,10 +449,10 @@ namespace Catan10
             MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.SentBy);
             Contract.Assert(MainPageModel.GameStartedBy != null);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
-            return Task.CompletedTask;
 
+            return AddPlayerLog.AddPlayer(this, TheHuman);
 
-
+            
         }
 
         /// <summary>

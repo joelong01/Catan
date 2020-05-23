@@ -66,11 +66,7 @@ namespace Catan10
                             if (players != null && players.Contains(TheHuman.PlayerName) == false)
                             {
                                 await this.Reset();
-                                await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
-                                this.MainPageModel.GameInfo = gameMessage.GameInfo;
-                                await StartGameLog.StartGame(this, gameMessage.GameInfo.Creator, 0);
-                                await AddPlayerLog.AddPlayer(this, TheHuman);
-
+                                MainPageModel.GameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);                                
                                 StartMonitoring();
                             }
                         }
@@ -146,7 +142,7 @@ namespace Catan10
             MainPageModel.GameInfo = dlg.SelectedGame;
             MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedGame.Creator);
             await StartGameLog.StartGame(this, TheHuman.PlayerName, 0);
-            await AddPlayerLog.AddPlayer(this, TheHuman);
+            
             StartMonitoring();
         }
 
@@ -189,13 +185,7 @@ namespace Catan10
             //
             //  start the game
             await StartGameLog.StartGame(this, MainPageModel.GameInfo.Creator, 0);
-
-            //
-            //  add players
-
             await Proxy.JoinGame(gameInfo.Id, TheHuman.PlayerName);
-            await AddPlayerLog.AddPlayer(this, TheHuman);
-
             StartMonitoring();
         }
 

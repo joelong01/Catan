@@ -715,8 +715,7 @@ namespace Catan10
                         }
 
                         break;
-                        break;
-
+                      
                     case GameState.DoneResourceAllocation:
                         break;
 
