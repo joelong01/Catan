@@ -39,7 +39,8 @@ namespace Catan10
                 RoadIndex = road.Index,
                 OldRoadState = road.RoadState,
                 NewRoadState = newRoadState,
-                OldRaceTracking = raceTracker
+                OldRaceTracking = raceTracker,
+                SentBy = gameController.CurrentPlayer.PlayerName
 
             };
 

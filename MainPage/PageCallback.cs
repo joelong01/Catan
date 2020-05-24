@@ -515,48 +515,7 @@ namespace Catan10
             //_gameTracker.SetState(currentState);
         }
 
-        private async Task<bool> RedoLogLine(LogEntry logLine)
-        {
-            switch (logLine.Action)
-            {
-                case CatanAction.Rolled:
-                    await ProcessRoll(logLine.Number);
-                    return true;
-
-                case CatanAction.ChangedPlayer:
-                    LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
-                    await AnimateToPlayerIndex(lcp.To);
-                    break;
-
-                case CatanAction.PlayedKnight:
-                case CatanAction.AssignedBaron:
-                case CatanAction.AssignedPirateShip:
-                case CatanAction.RolledSeven:
-                    LogBaronOrPirate redoObject = logLine.Tag as LogBaronOrPirate;
-                    await AssignBaronOrKnight(redoObject.TargetPlayer, redoObject.TargetTile, redoObject.TargetWeapon, logLine.Action, LogType.Normal);
-                    break;
-
-                case CatanAction.UpdatedRoadState:
-                    LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
-                    await UpdateRoadState(roadUpdate.Road, roadUpdate.OldRoadState, roadUpdate.NewRoadState, LogType.Normal);
-                    break;
-
-                case CatanAction.UpdateBuildingState:
-                    LogBuildingUpdate buildingUpdate = logLine.Tag as LogBuildingUpdate;
-                    await buildingUpdate.Building.UpdateBuildingState(CurrentPlayer, buildingUpdate.OldBuildingState, buildingUpdate.NewBuildingState);
-                    break;
-
-                case CatanAction.ChangePlayerAndSetState:
-                    LogChangePlayer lcpSS = logLine.Tag as LogChangePlayer;
-                    await ChangePlayerAndSetState(lcpSS.To - lcpSS.From, logLine.GameState, LogType.Replay);
-                    break;
-
-                default:
-                    break;
-            }
-
-            return false;
-        }
+     
 
         private bool RoadAllowed(RoadCtrl road)
         {

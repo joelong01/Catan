@@ -651,11 +651,51 @@ namespace Catan10
             PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
             Contract.Assert(player != null);
             await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
+            if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
+            {
+                await HideAllPipEllipses();
+                _showPipGroupIndex = 0;
+            }
+            BuildingState oldState = updateBuildingLog.OldBuildingState;
+            if (CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                
+
+                if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips))
+                {
+                    TradeResources tr = new TradeResources();
+                    foreach (var kvp in building.BuildingToTileDictionary)
+                    {
+                        tr.Add(kvp.Value.ResourceType, 1);
+                    }
+                    CurrentPlayer.GameData.Resources.GrantResources(tr);
+
+                }
+                else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
+                {
+                    //
+                    //  user did an undo
+                    TradeResources tr = new TradeResources();
+                    foreach (var kvp in building.BuildingToTileDictionary)
+                    {
+                        tr.Add(kvp.Value.ResourceType, -1);
+                    }
+                    CurrentPlayer.GameData.Resources.GrantResources(tr);
+                }
+
+            }
+
+            //
+            //  NOTE:  these have to be called in this order so that the undo works correctly
+            //  await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
+            UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
+            CalculateAndSetLongestRoad();
         }
 
         public void UpdateRoadState(PlayerModel player, RoadCtrl road, RoadState oldState, RoadState newState, RoadRaceTracking raceTracking)
         {
             road.RoadState = newState;
+            Contract.Assert(player != null);
             switch (newState)
             {
                 case RoadState.Unowned:

@@ -711,7 +711,7 @@ namespace Catan10
                         }
                         else
                         {
-                            await ChangePlayerLog.ChangePlayer(this, -1, GameState.AllocateResourceForward);
+                            await ChangePlayerLog.ChangePlayer(this, -1, GameState.AllocateResourceReverse);
                         }
 
                         break;
