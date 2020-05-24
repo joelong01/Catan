@@ -86,6 +86,17 @@ namespace Catan10
             return -1;
         }
 
+        private async Task ResetRollControl()
+        {
+            await _rollControl.Reset();
+
+            MainPageModel.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.NotificationsEnabled = true;
+                p.GameData.RollOrientation = TileOrientation.FaceUp;
+            }); // I hate this hack but I couldn't figure out how to do it with DataBinding
+        }
+
         private async Task UpdateUiForState(GameState currentState)
         {
             switch (currentState)
@@ -194,16 +205,6 @@ namespace Catan10
                 default:
                     break;
             }
-        }
-        private async Task ResetRollControl()
-        {
-            await _rollControl.Reset();
-
-            MainPageModel.PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.NotificationsEnabled = true;
-                p.GameData.RollOrientation = TileOrientation.FaceUp;
-            }); // I hate this hack but I couldn't figure out how to do it with DataBinding
         }
         /// <summary>
         ///     Called when a Player is added to a Service game
@@ -408,7 +409,10 @@ namespace Catan10
             string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
             RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
             Contract.Assert(newRaceTracker != null);
-
+            if (road.Owner != null)
+            {
+                this.TraceMessage("Owner changing!");
+            }
             UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 
             return Task.CompletedTask;
@@ -692,6 +696,14 @@ namespace Catan10
             CalculateAndSetLongestRoad();
         }
 
+        /// <summary>
+        ///     Function here so both Do and Undo can call it
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="road"></param>
+        /// <param name="oldState"></param>
+        /// <param name="newState"></param>
+        /// <param name="raceTracking"></param>
         public void UpdateRoadState(PlayerModel player, RoadCtrl road, RoadState oldState, RoadState newState, RoadRaceTracking raceTracking)
         {
             road.RoadState = newState;
@@ -727,7 +739,7 @@ namespace Catan10
                 default:
                     break;
             }
-
+            
             CalculateAndSetLongestRoad(raceTracking);
         }
     }
