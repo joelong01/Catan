@@ -387,7 +387,7 @@ namespace Catan10
                 AdjacentHarbor.Owner = Owner;
             }
 
-            await Callback?.BuildingStateChanged(this, oldState);
+            await Callback?.BuildingStateChanged(player, this, oldState);
         }
 
         private void UpdateResources()

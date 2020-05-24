@@ -908,9 +908,9 @@ namespace Catan10
         ///     in this case, recalc the longest road (a buidling can "break" a road) and then log it.
         ///     we also clear all the Pip ellipses if we are in the allocating phase
         /// </summary>
-        public async Task BuildingStateChanged(BuildingCtrl building, BuildingState oldState)
+        public async Task BuildingStateChanged(PlayerModel player, BuildingCtrl building, BuildingState oldState)
         {
-            PlayerModel player = CurrentPlayer;
+            
 
             //
             //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
@@ -922,7 +922,7 @@ namespace Catan10
                     _showPipGroupIndex = 0;
 
                 }
-                if (CurrentGameState == GameState.AllocateResourceReverse)
+                if (CurrentGameState == GameState.AllocateResourceReverse && player == CurrentPlayer)
                 {
                     TradeResources tr = new TradeResources();
                     int toAdd = 1;

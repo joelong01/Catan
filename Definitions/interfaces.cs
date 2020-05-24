@@ -62,7 +62,7 @@ namespace Catan10
 
         Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
 
-        Task BuildingStateChanged(BuildingCtrl settlement, BuildingState oldState);
+        Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
 
         bool BuildingStateChangeOk(BuildingCtrl building);
 
