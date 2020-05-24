@@ -427,12 +427,12 @@ namespace Catan10
         {
             if (owner != null)
             {
-                this.TraceMessage($"Road owner is {owner.PlayerName}");
+                this.TraceMessage($"Road index={Index} owner is {owner.PlayerName}");
                 return owner.BackgroundBrush;
             }
             if (current != null)
             {
-                this.TraceMessage($"no owner.  current is {owner.PlayerName}");
+                this.TraceMessage($"no owner.  current is {current.PlayerName} index is {Index}");
                 return current.BackgroundBrush;
             }
 
