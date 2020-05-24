@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -424,7 +425,15 @@ namespace Catan10
 
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
-            LinearGradientBrush brush = PlayerBindingFunctions.GetBackgroundBrush(current, owner);
+            if (owner != null) return owner.BackgroundBrush;
+            if (current != null) return current.BackgroundBrush;
+
+            var gradientStopCollection = new GradientStopCollection();
+            gradientStopCollection.Add(new GradientStop() { Color = Colors.HotPink, Offset = 0 });
+            gradientStopCollection.Add(new GradientStop() { Color = Colors.BurlyWood, Offset = 1 });
+            var brush = new LinearGradientBrush(gradientStopCollection, 45);
+            brush.StartPoint = new Windows.Foundation.Point(0, 0);
+            brush.EndPoint = new Windows.Foundation.Point(1.0, 1.0);
             return brush;
         }
 
