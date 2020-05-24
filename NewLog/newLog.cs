@@ -65,8 +65,11 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public bool PrintLogFlag { get; set; } = false;
+
         internal void PrintLog([CallerMemberName] string caller = "")
         {
+            if (!PrintLogFlag) return;
             int lines = 0;
             string actionLine = $"[CallerFilePath={caller}][Actions={DoneStack.Count}]";
             string undoLine = $"[CallerFilePath={caller}][Undo={UndoneStack.Count}]";

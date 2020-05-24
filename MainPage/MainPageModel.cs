@@ -12,7 +12,6 @@ namespace Catan10
 {
     public class MainPageModel : INotifyPropertyChanged
     {
-       
         private bool _EnableUiInteraction = true;
         private int _FiveStarPositions = 0;
         private int _FourStarPosition = 0;
@@ -44,13 +43,13 @@ namespace Catan10
                {GameState.WaitingForStart, "Start Game" },
                {GameState.AllocateResourceForward, "Next (Forward)" },
                {GameState.AllocateResourceReverse, "Next (Back)" },
+               {GameState.DoneResourceAllocation, "Click To Start Game" },
                {GameState.WaitingForRoll, "Select Roll" },
                {GameState.WaitingForNext, "End My Turn" },
                {GameState.Supplemental, "Finished (Next)" }
         };
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
-      
 
         public string DefaultUser { get; set; } = "";
 

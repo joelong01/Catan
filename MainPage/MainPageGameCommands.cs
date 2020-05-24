@@ -705,9 +705,9 @@ namespace Catan10
                         break;
 
                     case GameState.AllocateResourceReverse:
-                        if (MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1 == -1)
+                        if (MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1 == 0)
                         {
-                            await SetStateLog.SetState(this, GameState.WaitingForRoll);
+                            await SetStateLog.SetState(this, GameState.DoneResourceAllocation);
                         }
                         else
                         {
@@ -717,6 +717,7 @@ namespace Catan10
                         break;
                       
                     case GameState.DoneResourceAllocation:
+                        await SetStateLog.SetState(this, GameState.WaitingForRoll);
                         break;
 
                     case GameState.WaitingForRoll:

@@ -75,7 +75,7 @@ namespace Catan10
         GamePicked,                      
         MustMoveBaron,                   
         Unknown,
-        PickingBoard,
+        PickingBoard,        
     };
     public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea };
     //
