@@ -5,8 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="30" d:DesignWidth="30" IsHitTestVisible="True" mc:Ignorable="d">
-
-
     <Grid x:Name="LayoutRoot" PointerEntered="Building_PointerEntered"
         PointerExited="Building_PointerExited" PointerPressed="Building_PointerPressed"
         Background="Transparent" Opacity="1.0">
@@ -32,13 +30,9 @@
                     <!--<TextBlock Text="{x:Bind Index, FallbackValue=52, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
                       Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                        CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />-->
-
-
                 </StackPanel>
             </Viewbox>
-
         </Grid>
-
         <Grid Name="GRID_Build" Opacity="1" Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'Build'), Mode=OneWay}">
             <Ellipse Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=HotPink}" />
             <Viewbox>
@@ -47,7 +41,6 @@
                     Text="{x:Bind Pips, FallbackValue=52, Mode=TwoWay, Converter={StaticResource ResourceKey=IntToStringConverter}}"
                     Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     CharacterSpacing="0" FontSize="32" />
-
                 <!--<TextBlock Text="{x:Bind Index, FallbackValue=-1, Mode=TwoWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
                                   Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />-->
@@ -78,9 +71,7 @@
                     </StackPanel>
                 </StackPanel>
             </Viewbox>-->
-
         </Grid>
-
         <Grid Name="GRID_Error" Opacity=".25" Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'Error'), Mode=OneWay}">
             <Ellipse Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.BackgroundBrush, Mode=OneWay}" />
             <TextBlock x:Name="_txtPipCount" Margin="6,-9,5,-4" Padding="0"
@@ -88,16 +79,14 @@
                 CharacterSpacing="0" FontSize="32"
                 Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
         </Grid>
-
         <Grid Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
             Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}"
-            Canvas.ZIndex="9999" Background="Transparent"
+            Background="Transparent"
             Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'City'), Mode=OneWay}">
             <Viewbox Name="_vbCity" Width="30" Height="30" Stretch="Uniform">
                 <local:CityCtrl Width="30" Height="30" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
         </Grid>
-
         <Canvas Name="CANVAS_Settlement"
             Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
             Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}"
@@ -107,9 +96,15 @@
                 <local:SettlementCtrl Width="30" Height="30" Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
         </Canvas>
-
-
+        <Grid Name="GRID_NoEntitlement" Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'NoEntitlement'), Mode=OneWay}" 
+              Background="Transparent">
+            <Viewbox>
+                <TextBlock Text="$" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}"/>
+            </Viewbox>
+            <Ellipse Stroke="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}" StrokeThickness="2" />
+            <Line X1="6" Y1="6" X2="25" Y2="25"
+                        Stroke="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}"
+                        StrokeThickness="2" />
+        </Grid>
     </Grid>
-
-
 </UserControl>

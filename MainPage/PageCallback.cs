@@ -32,7 +32,7 @@ namespace Catan10
             }
         }
 
-        public bool CanBuild
+        public bool CanBuildRoad
 
         {
             get
@@ -45,6 +45,12 @@ namespace Catan10
 
                 if (CurrentPlayer != TheHuman) return false;
 
+                if (!CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.Road))
+                {
+                    this.TraceMessage($"Player={CurrentPlayer.PlayerName} does not have a road entitlement!");
+                    return false;
+                }
+
                 GameState state = CurrentGameState;
 
                 if (state == GameState.WaitingForNext || // I can build after I roll
@@ -54,6 +60,7 @@ namespace Catan10
                 {
                     return true;
                 }
+
 
                 return false;
             }
@@ -778,7 +785,7 @@ namespace Catan10
                 return true;
             }
 
-            if (!CanBuild)
+            if (!CanBuildRoad)
             {
                 return false;
             }
@@ -929,6 +936,20 @@ namespace Catan10
                 if (building.Owner != CurrentPlayer) // you can only click on your own stuff and when it is your turn
                 {
                     return false;
+                }
+                else
+                {
+                    if (building.BuildingState == BuildingState.Settlement)
+                    {
+                        if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.City))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
                 }
             }
             if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse || GameStateFromOldLog == GameState.Supplemental || GameStateFromOldLog == GameState.WaitingForNext)
@@ -1139,10 +1160,29 @@ namespace Catan10
             return _gameView.GetTile(tileIndex);
         }
 
-        public Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl building)
+        public BuildingState IsValidBuildingLocation(BuildingCtrl building)
         {
             bool ret = ValidateBuildingLocation(building, out bool showError);
-            return new Tuple<bool, bool>(ret, showError);
+            if (!ret && !showError)
+            {
+                //
+                //  ok place to build.  make sure they have entitlement
+                if (building.BuildingState != BuildingState.Settlement)
+                {
+                    if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.Settlement))
+                    {
+                        return BuildingState.Build;
+                    }
+                    else
+                    {
+                        return BuildingState.NoEntitlement;
+                    }
+                }
+                
+                return BuildingState.Build;
+            }
+
+            return BuildingState.Error;
         }
 
         public Task OnNewGame()
@@ -1209,7 +1249,7 @@ namespace Catan10
 
         public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
         {
-            if (!CanBuild)
+            if (!CanBuildRoad)
             {
                 return;
             }
@@ -1238,7 +1278,7 @@ namespace Catan10
 
         public void RoadExited(RoadCtrl road, PointerRoutedEventArgs e)
         {
-            if (!CanBuild)
+            if (!CanBuildRoad)
             {
                 return;
             }
@@ -1265,7 +1305,7 @@ namespace Catan10
 
         public async void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e)
         {
-            if (!CanBuild)
+            if (!CanBuildRoad)
             {
                 return;
             }

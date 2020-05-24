@@ -52,10 +52,6 @@ namespace Catan10
             if (idx >= count) idx -= count;
             if (idx < 0) idx += count;
 
-            // this controller is the one spot where the CurrentPlayer is changed.  it should update all the bindings
-            // the setter will update all the associated state changes that happen when the CurrentPlayer
-            // changes
-
             var newPlayer = playingPlayers[idx];
             await SetCurrentPlayer(gameController, newPlayer, newState);
         }

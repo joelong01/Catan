@@ -58,7 +58,7 @@ namespace Catan10
     public interface IGameCallback
     {
 
-        bool CanBuild { get; }
+        bool CanBuildRoad { get; }
 
         Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
 
@@ -66,7 +66,7 @@ namespace Catan10
 
         bool BuildingStateChangeOk(BuildingCtrl building);
 
-        Tuple<bool, bool> IsValidBuildingLocation(BuildingCtrl sender);
+        BuildingState IsValidBuildingLocation(BuildingCtrl sender);
 
         void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e);
 

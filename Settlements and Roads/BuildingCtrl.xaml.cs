@@ -17,7 +17,7 @@ namespace Catan10
     /// <summary>
     ///     The states that a building can be in
     /// </summary>
-    public enum BuildingState { None, Build, Error, Pips, Settlement, City };
+    public enum BuildingState { None, Build, Error, Pips, Settlement, City, NoEntitlement };
 
     public sealed partial class BuildingCtrl : UserControl
     {
@@ -51,6 +51,7 @@ namespace Catan10
             };
 
             this.RenderTransform = transform;
+            
         }
 
         public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
@@ -158,7 +159,7 @@ namespace Catan10
         /// <summary>
         ///     When we enter a building, we check to see if there is nothing being shown
         ///     if so and if it is a valid building location, show the build ellipse
-        ///     otherwise show the Error
+        ///     otherwise show the Error, which can indicate they don't have the entitlement to build.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -166,15 +167,7 @@ namespace Catan10
         {
             if (this.BuildingState == BuildingState.None)
             {
-                Tuple<bool, bool> validate = Callback?.IsValidBuildingLocation(this);
-                if (validate.Item1) // it is a valid location
-                {
-                    this.BuildingState = BuildingState.Build;
-                }
-                else if (validate.Item2) // it is not a valid location and we should show an error
-                {
-                    this.BuildingState = BuildingState.Error;
-                }
+                this.BuildingState= Callback.IsValidBuildingLocation(this);                
             }
         }
 
@@ -235,8 +228,6 @@ namespace Catan10
 
             var gameController = Callback as IGameController;
             await UpdateBuildingLog.UpdateBuildingState(gameController, this, newState);
-
-
         }
 
         private void OutputKeyInfo()
@@ -329,7 +320,7 @@ namespace Catan10
         /// </summary>
         /// <returns></returns>
         public Task UpdateBuildingState(PlayerModel player, BuildingState oldState, BuildingState newState)
-        {            
+        {
             bool ret = false;
             switch (oldState)
             {
@@ -370,13 +361,12 @@ namespace Catan10
                 case BuildingState.Settlement:
                     Owner = player;
                     player.GameData.Settlements.Add(this);
-                    UpdateResources();
+
                     break;
 
                 case BuildingState.City:
                     Owner = player;
                     player.GameData.Cities.Add(this);
-                    UpdateResources();
                     break;
 
                 default:
@@ -388,21 +378,8 @@ namespace Catan10
             }
 
             return Task.CompletedTask;
-
-          //  await Callback?.BuildingStateChanged(player, this, oldState);
-        }
-
-        private void UpdateResources()
-        {
-            foreach (var kvp in BuildingToTileDictionary)
-            {
-                this.TraceMessage($"[BuildingIndex={Index}][ResourceType={kvp.Value.ResourceType}][Number={kvp.Value.Number}]");
-            }
         }
     }
-
-   
-
     /// <summary>
     ///  This is for the "clones" support. the issue is that you can have multiple Tile/BuildingLocation pairs that map to the same
     ///  visual location for a Building.  We want to have exactly one building per location, so that datastructure allows us to find
@@ -446,4 +423,5 @@ namespace Catan10
             return obj.Tile.GetHashCode() * 17 + obj.Location.GetHashCode();
         }
     }
+
 }

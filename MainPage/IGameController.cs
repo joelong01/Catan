@@ -275,6 +275,14 @@ namespace Catan10
             {
                 await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
             }
+
+            if (changePlayerLog.NewState == GameState.AllocateResourceForward || changePlayerLog.NewState == GameState.AllocateResourceReverse)
+            {
+                //
+                //  during allocation phase, you get one road and one settlement
+                CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
+                CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
+            }
         }
 
         public void CompleteRedo()
