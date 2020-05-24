@@ -128,7 +128,7 @@ namespace Catan10
         public Guid LogId { get; set; } = Guid.NewGuid();
         public LogType LogType { get; set; } = LogType.Normal;
         public GameState NewState { get; set; } = MainPage.Current.CurrentGameState;
-        public GameState OldState { get; set; } = (MainPage.Current.MainPageModel.Log.PeekAction == null) ? GameState.WaitingForStart : MainPage.Current.MainPageModel.Log.PeekAction.NewState;
+        public GameState OldState { get; set; } = (MainPage.Current.MainPageModel.Log.PeekAction == null) ? GameState.WaitingForNewGame : MainPage.Current.MainPageModel.Log.PeekAction.NewState;
         public string SentBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
 
         // if state changes, you have to set this
