@@ -21,6 +21,7 @@ namespace Catan10
             {
                 PlayerToAdd = playerToAdd.PlayerName,
                 SentBy = gameController.TheHuman.PlayerName,
+                NewState = GameState.WaitingForPlayers,
                 CanUndo = false
             };
             
