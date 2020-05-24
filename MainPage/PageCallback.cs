@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -41,6 +42,8 @@ namespace Catan10
                 {
                     return false;
                 }
+
+                if (CurrentPlayer != TheHuman) return false;
 
                 GameState state = CurrentGameState;
 
@@ -910,35 +913,38 @@ namespace Catan10
         /// </summary>
         public async Task BuildingStateChanged(PlayerModel player, BuildingCtrl building, BuildingState oldState)
         {
-            
 
-            //
-            //  if we are in the allocation phase and we change the building state then hide all the Pip ellipses
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
+
+            if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
             {
-                if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
-                {
-                    await HideAllPipEllipses();
-                    _showPipGroupIndex = 0;
+                await HideAllPipEllipses();
+                _showPipGroupIndex = 0;
+            }
 
-                }
-                if (CurrentGameState == GameState.AllocateResourceReverse && player == CurrentPlayer)
+            if (CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips))
                 {
                     TradeResources tr = new TradeResources();
-                    int toAdd = 1;
-                    TradeResources resourcesThisTurn = CurrentPlayer.GameData.Resources.ResourcesThisTurn;
-                    if (building.BuildingState == BuildingState.None && resourcesThisTurn.Count > 0) // if we are allocating in reverse and we transition to None
-                    {
-                        toAdd = -1;
-                    }
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
-                        tr.Add(kvp.Value.ResourceType, toAdd);
-                        
+                        tr.Add(kvp.Value.ResourceType, 1);
                     }
+                    CurrentPlayer.GameData.Resources.GrantResources(tr);
 
+                }
+                else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
+                {
+                    //
+                    //  user did an undo
+                    TradeResources tr = new TradeResources();
+                    foreach (var kvp in building.BuildingToTileDictionary)
+                    {
+                        tr.Add(kvp.Value.ResourceType, -1);
+                    }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
                 }
+               
             }
 
             //
@@ -957,6 +963,8 @@ namespace Catan10
         {
             if (!ValidateBuilding) return true;
             if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
+            Contract.Assert(CurrentPlayer == TheHuman);
+
             if (building.Owner != null)
             {
                 if (building.Owner != CurrentPlayer) // you can only click on your own stuff and when it is your turn
@@ -1126,6 +1134,7 @@ namespace Catan10
                 await VisualShuffle();
             }
         }
+
         public async Task CurrentPlayerChanged()
         {
             //
@@ -1238,6 +1247,7 @@ namespace Catan10
             //    VerifyRoundTrip<MainPageModel>(MainPageModel);
             //}
         }
+
         public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
         {
             if (!CanBuild)
@@ -1316,7 +1326,7 @@ namespace Catan10
             await UpdateRoadLog.SetRoadState(this, road, NextRoadState(road), _raceTracking);
             //
             //  UpdateRoad state will be done in the IGameController
-            //  await UpdateRoadState(road, road.RoadState, NextRoadState(road), LogType.Normal);
+            
         }
 
         //
@@ -1515,6 +1525,7 @@ namespace Catan10
                 _menuBaron.ShowAt(targetTile, rte.GetPosition(targetTile));
             }
         }
+
         //
         //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
         ///

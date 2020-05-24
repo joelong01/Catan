@@ -199,6 +199,7 @@ namespace Catan10
         private void Road_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             //  this.TraceMessage(this.ToString());
+
             Callback?.RoadPressed(this, e);
         }
 
@@ -249,6 +250,7 @@ namespace Catan10
 
             UpdateVisuals(new Windows.Foundation.Size(this.ActualWidth, this.ActualHeight));
         }
+
         private void SetRoadType(RoadType roadtype)
         {
             if (this.ActualHeight * this.ActualWidth == 0)

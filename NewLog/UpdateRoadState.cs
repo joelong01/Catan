@@ -38,6 +38,7 @@ namespace Catan10
 
                 SentBy = gameController.CurrentPlayer.PlayerName,
                 OldState = gameController.CurrentGameState,
+                NewState = gameController.CurrentGameState,
                 Action = CatanAction.UpdatedRoadState,
                 RoadIndex = road.Index,
                 OldRoadState = road.RoadState,
