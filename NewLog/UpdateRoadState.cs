@@ -21,8 +21,7 @@ namespace Catan10
         public RoadState NewRoadState { get; set; } = RoadState.Unowned;
         public RoadRaceTracking OldRaceTracking { get; set; } = new RoadRaceTracking();
         public RoadRaceTracking NewRaceTracking { get; set; } = new RoadRaceTracking();
-        public GameType GameType { get; set; }
-
+      
         public UpdateRoadLog() : base() { }
         public static async Task SetRoadState(IGameController gameController, RoadCtrl road, RoadState newRoadState, RoadRaceTracking raceTracker)
         {
@@ -36,14 +35,10 @@ namespace Catan10
             UpdateRoadLog logHeader = new UpdateRoadLog()
             {
 
-                SentBy = gameController.CurrentPlayer.PlayerName,
-                OldState = gameController.CurrentGameState,
-                NewState = gameController.CurrentGameState,
                 Action = CatanAction.UpdatedRoadState,
                 RoadIndex = road.Index,
                 OldRoadState = road.RoadState,
                 NewRoadState = newRoadState,
-                CatanGame = gameController.CatanGame,
                 OldRaceTracking = raceTracker
 
             };

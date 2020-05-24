@@ -96,8 +96,7 @@ namespace Catan10
                 case GameState.WaitingForNewGame:
                     break;
 
-                case GameState.WaitingForStart:
-                    CurrentPlayer = PlayingPlayers[0];
+                case GameState.WaitingForStart:                    
                     break;
 
                 case GameState.WaitingForPlayers:
@@ -545,7 +544,7 @@ namespace Catan10
                     MainPageModel.PlayingPlayers[i] = newList[i];
                 }
 
-                await SetStateLog.SetState(this, GameState.WaitingForStart);
+                await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.PlayingPlayers[0], GameState.WaitingForStart);                
                 
             }
         }
