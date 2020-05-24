@@ -427,22 +427,16 @@ namespace Catan10
         {
             if (owner != null)
             {
-                this.TraceMessage($"Road index={Index} owner is {owner.PlayerName}");
                 return owner.BackgroundBrush;
             }
             if (current != null)
             {
-                this.TraceMessage($"no owner.  current is {current.PlayerName} index is {Index}");
                 return current.BackgroundBrush;
             }
 
-            var gradientStopCollection = new GradientStopCollection();
-            gradientStopCollection.Add(new GradientStop() { Color = Colors.HotPink, Offset = 0 });
-            gradientStopCollection.Add(new GradientStop() { Color = Colors.BurlyWood, Offset = 1 });
-            var brush = new LinearGradientBrush(gradientStopCollection, 45);
-            brush.StartPoint = new Windows.Foundation.Point(0, 0);
-            brush.EndPoint = new Windows.Foundation.Point(1.0, 1.0);
-            return brush;
+            return ConverterGlobals.GetLinearGradientBrush(Colors.HotPink, Colors.Black);
+
+
         }
 
         public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
