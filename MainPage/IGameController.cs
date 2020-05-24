@@ -97,7 +97,7 @@ namespace Catan10
                     break;
 
                 case GameState.WaitingForStart:
-                    await SetStateLog.SetState(this, GameState.AllocateResourceForward);
+                    CurrentPlayer = PlayingPlayers[0];
                     break;
 
                 case GameState.WaitingForPlayers:
@@ -546,6 +546,7 @@ namespace Catan10
                 }
 
                 await SetStateLog.SetState(this, GameState.WaitingForStart);
+                
             }
         }
 

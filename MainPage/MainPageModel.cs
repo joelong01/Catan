@@ -41,7 +41,7 @@ namespace Catan10
                {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
                {GameState.PickingBoard, "Roll for Order" },
                {GameState.WaitingForRollForOrder, "Start" },
-               {GameState.WaitingForStart, "Next (Pick Resources)" },
+               {GameState.WaitingForStart, "Start Game" },
                {GameState.AllocateResourceForward, "Next (Forward)" },
                {GameState.AllocateResourceReverse, "Next (Back)" },
                {GameState.WaitingForRoll, "Select Roll" },
