@@ -661,7 +661,7 @@ namespace Catan10
             {
                 
 
-                if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips))
+                if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build))
                 {
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)

@@ -143,7 +143,7 @@
                     FontFamily="Century Schoolbook" FontSize="28" />
                 <TextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Text="/"
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
-                    FontFamily="Century Schoolbook" FontSize="28" />                    
+                    FontFamily="Century Schoolbook" FontSize="28" />
                 <TextBlock Name="_txtRoads" Grid.Column="1" HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Text="{x:Bind Player.GameData.MaxRoads, Mode=OneWay, FallbackValue=7}"
