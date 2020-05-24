@@ -34,6 +34,7 @@ namespace Catan10
                 NewState = GameState.WaitingForRollForOrder,
                 DiceOne = dice1,
                 DiceTwo = dice2,
+                SentBy = gameController.TheHuman.PlayerName
 
             };
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
