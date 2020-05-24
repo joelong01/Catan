@@ -423,10 +423,18 @@ namespace Catan10
             Show(false);
         }
 
-        public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
+        public LinearGradientBrush GetBackgroundBrush(PlayerModel owner, PlayerModel current)
         {
-            if (owner != null) return owner.BackgroundBrush;
-            if (current != null) return current.BackgroundBrush;
+            if (owner != null)
+            {
+                this.TraceMessage($"Road owner is {owner.PlayerName}");
+                return owner.BackgroundBrush;
+            }
+            if (current != null)
+            {
+                this.TraceMessage($"no owner.  current is {owner.PlayerName}");
+                return current.BackgroundBrush;
+            }
 
             var gradientStopCollection = new GradientStopCollection();
             gradientStopCollection.Add(new GradientStop() { Color = Colors.HotPink, Offset = 0 });
