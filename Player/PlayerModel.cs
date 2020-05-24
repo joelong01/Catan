@@ -1,17 +1,14 @@
-﻿using Catan.Proxy;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
+using Catan.Proxy;
+
 using Windows.Storage;
 using Windows.UI;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -20,50 +17,119 @@ using Windows.UI.Xaml.Media.Imaging;
 namespace Catan10
 {
     public delegate void CardsLostUpdatedHandler(PlayerModel player, int oldVal, int newVal);
+
     public delegate void PlayerResourceUpdateHandler(PlayerModel player, ResourceType resource, int oldVal, int newVal);
 
+    internal class ResourceCount
+    {
+        public int Acquired { get; set; } = 0;
+        public int Lost { get; set; } = 0;
 
-
+        public override string ToString()
+        {
+            return String.Format($"Acquired:{Acquired} Lost:{Lost}");
+        }
+    }
 
     //
     //  this is where data goes that is applicable to players and all games
     //
     //  Only data that is stored on disk should be stored here
-    //  
-    //  
+    //
+    //
     public class PlayerModel : INotifyPropertyChanged
     {
-
-        private string _playerName = "Nameless";
+        private Color _Foreground = Colors.White;
+        private ImageBrush _imageBrush = null;
         private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
         private PlayerGameModel _playerGameData = null;
         private Guid _PlayerIdentifier;
-        private ImageBrush _imageBrush = null;
-        
-
-        Color _primaryBackgroundColor = Colors.SlateBlue;
-        Color _secondaryBackgroundColor = Colors.Black;
-        Color _Foreground = Colors.White;
-        public string PlayerName
+        private string _playerName = "Nameless";
+        private Color _primaryBackgroundColor = Colors.SlateBlue;
+        private Color _secondaryBackgroundColor = Colors.Black;
+        public PlayerModel()
         {
-            get => _playerName;
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+                BitmapImage bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/DefaultPlayers/guest.jpg", UriKind.RelativeOrAbsolute));
+                ImageBrush brush = new ImageBrush
+                {
+                    AlignmentX = AlignmentX.Left,
+                    AlignmentY = AlignmentY.Top,
+                    Stretch = Stretch.UniformToFill,
+                    ImageSource = bitmapImage
+                };
+                ImageBrush = brush;
+                _imageBrush = new ImageBrush();
+            }
+
+            _playerGameData = new PlayerGameModel(this);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [JsonIgnore]
+        public ObservableCollection<Brush> AvailableColors => new ObservableCollection<Brush>(CatanColors.AllAvailableBrushes());
+
+        [JsonIgnore]
+        public LinearGradientBrush BackgroundBrush
+        {
+            get
+            {
+                return ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
+            }
+        }
+
+        [JsonIgnore]
+        public SolidColorBrush ForegroundBrush
+        {
+            get
+            {
+                return ConverterGlobals.GetBrush(this.ForegroundColor);
+            }
+        }
+
+        public Color ForegroundColor
+        {
+            get
+            {
+                return _Foreground;
+            }
             set
             {
-                if (_playerName != value)
+                if (_Foreground != value)
                 {
-                    _playerName = value;
+                    _Foreground = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("ForegroundBrush");
+                    NotifyPropertyChanged("GetForegroundBrush");    // this is the binding function name that the roads and buildings use
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public PlayerGameModel GameData
+        {
+            get => _playerGameData;
+            set
+            {
+                if (_playerGameData != value)
+                {
+                    _playerGameData = value;
                     NotifyPropertyChanged();
                 }
             }
         }
-        public Guid PlayerIdentifier
+
+        [JsonIgnore]
+        public ImageBrush ImageBrush
         {
-            get => _PlayerIdentifier;
+            get => _imageBrush;
             set
             {
-                if (_PlayerIdentifier != value)
+                if (value != _imageBrush)
                 {
-                    _PlayerIdentifier = value;
+                    _imageBrush = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -81,65 +147,46 @@ namespace Catan10
                 }
             }
         }
-        public Color ForegroundColor
+
+        [JsonIgnore]
+        public PlayerModel PlayerDataInstance => this;
+
+        public Guid PlayerIdentifier
         {
-            get
-            {
-                return _Foreground;
-            }
+            get => _PlayerIdentifier;
             set
             {
-                if (_Foreground != value)
+                if (_PlayerIdentifier != value)
                 {
-                    _Foreground = value;
+                    _PlayerIdentifier = value;
                     NotifyPropertyChanged();
-                    NotifyPropertyChanged("ForegroundBrush");
-                    NotifyPropertyChanged("GetForegroundBrush");    // this is the binding function name that the roads and buildings use                
                 }
             }
         }
 
         [JsonIgnore]
-        public SolidColorBrush ForegroundBrush
+        public ImageSource PlayerImageSource
         {
-            get
-            {
-                return ConverterGlobals.GetBrush(this.ForegroundColor);
-            }
-        }
-        private int PerceivedBrightness(Color c)
-        {
-            return (int)Math.Sqrt(
-            c.R * c.R * .299 +
-            c.G * c.G * .587 +
-            c.B * c.B * .114);
-        }
-        [JsonIgnore]
-        
-        public bool UseWhiteImages
-        {
-            get
-            {
-
-                return PerceivedBrightness(PrimaryBackgroundColor) > 130 ? true : false;
-            }
-        }
-
-        public Color SecondaryBackgroundColor
-        {
-            get
-            {
-                return _secondaryBackgroundColor;
-            }
+            get => _imageBrush.ImageSource;
             set
             {
-                if (_secondaryBackgroundColor != value)
+                if (_imageBrush.ImageSource != value)
                 {
-                    _secondaryBackgroundColor = value;
+                    _imageBrush.ImageSource = value;
                     NotifyPropertyChanged();
-                    NotifyPropertyChanged("BackgroundBrush");
-                    NotifyPropertyChanged("SolidSecondaryBrush");
-                    NotifyPropertyChanged("GetBackgroundBrush");    // this is the binding function name that the roads and buildings use
+                }
+            }
+        }
+
+        public string PlayerName
+        {
+            get => _playerName;
+            set
+            {
+                if (_playerName != value)
+                {
+                    _playerName = value;
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -162,12 +209,23 @@ namespace Catan10
                 }
             }
         }
-        [JsonIgnore]
-        public LinearGradientBrush BackgroundBrush
+
+        public Color SecondaryBackgroundColor
         {
             get
             {
-                return ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
+                return _secondaryBackgroundColor;
+            }
+            set
+            {
+                if (_secondaryBackgroundColor != value)
+                {
+                    _secondaryBackgroundColor = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("BackgroundBrush");
+                    NotifyPropertyChanged("SolidSecondaryBrush");
+                    NotifyPropertyChanged("GetBackgroundBrush");    // this is the binding function name that the roads and buildings use
+                }
             }
         }
 
@@ -179,6 +237,7 @@ namespace Catan10
                 return ConverterGlobals.GetBrush(PrimaryBackgroundColor);
             }
         }
+
         [JsonIgnore]
         public SolidColorBrush SolidSecondaryBrush
         {
@@ -189,35 +248,33 @@ namespace Catan10
         }
 
         [JsonIgnore]
-        public PlayerModel PlayerDataInstance => this;
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        public PlayerModel This => this;
 
         [JsonIgnore]
-        public ObservableCollection<Brush> AvailableColors => new ObservableCollection<Brush>(CatanColors.AllAvailableBrushes());
-
-        public PlayerModel()
+        public bool UseWhiteImages
         {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
+            get
             {
-
-                BitmapImage bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/DefaultPlayers/guest.jpg", UriKind.RelativeOrAbsolute));
-                ImageBrush brush = new ImageBrush
-                {
-                    AlignmentX = AlignmentX.Left,
-                    AlignmentY = AlignmentY.Top,
-                    Stretch = Stretch.UniformToFill,
-                    ImageSource = bitmapImage
-                };
-                ImageBrush = brush;
-                _imageBrush = new ImageBrush();
-                            
+                return PerceivedBrightness(PrimaryBackgroundColor) > 130 ? true : false;
             }
-
-            _playerGameData = new PlayerGameModel(this);
-
         }
 
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private int PerceivedBrightness(Color c)
+        {
+            return (int)Math.Sqrt(
+            c.R * c.R * .299 +
+            c.G * c.G * .587 +
+            c.B * c.B * .114);
+        }
+        public static PlayerModel Deserialize(string json)
+        {
+            return CatanProxy.Deserialize<PlayerModel>(json);
+        }
 
         public async Task<StorageFile> CopyImage(StorageFile file)
         {
@@ -232,7 +289,6 @@ namespace Catan10
             {
                 if (ImageFileName.Contains("ms-appx"))
                 {
-
                     BitmapImage bitmapImage = new BitmapImage(new Uri(ImageFileName, UriKind.RelativeOrAbsolute));
                     ImageBrush brush = new ImageBrush
                     {
@@ -244,7 +300,6 @@ namespace Catan10
                     ImageBrush = brush;
                     return;
                 }
-
 
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
                 StorageFolder imageFolder = await folder.GetFolderAsync("Player Images");
@@ -264,130 +319,35 @@ namespace Catan10
                         ImageSource = bitmapImage
                     };
                     ImageBrush = brush;
-
                 }
             }
             catch
             {
                 if (await StaticHelpers.AskUserYesNoQuestion($"Problem loading player {PlayerName}.\nDelete it?", "yes", "no") == true)
                 {
-
-                }
-            }
-
-        }
-
-        [JsonIgnore]
-        public PlayerModel This => this;
-
-
-
-        [JsonIgnore]
-        public ImageBrush ImageBrush
-        {
-            get => _imageBrush;
-            set
-            {
-                if (value != _imageBrush)
-                {
-                    _imageBrush = value;
-                    NotifyPropertyChanged();
                 }
             }
         }
-
-        [JsonIgnore]
-        public ImageSource PlayerImageSource
-        {
-            get => _imageBrush.ImageSource;
-            set
-            {
-                if (_imageBrush.ImageSource != value)
-                {
-                    _imageBrush.ImageSource = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-
-
-
-       
-
-        [JsonIgnore]
-        public PlayerGameModel GameData
-        {
-            get => _playerGameData;
-            set
-            {
-                if (_playerGameData != value)
-                {
-                    _playerGameData = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-       
-
-
-      
-     
-        public string Serialize(bool indented)
-        {
-            return CatanProxy.Serialize<PlayerModel>(this, indented);
-            
-        }
-
-
-
-        public static PlayerModel Deserialize(string json)
-        {
-            return CatanProxy.Deserialize<PlayerModel>(json);
-
-        }
-
-
         /// <summary>
         ///     I've run into a bunch of problems where I add data (such as the GoldTiles list) but forget to clear it when Reset
         ///     is called.  this means state moves from one game to the next and we get funny results.  so instead i'm going to try
         ///     to just create a new game model when this is reset and see how it goes.
-        ///     
+        ///
         ///    4/13/2020 - Nasty bug here.  by wiping  GameData() we broke all bindings.  4 hours to debug. The change was to start
         ///                a new game by loading the PlayerData from disk in MainPage.LoadPlayerData();
         /// </summary>
         public void Reset()
         {
-
             GameData = new PlayerGameModel(this);
-
-
         }
 
+        public string Serialize(bool indented)
+        {
+            return CatanProxy.Serialize<PlayerModel>(this, indented);
+        }
         public override string ToString()
         {
             return String.Format($"{PlayerName}");
         }
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        }
-
     }
-
-    class ResourceCount
-    {
-        public int Acquired { get; set; } = 0;
-        public int Lost { get; set; } = 0;
-
-        public override string ToString()
-        {
-            return String.Format($"Acquired:{Acquired} Lost:{Lost}");
-        }
-    }
-
-
-
 }

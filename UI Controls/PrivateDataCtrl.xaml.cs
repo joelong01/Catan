@@ -30,7 +30,7 @@ namespace Catan10
         {
             if (value == null) return;
             PlayedDevCards.Clear();
-            PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);
+            PlayedDevCards.AddRange(value.GameData.Resources.PlayedDevCards);
             this.PlayedDevCards.Add(DevCardType.Knight);
             this.PlayedDevCards.Add(DevCardType.YearOfPlenty);
             this.PlayedDevCards.Add(DevCardType.Knight);

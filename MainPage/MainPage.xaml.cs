@@ -1342,7 +1342,9 @@ namespace Catan10
 
                     //
                     //  this updates the *count* of resources and returns the value the user gets for the number being rolled
-                    int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
+                    //  int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
+                    int value = 0;
+                    this.TraceMessage("You changed this, now fix it");
                     //
                     //  need to look up the control given the player and add it to the right one
                     AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);

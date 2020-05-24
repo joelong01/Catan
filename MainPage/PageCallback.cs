@@ -920,6 +920,24 @@ namespace Catan10
                 {
                     await HideAllPipEllipses();
                     _showPipGroupIndex = 0;
+
+                }
+                if (CurrentGameState == GameState.AllocateResourceReverse)
+                {
+                    TradeResources tr = new TradeResources();
+                    int toAdd = 1;
+                    TradeResources resourcesThisTurn = CurrentPlayer.GameData.Resources.ResourcesThisTurn;
+                    if (building.BuildingState == BuildingState.None && resourcesThisTurn.Count > 0) // if we are allocating in reverse and we transition to None
+                    {
+                        toAdd = -1;
+                    }
+                    foreach (var kvp in building.BuildingToTileDictionary)
+                    {
+                        tr.Add(kvp.Value.ResourceType, toAdd);
+                        
+                    }
+
+                    CurrentPlayer.GameData.Resources.GrantResources(tr);
                 }
             }
 

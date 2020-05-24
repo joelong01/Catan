@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -113,13 +114,7 @@ namespace Catan10
 
                 case GameState.PickingBoard:
 
-                    await _rollControl.Reset();
-
-                    MainPageModel.PlayingPlayers.ForEach((p) =>
-                    {
-                        p.GameData.NotificationsEnabled = true;
-                        p.GameData.RollOrientation = TileOrientation.FaceUp;
-                    }); // I hate this hack but I couldn't figure out how to do it with DataBinding
+                    await ResetRollControl();
 
                     await RandomBoardLog.RandomizeBoard(this, 0);
                     if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
@@ -157,12 +152,13 @@ namespace Catan10
                     break;
 
                 case GameState.AllocateResourceReverse:
+                   
                     break;
-
                 case GameState.DoneResourceAllocation:
                     break;
 
                 case GameState.WaitingForRoll:
+                    await ResetRollControl();
                     break;
 
                 case GameState.WaitingForNext:
@@ -200,7 +196,16 @@ namespace Catan10
                     break;
             }
         }
+        private async Task ResetRollControl()
+        {
+            await _rollControl.Reset();
 
+            MainPageModel.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.NotificationsEnabled = true;
+                p.GameData.RollOrientation = TileOrientation.FaceUp;
+            }); // I hate this hack but I couldn't figure out how to do it with DataBinding
+        }
         /// <summary>
         ///     Called when a Player is added to a Service game
         ///
@@ -274,12 +279,18 @@ namespace Catan10
 
         public void CompleteRedo()
         {
-            UndoRedoTcs.SetResult(true);
+            if (UndoRedoTcs != null)
+            {
+                UndoRedoTcs.SetResult(true);
+            }
         }
 
         public void CompleteUndo()
         {
-            UndoRedoTcs.SetResult(true);
+            if (UndoRedoTcs != null)
+            {
+                UndoRedoTcs.SetResult(true);
+            }
         }
 
         public RandomBoardSettings CurrentRandomBoard()

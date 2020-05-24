@@ -237,7 +237,6 @@ namespace Catan10
             await UpdateBuildingLog.UpdateBuildingState(gameController, this, newState);
 
 
-            //    await UpdateBuildingState(oldState, newState);
         }
 
         private void OutputKeyInfo()
@@ -371,11 +370,13 @@ namespace Catan10
                 case BuildingState.Settlement:
                     Owner = player;
                     player.GameData.Settlements.Add(this);
+                    UpdateResources();
                     break;
 
                 case BuildingState.City:
                     Owner = player;
                     player.GameData.Cities.Add(this);
+                    UpdateResources();
                     break;
 
                 default:
@@ -388,7 +389,17 @@ namespace Catan10
 
             await Callback?.BuildingStateChanged(this, oldState);
         }
+
+        private void UpdateResources()
+        {
+            foreach (var kvp in BuildingToTileDictionary)
+            {
+                this.TraceMessage($"[BuildingIndex={Index}][ResourceType={kvp.Value.ResourceType}][Number={kvp.Value.Number}]");
+            }
+        }
     }
+
+   
 
     /// <summary>
     ///  This is for the "clones" support. the issue is that you can have multiple Tile/BuildingLocation pairs that map to the same

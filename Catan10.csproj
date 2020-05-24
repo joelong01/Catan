@@ -152,6 +152,8 @@
     <Compile Include="NewLog\newLog.cs" />
     <Compile Include="NewLog\Rolled.cs" />
     <Compile Include="NewLog\StartGame.cs" />
+    <Compile Include="Player\PlayerResources.cs" />
+    <Compile Include="Player\TradeResources.cs" />
     <Compile Include="State\GridPosition.cs" />
     <Compile Include="State\TargetTracking.cs" />
     <Compile Include="NewLog\UpdateRoadState.cs" />

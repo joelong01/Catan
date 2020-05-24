@@ -90,7 +90,7 @@ namespace Catan10
         {
             if (value == null) return;
             PlayedDevCards.Clear();
-            PlayedDevCards.AddRange(value.GameData.PlayerResources.PlayedDevCards);            
+            PlayedDevCards.AddRange(value.GameData.Resources.PlayedDevCards);            
             //
             //  for testing...
             //
