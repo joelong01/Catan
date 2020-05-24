@@ -773,7 +773,7 @@ namespace Catan10
         //  returns True if it is OK to build this settlement - this is basically a Road check
         private BuildingState ValidateBuildingLocation(BuildingCtrl building)
         {
-            if ((GameStateFromOldLog == GameState.WaitingForNewGame || GameStateFromOldLog == GameState.WaitingForStart) && ValidateBuilding)
+            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.WaitingForStart) && ValidateBuilding)
             {
                 
                 return BuildingState.None;
