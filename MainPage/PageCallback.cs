@@ -771,55 +771,52 @@ namespace Catan10
 
         //
         //  returns True if it is OK to build this settlement - this is basically a Road check
-        private bool ValidateBuildingLocation(BuildingCtrl building, out bool showErrorUI)
+        private BuildingState ValidateBuildingLocation(BuildingCtrl building)
         {
-            showErrorUI = true;
             if ((GameStateFromOldLog == GameState.WaitingForNewGame || GameStateFromOldLog == GameState.WaitingForStart) && ValidateBuilding)
             {
-                showErrorUI = false;
-                return false;
+                
+                return BuildingState.None;
             }
 
             if (!ValidateBuilding)
             {
-                return true;
+                return BuildingState.Build;
             }
 
             if (!CanBuildRoad)
             {
-                return false;
+                return BuildingState.None;
             }
 
             if (CurrentPlayer == null) // this happens if you move the mouse over the board before a new game is started
             {
-                showErrorUI = false;
-                return false;
+                return BuildingState.None;
             }
 
             if (CurrentGameState == GameState.PickingBoard)
             {
-                return true; // I want to show pips when picking the board
+                return BuildingState.Pips;
             }
 
             bool allocationPhase = false;
-            bool error = false;
+            
 
-            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
                 allocationPhase = true;
             }
 
-            error = SettlementsWithinOneSpace(building);
+            bool error = SettlementsWithinOneSpace(building);
 
-            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
                 if (building.BuildingToTileDictionary.Count > 0)
                 {
                     if (_gameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
                     {
                         //  we are on an island - you can't build on an island when you are allocating resources
-                        error = true;
-                        return false;
+                        return BuildingState.Error;
                     }
                 }
             }
@@ -838,8 +835,7 @@ namespace Catan10
 
             if (!buildableTile)
             {
-                showErrorUI = false;
-                return false;
+                return BuildingState.None;
             }
 
             if (!allocationPhase && error == false)
@@ -857,7 +853,23 @@ namespace Catan10
                 }
             }
 
-            return !error;
+            //
+            //  if we get here, we have a valid place to build (or we've bypassed the business logic)...make sure there is an entitlement
+            
+            if (error == false)
+            {
+                if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement))
+                {
+                    return BuildingState.Build;
+                }
+                else
+                {
+                    return BuildingState.NoEntitlement;
+                }
+                
+            }
+
+            return BuildingState.Error;
         }
 
         internal PlayerModel PlayerNameToPlayer(string name, ICollection<PlayerModel> players)
@@ -1162,27 +1174,7 @@ namespace Catan10
 
         public BuildingState IsValidBuildingLocation(BuildingCtrl building)
         {
-            bool ret = ValidateBuildingLocation(building, out bool showError);
-            if (!ret && !showError)
-            {
-                //
-                //  ok place to build.  make sure they have entitlement
-                if (building.BuildingState != BuildingState.Settlement)
-                {
-                    if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.Settlement))
-                    {
-                        return BuildingState.Build;
-                    }
-                    else
-                    {
-                        return BuildingState.NoEntitlement;
-                    }
-                }
-                
-                return BuildingState.Build;
-            }
-
-            return BuildingState.Error;
+            return ValidateBuildingLocation(building);            
         }
 
         public Task OnNewGame()

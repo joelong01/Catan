@@ -353,7 +353,7 @@ namespace Catan10
                     {
                         if (b.BuildingState != BuildingState.Settlement && b.BuildingState != BuildingState.City)
                         {
-                            if (ValidateBuildingLocation(b, out bool showError))
+                            if (ValidateBuildingLocation(b) == BuildingState.Pips)
                                 return b;
                         }
                     }
@@ -777,8 +777,8 @@ namespace Catan10
                         building.PipGroup = -1;
                         continue; // outside the main map or a desert next to nothing
                     }
-
-                    if (ValidateBuildingLocation(building, out bool showerror) == false) // throw out the ones you can't build in
+                    BuildingState bState = ValidateBuildingLocation(building);
+                    if (bState == BuildingState.Error) // throw out the ones you can't build in
                     {
                         continue;
                     }

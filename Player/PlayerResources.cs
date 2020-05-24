@@ -308,5 +308,10 @@ namespace Catan10
         {
             return $"[Total={Current}][Ore={Current.Ore}][Brick={Current.Brick}][Wheat={Current.Wheat}][Wood={Current.Wood}][Sheep={Current.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
         }
+
+        public bool HasEntitlement(Entitlement entitlement)
+        {
+            return UnspentEntitlements.Contains(entitlement);
+        }
     }
 }
