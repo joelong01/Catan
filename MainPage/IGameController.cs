@@ -129,13 +129,17 @@ namespace Catan10
                 case GameState.PickingBoard:
 
                     await ResetRollControl();
-
-                    await RandomBoardLog.RandomizeBoard(this, 0);
-                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
+                    if (MainPageModel.GameStartedBy == TheHuman)
                     {
                         //
-                        //  simulate clicking on Next
-                        await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
+                        //  we only need one person sending around a random board
+                        await RandomBoardLog.RandomizeBoard(this, 0);
+                        if (MainPageModel.Settings.AutoRespond)
+                        {
+                            //
+                            //  simulate clicking on Next
+                            await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
+                        }
                     }
                     break;
 
@@ -573,7 +577,7 @@ namespace Catan10
 
                 await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.PlayingPlayers[0], GameState.WaitingForStart);
 
-                
+
 
             }
         }
