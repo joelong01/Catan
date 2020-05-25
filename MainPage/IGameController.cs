@@ -145,7 +145,7 @@ namespace Catan10
 
                     _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
 
-                    if (MainPageModel.Settings.AutoRespond)
+                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
                     {
                         Random rand = new Random();
                         await SynchronizedRollLog.StartSyncronizedRoll(this, rand.Next(1, 7), rand.Next(1, 7));
@@ -256,7 +256,10 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.Add(playerToAdd);
             }
 
-            await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.GameStartedBy, CurrentGameState);
+            if (CurrentPlayer != MainPageModel.GameStartedBy)
+            {
+                await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.GameStartedBy, CurrentGameState);
+            }
         }
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
