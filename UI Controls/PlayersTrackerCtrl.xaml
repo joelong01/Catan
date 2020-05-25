@@ -10,7 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="110" />
             <RowDefinition Height="2" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80" />
@@ -33,14 +33,14 @@
         </StackPanel>
         <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Margin="5,0,5,0" Fill="{StaticResource bmMaple}" />
         <ListBox x:Name="ListBox_PlayerResourceCountList" Grid.Row="2" Grid.ColumnSpan="2"
-            Width="620" Margin="0"
+            Width="610" Margin="0,5,0,0"
             ItemsSource="{x:Bind TestPlayers, Mode=OneWay}"
-            Background="Transparent" UseSystemFocusVisuals="True"
+            Background="Firebrick" UseSystemFocusVisuals="True"
             ScrollViewer.VerticalScrollBarVisibility="Disabled">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
-                    <Setter Property="Margin" Value="8,10,0,0" />
-                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,15,0,-15" />
+                    <Setter Property="Padding" Value="0,-15" />
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.Items>
@@ -48,9 +48,9 @@
             </ListBox.Items>
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PublicDataCtrl Width="610" Player="{x:Bind This, Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay}" RenderTransformOrigin=".5 0">
+                    <local:PublicDataCtrl Width="610" Player="{x:Bind This, Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay}" RenderTransformOrigin="0 0">
                         <local:PublicDataCtrl.RenderTransform>
-                            <CompositeTransform ScaleX=".88" ScaleY=".88" TranslateX="-36" />
+                            <CompositeTransform ScaleX=".88" ScaleY=".88" TranslateX="0" />
                         </local:PublicDataCtrl.RenderTransform>
                     </local:PublicDataCtrl>
                 </DataTemplate>

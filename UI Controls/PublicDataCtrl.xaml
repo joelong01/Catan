@@ -45,14 +45,8 @@
         </Border.Background>
         <Grid Width="605" >-->
 
-    <Border Margin="-2" CornerRadius="30,15,15,10" BorderThickness="4" BorderBrush="{StaticResource bmMaple}">
-        <Grid Width="605">
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                    <GradientStop Color="{x:Bind Player.PrimaryBackgroundColor, Mode=OneWay}" />
-                    <GradientStop Offset="1" Color="{x:Bind Player.SecondaryBackgroundColor, Mode=OneWay}" />
-                </LinearGradientBrush>
-            </Grid.Background>
+    <Border Margin="0,0,0,0" CornerRadius="30,15,15,10" BorderThickness="4" BorderBrush="{StaticResource bmMaple}">
+        <Grid Width="605" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="60" />
                 <RowDefinition Height="50" />
@@ -72,7 +66,7 @@
                 PointerPressed="Picture_PointerPressed" />
 
             <!--  Top Row with resource tracking  -->
-            <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Height="44"
+            <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Height="45"
                 Margin="3,0,5,0" VerticalAlignment="Stretch" Orientation="Horizontal"
                 BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                 BorderThickness="1" CornerRadius="6">
