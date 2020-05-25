@@ -107,7 +107,11 @@ namespace Catan10
                 case GameState.WaitingForNewGame:
                     break;
 
-                case GameState.WaitingForStart:                    
+                case GameState.WaitingForStart:
+                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
+                    {
+                        await SetStateLog.SetState(this, GameState.AllocateResourceForward);
+                    }
                     break;
 
                 case GameState.WaitingForPlayers:
@@ -159,10 +163,18 @@ namespace Catan10
                         p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
                         p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
                     });
+
+                    //
+                    //  during allocation phase, you get one road and one settlement
+                    CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
+                    CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
                     break;
 
                 case GameState.AllocateResourceReverse:
-                   
+                    //
+                    //  during allocation phase, you get one road and one settlement
+                    CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
+                    CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
                     break;
                 case GameState.DoneResourceAllocation:
                     break;
@@ -276,12 +288,9 @@ namespace Catan10
                 await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
             }
 
-            if (changePlayerLog.NewState == GameState.AllocateResourceForward || changePlayerLog.NewState == GameState.AllocateResourceReverse)
+            if (changePlayerLog.NewState != changePlayerLog.OldState)
             {
-                //
-                //  during allocation phase, you get one road and one settlement
-                CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
-                CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
+                await UpdateUiForState(changePlayerLog.NewState);
             }
         }
 
@@ -421,6 +430,9 @@ namespace Catan10
             {
                 this.TraceMessage("Owner changing!");
             }
+
+            CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.Road);
+
             UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 
             return Task.CompletedTask;
@@ -556,8 +568,10 @@ namespace Catan10
                     MainPageModel.PlayingPlayers[i] = newList[i];
                 }
 
-                await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.PlayingPlayers[0], GameState.WaitingForStart);                
+                await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.PlayingPlayers[0], GameState.WaitingForStart);
+
                 
+
             }
         }
 
@@ -662,6 +676,11 @@ namespace Catan10
             Contract.Assert(building != null);
             PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
             Contract.Assert(player != null);
+            Entitlement entitlement = Entitlement.Undefined;
+            if (updateBuildingLog.NewBuildingState == BuildingState.City) entitlement = Entitlement.City;
+            if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
+            Contract.Assert(entitlement != Entitlement.Undefined);
+            player.GameData.Resources.ConsumeEntitlement(entitlement);
             await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
             if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
             {
@@ -671,7 +690,7 @@ namespace Catan10
             BuildingState oldState = updateBuildingLog.OldBuildingState;
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
-                
+
 
                 if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build))
                 {
@@ -747,7 +766,7 @@ namespace Catan10
                 default:
                     break;
             }
-            
+
             CalculateAndSetLongestRoad(raceTracking);
         }
     }

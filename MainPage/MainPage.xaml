@@ -67,7 +67,7 @@
             <Button Margin="29,20,0,0" VerticalAlignment="Top" FontSize="22"
                 Background="Transparent" Canvas.ZIndex="9999">
                 <Button.Content>
-                    <TextBlock Text="&#xE700;" FontFamily="Segoe MDL2 Assets" FontSize="42" />
+                    <TextBlock Text="&#xE700;" FontFamily="Segoe MDL2 Assets" FontSize="30" />
                 </Button.Content>
                 <Button.Flyout>
                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">

@@ -200,9 +200,13 @@
             <!--  Second Row  -->
             <Viewbox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
-                    <local:ResourceCardCtrl Margin="10,0,0,0" DevCardType="VictoryPoint" ReadOnly="True" CountVisible="Collapsed" />
+                    <local:ResourceCardCtrl Margin="10,0,0,0" DevCardType="VictoryPoint" ReadOnly="True"
+                        CountVisible="Collapsed" ToolTipService.ToolTip="Score" />
                     <!--  Score  -->
-                    <TextBlock Margin="10,0,0,0" FontSize="72" Text="{x:Bind Player.GameData.Score, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                    <TextBlock Margin="10,0,0,0" FontSize="72"
+                        Text="{x:Bind Player.GameData.Score, Mode=OneWay, FallbackValue=12}"
+                        Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
+                        ToolTipService.ToolTip="Score" />
                     <!--  Resources Acquired  -->
                     <local:ResourceCardCtrl Margin="30,0,0,0" Orientation="FaceDown" />
                     <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"

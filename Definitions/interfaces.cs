@@ -58,7 +58,7 @@ namespace Catan10
     public interface IGameCallback
     {
 
-        bool CanBuildRoad { get; }
+        bool CanBuildRoad();
 
         Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
 

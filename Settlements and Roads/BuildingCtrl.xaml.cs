@@ -167,7 +167,7 @@ namespace Catan10
         {
             if (this.BuildingState == BuildingState.None)
             {
-                this.BuildingState= Callback.IsValidBuildingLocation(this);                
+                this.BuildingState= Callback.ValidateBuildingLocation(this);                
             }
         }
 
@@ -178,7 +178,7 @@ namespace Catan10
         /// <param name="e"></param>
         private void Building_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            if (this.BuildingState == BuildingState.Build || BuildingState == BuildingState.Error)
+            if (this.BuildingState == BuildingState.Build || BuildingState == BuildingState.Error || BuildingState == BuildingState.NoEntitlement)
             {
                 this.BuildingState = BuildingState.None;
             }

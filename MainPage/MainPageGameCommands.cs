@@ -685,8 +685,7 @@ namespace Catan10
                         break;
 
                     case GameState.WaitingForStart:
-                        await SetStateLog.SetState(this, GameState.AllocateResourceForward);
-                        await ChangePlayerLog.ChangePlayer(this, 0, GameState.AllocateResourceForward);
+                        await SetStateLog.SetState(this, GameState.AllocateResourceForward);                        
                         break;
 
                     case GameState.AllocateResourceForward:
@@ -703,7 +702,9 @@ namespace Catan10
                         break;
 
                     case GameState.AllocateResourceReverse:
-                        if (MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1 == 0)
+                        int players = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1;
+
+                        if (players == 0 || players == -1) // only -1 if there is only one player (e.g. testing)
                         {
                             await SetStateLog.SetState(this, GameState.DoneResourceAllocation);
                         }

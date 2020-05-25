@@ -32,39 +32,6 @@ namespace Catan10
             }
         }
 
-        public bool CanBuildRoad
-
-        {
-            get
-            {
-                if (ValidateBuilding == false) return true;
-                if (MainPageModel.Log == null)
-                {
-                    return false;
-                }
-
-                if (CurrentPlayer != TheHuman) return false;
-
-                if (!CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.Road))
-                {
-                    this.TraceMessage($"Player={CurrentPlayer.PlayerName} does not have a road entitlement!");
-                    return false;
-                }
-
-                GameState state = CurrentGameState;
-
-                if (state == GameState.WaitingForNext || // I can build after I roll
-                    state == GameState.AllocateResourceForward || // I can build during the initial phase )
-                    state == GameState.AllocateResourceReverse || state == GameState.Supplemental ||
-                    state == GameState.PickingBoard)
-                {
-                    return true;
-                }
-
-                return false;
-            }
-        }
-
         public GameContainerCtrl GameContainer
         {
             get
@@ -404,8 +371,6 @@ namespace Catan10
             return max;
         }
 
-      
-
         //
         //   when a user clicks on a Road, return the next state for it
         //
@@ -466,7 +431,6 @@ namespace Catan10
             return nextState;
         }
 
-
         private bool RoadAllowed(RoadCtrl road)
         {
             if (!ValidateBuilding)
@@ -524,8 +488,6 @@ namespace Catan10
 
             return false;
         }
-
-      
 
         private async Task UndoMoveBaron(LogEntry logLine)
         {
@@ -588,107 +550,6 @@ namespace Catan10
             }
 
             CurrentPlayer.GameData.IsCurrentPlayer = true; // this should start the timer for this view
-        }
-
-        //
-        //    
-        //
-        public  BuildingState ValidateBuildingLocation(BuildingCtrl building)
-        {
-            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.WaitingForStart) && ValidateBuilding)
-            {
-                return BuildingState.None;
-            }
-
-            if (!ValidateBuilding)
-            {
-                return BuildingState.Build;
-            }
-
-            if (!CanBuildRoad)
-            {
-                return BuildingState.None;
-            }
-
-            if (CurrentPlayer == null) // this happens if you move the mouse over the board before a new game is started
-            {
-                return BuildingState.None;
-            }
-
-            if (CurrentGameState == GameState.PickingBoard)
-            {
-                return BuildingState.Pips;
-            }
-
-            bool allocationPhase = false;
-
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
-            {
-                allocationPhase = true;
-            }
-
-            bool error = SettlementsWithinOneSpace(building);
-
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
-            {
-                if (building.BuildingToTileDictionary.Count > 0)
-                {
-                    if (_gameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
-                    {
-                        //  we are on an island - you can't build on an island when you are allocating resources
-                        return BuildingState.Error;
-                    }
-                }
-            }
-
-            //
-            //  make sure that we have at least one buildable tile
-            bool buildableTile = false;
-            foreach (KeyValuePair<BuildingLocation, TileCtrl> kvp in building.BuildingToTileDictionary)
-            {
-                if (kvp.Value.ResourceType != ResourceType.Sea)
-                {
-                    buildableTile = true;
-                    break;
-                }
-            }
-
-            if (!buildableTile)
-            {
-                return BuildingState.None;
-            }
-
-            if (!allocationPhase && error == false)
-            {
-                error = true;
-                //
-                //   if the settlement is not next to another settlement and we are not in allocation phase, we have to be next to a road
-                foreach (RoadCtrl road in building.AdjacentRoads)
-                {
-                    if (road.Owner == CurrentPlayer && road.RoadState != RoadState.Unowned)
-                    {
-                        error = false;
-                        break;
-                    }
-                }
-            }
-
-            //
-            //  if we get here, we have a valid place to build (or we've bypassed the business logic)...make sure there is an entitlement
-
-            if (error == false)
-            {
-                if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement))
-                {
-                    return BuildingState.Build;
-                }
-                else
-                {
-                    return BuildingState.NoEntitlement;
-                }
-            }
-
-            return BuildingState.Error;
         }
 
         internal PlayerModel PlayerNameToPlayer(string name, ICollection<PlayerModel> players)
@@ -766,6 +627,8 @@ namespace Catan10
                 }
                 else
                 {
+                    //
+                    //  they clicked on one of their own cities to upgrade it -- make sure they have a City to go to
                     if (building.BuildingState == BuildingState.Settlement)
                     {
                         if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.City))
@@ -781,9 +644,24 @@ namespace Catan10
             }
             if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse || GameStateFromOldLog == GameState.Supplemental || GameStateFromOldLog == GameState.WaitingForNext)
             {
-                return true;
+                if (building.BuildingState == BuildingState.Settlement)
+                {
+                    if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.City))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                if (building.BuildingState == BuildingState.Build) // would be NoEntitlement if they didn't have the entitlement
+                {
+                    Contract.Assert(CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement));
+                    return true;
+                }
             }
-
+            if (building.BuildingState == BuildingState.NoEntitlement) return false;
             return false;
         }
 
@@ -921,6 +799,35 @@ namespace Catan10
             return max;
         }
 
+        public bool CanBuildRoad()
+
+        {
+            if (ValidateBuilding == false) return true;
+            if (MainPageModel.Log == null)
+            {
+                return false;
+            }
+
+            if (CurrentPlayer != TheHuman) return false;
+
+            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Road))
+            {
+                return false;
+            }
+
+            GameState state = CurrentGameState;
+
+            if (state == GameState.WaitingForNext || // I can build after I roll
+                state == GameState.AllocateResourceForward || // I can build during the initial phase )
+                state == GameState.AllocateResourceReverse || state == GameState.Supplemental ||
+                state == GameState.PickingBoard)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public async Task ChangeGame(CatanGameCtrl game)
         {
             if (game == _gameView.CurrentGame)
@@ -987,8 +894,6 @@ namespace Catan10
             return _gameView.GetTile(tileIndex);
         }
 
-       
-
         public Task OnNewGame()
         {
             return Task.CompletedTask;
@@ -1053,7 +958,7 @@ namespace Catan10
 
         public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
         {
-            if (!CanBuildRoad)
+            if (!CanBuildRoad())
             {
                 return;
             }
@@ -1082,7 +987,7 @@ namespace Catan10
 
         public void RoadExited(RoadCtrl road, PointerRoutedEventArgs e)
         {
-            if (!CanBuildRoad)
+            if (!CanBuildRoad())
             {
                 return;
             }
@@ -1109,7 +1014,7 @@ namespace Catan10
 
         public async void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e)
         {
-            if (!CanBuildRoad)
+            if (!CanBuildRoad())
             {
                 return;
             }
@@ -1372,6 +1277,107 @@ namespace Catan10
 
             CalculateAndSetLongestRoad();
             return Task.CompletedTask;
+        }
+
+        //
+        //
+        //
+        public BuildingState ValidateBuildingLocation(BuildingCtrl building)
+        {
+            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.WaitingForStart) && ValidateBuilding)
+            {
+                return BuildingState.None;
+            }
+
+            if (!ValidateBuilding)
+            {
+                return BuildingState.Build;
+            }
+
+            //if (!CanBuildRoad())
+            //{
+            //    return BuildingState.None;
+            //}
+
+            if (CurrentPlayer == null) // this happens if you move the mouse over the board before a new game is started
+            {
+                return BuildingState.None;
+            }
+
+            if (CurrentGameState == GameState.PickingBoard)
+            {
+                return BuildingState.Pips;
+            }
+
+            bool allocationPhase = false;
+
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                allocationPhase = true;
+            }
+
+            bool error = SettlementsWithinOneSpace(building);
+
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                if (building.BuildingToTileDictionary.Count > 0)
+                {
+                    if (_gameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
+                    {
+                        //  we are on an island - you can't build on an island when you are allocating resources
+                        return BuildingState.Error;
+                    }
+                }
+            }
+
+            //
+            //  make sure that we have at least one buildable tile
+            bool buildableTile = false;
+            foreach (KeyValuePair<BuildingLocation, TileCtrl> kvp in building.BuildingToTileDictionary)
+            {
+                if (kvp.Value.ResourceType != ResourceType.Sea)
+                {
+                    buildableTile = true;
+                    break;
+                }
+            }
+
+            if (!buildableTile)
+            {
+                return BuildingState.None;
+            }
+
+            if (!allocationPhase && error == false)
+            {
+                error = true;
+                //
+                //   if the settlement is not next to another settlement and we are not in allocation phase, we have to be next to a road
+                foreach (RoadCtrl road in building.AdjacentRoads)
+                {
+                    if (road.Owner == CurrentPlayer && road.RoadState != RoadState.Unowned)
+                    {
+                        error = false;
+                        break;
+                    }
+                }
+            }
+
+            //
+            //  if we get here, we have a valid place to build (or we've bypassed the business logic)...make sure there is an entitlement
+
+            if (error == false)
+            {
+                if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement))
+                {
+                    return BuildingState.Build;
+                }
+                else
+                {
+                    return BuildingState.NoEntitlement;
+                }
+            }
+
+            return BuildingState.Error;
         }
     }
 }

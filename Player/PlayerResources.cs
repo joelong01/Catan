@@ -313,5 +313,11 @@ namespace Catan10
         {
             return UnspentEntitlements.Contains(entitlement);
         }
+
+        internal void ConsumeEntitlement(Entitlement entitlement)
+        {
+            System.Diagnostics.Contracts.Contract.Assert(HasEntitlement(entitlement));
+            UnspentEntitlements.Remove(entitlement);
+        }
     }
 }
