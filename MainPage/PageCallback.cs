@@ -655,7 +655,7 @@ namespace Catan10
                         return false;
                     }
                 }
-                if (building.BuildingState == BuildingState.Build) // would be NoEntitlement if they didn't have the entitlement
+                if (building.BuildingState == BuildingState.Build || building.BuildingState == BuildingState.Pips) // would be NoEntitlement if they didn't have the entitlement
                 {
                     Contract.Assert(CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement));
                     return true;
