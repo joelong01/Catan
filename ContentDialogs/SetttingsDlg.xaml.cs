@@ -22,8 +22,9 @@ namespace Catan10
         private bool _AutoRespond = false;
         private int _fadeSeconds = 3;
         private int _FadeTime = 0;
+        private GridPosition _GameViewPosition = new GridPosition();
         private Dictionary<string, GridPosition> _gridPosition = new Dictionary<string, GridPosition>();
-        bool _RandomizeNumbers = true;
+        private bool _RandomizeNumbers = true;
         private bool _resourceTracking = true;
         private bool _rotateTile = false;
         private bool _showStopwatch = true;
@@ -31,6 +32,7 @@ namespace Catan10
         private bool _useRandomNumbers = true;
         private bool _validateBuilding = true;
         private double _zoom = 1.0;
+
         public bool AnimateFade
         {
             get
@@ -62,6 +64,7 @@ namespace Catan10
                 }
             }
         }
+
         public int AnimationSpeed
         {
             get
@@ -142,6 +145,22 @@ namespace Catan10
             }
         }
 
+        public GridPosition GameViewPosition
+        {
+            get
+            {
+                return _GameViewPosition;
+            }
+            set
+            {
+                if (_GameViewPosition != value)
+                {
+                    _GameViewPosition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public Dictionary<string, GridPosition> GridPositions
         {
             get
@@ -157,6 +176,7 @@ namespace Catan10
                 }
             }
         }
+
         public bool RandomizeNumbers
         {
             get
@@ -316,11 +336,11 @@ namespace Catan10
             this.InitializeComponent();
         }
 
-        public SettingsDlg(Settings settings)
+        public SettingsDlg(Settings settings, PlayerModel human)
         {
-            this.InitializeComponent();            
+            this.InitializeComponent();
             this.Settings = settings;
-            
+            this.TheHuman = human;
         }
 
         public ICatanSettings CatanSettingsCallback { get; set; }
@@ -328,11 +348,18 @@ namespace Catan10
         #region Properties
 
         public static readonly DependencyProperty SettingsProperty = DependencyProperty.Register("Settings", typeof(Settings), typeof(SettingsDlg), new PropertyMetadata(new Settings()));
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(SettingsDlg), new PropertyMetadata(MainPage.Current.TheHuman));
 
         public Settings Settings
         {
             get => (Settings)GetValue(SettingsProperty);
             set => SetValue(SettingsProperty, value);
+        }
+
+        public PlayerModel TheHuman
+        {
+            get => (PlayerModel)GetValue(TheHumanProperty);
+            set => SetValue(TheHumanProperty, value);
         }
 
         #endregion Properties
@@ -347,8 +374,7 @@ namespace Catan10
 
         private async void OnResetGridLayout(object sender, RoutedEventArgs e)
         {
-            await CatanSettingsCallback.ResetGridLayout();
+            await MainPage.Current.ResetGridLayout();
         }
-
     }
 }

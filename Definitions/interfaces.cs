@@ -66,7 +66,7 @@ namespace Catan10
 
         bool BuildingStateChangeOk(BuildingCtrl building);
 
-        BuildingState IsValidBuildingLocation(BuildingCtrl sender);
+        BuildingState ValidateBuildingLocation(BuildingCtrl sender);
 
         void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e);
 

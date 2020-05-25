@@ -30,7 +30,7 @@
             <CompositeTransform />
         </Grid.RenderTransform>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30" />
+            <RowDefinition Height="25" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Rectangle Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />

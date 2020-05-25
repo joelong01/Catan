@@ -8,7 +8,7 @@
 
     <Control.Resources />
 
-    <Grid Width="530" Height="240" Background="{StaticResource bmMaple}">
+    <Grid Width="530" Height="230" Margin="0" Background="{StaticResource bmMaple}">
         <StackPanel>
             <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
                 <local:RollCtrl x:Name="RollCtrl_One" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
@@ -16,7 +16,7 @@
                 <local:RollCtrl x:Name="RollCtrl_Three" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
                 <local:RollCtrl x:Name="RollCtrl_Four" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
             </StackPanel>
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <StackPanel Margin="0,0,10,0" HorizontalAlignment="Right" Orientation="Horizontal">
                 <Button Width="100" Content="Reset" Click="OnReset" Foreground="White"
                     Visibility="Collapsed" />
                 <Button Width="100" Content="FaceUp" Click="OnFaceUp" Foreground="White"

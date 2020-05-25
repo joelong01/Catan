@@ -167,7 +167,7 @@ namespace Catan10
         {
             if (this.BuildingState == BuildingState.None)
             {
-                this.BuildingState= Callback.IsValidBuildingLocation(this);                
+                this.BuildingState= Callback.ValidateBuildingLocation(this);                
             }
         }
 

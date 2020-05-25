@@ -313,29 +313,7 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style x:Key="SettingCheckBoxStyle" TargetType="CheckBox">
-                <Setter Property="Foreground" Value="white" />
-                <Setter Property="IsChecked" Value="False" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontWeight" Value="SemiLight" />
-                <Setter Property="FontSize" Value="28" />
-                <Setter Property="Margin" Value="28,10,10,10" />
-            </Style>
-            <Style x:Key="SettingRadioButtonStyle" TargetType="RadioButton">
-                <Setter Property="Foreground" Value="white" />
-                <Setter Property="IsChecked" Value="False" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontWeight" Value="SemiLight" />
-                <Setter Property="FontSize" Value="28" />
-                <Setter Property="Margin" Value="5" />
-            </Style>
-            <Style x:Key="SettingBorderStyle" TargetType="Border">
-                <Setter Property="BorderThickness" Value="2" />
-                <Setter Property="BorderBrush" Value="White" />
-                <Setter Property="Margin" Value="10,10,10,10" />
-            </Style>
+           
             <!--  from https://msdn.microsoft.com/en-us/library/windows/apps/mt299120.aspx  -->
             <Style x:Key="CatanContentDialog" TargetType="ContentDialog">
                 <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseHighBrush}" />

@@ -19,6 +19,7 @@ namespace Catan10
         private bool _isServiceGame = false;
         private NewLog _newLog = null;
         private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
+        private Settings _Settings = new Settings();
         private int _ThreeStarPosition = 0;
         private int _TwoStarPosition = 0;
         private bool _WebSocketConnected = false;
@@ -301,8 +302,21 @@ namespace Catan10
                 return Visibility.Collapsed;
             }
         }
-
-        public Settings Settings { get; set; } = new Settings();
+        public Settings Settings
+        {
+            get
+            {
+                return _Settings;
+            }
+            set
+            {
+                if (_Settings != value)
+                {
+                    _Settings = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         [JsonIgnore]
         public Visibility ShowBoardMeasurements

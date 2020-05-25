@@ -432,7 +432,11 @@ namespace Catan10
         private async void OnViewSettings(object sender, RoutedEventArgs e)
         {
             _initializeSettings = true;
-            SettingsDlg dlg = new SettingsDlg(MainPageModel.Settings);
+            if (TheHuman.PlayerName == "")
+            {
+                await PickDefaultUser();
+            }
+            SettingsDlg dlg = new SettingsDlg(MainPageModel.Settings, TheHuman);
             _initializeSettings = false;
             await dlg.ShowAsync();
         }
@@ -605,17 +609,11 @@ namespace Catan10
                     string name = kvp.Key;
                     var ctrl = this.FindName(name);
                     if (ctrl == null) continue; // the dev renamed the control!!
-                    if (ctrl.GetType().FullName == "Catan10.GameContainerCtrl")
-                    {
-                        _transformGameView.TranslateX = pos.TranslateX;
-                        _transformGameView.TranslateY = pos.TranslateY;
-                    }
-                    else
-                    {
-                        DragableGridCtrl dGrid = (DragableGridCtrl)this.FindName(name);
-                        Contract.Assert(dGrid != null);
-                        dGrid.GridPosition = pos;
-                    }
+                    if (ctrl.GetType().FullName == "Catan10.GameContainerCtrl") continue;
+
+                    DragableGridCtrl dGrid = ctrl as DragableGridCtrl;
+                    if (dGrid != null) dGrid.GridPosition = pos;
+
                 }
             }
             catch (Exception e)
@@ -692,7 +690,7 @@ namespace Catan10
                         break;
 
                     case GameState.AllocateResourceForward:
-                       
+
                         if (MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) + 1 == MainPageModel.PlayingPlayers.Count)
                         {
                             await ChangePlayerLog.ChangePlayer(this, 0, GameState.AllocateResourceReverse);
@@ -715,7 +713,7 @@ namespace Catan10
                         }
 
                         break;
-                      
+
                     case GameState.DoneResourceAllocation:
                         await SetStateLog.SetState(this, GameState.WaitingForRoll);
                         break;

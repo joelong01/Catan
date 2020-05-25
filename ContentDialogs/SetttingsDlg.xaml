@@ -8,8 +8,57 @@
     MinHeight="640" PrimaryButtonText="Ok" SecondaryButtonText="Cancel"
     PrimaryButtonClick="OnOk" SecondaryButtonClick="OnCancel" mc:Ignorable="d">
 
+    <ContentDialog.Resources>
+        <Style x:Key="SettingsTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="30" />
+            <Setter Property="Foreground" Value="{x:Bind TheHuman.ForegroundBrush, TargetNullValue=White, FallbackValue=White, Mode=OneWay}" />
+            <Setter Property="Margin" Value="0,-10,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="SettingsButtonStyle" TargetType="Button">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="32" />
+            <Setter Property="Foreground" Value="{x:Bind TheHuman.ForegroundBrush, TargetNullValue=White, FallbackValue=White, Mode=OneWay}" />
+            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+          <Style x:Key="SettingsSliderStyle" TargetType="Slider">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="32" />
+            <Setter Property="Foreground" Value="{x:Bind TheHuman.ForegroundBrush, TargetNullValue=White, FallbackValue=White, Mode=OneWay}" />
+            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+         <Style x:Key="SettingCheckBoxStyle" TargetType="CheckBox">
+                <Setter Property="Foreground" Value="{x:Bind TheHuman.ForegroundBrush, TargetNullValue=White, FallbackValue=White, Mode=OneWay}" />
+                <Setter Property="IsChecked" Value="False" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontWeight" Value="SemiLight" />
+                <Setter Property="FontSize" Value="28" />
+                <Setter Property="Margin" Value="28,10,10,10" />
+            </Style>
+            <Style x:Key="SettingRadioButtonStyle" TargetType="RadioButton">
+                <Setter Property="Foreground" Value="{x:Bind TheHuman.ForegroundBrush, TargetNullValue=White, FallbackValue=White, Mode=OneWay}" />
+                <Setter Property="IsChecked" Value="False" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontWeight" Value="SemiLight" />
+                <Setter Property="FontSize" Value="28" />
+                <Setter Property="Margin" Value="5" />
+            </Style>
+            <Style x:Key="SettingBorderStyle" TargetType="Border">
+                <Setter Property="BorderThickness" Value="2" />
+                <Setter Property="BorderBrush" Value="{x:Bind TheHuman.ForegroundBrush, TargetNullValue=White, FallbackValue=White, Mode=OneWay}" />
+                <Setter Property="Margin" Value="10,10,10,10" />                
+            </Style>
+    </ContentDialog.Resources>
 
-    <Grid Name="LayoutRoot">
+
+    <Grid Name="LayoutRoot" Background="{x:Bind TheHuman.BackgroundBrush, TargetNullValue=Black, FallbackValue=Black, Mode=OneWay}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50*" />
             <ColumnDefinition Width="50*" />
@@ -27,8 +76,8 @@
                         IsChecked="{x:Bind Settings.ResourceTracking, Mode=TwoWay, FallbackValue=True}"
                         IsThreeState="False"
                         ToolTipService.ToolTip="Ask for cards lost after every roll"
-                        FontFamily="Global User Interface">
-                        <TextBlock Margin="0,-10,0,0" VerticalAlignment="Center" Text="Resource Tracking" FontSize="30" />
+                        FontFamily="Segoe UI">
+                        <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Resource Tracking" />
 
                     </CheckBox>
 
@@ -38,12 +87,8 @@
                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"
                         IsThreeState="False"
                         IsChecked="{x:Bind Settings.ShowStopwatch, Mode=TwoWay, FallbackValue=True}"
-                        ToolTipService.ToolTip="Shows/Hides the Stopwatch"
-                        FontFamily="Global User Interface">
-                        <TextBlock Margin="0,-10,0,0" VerticalAlignment="Center" Text="Show Stopwatch"
-                            FontSize="30"
-                            ToolTipService.ToolTip="Reqires manual updating and can lead to arguments..."
-                            FontFamily="Global User Interface" />
+                        ToolTipService.ToolTip="Shows/Hides the Stopwatch" FontFamily="Segoe UI">
+                        <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Show Stopwatch" ToolTipService.ToolTip="Reqires manual updating and can lead to arguments..." />
 
                     </CheckBox>
 
@@ -51,10 +96,8 @@
                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"
                         IsThreeState="False"
                         IsChecked="{x:Bind Settings.RandomizeNumbers, Mode=TwoWay, FallbackValue=True}"
-                        ToolTipService.ToolTip="Distribute all numbers randomly"
-                        FontFamily="Global User Interface">
-                        <TextBlock Margin="0,-10,0,0" VerticalAlignment="Center" Text="Randomize Numbers"
-                            FontSize="30" FontFamily="Global User Interface" />
+                        ToolTipService.ToolTip="Distribute all numbers randomly" FontFamily="Segoe UI">
+                        <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Randomize Numbers" />
 
                     </CheckBox>
 
@@ -63,17 +106,16 @@
                         IsThreeState="False"
                         IsChecked="{x:Bind Settings.ValidateBuilding, Mode=TwoWay, FallbackValue=True}"
                         ToolTipService.ToolTip="Validate the building of Roads and Settlements"
-                        FontFamily="Global User Interface">
-                        <TextBlock Margin="0,-10,0,0" VerticalAlignment="Center" Text="Validate Building"
-                            FontSize="30" FontFamily="Global User Interface" />
+                        FontFamily="Segoe UI">
+                        <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Validate Building" />
 
                     </CheckBox>
                     <CheckBox x:Name="_chkAnimateFade" Margin="5"
                         IsChecked="{x:Bind Settings.AnimateFadeTiles, Mode=TwoWay, FallbackValue=True}"
                         Style="{StaticResource SettingCheckBoxStyle}"
                         ToolTipService.ToolTip="Fades the tiles when their number is rolled"
-                        FontFamily="Global User Interface">
-                        <TextBlock Margin="0,-10,0,0" Text="Animate Fade Tiles" FontSize="30" />
+                        FontFamily="Segoe UI">
+                        <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Animate Fade Tiles" />
                     </CheckBox>
 
                 </StackPanel>
@@ -82,37 +124,35 @@
             <Border Style="{StaticResource SettingBorderStyle}">
                 <StackPanel HorizontalAlignment="Stretch">
 
-                    <Button Height="60" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                        Content="Reset Grid Layout" FontSize="32" Click="OnResetGridLayout" />
+                    <Button Height="60" Style="{StaticResource SettingsButtonStyle}" Content="Reset Grid Layout" Click="OnResetGridLayout" />
                 </StackPanel>
             </Border>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <Border Style="{StaticResource SettingBorderStyle}">
                 <StackPanel Margin="10,0,10,10">
-                    <TextBlock Margin="10,5,20,0" Text="Fade Time (s):" FontSize="30" />
+                    <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Fade Time (s):" />
                     <Slider Name="_sliderFadeTime" Margin="10,-10,10,10" Padding="0" LargeChange="5"
-                        Maximum="30" TickPlacement="Inline" FontFamily="Global User Interface"
-                        TickFrequency="5"
+                        Maximum="30" TickPlacement="Inline" FontFamily="Segoe UI" TickFrequency="5"
                         Value="{x:Bind Settings.FadeTime, Mode=TwoWay, FallbackValue=5}" />
                 </StackPanel>
             </Border>
             <Border Style="{StaticResource SettingBorderStyle}">
                 <StackPanel Margin="10,0,10,10">
-                    <TextBlock Margin="0,10,0,0" Text="Zoom: " FontSize="30" />
+                    <TextBlock Text="Zoom: " Style="{StaticResource SettingsTextBlockStyle}"/>
                     <Slider Name="_sliderZoom" Margin="0,-10,10,10" Padding="0" LargeChange=".1"
-                        Maximum="2" TickPlacement="Inline" FontFamily="Global User Interface"
-                        SmallChange="0.1" StepFrequency="0.1" TickFrequency="0.5"
+                        Maximum="2" TickPlacement="Inline" FontFamily="Segoe UI" SmallChange="0.1"
+                        StepFrequency="0.1" TickFrequency="0.5"
                         Value="{x:Bind Settings.Zoom, Mode=TwoWay, FallbackValue=1.0}" />
                 </StackPanel>
             </Border>
 
             <Border Margin="10,0,10,10" Style="{StaticResource SettingBorderStyle}">
                 <StackPanel Margin="10">
-                    <TextBlock Text="Animation Speed: " FontSize="30" />
-                    <Slider Name="_sliderAnimationSpeed" Margin="0,-10,10,10" Padding="0" LargeChange="1"
+                    <TextBlock Text="Animation Speed: " Style="{StaticResource SettingsTextBlockStyle}" />
+                    <Slider Name="_sliderAnimationSpeed"  LargeChange="1" FontSize="30" Margin="0,-10,10,10" Padding="0"
                         Maximum="4" Minimum="1" SmallChange="1" StepFrequency="1"
-                        TickFrequency="1" FontFamily="Global User Interface" TickPlacement="Inline"
+                        TickFrequency="1" FontFamily="Segoe UI" TickPlacement="Inline"
                         ThumbToolTipValueConverter="{StaticResource AnimationSpeedValueConverter}"
                         Value="{x:Bind Settings.AnimationSpeed, Mode=TwoWay, FallbackValue=4}" />
                 </StackPanel>

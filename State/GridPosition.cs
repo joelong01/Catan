@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+
 using Catan.Proxy;
+
 using Windows.UI.Xaml.Media;
 
 namespace Catan10
@@ -20,7 +22,7 @@ namespace Catan10
         public double ScaleX
         {
             get
-            {                
+            {
                 return _scaleX;
             }
             set
@@ -98,6 +100,19 @@ namespace Catan10
         {
         }
 
+        public GridPosition(CompositeTransform ct)
+        {
+            ScaleX = ct.ScaleX;
+            ScaleY = ct.ScaleY;
+            TranslateX = ct.TranslateX;
+            TranslateY = ct.TranslateY;
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         new public virtual bool Equals(Object obj)
         {
             if (obj.GetType() != typeof(GridPosition)) return false;
@@ -110,18 +125,6 @@ namespace Catan10
                 return true;
             }
             return false;
-        }
-        public GridPosition(CompositeTransform ct)
-        {
-            ScaleX = ct.ScaleX;
-            ScaleY = ct.ScaleY;
-            TranslateX = ct.TranslateX;
-            TranslateY = ct.TranslateY;
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public string Serialize()

@@ -61,7 +61,6 @@ namespace Catan10
                     return true;
                 }
 
-
                 return false;
             }
         }
@@ -405,39 +404,7 @@ namespace Catan10
             return max;
         }
 
-        private Task DoIteration(bool skipActivePlayerView, CatanAction action)
-        {
-            //GameState lastState = MainPageModel.Log.Last().GameState;
-            //List<PlayerView> iterPlayers = new List<PlayerView>();
-            //int i = 0;
-            //if (skipActivePlayerView)
-            //{
-            //    await OnNext(1, LogType.Undo);
-            //    i = 1;
-            //}
-            //while (i < PlayingPlayers.Count)
-            //{
-            //    string input = await ShowAndWait("Cards Lost", "0");
-            //    int cardsLost = 0;
-            //    //
-            //    //  if this fails, then we'll just move to the next player
-            //    if (Int32.TryParse(input, out cardsLost))
-            //    {
-            //        CurrentPlayer.SetCardCountForAction(action, cardsLost);
-            //        await AddLogEntry(CurrentPlayer, lastState, action, cardsLost);
-            //    }
-
-            //    await OnNext(1, LogType.Undo); // don't log - we dont undo the movement, just the counting
-            //    i++;
-
-            //}
-            //
-            //  put us back where we started
-            /// await SetStateAsync(CurrentPlayer, lastState, CatanAction.ChangedState, true);
-            ///
-
-            throw new NotImplementedException();
-        }
+      
 
         //
         //   when a user clicks on a Road, return the next state for it
@@ -499,30 +466,6 @@ namespace Catan10
             return nextState;
         }
 
-        private async Task PromptForLostCards(PlayerModel targetedPlayer, CatanAction action)
-        {
-            await Task.Delay(0);
-            throw new NotImplementedException();
-            //GameState currentState = MainPageModel.Log.Last().GameState;
-            //CatanPlayer ActivePlayerView = CurrentPlayer;
-            //await AnimateToPlayer(targetedPlayer, currentState);
-
-            //string input = await _gameTracker.ShowAndWait("Cards Lost", "0", true);
-            //int cardsLost = 0;
-            ////
-            ////  if this fails, then we'll just move to the next player
-            //if (Int32.TryParse(input, out cardsLost))
-            //{
-            //    CurrentPlayer.SetCardCountForAction(action, cardsLost);
-            //    AddLogEntry(CurrentPlayer, currentState, action, cardsLost);
-            //    await OnSave();
-            //}
-
-            //await AnimateToPlayer(ActivePlayerView, currentState, false);
-            //_gameTracker.SetState(currentState);
-        }
-
-     
 
         private bool RoadAllowed(RoadCtrl road)
         {
@@ -582,129 +525,7 @@ namespace Catan10
             return false;
         }
 
-        //
-        //  returns True if it undid something, false if the undo action has no UI affect (e.g. true if the user would think undo happened)
-        private async Task<bool> UndoLogLine(LogEntry logLine)
-        {
-            //this.TraceMessage($"Replay:{replayingLog} Line:{logLine}");
-            switch (logLine.Action)
-            {
-                case CatanAction.Rolled:
-                    UndoRoll();
-
-                    //    I don't remember why -- but instead of having "actions" and "consequeces" where only "actions" are logged, I log both and undo both.
-                    //    in particular Rolls generate stats and the stats are logged (and then undone below).  this shoudl probably be fixed.  someday.
-                    //  CountResourcesForRoll(_gameView.GetTilesWithNumber(roll), true);
-                    break;
-
-                case CatanAction.AddResourceCount:
-                    LogResourceCount lrc = logLine.Tag as LogResourceCount;
-                    if (logLine.PlayerData != null)
-                    {
-                        logLine.PlayerData.GameData.PlayerTurnResourceCount.AddResourceCount(lrc.ResourceType, -logLine.Number);
-                    }
-                    else
-                    {
-                        Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(lrc.ResourceType, -logLine.Number);
-                    }
-
-                    break;
-
-                case CatanAction.CardsLost:
-                    LogCardsLost lcl = logLine.Tag as LogCardsLost;
-                    _undoingCardLostHack = true;
-                    logLine.PlayerData.GameData.CardsLost = lcl.OldVal;
-                    _undoingCardLostHack = false;
-                    await LogPlayerLostCards(logLine.PlayerData, lcl.NewVal, lcl.OldVal, LogType.Undo); // values swapped
-                    break;
-
-                case CatanAction.MissedOpportunity:
-                case CatanAction.CardsLostToSeven:
-                    //UndoAction(i);      // this will remove one or many
-                    break;
-
-                case CatanAction.ChangedState:
-                    LogStateTranstion lst = logLine.Tag as LogStateTranstion;
-                    //
-                    //  don't go prior to WaitingForStart
-                    if (lst.OldState == GameState.WaitingForStart)
-                    {
-                        break;
-                    }
-
-                    await SetStateAsync(logLine.PlayerData, lst.OldState, logLine.StopProcessingUndo, LogType.Undo);
-
-                    break;
-
-                case CatanAction.SetRandomTileToGold:
-
-                    break;
-
-                case CatanAction.ChangedPlayer:
-                    LogChangePlayer lcp = logLine.Tag as LogChangePlayer;
-                    await AnimateToPlayerIndex(lcp.From, LogType.Undo);
-                    if (lcp.OldGameState == GameState.WaitingForNext)
-                    {
-                        //
-                        //  if we are in supplemental, do not mess with the gold tile(s)
-                        await _gameView.SetRandomTilesToGold(lcp.OldRandomGoldTiles);
-                    }
-                    break;
-
-                case CatanAction.ChangePlayerAndSetState:
-                    LogChangePlayer lcpSS = logLine.Tag as LogChangePlayer;
-                    await ChangePlayerAndSetState(lcpSS.From - lcpSS.To, lcpSS.OldGameState, LogType.Undo);
-                    break;
-
-                case CatanAction.DoneSupplemental:
-                    _supplementalStartIndex = logLine.Number; // we don't stop undoing on this one -- just set the number we need to terminate the loop and continue on
-                    await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.DoneSupplemental, false, LogType.Undo);
-                    break;
-
-                case CatanAction.Dealt:
-                    await Reshuffle();
-                    // don't take out the log line because Reshuffle doesn't log...
-                    // put the state back regardless if they really reshuffled or not
-                    await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
-                    //await ProcessEnter(null, "");
-                    break;
-
-                case CatanAction.PlayedKnight:
-                case CatanAction.AssignedBaron:
-                case CatanAction.AssignedPirateShip:
-                case CatanAction.RolledSeven:
-                    await UndoMoveBaron(logLine);
-                    break;
-
-                case CatanAction.UpdatedRoadState:
-                    LogRoadUpdate roadUpdate = logLine.Tag as LogRoadUpdate;
-                    await UpdateRoadState(roadUpdate.Road, roadUpdate.NewRoadState, roadUpdate.OldRoadState, LogType.Undo);
-                    CalculateAndSetLongestRoad();
-                    break;
-
-                case CatanAction.UpdateBuildingState:
-                    LogBuildingUpdate buildingUpdate = logLine.Tag as LogBuildingUpdate;
-                    await buildingUpdate.Building.UpdateBuildingState(CurrentPlayer, buildingUpdate.NewBuildingState, buildingUpdate.OldBuildingState); // NOTE:  New and Old have been swapped
-                    CalculateAndSetLongestRoad();  // this executes with the new tracking -- things may change since ties are different.
-                    break;
-
-                case CatanAction.RoadTrackingChanged:
-                    LogRoadTrackingChanged lrtc = logLine.Tag as LogRoadTrackingChanged;
-                    //_raceTracking.Undo(lrtc.OldState, lrtc.NewState, logLine.PlayerData, this, this.GameStateFromOldLog); // this will log the undo action to balance the log write
-                    //Debug.Assert(logLine.StopProcessingUndo == false, "this has no UI affect");
-                    break;
-
-                case CatanAction.ChangedPlayerProperty:
-                    LogPropertyChanged lpc = logLine.Tag as LogPropertyChanged;
-                    logLine.PlayerData.GameData.SetKeyValue<PlayerGameModel>(lpc.PropertyName, lpc.OldVal);
-                    break;
-
-                default:
-                    break;
-            }
-
-            return logLine.StopProcessingUndo;
-        }
+      
 
         private async Task UndoMoveBaron(LogEntry logLine)
         {
@@ -770,12 +591,12 @@ namespace Catan10
         }
 
         //
-        //  returns True if it is OK to build this settlement - this is basically a Road check
-        private BuildingState ValidateBuildingLocation(BuildingCtrl building)
+        //    
+        //
+        public  BuildingState ValidateBuildingLocation(BuildingCtrl building)
         {
             if ((GameStateFromOldLog == GameState.WaitingForNewGame || GameStateFromOldLog == GameState.WaitingForStart) && ValidateBuilding)
             {
-                
                 return BuildingState.None;
             }
 
@@ -800,7 +621,6 @@ namespace Catan10
             }
 
             bool allocationPhase = false;
-            
 
             if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
@@ -855,7 +675,7 @@ namespace Catan10
 
             //
             //  if we get here, we have a valid place to build (or we've bypassed the business logic)...make sure there is an entitlement
-            
+
             if (error == false)
             {
                 if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement))
@@ -866,7 +686,6 @@ namespace Catan10
                 {
                     return BuildingState.NoEntitlement;
                 }
-                
             }
 
             return BuildingState.Error;
@@ -891,8 +710,6 @@ namespace Catan10
         /// </summary>
         public async Task BuildingStateChanged(PlayerModel player, BuildingCtrl building, BuildingState oldState)
         {
-
-
             if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
             {
                 await HideAllPipEllipses();
@@ -909,7 +726,6 @@ namespace Catan10
                         tr.Add(kvp.Value.ResourceType, 1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
-
                 }
                 else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
                 {
@@ -922,7 +738,6 @@ namespace Catan10
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
                 }
-               
             }
 
             //
@@ -1172,10 +987,7 @@ namespace Catan10
             return _gameView.GetTile(tileIndex);
         }
 
-        public BuildingState IsValidBuildingLocation(BuildingCtrl building)
-        {
-            return ValidateBuildingLocation(building);            
-        }
+       
 
         public Task OnNewGame()
         {
@@ -1317,7 +1129,6 @@ namespace Catan10
             await UpdateRoadLog.SetRoadState(this, road, NextRoadState(road), _raceTracking);
             //
             //  UpdateRoad state will be done in the IGameController
-            
         }
 
         //
