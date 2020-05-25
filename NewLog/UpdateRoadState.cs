@@ -29,7 +29,7 @@ namespace Catan10
 
             if (newRoadState == oldState)
             {
-                throw new Exception("Why are you updating the road state to be the same state it already is?");
+                throw  new Exception("Why are you updating the road state to be the same state it already is?");
             }
 
             UpdateRoadLog logHeader = new UpdateRoadLog()
