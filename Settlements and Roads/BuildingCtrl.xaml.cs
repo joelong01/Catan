@@ -167,7 +167,9 @@ namespace Catan10
         {
             if (this.BuildingState == BuildingState.None)
             {
-                this.BuildingState= Callback.ValidateBuildingLocation(this);                
+                BuildingState oldState = this.BuildingState;
+                this.BuildingState= Callback.IsValidBuildingLocation(this);
+                this.TraceMessage($"Building Entered. OldState={oldState} NewState={this.BuildingState}");
             }
         }
 

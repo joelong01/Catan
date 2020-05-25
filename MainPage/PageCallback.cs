@@ -595,7 +595,7 @@ namespace Catan10
         //
         public  BuildingState ValidateBuildingLocation(BuildingCtrl building)
         {
-            if ((GameStateFromOldLog == GameState.WaitingForNewGame || GameStateFromOldLog == GameState.WaitingForStart) && ValidateBuilding)
+            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.WaitingForStart) && ValidateBuilding)
             {
                 return BuildingState.None;
             }
