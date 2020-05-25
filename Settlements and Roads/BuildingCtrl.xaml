@@ -79,10 +79,7 @@
                 CharacterSpacing="0" FontSize="32"
                 Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
         </Grid>
-        <Grid Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
-            Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}"
-            Background="Transparent"
-            Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'City'), Mode=OneWay}">
+        <Grid Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}" Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent" Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'City'), Mode=OneWay}">
             <Viewbox Name="_vbCity" Width="30" Height="30" Stretch="Uniform">
                 <local:CityCtrl Width="30" Height="30" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
@@ -96,15 +93,14 @@
                 <local:SettlementCtrl Width="30" Height="30" Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
         </Canvas>
-        <Grid Name="GRID_NoEntitlement" Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'NoEntitlement'), Mode=OneWay}" 
-              Background="Transparent">
+        <Grid Name="GRID_NoEntitlement" Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'NoEntitlement'), Mode=OneWay}" Background="Transparent">
             <Viewbox>
-                <TextBlock Text="$" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}"/>
+                <TextBlock Text="$" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}" />
             </Viewbox>
             <Ellipse Stroke="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}" StrokeThickness="2" />
             <Line X1="6" Y1="6" X2="25" Y2="25"
-                        Stroke="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}"
-                        StrokeThickness="2" />
+                Stroke="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}"
+                StrokeThickness="2" />
         </Grid>
     </Grid>
 </UserControl>

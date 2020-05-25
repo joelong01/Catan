@@ -133,22 +133,17 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-           
-                <local:GameContainerCtrl x:Name="_gameView" DoubleTapped="GameViewControlDoubleTapped" Canvas.ZIndex="-1" 
-                    RenderTransformOrigin="0.5,0.5" IsEnabled="True"
-                    PointerPressed="GameViewControlPointerPressed">
-                    <local:GameContainerCtrl.RenderTransform>
-                        <CompositeTransform x:Name="_transformGameView" 
-                                            TranslateX="{x:Bind MainPageModel.Settings.GameViewPosition.TranslateX, Mode=TwoWay}" 
-                                            TranslateY="{x:Bind MainPageModel.Settings.GameViewPosition.TranslateY, Mode=TwoWay}"
-                                           
-                                            />
-                    </local:GameContainerCtrl.RenderTransform>
-                </local:GameContainerCtrl>
-           
-            <local:DragableGridCtrl Name="Draggable_PrivateData" Width="360" 
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                OnGridPositionChanged="OnGridPositionChanged"
+
+            <local:GameContainerCtrl x:Name="_gameView" DoubleTapped="GameViewControlDoubleTapped" Canvas.ZIndex="-1"
+                RenderTransformOrigin="0.5,0.5" IsEnabled="True"
+                PointerPressed="GameViewControlPointerPressed">
+                <local:GameContainerCtrl.RenderTransform>
+                    <CompositeTransform x:Name="_transformGameView" TranslateX="{x:Bind MainPageModel.Settings.GameViewPosition.TranslateX, Mode=TwoWay}" TranslateY="{x:Bind MainPageModel.Settings.GameViewPosition.TranslateY, Mode=TwoWay}" />
+                </local:GameContainerCtrl.RenderTransform>
+            </local:GameContainerCtrl>
+
+            <local:DragableGridCtrl Name="Draggable_PrivateData" Width="360" HorizontalAlignment="Center"
+                VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
                 Player="{x:Bind TheHuman, Mode=OneWay}"
                 Background="{StaticResource bmKnight}"
                 Caption="Private Data" Canvas.ZIndex="9999" BorderThickness="2"
@@ -158,8 +153,7 @@
                     <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl"  Margin="10"
-                HorizontalAlignment="Right"
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right"
                 PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
                 GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" />
             <local:DragableGridCtrl x:Name="ControlGrid" Width="172" HorizontalAlignment="Center"
@@ -169,8 +163,8 @@
                 Player="{x:Bind CurrentPlayer, Mode=OneWay}"
                 Caption="{x:Bind CurrentPlayer.PlayerName, Mode=OneWay}"
                 BorderBrush="{StaticResource WhiteBrush}">
-                <local:DragableGridCtrl.Child >
-                    <StackPanel Margin="5" Orientation="Vertical" Background="{StaticResource bmCherry}" CornerRadius="10" >
+                <local:DragableGridCtrl.Child>
+                    <StackPanel Margin="5" Orientation="Vertical" Background="{StaticResource bmCherry}" CornerRadius="10">
                         <StackPanel>
                             <Button x:Name="_btnNextStep" Margin="0" HorizontalAlignment="Center"
                                 Content="&#xE101;"
