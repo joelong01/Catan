@@ -93,7 +93,7 @@ namespace Catan10
         public Task Do(IGameController gameController)
         {
             
-            gameController.ResetRollControl();
+            gameController.HideRollsInPublicUi();
             
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;

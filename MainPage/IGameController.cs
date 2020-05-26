@@ -75,20 +75,7 @@ namespace Catan10
         public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
         public CatanProxy Proxy => MainPageModel.Proxy;
 
-        public bool ShowPlayerRolls
-        {
-            set
-            {
-                var orientation = TileOrientation.FaceDown;
-                if (value) orientation = TileOrientation.FaceUp;
-                MainPageModel.PlayingPlayers.ForEach((p) =>
-                {
-                    p.GameData.RollOrientation = orientation;
-                    p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
-                    p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
-                });
-            }
-        }
+       
 
         private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
         {
@@ -132,7 +119,7 @@ namespace Catan10
 
                 case GameState.PickingBoard:
 
-                    await ResetRollControl();
+                    await HideRollsInPublicUi();
                     if (MainPageModel.GameStartedBy == TheHuman)
                     {
                         //
@@ -189,7 +176,7 @@ namespace Catan10
                     break;
 
                 case GameState.WaitingForRoll:
-                    await ResetRollControl();
+                    await HideRollsInPublicUi();
                     break;
 
                 case GameState.WaitingForNext:
@@ -411,13 +398,23 @@ namespace Catan10
             _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
         }
 
-        public async Task ResetRollControl()
+        public void ShowRollsInPublicUi()
+        {
+            MainPageModel.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.RollOrientation = TileOrientation.FaceUp;
+            });
+        }
+
+        public async Task HideRollsInPublicUi()
         {
             await _rollControl.Reset();
 
             MainPageModel.PlayingPlayers.ForEach((p) =>
-            {               
-                p.GameData.RollOrientation = TileOrientation.FaceUp;
+            {
+                p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
+                p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
+                p.GameData.RollOrientation = TileOrientation.FaceDown;
             }); // I hate this hack but I couldn't figure out how to do it with DataBinding
         }
 
@@ -459,7 +456,7 @@ namespace Catan10
                 this.TraceMessage("Owner changing!");
             }
 
-           
+
 
             UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 
@@ -689,7 +686,7 @@ namespace Catan10
             Contract.Assert(player != null);
 
             UpdateRoadState(player, road, updateRoadModel.NewRoadState, updateRoadModel.OldRoadState, updateRoadModel.OldRaceTracking);
-            
+
             return Task.CompletedTask;
         }
 
@@ -837,6 +834,11 @@ namespace Catan10
             }
 
             CalculateAndSetLongestRoad(raceTracking);
+        }
+
+        public async Task StartGame()
+        {
+            await Proxy.StartGame(MainPageModel.GameInfo);
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Catan10
         {
             //
             //  do any state cleanup needed for transitioning into Pick board
-            await gameController.ResetRollControl();
+            gameController.ShowRollsInPublicUi();
             if (gameController.MainPageModel.GameStartedBy == gameController.TheHuman)
             {
                 //

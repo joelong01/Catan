@@ -9,7 +9,8 @@ namespace Catan10
 {
     /// <summary>
     ///     This is a UI pause where 
-    ///     1. turn off Pips    
+    ///     1. turn off Pips
+    ///     2. tell the service the game has started
     /// </summary>
     public class PickingBoardToWaitingForRollOrder : LogHeader, ILogController
     {
@@ -33,9 +34,9 @@ namespace Catan10
             //
             //  turn off pips
             gameController.ResetAllBuildings();
-
+            await gameController.StartGame();
             MainPageModel mainPageModel = gameController.MainPageModel;
-
+            
             if (mainPageModel.Settings.AutoRespond)
             {
                 //

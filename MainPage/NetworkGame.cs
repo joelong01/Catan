@@ -63,7 +63,7 @@ namespace Catan10
                         {
 
                             var players = await Proxy.GetPlayers(gameMessage.GameInfo.Id);
-                            if (players != null && players.Contains(TheHuman.PlayerName) == false)
+                            if (players != null && players.Contains(TheHuman.PlayerName) == false && gameMessage.GameInfo.Started == false)
                             {
                                 await this.Reset();
                                 MainPageModel.GameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);                                

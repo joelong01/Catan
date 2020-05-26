@@ -81,6 +81,7 @@ namespace Catan10
 
     public interface IGameController
     {
+        Task StartGame();
         bool AutoRespondAndTheHuman { get; }
         CatanGames CatanGame { get; set; }
 
@@ -106,7 +107,7 @@ namespace Catan10
         List<int> NextRandomGoldTiles { get; }
 
         List<PlayerModel> PlayingPlayers { get; }
-        bool ShowPlayerRolls { set; }
+
         PlayerModel TheHuman { get; }
 
         /// <summary>
@@ -126,6 +127,8 @@ namespace Catan10
 
         RandomBoardSettings GetRandomBoard();
 
+        Task HideRollsInPublicUi();
+
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection
         /// </summary>
@@ -139,13 +142,13 @@ namespace Catan10
 
         void ResetAllBuildings();
 
-        Task ResetRollControl();
-
         Task SetRandomBoard(RandomBoardLog randomBoard);
 
         Task SetRoadState(UpdateRoadLog updateRoadModel);
 
         Task SetState(SetStateLog log);
+
+        void ShowRollsInPublicUi();
 
         Task StartGame(StartGameLog model);
 

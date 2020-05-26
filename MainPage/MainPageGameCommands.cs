@@ -711,7 +711,7 @@ namespace Catan10
 
                         int players = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1;
 
-                        if (players == 0 || players == -1) // only -1 if there is only one player (e.g. testing)
+                        if (players == -1)
                         {
                             await AllocateResourcesReverseToDoneAllocResources.PostLog(this);
                         }

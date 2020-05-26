@@ -42,7 +42,7 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            gameController.ShowPlayerRolls = true;
+            gameController.ShowRollsInPublicUi();
             return gameController.SynchronizedRoll(this);
         }
 
