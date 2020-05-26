@@ -60,7 +60,7 @@ namespace Catan10
             firstPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
             firstPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
 
-            ChangePlayer(gameController, 1);
+            ChangePlayer(gameController, 0);
 
             return Task.CompletedTask;
         }

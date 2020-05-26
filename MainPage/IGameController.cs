@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
+using Windows.Devices.Sensors;
 using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -441,7 +441,7 @@ namespace Catan10
                 this.TraceMessage("Owner changing!");
             }
 
-            CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.Road);
+            player.GameData.Resources.ConsumeEntitlement(Entitlement.Road);
 
             UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 
