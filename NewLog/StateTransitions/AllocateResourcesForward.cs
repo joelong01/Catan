@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -26,19 +27,19 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController);
+            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, this.SentBy);
         }
 
         public Task Redo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController);
+            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, this.SentBy);
         }
 
         public Task Undo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.UndoAllocateForwardResources(gameController);
+            return WaitingForStartToAllocateResourcesForward.UndoAllocateForwardResources(gameController, this.SentBy);
         }
-        public static Task DoAllocateForwardResources(IGameController gameController)
+        public static Task DoAllocateForwardResources(IGameController gameController, string sentByName)
         {
             gameController.MainPageModel.PlayingPlayers.ForEach((p) =>
             {
@@ -47,10 +48,13 @@ namespace Catan10
                 p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
             });
 
+            var sentPlayer = gameController.NameToPlayer(sentByName);
+
+
             //
             //  during allocation phase, you get one road and one settlement
-            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
-            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
+            sentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
+            sentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
 
             ChangePlayer(gameController, 1);
 
@@ -77,16 +81,18 @@ namespace Catan10
             
         }
 
-        public static Task UndoAllocateReverseResources(IGameController gameController)
+        public static Task UndoAllocateReverseResources(IGameController gameController, string sentByName)
         {
-            gameController.CurrentPlayer.GameData.Resources.RevokeEntitlement(Entitlement.Road);
-            gameController.CurrentPlayer.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
+            var sentBy = gameController.NameToPlayer(sentByName);
+            sentBy.GameData.Resources.RevokeEntitlement(Entitlement.Road);
+            sentBy.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
             ChangePlayer(gameController, 1);
             return Task.CompletedTask;
         }
 
-        public static Task DoAllocateReverseResources(IGameController gameController)
+        public static Task DoAllocateReverseResources(IGameController gameController, string sentByName)
         {
+            var sentBy = gameController.NameToPlayer(sentByName);
             gameController.MainPageModel.PlayingPlayers.ForEach((p) =>
             {
                 p.GameData.RollOrientation = TileOrientation.FaceDown;
@@ -96,16 +102,17 @@ namespace Catan10
 
             //
             //  during allocation phase, you get one road and one settlement
-            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
-            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
+            sentBy.GameData.Resources.GrantEntitlement(Entitlement.Road);
+            sentBy.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
             ChangePlayer(gameController, -1);
             return Task.CompletedTask;
         }
 
-        public static Task UndoAllocateForwardResources(IGameController gameController)
+        public static Task UndoAllocateForwardResources(IGameController gameController, string sentByName)
         {
-            gameController.CurrentPlayer.GameData.Resources.RevokeEntitlement(Entitlement.Road);
-            gameController.CurrentPlayer.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
+            var sentBy = gameController.NameToPlayer(sentByName);
+            sentBy.GameData.Resources.RevokeEntitlement(Entitlement.Road);
+            sentBy.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
             ChangePlayer(gameController, -1);
             return Task.CompletedTask;
         }

@@ -1095,7 +1095,10 @@ namespace Catan10
             {
                 return this.Rolls.Count - other.Rolls.Count;
             }
-
+            if (other.Rolls.Count == 0)
+            {
+                return -1;
+            }
             int max = Math.Max(this.Rolls.Count, other.Rolls.Count);
 
             for (int i = 0; i < max; i++)

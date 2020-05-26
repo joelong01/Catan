@@ -516,19 +516,20 @@ namespace Catan10
 
             Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
 
-            PlayerModel theHuman = PlayerNameToPlayer(logEntry.SentBy, MainPageModel.AllPlayers);
+            PlayerModel sentBy = PlayerNameToPlayer(logEntry.SentBy, MainPageModel.AllPlayers);
 
-            Contract.Assert(theHuman != null);
+            Contract.Assert(sentBy != null);
             Contract.Assert(logEntry.DiceOne > 0 && logEntry.DiceOne < 7);
             Contract.Assert(logEntry.DiceTwo > 0 && logEntry.DiceTwo < 7);
 
-            theHuman.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.DiceOne, logEntry.DiceTwo);
+            sentBy.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.DiceOne, logEntry.DiceTwo);
 
             //
             //  look at all the rolls and see if the current player needs to roll again
             foreach (var p in MainPageModel.PlayingPlayers)
             {
                 if (p == TheHuman) continue; // don't compare yourself to yourself
+                if (p.GameData.SyncronizedPlayerRolls.DiceOne == -1) continue; //hasn't rolled yet
                 if (p.GameData.SyncronizedPlayerRolls.CompareTo(TheHuman.GameData.SyncronizedPlayerRolls) == 0)
                 {
                     await _rollControl.Reset();
@@ -578,9 +579,18 @@ namespace Catan10
                     MainPageModel.PlayingPlayers[i] = newList[i];
                 }
 
-                await WaitingForRollOrderToWaitingForStart.PostLog(this);
-                // await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.PlayingPlayers[0], GameState.WaitingForStart);
-
+                //
+                //  
+                if (CurrentGameState == GameState.WaitingForRollForOrder)
+                {
+                    await WaitingForRollOrderToWaitingForStart.PostLog(this);
+                }
+                else
+                {
+                    this.TraceMessage($"didn't call WaitingForRollOrderToWaitingForStart for {logEntry}");
+                }
+                // else eat it...only need one of these
+                
 
 
             }
