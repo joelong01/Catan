@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
@@ -62,11 +63,6 @@ namespace Catan10
                     NotifyPropertyChanged();
                 }
             }
-        }
-
-        internal void RevokeEntitlement(Entitlement entitlement)
-        {
-            this.ConsumeEntitlement(entitlement);
         }
 
         public int GoldTotal
@@ -268,7 +264,7 @@ namespace Catan10
             }
         }
 
-        public List<Entitlement> UnspentEntitlements { get; } = new List<Entitlement>();
+        public ObservableCollection<Entitlement> UnspentEntitlements { get; } = new ObservableCollection<Entitlement>();
 
         public int VictoryPoints
         {
@@ -291,6 +287,17 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        internal void ConsumeEntitlement(Entitlement entitlement)
+        {
+            Contract.Assert(HasEntitlement(entitlement));
+            UnspentEntitlements.Remove(entitlement);
+        }
+
+        internal void RevokeEntitlement(Entitlement entitlement)
+        {
+            this.ConsumeEntitlement(entitlement);
+        }
+
         public bool Equivalent(TradeResources tradeResources)
         {
             this.Current.Equivalent(tradeResources);
@@ -309,22 +316,15 @@ namespace Catan10
             TotalResources += tr;
         }
 
-        // the list of cards that have been played.  this is public information!
-        public override string ToString()
-        {
-            return $"[Total={Current}][Ore={Current.Ore}][Brick={Current.Brick}][Wheat={Current.Wheat}][Wood={Current.Wood}][Sheep={Current.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
-        }
-
         public bool HasEntitlement(Entitlement entitlement)
         {
             return UnspentEntitlements.Contains(entitlement);
         }
 
-        internal void ConsumeEntitlement(Entitlement entitlement)
+        // the list of cards that have been played.  this is public information!
+        public override string ToString()
         {
-            Contract.Assert(HasEntitlement(entitlement));
-            UnspentEntitlements.Remove(entitlement);
+            return $"[Total={Current}][Ore={Current.Ore}][Brick={Current.Brick}][Wheat={Current.Wheat}][Wood={Current.Wood}][Sheep={Current.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
         }
-
     }
 }
