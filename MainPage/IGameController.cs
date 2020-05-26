@@ -579,6 +579,8 @@ namespace Catan10
                     MainPageModel.PlayingPlayers[i] = newList[i];
                 }
 
+                CurrentPlayer = MainPageModel.PlayingPlayers[0];
+
                 //
                 //  
                 if (CurrentGameState == GameState.WaitingForRollForOrder)
