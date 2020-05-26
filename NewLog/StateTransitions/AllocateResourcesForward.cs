@@ -50,15 +50,12 @@ namespace Catan10
                 p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
                 p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
             });
-            //
-            //  we only get one of these, so we need to give whoever is the first player the resources
-
-            var firstPlayer = gameController.MainPageModel.PlayingPlayers[0];
+            var sentBy = gameController.NameToPlayer(sentByName);
 
             //
             //  during allocation phase, you get one road and one settlement
-            firstPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
-            firstPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
+            sentBy.GameData.Resources.GrantEntitlement(Entitlement.Road);
+            sentBy.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
 
             ChangePlayer(gameController, 0);
 
@@ -104,12 +101,13 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, this.SentBy);
+    
+            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, gameController.PlayingPlayers[0].PlayerName);
         }
 
         public Task Redo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, this.SentBy);
+            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, gameController.PlayingPlayers[0].PlayerName);
         }
 
         public Task Undo(IGameController gameController)
