@@ -42,11 +42,7 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            gameController.MainPageModel.PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.RollOrientation = TileOrientation.FaceUp;
-
-            });
+            gameController.ShowPlayerRolls = true;
             return gameController.SynchronizedRoll(this);
         }
 

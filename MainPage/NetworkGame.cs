@@ -140,6 +140,7 @@ namespace Catan10
             }
 
             MainPageModel.GameInfo = dlg.SelectedGame;
+            await _rollControl.Reset();
             MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedGame.Creator);
             await StartGameLog.StartGame(this, TheHuman.PlayerName, 0);
             
@@ -198,7 +199,10 @@ namespace Catan10
             {
                 case CatanMessageType.Normal:
                     await logController.Do(this);
-                    await Log.PushAction(logHeader);
+                    if (logHeader.Action != CatanAction.Verify)
+                    {
+                        await Log.PushAction(logHeader);
+                    }
                     break;
 
                 case CatanMessageType.Undo:

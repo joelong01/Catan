@@ -5,6 +5,9 @@ using Catan.Proxy;
 
 namespace Catan10
 {
+    /// <summary>
+    ///     This is just a UI pause so people can see what happened
+    /// </summary>
     public class WaitingForRollOrderToWaitingForStart : LogHeader, ILogController
     {
         public WaitingForRollOrderToWaitingForStart()
@@ -17,7 +20,7 @@ namespace Catan10
 
             WaitingForRollOrderToWaitingForStart logHeader = new WaitingForRollOrderToWaitingForStart()
             {
-                CanUndo = true,
+                CanUndo = false, // Rolls to see who starts are final
                 Action = CatanAction.ChangedState,
                 OldState = GameState.WaitingForRollForOrder,
                 NewState = GameState.WaitingForStart,

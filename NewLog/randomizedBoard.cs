@@ -38,6 +38,7 @@ namespace Catan10
         {
             RandomBoardLog logHeader = new RandomBoardLog()
             {
+                CanUndo = (gameController.CurrentGameState == GameState.PickingBoard), // you can only undo if you have a board to go back to.
                 NewState = GameState.PickingBoard,
                 NewRandomBoard = gameController.GetRandomBoard(),
                 PreviousRandomBoard = gameController.CurrentRandomBoard(),

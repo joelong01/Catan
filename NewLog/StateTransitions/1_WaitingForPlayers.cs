@@ -6,6 +6,9 @@ using Catan.Proxy;
 
 namespace Catan10
 {
+    /// <summary>
+    ///     This is just a UI pause.
+    /// </summary>
     public class WaitingForNewGameToWaitingForPlayers : LogHeader, ILogController
     {
         public WaitingForNewGameToWaitingForPlayers() : base()

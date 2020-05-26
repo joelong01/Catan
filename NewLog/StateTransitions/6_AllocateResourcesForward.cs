@@ -26,6 +26,7 @@ namespace Catan10
 
             var newPlayer = playingPlayers[idx];
             gameController.CurrentPlayer = newPlayer;
+
         }
 
         public static void GrantEntitlements(IGameController gameController, string to)
@@ -64,11 +65,19 @@ namespace Catan10
             player.GameData.Resources.GrantResources(tr.GetNegated());
         }       
     }
-
+    /// <summary>
+    ///     Allocate one road and one settlement to the player
+    ///     Reset the roll control for next time
+    /// </summary>
     public class WaitingForStartToAllocateResourcesForward : LogHeader, ILogController
     {
         internal static async Task PostLog(IGameController gameController)
         {
+            //
+            //  Player Order and Current players should be consistent
+            //  Verify the players are consistent across the machines
+            await VerifyPlayers.PostMessage(gameController);
+
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForStart);
 
             WaitingForStartToAllocateResourcesForward logHeader = new WaitingForStartToAllocateResourcesForward()
@@ -83,14 +92,9 @@ namespace Catan10
         }
         public Task Do(IGameController gameController)
         {
-            gameController.MainPageModel.PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.RollOrientation = TileOrientation.FaceDown;
-                p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
-                p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
-            });
-
-            AllocationPhaseHelper.ChangePlayer(gameController, 0);
+            
+            gameController.ResetRollControl();
+            
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
 

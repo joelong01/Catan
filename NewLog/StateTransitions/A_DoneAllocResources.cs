@@ -6,6 +6,9 @@ using Catan.Proxy;
 
 namespace Catan10
 {
+    /// <summary>
+    ///     Just a UI pause
+    /// </summary>
     public class AllocateResourcesReverseToDoneAllocResources :  LogHeader, ILogController
     {
         public AllocateResourcesReverseToDoneAllocResources() { }

@@ -325,5 +325,6 @@ namespace Catan10
             Contract.Assert(HasEntitlement(entitlement));
             UnspentEntitlements.Remove(entitlement);
         }
+
     }
 }

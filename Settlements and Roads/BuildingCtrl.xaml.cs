@@ -289,7 +289,8 @@ namespace Catan10
         {
             var controlState = (BuildingState)Enum.Parse(typeof(BuildingState), match, true);
             Contract.Assert(controlState != BuildingState.None);
-            return (state == controlState) ? Visibility.Visible : Visibility.Collapsed;
+            var vis = (state == controlState) ? Visibility.Visible : Visibility.Collapsed;
+            return vis;
         }
 
         public Brush PickPlayerBackground(PlayerModel owner, PlayerModel current)

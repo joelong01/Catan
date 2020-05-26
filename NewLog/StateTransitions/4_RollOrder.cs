@@ -7,6 +7,10 @@ using Catan.Proxy;
 
 namespace Catan10
 {
+    /// <summary>
+    ///     This is a UI pause where 
+    ///     1. turn off Pips    
+    /// </summary>
     public class PickingBoardToWaitingForRollOrder : LogHeader, ILogController
     {
         public static async Task PostLog(IGameController gameController)
@@ -28,12 +32,14 @@ namespace Catan10
         {
             //
             //  turn off pips
-
             gameController.ResetAllBuildings();
+
             MainPageModel mainPageModel = gameController.MainPageModel;
 
             if (mainPageModel.Settings.AutoRespond)
             {
+                //
+                //  step 5 is to roll -- simulate it
                 Random rand = new Random();
                 await SynchronizedRollLog.StartSyncronizedRoll(gameController, rand.Next(1, 7), rand.Next(1, 7));
             }

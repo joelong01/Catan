@@ -6,6 +6,10 @@ using Catan10;
 
 namespace Catan10
 {
+    /// <summary>
+    ///     Get a random board and send it to all the players.
+    ///     Turn on notifications for game data
+    /// </summary>
     public class WaitingForPlayersToPickingBoard : LogHeader, ILogController
     {
         public WaitingForPlayersToPickingBoard() : base()
@@ -30,6 +34,8 @@ namespace Catan10
         public async Task Do(IGameController gameController)
         {
             var mainPageModel = gameController.MainPageModel;
+            mainPageModel.PlayingPlayers.ForEach((p) => p.GameData.NotificationsEnabled = true);
+
             if (mainPageModel.GameStartedBy == gameController.TheHuman)
             {
                 //

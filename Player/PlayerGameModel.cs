@@ -58,7 +58,7 @@ namespace Catan10
 
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
-        private int pips = 0;
+        private int _pips = 0;
         public CardsLostUpdatedHandler OnCardsLost;
 
         public PlayerGameModel()
@@ -388,17 +388,13 @@ namespace Catan10
 
         public int Pips
         {
-            get => pips;
+            get => _pips;
             set
             {
-                if (pips != value)
+                if (_pips != value)
                 {
-                    //    12/14/2019: this line is causingt problems because this log gets added *before* the log for the settlment update,
-                    //    which means Undo is broken because we stop undoing on a settlement changed event.  Undo always changes the collections,
-                    //    so this gets updated anyway.  going to comment out to see if there are issues...
-
-                    //LogPropertyChanged(pips, value); // this needs to be here so that the Pips are set when the log is replayed.  it'd be unfortunate if this was Undone...
-                    pips = value;
+                    
+                    _pips = value;
                     NotifyPropertyChanged();
                 }
             }

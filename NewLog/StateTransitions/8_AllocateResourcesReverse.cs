@@ -1,23 +1,28 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
 
 namespace Catan10
 {
-    public class AllocateResourcesReverseToAllocateResourcesReverse : LogHeader, ILogController
+    /// <summary>
+    ///     Grant/Revoke (Do/Undo) one settlement and one road
+    /// </summary>
+    public class AllocateResourcesForwardToAllocateResourcesReverse : LogHeader, ILogController
     {
-        public AllocateResourcesReverseToAllocateResourcesReverse() { }
+        public AllocateResourcesForwardToAllocateResourcesReverse()
+        {
+        }
+
         internal static async Task PostLog(IGameController gameController)
         {
-            Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceReverse);
+            Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceForward);
 
-            AllocateResourcesReverseToAllocateResourcesReverse logHeader = new AllocateResourcesReverseToAllocateResourcesReverse()
+            AllocateResourcesForwardToAllocateResourcesReverse logHeader = new AllocateResourcesForwardToAllocateResourcesReverse()
             {
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
-                OldState = GameState.AllocateResourceReverse,
+                OldState = GameState.AllocateResourceForward,
                 NewState = GameState.AllocateResourceReverse,
             };
 
@@ -26,7 +31,6 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            AllocationPhaseHelper.ChangePlayer(gameController, -1);
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
         }
@@ -38,7 +42,6 @@ namespace Catan10
 
         public Task Undo(IGameController gameController)
         {
-            AllocationPhaseHelper.ChangePlayer(gameController, -1);
             AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
         }

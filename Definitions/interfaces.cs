@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
 using Catan.Proxy;
+
 using Windows.UI.Xaml.Input;
 
 namespace Catan10
@@ -10,7 +11,7 @@ namespace Catan10
     //
     //  this interface is implemented by the Controls that wrap the SimpleHexPanel
     //  and exposes the data needed by the Views/Pages
-    interface ICatanGameData
+    internal interface ICatanGameData
     {
         CatanGames CatanGame { get; }
         string Description { get; }
@@ -37,6 +38,7 @@ namespace Catan10
         bool UseRandomNumbers { get; set; }
         bool ValidateBuilding { get; set; }
         double Zoom { get; set; }
+
         void Close();
 
         Task Explorer();
@@ -52,21 +54,19 @@ namespace Catan10
         Task RotateTiles();
 
         Task SettingChanged();
+
         Task Winner();
     }
 
     public interface IGameCallback
     {
-
-        bool CanBuildRoad();
-
         Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
 
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
 
         bool BuildingStateChangeOk(BuildingCtrl building);
 
-        BuildingState ValidateBuildingLocation(BuildingCtrl sender);
+        bool CanBuildRoad();
 
         void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e);
 
@@ -75,10 +75,13 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
+
+        BuildingState ValidateBuildingLocation(BuildingCtrl sender);
     }
 
     public interface IGameController
     {
+        bool AutoRespondAndTheHuman { get; }
         CatanGames CatanGame { get; set; }
 
         /// <summary>
@@ -99,8 +102,11 @@ namespace Catan10
 
         NewLog Log { get; }
 
+        MainPageModel MainPageModel { get; }
         List<int> NextRandomGoldTiles { get; }
 
+        List<PlayerModel> PlayingPlayers { get; }
+        bool ShowPlayerRolls { set; }
         PlayerModel TheHuman { get; }
 
         /// <summary>
@@ -119,7 +125,6 @@ namespace Catan10
         RandomBoardSettings CurrentRandomBoard();
 
         RandomBoardSettings GetRandomBoard();
-        Task SetRoadState(UpdateRoadLog updateRoadModel);
 
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection
@@ -127,12 +132,18 @@ namespace Catan10
         /// <param name="playerName"></param>
         /// <returns></returns>
         PlayerModel NameToPlayer(string playerName);
-        Task UndoSetRoadState(UpdateRoadLog updateRoadModel);
+
         Task<bool> PostMessage(LogHeader logHeader, CatanMessageType normal);
 
         Task<bool> RedoAsync();
 
+        void ResetAllBuildings();
+
+        Task ResetRollControl();
+
         Task SetRandomBoard(RandomBoardLog randomBoard);
+
+        Task SetRoadState(UpdateRoadLog updateRoadModel);
 
         Task SetState(SetStateLog log);
 
@@ -147,23 +158,22 @@ namespace Catan10
         Task UndoChangePlayer(ChangePlayerLog log);
 
         Task UndoSetRandomBoard(RandomBoardLog logHeader);
+
+        Task UndoSetRoadState(UpdateRoadLog updateRoadModel);
+
         Task UndoSetState(SetStateLog setStateLog);
-        Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
+
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
-        
-        Task ResetRollControl();
-        void ResetAllBuildings();
 
-        List<PlayerModel> PlayingPlayers { get; }
-        MainPageModel MainPageModel { get; }
-        bool AutoRespondAndTheHuman { get; }
+        Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
     }
-
 
     public interface IGameViewCallback
     {
         void OnGridLeftTapped(TileCtrl tile, TappedRoutedEventArgs e);
+
         void OnGridRightTapped(TileCtrl tile, RightTappedRoutedEventArgs e);
+
         void OnHarborRightTapped(TileCtrl tileCtrl, HarborLocation location, RightTappedRoutedEventArgs e);
 
         void OnTileDoubleTapped(object sender, DoubleTappedRoutedEventArgs e);
@@ -172,14 +182,14 @@ namespace Catan10
     public interface ILogController
     {
         Task Do(IGameController gameController);
+
         Task Redo(IGameController gameController);
 
         Task Undo(IGameController gameController);
     }
+
     public interface ITileControlCallback
     {
-
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
-
     }
 }

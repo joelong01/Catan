@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-using Windows.Devices.Sensors;
+
 using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -18,6 +16,7 @@ namespace Catan10
     {
         private TaskCompletionSource<bool> ActionTcs { get; set; }
         private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
+        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
         public GameState CurrentGameState
@@ -76,7 +75,20 @@ namespace Catan10
         public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
         public CatanProxy Proxy => MainPageModel.Proxy;
 
-        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
+        public bool ShowPlayerRolls
+        {
+            set
+            {
+                var orientation = TileOrientation.FaceDown;
+                if (value) orientation = TileOrientation.FaceUp;
+                MainPageModel.PlayingPlayers.ForEach((p) =>
+                {
+                    p.GameData.RollOrientation = orientation;
+                    p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
+                    p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
+                });
+            }
+        }
 
         private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
         {
@@ -87,17 +99,6 @@ namespace Catan10
                 index++;
             };
             return -1;
-        }
-
-        public async Task ResetRollControl()
-        {
-            await _rollControl.Reset();
-
-            MainPageModel.PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.NotificationsEnabled = true;
-                p.GameData.RollOrientation = TileOrientation.FaceUp;
-            }); // I hate this hack but I couldn't figure out how to do it with DataBinding
         }
 
         private async Task UpdateUiForState(GameState currentState)
@@ -183,6 +184,7 @@ namespace Catan10
                     CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
                     CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
                     break;
+
                 case GameState.DoneResourceAllocation:
                     break;
 
@@ -225,6 +227,7 @@ namespace Catan10
                     break;
             }
         }
+
         /// <summary>
         ///     Called when a Player is added to a Service game
         ///
@@ -403,6 +406,21 @@ namespace Catan10
             return await UndoRedoTcs.Task;
         }
 
+        public void ResetAllBuildings()
+        {
+            _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
+        }
+
+        public async Task ResetRollControl()
+        {
+            await _rollControl.Reset();
+
+            MainPageModel.PlayingPlayers.ForEach((p) =>
+            {               
+                p.GameData.RollOrientation = TileOrientation.FaceUp;
+            }); // I hate this hack but I couldn't figure out how to do it with DataBinding
+        }
+
         /// <summary>
         ///     Set a random board.  Only the creator can set a random board.
         ///
@@ -441,7 +459,7 @@ namespace Catan10
                 this.TraceMessage("Owner changing!");
             }
 
-            player.GameData.Resources.ConsumeEntitlement(Entitlement.Road);
+           
 
             UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 
@@ -537,7 +555,7 @@ namespace Catan10
             }
 
             //
-            //  TODO how do we know to stop? - go through PlayingPlayers and ask if any are tied and if any need to roll
+            //  go through PlayingPlayers and ask if any are tied and if any need to roll
             //
 
             int count = MainPageModel.PlayingPlayers.Count;
@@ -579,10 +597,12 @@ namespace Catan10
                     MainPageModel.PlayingPlayers[i] = newList[i];
                 }
 
+                //
+                //  because all players are sharing the rolls, we can implicitly set the CurrentPlayer w/o sharing that we have done so.
                 CurrentPlayer = MainPageModel.PlayingPlayers[0];
 
                 //
-                //  
+                //
                 if (CurrentGameState == GameState.WaitingForRollForOrder)
                 {
                     await WaitingForRollOrderToWaitingForStart.PostLog(this);
@@ -592,9 +612,6 @@ namespace Catan10
                     this.TraceMessage($"didn't call WaitingForRollOrderToWaitingForStart for {logEntry}");
                 }
                 // else eat it...only need one of these
-                
-
-
             }
         }
 
@@ -672,6 +689,7 @@ namespace Catan10
             Contract.Assert(player != null);
 
             UpdateRoadState(player, road, updateRoadModel.NewRoadState, updateRoadModel.OldRoadState, updateRoadModel.OldRaceTracking);
+            
             return Task.CompletedTask;
         }
 
@@ -690,7 +708,11 @@ namespace Catan10
             Contract.Assert(building != null);
             PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
             Contract.Assert(player != null);
-            await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
+            //
+            //  5/26/2020: when we undo, we don't want to see the pips (which is the same as "Building")
+            var newState = updateBuildingLog.OldBuildingState;
+            if (updateBuildingLog.OldBuildingState == BuildingState.Pips || updateBuildingLog.OldBuildingState == BuildingState.Build) newState = BuildingState.None;
+            await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, newState);
             if (updateBuildingLog.NewBuildingState == BuildingState.City)
             {
                 player.GameData.Resources.UnspentEntitlements.Add(Entitlement.City);
@@ -703,6 +725,17 @@ namespace Catan10
             {
                 Contract.Assert(false, "should be city or settlement");
             }
+
+            if (updateBuildingLog.OldState == GameState.AllocateResourceReverse)
+            {
+                TradeResources tr = new TradeResources();
+                foreach (var kvp in building.BuildingToTileDictionary)
+                {
+                    tr.Add(kvp.Value.ResourceType, -1);
+                }
+                CurrentPlayer.GameData.Resources.GrantResources(tr);
+            }
+
         }
 
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
@@ -725,8 +758,6 @@ namespace Catan10
             BuildingState oldState = updateBuildingLog.OldBuildingState;
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
-
-
                 if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build))
                 {
                     TradeResources tr = new TradeResources();
@@ -748,7 +779,6 @@ namespace Catan10
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
                 }
-
             }
 
             //
@@ -776,10 +806,12 @@ namespace Catan10
                     if (oldState == RoadState.Ship)
                     {
                         player.GameData.Ships.Remove(road);
+                        player.GameData.Resources.GrantEntitlement(Entitlement.Ship);
                     }
                     else
                     {
                         player.GameData.Roads.Remove(road);
+                        player.GameData.Resources.GrantEntitlement(Entitlement.Road);
                     }
 
                     road.Owner = null;
@@ -787,6 +819,7 @@ namespace Catan10
                     break;
 
                 case RoadState.Road:
+                    player.GameData.Resources.ConsumeEntitlement(Entitlement.Road);
                     road.Number = player.GameData.Roads.Count; // undo-able
                     Contract.Assert(player.GameData != null);
                     player.GameData.Roads.Add(road);
@@ -794,6 +827,7 @@ namespace Catan10
                     break;
 
                 case RoadState.Ship:
+                    player.GameData.Resources.ConsumeEntitlement(Entitlement.Ship);
                     player.GameData.Roads.Remove(road); // can't be a ship if you aren't a road
                     player.GameData.Ships.Add(road);
                     break;
@@ -803,12 +837,6 @@ namespace Catan10
             }
 
             CalculateAndSetLongestRoad(raceTracking);
-        }
-
-
-        public void ResetAllBuildings()
-        {
-            _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
         }
     }
 }
