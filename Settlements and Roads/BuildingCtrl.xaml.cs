@@ -182,6 +182,11 @@ namespace Catan10
             {
                 this.BuildingState = BuildingState.None;
             }
+
+            if (MainPage.Current.CurrentGameState == GameState.PickingBoard && this.BuildingState == BuildingState.Pips)
+            {
+                this.BuildingState = BuildingState.None;
+            }
         }
 
         /// <summary>

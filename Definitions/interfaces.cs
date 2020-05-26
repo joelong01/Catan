@@ -89,7 +89,7 @@ namespace Catan10
         /// <summary>
         ///     The current player in the game
         /// </summary>
-        PlayerModel CurrentPlayer { get; }
+        PlayerModel CurrentPlayer { get; set; }
 
         List<int> CurrentRandomGoldTiles { get; }
 
@@ -150,7 +150,13 @@ namespace Catan10
         Task UndoSetState(SetStateLog setStateLog);
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
+        
+        Task ResetRollControl();
+        void ResetAllBuildings();
+
         List<PlayerModel> PlayingPlayers { get; }
+        MainPageModel MainPageModel { get; }
+        bool AutoRespondAndTheHuman { get; }
     }
 
 

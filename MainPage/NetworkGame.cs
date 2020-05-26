@@ -105,7 +105,7 @@ namespace Catan10
                 if (s == null)
                 {
                     var ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-                    this.TraceMessage(ErrorMessage);
+                   // this.TraceMessage(ErrorMessage);
                 }
             });
         }

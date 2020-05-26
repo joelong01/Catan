@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
@@ -61,6 +62,11 @@ namespace Catan10
                     NotifyPropertyChanged();
                 }
             }
+        }
+
+        internal void RevokeEntitlement(Entitlement entitlement)
+        {
+            this.ConsumeEntitlement(entitlement);
         }
 
         public int GoldTotal
@@ -316,7 +322,7 @@ namespace Catan10
 
         internal void ConsumeEntitlement(Entitlement entitlement)
         {
-            System.Diagnostics.Contracts.Contract.Assert(HasEntitlement(entitlement));
+            Contract.Assert(HasEntitlement(entitlement));
             UnspentEntitlements.Remove(entitlement);
         }
     }

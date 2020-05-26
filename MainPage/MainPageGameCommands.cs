@@ -402,6 +402,7 @@ namespace Catan10
         {
             await SaveGameState();
         }
+
         private async void OnSetDefaultState(object sender, RoutedEventArgs e)
         {
             if (SaveFolder == null)
@@ -613,7 +614,6 @@ namespace Catan10
 
                     DragableGridCtrl dGrid = ctrl as DragableGridCtrl;
                     if (dGrid != null) dGrid.GridPosition = pos;
-
                 }
             }
             catch (Exception e)
@@ -665,58 +665,69 @@ namespace Catan10
             {
                 if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
 
+                if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;
+
                 // this.TraceMessage("starting NextStep");
                 MainPageModel.EnableUiInteraction = false;
                 switch (CurrentGameState)
                 {
                     case GameState.WaitingForNewGame:
-                        return false;
+                        OnStartDefaultNetworkGame(null, null);
+                        break;
 
                     case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
-                        await SetStateLog.SetState(this, GameState.PickingBoard);
+                        await WaitingForPlayersToPickingBoard.PostLog(this);
                         break;
 
                     case GameState.PickingBoard:  // you get here by clicking the "=>" button
-                        await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
+                        await PickingBoardToWaitingForRollOrder.PostLog(this);
                         break;
 
                     case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
-                        await SetStateLog.SetState(this, GameState.WaitingForStart);
+                        await WaitingForRollOrderToWaitingForStart.PostLog(this);
                         break;
 
                     case GameState.WaitingForStart:
-                        await SetStateLog.SetState(this, GameState.AllocateResourceForward);                        
+                        await WaitingForStartToAllocateResourcesForward.PostLog(this);
                         break;
 
                     case GameState.AllocateResourceForward:
-
-                        if (MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) + 1 == MainPageModel.PlayingPlayers.Count)
+                        int index = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer);
+                        if (MainPageModel.PlayingPlayers.Count == 1) // only during testing!
                         {
-                            await ChangePlayerLog.ChangePlayer(this, 0, GameState.AllocateResourceReverse);
+                            await AllocateResourcesForwardToAllocateResourcesReverse.PostLog(this);
+                        }
+                        else if (index == 0)
+                        {
+                            await WaitingForStartToAllocateResourcesForward.PostLog(this);
+                        }
+                        else if (index == MainPageModel.PlayingPlayers.Count - 1)
+                        {
+                            await AllocateResourcesForwardToAllocateResourcesReverse.PostLog(this);
                         }
                         else
                         {
-                            await ChangePlayerLog.ChangePlayer(this, 1, GameState.AllocateResourceForward);
+                            await AllocateResourcesForwardToAllocateResourcesForward.PostLog(this);
                         }
-
                         break;
 
                     case GameState.AllocateResourceReverse:
-                        int players = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1;
 
+                        int players = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1;
+                       
                         if (players == 0 || players == -1) // only -1 if there is only one player (e.g. testing)
                         {
-                            await SetStateLog.SetState(this, GameState.DoneResourceAllocation);
+                            await AllocateResourcesReverseToDoneAllocResources.PostLog(this);
                         }
                         else
                         {
-                            await ChangePlayerLog.ChangePlayer(this, -1, GameState.AllocateResourceReverse);
+                            await AllocateResourcesReverseToAllocateResourcesReverse.PostLog(this);
                         }
 
                         break;
 
                     case GameState.DoneResourceAllocation:
-                        await SetStateLog.SetState(this, GameState.WaitingForRoll);
+                        await DoneAllocResourcesToWaitingForRoll.PostLog(this);
                         break;
 
                     case GameState.WaitingForRoll:

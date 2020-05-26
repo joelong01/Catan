@@ -67,6 +67,8 @@ namespace Catan10
 
                     if (Log == null) return true;
 
+                    if (MainPage.Current.CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;
+
                     if (state == GameState.PickingBoard || state == GameState.WaitingForPlayers)
                     {
                         ret = (MainPage.Current.TheHuman == this.GameStartedBy);
@@ -326,6 +328,7 @@ namespace Catan10
                 if (Log == null) return Visibility.Visible;
                 if (Log.GameState == GameState.WaitingForNewGame) return Visibility.Visible;
                 if (Log.GameState == GameState.PickingBoard) return Visibility.Visible;
+                if (Log.GameState == GameState.AllocateResourceForward || Log.GameState == GameState.AllocateResourceReverse) return Visibility.Visible;
                 return Visibility.Collapsed;
             }
         }

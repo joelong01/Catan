@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -75,6 +76,8 @@ namespace Catan10
         public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
         public CatanProxy Proxy => MainPageModel.Proxy;
 
+        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
+
         private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
         {
             int index = 0;
@@ -86,7 +89,7 @@ namespace Catan10
             return -1;
         }
 
-        private async Task ResetRollControl()
+        public async Task ResetRollControl()
         {
             await _rollControl.Reset();
 
@@ -149,7 +152,7 @@ namespace Catan10
 
                     _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
 
-                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
+                    if (MainPageModel.Settings.AutoRespond)
                     {
                         Random rand = new Random();
                         await SynchronizedRollLog.StartSyncronizedRoll(this, rand.Next(1, 7), rand.Next(1, 7));
@@ -575,7 +578,8 @@ namespace Catan10
                     MainPageModel.PlayingPlayers[i] = newList[i];
                 }
 
-                await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.PlayingPlayers[0], GameState.WaitingForStart);
+                await WaitingForRollOrderToWaitingForStart.PostLog(this);
+                // await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.PlayingPlayers[0], GameState.WaitingForStart);
 
 
 
@@ -675,6 +679,18 @@ namespace Catan10
             PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
             Contract.Assert(player != null);
             await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
+            if (updateBuildingLog.NewBuildingState == BuildingState.City)
+            {
+                player.GameData.Resources.UnspentEntitlements.Add(Entitlement.City);
+            }
+            else if (updateBuildingLog.NewBuildingState == BuildingState.Settlement)
+            {
+                player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Settlement);
+            }
+            else
+            {
+                Contract.Assert(false, "should be city or settlement");
+            }
         }
 
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
@@ -707,7 +723,7 @@ namespace Catan10
                         tr.Add(kvp.Value.ResourceType, 1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
-                    this.TraceMessage($"{CurrentPlayer.PlayerName} Granted: {CurrentPlayer.GameData.Resources.TotalResources}");
+                    // this.TraceMessage($"{CurrentPlayer.PlayerName} Granted: {CurrentPlayer.GameData.Resources.TotalResources}");
                 }
                 else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
                 {
@@ -775,6 +791,12 @@ namespace Catan10
             }
 
             CalculateAndSetLongestRoad(raceTracking);
+        }
+
+
+        public void ResetAllBuildings()
+        {
+            _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
         }
     }
 }
