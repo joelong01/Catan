@@ -7,7 +7,8 @@ using Catan.Proxy;
 namespace Catan10
 {
     /// <summary>
-    ///     Just a UI pause
+    ///     UI Pause
+    ///     wipes the resources for the turn
     /// </summary>
     public class AllocateResourcesReverseToDoneAllocResources :  LogHeader, ILogController
     {
@@ -34,6 +35,7 @@ namespace Catan10
         
         public Task Do(IGameController gameController)
         {
+            gameController.MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.Resources.ResourcesThisTurn = new TradeResources());
             return Task.CompletedTask;
         }
 

@@ -186,7 +186,7 @@ namespace Catan10
             // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
             // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
-            if (logType != LogType.Undo && (GameStateFromOldLog == GameState.WaitingForNext || GameStateFromOldLog == GameState.WaitingForRoll))
+            if (logType != LogType.Undo && (CurrentGameState == GameState.WaitingForNext || CurrentGameState == GameState.WaitingForRoll))
             {
                 int playerRoll = TotalRolls / MainPageModel.PlayingPlayers.Count;  // integer divide - drops remainder
                 if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)

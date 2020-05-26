@@ -81,7 +81,7 @@ namespace Catan10
 
         private async Task DoRedo()
         {
-            if (GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
+            if (CurrentGameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
             {
                 return;
             }
@@ -233,7 +233,7 @@ namespace Catan10
 
         private async void OnPickOptimalBaron(object sender, RoutedEventArgs e)
         {
-            if (GameStateFromOldLog != GameState.WaitingForRoll && GameStateFromOldLog != GameState.WaitingForNext && GameStateFromOldLog != GameState.MustMoveBaron)
+            if (CurrentGameState != GameState.WaitingForRoll && CurrentGameState != GameState.WaitingForNext && CurrentGameState != GameState.MustMoveBaron)
             {
                 return;
             }
@@ -318,7 +318,7 @@ namespace Catan10
 
             CatanAction action = CatanAction.PlayedKnight;
             TargetWeapon weapon = TargetWeapon.Baron;
-            if (GameStateFromOldLog == GameState.MustMoveBaron)
+            if (CurrentGameState == GameState.MustMoveBaron)
             {
                 action = CatanAction.AssignedBaron;
             }
@@ -341,7 +341,7 @@ namespace Catan10
         /// </summary>
         private async void OnPickRandomBaron(object sender, RoutedEventArgs e)
         {
-            if (GameStateFromOldLog != GameState.WaitingForRoll && GameStateFromOldLog != GameState.WaitingForNext && GameStateFromOldLog != GameState.MustMoveBaron)
+            if (CurrentGameState != GameState.WaitingForRoll && CurrentGameState != GameState.WaitingForNext && CurrentGameState != GameState.MustMoveBaron)
             {
                 return;
             }
@@ -364,7 +364,7 @@ namespace Catan10
             Target target = targetList[index];
             CatanAction action = CatanAction.PlayedKnight;
             TargetWeapon weapon = TargetWeapon.Baron;
-            if (GameStateFromOldLog == GameState.MustMoveBaron)
+            if (CurrentGameState == GameState.MustMoveBaron)
             {
                 action = CatanAction.AssignedBaron;
             }
@@ -628,7 +628,7 @@ namespace Catan10
 
         public async Task DoUndo()
         {
-            if ((GameStateFromOldLog == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction) && ValidateBuilding)
+            if ((CurrentGameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction) && ValidateBuilding)
             {
                 return;
             }

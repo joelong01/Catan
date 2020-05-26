@@ -56,7 +56,7 @@ namespace Catan10
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
             _stopWatchForTurn.StartTimer();
 
-            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
 
                 _ = HideAllPipEllipses();
@@ -89,7 +89,7 @@ namespace Catan10
             //
             //  TODO:  what should we do if the option is set while the game is running?
 
-            if (GameStateFromOldLog != GameState.WaitingForStart)
+            if (CurrentGameState != GameState.WaitingForStart)
                 return;
 
             // _ = SetRandomTileToGold();

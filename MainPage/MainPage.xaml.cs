@@ -104,8 +104,6 @@ namespace Catan10
         // the index into PlayingPlayers that is the CurrentPlayer
         public static MainPage Current { get; private set; }
 
-        public GameState GameStateFromOldLog => CurrentGameState;
-
         public GameType GameType
         {
             get => _gameView.CurrentGame.GameType;
@@ -180,7 +178,7 @@ namespace Catan10
             int from = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer);
             int to = GetNextPlayerPosition(numberofPositions);
             _currentPlayerIndex = to;
-            GameState oldState = GameStateFromOldLog;
+            GameState oldState = CurrentGameState;
 
             var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
             List<int> newRandomGoldTiles = null;
@@ -564,12 +562,12 @@ namespace Catan10
 
         private async Task LogPlayerLostCards(PlayerModel player, int oldVal, int newVal, LogType logType)
         {
-            await AddLogEntry(player, GameStateFromOldLog, CatanAction.CardsLost, true, logType, -1, new LogCardsLost(oldVal, newVal));
+            await AddLogEntry(player, CurrentGameState, CatanAction.CardsLost, true, logType, -1, new LogCardsLost(oldVal, newVal));
         }
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
         {
-            if (GameStateFromOldLog != GameState.WaitingForStart)
+            if (CurrentGameState != GameState.WaitingForStart)
             {
                 return;
             }
@@ -848,16 +846,16 @@ namespace Catan10
 
         private async Task PickSettlementsAndRoads()
         {
-            while (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
+            while (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
                 await SetBuildingAndRoad();
                 // move to next
-                GameState oldState = GameStateFromOldLog;
+                GameState oldState = CurrentGameState;
                 await NextState();
                 //
                 //  we do it this way because the last player goes twice in the same state
                 //
-                if (oldState == GameState.AllocateResourceForward && GameStateFromOldLog == GameState.AllocateResourceReverse)
+                if (oldState == GameState.AllocateResourceForward && CurrentGameState == GameState.AllocateResourceReverse)
                 {
                     await SetBuildingAndRoad();
                 }

@@ -89,14 +89,14 @@ namespace Catan10
                 CurrentPlayer.GameData.MovedBaronAfterRollingSeven = flagState;
             }
 
-            await AddLogEntry(CurrentPlayer, GameStateFromOldLog, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
+            await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
 
-            if (GameStateFromOldLog == GameState.MustMoveBaron && logType != LogType.Undo)
+            if (CurrentGameState == GameState.MustMoveBaron && logType != LogType.Undo)
             {
                 await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false, logType);
             }
 
-            if (GameStateFromOldLog == GameState.WaitingForRoll)
+            if (CurrentGameState == GameState.WaitingForRoll)
             {
                 if (logType == LogType.Undo)
                 {
@@ -259,7 +259,7 @@ namespace Catan10
                 //
                 //  this pattern makes it so we can change race tracking multiple times but only end up with
                 //  one log write
-                raceTracking.EndChanges(CurrentPlayer, GameStateFromOldLog);
+                raceTracking.EndChanges(CurrentPlayer, CurrentGameState);
             }
         }
 
@@ -642,7 +642,7 @@ namespace Catan10
                     }
                 }
             }
-            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse || GameStateFromOldLog == GameState.Supplemental || GameStateFromOldLog == GameState.WaitingForNext)
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse || CurrentGameState == GameState.Supplemental || CurrentGameState == GameState.WaitingForNext)
             {
                 if (building.BuildingState == BuildingState.Settlement)
                 {
@@ -664,6 +664,7 @@ namespace Catan10
             if (building.BuildingState == BuildingState.NoEntitlement) return false;
             return false;
         }
+
 
         /// <summary>
         ///         this looks at the global state of all the roads and makes sure that it
@@ -771,7 +772,7 @@ namespace Catan10
                 //
                 //  this pattern makes it so we can change race tracking multiple times but only end up with
                 //  one log write
-                _raceTracking.EndChanges(CurrentPlayer, this.GameStateFromOldLog);
+                _raceTracking.EndChanges(CurrentPlayer, this.CurrentGameState);
             }
         }
 
@@ -861,7 +862,7 @@ namespace Catan10
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
             _stopWatchForTurn.StartTimer();
 
-            if (GameStateFromOldLog == GameState.AllocateResourceForward || GameStateFromOldLog == GameState.AllocateResourceReverse)
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
                 await HideAllPipEllipses();
                 _showPipGroupIndex = 0;
@@ -1049,13 +1050,13 @@ namespace Catan10
         //
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
-            if (GameStateFromOldLog != GameState.MustMoveBaron && GameStateFromOldLog != GameState.WaitingForNext &&
-                GameStateFromOldLog != GameState.WaitingForRoll)
+            if (CurrentGameState != GameState.MustMoveBaron && CurrentGameState != GameState.WaitingForNext &&
+                CurrentGameState != GameState.WaitingForRoll)
             {
                 return;
             }
 
-            if ((GameStateFromOldLog == GameState.WaitingForRoll && !this.CanMoveBaronBeforeRoll) && GameStateFromOldLog != GameState.MustMoveBaron)
+            if ((CurrentGameState == GameState.WaitingForRoll && !this.CanMoveBaronBeforeRoll) && CurrentGameState != GameState.MustMoveBaron)
             {
                 Debug.WriteLine("You need to check the baron button before assiging baron");
                 return;
