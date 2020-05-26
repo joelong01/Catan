@@ -26,17 +26,21 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateReverseResources(gameController, this.SentBy);
+            AllocationPhaseHelper.ChangePlayer(gameController, -1);
+            AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
+            return Task.CompletedTask;
         }
 
         public Task Redo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateReverseResources(gameController, this.SentBy);
+            return Do(gameController);
         }
 
         public Task Undo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.UndoAllocateReverseResources(gameController, this.SentBy);
+            AllocationPhaseHelper.ChangePlayer(gameController, -1);
+            AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
+            return Task.CompletedTask;
         }
     }
 }

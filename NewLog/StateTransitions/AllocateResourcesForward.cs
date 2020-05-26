@@ -6,23 +6,9 @@ using Catan.Proxy;
 
 namespace Catan10
 {
-    public class WaitingForStartToAllocateResourcesForward : LogHeader, ILogController
+
+    public static class AllocationPhaseHelper
     {
-        internal static async Task PostLog(IGameController gameController)
-        {
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForStart);
-
-            WaitingForStartToAllocateResourcesForward logHeader = new WaitingForStartToAllocateResourcesForward()
-            {
-                CanUndo = true,
-                Action = CatanAction.ChangedState,
-                OldState = GameState.WaitingForStart,
-                NewState = GameState.AllocateResourceForward,
-            };
-
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
-        }
-
         public static void ChangePlayer(IGameController gameController, int numberofPositions)
         {
             Contract.Assert(gameController.CurrentPlayer != null);
@@ -42,77 +28,84 @@ namespace Catan10
             gameController.CurrentPlayer = newPlayer;
         }
 
-        public static Task DoAllocateForwardResources(IGameController gameController, string sentByName)
+        public static void GrantEntitlements(IGameController gameController, string to)
         {
-            gameController.MainPageModel.PlayingPlayers.ForEach((p) =>
+            var player = gameController.NameToPlayer(to);
+            player.GameData.Resources.GrantEntitlement(Entitlement.Road);
+            player.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
+        }
+
+        public static void RevokeEntitlements(IGameController gameController, string to)
+        {
+            var player = gameController.NameToPlayer(to);
+            player.GameData.Resources.RevokeEntitlement(Entitlement.Road);
+            player.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
+        }
+        public static void GrantResources(IGameController gameController, BuildingCtrl building, string to)
+        {
+            var player = gameController.NameToPlayer(to);
+            TradeResources tr = new TradeResources();
+            foreach (var kvp in building.BuildingToTileDictionary)
             {
-                p.GameData.RollOrientation = TileOrientation.FaceDown;
-                p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
-                p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
-            });
-            var sentBy = gameController.NameToPlayer(sentByName);
-
-            //
-            //  during allocation phase, you get one road and one settlement
-            sentBy.GameData.Resources.GrantEntitlement(Entitlement.Road);
-            sentBy.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
-
-            ChangePlayer(gameController, 0);
-
-            return Task.CompletedTask;
+                tr.Add(kvp.Value.ResourceType, 1);
+            }
+            player.GameData.Resources.GrantResources(tr);
         }
 
-        public static Task DoAllocateReverseResources(IGameController gameController, string sentByName)
+        public static void RevokeResources(IGameController gameController, BuildingCtrl building, string to)
         {
-            var sentBy = gameController.NameToPlayer(sentByName);
-            gameController.MainPageModel.PlayingPlayers.ForEach((p) =>
+            var player = gameController.NameToPlayer(to);
+            TradeResources tr = new TradeResources();
+            foreach (var kvp in building.BuildingToTileDictionary)
             {
-                p.GameData.RollOrientation = TileOrientation.FaceDown;
-                p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
-                p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
-            });
+                tr.Add(kvp.Value.ResourceType, 1);
+            }
 
-            //
-            //  during allocation phase, you get one road and one settlement
-            sentBy.GameData.Resources.GrantEntitlement(Entitlement.Road);
-            sentBy.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
-            ChangePlayer(gameController, -1);
-            return Task.CompletedTask;
-        }
+            player.GameData.Resources.GrantResources(tr.GetNegated());
+        }       
+    }
 
-        public static Task UndoAllocateForwardResources(IGameController gameController, string sentByName)
+    public class WaitingForStartToAllocateResourcesForward : LogHeader, ILogController
+    {
+        internal static async Task PostLog(IGameController gameController)
         {
-            var sentBy = gameController.NameToPlayer(sentByName);
-            sentBy.GameData.Resources.RevokeEntitlement(Entitlement.Road);
-            sentBy.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
-            ChangePlayer(gameController, -1);
-            return Task.CompletedTask;
+            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForStart);
+
+            WaitingForStartToAllocateResourcesForward logHeader = new WaitingForStartToAllocateResourcesForward()
+            {
+                CanUndo = true,
+                Action = CatanAction.ChangedState,
+                OldState = GameState.WaitingForStart,
+                NewState = GameState.AllocateResourceForward,
+            };
+
+            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
-
-        public static Task UndoAllocateReverseResources(IGameController gameController, string sentByName)
-        {
-            var firstPlayer = gameController.MainPageModel.PlayingPlayers[0];
-
-            firstPlayer.GameData.Resources.RevokeEntitlement(Entitlement.Road);
-            firstPlayer.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
-            ChangePlayer(gameController, 1);
-            return Task.CompletedTask;
-        }
-
         public Task Do(IGameController gameController)
         {
-    
-            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, gameController.PlayingPlayers[0].PlayerName);
+            gameController.MainPageModel.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.RollOrientation = TileOrientation.FaceDown;
+                p.GameData.SyncronizedPlayerRolls.DiceOne = 0;
+                p.GameData.SyncronizedPlayerRolls.DiceTwo = 0;
+            });
+
+            AllocationPhaseHelper.ChangePlayer(gameController, 0);
+            AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
+            return Task.CompletedTask;
+
         }
 
         public Task Redo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, gameController.PlayingPlayers[0].PlayerName);
+            return Do(gameController);
         }
 
         public Task Undo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.UndoAllocateForwardResources(gameController, this.SentBy);
+            AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);                        
+            return Task.CompletedTask;
+
         }
     }
 }

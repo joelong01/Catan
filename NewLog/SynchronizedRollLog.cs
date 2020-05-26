@@ -10,10 +10,10 @@ using Catan.Proxy;
 namespace Catan10
 {
 
- 
+
     public class SynchronizedRollLog : LogHeader, ILogController
     {
-        public SynchronizedRollLog(): base() 
+        public SynchronizedRollLog() : base()
         {
             Action = CatanAction.Rolled;
         }
@@ -42,6 +42,11 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
+            gameController.MainPageModel.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.RollOrientation = TileOrientation.FaceUp;
+
+            });
             return gameController.SynchronizedRoll(this);
         }
 

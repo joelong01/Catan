@@ -7,7 +7,10 @@ namespace Catan10
 {
     public class AllocateResourcesForwardToAllocateResourcesReverse : LogHeader, ILogController
     {
-        public AllocateResourcesForwardToAllocateResourcesReverse() { }
+        public AllocateResourcesForwardToAllocateResourcesReverse()
+        {
+        }
+
         internal static async Task PostLog(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceForward);
@@ -25,17 +28,20 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, this.SentBy);
+            AllocationPhaseHelper.ChangePlayer(gameController, 0);
+            AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
+            return Task.CompletedTask;
         }
 
         public Task Redo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.DoAllocateForwardResources(gameController, this.SentBy);
+            return Do(gameController);
         }
 
         public Task Undo(IGameController gameController)
         {
-            return WaitingForStartToAllocateResourcesForward.UndoAllocateForwardResources(gameController, this.SentBy);
+            AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
+            return Task.CompletedTask;
         }
     }
 }
