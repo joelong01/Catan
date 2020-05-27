@@ -18,22 +18,17 @@ namespace Catan10
             Action = CatanAction.Rolled;
         }
 
-        public int DiceOne { get; set; } = -1;
+        public List<RollModel> Rolls { get; set; } = new List<RollModel>();
 
-        public int DiceTwo { get; set; } = -1;
 
-        [JsonIgnore]
-        public int Roll => DiceOne + DiceTwo;
-
-        public static async Task StartSyncronizedRoll(IGameController gameController, int dice1, int dice2)
+        public static async Task StartSyncronizedRoll(IGameController gameController, List<RollModel> rolls)
         {
             SynchronizedRollLog logHeader = new SynchronizedRollLog()
             {
                 CanUndo = false,
                 Action = CatanAction.RollToSeeWhoGoesFirst,
                 NewState = GameState.WaitingForRollForOrder,
-                DiceOne = dice1,
-                DiceTwo = dice2,
+                Rolls = rolls,
                 SentBy = gameController.TheHuman.PlayerName
 
             };
@@ -53,7 +48,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return $"[DiceOne={DiceOne}][DiceTwo={DiceTwo}]" + base.ToString();
+            return $"[DiceOne={Rolls[0].DiceOne}][DiceTwo={Rolls[0].DiceTwo}]" + base.ToString();
         }
         public Task Undo(IGameController gameController)
         {

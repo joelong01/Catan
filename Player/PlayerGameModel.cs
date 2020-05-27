@@ -1010,20 +1010,21 @@ namespace Catan10
     {
         private int _DiceOne = -1;
         private int _DiceTwo = -1;
+        private RollModel _rollModel = new RollModel(); 
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public int DiceOne
+        public RollModel Roll
         {
             get
             {
-                return _DiceOne;
+                return _rollModel;
             }
             set
             {
-                if (_DiceOne != value)
+                if (_rollModel != value)
                 {
-                    _DiceOne = value;
+                    _rollModel = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("LatestRoll");
                     NotifyPropertyChanged("ShowLatestRoll");
@@ -1062,14 +1063,14 @@ namespace Catan10
             }
         }
 
-        public int LatestRoll => DiceOne + DiceTwo;
+        public int LatestRoll => Roll.DiceOne + Roll.DiceTwo;
         public List<int> Rolls { get; set; } = new List<int>();
 
         public bool ShowLatestRoll
         {
             get
             {
-                return ((DiceOne > 0 && DiceTwo > 0));
+                return ((Roll.DiceOne > 0 && Roll.DiceTwo > 0));
             }
         }
 
@@ -1080,8 +1081,8 @@ namespace Catan10
 
         public void AddRoll(int d1, int d2)
         {
-            DiceOne = d1;
-            DiceTwo = d2;
+            Roll.DiceOne = d1;
+            Roll.DiceTwo = d2;
             Rolls.Add(d1 + d2);
         }
 

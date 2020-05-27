@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -36,17 +37,28 @@ namespace Catan10
             gameController.ResetAllBuildings();
             await gameController.StartGame();
             MainPageModel mainPageModel = gameController.MainPageModel;
-            
+
             if (mainPageModel.Settings.AutoRespond)
             {
                 //
                 //  step 5 is to roll -- simulate it
-                Random rand = new Random();
-                await SynchronizedRollLog.StartSyncronizedRoll(gameController, rand.Next(1, 7), rand.Next(1, 7));
+                await SynchronizedRollLog.StartSyncronizedRoll(gameController, GetRollModelList());
             }
-
-           
         }
+
+        public static List<RollModel> GetRollModelList()
+        {
+            List<RollModel> list = new List<RollModel>();
+            for (int i = 0; i < 4; i++)
+            {
+                var model = new RollModel();
+                model.Randomize();
+                list.Add(model);
+            }
+            list[0].Selected = true;
+            return list;
+        }
+
         /// <summary>
         ///     Redo the action from the log
         ///     Don't call Do as we don't want to do the AutoRespond actions
@@ -58,7 +70,7 @@ namespace Catan10
 
             gameController.ResetAllBuildings();
             MainPageModel mainPageModel = gameController.MainPageModel;
-            return Task.CompletedTask; 
+            return Task.CompletedTask;
         }
 
         public Task Undo(IGameController gameController)

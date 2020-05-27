@@ -8,17 +8,33 @@
 
     <Control.Resources />
 
-    <Grid Width="530" Height="230" Margin="0" Background="{StaticResource bmMaple}">
+    <Grid Width="530" Height="230" Margin="0"
+        Background="{StaticResource bmMaple}"
+        CornerRadius="0,0,10,10">
         <StackPanel>
-            <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
-                <local:RollCtrl x:Name="RollCtrl_One" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
-                <local:RollCtrl x:Name="RollCtrl_Two" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
-                <local:RollCtrl x:Name="RollCtrl_Three" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
-                <local:RollCtrl x:Name="RollCtrl_Four" Margin="10,10,0,10" PointerPressed="Roll_PointerPressed" />
-            </StackPanel>
-            <StackPanel Margin="0,0,10,0" HorizontalAlignment="Right" Orientation="Horizontal">
+            <GridView Name="GridView_Rolls" Height="180" VerticalAlignment="Top"
+                Background="Transparent"
+                ItemsSource="{x:Bind Rolls, Mode=OneWay}"
+                SelectionMode="None">
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="local:RollModel">                        
+                            <local:RollCtrl Height="150" Margin="0"
+                                Roll="{x:Bind}"
+                                PointerPressed="Roll_PointerPressed"
+                                Orientation="{x:Bind Orientation, Mode=OneWay}"
+                                CornerRadius="10" />                        
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+                <GridView.ItemContainerStyle>
+                    <Style TargetType="GridViewItem">
+                        <Setter Property="Margin" Value="23,20,0,0" />
+                        <Setter Property="Padding" Value="0" />
+                    </Style>
+                </GridView.ItemContainerStyle>
+            </GridView>
+            <StackPanel Margin="0,10,10,0" HorizontalAlignment="Right" Orientation="Horizontal">
                 <Button Width="100" Content="Reset" Click="OnReset" Foreground="White"
-                    Visibility="Collapsed" />
+                    Visibility="Visible" />
                 <Button Width="100" Content="FaceUp" Click="OnFaceUp" Foreground="White"
                     Visibility="Collapsed" />
                 <Button Width="100" Content="FaceDown" Click="OnFaceDown" Foreground="White"

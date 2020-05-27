@@ -1,90 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Catan10
 {
-    public delegate void OnRolledHandler(int dice1, int dice2);
+    public delegate void OnRolledHandler(List<RollModel> rolls);
+
     public sealed partial class PlayerRollCtrl : UserControl
     {
-        bool _rolled = false;
-        List<RollCtrl> _rollControls = new List<RollCtrl>();
-        TaskCompletionSource<int> RollTcs { get; set; } = null;
-        public event OnRolledHandler OnRolled;
+        private bool _rolled = false;
+        private bool clicked = false;
 
         public PlayerRollCtrl()
         {
             this.InitializeComponent();
-            this.DataContext = this;
-            _rollControls.Add(RollCtrl_One);
-            _rollControls.Add(RollCtrl_Two);
-            _rollControls.Add(RollCtrl_Three);
-            _rollControls.Add(RollCtrl_Four);
+            
+            for (int i = 0; i < 4; i++)
+            {
+                Rolls.Add(new RollModel());
+            }
+
             Randomize();
         }
 
-        private void Roll_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            if (_rolled) return;
-            _rolled = true;
-            RollCtrl rollCtrl = sender as RollCtrl;
-            DiceOne = rollCtrl.DiceOne;
-            DiceTwo = rollCtrl.DiceTwo;
+        public event OnRolledHandler OnRolled;
 
-            rollCtrl.Orientation = TileOrientation.FaceUp;
-            if (RollTcs != null)
-            {
-                RollTcs.SetResult(Roll);
-                RollTcs = null;
-            }
-            _rollControls.ForEach((ctrl) => ctrl.IsHitTestVisible = false);
-            OnRolled?.Invoke(DiceOne, DiceTwo);
+        private ObservableCollection<RollModel> Rolls { get; } = new ObservableCollection<RollModel>();
 
-        }
-
-        public int Roll => DiceOne + DiceTwo;
-        public int DiceOne { get; private set; } = 0;
-        public int DiceTwo { get; private set; } = 0;
-
-        public async Task Reset()
+        private void OnFaceDown(object sender, RoutedEventArgs e)
         {
             var list = new List<Task>();
-            _rollControls.ForEach((ctrl) =>
-            {
-                ctrl.IsHitTestVisible = true;
-                var task = ctrl.GetFlipTask(TileOrientation.FaceDown);
-                list.Add(task);
-            });
-            await Task.WhenAll(list);
-            _rolled = false;
-            
-            Randomize();
-
+            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceDown);
         }
 
-        public void Randomize()
+        private void OnFaceUp(object sender, RoutedEventArgs e)
         {
-            _rollControls.ForEach((ctrl) => ctrl.Randomize());
+            var list = new List<Task>();
+            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceUp);
         }
-        private bool clicked = false;
-        
-        private async void OnShowAll(object sender, RoutedEventArgs e)
+
+        private async void OnReset(object sender, RoutedEventArgs e)
+        {
+            await Reset();
+            Randomize();
+        }
+
+        private void OnShowAll(object sender, RoutedEventArgs e)
         {
             
 
@@ -94,38 +61,51 @@ namespace Catan10
             clicked = true;
 
             var list = new List<Task>();
-            _rollControls.ForEach((ctrl) => list.Add(ctrl.GetFlipTask(TileOrientation.FaceUp)));
-            await Task.WhenAll(list);
+            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceUp);
+
             clicked = false;
         }
 
-        private async void OnReset(object sender, RoutedEventArgs e)
+        private void PopulateControlList()
         {
-            await Reset();
-            Randomize();
         }
 
-        private async void OnFaceUp(object sender, RoutedEventArgs e)
+        private void Roll_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            if (_rolled) return;
+            try
+            {
+                _rolled = true;
+                RollModel roll = ((RollCtrl)sender).Roll;
+                roll.Selected = true;
+                roll.Orientation = TileOrientation.FaceUp;
+
+                OnRolled?.Invoke(new List<RollModel>(Rolls));
+            }
+            finally
+            {
+                
+            }
+        }
+
+        public void Randomize()
+        {
+            Rolls.ForEach((roll) => roll.Randomize());
+        }
+
+        public Task Reset()
+        {
+            PopulateControlList();
             var list = new List<Task>();
-            _rollControls.ForEach((ctrl) => list.Add(ctrl.GetFlipTask(TileOrientation.FaceUp)));
-            await Task.WhenAll(list);
-        }
+            Rolls.ForEach((roll) =>
+               {
+                   roll.Orientation = TileOrientation.FaceDown;
+                   roll.Randomize();
+               });
 
-        private async void OnFaceDown(object sender, RoutedEventArgs e)
-        {
-            var list = new List<Task>();
-            _rollControls.ForEach((ctrl) => list.Add(ctrl.GetFlipTask(TileOrientation.FaceDown)));
-            await Task.WhenAll(list);
-        }
+            _rolled = false;
 
-        internal async Task<int> GetRoll()
-        {
-            Contract.Assert(RollTcs == null);
-            RollTcs = new TaskCompletionSource<int>();
-            await this.Reset();
-            return await RollTcs.Task;
-
+            return Task.CompletedTask;
         }
     }
 }

@@ -686,11 +686,11 @@ namespace Catan10
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
 
-        private async void OnRolled(int dice1, int dice2)
+        private async void OnRolled(List<RollModel> rolls)
         {
             if (!MainPageModel.EnableRolls) return;
 
-            await SynchronizedRollLog.StartSyncronizedRoll(this, dice1, dice2);
+            await SynchronizedRollLog.StartSyncronizedRoll(this, rolls);
         }
 
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)

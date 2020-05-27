@@ -6,6 +6,9 @@ using Catan.Proxy;
 
 namespace Catan10
 {
+    /// <summary>
+    ///     This is just for a UI Pause
+    /// </summary>
     public class DoneAllocResourcesToWaitingForRoll : LogHeader, ILogController
     {
         internal static async Task PostLog(IGameController gameController)

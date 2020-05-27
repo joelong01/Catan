@@ -58,13 +58,17 @@
                     VerticalAlignment="Top"
                     FillColor="{StaticResource WhiteBrush}"
                     Thickness="15"
-                    Number="{x:Bind DiceOne, Mode=OneWay}" />
+                    Number="{x:Bind Roll.DiceOne, Mode=OneWay}" />
                 <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
                     FillColor="{StaticResource WhiteBrush}"
                     Thickness="15"
-                    Number="{x:Bind DiceTwo, Mode=OneWay}" />
+                    Number="{x:Bind Roll.DiceTwo, Mode=OneWay}" />
 
+                
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="⊘" Margin="0,-10,-10,0" Visibility="{x:Bind Roll.NotSelected, Mode=OneWay}"
+                        Foreground="Red" FontSize="80" LineStackingStrategy="BaselineToBaseline" TextLineBounds="Tight"  />
+                
             </Grid>
 
         </Grid>
