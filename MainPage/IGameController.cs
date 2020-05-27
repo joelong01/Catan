@@ -843,5 +843,52 @@ namespace Catan10
         {
             await Proxy.StartGame(MainPageModel.GameInfo);
         }
+
+        //
+        //  find all the tiles with building for this roll where the onwer == Player
+        public (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll)
+        {
+            TradeResources tr = new TradeResources();
+            TradeResources baron = new TradeResources();
+            foreach (BuildingCtrl building in _gameView.CurrentGame.HexPanel.Buildings)
+            {
+                if (building == null) continue;
+                if (building.Owner != player) continue;
+                foreach (var kvp in building.BuildingToTileDictionary)                
+                {
+                    if (kvp.Value.Number == roll)
+                    {
+
+                        if (kvp.Value.HasBaron == false)
+                        {
+                            tr.Add(kvp.Value.ResourceType, building.ScoreValue);
+                        }
+                        else
+                        {
+                            baron.Add(kvp.Value.ResourceType, building.ScoreValue);
+                        }
+                    }
+                }
+            }
+            return (tr, baron);
+        }
+        public List<int> GetRandomGoldTiles()
+        {
+            if (!this.RandomGold || this.RandomGoldTileCount < 1) return new List<int>();
+            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
+            return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
+        }
+        public async Task SetRandomTileToGold(List<int> goldTilesIndices)
+        {
+            await ResetRandomGoldTiles();
+            if (this.RandomGold && this.RandomGoldTileCount > 0)
+            {
+                await _gameView.SetRandomTilesToGold(goldTilesIndices);
+            }
+        }
+        public async Task ResetRandomGoldTiles()
+        {
+            await _gameView.ResetRandomGoldTiles();
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            Contract.Assert(this.NewState == GameState.WaitingForRoll); // log gets pushed *after* this call
+            Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
 
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(sentBy != null);
@@ -47,8 +47,24 @@ namespace Catan10
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
+            //
+            //  get the resources for the roll
 
+            (TradeResources Granted, TradeResources Baroned) tradeResources = gameController.ResourcesForRoll(sentBy, pickedRoll.Roll);
 
+            sentBy.GameData.Resources.GrantResources(tradeResources.Granted);
+            sentBy.GameData.Resources.ResourcesLostToBaron += tradeResources.Baroned;
+
+            if (tradeResources.Granted.Count == 0)
+            {
+                sentBy.GameData.GoodRoll = false;
+                sentBy.GameData.NoResourceCount++;
+            }
+            else
+            {
+                sentBy.GameData.NoResourceCount = 0;
+                sentBy.GameData.GoodRoll = true;
+            }
 
 
             return Task.CompletedTask;
@@ -56,12 +72,29 @@ namespace Catan10
 
         public Task Redo(IGameController gameController)
         {
-            throw new System.NotImplementedException();
+            return Do(gameController);
         }
 
         public Task Undo(IGameController gameController)
         {
-            throw new System.NotImplementedException();
+            Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
+
+            PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
+            Contract.Assert(sentBy != null);
+            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(this.Rolls);
+            Contract.Assert(pickedRoll != null);
+            Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
+            Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
+            //
+            //  get the resources for the roll
+
+            (TradeResources Granted, TradeResources Baroned) tradeResources = gameController.ResourcesForRoll(sentBy, pickedRoll.Roll);
+
+            sentBy.GameData.Resources.GrantResources(tradeResources.Granted.GetNegated());
+            sentBy.GameData.Resources.ResourcesLostToBaron += tradeResources.Baroned.GetNegated();
+
+
+            return Task.CompletedTask;
         }
     }
 }

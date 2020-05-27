@@ -79,6 +79,8 @@ namespace Catan10
         }
         #region properties
 
+        public int Roll => DiceOne + DiceTwo;
+
         private int _diceOne = 2;
         private int _diceTwo = 5;
         private TileOrientation _Orientation = TileOrientation.FaceDown;
@@ -96,6 +98,7 @@ namespace Catan10
                 {
                     _diceOne = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("Roll");
                 }
             }
         }
@@ -112,6 +115,7 @@ namespace Catan10
                 {
                     _diceTwo = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("Roll");
                 }
             }
         }

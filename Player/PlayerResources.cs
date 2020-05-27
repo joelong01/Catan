@@ -17,6 +17,7 @@ namespace Catan10
         private int _PlayedMonopoly = 0;
         private int _PlayedRoadBuilding = 0;
         private int _PlayedYearOfPlenty = 0;
+        private TradeResources _ResourcesLostToBard = new TradeResources();
         private TradeResources _ResourcesThisTurn = new TradeResources();
         private int _Roads = 0;
         private int _Settlements = 0;
@@ -26,6 +27,38 @@ namespace Catan10
         private int _UnplayedMonopoly = 0;
         private int _UnplayedYearOfPlenty = 0;
         private int _VictoryPoints = 0;
+        TradeResources _ResourcesLostToMonopoly = new TradeResources();
+        TradeResources _ResourcesLostSeven = new TradeResources();
+        public TradeResources ResourcesLostSeven
+        {
+            get
+            {
+                return _ResourcesLostSeven;
+            }
+            set
+            {
+                if (_ResourcesLostSeven != value)
+                {
+                    _ResourcesLostSeven = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public TradeResources ResourcesLostToMonopoly
+        {
+            get
+            {
+                return _ResourcesLostToMonopoly;
+            }
+            set
+            {
+                if (_ResourcesLostToMonopoly != value)
+                {
+                    _ResourcesLostToMonopoly = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         public PlayerResources()
         {
@@ -126,6 +159,22 @@ namespace Catan10
                 if (_PlayedYearOfPlenty != value)
                 {
                     _PlayedYearOfPlenty = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public TradeResources ResourcesLostToBaron
+        {
+            get
+            {
+                return _ResourcesLostToBard;
+            }
+            set
+            {
+                if (_ResourcesLostToBard != value)
+                {
+                    _ResourcesLostToBard = value;
                     NotifyPropertyChanged();
                 }
             }

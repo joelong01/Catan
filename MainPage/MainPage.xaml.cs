@@ -1389,12 +1389,7 @@ namespace Catan10
             }
         }
 
-        public List<int> GetRandomGoldTiles()
-        {
-            if (!this.RandomGold || this.RandomGoldTileCount < 1) return new List<int>();
-            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
-            return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
-        }
+       
 
         /// <summary>
         /// Update this because you did the sorting work in the dialog
@@ -1523,14 +1518,7 @@ namespace Catan10
 
      
 
-        public async Task SetRandomTileToGold(List<int> goldTilesIndices)
-        {
-            await _gameView.ResetRandomGoldTiles();
-            if (this.RandomGold && this.RandomGoldTileCount > 0)
-            {
-                await _gameView.SetRandomTilesToGold(goldTilesIndices);
-            }
-        }
+       
 
         public Task SetStateAsync(PlayerModel playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
 

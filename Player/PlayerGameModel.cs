@@ -24,10 +24,6 @@ namespace Catan10
                                                                                 "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
                                                                                 "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
 
-        private int _cardsLost = 0;
-        private int _CardsLostToBaron = 0;
-        private int _CardsLostToMonopoly = 0;
-        private int _CardsLostToSeven = 0;
         private int _CitiesPlayed = 0;
         private List<List<int>> _GoldRolls = new List<List<int>>();
 
@@ -46,6 +42,7 @@ namespace Catan10
         private int _MaxShips = 0;
         private bool? _MovedBaronAfterRollingSeven = null;
         private int _noResourceCount = 0;
+        private int _pips = 0;
         private bool _PlayedKnightThisTurn = false;
         private PlayerModel _playerData = null;
         private PlayerResources _resources = new PlayerResources();
@@ -58,7 +55,6 @@ namespace Catan10
 
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
-        private int _pips = 0;
         public CardsLostUpdatedHandler OnCardsLost;
 
         public PlayerGameModel()
@@ -77,63 +73,6 @@ namespace Catan10
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public int CardsLost
-        {
-            get => _cardsLost;
-            set
-            {
-                if (_cardsLost != value)
-                {
-                    LogPropertyChanged(_cardsLost, value);
-                    OnCardsLost?.Invoke(_playerData, _cardsLost, value);
-                    _cardsLost = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int CardsLostToBaron
-        {
-            get => _CardsLostToBaron;
-            set
-            {
-                if (_CardsLostToBaron != value)
-                {
-                    LogPropertyChanged(_CardsLostToBaron, value);
-                    _CardsLostToBaron = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int CardsLostToMonopoly
-        {
-            get => _CardsLostToMonopoly;
-            set
-            {
-                if (_CardsLostToMonopoly != value)
-                {
-                    LogPropertyChanged(_CardsLostToMonopoly, value);
-                    _CardsLostToMonopoly = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int CardsLostToSeven
-        {
-            get => _CardsLostToSeven;
-            set
-            {
-                if (_CardsLostToSeven != value)
-                {
-                    LogPropertyChanged(_CardsLostToSeven, value);
-                    _CardsLostToSeven = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -393,7 +332,6 @@ namespace Catan10
             {
                 if (_pips != value)
                 {
-                    
                     _pips = value;
                     NotifyPropertyChanged();
                 }
@@ -426,6 +364,9 @@ namespace Catan10
             }
         }
 
+        [JsonIgnore]
+        public PlayerResourceModel PlayerTurnResourceCount { get; set; } = null;
+
         public PlayerResources Resources
         {
             get
@@ -441,10 +382,6 @@ namespace Catan10
                 }
             }
         }
-
-        [JsonIgnore]
-        public PlayerResourceModel PlayerTurnResourceCount { get; set; } = null;
-
         [JsonIgnore]
         public ObservableCollection<RoadCtrl> Roads { get; private set; } = new ObservableCollection<RoadCtrl>();
 
@@ -748,10 +685,7 @@ namespace Catan10
             RollsWithResource = 0;
             MaxNoResourceRolls = 0;
             GoodRoll = false;
-            CardsLost = 0;
-            CardsLostToBaron = 0;
-            CardsLostToSeven = 0;
-            CardsLostToMonopoly = 0;
+            Resources = new PlayerResources();
             LargestArmy = false;
             HasLongestRoad = false;
             RoadsPlayed = 0;
@@ -806,7 +740,8 @@ namespace Catan10
 
             if (rrModel.BlockedByBaron)
             {
-                CardsLostToBaron += (rrModel.Value * mult);
+                this.TraceMessage("You deleted this.  might want to fix it.");
+                // CardsLostToBaron += (rrModel.Value * mult);
             }
             else
             {
@@ -1008,12 +943,12 @@ namespace Catan10
 
     public class SyncronizedPlayerRolls : IComparable<SyncronizedPlayerRolls>, INotifyPropertyChanged
     {
+        private RollModel _rollModel = new RollModel();
+
         public SyncronizedPlayerRolls()
         {
             LatestRolls.AddRange(PickingBoardToWaitingForRollOrder.GetRollModelList()); // always have 4 Rolls in here so XAML doesn't throw
         }
-        private RollModel _rollModel = new RollModel();
-        public ObservableCollection<RollModel> LatestRolls { get; set; } = new ObservableCollection<RollModel>();
         public event PropertyChangedEventHandler PropertyChanged;
 
         public RollModel CurrentRoll
@@ -1034,28 +969,8 @@ namespace Catan10
             }
         }
 
-        public RollModel AddRolls (List<RollModel> rolls)
-        {
-            //
-            //  5/26/2020:  Don't clear and add range -- XAML will barf because i'm accessing the indexers in PublicDataCtrl.xaml
-
-            Contract.Assert(rolls.Count == 4);
-            for (int i=0; i< rolls.Count; i++)
-            {
-                LatestRolls[i] = rolls[i];
-                if (rolls[i].Selected)
-                {
-                    CurrentRoll = rolls[i];
-                }
-
-            }
-            
-            RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);
-            return CurrentRoll;
-        }
-        
-
-        public List<int> RollValues { get; set; } = new List<int>(); // a list of the chosen roll values -- used to break ties
+        public ObservableCollection<RollModel> LatestRolls { get; set; } = new ObservableCollection<RollModel>();
+        public List<int> RollValues { get; set; } = new List<int>();
 
         public bool ShowLatestRoll
         {
@@ -1065,14 +980,30 @@ namespace Catan10
             }
         }
 
-
-
+        // a list of the chosen roll values -- used to break ties
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        
+        public RollModel AddRolls(List<RollModel> rolls)
+        {
+            //
+            //  5/26/2020:  Don't clear and add range -- XAML will barf because i'm accessing the indexers in PublicDataCtrl.xaml
+
+            Contract.Assert(rolls.Count == 4);
+            for (int i = 0; i < rolls.Count; i++)
+            {
+                LatestRolls[i] = rolls[i];
+                if (rolls[i].Selected)
+                {
+                    CurrentRoll = rolls[i];
+                }
+            }
+
+            RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);
+            return CurrentRoll;
+        }
         public int CompareTo(SyncronizedPlayerRolls other)
         {
             if (this.RollValues.Count == 0)
@@ -1103,8 +1034,8 @@ namespace Catan10
             }
 
             if (this.RollValues.Count == other.RollValues.Count) return 0;  // tie for all rolls!
-                                                                  //
-                                                                  //   this means that there is a tie, but somebody has extra rolls -- call it a ties
+                                                                            //
+                                                                            //   this means that there is a tie, but somebody has extra rolls -- call it a ties
 
             return 0;
         }

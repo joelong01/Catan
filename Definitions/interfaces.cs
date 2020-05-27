@@ -169,6 +169,10 @@ namespace Catan10
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
+        (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll);
+        List<int> GetRandomGoldTiles();
+        Task SetRandomTileToGold(List<int> goldTiles);
+        Task ResetRandomGoldTiles();
     }
 
     public interface IGameViewCallback

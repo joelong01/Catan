@@ -43,19 +43,20 @@ namespace Catan10
 
 
         // int toggle = 0;
-        private void OnTest1(object sdr, RoutedEventArgs rea)
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
+            var rolls = PickingBoardToWaitingForRollOrder.GetRollModelList();
+            rolls[0].DiceOne = 5;
+            rolls[0].DiceTwo = 1;
 
-          
-
+            await WaitingForRollToWaitingForNext.PostLog(this, rolls);
 
         }
        
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
 
-            //_gameView.AllTiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceUp);
-            //ValidateBuilding = false;
+           
            
         }
 

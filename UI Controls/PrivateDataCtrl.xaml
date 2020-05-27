@@ -99,14 +99,15 @@
                 <Button Margin="5,0,5,0" Padding="0" Background="Transparent" ToolTipService.ToolTip="Buy Road">
                     <Button.Content>
                         <StackPanel Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
-                            <TextBlock Grid.Column="0" Margin="0" HorizontalAlignment="Center"
-                                VerticalAlignment="Center" Text="⛙" FontFamily="Segoe UI Symbol" FontSize="38"
-                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}">
-                                <TextBlock.RenderTransform>
-                                    <CompositeTransform TranslateY="-2" />
-                                </TextBlock.RenderTransform>
-                            </TextBlock>
-                            <TextBlock Text="Road" Style="{StaticResource ButtonTextStyle}" />
+                            <local:RoadCtrl Grid.Column="0" Width="50" Height="30" Margin="0,0,2,20"
+                                Owner="{x:Bind Player, Mode=OneWay}"
+                                Location="Top" RenderTransformOrigin=".5 .5">
+                                <local:RoadCtrl.RenderTransform>
+                                    <CompositeTransform Rotation="90" TranslateX="10" TranslateY="12" ScaleY="1.5"
+                                        ScaleX="1.4" />
+                                </local:RoadCtrl.RenderTransform>
+                            </local:RoadCtrl>
+                            <TextBlock Margin="0,0,0,0" Text="Road" Style="{StaticResource ButtonTextStyle}" />
                         </StackPanel>
                     </Button.Content>
                 </Button>
