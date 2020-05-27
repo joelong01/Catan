@@ -21,6 +21,7 @@ namespace Catan10
             var log = new VerifyPlayers()
             {
                 Action = CatanAction.Verify,
+                LogType = LogType.DoNotLog,
                 PlayingPlayers = gameController.PlayingPlayers,
                 CurrentPlayer = gameController.CurrentPlayer
 

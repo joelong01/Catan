@@ -30,6 +30,7 @@ namespace Catan10
         }
 
         public event OnRolledHandler OnRolled;
+        public event OnRolledHandler OnShowAllRolls;
 
         private ObservableCollection<RollModel> Rolls { get; } = new ObservableCollection<RollModel>();
 
@@ -62,7 +63,7 @@ namespace Catan10
 
             var list = new List<Task>();
             Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceUp);
-
+            OnShowAllRolls?.Invoke(new List<RollModel>(Rolls));
             clicked = false;
         }
 

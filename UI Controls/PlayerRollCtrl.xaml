@@ -17,12 +17,12 @@
                 ItemsSource="{x:Bind Rolls, Mode=OneWay}"
                 SelectionMode="None">
                 <GridView.ItemTemplate>
-                    <DataTemplate x:DataType="local:RollModel">                        
-                            <local:RollCtrl Height="150" Margin="0"
-                                Roll="{x:Bind}"
-                                PointerPressed="Roll_PointerPressed"
-                                Orientation="{x:Bind Orientation, Mode=OneWay}"
-                                CornerRadius="10" />                        
+                    <DataTemplate x:DataType="local:RollModel">
+                        <local:RollCtrl Height="150" Margin="0"
+                            Roll="{x:Bind}"
+                            PointerPressed="Roll_PointerPressed"
+                            Orientation="{x:Bind Orientation, Mode=OneWay}"
+                            CornerRadius="10" />
                     </DataTemplate>
                 </GridView.ItemTemplate>
                 <GridView.ItemContainerStyle>

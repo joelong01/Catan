@@ -1008,13 +1008,15 @@ namespace Catan10
 
     public class SyncronizedPlayerRolls : IComparable<SyncronizedPlayerRolls>, INotifyPropertyChanged
     {
-        private int _DiceOne = -1;
-        private int _DiceTwo = -1;
-        private RollModel _rollModel = new RollModel(); 
-
+        public SyncronizedPlayerRolls()
+        {
+            LatestRolls.AddRange(PickingBoardToWaitingForRollOrder.GetRollModelList()); // always have 4 Rolls in here so XAML doesn't throw
+        }
+        private RollModel _rollModel = new RollModel();
+        public ObservableCollection<RollModel> LatestRolls { get; set; } = new ObservableCollection<RollModel>();
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public RollModel Roll
+        public RollModel CurrentRoll
         {
             get
             {
@@ -1032,79 +1034,64 @@ namespace Catan10
             }
         }
 
-        public int DiceTwo
+        public RollModel AddRolls (List<RollModel> rolls)
         {
-            get
-            {
-                return _DiceTwo;
-            }
-            set
-            {
-                if (_DiceTwo != value)
-                {
-                    _DiceTwo = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("LatestRoll");
-                    NotifyPropertyChanged("ShowLatestRoll");
-                }
-            }
-        }
+            //
+            //  5/26/2020:  Don't clear and add range -- XAML will barf because i'm accessing the indexers in PublicDataCtrl.xaml
 
-        public int Hash
-        {
-            get
+            Contract.Assert(rolls.Count == 4);
+            for (int i=0; i< rolls.Count; i++)
             {
-                int total = 0;
-                foreach (var roll in Rolls)
+                LatestRolls[i] = rolls[i];
+                if (rolls[i].Selected)
                 {
-                    total = total * 10 + roll;
+                    CurrentRoll = rolls[i];
                 }
-                return total;
-            }
-        }
 
-        public int LatestRoll => Roll.DiceOne + Roll.DiceTwo;
-        public List<int> Rolls { get; set; } = new List<int>();
+            }
+            
+            RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);
+            return CurrentRoll;
+        }
+        
+
+        public List<int> RollValues { get; set; } = new List<int>(); // a list of the chosen roll values -- used to break ties
 
         public bool ShowLatestRoll
         {
             get
             {
-                return ((Roll.DiceOne > 0 && Roll.DiceTwo > 0));
+                return ((CurrentRoll.DiceOne > 0 && CurrentRoll.DiceTwo > 0));
             }
         }
+
+
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void AddRoll(int d1, int d2)
-        {
-            Roll.DiceOne = d1;
-            Roll.DiceTwo = d2;
-            Rolls.Add(d1 + d2);
-        }
-
+        
         public int CompareTo(SyncronizedPlayerRolls other)
         {
-            if (this.Rolls.Count == 0)
+            if (this.RollValues.Count == 0)
             {
-                return this.Rolls.Count - other.Rolls.Count;
+                return this.RollValues.Count - other.RollValues.Count;
             }
-            if (other.Rolls.Count == 0)
+            if (other.RollValues.Count == 0)
             {
                 return -1;
             }
-            int max = Math.Max(this.Rolls.Count, other.Rolls.Count);
+            int max = Math.Max(this.RollValues.Count, other.RollValues.Count);
 
             for (int i = 0; i < max; i++)
             {
-                if (i < this.Rolls.Count && i < other.Rolls.Count)
+                if (i < this.RollValues.Count && i < other.RollValues.Count)
                 {
-                    if (this.Rolls[i] == other.Rolls[i]) continue;   // tie
+                    if (this.RollValues[i] == other.RollValues[i]) continue;   // tie
 
-                    if (this.Rolls[i] < other.Rolls[i])
+                    if (this.RollValues[i] < other.RollValues[i])
                     {
                         return 1; // b bigger
                     }
@@ -1115,7 +1102,7 @@ namespace Catan10
                 }
             }
 
-            if (this.Rolls.Count == other.Rolls.Count) return 0;  // tie for all rolls!
+            if (this.RollValues.Count == other.RollValues.Count) return 0;  // tie for all rolls!
                                                                   //
                                                                   //   this means that there is a tie, but somebody has extra rolls -- call it a ties
 
@@ -1125,13 +1112,13 @@ namespace Catan10
         public bool InTie(SyncronizedPlayerRolls roll)
         {
             Contract.Assert(roll != null);
-            if (roll.Rolls.Count == 0) return true;
+            if (roll.RollValues.Count == 0) return true;
 
-            foreach (var r in Rolls)
+            foreach (var r in RollValues)
             {
                 if (r.CompareTo(roll) == 0)
                 {
-                    if (roll.Rolls.Count <= this.Rolls.Count) // the same or missing a roll
+                    if (roll.RollValues.Count <= this.RollValues.Count) // the same or missing a roll
                     {
                         return true;
                     }
@@ -1143,12 +1130,12 @@ namespace Catan10
 
         public bool TiedWith(List<int> rolls)
         {
-            if (Math.Abs(rolls.Count - Rolls.Count) > 1) return false; //
+            if (Math.Abs(rolls.Count - RollValues.Count) > 1) return false; //
 
-            int count = Math.Min(rolls.Count, Rolls.Count);
+            int count = Math.Min(rolls.Count, RollValues.Count);
             for (int i = 0; i < count; i++)
             {
-                if (rolls[i] != Rolls[i])
+                if (rolls[i] != RollValues[i])
                     return false;
             }
 

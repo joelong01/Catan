@@ -143,6 +143,7 @@
     <Compile Include="NewLog\playeDevCard.cs" />
     <Compile Include="NewLog\randomizedBoard.cs" />
     <Compile Include="NewLog\SetStateLog.cs" />
+    <Compile Include="NewLog\ShowAllRollsLog.cs" />
     <Compile Include="NewLog\StateTransitions\7_AllocateResourcesForwardToSelf.cs" />
     <Compile Include="NewLog\StateTransitions\8_AllocateResourcesReverse.cs" />
     <Compile Include="NewLog\StateTransitions\9_AllocateResourcesReverseToSelf.cs" />

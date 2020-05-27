@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -12,8 +13,14 @@ namespace Catan10
     /// </summary>
     public class WaitingForRollToWaitingForNext : LogHeader, ILogController
     {
-        
-        internal static async Task PostLog(IGameController gameController)
+        public WaitingForRollToWaitingForNext() : base()
+        {
+
+        }
+
+        public List<RollModel> Rolls { get; set; } = new List<RollModel>();
+
+        internal static async Task PostLog(IGameController gameController, List<RollModel> rolls)
         {
 
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
@@ -21,9 +28,10 @@ namespace Catan10
             WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
             {
                 CanUndo = true,
+                Rolls = rolls,
                 Action = CatanAction.ChangedState,
-                OldState = GameState.WaitingForNext,
-                NewState = GameState.WaitingForRoll,
+                OldState = GameState.WaitingForRoll,
+                NewState = GameState.WaitingForNext,
             };
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
@@ -31,7 +39,19 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            throw new System.NotImplementedException();
+            Contract.Assert(this.NewState == GameState.WaitingForRoll); // log gets pushed *after* this call
+
+            PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
+            Contract.Assert(sentBy != null);
+            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(this.Rolls);
+            Contract.Assert(pickedRoll != null);
+            Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
+            Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
+
+
+
+
+            return Task.CompletedTask;
         }
 
         public Task Redo(IGameController gameController)

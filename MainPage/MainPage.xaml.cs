@@ -685,12 +685,32 @@ namespace Catan10
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
-
+        /// <summary>
+        ///     When the user clicks on the PlayerRollCtrl, it comes here.  We need to call the appropriate Log object
+        ///     based on the state to coordinate the UI updaes
+        /// </summary>
+        /// <param name="rolls"></param>
         private async void OnRolled(List<RollModel> rolls)
         {
             if (!MainPageModel.EnableRolls) return;
 
-            await SynchronizedRollLog.StartSyncronizedRoll(this, rolls);
+            switch (CurrentGameState)
+            {
+                case GameState.WaitingForRollForOrder:
+                    await SynchronizedRollLog.StartSyncronizedRoll(this, rolls);
+                    break;
+                case GameState.WaitingForRoll:
+                    await WaitingForRollToWaitingForNext.PostLog(this, rolls);
+                    break;
+                default:                    
+                    break;
+            }
+
+            
+        }
+        private async void OnShowAllRolls(List<RollModel> rolls)
+        {
+            await ShowAllRollsLog.Post(this, rolls);
         }
 
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
@@ -1564,16 +1584,8 @@ namespace Catan10
             TwelvePercent = string.Format($"{roals[10]} ({percent[10] * 100:0.#}%)");
         }
 
-        
+      
 
-        /**
-         *  this feature will take one tile and randomly turn it into the gold tile
-         *  it happens *before* the user rolls so that the player can decide to (say)
-         *  put a knight on the Gold tile, or move the knight off the gold tile.
-         *
-         *  based on game play experience, it also makes sure that it doesn't pick the same tile
-         *  twice in a row
-         *
-         */
+       
     }
 }

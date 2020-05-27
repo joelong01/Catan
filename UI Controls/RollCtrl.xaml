@@ -65,10 +65,13 @@
                     Thickness="15"
                     Number="{x:Bind Roll.DiceTwo, Mode=OneWay}" />
 
-                
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="⊘" Margin="0,-10,-10,0" Visibility="{x:Bind Roll.NotSelected, Mode=OneWay}"
-                        Foreground="Red" FontSize="80" LineStackingStrategy="BaselineToBaseline" TextLineBounds="Tight"  />
-                
+
+                <TextBlock Margin="0,-10,-10,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Text="⊘"
+                    Visibility="{x:Bind Roll.NotSelected, Mode=OneWay}"
+                    Foreground="Red" FontSize="80" LineStackingStrategy="BaselineToBaseline"
+                    TextLineBounds="Tight" />
+
             </Grid>
 
         </Grid>

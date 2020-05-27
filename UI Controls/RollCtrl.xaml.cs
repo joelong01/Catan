@@ -115,7 +115,7 @@ namespace Catan10
                 }
             }
         }
-        [JsonIgnore]
+        
         public TileOrientation Orientation
         {
             get

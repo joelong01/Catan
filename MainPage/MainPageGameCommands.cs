@@ -727,6 +727,8 @@ namespace Catan10
                         break;
 
                     case GameState.WaitingForRoll:
+                        //
+                        //  this is called in MainPage.OnRolled
                         break;
 
                     case GameState.Targeted:
@@ -774,5 +776,6 @@ namespace Catan10
                 MainPageModel.EnableUiInteraction = true;
             }
         }
+       
     }
 }

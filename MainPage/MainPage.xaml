@@ -394,7 +394,7 @@
                 Caption="{x:Bind TheHuman.PlayerName, Mode=OneWay}"
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
-                    <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" />
+                    <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" OnShowAllRolls="OnShowAllRolls" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
 

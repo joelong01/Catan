@@ -156,8 +156,8 @@ namespace Catan10
                     MainPageModel.PlayingPlayers.ForEach((p) =>
                     {
                         p.GameData.RollOrientation = TileOrientation.FaceDown;
-                        p.GameData.SyncronizedPlayerRolls.Roll.DiceOne = 0;
-                        p.GameData.SyncronizedPlayerRolls.Roll.DiceTwo = 0;
+                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = 0;
+                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = 0;
                     });
 
                     //
@@ -413,8 +413,8 @@ namespace Catan10
 
             MainPageModel.PlayingPlayers.ForEach((p) =>
             {
-                p.GameData.SyncronizedPlayerRolls.Roll.DiceOne = 0;
-                p.GameData.SyncronizedPlayerRolls.Roll.DiceTwo = 0;
+                p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = 0;
+                p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = 0;
                 p.GameData.RollOrientation = TileOrientation.FaceDown;
             }); // I hate this hack but I couldn't figure out how to do it with DataBinding
         }
@@ -535,27 +535,19 @@ namespace Catan10
             PlayerModel sentBy = PlayerNameToPlayer(logEntry.SentBy, MainPageModel.AllPlayers);
 
             Contract.Assert(sentBy != null);
-            RollModel pickedRoll = null;
-            foreach (var roll in logEntry.Rolls)
-            {
-                if (roll.Selected)
-                {
-                    pickedRoll = roll;
-                    break;
-                }
-            }
+            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(logEntry.Rolls);
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
 
-            sentBy.GameData.SyncronizedPlayerRolls.AddRoll(pickedRoll.DiceOne, pickedRoll.DiceTwo);
+            
 
             //
             //  look at all the rolls and see if the current player needs to roll again
             foreach (var p in MainPageModel.PlayingPlayers)
             {
                 if (p == TheHuman) continue; // don't compare yourself to yourself
-                if (p.GameData.SyncronizedPlayerRolls.Roll.DiceOne == -1) continue; //hasn't rolled yet
+                if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) continue; //hasn't rolled yet
                 if (p.GameData.SyncronizedPlayerRolls.CompareTo(TheHuman.GameData.SyncronizedPlayerRolls) == 0)
                 {
                     await _rollControl.Reset();
@@ -589,7 +581,7 @@ namespace Catan10
             bool allPlayersRolled = true;
             foreach (var p in MainPageModel.PlayingPlayers)
             {
-                if (p.GameData.SyncronizedPlayerRolls.Rolls.Count == 0)
+                if (p.GameData.SyncronizedPlayerRolls.RollValues.Count == 0)
                 {
                     allPlayersRolled = false;
                     break;

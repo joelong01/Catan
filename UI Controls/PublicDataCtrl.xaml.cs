@@ -1,5 +1,6 @@
 ﻿using Catan.Proxy;
 using System.Collections.ObjectModel;
+using Windows.Media.Playback;
 using Windows.UI;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
@@ -140,6 +141,13 @@ namespace Catan10
                 ellipse.IsTapEnabled = true;
             }
 
+        }
+
+        private void OnFlipRollGrid(object sender, RoutedEventArgs e)
+        {
+
+            Player.GameData.RollOrientation = (Player.GameData.RollOrientation == TileOrientation.FaceDown) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
+            
         }
     }
 }

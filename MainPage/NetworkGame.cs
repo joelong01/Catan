@@ -199,7 +199,7 @@ namespace Catan10
             {
                 case CatanMessageType.Normal:
                     await logController.Do(this);
-                    if (logHeader.Action != CatanAction.Verify)
+                    if (logHeader.LogType != LogType.DoNotLog)
                     {
                         await Log.PushAction(logHeader);
                     }
