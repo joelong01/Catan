@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Catan10.NewLogging.Actions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -1038,49 +1038,56 @@ namespace Catan10
         }
 
         //
-        //  this is where the CurrentPlayer can pick somebody to target for the Baron
+        //  this is where the CurrentPlayer can pick somebody to target for the Baron.  this is always called from the tile, so first
+        //  make sure that the user is elligible to move baron/ship
         //
         //  it can happen because the user rolled 7 or they played a Knight, or they could do both in the same turn
         //
-        //  if they do this before a roll, it is a knight played.
-        //  if they do it after a roll, and it is not a 7, it is a baron
-        //  if they do it after a roll, and it is a 7, then it is not a baron
-        //  if they do it after a roll, and it is a 7, and they have already done it once, then it is a knight.
+        //  if there is a knight entitlement, then they played a knight
+        //  if there is not, then they rolled 7
         //
         //
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
+            //
+            //  if you have a knight entitlement, you *must* be playing the knight
+            bool playingKnight = CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.Knight);
+
+
             if (CurrentGameState != GameState.MustMoveBaron && CurrentGameState != GameState.WaitingForNext &&
-                CurrentGameState != GameState.WaitingForRoll)
+               CurrentGameState != GameState.WaitingForRoll)
             {
                 return;
             }
 
-            if ((CurrentGameState == GameState.WaitingForRoll && !this.CanMoveBaronBeforeRoll) && CurrentGameState != GameState.MustMoveBaron)
+            //
+            //  must have an entitlement to play before roll
+            if (CurrentGameState == GameState.WaitingForRoll && playingKnight == false)
             {
-                Debug.WriteLine("You need to check the baron button before assiging baron");
                 return;
             }
 
-            //if (GameState != GameState.WaitingForNext &&
-            //    GameState != GameState.WaitingForRoll)
-            //    return;
+
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
 
-            CatanAction action = CatanAction.None;
+
             TargetWeapon weapon = TargetWeapon.Baron;
 
-            if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
-            {
-                return;
-            }
-
+            //
+            //  I made this a local function to capture the stack variables.
             async void Baron_MenuClicked(object s, RoutedEventArgs e)
             {
                 PlayerModel player = (PlayerModel)((MenuFlyoutItem)s).Tag;
+                await MustMoveBaronToWaitingForNext.PostLog(this, player, targetTile.Index, weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index, weapon);
+            }
 
-                await AssignBaronOrKnight(player, targetTile, weapon, action, LogType.Normal);
+            //
+            //  I made this a local function to capture the stack variables.
+            async void KnightPlayed_MenuClicked(object s, RoutedEventArgs e)
+            {
+                PlayerModel player = (PlayerModel)((MenuFlyoutItem)s).Tag;
+                await PlayKnightLog.PostLog(this, player, targetTile.Index, weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index, weapon);
             }
 
             _menuBaron.Items.Clear();
@@ -1106,20 +1113,6 @@ namespace Catan10
                 foreach (RoadCtrl road in roads)
                 {
                     string s = "";
-                    if (playerGameData.MovedBaronAfterRollingSeven == false)
-                    {
-                        s = String.Format($"Rolled 7. Pirate Target: {road.Owner.PlayerName}");
-                        action = CatanAction.RolledSeven;
-                    }
-                    else if (playerGameData.PlayedKnightThisTurn == false)
-                    {
-                        s = String.Format($"Knight Played. Pirate Target: {road.Owner.PlayerName}");
-                        action = CatanAction.PlayedKnight;
-                    }
-                    else
-                    {
-                        return;
-                    }
 
                     bool found = false;
                     foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
@@ -1137,22 +1130,20 @@ namespace Catan10
                             Text = s,
                             Tag = road.Owner
                         };
-                        item.Click += Baron_MenuClicked;
+                        if (playingKnight)
+                        {
+                            item.Click += KnightPlayed_MenuClicked;
+                        }
+                        else
+                        {
+                            item.Click += Baron_MenuClicked;
+                        }
                         _menuBaron.Items.Add(item);
                     }
                 }
 
                 if (roads.Count == 0)
                 {
-                    if (playerGameData.MovedBaronAfterRollingSeven == false)
-                    {
-                        action = CatanAction.RolledSeven;
-                    }
-                    else if (playerGameData.PlayedKnightThisTurn == false)
-                    {
-                        action = CatanAction.PlayedKnight;
-                    }
-
                     item = new MenuFlyoutItem
                     {
                         Text = "Pirate Targets Nobody (how nice!)"
@@ -1172,20 +1163,7 @@ namespace Catan10
                 foreach (BuildingCtrl settlement in targetTile.OwnedBuilding)
                 {
                     string s = "";
-                    if (playerGameData.MovedBaronAfterRollingSeven == false)
-                    {
-                        s = String.Format($"Rolled 7. Target: {settlement.Owner.PlayerName}");
-                        action = CatanAction.RolledSeven;
-                    }
-                    else if (playerGameData.PlayedKnightThisTurn == false)
-                    {
-                        s = String.Format($"Knight Played. Target: {settlement.Owner.PlayerName}");
-                        action = CatanAction.PlayedKnight;
-                    }
-                    else
-                    {
-                        return;
-                    }
+
 
                     bool found = false;
                     foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
@@ -1203,21 +1181,20 @@ namespace Catan10
                             Text = s,
                             Tag = settlement.Owner
                         };
-                        item.Click += Baron_MenuClicked;
+                        if (playingKnight)
+                        {
+                            item.Click += KnightPlayed_MenuClicked;
+                        }
+                        else
+                        {
+                            item.Click += Baron_MenuClicked;
+                        }
                         _menuBaron.Items.Add(item);
                     }
                 }
 
                 if (targetTile.OwnedBuilding.Count == 0)
                 {
-                    if (playerGameData.MovedBaronAfterRollingSeven == false)
-                    {
-                        action = CatanAction.RolledSeven;
-                    }
-                    else if (playerGameData.PlayedKnightThisTurn == false)
-                    {
-                        action = CatanAction.PlayedKnight;
-                    }
                     item = new MenuFlyoutItem
                     {
                         Text = "Target Nobody (how nice!)"
@@ -1285,7 +1262,7 @@ namespace Catan10
         //
         public BuildingState ValidateBuildingLocation(BuildingCtrl building)
         {
-            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.WaitingForStart) && ValidateBuilding)
+            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.BeginResourceAllocation) && ValidateBuilding)
             {
                 return BuildingState.None;
             }

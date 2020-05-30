@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,7 @@ namespace Catan10
         private bool _EnableUiInteraction = true;
         private int _FiveStarPositions = 0;
         private int _FourStarPosition = 0;
+        private TradeResources _gameResources = new TradeResources();
         private string _HostName = "http://192.168.1.128:5000";
         private bool _isServiceGame = false;
         private NewLog _newLog = null;
@@ -26,8 +28,35 @@ namespace Catan10
 
         public MainPageModel()
         {
-            Log = new NewLog();
         }
+
+        public MainPageModel(IGameController gameController)
+        {
+            Log = new NewLog(gameController);
+            GameController = gameController;
+        }
+
+        internal void FinishedAddingPlayers()
+        {
+            //
+            //   turn on NotifyPropertyChanged() events for the model and subscribe to the entitlements changed event so that 
+            //   we can enabled/disable the next button 
+
+            PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.NotificationsEnabled = true;
+                p.GameData.Resources.UnspentEntitlements.CollectionChanged += UnspentEntitlements_CollectionChanged;
+            }
+            );
+
+        }
+
+        private void UnspentEntitlements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {             
+            NotifyPropertyChanged("EnableNextButton");
+            NotifyPropertyChanged("StateMessage");
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -41,7 +70,7 @@ namespace Catan10
                {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
                {GameState.PickingBoard, "Roll for Order" },
                {GameState.WaitingForRollForOrder, "Select Roll!" },
-               {GameState.WaitingForStart, "Start Game" },
+               {GameState.BeginResourceAllocation, "Start Game" },
                {GameState.AllocateResourceForward, "Next (Forward)" },
                {GameState.AllocateResourceReverse, "Next (Back)" },
                {GameState.DoneResourceAllocation, "Click To Start Game" },
@@ -81,7 +110,7 @@ namespace Catan10
                         return ret;
                     }
 
-                    ret = (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
+                    ret = (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.BeginResourceAllocation || state == GameState.PickingBoard ||
                             state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
                             state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers);
                     return ret;
@@ -92,31 +121,6 @@ namespace Catan10
                 }
             }
         }
-
-        //[JsonIgnore]
-        //public Visibility CommandGridVisible
-        //{
-        //    get
-        //    {
-        //        if (Log == null) return Visibility;
-        //        GameState state = Log.GameState;
-
-        //        if (state == GameState.PickingBoard || state == GameState.WaitingForRollForOrder || state == GameState.WaitingForPlayers)
-        //        {
-        //            return (MainPage.Current.TheHuman == this.GameStartedBy);
-        //        }
-
-        //        if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll)
-        //        {
-        //            return (MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer); // only the person whose turn it is can hit "Next"
-        //        }
-
-        //        return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
-        //                state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
-        //                state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers));
-
-        //    }
-        //}
 
         [JsonIgnore]
         public bool EnableRedo
@@ -129,6 +133,8 @@ namespace Catan10
             }
         }
 
+        //    }
+        //}
         [JsonIgnore]
         public bool EnableRolls
         {
@@ -140,6 +146,9 @@ namespace Catan10
             }
         }
 
+        //        return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
+        //                state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
+        //                state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers));
         [JsonIgnore]
         public bool EnableUiInteraction
         {
@@ -160,6 +169,10 @@ namespace Catan10
             }
         }
 
+        //        if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll)
+        //        {
+        //            return (MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer); // only the person whose turn it is can hit "Next"
+        //        }
         [JsonIgnore]
         public bool EnableUndo
         {
@@ -171,6 +184,10 @@ namespace Catan10
             }
         }
 
+        //        if (state == GameState.PickingBoard || state == GameState.WaitingForRollForOrder || state == GameState.WaitingForPlayers)
+        //        {
+        //            return (MainPage.Current.TheHuman == this.GameStartedBy);
+        //        }
         [JsonIgnore]
         public int FiveStarPositions
         {
@@ -188,6 +205,13 @@ namespace Catan10
             }
         }
 
+        //[JsonIgnore]
+        //public Visibility CommandGridVisible
+        //{
+        //    get
+        //    {
+        //        if (Log == null) return Visibility;
+        //        GameState state = Log.GameState;
         [JsonIgnore]
         public int FourStarPositions
         {
@@ -206,7 +230,26 @@ namespace Catan10
         }
 
         [JsonIgnore]
+        public IGameController GameController { get; set; }
+
+        [JsonIgnore]
         public GameInfo GameInfo { get; set; }
+
+        public TradeResources GameResources
+        {
+            get
+            {
+                return _gameResources;
+            }
+            set
+            {
+                if (_gameResources != value)
+                {
+                    _gameResources = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         [JsonIgnore]
         public PlayerModel GameStartedBy { get; internal set; }
@@ -304,6 +347,7 @@ namespace Catan10
                 return Visibility.Collapsed;
             }
         }
+
         public Settings Settings
         {
             get
@@ -342,7 +386,7 @@ namespace Catan10
                 try
                 {
                     if (Log == null) return visibility;
-                    if (Log.GameState == GameState.WaitingForNewGame || Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForStart ||
+                    if (Log.GameState == GameState.WaitingForNewGame || Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.BeginResourceAllocation ||
                         Log.GameState == GameState.WaitingForRollForOrder || Log.GameState == GameState.WaitingForNext) return visibility;
 
                     visibility = Visibility.Collapsed;

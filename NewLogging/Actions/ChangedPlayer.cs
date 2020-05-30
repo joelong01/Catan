@@ -37,7 +37,7 @@ namespace Catan10
             return true;
         }
 
-        public static async Task ChangePlayer(IGameController gameController, int numberofPositions, GameState newState)
+        public static async Task ChangePlayer(IGameController gameController, int numberofPositions)
         {
             Contract.Assert(gameController.CurrentPlayer != null);
 
@@ -53,18 +53,18 @@ namespace Catan10
             if (idx < 0) idx += count;
 
             var newPlayer = playingPlayers[idx];
-            await SetCurrentPlayer(gameController, newPlayer, newState);
+            await SetCurrentPlayer(gameController, newPlayer);
         }
 
-        public static async Task SetCurrentPlayer(IGameController gameController, PlayerModel newPlayer, GameState newState)
+        public static async Task SetCurrentPlayer(IGameController gameController, PlayerModel newPlayer)
         {
             ChangePlayerLog logHeader = new ChangePlayerLog
             {
+                Action = CatanAction.ChangedPlayer,
                 SentBy = gameController.CurrentPlayer.PlayerName,
                 PreviousPlayer = gameController.CurrentPlayer.PlayerName,
                 OldState = gameController.CurrentGameState,
-                NewState = newState,
-                Action = CatanAction.ChangePlayerAndSetState,
+                NewState = gameController.CurrentGameState,
                 NewCurrentPlayer = newPlayer.PlayerName,
                 OldRandomGoldTiles = gameController.CurrentRandomGoldTiles,
                 NewRandomGoldTiles = gameController.NextRandomGoldTiles,

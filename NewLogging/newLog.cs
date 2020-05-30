@@ -4,8 +4,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -19,6 +25,7 @@ namespace Catan10
         private readonly Stack<LogHeader> DoneStack = new Stack<LogHeader>();
         private readonly Queue<LogHeader> PendingQueue = new Queue<LogHeader>();
         private readonly Stack<LogHeader> UndoneStack = new Stack<LogHeader>();
+
         public Stacks()
         {
         }
@@ -27,6 +34,7 @@ namespace Catan10
 
         public int ActionCount => DoneStack.Count;
         public bool CanRedo => UndoneStack.Count > 0;
+
         public bool CanUndo
         {
             get
@@ -57,6 +65,7 @@ namespace Catan10
             }
         }
 
+        public static bool PrintLogFlag { get; set; } = false;
 
         //
         //  whenever we push or pop from the stack we should notify up
@@ -64,8 +73,6 @@ namespace Catan10
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        public bool PrintLogFlag { get; set; } = false;
 
         internal void PrintLog([CallerMemberName] string caller = "")
         {
@@ -76,20 +83,16 @@ namespace Catan10
 
             foreach (var lh in DoneStack)
             {
-
                 actionLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
                 lines++;
                 if (lines == 3) break;
-
             }
             foreach (var lh in UndoneStack)
             {
                 undoLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
                 lines++;
                 if (lines == 3) break;
-
             }
-
 
             Debug.WriteLine(actionLine);
             Debug.WriteLine(undoLine + "\n");
@@ -106,7 +109,7 @@ namespace Catan10
 
             LogHeader lh = DoneStack.Pop();
             NotifyPropertyChanged("GameState");
-         //   NotifyPropertyChanged("ActionStack");
+            //   NotifyPropertyChanged("ActionStack");
             return lh;
         }
 
@@ -122,20 +125,18 @@ namespace Catan10
         {
             try
             {
-
                 if (logHeader.LogType != LogType.Redo)
                 {
                     UndoneStack.Clear();
                 }
 
                 DoneStack.Push(logHeader);
-
             }
             finally
             {
                 NotifyPropertyChanged("GameState");
-             //   NotifyPropertyChanged("RedoPossible"); // because it is no longer possible
-             //   NotifyPropertyChanged("ActionStack");
+                //   NotifyPropertyChanged("RedoPossible"); // because it is no longer possible
+                //   NotifyPropertyChanged("ActionStack");
                 PrintLog();
             }
         }
@@ -151,10 +152,9 @@ namespace Catan10
     public class NewLog : INotifyPropertyChanged, IDisposable
     {
         private readonly Stacks Stacks = new Stacks();
-
         private bool _writing = false;
 
-        public NewLog()
+        public NewLog(IGameController gameController)
         {
             Stacks.PropertyChanged += Stacks_PropertyChanged;
             DateTime dt = DateTime.Now;
@@ -163,6 +163,17 @@ namespace Catan10
             string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
 
             SaveFileName = String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm}{MainPage.SAVED_GAME_EXTENSION}");
+            RollLog = new RollLog(gameController);
+
+            Timer = new Timer(OnSaveTimer, this, 10 * 1000, Timeout.Infinite);
+        }
+
+        private async void OnSaveTimer(object state)
+        {
+            NewLog log = state as NewLog;
+            Contract.Assert(log != null);
+            await log.WriteToDisk();
+            log.Timer.Change(10 * 1000, Timeout.Infinite);
         }
 
         public event PropertyChangedEventHandler LogChanged;
@@ -171,9 +182,9 @@ namespace Catan10
 
         private ConcurrentQueue<CatanMessage> MessageLog { get; } = new ConcurrentQueue<CatanMessage>();
         private string SaveFileName { get; set; }
+        private Timer Timer { get; set; }
         public bool CanRedo => Stacks.CanRedo;
         public bool CanUndo => Stacks.CanUndo;
-
         public IGameController GameController => MainPage.Current;
 
         public GameState GameState
@@ -188,23 +199,21 @@ namespace Catan10
                 return Stacks.PeekAction.NewState;
             }
         }
+
         public LogHeader PeekAction => Stacks.PeekAction;
         public LogHeader PeekUndo => Stacks.PeekUndo;
+        public RollLog RollLog { get; private set; }
+        private bool UpdateLogFlag { get; set; } = false;
         //
         //  whenever we push or pop from the stack we should
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             LogChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            UpdateLogFlag = true;
         }
 
-        private async void SaveLogAsync()
-        {
-            await Task.Run(() =>
-            {
-                WriteToDisk();
-            });
-        }
+
 
         /// <summary>
         ///     forward the event to the Log's customers
@@ -216,17 +225,40 @@ namespace Catan10
             NotifyPropertyChanged(e.PropertyName);
         }
 
-        private void WriteToDisk()
+        private string GetJson()
         {
+            // return CatanProxy.Serialize(MessageLog);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+            sb.Append(Environment.NewLine);
+
+            foreach (var message in MessageLog)
+            {
+                string json = CatanProxy.Serialize(message);
+                sb.Append(json);
+                sb.Append(",");
+                sb.Append(Environment.NewLine);
+            }
+            sb.Length -= (1 + Environment.NewLine.Length); // remove trailing comma
+            sb.Append(Environment.NewLine);
+            sb.Append("]");
+            return sb.ToString();
+
+        }
+
+        private async Task WriteToDisk()
+        {
+            if (UpdateLogFlag == false) return;
             try
             {
                 if (_writing) return;
                 _writing = true;
 
-                string json = CatanProxy.Serialize(MessageLog, true);
+                string json = GetJson();
                 var folder = MainPage.Current.SaveFolder;
-                var file = folder.CreateFileAsync(SaveFileName, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
-                FileIO.WriteTextAsync(file, json).AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+                var file = await folder.CreateFileAsync(SaveFileName, CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(file, json).AsTask().ConfigureAwait(false);
+                UpdateLogFlag = false;
             }
             catch (System.IO.IOException)
             {
@@ -250,11 +282,12 @@ namespace Catan10
             }
 
             MessageLog.Enqueue(message);
-            SaveLogAsync();
+
         }
 
         public void Dispose()
         {
+            Timer.Dispose();
         }
 
         public void DumpLogRecords()
@@ -298,7 +331,7 @@ namespace Catan10
                 Contract.Assert(logHeader.LogType == LogType.Undo);
                 Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
                 logHeader.LogType = LogType.Redo;  // 5/21/2020:  We need this so that we know to know clear the undo stack on the push
-                Stacks.PushAction(logHeader);          
+                Stacks.PushAction(logHeader);
                 return Task.CompletedTask;
             }
             finally
@@ -334,7 +367,7 @@ namespace Catan10
                 }
                 Stacks.PopAction();
                 logHeader.LogType = LogType.Undo;
-                Stacks.PushUndo(logHeader);                
+                Stacks.PushUndo(logHeader);
                 return Task.CompletedTask;
             }
             finally
@@ -344,4 +377,8 @@ namespace Catan10
             }
         }
     }
+
+
+
+
 }

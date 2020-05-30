@@ -8,7 +8,7 @@ namespace Catan10
 {
     /// <summary>
     ///     UI Pause
-    ///     wipes the resources for the turn
+    ///     wipes the resources for the turn    
     /// </summary>
     public class AllocateResourcesReverseToDoneAllocResources :  LogHeader, ILogController
     {

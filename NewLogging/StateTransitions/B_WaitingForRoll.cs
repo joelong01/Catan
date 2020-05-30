@@ -22,9 +22,8 @@ namespace Catan10
             DoneAllocResourcesToWaitingForRoll logHeader = new DoneAllocResourcesToWaitingForRoll()
             {
                 CanUndo = true,
-                GoldTiles = gameController.GetRandomGoldTiles(),
+                GoldTiles = gameController.NextRandomGoldTiles,
                 Action = CatanAction.ChangedState,
-                OldState = GameState.DoneResourceAllocation,
                 NewState = GameState.WaitingForRoll,
             };
 
@@ -33,6 +32,20 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
+            //
+            //  hide the rolls in the public data control
+            gameController.PlayingPlayers.ForEach((p) =>
+            {               
+                p.GameData.RollOrientation = TileOrientation.FaceDown;
+                p.GameData.Resources.ResourcesThisTurn = new TradeResources();
+            });
+            //
+            // if we have a roll for this turn already, use it.
+            if (gameController.RollLog.CanRedo)
+            {
+                await WaitingForRollToWaitingForNext.PostLog(gameController, gameController.RollLog.NextRolls);
+
+            }
             await gameController.SetRandomTileToGold(GoldTiles);
         }
 
@@ -44,6 +57,10 @@ namespace Catan10
         public async Task Undo(IGameController gameController)
         {
             await gameController.ResetRandomGoldTiles();
+            gameController.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.Resources.ResourcesThisTurn += p.GameData.Resources.Current;                
+            });
         }
     }
 }

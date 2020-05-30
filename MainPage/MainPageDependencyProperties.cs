@@ -89,7 +89,7 @@ namespace Catan10
             //
             //  TODO:  what should we do if the option is set while the game is running?
 
-            if (CurrentGameState != GameState.WaitingForStart)
+            if (CurrentGameState != GameState.BeginResourceAllocation)
                 return;
 
             // _ = SetRandomTileToGold();

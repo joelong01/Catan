@@ -62,50 +62,7 @@ namespace Catan10
             set => SetValue(LastRollProperty, value);
         }
 
-        public bool PushRoll(int roll)
-        {
-
-            if (roll < 2 || roll > 12)
-            {
-                return false;
-            }
-
-            Rolls.Push(roll);
-            LastRoll = roll;
-            // PostLogEntry(CurrentPlayer, GameState.WaitingForRoll, CatanAction.Rolled, true, LogType.Normal, roll, StaticHelpers.SerializeList<int>(_gameView.CurrentRandomGoldTiles));
-            UpdateGlobalRollStats();
-            return true;
-        }
-
-
-
-        public int PopRoll()
-        {
-            if (Rolls.Count == 0)
-            {
-                return -1;
-            }
-
-            int lastRoll = Rolls.Pop();
-            if (Rolls.Count > 0)
-            {
-                LastRoll = Rolls.First();
-            }
-            else
-            {
-                LastRoll = 0;
-            }
-           // PostLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.Rolled, true, LogType.Undo, lastRoll);
-            UpdateGlobalRollStats();
-            foreach (TileCtrl t in _gameView.AllTiles)
-            {
-                t.ResetOpacity();
-                t.ResetTileRotation();
-                t.StopHighlightingTile();
-
-            }
-            return lastRoll;
-        }
+       
 
         private void UndoRoll()
         {

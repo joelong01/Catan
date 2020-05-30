@@ -160,6 +160,11 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public override string ToString()
+        {
+            return $"[Roll={Roll}][One={DiceOne}][Two={DiceTwo}][Selected={Selected}][Orientation={Orientation}]";
+        }
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

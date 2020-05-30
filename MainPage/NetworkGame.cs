@@ -142,7 +142,7 @@ namespace Catan10
             MainPageModel.GameInfo = dlg.SelectedGame;
             await _rollControl.Reset();
             MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedGame.Creator);
-            await StartGameLog.StartGame(this, TheHuman.PlayerName, 0);
+            await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
             
             StartMonitoring();
         }
@@ -156,7 +156,7 @@ namespace Catan10
             if (TheHuman == null) return;
 
             MainPageModel.PlayingPlayers.Clear();
-            MainPageModel.Log = new NewLog();
+            MainPageModel.Log = new NewLog(this);
 
             string gameName = "OnStartDefaultNetworkGame";
 
@@ -185,7 +185,7 @@ namespace Catan10
             MainPageModel.IsServiceGame = true;
             //
             //  start the game
-            await StartGameLog.StartGame(this, MainPageModel.GameInfo.Creator, 0);
+            await NewGameLog.NewGame(this, MainPageModel.GameInfo.Creator, 0);
             await Proxy.JoinGame(gameInfo.Id, TheHuman.PlayerName);
             StartMonitoring();
         }
@@ -198,11 +198,14 @@ namespace Catan10
             switch (message.CatanMessageType)
             {
                 case CatanMessageType.Normal:
-                    await logController.Do(this);
+                    //
+                    //  5/20/2020: we are logging first so that the Do() method has the correct current state of the system
+                    //             instead of the *anticipated* correct state.
                     if (logHeader.LogType != LogType.DoNotLog)
                     {
                         await Log.PushAction(logHeader);
                     }
+                    await logController.Do(this);
                     break;
 
                 case CatanMessageType.Undo:

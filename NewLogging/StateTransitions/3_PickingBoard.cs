@@ -23,8 +23,7 @@ namespace Catan10
             WaitingForPlayersToPickingBoard logHeader = new WaitingForPlayersToPickingBoard()
             {
                 CanUndo = false,
-                Action = CatanAction.ChangedState,
-                OldState = GameState.WaitingForPlayers,
+                Action = CatanAction.ChangedState,                
                 NewState = GameState.PickingBoard,
             };
 
@@ -34,7 +33,8 @@ namespace Catan10
         public async Task Do(IGameController gameController)
         {
             var mainPageModel = gameController.MainPageModel;
-            mainPageModel.PlayingPlayers.ForEach((p) => p.GameData.NotificationsEnabled = true);
+            mainPageModel.FinishedAddingPlayers();
+            
 
             if (mainPageModel.GameStartedBy == gameController.TheHuman)
             {

@@ -9,7 +9,7 @@ namespace Catan10
     {
         public RandomBoardLog() : base()
         {
-            Action = CatanAction.RandomizeBoard;
+            
         }
 
         public int GameIndex { get; set; }
@@ -34,19 +34,26 @@ namespace Catan10
             return log.Undo(logRecord);
         }
 
+        /// <summary>
+        ///     can't change state!
+        /// </summary>
+        /// <param name="gameController"></param>
+        /// <param name="gameIndex"></param>
+        /// <returns></returns>
         public static async Task RandomizeBoard(IGameController gameController, int gameIndex)
         {
+
             RandomBoardLog logHeader = new RandomBoardLog()
             {
-                CanUndo = (gameController.CurrentGameState == GameState.PickingBoard), // you can only undo if you have a board to go back to.
+                Action = CatanAction.RandomizeBoard,
+                CanUndo = true,
                 NewState = GameState.PickingBoard,
                 NewRandomBoard = gameController.GetRandomBoard(),
                 PreviousRandomBoard = gameController.CurrentRandomBoard(),
                 GameIndex = gameIndex
             };
-           
+
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
-           
         }
 
         public Task Do(IGameController gameController)
@@ -65,6 +72,8 @@ namespace Catan10
             return $"[Action={Action}][[SentBy={SentBy}]]";
         }
 
+        //
+        //  if transition out of PickingBoard, will turn tiles facedown
         public Task Undo(IGameController gameController)
         {
             return gameController.UndoSetRandomBoard(this);

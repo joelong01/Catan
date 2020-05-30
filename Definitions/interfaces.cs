@@ -81,8 +81,8 @@ namespace Catan10
 
     public interface IGameController
     {
-        Task StartGame();
         bool AutoRespondAndTheHuman { get; }
+
         CatanGames CatanGame { get; set; }
 
         /// <summary>
@@ -104,11 +104,14 @@ namespace Catan10
         NewLog Log { get; }
 
         MainPageModel MainPageModel { get; }
+
         List<int> NextRandomGoldTiles { get; }
 
         List<PlayerModel> PlayingPlayers { get; }
 
         PlayerModel TheHuman { get; }
+        IRollLog RollLog { get; }
+
 
         /// <summary>
         ///     Adds a player to the game.  if the Player is already in the game, return false.
@@ -136,13 +139,25 @@ namespace Catan10
         /// <returns></returns>
         PlayerModel NameToPlayer(string playerName);
 
+        int PopRoll();
+
         Task<bool> PostMessage(LogHeader logHeader, CatanMessageType normal);
+
+        bool PushRoll(int roll);
 
         Task<bool> RedoAsync();
 
         void ResetAllBuildings();
 
+        Task ResetRandomGoldTiles();
+
+        (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll);
+
+        void SetHighlightedTiles(int roll);
+
         Task SetRandomBoard(RandomBoardLog randomBoard);
+
+        Task SetRandomTileToGold(List<int> goldTiles);
 
         Task SetRoadState(UpdateRoadLog updateRoadModel);
 
@@ -150,9 +165,13 @@ namespace Catan10
 
         void ShowRollsInPublicUi();
 
-        Task StartGame(StartGameLog model);
+        Task TellServiceGameStarted();
 
-        Task SynchronizedRoll(SynchronizedRollLog log);
+        Task StartGame(NewGameLog model);
+
+        void StopHighlightingTiles();
+
+        Task<bool> DetermineRollOrder(RollOrderLog log);
 
         Task UndoAddPlayer(AddPlayerLog playerLogHeader);
 
@@ -169,10 +188,8 @@ namespace Catan10
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
-        (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll);
-        List<int> GetRandomGoldTiles();
-        Task SetRandomTileToGold(List<int> goldTiles);
-        Task ResetRandomGoldTiles();
+        TileCtrl TileFromIndex(int targetTile);
+        GameContainerCtrl GameContainer { get; }
     }
 
     public interface IGameViewCallback

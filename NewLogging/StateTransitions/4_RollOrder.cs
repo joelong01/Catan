@@ -22,11 +22,11 @@ namespace Catan10
             PickingBoardToWaitingForRollOrder logHeader = new PickingBoardToWaitingForRollOrder()
             {
                 CanUndo = false,
-                Action = CatanAction.ChangedState,
-                OldState = GameState.PickingBoard,
+                Action = CatanAction.ChangedState,                         
                 NewState = GameState.WaitingForRollForOrder,
             };
 
+            
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
 
@@ -35,14 +35,14 @@ namespace Catan10
             //
             //  turn off pips
             gameController.ResetAllBuildings();
-            await gameController.StartGame();
+            await gameController.TellServiceGameStarted();
             MainPageModel mainPageModel = gameController.MainPageModel;
 
             if (mainPageModel.Settings.AutoRespond)
             {
                 //
                 //  step 5 is to roll -- simulate it
-                await SynchronizedRollLog.StartSyncronizedRoll(gameController, GetRollModelList());
+                await RollOrderLog.PostMessage(gameController, GetRollModelList());
             }
         }
 

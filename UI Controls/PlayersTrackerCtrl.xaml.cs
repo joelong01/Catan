@@ -30,6 +30,12 @@ namespace Catan10
 
         public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayersTrackerCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PlayersTrackerCtrl), new PropertyMetadata(GameState.WaitingForNewGame));
+        public static readonly DependencyProperty GameResourcesProperty = DependencyProperty.Register("GameResources", typeof(TradeResources), typeof(PlayersTrackerCtrl), new PropertyMetadata(new TradeResources()));
+        public TradeResources GameResources
+        {
+            get => (TradeResources)GetValue(GameResourcesProperty);
+            set => SetValue(GameResourcesProperty, value);
+        }
         public GameState GameState
         {
             get => (GameState)GetValue(GameStateProperty);

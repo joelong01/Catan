@@ -22,10 +22,11 @@ namespace Catan10
             WaitingForNewGameToWaitingForPlayers logHeader = new WaitingForNewGameToWaitingForPlayers()
             {
                 CanUndo = false,
-                Action = CatanAction.ChangedState,
-                OldState = GameState.WaitingForNewGame,
+                Action = CatanAction.ChangedState,             
                 NewState = GameState.WaitingForPlayers,
             };
+
+            Contract.Assert(logHeader.OldState == GameState.WaitingForNewGame);  
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
@@ -42,6 +43,8 @@ namespace Catan10
             if (mpm.Settings.AutoRespond && mpm.GameStartedBy == gameController.TheHuman)
             {
                 await AddPlayerLog.AddPlayer(gameController, gameController.TheHuman);
+                //
+                //  AutoRespond doesn't chane the state because we need to give the other machines a chance to add their own humans
             }
         }
 

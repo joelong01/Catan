@@ -27,8 +27,7 @@ namespace Catan10
             {
                 CanUndo = false,
                 LogType= LogType.DoNotLog,
-                Action = CatanAction.RollToSeeWhoGoesFirst,
-                NewState = GameState.WaitingForRollForOrder,
+                Action = CatanAction.ShowAllRolls,                
                 Rolls = rolls,
                 SentBy = gameController.TheHuman.PlayerName
 

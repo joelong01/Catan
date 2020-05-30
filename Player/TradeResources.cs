@@ -177,7 +177,7 @@ namespace Catan10
                     break;
 
                 case ResourceType.Wheat:
-                    Wood += toAdd;
+                    Wheat += toAdd;
                     break;
 
                 case ResourceType.Brick:

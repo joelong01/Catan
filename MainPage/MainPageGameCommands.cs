@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Windows.Storage;
@@ -684,20 +685,15 @@ namespace Catan10
                         break;
 
                     case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
-                        await WaitingForRollOrderToWaitingForStart.PostLog(this);
+                        await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
                         break;
 
-                    case GameState.WaitingForStart:
-                        await WaitingForStartToAllocateResourcesForward.PostLog(this);
+                    case GameState.BeginResourceAllocation:
+                        await BeginAllocationToAllocateResourcesForward.PostLog(this);
                         break;
 
                     case GameState.AllocateResourceForward:
-                        int index = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) + 1;
-                        if (MainPageModel.PlayingPlayers.Count == 1) // only during testing!
-                        {
-                            await AllocateResourcesForwardToAllocateResourcesReverse.PostLog(this);
-                        }
-                        else if (index == MainPageModel.PlayingPlayers.Count)
+                        if (MainPageModel.PlayingPlayers.Last().GameData.Score == 1) 
                         {
                             await AllocateResourcesForwardToAllocateResourcesReverse.PostLog(this);
                         }
@@ -711,7 +707,7 @@ namespace Catan10
 
                         int players = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1;
 
-                        if (players == -1)
+                        if (MainPageModel.PlayingPlayers[0].GameData.Score == 2)
                         {
                             await AllocateResourcesReverseToDoneAllocResources.PostLog(this);
                         }

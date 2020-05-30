@@ -9,9 +9,9 @@ namespace Catan10
     /// <summary>
     ///     knows how to start a game
     /// </summary>
-    public class StartGameLog : LogHeader, ILogController
+    public class NewGameLog : LogHeader, ILogController
     {
-        public StartGameLog() : base()
+        public NewGameLog() : base()
         {
             Action = CatanAction.StartGame;
         }
@@ -24,15 +24,15 @@ namespace Catan10
         }
 
         
-        public static async Task StartGame(IGameController gameController, string startingPlayer, int gameIndex)
+        public static async Task NewGame(IGameController gameController, string startingPlayer, int gameIndex)
         {
 
-            StartGameLog logHeader = new StartGameLog
+            NewGameLog logHeader = new NewGameLog
             {
                 CreatedBy = startingPlayer,
                 SentBy = gameController.TheHuman.PlayerName,                
                 NewState = GameState.WaitingForPlayers,
-                OldState = GameState.WaitingForNewGame, // this is a lie -- you can start a new game whenever you want.  
+                OldState = (gameController.Log.PeekAction == null) ? GameState.Uninitialized : gameController.Log.PeekAction.NewState,
                 Action = CatanAction.GameCreated,
                 GameIndex = gameIndex,
                 CanUndo = false
@@ -43,9 +43,10 @@ namespace Catan10
              
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
-            return gameController.StartGame(this);
+            await gameController.StartGame(this);
+            await AddPlayerLog.AddPlayer(gameController, gameController.TheHuman);
 
         }
 

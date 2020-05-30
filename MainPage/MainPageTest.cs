@@ -52,15 +52,25 @@ namespace Catan10
             await WaitingForRollToWaitingForNext.PostLog(this, rolls);
 
         }
-       
+
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
 
-           
-           
+            TradeResources tr = new TradeResources()
+            {
+                Sheep = 3,
+                Wheat = 3,
+                Ore = 3,
+                Brick = 3,
+                Wood = 3
+
+            };
+
+            CurrentPlayer.GameData.Resources.GrantResources(tr);
+
         }
 
-       
+
 
         // Undo
         private async void OnTest3(object sdr, RoutedEventArgs rea)
@@ -81,20 +91,20 @@ namespace Catan10
                 LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
                 message.Data = logHeader;
                 Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
-                
+
                 ILogController logController = logHeader as ILogController;
                 Contract.Assert(logController != null, "every LogEntry is a LogController!");
                 switch (logHeader.LogType)
                 {
                     case LogType.Normal:
-                         await logController.Redo(this);
+                        await logController.Redo(this);
                         break;
                     case LogType.Undo:
-                      //  await MainPageModel.Log.Undo(message);
+                        //  await MainPageModel.Log.Undo(message);
                         break;
                     case LogType.Replay:
 
-                      //  await MainPageModel.Log.Redo(message);
+                        //  await MainPageModel.Log.Redo(message);
                         break;
                     case LogType.DoNotLog:
                     case LogType.DoNotUndo:

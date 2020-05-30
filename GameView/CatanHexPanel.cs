@@ -404,6 +404,18 @@ namespace Catan10
                                     tg.TilesToRandomize.Add(tile);
                                     tg.OriginalNonSeaTiles.Add(tile);
                                 }
+                                //
+                                //  Bind to CurrentPlayer
+                                Binding binding = new Binding()
+                                {
+                                    Path = new PropertyPath("CurrentPlayer"),
+                                    Mode = BindingMode.OneWay,
+                                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                                    Source = MainPage.Current
+                                };
+
+
+                                tile.SetBinding(BuildingCtrl.CurrentPlayerProperty, binding);
 
                             }
                             _tileSets.Add(tg);

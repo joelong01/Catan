@@ -8,9 +8,9 @@ namespace Catan10
     /// <summary>
     ///     This is just a UI pause so people can see what happened
     /// </summary>
-    public class WaitingForRollOrderToWaitingForStart : LogHeader, ILogController
+    public class WaitingForRollOrderToBeginResourceAllocation : LogHeader, ILogController
     {
-        public WaitingForRollOrderToWaitingForStart()
+        public WaitingForRollOrderToBeginResourceAllocation()
         {
         }
 
@@ -18,13 +18,14 @@ namespace Catan10
         {
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRollForOrder);
 
-            WaitingForRollOrderToWaitingForStart logHeader = new WaitingForRollOrderToWaitingForStart()
+            WaitingForRollOrderToBeginResourceAllocation logHeader = new WaitingForRollOrderToBeginResourceAllocation()
             {
                 CanUndo = false, // Rolls to see who starts are final
                 Action = CatanAction.ChangedState,
-                OldState = GameState.WaitingForRollForOrder,
-                NewState = GameState.WaitingForStart,
+                NewState = GameState.BeginResourceAllocation,
             };
+
+            Contract.Assert(logHeader.OldState == GameState.WaitingForRollForOrder);
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
@@ -38,7 +39,7 @@ namespace Catan10
         {
             if (gameController.AutoRespondAndTheHuman)
             {
-                await WaitingForStartToAllocateResourcesForward.PostLog(gameController);
+                await BeginAllocationToAllocateResourcesForward.PostLog(gameController);
             }
         }
 

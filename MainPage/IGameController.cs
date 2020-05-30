@@ -76,7 +76,9 @@ namespace Catan10
         public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
         public CatanProxy Proxy => MainPageModel.Proxy;
 
-       
+        public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
+
+        
 
         private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
         {
@@ -99,7 +101,7 @@ namespace Catan10
                 case GameState.WaitingForNewGame:
                     break;
 
-                case GameState.WaitingForStart:
+                case GameState.BeginResourceAllocation:
                     if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
                     {
                         await SetStateLog.SetState(this, GameState.AllocateResourceForward);
@@ -144,7 +146,7 @@ namespace Catan10
                     if (MainPageModel.Settings.AutoRespond)
                     {
                         Random rand = new Random();
-                        await SynchronizedRollLog.StartSyncronizedRoll(this, PickingBoardToWaitingForRollOrder.GetRollModelList());
+                        await RollOrderLog.PostMessage(this, PickingBoardToWaitingForRollOrder.GetRollModelList());
                     }
 
                     //
@@ -234,7 +236,7 @@ namespace Catan10
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
-        public async Task AddPlayer(AddPlayerLog playerLogHeader)
+        public Task AddPlayer(AddPlayerLog playerLogHeader)
         {
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
@@ -254,10 +256,7 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.Add(playerToAdd);
             }
 
-            if (CurrentPlayer != MainPageModel.GameStartedBy)
-            {
-                await ChangePlayerLog.SetCurrentPlayer(this, MainPageModel.GameStartedBy, CurrentGameState);
-            }
+            return Task.CompletedTask;
         }
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
@@ -286,7 +285,7 @@ namespace Catan10
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
             if ((changePlayerLog.NewState == GameState.WaitingForRoll) || (changePlayerLog.NewState == GameState.WaitingForNext))
             {
-                await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
+                 await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
             }
 
             if (changePlayerLog.NewState != changePlayerLog.OldState)
@@ -483,9 +482,10 @@ namespace Catan10
         /// </summary>
         /// <param name="logHeader"></param>
         /// <returns></returns>
-        public async Task StartGame(StartGameLog logHeader)
+        public Task StartGame(NewGameLog logHeader)
         {
-            if (Log.PeekAction?.LogId == logHeader.LogId) return; // this happens on the machine that starts the game.
+
+
 
             //
             //  the issue here is that we Log StartGame, Add Player, then Monitor under normal circumstances
@@ -494,7 +494,7 @@ namespace Catan10
             //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't
             //  in the game because this StartGame resets PlayingPlayers
             //
-            if (CurrentGameState != GameState.WaitingForNewGame) return;
+            if (logHeader.OldState != GameState.Uninitialized) return Task.CompletedTask;
 
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
@@ -502,8 +502,8 @@ namespace Catan10
             MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.SentBy);
             Contract.Assert(MainPageModel.GameStartedBy != null);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
+            return Task.CompletedTask;
 
-            await AddPlayerLog.AddPlayer(this, TheHuman);
         }
 
         /// <summary>
@@ -523,8 +523,8 @@ namespace Catan10
         ///
         /// </summary>
         /// <param name="logEntry"></param>
-        /// <returns></returns>
-        public async Task SynchronizedRoll(SynchronizedRollLog logEntry)
+        /// <returns>true if everybody has rolled and their are no ties</returns>
+        public async Task<bool> DetermineRollOrder(RollOrderLog logEntry)
         {
             //
             // need to update the state first because data binding is used to show/hide roll UI and it is driven off of
@@ -605,7 +605,7 @@ namespace Catan10
                 //
                 if (CurrentGameState == GameState.WaitingForRollForOrder)
                 {
-                    await WaitingForRollOrderToWaitingForStart.PostLog(this);
+                    return true;
                 }
                 else
                 {
@@ -613,6 +613,8 @@ namespace Catan10
                 }
                 // else eat it...only need one of these
             }
+
+            return false;
         }
 
         /// <summary>
@@ -669,16 +671,22 @@ namespace Catan10
                     await SetRandomTileToGold(logHeader.OldRandomGoldTiles);
                 }
 
-                logHeader.HighlightedTiles.ForEach((idx) => GameContainer.AllTiles[idx].HighlightTile(CurrentPlayer.BackgroundBrush));
+                logHeader.HighlightedTiles.ForEach((idx) => GameContainer.AllTiles[idx].HighlightTile());
             }
         }
 
         public async Task UndoSetRandomBoard(RandomBoardLog logHeader)
         {
-            if (logHeader.PreviousRandomBoard == null) return;
-
-            await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
-            UpdateBoardMeasurements();
+            if (logHeader.PreviousRandomBoard == null)
+            {
+                GameContainer.AllTiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceDown);
+            }
+            else
+            {
+                await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
+                UpdateBoardMeasurements();
+            }
+            
         }
 
         public Task UndoSetRoadState(UpdateRoadLog updateRoadModel)
@@ -760,12 +768,14 @@ namespace Catan10
             {
                 if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build))
                 {
+                    
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
                         tr.Add(kvp.Value.ResourceType, 1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
+                    MainPageModel.GameResources += tr;
                     // this.TraceMessage($"{CurrentPlayer.PlayerName} Granted: {CurrentPlayer.GameData.Resources.TotalResources}");
                 }
                 else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
@@ -778,6 +788,7 @@ namespace Catan10
                         tr.Add(kvp.Value.ResourceType, -1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
+                    MainPageModel.GameResources += tr;
                 }
             }
 
@@ -839,7 +850,7 @@ namespace Catan10
             CalculateAndSetLongestRoad(raceTracking);
         }
 
-        public async Task StartGame()
+        public async Task TellServiceGameStarted()
         {
             await Proxy.StartGame(MainPageModel.GameInfo);
         }
@@ -889,6 +900,76 @@ namespace Catan10
         public async Task ResetRandomGoldTiles()
         {
             await _gameView.ResetRandomGoldTiles();
+        }
+
+        public void SetHighlightedTiles(int roll)
+        {
+            foreach (var tile in _gameView.AllTiles)
+            {
+                if (tile.Number != roll)
+                {
+                    tile.AnimateFadeAsync(0.25);
+                    tile.StopHighlightingTile();
+                }
+                else
+                {
+                    tile.HighlightTile();
+                }
+            }
+        }
+
+        public void StopHighlightingTiles()
+        {
+            GameContainer.AllTiles.ForEach((tile) => tile.StopHighlightingTile());
+        }
+
+         public bool PushRoll(int roll)
+        {
+
+            if (roll < 2 || roll > 12)
+            {
+                return false;
+            }
+
+            Rolls.Push(roll);
+            LastRoll = roll;
+            UpdateGlobalRollStats();
+            return true;
+        }
+
+
+
+        public int PopRoll()
+        {
+            if (Rolls.Count == 0)
+            {
+                return -1;
+            }
+
+            int lastRoll = Rolls.Pop();
+            if (Rolls.Count > 0)
+            {
+                LastRoll = Rolls.First();
+            }
+            else
+            {
+                LastRoll = 0;
+            }
+           
+            UpdateGlobalRollStats();
+            foreach (TileCtrl t in _gameView.AllTiles)
+            {
+                t.ResetOpacity();
+                t.ResetTileRotation();
+                t.StopHighlightingTile();
+
+            }
+            return lastRoll;
+        }
+
+        public TileCtrl TileFromIndex(int targetTile)
+        {
+            return GameContainer.TilesInIndexOrder[targetTile];
         }
     }
 }

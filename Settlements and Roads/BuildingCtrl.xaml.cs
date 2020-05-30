@@ -338,12 +338,12 @@ namespace Catan10
 
                 case BuildingState.Settlement:
                     ret = player.GameData.Settlements.Remove(this);
-                    this.Assert(ret, "a settlement needs to be in the Settlements Collection");
+                    Contract.Assert(ret, "a settlement needs to be in the Settlements Collection");
                     break;
 
                 case BuildingState.City:
                     ret = player.GameData.Cities.Remove(this);
-                    this.Assert(ret, "a settlement needs to be in the Settlements Collection");
+                    Contract.Assert(ret, "a settlement needs to be in the Settlements Collection");
                     break;
 
                 default:

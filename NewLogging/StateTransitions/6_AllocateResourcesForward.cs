@@ -69,7 +69,7 @@ namespace Catan10
     ///     Allocate one road and one settlement to the player
     ///     Reset the roll control for next time
     /// </summary>
-    public class WaitingForStartToAllocateResourcesForward : LogHeader, ILogController
+    public class BeginAllocationToAllocateResourcesForward : LogHeader, ILogController
     {
         internal static async Task PostLog(IGameController gameController)
         {
@@ -78,15 +78,16 @@ namespace Catan10
             //  Verify the players are consistent across the machines
             await VerifyPlayers.PostMessage(gameController);
 
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForStart);
+            Contract.Assert(gameController.CurrentGameState == GameState.BeginResourceAllocation);
 
-            WaitingForStartToAllocateResourcesForward logHeader = new WaitingForStartToAllocateResourcesForward()
+            BeginAllocationToAllocateResourcesForward logHeader = new BeginAllocationToAllocateResourcesForward()
             {
                 CanUndo = true,
-                Action = CatanAction.ChangedState,
-                OldState = GameState.WaitingForStart,
+                Action = CatanAction.ChangedState,                
                 NewState = GameState.AllocateResourceForward,
             };
+
+            Contract.Assert(logHeader.OldState == GameState.BeginResourceAllocation);
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }

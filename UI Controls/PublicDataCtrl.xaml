@@ -61,20 +61,21 @@
                 <ColumnDefinition Width="0" />
             </Grid.ColumnDefinitions>
             <!--  The button to flip between stats and rolls  -->
-            <Button Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"  Margin="42,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+            <Button Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="42,0,0,0"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                 BorderBrush="Transparent" Visibility="Visible" Background="Transparent"
                 Click="OnFlipRollGrid">
 
                 <Button.Content>
-                        <TextBlock Text="" RenderTransformOrigin=".5 .5"
-                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
-                            FontFamily="Segoe MDL2 Assets" LineStackingStrategy="BaselineToBaseline"
-                            TextLineBounds="Tight" LineHeight="0" >
-                            <TextBlock.RenderTransform>
-                                <CompositeTransform ScaleX="1.25" ScaleY="1.25" />
-                            </TextBlock.RenderTransform>
-                            </TextBlock>
+                    <TextBlock Text="&#xE895;" RenderTransformOrigin=".5 .5"
+                        Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
+                        FontFamily="Segoe MDL2 Assets" LineStackingStrategy="BaselineToBaseline"
+                        TextLineBounds="Tight" LineHeight="0">
+                        <TextBlock.RenderTransform>
+                            <CompositeTransform ScaleX="1.25" ScaleY="1.25" />
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
                 </Button.Content>
 
             </Button>

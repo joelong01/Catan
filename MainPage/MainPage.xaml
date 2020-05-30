@@ -154,6 +154,7 @@
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right"
+                GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
                 PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
                 GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" />
             <local:DragableGridCtrl x:Name="ControlGrid" Width="172" HorizontalAlignment="Center"
@@ -240,19 +241,19 @@
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="2" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=TwoPercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TwoPercent}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical">
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="3" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=ThreePercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.ThreePercent}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical">
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="4" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=FourPercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.FourPercent}" />
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
@@ -260,20 +261,20 @@
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="5" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=FivePercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.FivePercent}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical">
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="6" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=SixPercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.SixPercent}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical">
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="7"
                                             Visibility="Visible" Theme="Dark" HideSeven="False" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=SevenPercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.SevenPercent}" />
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
@@ -281,19 +282,19 @@
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="8" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=EightPercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.EightPercent}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical">
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="9" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=NinePercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.NinePercent}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical">
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="10" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=TenPercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TenPercent}" />
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Margin="0,5" Style="{StaticResource GameControllerStackPanelCommand}">
@@ -301,13 +302,13 @@
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="11" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=ElevenPercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.ElevenPercent}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical">
                                     <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
                                         <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="12" />
                                     </Button>
-                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=TwelvePercent}" />
+                                    <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TwelvePercent}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <ToggleButton x:Name="btn_BaronToggle" Margin="0,-13,0,0" Background="Transparent"

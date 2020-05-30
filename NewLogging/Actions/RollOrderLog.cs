@@ -11,39 +11,46 @@ namespace Catan10
 {
 
 
-    public class SynchronizedRollLog : LogHeader, ILogController
+    public class RollOrderLog : LogHeader, ILogController
     {
-        public SynchronizedRollLog() : base()
+        public RollOrderLog() : base()
         {
-            Action = CatanAction.Rolled;
+            
         }
 
         public List<RollModel> Rolls { get; set; } = new List<RollModel>();
 
 
-        public static async Task StartSyncronizedRoll(IGameController gameController, List<RollModel> rolls)
+        public static async Task PostMessage(IGameController gameController, List<RollModel> rolls)
         {
-            SynchronizedRollLog logHeader = new SynchronizedRollLog()
+            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRollForOrder);
+
+            RollOrderLog logHeader = new RollOrderLog()
             {
                 CanUndo = false,
-                Action = CatanAction.RollToSeeWhoGoesFirst,
-                NewState = GameState.WaitingForRollForOrder,
+                Action = CatanAction.Rolled,                                
                 Rolls = rolls,
                 SentBy = gameController.TheHuman.PlayerName
 
             };
+
+
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             gameController.ShowRollsInPublicUi();
-            return gameController.SynchronizedRoll(this);
+            bool finished =  await gameController.DetermineRollOrder(this);
+            if (finished)
+            {
+                await WaitingForRollOrderToBeginResourceAllocation.PostLog(gameController);
+            }
         }
 
         public Task Redo(IGameController gameController)
         {
-            return gameController.SynchronizedRoll(this);
+            return gameController.DetermineRollOrder(this);
         }
 
         public override string ToString()

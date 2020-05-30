@@ -178,19 +178,11 @@ namespace Catan10
 
             dlg.PrimaryButtonClick += async (o, i) =>
             {
-
                 await _gameView.SetRandomCatanBoard(true);
-                await SetStateAsync(CurrentPlayer, GameState.WaitingForStart, true);
-                //  await ProcessEnter(CurrentPlayer, "");
-
-
+            
             };
 
-
-
             ContentDialogResult ret = await dlg.ShowAsync();
-
-
             return ret == ContentDialogResult.Primary;
         }
 

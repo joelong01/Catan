@@ -19,6 +19,8 @@ namespace Catan10
         }
 
         public List<RollModel> Rolls { get; set; } = new List<RollModel>();
+        public List<int> GoldTiles { get; set; } // set in Do() prior to logging because we need to Push the roll before we get the Tiles
+
 
         internal static async Task PostLog(IGameController gameController, List<RollModel> rolls)
         {
@@ -28,46 +30,54 @@ namespace Catan10
             WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
             {
                 CanUndo = true,
+                GoldTiles = gameController.CurrentRandomGoldTiles,
                 Rolls = rolls,
-                Action = CatanAction.ChangedState,
-                OldState = GameState.WaitingForRoll,
+                Action = CatanAction.ChangedState,                
                 NewState = GameState.WaitingForNext,
+               
+
             };
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
-
-        public Task Do(IGameController gameController)
+        /// <summary>
+        ///     a Roll has come in to this machine -- it can come from any machine (including this one)
+        ///     update *all* players
+        /// </summary>
+        /// <param name="gameController"></param>
+        /// <returns></returns>
+        public async Task Do(IGameController gameController)
         {
+            //
+            // if the state is wrong, there is a big bug someplace
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
 
+            //
+            //  get the player and make sure they are playing
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(sentBy != null);
+            
+            //
+            //  what roll did the user pick?
+            //  make sure it is valid, otherwise there is a bug
             RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(this.Rolls);
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
+
+            
+            IRollLog rollLog = gameController.RollLog;
+            
             //
-            //  get the resources for the roll
+            //  this pushes the rolls onto the roll stack and updates all the data for the roll
+            //
+            await rollLog.DoRoll(this.Rolls, this.GoldTiles);
 
-            (TradeResources Granted, TradeResources Baroned) tradeResources = gameController.ResourcesForRoll(sentBy, pickedRoll.Roll);
-
-            sentBy.GameData.Resources.GrantResources(tradeResources.Granted);
-            sentBy.GameData.Resources.ResourcesLostToBaron += tradeResources.Baroned;
-
-            if (tradeResources.Granted.Count == 0)
+            if (rollLog.LastRoll == 7)
             {
-                sentBy.GameData.GoodRoll = false;
-                sentBy.GameData.NoResourceCount++;
-            }
-            else
-            {
-                sentBy.GameData.NoResourceCount = 0;
-                sentBy.GameData.GoodRoll = true;
+                await WaitingForNextToMustRollBaron.PostLog(gameController);
             }
 
-
-            return Task.CompletedTask;
         }
 
         public Task Redo(IGameController gameController)
@@ -75,26 +85,29 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
-        {
+        public async Task Undo(IGameController gameController)
+        { //
+            // if the state is wrong, there is a big bug someplace
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
 
+            //
+            //  get the player and make sure they are playing
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(sentBy != null);
+
+            //
+            //  what roll did the user pick?
+            //  make sure it is valid, otherwise there is a bug
             RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(this.Rolls);
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
-            //
-            //  get the resources for the roll
 
-            (TradeResources Granted, TradeResources Baroned) tradeResources = gameController.ResourcesForRoll(sentBy, pickedRoll.Roll);
-
-            sentBy.GameData.Resources.GrantResources(tradeResources.Granted.GetNegated());
-            sentBy.GameData.Resources.ResourcesLostToBaron += tradeResources.Baroned.GetNegated();
+            await gameController.Log.RollLog.UndoRoll();
+            
+        
 
 
-            return Task.CompletedTask;
         }
     }
 }

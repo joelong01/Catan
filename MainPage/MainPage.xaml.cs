@@ -57,37 +57,10 @@ namespace Catan10
 
         // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
         //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(), MainPageModelChanged));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(MainPage.Current), MainPageModelChanged));
 
-        private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as MainPage;
-            var depPropValue = (MainPageModel)e.NewValue;
-            depPropClass?.SetMainPageModel((MainPageModel)e.OldValue, (MainPageModel)e.NewValue);
-        }
-        private void SetMainPageModel(MainPageModel oldModel, MainPageModel newModel)
-        {
-            if (oldModel != null)
-            {
-                oldModel.Settings.PropertyChanged -= Settings_PropertyChanged;
-            }
-            if (newModel != null)
-            {
-                newModel.Settings.PropertyChanged += Settings_PropertyChanged;
-            }
+        public static readonly string SAVED_GAME_EXTENSION = ".log.json";
 
-        }
-        /// <summary>
-        ///     When a setting changes, write the changes to disk
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            await SaveGameState();
-        }
-
-        public static readonly string SAVED_GAME_EXTENSION = ".log";
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
 
         public MainPage()
@@ -129,6 +102,13 @@ namespace Catan10
         {
             get => (PlayerModel)GetValue(TheHumanProperty);
             set => SetValue(TheHumanProperty, value);
+        }
+
+        private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as MainPage;
+            var depPropValue = (MainPageModel)e.NewValue;
+            depPropClass?.SetMainPageModel((MainPageModel)e.OldValue, (MainPageModel)e.NewValue);
         }
 
         private Task AddPlayer(PlayerModel pData, LogType logType)
@@ -456,7 +436,7 @@ namespace Catan10
             List<TileCtrl> tilesWithNumber = await HighlightRolledTiles(roll);
             foreach (TileCtrl tile in tilesWithNumber)
             {
-                tile.HighlightTile(CurrentPlayer.BackgroundBrush); // shows what was rolled
+                tile.HighlightTile(); // shows what was rolled
             }
 
             if (roll == 7)
@@ -487,15 +467,6 @@ namespace Catan10
             }
         }
 
-        /// <summary>
-        ///     Load Data that is global to the game
-        ///     1. Players
-        ///     2. Settings
-        ///     3. Service settings
-        /// </summary>
-        /// <returns></returns>
-        ///
-
         private async Task LoadMainPageModel()
         {
             try
@@ -505,7 +476,7 @@ namespace Catan10
                 {
                     var list = await GetDefaultUsers();
 
-                    MainPageModel = new MainPageModel()
+                    MainPageModel = new MainPageModel(this)
                     {
                         AllPlayers = list,
                         Settings = new Settings(),
@@ -545,6 +516,14 @@ namespace Catan10
             }
         }
 
+        /// <summary>
+        ///     Load Data that is global to the game
+        ///     1. Players
+        ///     2. Settings
+        ///     3. Service settings
+        /// </summary>
+        /// <returns></returns>
+        ///
         private async Task LoadSavedGames()
         {
             IReadOnlyList<StorageFile> files = await GetSavedFilesInternal();
@@ -567,7 +546,7 @@ namespace Catan10
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
         {
-            if (CurrentGameState != GameState.WaitingForStart)
+            if (CurrentGameState != GameState.BeginResourceAllocation)
             {
                 return;
             }
@@ -685,6 +664,7 @@ namespace Catan10
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
+
         /// <summary>
         ///     When the user clicks on the PlayerRollCtrl, it comes here.  We need to call the appropriate Log object
         ///     based on the state to coordinate the UI updaes
@@ -697,20 +677,16 @@ namespace Catan10
             switch (CurrentGameState)
             {
                 case GameState.WaitingForRollForOrder:
-                    await SynchronizedRollLog.StartSyncronizedRoll(this, rolls);
+                    await RollOrderLog.PostMessage(this, rolls);
                     break;
+
                 case GameState.WaitingForRoll:
                     await WaitingForRollToWaitingForNext.PostLog(this, rolls);
                     break;
-                default:                    
+
+                default:
                     break;
             }
-
-            
-        }
-        private async void OnShowAllRolls(List<RollModel> rolls)
-        {
-            await ShowAllRollsLog.Post(this, rolls);
         }
 
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
@@ -725,15 +701,12 @@ namespace Catan10
 
             _dt = dt;
 
-          
-
             if (MainPageModel.IsServiceGame && CurrentGameState == GameState.PickingBoard && e.KeyModifiers == VirtualKeyModifiers.None)
             {
                 await ScrollMouseWheelInServiceGame(e);
                 return;
             }
 
-          
             int showPipGroupIndex = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
 
             if (showPipGroupIndex >= 0)
@@ -810,6 +783,11 @@ namespace Catan10
                     await building.UpdateBuildingState(CurrentPlayer, building.BuildingState, BuildingState.Pips);
                 }
             }
+        }
+
+        private async void OnShowAllRolls(List<RollModel> rolls)
+        {
+            await ShowAllRollsLog.Post(this, rolls);
         }
 
         private void OnShowPips(object sender, RoutedEventArgs e)
@@ -898,130 +876,7 @@ namespace Catan10
             return false;
         }
 
-        /// <summary>
-        ///     this is called when the UI interactions cause a state change
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="inputText"></param>
-        /// <returns></returns>
-        private async Task ProcessState(PlayerModel player, string inputText)
-        {
-            try
-            {
-                switch (CurrentGameState) // this is actually better thought of as the state we are about to change or that we need to do something and the user takes care of hitting the Next button
-                {
-                    case GameState.WaitingForNewGame:
-                        OnNewNetworkGame(null, null);
-                        break;
-
-                    case GameState.WaitingForPlayers:
-                        //
-                        //  if the current player created the game, then we start the game
-                        //  otherwise we just listen to messages, which will have these messages in the queue
-                        if (MainPageModel.GameStartedBy == TheHuman)
-                        {
-                            //
-                            //  randomize the board
-                            await RandomBoardLog.RandomizeBoard(this, 0);
-                        }
-                        await SetStateLog.SetState(this, GameState.WaitingForRollForOrder);
-
-                        break;
-
-                    case GameState.WaitingForRollForOrder:
-                        //
-                        // hide board measurement UI as we've now picked out poison
-
-                        break;
-
-                    case GameState.WaitingForStart:
-                        MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.RollOrientation = TileOrientation.FaceDown);
-                        await CopyScreenShotToClipboard(_gameView);
-                        await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, true);
-                        break;
-
-                    case GameState.AllocateResourceForward:
-
-                        await OnNext();
-                        await SetStateAsync(CurrentPlayer, GameState.AllocateResourceForward, false);
-
-                        if (CurrentPlayer == MainPageModel.PlayingPlayers.Last())
-                        {
-                            await SetStateAsync(CurrentPlayer, GameState.AllocateResourceReverse, false);
-                        }
-
-                        break;
-
-                    case GameState.AllocateResourceReverse:
-
-                        if (MainPageModel.PlayingPlayers.IndexOf(MainPageModel.PlayingPlayers.Last()) != GetNextPlayerPosition(-1))
-                        {
-                            await OnNext(-1);
-                        }
-                        else
-                        {
-                            await ChangePlayerAndSetState(0, GameState.WaitingForRoll);
-                        }
-
-                        break;
-
-                    case GameState.WaitingForRoll:
-                        {
-                            await ProcessRoll(inputText); // this will either succeed and change state to Waiting for Next, or fail and leave it in the current state...
-                        }
-                        break;
-
-                    case GameState.MustMoveBaron:
-                        await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, true);
-                        break;
-
-                    case GameState.WaitingForNext:
-                        if (HasSupplementalBuild)
-                        {
-                            _supplementalStartIndex = _currentPlayerIndex;
-                            await ChangePlayerAndSetState(1, GameState.Supplemental);
-                        }
-                        else
-                        {
-                            await ChangePlayerAndSetState(1, GameState.WaitingForRoll);
-                        }
-                        break;
-
-                    case GameState.Supplemental:
-                        //
-                        //  look to see what the next spot is supposed to be
-                        int tempPos = GetNextPlayerPosition(1);
-                        if (tempPos == _supplementalStartIndex)
-                        {
-                            await ChangePlayerAndSetState(2, GameState.WaitingForRoll);
-
-                            ////
-                            ////  next spot is where we started -- skip over it
-                            //await OnNext(2);
-                            ////
-                            ////  log that we finished supplemental
-                            //await AddLogEntry(CurrentPlayer, GameState, CatanAction.DoneSupplemental, false, LogType.Normal, _supplementalStartIndex);
-                            //_supplementalStartIndex = -1;
-
-                            ////
-                            ////  make the UI want to get a rolll
-                            //await SetStateAsync(CurrentPlayer, GameState.WaitingForRoll, false);
-                        }
-                        else
-                        {
-                            await OnNext();
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            finally
-            {
-            }
-        }
-
+        
         private async Task<MainPageModel> ReadMainPageModelOffDisk()
         {
             if (SaveFolder == null)
@@ -1039,6 +894,9 @@ namespace Catan10
             try
             {
                 mainPageModel = CatanProxy.Deserialize<MainPageModel>(content);
+                if (mainPageModel == null) mainPageModel = new MainPageModel();
+                mainPageModel.GameController = this;
+                mainPageModel.Log = new NewLog(this);
 
                 if (mainPageModel.Settings.GridPositions.Count == 0)
                 {
@@ -1073,7 +931,7 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.RemoveAt(0); // the clear doesn't trigger the unsubscribe because the NewItems and the OldItems are both null
             }
 
-            MainPageModel.Log = new NewLog();
+            MainPageModel.Log = new NewLog(this);
 
             // _lbGames.SelectedValue = MainPageModel.Log;
             await ResetTiles(true);
@@ -1168,6 +1026,7 @@ namespace Catan10
             //    MessageDialog dlg = new MessageDialog($"Error loading file {e.AddedItems[0]}\nMessage:\n{exception.Message}");
             //}
         }
+
         private async Task SaveGameState()
         {
             try
@@ -1188,7 +1047,7 @@ namespace Catan10
 
                 badGridNames.ForEach((name) => MainPageModel.Settings.GridPositions.Remove(name));
 
-                this.TraceMessage($"Saving GameState");                
+                this.TraceMessage($"Saving GameState");
                 fileGuard = new TaskCompletionSource<object>();
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
                 var content = CatanProxy.Serialize<MainPageModel>(MainPageModel, true);
@@ -1214,7 +1073,7 @@ namespace Catan10
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
             if (TheHuman.PlayerName != MainPageModel.GameInfo.Creator) return;
-            
+
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
@@ -1254,6 +1113,28 @@ namespace Catan10
             await UpdateRoadState(road, road.RoadState, RoadState.Road, LogType.Normal);
         }
 
+        private void SetMainPageModel(MainPageModel oldModel, MainPageModel newModel)
+        {
+            if (oldModel != null)
+            {
+                oldModel.Settings.PropertyChanged -= Settings_PropertyChanged;
+            }
+            if (newModel != null)
+            {
+                newModel.Settings.PropertyChanged += Settings_PropertyChanged;
+            }
+        }
+
+        /// <summary>
+        ///     When a setting changes, write the changes to disk
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            await SaveGameState();
+        }
+
         private async Task StartGame(ICollection<PlayerModel> players, int selectedIndex)
         {
             ResetDataForNewGame();
@@ -1266,7 +1147,7 @@ namespace Catan10
             }
 
             await VisualShuffle();
-            await SetStateAsync(null, GameState.WaitingForStart, true);
+            await SetStateAsync(null, GameState.BeginResourceAllocation, true);
             await AnimateToPlayerIndex(_currentPlayerIndex);
 
             //  var model = StartGameController.StartGame(this, selectedIndex, GameContainer.RandomBoardSettings, MainPageModel.PlayingPlayers);
@@ -1389,8 +1270,6 @@ namespace Catan10
             }
         }
 
-       
-
         /// <summary>
         /// Update this because you did the sorting work in the dialog
         /// hide all positions and then loop through the array to make them visible
@@ -1454,42 +1333,6 @@ namespace Catan10
             return tilesWithNumber;
         }
 
-        public async Task<List<TileCtrl>> PlayRollAnimation(int rolledNumber)
-        {
-            List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
-            List<Task> tasks = new List<Task>();
-            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
-            {
-                if (t.Number == rolledNumber)
-
-                {
-                    tilesWithNumber.Add(t);
-                    if (MainPageModel.Settings.AnimateFade)
-                    {
-                        t.AnimateFadeAsync(1.0);
-                    }
-                    if (MainPageModel.Settings.RotateTile)
-                    {
-                        t.Rotate(180, tasks, true);
-                    }
-                }
-                else
-                {
-                    if (MainPageModel.Settings.AnimateFade)
-                    {
-                        t.AnimateFadeAsync(0.25);
-                    }
-                }
-            }
-
-            if (tasks.Count > 0)
-            {
-                await Task.WhenAll(tasks.ToArray());
-            }
-
-            return tilesWithNumber;
-        }
-
         public void PostLogEntry(PlayerModel player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
 
         {
@@ -1515,10 +1358,6 @@ namespace Catan10
 
             return false;
         }
-
-     
-
-       
 
         public Task SetStateAsync(PlayerModel playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
 
@@ -1571,9 +1410,5 @@ namespace Catan10
             ElevenPercent = string.Format($"{roals[9]} ({percent[9] * 100:0.#}%)");
             TwelvePercent = string.Format($"{roals[10]} ({percent[10] * 100:0.#}%)");
         }
-
-      
-
-       
     }
 }

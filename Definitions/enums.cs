@@ -47,20 +47,22 @@ namespace Catan10
         RollToSeeWhoGoesFirst,
         Undo,
         Redo,
-        Verify
+        Verify,
+        ShowAllRolls
     };
     public enum CatanGames { Regular, Expansion, Seafarers, Seafarers4Player };
     public enum TileOrientation { FaceDown, FaceUp, None };
     public enum HarborType { Sheep, Wood, Ore, Wheat, Brick, ThreeForOne, Uninitialized, None };
     public enum Entitlement { Undefined, DevCard, Settlement, City, Road,
-        Ship
+        Ship,
+        Knight
     }
     
     public enum GameState
     {
         Uninitialized,                   
         WaitingForNewGame,               
-        WaitingForStart,
+        BeginResourceAllocation,
         WaitingForPlayers,
         WaitingForRollForOrder,
         AllocateResourceForward,         
