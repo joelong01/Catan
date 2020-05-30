@@ -31,7 +31,7 @@ namespace Catan10
         }
 
         public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
-        public GameInfo GameInfo => MainPageModel.GameInfo;
+        public GameInfo GameInfo => MainPageModel.ServiceGameInfo;
 
         public List<int> HighlightedTiles
         {
@@ -350,7 +350,7 @@ namespace Catan10
             };
             if (MainPageModel.IsServiceGame)
             {
-                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
+                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
                 //  this.TraceMessage($"Sending {message}");
                 if (!ret)
                 {
@@ -379,7 +379,7 @@ namespace Catan10
                     CatanMessageType = CatanMessageType.Redo
                 };
 
-                await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
+                await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
             }
             else
             {
@@ -499,9 +499,10 @@ namespace Catan10
             ResetDataForNewGame();
             MainPageModel.PlayingPlayers.Clear();
             MainPageModel.IsServiceGame = true;
-            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.SentBy);
+            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.SentBy);            
             Contract.Assert(MainPageModel.GameStartedBy != null);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
+            
             return Task.CompletedTask;
 
         }
@@ -645,7 +646,7 @@ namespace Catan10
                     CatanMessageType = CatanMessageType.Undo
                 };
 
-                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.GameInfo.Id, message);
+                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
                 if (!ret) return false; // this is very bad! :(
             }
             else
@@ -852,7 +853,7 @@ namespace Catan10
 
         public async Task TellServiceGameStarted()
         {
-            await Proxy.StartGame(MainPageModel.GameInfo);
+            await Proxy.StartGame(MainPageModel.ServiceGameInfo);
         }
 
         //
@@ -970,6 +971,11 @@ namespace Catan10
         public TileCtrl TileFromIndex(int targetTile)
         {
             return GameContainer.TilesInIndexOrder[targetTile];
+        }
+
+        public DevCardType PurchaseNextDevCard()
+        {
+            throw new NotImplementedException();
         }
     }
 }

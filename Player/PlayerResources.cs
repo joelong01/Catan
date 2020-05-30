@@ -44,6 +44,20 @@ namespace Catan10
                 }
             }
         }
+
+        public bool CanAfford(Entitlement entitlement)
+        {
+            TradeResources cost = TradeResources.GetEntitlementCost(entitlement);
+            Contract.Assert(cost != null);
+            foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
+            {
+                if (cost.CountForResource(resourceType) > this.Current.CountForResource(resourceType))
+                    return false;
+            }
+
+            return true;
+        }
+
         public TradeResources ResourcesLostToMonopoly
         {
             get
@@ -358,11 +372,34 @@ namespace Catan10
             UnspentEntitlements.Add(entitlement);
         }
 
+        public bool BuyEntitlement(Entitlement entitlement)
+        {
+            if (!CanAfford(entitlement))
+                return false;
+
+            var cost = TradeResources.GetEntitlementCost(entitlement);
+            Current += cost.GetNegated();
+            if (entitlement == Entitlement.DevCard)
+            {
+                
+            }
+            else
+            {
+                GrantEntitlement(entitlement);
+            }
+            return true;
+        }
+
         public void GrantResources(TradeResources tr)
         {
             Current += tr;
             ResourcesThisTurn += tr;
             TotalResources += tr;
+            NotifyPropertyChanged("PlayerResources");
+            NotifyPropertyChanged("Current");
+            NotifyPropertyChanged("ResourcesThisTurn");
+            NotifyPropertyChanged("TotalResources");
+
         }
 
         public bool HasEntitlement(Entitlement entitlement)

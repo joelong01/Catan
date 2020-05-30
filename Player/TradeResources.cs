@@ -145,6 +145,64 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
         }
 
+        public static TradeResources GetEntitlementCost(Entitlement entitlement)
+        {
+            TradeResources cost = null;
+            switch (entitlement)
+            {
+                case Entitlement.DevCard:
+                    cost = new TradeResources()
+                    {
+                        Sheep = 1,
+                        Wheat = 1,
+                        Ore = 1
+                    };
+                    break;
+
+                case Entitlement.Settlement:
+                    cost = new TradeResources()
+                    {
+                        Sheep = 1,
+                        Wheat = 1,
+                        Wood = 1,
+                        Brick = 1
+                    };
+                    break;
+
+                case Entitlement.City:
+                    cost = new TradeResources()
+                    {
+                        Wheat = 2,
+                        Ore = 3
+                    };
+                    break;
+
+                case Entitlement.Road:
+                    cost = new TradeResources()
+                    {
+                        Wood = 1,
+                        Brick = 1,
+                    };
+                    break;
+
+                case Entitlement.Ship:
+                    cost = new TradeResources()
+                    {
+                        Sheep = 1,
+                        Wood = 1,
+                    };
+                    break;
+
+                case Entitlement.Knight:
+                case Entitlement.Undefined:
+                default:
+                    Contract.Assert(false, "Bad Entitlement");
+                    break;
+            }
+
+            return cost;
+        }
+
         //
         //  useful for the Resource Tests
         public static TradeResources operator +(TradeResources a, TradeResources b)
@@ -200,6 +258,37 @@ namespace Catan10
                 default:
                     Contract.Assert(false, "Bad pass to Add!");
                     break;
+            }
+        }
+
+        public int CountForResource(ResourceType resourceType)
+        {
+            switch (resourceType)
+            {
+                case ResourceType.Sheep:
+                    return Sheep;
+
+                case ResourceType.Wood:
+                    return Wood;
+
+                case ResourceType.Ore:
+                    return Ore;
+
+                case ResourceType.Wheat:
+                    return Wheat;
+
+                case ResourceType.Brick:
+                    return Brick;
+
+                case ResourceType.GoldMine:
+                    return GoldMine;
+
+                case ResourceType.Desert:
+                case ResourceType.Back:
+                case ResourceType.None:
+                case ResourceType.Sea:
+                default:
+                    return 0;
             }
         }
 

@@ -8,7 +8,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-
+using Catan.Proxy;
 using Windows.UI.Xaml;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -19,42 +19,64 @@ namespace Catan10
     {
         private readonly bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
 
-        private readonly List<string> _savedGameProperties = new List<string> { "Score", "ResourceCount", "KnightsPlayed","TimesTargeted", "NoResourceCount", "RollsWithResource",
-                                                                                "MaxNoResourceRolls", "CardsLost", "CardsLostToSeven", "CardsLostToMonopoly", "ResourcesAcquired",
-                                                                                "LargestArmy",  "HasLongestRoad", "Rolls", "ColorAsString", "RoadsLeft", "CitiesPlayed", "SettlementsLeft", "TotalTime",
-                                                                                "Roads", "Ships", "Buildings", "Rolls", "PlayedKnightThisTurn", "MovedBaronAfterRollingSeven"};
-
         private int _CitiesPlayed = 0;
+
         private List<List<int>> _GoldRolls = new List<List<int>>();
 
         private bool _goodRoll = false;
+
         private bool _HasLongestRoad = false;
+
         private bool _isCurrentPlayer = false;
+
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
+
         private int _IslandsPlayed = 0;
+
         private int _knightsPlayed = 0;
+
         private bool _LargestArmy = false;
+
         private int _LongestRoad = 0;
+
         private int _MaxCities = 0;
+
         private int _maxNoResourceRolls = 0;
+
         private int _MaxRoads = 0;
+
         private int _MaxSettlements = 0;
+
         private int _MaxShips = 0;
+
         private bool? _MovedBaronAfterRollingSeven = null;
+
         private int _noResourceCount = 0;
+
         private int _pips = 0;
+
         private bool _PlayedKnightThisTurn = false;
+
         private PlayerModel _playerData = null;
+
         private PlayerResources _resources = new PlayerResources();
+
         private int _RoadsPlayed = 0;
+
         private TileOrientation _RollOrientation = TileOrientation.FaceDown;
+
         private int _rollsWithResource = 0;
+
         private int _score = 0;
+
         private int _SettlementsPlayed = 0;
+
         private int _ShipsPlayed = 0;
 
         private int _timesTargeted = 0;
+
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
+
         public CardsLostUpdatedHandler OnCardsLost;
 
         public PlayerGameModel()
@@ -382,6 +404,7 @@ namespace Catan10
                 }
             }
         }
+
         [JsonIgnore]
         public ObservableCollection<RoadCtrl> Roads { get; private set; } = new ObservableCollection<RoadCtrl>();
 
@@ -647,6 +670,7 @@ namespace Catan10
             OwnedHarbors.Add(harbor);
         }
 
+        
         public bool Deserialize(string s, bool oneLine)
         {
             StaticHelpers.DeserializeObject<PlayerGameModel>(this, s, ":", "|");
@@ -716,9 +740,9 @@ namespace Catan10
             }
         }
 
-        public string Serialize(bool oneLine)
+        public string Serialize(bool indented)
         {
-            return StaticHelpers.SerializeObject<PlayerGameModel>(this, _savedGameProperties, "=", "|");
+            return CatanProxy.Serialize(this, indented);
         }
 
         /// <summary>
@@ -1077,5 +1101,7 @@ namespace Catan10
         {
             return base.ToString();
         }
+
+      
     }
 }

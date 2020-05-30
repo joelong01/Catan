@@ -45,8 +45,6 @@
         </Storyboard>
     </Control.Resources>
 
-
-
     <Grid Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
         Background="Transparent" SizeChanged="OnSizeChanged">
         <Grid Name="_gridRoads" Visibility="{x:Bind GetStateBasedVisibility(RoadState, 'road'),Mode=OneWay}">

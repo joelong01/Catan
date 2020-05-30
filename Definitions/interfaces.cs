@@ -189,6 +189,8 @@ namespace Catan10
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
         TileCtrl TileFromIndex(int targetTile);
+        DevCardType PurchaseNextDevCard();
+
         GameContainerCtrl GameContainer { get; }
     }
 

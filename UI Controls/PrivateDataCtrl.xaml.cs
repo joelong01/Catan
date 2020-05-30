@@ -1,7 +1,8 @@
 ﻿using Catan.Proxy;
-
+using System;
 using System.Collections.ObjectModel;
-
+using System.Diagnostics.Contracts;
+using Windows.Media.PlayTo;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -64,5 +65,54 @@ namespace Catan10
                 Canvas.SetZIndex(uiElement, zIndex);
             }
         }
+
+        private async void OnBuySettlement(object sender, RoutedEventArgs e)
+        {
+            if (Player.GameData.Resources.CanAfford(Entitlement.Settlement))
+            {
+                Contract.Assert(Player == MainPage.Current.TheHuman);
+                await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement);
+            }
+            
+
+        }
+
+        private void OnBuyCity(object sender, RoutedEventArgs e)
+        {
+            Player.GameData.Resources.BuyEntitlement(Entitlement.City);
+        }
+
+        private void OnBuyRoad(object sender, RoutedEventArgs e)
+        {
+            Player.GameData.Resources.BuyEntitlement(Entitlement.Road);
+        }
+
+        private void OnBuyDevCard(object sender, RoutedEventArgs e)
+        {
+            Player.GameData.Resources.BuyEntitlement(Entitlement.DevCard);
+        }
+
+        private void OnTrade(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private bool EnabledEntitlementPurchase(string entitlementValue, PlayerResources playerResources)
+        {
+            if (MainPage.Current.CurrentGameState != GameState.WaitingForNext && MainPage.Current.CurrentGameState != GameState.Supplemental)
+                return false;
+
+            if (!Enum.TryParse(entitlementValue, out Entitlement entitlement))
+            {
+                Contract.Assert(false, "back string in xaml passed to EnableEntitlement");
+            }
+            Contract.Assert(playerResources != null);
+
+            return playerResources.CanAfford(entitlement);
+
+            
+        }
+
+
     }
 }

@@ -14,6 +14,7 @@ namespace Catan10
     {
         public CatanGameInfo()
         {
+            BuildDevCardList();
         }
 
         public CatanGameInfo(CatanGameInfo info)
@@ -28,8 +29,47 @@ namespace Catan10
             YearOfPlenty = info.VictoryPoint;
             RoadBuilding = info.YearOfPlenty;
             Monopoly = info.Monopoly;
+            BuildDevCardList();
+
+
+
         }
 
+        public void BuildDevCardList()
+        {
+            DevCards.Clear();
+            for (int i = 0; i < Knight; i++)
+            {
+                DevCards.Add(DevCardType.Knight);
+            }
+            for (int i = 0; i < VictoryPoint; i++)
+            {
+                DevCards.Add(DevCardType.VictoryPoint);
+            }
+            for (int i = 0; i < YearOfPlenty; i++)
+            {
+                DevCards.Add(DevCardType.YearOfPlenty);
+            }
+            for (int i = 0; i < Monopoly; i++)
+            {
+                DevCards.Add(DevCardType.Monopoly);
+            }
+            for (int i = 0; i < RoadBuilding; i++)
+            {
+                DevCards.Add(DevCardType.RoadBuilding);
+            }
+        }
+
+        public DevCardType NextDevCard()
+        {
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            int index = rand.Next(DevCards.Count);
+            var devCard = DevCards[index];
+            DevCards.RemoveAt(index);
+            return devCard;
+        }
+
+        public List<DevCardType> DevCards { get; set; } = new List<DevCardType>();
         public bool AllowShips { get; set; } = false;
         public RandomBoardSettings BoardSettings { get; set; } = new RandomBoardSettings();
         public CatanGames GameName { get; set; } = CatanGames.Regular;
@@ -134,11 +174,11 @@ namespace Catan10
 
         public Guid LogId { get; set; } = Guid.NewGuid();
         public LogType LogType { get; set; } = LogType.Normal;
-       
-        
+
+
 
         // if state changes, you have to set this
-        
+
 
         public string TypeName { get; set; }
 
@@ -170,7 +210,7 @@ namespace Catan10
         }
     }
 
-    
+
 
     public class RandomBoardSettings
     {
@@ -243,5 +283,5 @@ namespace Catan10
         }
     }
 
- 
+
 }

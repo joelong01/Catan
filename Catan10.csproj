@@ -141,6 +141,7 @@
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\webSocket.cs" />
     <Compile Include="NewLogging\Actions\PlayKnight.cs" />
+    <Compile Include="NewLogging\Actions\PurchaseLog.cs" />
     <Compile Include="NewLogging\StateTransitions\playeDevCard.cs" />
     <Compile Include="NewLogging\Actions\randomizedBoard.cs" />
     <Compile Include="NewLogging\StateTransitions\SetStateLog.cs" />

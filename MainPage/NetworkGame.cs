@@ -66,7 +66,7 @@ namespace Catan10
                             if (players != null && players.Contains(TheHuman.PlayerName) == false && gameMessage.GameInfo.Started == false)
                             {
                                 await this.Reset();
-                                MainPageModel.GameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);                                
+                                MainPageModel.ServiceGameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);                                
                                 StartMonitoring();
                             }
                         }
@@ -139,7 +139,7 @@ namespace Catan10
                 return;
             }
 
-            MainPageModel.GameInfo = dlg.SelectedGame;
+            MainPageModel.ServiceGameInfo = dlg.SelectedGame;
             await _rollControl.Reset();
             MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedGame.Creator);
             await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
@@ -181,11 +181,11 @@ namespace Catan10
             games = await Proxy.CreateGame(gameInfo);
             Contract.Assert(games != null);
 
-            MainPageModel.GameInfo = gameInfo;
+            MainPageModel.ServiceGameInfo = gameInfo;
             MainPageModel.IsServiceGame = true;
             //
             //  start the game
-            await NewGameLog.NewGame(this, MainPageModel.GameInfo.Creator, 0);
+            await NewGameLog.NewGame(this, MainPageModel.ServiceGameInfo.Creator, 0);
             await Proxy.JoinGame(gameInfo.Id, TheHuman.PlayerName);
             StartMonitoring();
         }
@@ -238,7 +238,7 @@ namespace Catan10
         private async void StartMonitoring()
         {
             var proxy = MainPageModel.Proxy;
-            var gameId = MainPageModel.GameInfo.Id;
+            var gameId = MainPageModel.ServiceGameInfo.Id;
 
             var players = await proxy.GetPlayers(gameId);
             Contract.Assert(players.Contains(TheHuman.PlayerName), "You need to join the game before you can monitor it!");

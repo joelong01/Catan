@@ -58,15 +58,17 @@ namespace Catan10
 
             TradeResources tr = new TradeResources()
             {
-                Sheep = 3,
-                Wheat = 3,
-                Ore = 3,
+                Sheep = 4,
+                Wheat = 10,
+                Ore = 9,
                 Brick = 3,
-                Wood = 3
+                Wood = 5
 
             };
 
             CurrentPlayer.GameData.Resources.GrantResources(tr);
+
+            //CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Knight);
 
         }
 

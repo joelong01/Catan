@@ -1072,7 +1072,7 @@ namespace Catan10
         /// <returns></returns>
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
-            if (TheHuman.PlayerName != MainPageModel.GameInfo.Creator) return;
+            if (TheHuman.PlayerName != MainPageModel.ServiceGameInfo.Creator) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {

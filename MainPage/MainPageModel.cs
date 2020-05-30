@@ -11,12 +11,14 @@ using Windows.UI.Xaml;
 
 namespace Catan10
 {
+   
+
     public class MainPageModel : INotifyPropertyChanged
     {
         private bool _EnableUiInteraction = true;
         private int _FiveStarPositions = 0;
         private int _FourStarPosition = 0;
-        private TradeResources _gameResources = new TradeResources();
+        private TradeResources _gameResources = new TradeResources(); // the total number of resources that have been handed out in this game
         private string _HostName = "http://192.168.1.128:5000";
         private bool _isServiceGame = false;
         private NewLog _newLog = null;
@@ -233,7 +235,7 @@ namespace Catan10
         public IGameController GameController { get; set; }
 
         [JsonIgnore]
-        public GameInfo GameInfo { get; set; }
+        public GameInfo ServiceGameInfo { get; set; }
 
         public TradeResources GameResources
         {
