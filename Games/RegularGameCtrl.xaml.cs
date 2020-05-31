@@ -14,7 +14,19 @@ namespace Catan10
         public RegularGameCtrl()
         {
             this.InitializeComponent();
-
+            GameData.AllowShips = _HexPanel.AllowShips;
+            GameData.MaxRoads = _HexPanel.MaxRoads;
+            GameData.MaxCities = _HexPanel.MaxCities;
+            GameData.MaxSettlements = _HexPanel.MaxSettlements;
+            GameData.MaxResourceAllocated = _HexPanel.MaxResourceAllocated;
+            GameData.AllowShips = _HexPanel.AllowShips;
+            GameData.Knight = _HexPanel.Knights;
+            GameData.VictoryPoint = _HexPanel.VictoryPoints;
+            GameData.YearOfPlenty = _HexPanel.YearOfPlenty;
+            GameData.RoadBuilding = _HexPanel.RoadBuilding;
+            GameData.Monopoly = _HexPanel.Monopoly;
+            GameData.MaxShips = _HexPanel.MaxShips;
+            GameData.BuildDevCardList();
         }
 
         public CatanHexPanel HexPanel => _HexPanel;
@@ -23,15 +35,13 @@ namespace Catan10
         public int Index { get; set; } = -1;
         public string Description => _HexPanel.Description;
         public GameType GameType => _HexPanel.GameType;
-        public int MaxCities => _HexPanel.MaxCities;
-        public int MaxRoads => _HexPanel.MaxRoads;
-        public int MaxSettlements => _HexPanel.MaxSettlements;
-        public int MaxShips => _HexPanel.MaxShips;
+       
 
         public List<TileCtrl> Tiles => _HexPanel.Tiles;
 
         public List<TileCtrl> DesertTiles => _HexPanel.DesertTiles;
         public CatanGames CatanGame{ get => CatanGames.Regular; }
+        public CatanGameData GameData { get; } = new CatanGameData();
         #endregion
     }
 }

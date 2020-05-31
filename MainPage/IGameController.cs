@@ -248,10 +248,10 @@ namespace Catan10
                 AddPlayerMenu(playerToAdd);
                 //
                 //  need to give the players some data about the game
-                playerToAdd.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
-                playerToAdd.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
-                playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
-                playerToAdd.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
+                playerToAdd.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
+                playerToAdd.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
+                playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
+                playerToAdd.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
 
                 MainPageModel.PlayingPlayers.Add(playerToAdd);
             }
@@ -975,7 +975,7 @@ namespace Catan10
 
         public DevCardType PurchaseNextDevCard()
         {
-            throw new NotImplementedException();
+          return  _gameView.CurrentGame.GetNextDevCard();
         }
     }
 }

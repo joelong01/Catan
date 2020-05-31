@@ -45,11 +45,7 @@ namespace Catan10
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            var rolls = PickingBoardToWaitingForRollOrder.GetRollModelList();
-            rolls[0].DiceOne = 5;
-            rolls[0].DiceTwo = 1;
-
-            await WaitingForRollToWaitingForNext.PostLog(this, rolls);
+           
 
         }
 
@@ -58,11 +54,11 @@ namespace Catan10
 
             TradeResources tr = new TradeResources()
             {
-                Sheep = 4,
-                Wheat = 10,
-                Ore = 9,
+                Sheep = 3,
+                Wheat = 3,
+                Ore = 3,
                 Brick = 3,
-                Wood = 5
+                Wood = 3
 
             };
 

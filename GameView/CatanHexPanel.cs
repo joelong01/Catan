@@ -1,6 +1,4 @@
-﻿using Catan.Proxy;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,201 +10,137 @@ using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
-    public class Island
-    {
-        public int Start = -1;
-        public int End = -1;
-        public bool BonusPoint = false;
-    }
-
-
     public partial class CatanHexPanel : Canvas
     {
-        //
-        //  ways to look Road/Buildings/Tiles up
-        public Dictionary<RoadKey, RoadCtrl> RoadKeyToRoadDictionary { get; } = new Dictionary<RoadKey, RoadCtrl>(new RoadKeyComparer());
-        public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
-        public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
-        private readonly List<TileCtrl> _desertTiles = new List<TileCtrl>();
-
-        private readonly List<TileGroup> _tileSets = new List<TileGroup>();
-        private readonly List<List<TileCtrl>> _tilesInVisualLayout = new List<List<TileCtrl>>();
-        public Dictionary<TileCtrl, Island> TileToIslandDictionary { get; set; } = new Dictionary<TileCtrl, Island>(); // given a tile, tell me what Island it is in
-
-
-        //
-        //  layers
-        public Grid TopLayer { get; set; } = new Grid();
-        private Canvas HarborLayer { get; set; } = new Canvas();
-        private Canvas RoadLayer { get; set; } = new Canvas();
-
-
-        //
-        //   UI Elements
-        public List<BuildingCtrl> Buildings { get; } = new List<BuildingCtrl>();
-        public List<RoadCtrl> Roads { get; } = new List<RoadCtrl>();
-        public List<TileCtrl> Tiles { get; } = new List<TileCtrl>();
-        public List<Harbor> Harbors { get; } = new List<Harbor>();
-        private TileCtrl[] _tilesInIndexOrder = null;
-
-        private ResourceType[] _resourceTypes = null;
-        private int[] _tileNumbers = null;
-        public HarborType[] StartingHarborTypes { get; private set; } = null;
-        private readonly PirateShip _pirateShip = new PirateShip();
         private readonly BaronCtrl _baron = new BaronCtrl();
 
+        private readonly List<TileCtrl> _desertTiles = new List<TileCtrl>();
+
+        private readonly PirateShip _pirateShip = new PirateShip();
+
+        private readonly List<TileGroup> _tileSets = new List<TileGroup>();
+
+        private readonly List<List<TileCtrl>> _tilesInVisualLayout = new List<List<TileCtrl>>();
+
+        private readonly Dictionary<int, int> BuildingIndexToHarborIndexDict = new Dictionary<int, int>();
+
+        private readonly List<int> RowCounts = new List<int>();
+
+        private bool _arrangeRoadsDone = false;
+
+        private TileCtrl _baronTile = null;
+
+        private int _colCount = 0;
 
         //
         //  callbacks
         private IGameCallback _gameCallback = null;
-        private ITileControlCallback _tileCallback = null;
 
-
-        // book keeping
-        //
-        public int DesertCount => _desertTiles.Count;
-        private int _colCount = 0;
-        private double _normalWidth = 110;
         private double _normalHeight = 96;
-        private readonly List<int> RowCounts = new List<int>(); // RowCounts[0] tells you how many rows there are in the 0th Column
+
+        private double _normalWidth = 110;
 
         private TileCtrl _pirateTile = null;
-        private TileCtrl _baronTile = null;
-        private readonly Dictionary<int, int> BuildingIndexToHarborIndexDict = new Dictionary<int, int>();
 
-        #region Properties
+        private ResourceType[] _resourceTypes = null;
 
-        public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(50));
+        private ITileControlCallback _tileCallback = null;
+
+        private int[] _tileNumbers = null;
+
+        private TileCtrl[] _tilesInIndexOrder = null;
+
+        public static readonly DependencyProperty AllowShipsProperty = DependencyProperty.Register("AllowShips", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
+        public static readonly DependencyProperty BaronTileProperty = DependencyProperty.Register("BaronTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, BaronTileChanged));
+
+        // RowCounts[0] tells you how many rows there are in the 0th Column
+        public static readonly DependencyProperty BaronVisibilityProperty = DependencyProperty.Register("BaronVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, BaronVisibilityChanged));
+        public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
+        public static readonly DependencyProperty CatanGameProperty = DependencyProperty.Register("CatanGame", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
+        public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register("Description", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
+        public static readonly DependencyProperty DevCardsProperty = DependencyProperty.Register("DevCards", typeof(List<DevCardType>), typeof(CatanHexPanel), new PropertyMetadata(new List<DevCardType>()));
         public static readonly DependencyProperty DisableLayoutProperty = DependencyProperty.Register("DisableLayout", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
+        public static readonly DependencyProperty GameNameProperty = DependencyProperty.Register("GameName", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
+        public static readonly DependencyProperty GameTypeProperty = DependencyProperty.Register("GameType", typeof(GameType), typeof(CatanHexPanel), new PropertyMetadata(GameType.Regular));
+        public static readonly DependencyProperty HarborCountProperty = DependencyProperty.Register("HarborCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(9));
+        public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
+        public static readonly DependencyProperty KnightsProperty = DependencyProperty.Register("Knights", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(14));
+        public static readonly DependencyProperty MaxCitiesProperty = DependencyProperty.Register("MaxCities", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(4));
+        public static readonly DependencyProperty MaxResourceAllocatedProperty = DependencyProperty.Register("MaxResourceAllocated", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
+        public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.Register("MaxRoads", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(15));
+        public static readonly DependencyProperty MaxSettlementsProperty = DependencyProperty.Register("MaxSettlements", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
+        public static readonly DependencyProperty MaxShipsProperty = DependencyProperty.Register("MaxShips", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(0));
+        public static readonly DependencyProperty MonopolyProperty = DependencyProperty.Register("Monopoly", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public static readonly DependencyProperty PirateShipTileProperty = DependencyProperty.Register("PirateShipTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, PirateTileChanged));
+        public static readonly DependencyProperty PirateVisibilityProperty = DependencyProperty.Register("PirateVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, PirateVisibilityChanged));
+        public static readonly DependencyProperty RoadBuildingProperty = DependencyProperty.Register("RoadBuilding", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public static readonly DependencyProperty TileCountProperty = DependencyProperty.Register("TileCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
         public static readonly DependencyProperty TileGapProperty = DependencyProperty.Register("TileGap", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(0));
         public static readonly DependencyProperty TileGroupsProperty = DependencyProperty.Register("TileGroups", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
-        public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register("Description", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
-        public static readonly DependencyProperty GameTypeProperty = DependencyProperty.Register("GameType", typeof(GameType), typeof(CatanHexPanel), new PropertyMetadata(GameType.Regular));
-        public static readonly DependencyProperty MaxCitiesProperty = DependencyProperty.Register("MaxCities", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(4));
-        public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.Register("MaxRoads", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(15));
-        public static readonly DependencyProperty MaxSettlementsProperty = DependencyProperty.Register("MaxSettlements", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5, null));
-        public static readonly DependencyProperty MaxShipsProperty = DependencyProperty.Register("MaxShips", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(0));
-        public static readonly DependencyProperty PirateShipTileProperty = DependencyProperty.Register("PirateShipTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, PirateTileChanged));
-        public static readonly DependencyProperty BaronTileProperty = DependencyProperty.Register("BaronTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, BaronTileChanged));
-        public static readonly DependencyProperty BaronVisibilityProperty = DependencyProperty.Register("BaronVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, BaronVisibilityChanged));
-        public static readonly DependencyProperty PirateVisibilityProperty = DependencyProperty.Register("PirateVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, PirateVisibilityChanged));
-        public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
-        public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
-        public static readonly DependencyProperty CataGameTypeProperty = DependencyProperty.Register("CataGameType", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
-        public CatanGames CataGameType
+        public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(50));
+        public static readonly DependencyProperty VictoryPointsProperty = DependencyProperty.Register("VictoryPoints", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
+        public static readonly DependencyProperty YearOfPlentyProperty = DependencyProperty.Register("YearOfPlenty", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
+
+        public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
+
+        public CatanHexPanel()
         {
-            get => (CatanGames)GetValue(CataGameTypeProperty);
-            set => SetValue(CataGameTypeProperty, value);
-        }
-        public string BuildingIndexToHarborIndex
-        {
-            get => (string)GetValue(BuildingIndexToHarborIndexProperty);
-            set => SetValue(BuildingIndexToHarborIndexProperty, value);
-        }
-        private static void BuildingIndexToHarborIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as CatanHexPanel;
-            var depPropValue = (string)e.NewValue;
-            depPropClass?.SetBuildingIndexToHarborIndex(depPropValue);
-        }
-        private void SetBuildingIndexToHarborIndex(string value)
-        {
-            if (value == null)
-            {
-                return;
-            }
+            _pirateShip.Visibility = Visibility.Collapsed;
+            _baron.Visibility = Visibility.Collapsed;
+            _baron.Width = 50;
+            _baron.Height = 60;
 
-            if (value == "")
-            {
-                return;
-            }
+            HarborLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            HarborLayer.VerticalAlignment = VerticalAlignment.Stretch;
 
-            //
-            //  parse this into the map of building index => Harbor Index
-            //  form: "4=0,5=0,8=1,36=2,37=2,47=3,48=3,50=4,51=4,45=5,46=5,26=6,38=6,14=7,17=7,11=8,24=8"
-            //          buildingIndex=HarborIndex,
+            RoadLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            RoadLayer.VerticalAlignment = VerticalAlignment.Stretch;
 
-            string[] tokens = value.Split(new char[] { ',', '=' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < tokens.Length; i += 2)
-            {
-                BuildingIndexToHarborIndexDict[Int32.Parse(tokens[i])] = Int32.Parse(tokens[i + 1]);
-            }
+            Canvas.SetZIndex(this, 5);
+            Canvas.SetZIndex(HarborLayer, 10);
+            Canvas.SetZIndex(RoadLayer, 20);
+            Canvas.SetZIndex(TopLayer, 95);
 
-        }
+            HarborLayer.Width = 5000;
+            HarborLayer.Height = 5000;
+            HarborLayer.Opacity = 1.0;
+            RoadLayer.Width = 5000;
+            RoadLayer.Height = 5000;
+            RoadLayer.Opacity = 1.0;
 
-        public string Islands
-        {
-            get => (string)GetValue(IslandsProperty);
-            set => SetValue(IslandsProperty, value);
-        }
-        private static void IslandsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            CatanHexPanel depPropClass = d as CatanHexPanel;
-            string depPropValue = (string)e.NewValue;
-            depPropClass.SetIslands(depPropValue);
-        }
-        private void SetIslands(string islands)
-        {
-            if (Tiles.Count == 0)
-            {
-                return;
-            }
+            TopLayer.Width = 5000;
+            TopLayer.Height = 5000;
+            TopLayer.Opacity = 1.0;
+            TopLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            TopLayer.VerticalAlignment = VerticalAlignment.Stretch;
+            TopLayer.IsHitTestVisible = true;
+            TopLayer.IsDoubleTapEnabled = true;
+            TopLayer.IsHoldingEnabled = true;
+            TopLayer.IsRightTapEnabled = true;
+            TopLayer.IsTapEnabled = true;
 
-            string[] tokens = islands.Split(new char[] { '-', ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < tokens.Count(); i += 2)
-            {
+            Canvas.SetZIndex(_baron, 5);
+            Canvas.SetZIndex(_pirateShip, 5);
 
-                Island island = new Island
-                {
-                    Start = int.Parse(tokens[i]),
-                    End = int.Parse(tokens[i + 1])
-                };
-                island.BonusPoint = (island.Start != 0); // no points for the default map
-                for (int count = island.Start; count <= island.End; count++)
-                {
-                    TileToIslandDictionary[TilesInIndexOrder[count]] = island;
-                }
-            }
+            HarborLayer.Children.Add(_pirateShip);
+            HarborLayer.Children.Add(_baron);
 
-
+            this.SizeChanged += SimpleHexPanel_SizeChanged;
+            this.Children.Add(HarborLayer);
+            this.Children.Add(RoadLayer);
+            this.Children.Add(TopLayer);
         }
 
-        public bool HasIslands => TileToIslandDictionary.Keys.Count > 1;
+        private Canvas HarborLayer { get; set; } = new Canvas();
 
-        public Visibility PirateVisibility
-        {
-            get => (Visibility)GetValue(PirateVisibilityProperty);
-            set => SetValue(PirateVisibilityProperty, value);
-        }
-        private static void PirateVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            CatanHexPanel depPropClass = d as CatanHexPanel;
-            Visibility depPropValue = (Visibility)e.NewValue;
-            depPropClass.SetPirateVisibility(depPropValue);
-        }
-        private void SetPirateVisibility(Visibility visibility)
-        {
-            _pirateShip.Visibility = Visibility;
-        }
+        private Canvas RoadLayer { get; set; } = new Canvas();
 
-        public Visibility BaronVisibility
+        public bool AllowShips
         {
-            get => (Visibility)GetValue(BaronVisibilityProperty);
-            set => SetValue(BaronVisibilityProperty, value);
+            get => (bool)GetValue(AllowShipsProperty);
+            set => SetValue(AllowShipsProperty, value);
         }
-        private static void BaronVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            CatanHexPanel depPropClass = d as CatanHexPanel;
-            Visibility depPropValue = (Visibility)e.NewValue;
-            depPropClass.SetBaronVisibility(depPropValue);
-        }
-        private void SetBaronVisibility(Visibility visibility)
-        {
-            _baron.Visibility = visibility;
-        }
-
-
-
 
         public TileCtrl BaronTile
         {
@@ -214,92 +148,77 @@ namespace Catan10
             set => SetValue(BaronTileProperty, value);
         }
 
-
-        public TileCtrl PirateShipTile
+        public Visibility BaronVisibility
         {
-            get => (TileCtrl)GetValue(PirateShipTileProperty);
-            set => SetValue(PirateShipTileProperty, value);
-        }
-        private static void PirateTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            CatanHexPanel panel = d as CatanHexPanel;
-            TileCtrl newTile = e.NewValue as TileCtrl;
-            panel.SetPirateTile(newTile);
+            get => (Visibility)GetValue(BaronVisibilityProperty);
+            set => SetValue(BaronVisibilityProperty, value);
         }
 
-        private static void BaronTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public string BuildingIndexToHarborIndex
         {
-            CatanHexPanel panel = d as CatanHexPanel;
-            TileCtrl newTile = e.NewValue as TileCtrl;
-            panel.SetBaronTile(newTile);
+            get => (string)GetValue(BuildingIndexToHarborIndexProperty);
+            set => SetValue(BuildingIndexToHarborIndexProperty, value);
         }
 
-        private void SetPirateTile(TileCtrl tile)
+        //
+        //   UI Elements
+        public List<BuildingCtrl> Buildings { get; } = new List<BuildingCtrl>();
+
+        public CatanGames CatanGame
         {
-            if (_pirateTile != null)
+            get => (CatanGames)GetValue(CatanGameProperty);
+            set => SetValue(CatanGameProperty, value);
+        }
+
+        public int Columns => RowCounts.Count();
+
+        public string Description
+        {
+            get => (string)GetValue(DescriptionProperty);
+            set => SetValue(DescriptionProperty, value);
+        }
+
+        // book keeping
+        //
+        public int DesertCount => _desertTiles.Count;
+
+        public List<TileCtrl> DesertTiles => _desertTiles;
+
+        public List<DevCardType> DevCards
+        {
+            get => (List<DevCardType>)GetValue(DevCardsProperty);
+            set => SetValue(DevCardsProperty, value);
+        }
+
+        public bool DisableLayout
+        {
+            get => (bool)GetValue(DisableLayoutProperty);
+            set => SetValue(DisableLayoutProperty, value);
+        }
+
+        public IGameCallback GameCallback
+        {
+            get => _gameCallback;
+            set
             {
-                _pirateTile.HasPirateShip = false;
+                _gameCallback = value;
+
+                foreach (RoadCtrl road in Roads)
+                {
+                    road.Callback = _gameCallback;
+                }
+
+                foreach (BuildingCtrl s in Buildings)
+                {
+                    s.Callback = _gameCallback;
+                }
             }
-
-            if (tile == null)
-            {
-                _pirateShip.Visibility = Visibility.Collapsed;
-                return;
-            }
-
-            tile.HasPirateShip = true;
-            _pirateTile = tile;
-            GeneralTransform gt = tile.TransformToVisual(HarborLayer);
-
-            Point to = new Point((tile.Width - _pirateShip.Width) * .5, (tile.Height - _pirateShip.Height) * .5 - tile.HexThickness); // Horizontal = center and Vertical = bottom
-            to = gt.TransformPoint(to);
-            _pirateShip.Visibility = Visibility.Visible;
-            _pirateShip.MoveAsync(to);
-
-        }
-        private void SetBaronTile(TileCtrl tile)
-        {
-            if (_baronTile != null)
-            {
-                _baronTile.HasBaron = false;
-            }
-
-            if (tile == null)
-            {
-                _baronTile.Visibility = Visibility.Collapsed;
-                return;
-            }
-
-            tile.HasBaron = true;
-            _baronTile = tile;
-            GeneralTransform gt = tile.TransformToVisual(HarborLayer);
-
-            Point to = new Point((tile.Width - _baron.Width) * .5, (tile.Height - _baron.Height - tile.HexThickness));
-            to = gt.TransformPoint(to);
-            _baron.Visibility = Visibility.Visible;
-            _baron.MoveAsync(to);
-
         }
 
-        public int MaxShips
+        public CatanGames GameName
         {
-            get => (int)GetValue(MaxShipsProperty);
-            set => SetValue(MaxShipsProperty, value);
-        }
-        public int MaxSettlements
-        {
-            get => (int)GetValue(MaxSettlementsProperty);
-            set => SetValue(MaxSettlementsProperty, value);
-        }
-        public int MaxRoads
-        {
-            get => (int)GetValue(MaxRoadsProperty);
-            set => SetValue(MaxRoadsProperty, value);
-        }
-        public int MaxCities
-        {
-            get => (int)GetValue(MaxCitiesProperty);
-            set => SetValue(MaxCitiesProperty, value);
+            get => (CatanGames)GetValue(GameNameProperty);
+            set => SetValue(GameNameProperty, value);
         }
 
         public GameType GameType
@@ -308,34 +227,92 @@ namespace Catan10
             set => SetValue(GameTypeProperty, value);
         }
 
-
-
-        public string Description
+        public int HarborCount
         {
-            get => (string)GetValue(DescriptionProperty);
-            set => SetValue(DescriptionProperty, value);
-        }
-        public string TileGroups
-        {
-            get => (string)GetValue(TileGroupsProperty);
-            set => SetValue(TileGroupsProperty, value);
+            get => (int)GetValue(HarborCountProperty);
+            set => SetValue(HarborCountProperty, value);
         }
 
+        public List<Harbor> Harbors { get; } = new List<Harbor>();
 
-        public double TileGap
+        public bool HasIslands => TileToIslandDictionary.Keys.Count > 1;
+
+        public string Islands
         {
-            get => (double)GetValue(TileGapProperty);
-            set => SetValue(TileGapProperty, value);
+            get => (string)GetValue(IslandsProperty);
+            set => SetValue(IslandsProperty, value);
         }
-        public bool DisableLayout
+
+        public int Knights
         {
-            get => (bool)GetValue(DisableLayoutProperty);
-            set => SetValue(DisableLayoutProperty, value);
+            get => (int)GetValue(KnightsProperty);
+            set => SetValue(KnightsProperty, value);
         }
-        public double UniformMargin
+
+        public int MaxCities
         {
-            get => (double)GetValue(UniformMarginProperty);
-            set => SetValue(UniformMarginProperty, value);
+            get => (int)GetValue(MaxCitiesProperty);
+            set => SetValue(MaxCitiesProperty, value);
+        }
+
+        public int MaxResourceAllocated
+        {
+            get => (int)GetValue(MaxResourceAllocatedProperty);
+            set => SetValue(MaxResourceAllocatedProperty, value);
+        }
+
+        public int MaxRoads
+        {
+            get => (int)GetValue(MaxRoadsProperty);
+            set => SetValue(MaxRoadsProperty, value);
+        }
+
+        public int MaxSettlements
+        {
+            get => (int)GetValue(MaxSettlementsProperty);
+            set => SetValue(MaxSettlementsProperty, value);
+        }
+
+        public int MaxShips
+        {
+            get => (int)GetValue(MaxShipsProperty);
+            set => SetValue(MaxShipsProperty, value);
+        }
+
+        public int Monopoly
+        {
+            get => (int)GetValue(MonopolyProperty);
+            set => SetValue(MonopolyProperty, value);
+        }
+
+        public double NormalHeight
+        {
+            get => _normalHeight;
+
+            set => _normalHeight = value;
+        }
+
+        public double NormalWidth
+        {
+            get => _normalWidth;
+
+            set
+            {
+                _normalWidth = value;
+                SetupHarborData();
+            }
+        }
+
+        public TileCtrl PirateShipTile
+        {
+            get => (TileCtrl)GetValue(PirateShipTileProperty);
+            set => SetValue(PirateShipTileProperty, value);
+        }
+
+        public Visibility PirateVisibility
+        {
+            get => (Visibility)GetValue(PirateVisibilityProperty);
+            set => SetValue(PirateVisibilityProperty, value);
         }
 
         public ResourceType[] ResourceTypes
@@ -347,27 +324,90 @@ namespace Catan10
             }
         }
 
-        public TileCtrl[] TilesInIndexOrder
+        public int RoadBuilding
+        {
+            get => (int)GetValue(RoadBuildingProperty);
+            set => SetValue(RoadBuildingProperty, value);
+        }
+
+        //
+        //  ways to look Road/Buildings/Tiles up
+        public Dictionary<RoadKey, RoadCtrl> RoadKeyToRoadDictionary { get; } = new Dictionary<RoadKey, RoadCtrl>(new RoadKeyComparer());
+
+        public List<RoadCtrl> Roads { get; } = new List<RoadCtrl>();
+
+        public string RowsPerColumn
         {
             get
             {
-                BuildChildList();
-                BuildDataLists();
-                return _tilesInIndexOrder;
-            }
+                string s = "";
+                foreach (int i in RowCounts)
+                {
+                    s += string.Format($"{i},");
+                }
 
+                return s;
+            }
+            set
+            {
+                try
+                {
+                    if (value == "")
+                    {
+                        return;
+                    }
+
+                    RowCounts.Clear();
+
+                    string[] tokens = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string s in tokens)
+                    {
+                        RowCounts.Add(int.Parse(s));
+                    }
+
+                    _colCount = RowCounts.Count();
+                }
+                catch { }
+            }
+        }
+
+        public HarborType[] StartingHarborTypes { get; private set; } = null;
+
+        public ITileControlCallback TileCallback
+        {
+            get => _tileCallback;
+            set
+            {
+                _tileCallback = value;
+                foreach (TileCtrl tile in Tiles)
+                {
+                    tile.SetTileCallback(value);
+                }
+            }
+        }
+
+        public double TileGap
+        {
+            get => (double)GetValue(TileGapProperty);
+            set => SetValue(TileGapProperty, value);
+        }
+
+        public string TileGroups
+        {
+            get => (string)GetValue(TileGroupsProperty);
+            set => SetValue(TileGroupsProperty, value);
         }
 
         public int[] TileNumbers
         {
             get
             {
-
                 BuildDataLists();
                 return _tileNumbers;
             }
-
         }
+
+        public List<TileCtrl> Tiles { get; } = new List<TileCtrl>();
 
         //
         //  this is where be build up all the state needed in a TileGroup list
@@ -414,12 +454,9 @@ namespace Catan10
                                     Source = MainPage.Current
                                 };
 
-
                                 tile.SetBinding(BuildingCtrl.CurrentPlayerProperty, binding);
-
                             }
                             _tileSets.Add(tg);
-
                         }
                     }
                     else
@@ -442,330 +479,269 @@ namespace Catan10
             }
         }
 
-
-        private void BuildDataLists()
-        {
-            try
-            {
-                if (_tilesInIndexOrder == null || _tilesInIndexOrder.Count() == 0)
-                {
-
-                    _tilesInIndexOrder = new TileCtrl[Tiles.Count];
-                    _resourceTypes = new ResourceType[Tiles.Count];
-                    _tileNumbers = new int[Tiles.Count];
-                    foreach (TileCtrl tile in Tiles)
-                    {
-                        _tilesInIndexOrder[tile.Index] = tile;
-                        _resourceTypes[tile.Index] = tile.ResourceType;
-                        _tileNumbers[tile.Index] = tile.Number;
-
-                    }
-
-
-
-                    StartingHarborTypes = new HarborType[Harbors.Count];
-                    for (int i = 0; i < Harbors.Count; i++)
-                    {
-                        StartingHarborTypes[i] = Harbors[i].HarborType;
-                    }
-                }
-            }
-            catch
-            {
-
-            }
-        }
-        public List<TileCtrl> DesertTiles => _desertTiles;
-
-
-        public int Columns => RowCounts.Count();
-
-
-
-        public List<List<TileCtrl>> VisualTiles => _tilesInVisualLayout;
-
-        public string RowsPerColumn
+        public TileCtrl[] TilesInIndexOrder
         {
             get
             {
-                string s = "";
-                foreach (int i in RowCounts)
-                {
-                    s += string.Format($"{i},");
-                }
-
-                return s;
-
-
+                BuildChildList();
+                BuildDataLists();
+                return _tilesInIndexOrder;
             }
-            set
+        }
+
+        public Dictionary<TileCtrl, Island> TileToIslandDictionary { get; set; } = new Dictionary<TileCtrl, Island>();
+
+        //
+        //  layers
+        public Grid TopLayer { get; set; } = new Grid();
+
+        // given a tile, tell me what Island it is in
+        public double UniformMargin
+        {
+            get => (double)GetValue(UniformMarginProperty);
+            set => SetValue(UniformMarginProperty, value);
+        }
+
+        public int VictoryPoints
+        {
+            get => (int)GetValue(VictoryPointsProperty);
+            set => SetValue(VictoryPointsProperty, value);
+        }
+
+        public List<List<TileCtrl>> VisualTiles => _tilesInVisualLayout;
+
+        public int YearOfPlenty
+        {
+            get => (int)GetValue(YearOfPlentyProperty);
+            set => SetValue(YearOfPlentyProperty, value);
+        }
+
+        private static void BaronTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            CatanHexPanel panel = d as CatanHexPanel;
+            TileCtrl newTile = e.NewValue as TileCtrl;
+            panel.SetBaronTile(newTile);
+        }
+
+        private static void BaronVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            CatanHexPanel depPropClass = d as CatanHexPanel;
+            Visibility depPropValue = (Visibility)e.NewValue;
+            depPropClass.SetBaronVisibility(depPropValue);
+        }
+
+        private static void BuildingIndexToHarborIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as CatanHexPanel;
+            var depPropValue = (string)e.NewValue;
+            depPropClass?.SetBuildingIndexToHarborIndex(depPropValue);
+        }
+
+        private static void GameTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as CatanHexPanel;
+            var depPropValue = (GameType)e.NewValue;
+            depPropClass?.SetGameType(depPropValue);
+        }
+
+        private static void IslandsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            CatanHexPanel depPropClass = d as CatanHexPanel;
+            string depPropValue = (string)e.NewValue;
+            depPropClass.SetIslands(depPropValue);
+        }
+
+        private static void PirateTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            CatanHexPanel panel = d as CatanHexPanel;
+            TileCtrl newTile = e.NewValue as TileCtrl;
+            panel.SetPirateTile(newTile);
+        }
+
+        private static void PirateVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            CatanHexPanel depPropClass = d as CatanHexPanel;
+            Visibility depPropValue = (Visibility)e.NewValue;
+            depPropClass.SetPirateVisibility(depPropValue);
+        }
+
+        private static void TileCountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as CatanHexPanel;
+            var depPropValue = (int)e.NewValue;
+            depPropClass?.SetTileCount(depPropValue);
+        }
+
+        private void AddAdjacentBuildings(BuildingCtrl currentBuilding, TileCtrl tile, BuildingLocation location)
+        {
+            if (tile != null)
             {
-                try
+                BuildingKey key = new BuildingKey(tile, location);
+                if (BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out BuildingCtrl adjacentBuilding))
                 {
-                    if (value == "")
+                    if (currentBuilding.AdjacentBuildings.Contains(adjacentBuilding) == false)
                     {
-                        return;
+                        currentBuilding.AdjacentBuildings.Add(adjacentBuilding);
                     }
+                }
+            }
+        }
 
-                    RowCounts.Clear();
-
-                    string[] tokens = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string s in tokens)
+        private bool AddAdjacentRoad(RoadCtrl currentRoad, TileCtrl tile, RoadLocation location)
+        {
+            if (tile != null)
+            {
+                RoadKey key = new RoadKey(tile, location);
+                if (RoadKeyToRoadDictionary.TryGetValue(key, out RoadCtrl road))
+                {
+                    if (currentRoad.AdjacentRoads.Contains(road) == false)
                     {
-                        RowCounts.Add(int.Parse(s));
+                        currentRoad.AdjacentRoads.Add(road);
                     }
-
-                    _colCount = RowCounts.Count();
-                }
-                catch { }
-            }
-        }
-
-
-
-        public double NormalWidth
-        {
-            get => _normalWidth;
-
-            set
-            {
-                _normalWidth = value;
-                SetupHarborData();
-            }
-        }
-
-        public double NormalHeight
-        {
-            get => _normalHeight;
-
-            set => _normalHeight = value;
-        }
-
-        public IGameCallback GameCallback
-        {
-            get => _gameCallback;
-            set
-            {
-
-                _gameCallback = value;
-
-
-                foreach (RoadCtrl road in Roads)
-                {
-                    road.Callback = _gameCallback;
                 }
 
-                foreach (BuildingCtrl s in Buildings)
-                {
-                    s.Callback = _gameCallback;
-                }
-
+                return true;
             }
+
+            return false;
         }
 
-        public ITileControlCallback TileCallback
+        private bool AddBuildingAdjacentRoad(BuildingCtrl building, TileCtrl tile, RoadLocation location)
         {
-            get => _tileCallback;
-            set
+            if (tile == null)
             {
-
-                _tileCallback = value;
-                foreach (TileCtrl tile in Tiles)
-                {
-                    tile.SetTileCallback(value);
-                }
-
+                return false;
             }
+
+            RoadKey key = new RoadKey(tile, location);
+            RoadCtrl road = RoadKeyToRoadDictionary[key];
+            if (building.AdjacentRoads.Contains(road, new RoadCloneComparer()) == false)
+            {
+                building.AdjacentRoads.Add(road);
+            }
+            return true;
         }
 
-
-
-        #endregion
-        public CatanHexPanel()
+        private void ArrangeBuildings()
         {
-            _pirateShip.Visibility = Visibility.Collapsed;
-            _baron.Visibility = Visibility.Collapsed;
-            _baron.Width = 50;
-            _baron.Height = 60;
-
-            HarborLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            HarborLayer.VerticalAlignment = VerticalAlignment.Stretch;
-
-            RoadLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            RoadLayer.VerticalAlignment = VerticalAlignment.Stretch;
-
-            Canvas.SetZIndex(this, 5);
-            Canvas.SetZIndex(HarborLayer, 10);
-            Canvas.SetZIndex(RoadLayer, 20);
-            Canvas.SetZIndex(TopLayer, 95);
-
-
-
-            HarborLayer.Width = 5000;
-            HarborLayer.Height = 5000;
-            HarborLayer.Opacity = 1.0;
-            RoadLayer.Width = 5000;
-            RoadLayer.Height = 5000;
-            RoadLayer.Opacity = 1.0;
-
-            TopLayer.Width = 5000;
-            TopLayer.Height = 5000;
-            TopLayer.Opacity = 1.0;
-            TopLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            TopLayer.VerticalAlignment = VerticalAlignment.Stretch;
-            TopLayer.IsHitTestVisible = true;
-            TopLayer.IsDoubleTapEnabled = true;
-            TopLayer.IsHoldingEnabled = true;
-            TopLayer.IsRightTapEnabled = true;
-            TopLayer.IsTapEnabled = true;
-
-
-            Canvas.SetZIndex(_baron, 5);
-            Canvas.SetZIndex(_pirateShip, 5);
-
-            HarborLayer.Children.Add(_pirateShip);
-            HarborLayer.Children.Add(_baron);
-
-            this.SizeChanged += SimpleHexPanel_SizeChanged;
-            this.Children.Add(HarborLayer);
-            this.Children.Add(RoadLayer);
-            this.Children.Add(TopLayer);
-
-        }
-
-
-
-
-
-        public void ShuffleHarbors(List<int> randomHarborTypeList)
-        {
-            for (int i = 0; i < Harbors.Count; i++)
-            {
-                Harbors[i].HarborType = StartingHarborTypes[randomHarborTypeList[i]];
-            }
-
-
-        }
-        public List<int> ShuffleTileGroup(TileGroup tileGroup, List<int> randomResourceTypeList)
-        {
-
-            if (randomResourceTypeList == null)
-            {
-                randomResourceTypeList = GameContainerCtrl.GetRandomList(tileGroup.TilesToRandomize.Count - 1);
-            }
-
-            for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
-            {
-                if (tileGroup.TilesToRandomize[i].ResourceType != tileGroup.StartingResourceTypes[randomResourceTypeList[i]])
-                {
-                    tileGroup.TilesToRandomize[i].ResourceType = tileGroup.StartingResourceTypes[randomResourceTypeList[i]];
-                }
-            }
-
-            return randomResourceTypeList;
-
-        }
-
-
-
-        internal void Reset()
-        {
-
-            foreach (TileCtrl tile in Tiles)
-            {
-                tile.Reset();
-                if (tile.ResourceType != ResourceType.Sea)
-                {
-                    // tile.TileOrientation = TileOrientation.FaceUp;
-                    tile.TileOrientation = TileOrientation.FaceDown;
-                }
-
-            }
-            foreach (RoadCtrl road in Roads)
-            {
-                road.Reset();
-            }
-
-            foreach (BuildingCtrl s in Buildings)
-            {
-                s.Reset();
-            }
-
-            foreach (Harbor h in Harbors)
-            {
-                h.Reset();
-                h.SetOrientationAsync(TileOrientation.FaceUp);
-                h.SetOrientationAsync(TileOrientation.FaceDown);
-            }
-
-
-
-
-        }
-
-
-
-
-
-
-        private void SetupHarborData()
-        {
-            //
-            //  can't do this w/o knowing the Width, so this is called from the Width.set property
-            if (NormalWidth == 0)
+            if (Columns == 0)
             {
                 return;
             }
 
-            HarborLayoutDataDictionary.Clear();
+            if (VisualTiles.Count == 0)
+            {
+                return;
+            }
 
-            double side = NormalWidth * 0.5;
-            double sinLen = Math.Round(Math.Sin(Math.PI / 3) * side, 5);
+            int count = 0;
+            for (int col = 0; col < this.Columns; col++)
+            {
+                for (int row = 0; row < VisualTiles.ElementAt(col).Count; row++)
+                {
+                    TileCtrl tile = VisualTiles.ElementAt(col).ElementAt(row);
+                    GeneralTransform gt = tile.Visual.TransformToVisual(TopLayer);
 
-            //
-            //  these are our anchor points in the local coordinates of a tile
-            Point middleLeft = new Point(0, sinLen);
-            Point topLeft = new Point(side * .5, 0);
-            Point topRight = new Point(1.5 * side, 0);
-            Point middleRight = new Point(2 * side, sinLen);
-            Point bottomRight = new Point(1.5 * side, 2 * sinLen);
-            Point bottomLeft = new Point(.5 * side, 2 * sinLen);
+                    Point point = new Point();
+                    foreach (BuildingLocation location in Enum.GetValues(typeof(BuildingLocation)))
+                    {
+                        switch (location)
+                        {
+                            case BuildingLocation.TopRight:
+                                point.X = 81;
+                                point.Y = 3;
+                                break;
 
+                            case BuildingLocation.MiddleRight:
+                                point.X = 106.5;
+                                point.Y = 48;
+                                break;
 
+                            case BuildingLocation.BottomRight:
+                                point.X = 81;
+                                point.Y = 93;
+                                break;
 
-            HarborLayoutData.AddLocation(HarborLocation.Top, new Point(0.5, 0.5), 90, 1.0, new Point(topLeft.X + 2, topLeft.Y - HarborLayoutData.Height), HarborLayoutDataDictionary);
-            HarborLayoutData.AddLocation(HarborLocation.TopRight, new Point(1, 1), 150, 1.0, new Point(topRight.X + 1 - HarborLayoutData.Width, topRight.Y - HarborLayoutData.Height + 2), HarborLayoutDataDictionary);
-            HarborLayoutData.AddLocation(HarborLocation.BottomRight, new Point(1, 1), 209.5, 1.0, new Point(middleRight.X - 1 - HarborLayoutData.Width, middleRight.Y - HarborLayoutData.Height + 2), HarborLayoutDataDictionary);
-            HarborLayoutData.AddLocation(HarborLocation.Bottom, new Point(0.5, 0.5), 270, 1.0, new Point(bottomLeft.X + 2.5, bottomLeft.Y + .5), HarborLayoutDataDictionary);
-            HarborLayoutData.AddLocation(HarborLocation.BottomLeft, new Point(1, 0), 330.5, 1.0, new Point(middleLeft.X + 1.5 - HarborLayoutData.Width, middleLeft.Y + 3), HarborLayoutDataDictionary);
-            HarborLayoutData.AddLocation(HarborLocation.TopLeft, new Point(1, 1), 29.5, 1.0, new Point(middleLeft.X + 1.5 - HarborLayoutData.Width, middleLeft.Y - HarborLayoutData.Height - 2.5), HarborLayoutDataDictionary);
+                            case BuildingLocation.BottomLeft:
+                                point.X = 29;
+                                point.Y = 93;
+                                break;
 
+                            case BuildingLocation.MiddleLeft:
+                                point.X = 3.5;
+                                point.Y = 48;
+                                break;
+
+                            case BuildingLocation.TopLeft:
+                                point.X = 29;
+                                point.Y = 3;
+                                break;
+
+                            case BuildingLocation.None:
+                                continue;
+                            default:
+                                continue;
+                        }
+
+                        point = gt.TransformPoint(point);
+
+                        //
+                        //  tag the Building with the tile and the position
+
+                        bool cloned = FindBuildingAtVisualLocation(point, Buildings, location, tile, out BuildingCtrl building);
+                        if (!cloned)
+                        {
+                            building = Buildings[count];
+                            building.LayoutPoint = point;
+                            building.Transform.TranslateX = point.X - .5 * building.Width;
+                            building.Transform.TranslateY = point.Y - .5 * building.Height;
+
+                            //
+                            //  add to dictionary...
+                            if (!building.BuildingToTileDictionary.ContainsKey(location))
+                            {
+                                building.BuildingToTileDictionary[location] = tile;
+                            }
+                            else
+                            {
+                                // this.TraceMessage($"{tile} @ {location} already in map!");
+                            }
+                            building.AddKey(tile, location);
+                            // setl2.BuildingCtrl.Show(BuildingState.City);
+                            count++;
+                        }
+
+                        BuildingKey key = new BuildingKey(tile, location);
+                        BuildingKeyToBuildingCtrlDictionary[key] = building;
+
+                        if (count == Buildings.Count)
+                        {
+                        }
+                    }
+                }
+            }
+
+            //foreach (var kvp in BuildingKeyToBuildingCtrlDictionary)
+            //{
+            //    Debug.Write($"{kvp.Key}: {kvp.Value.LayoutPoint}\t");
+            //    foreach (var clone in kvp.Value.Clones)
+            //    {
+            //        Debug.Write($"{clone}");
+            //    }
+            //    Debug.WriteLine("");
+            //}
         }
-
-        private void SimpleHexPanel_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            HarborLayer.Width = e.NewSize.Width;
-            HarborLayer.Height = e.NewSize.Height;
-            RoadLayer.Width = e.NewSize.Width;
-            RoadLayer.Height = e.NewSize.Height;
-
-        }
-
-
-
 
         private void BuildChildList()
         {
-
             if (_tilesInVisualLayout.Count != 0)
             {
                 return;
             }
 
-
             //
             //  first bucket the controls into their various collections
-            //  
+            //
             //  the order they are entered in the XAML file will determine the order they are here
             List<Harbor> harbors = this.Harbors;
             for (int i = Children.Count - 1; i >= 0; i--)
@@ -827,52 +803,44 @@ namespace Catan10
                     Tiles[tileCount].Col = col;
 
                     tileCount++;
-
                 }
                 _tilesInVisualLayout.Add(innerList);
-
             }
 
             if (Islands != "")
             {
                 SetIslands(Islands);
             }
-
         }
 
-        /// <summary>
-        ///     Fit the Tiles into the right size
-        ///     ther are also Harbors, Roads, and Buildings in the panel, but none of these take up space
-        ///     as they are implemented in their own layer
-        /// </summary>
-        /// <param name="availableSize"></param>
-        /// <returns></returns>
-        protected override Size MeasureOverride(Size availableSize)
+        private void BuildDataLists()
         {
-            if (DisableLayout || (RowCounts.Count == 0) || NormalHeight == 0 || NormalWidth == 0)
+            try
             {
-                return availableSize;
+                if (_tilesInIndexOrder == null || _tilesInIndexOrder.Count() == 0)
+                {
+                    _tilesInIndexOrder = new TileCtrl[Tiles.Count];
+                    _resourceTypes = new ResourceType[Tiles.Count];
+                    _tileNumbers = new int[Tiles.Count];
+                    foreach (TileCtrl tile in Tiles)
+                    {
+                        _tilesInIndexOrder[tile.Index] = tile;
+                        _resourceTypes[tile.Index] = tile.ResourceType;
+                        _tileNumbers[tile.Index] = tile.Number;
+                    }
+
+                    StartingHarborTypes = new HarborType[Harbors.Count];
+                    for (int i = 0; i < Harbors.Count; i++)
+                    {
+                        StartingHarborTypes[i] = Harbors[i].HarborType;
+                    }
+                }
             }
-
-            Size maxSize = new Size();
-            int middleCol = _colCount / 2;
-
-            foreach (UIElement child in Children)
+            catch
             {
-                child.Measure(availableSize);
             }
-
-            BuildChildList();
-            //
-            //  Build the roads and buildings on the TopLayer
-            CreateBuildings();
-
-            maxSize.Width = (_normalWidth + TileGap) * (_colCount - 1) + 2 * UniformMargin;
-
-            maxSize.Height = (_normalHeight + TileGap) * RowCounts[middleCol] + 2 * UniformMargin;
-
-            return maxSize;
         }
+
         private void CreateBuildings()
         {
             if (_colCount == 0)
@@ -921,9 +889,7 @@ namespace Catan10
                     Source = MainPage.Current
                 };
 
-
                 building.SetBinding(BuildingCtrl.CurrentPlayerProperty, binding);
-
 
                 building.Index = Buildings.Count;
                 Buildings.Add(building);
@@ -939,7 +905,141 @@ namespace Catan10
                 building.Callback = _gameCallback;
 
                 TopLayer.Children.Add(building);
+            }
+        }
 
+        //
+        //  we have here an n! algorythm where we keep a list of all of the building and then when we add one, we check to see if there is another "close" to the one
+        //  we are trying to add. if they are close, we add it to the Clone map and return "true".  if it isn't a Clone, we return false
+        //
+        //  this makes it so that one building can "connect" to multiple tiles.
+        //
+        private bool FindBuildingAtVisualLocation(Point p, List<BuildingCtrl> buildings, BuildingLocation location, TileCtrl tile, out BuildingCtrl clone)
+        {
+            //  this.TraceMessage($"looking for a clone for {tile} at {location}");
+            foreach (BuildingCtrl s in buildings)
+            {
+                //  this.TraceMessage($"\t\tChecking {s.Clones[0].Tile} at {s.Clones[0].Location} DelatX: {Math.Abs(s.LayoutPoint.X - p.X)} DeltaY: {Math.Abs(s.LayoutPoint.Y - p.Y)}");
+                if (Math.Abs(s.LayoutPoint.X - p.X) < 20 && Math.Abs(s.LayoutPoint.Y - p.Y) < 20)
+                {
+                    //  this.TraceMessage($"found clone of {s} from {s.LayoutPoint} at {p} deltaX={Math.Abs(s.LayoutPoint.X - p.X)} deltaY={Math.Abs(s.LayoutPoint.Y - p.Y)}");
+                    if (!s.BuildingToTileDictionary.ContainsKey(location))
+                    {
+                        s.BuildingToTileDictionary[location] = tile;
+                    }
+                    else
+                    {
+                        //this.TraceMessage($"{tile} @ {location} already in map!");
+                    }
+                    clone = s;
+                    s.AddKey(tile, location);
+                    return true;
+                }
+            }
+            clone = null;
+            return false;
+        }
+
+        private BuildingCtrl GetBuildingAt(TileCtrl tile, BuildingLocation location)
+        {
+            BuildingKey key = new BuildingKey(tile, location);
+            return BuildingKeyToBuildingCtrlDictionary[key];
+        }
+
+        //
+        //  given a current tile and road location, return the Road that sits in the same place visually
+        private RoadCtrl GetCloneRoad(int row, int col, RoadLocation location)
+        {
+            TileCtrl cloneTile = null;
+            RoadLocation cloneLoc = RoadLocation.None;
+            switch (location)
+            {
+                case RoadLocation.None:
+                    cloneLoc = RoadLocation.None;
+                    break;
+
+                case RoadLocation.Top:
+                    cloneTile = GetAdjacentTile(row, col, TileLocation.Top);
+                    cloneLoc = RoadLocation.Bottom;
+                    break;
+
+                case RoadLocation.TopRight:
+                    cloneTile = GetAdjacentTile(row, col, TileLocation.TopRight);
+                    cloneLoc = RoadLocation.BottomLeft;
+                    break;
+
+                case RoadLocation.BottomRight:
+                    cloneTile = GetAdjacentTile(row, col, TileLocation.BottomRight);
+                    cloneLoc = RoadLocation.TopLeft;
+                    break;
+
+                case RoadLocation.Bottom:
+                    cloneTile = GetAdjacentTile(row, col, TileLocation.Bottom);
+                    cloneLoc = RoadLocation.Top;
+                    break;
+
+                case RoadLocation.BottomLeft:
+                    cloneTile = GetAdjacentTile(row, col, TileLocation.BottomLeft);
+                    cloneLoc = RoadLocation.TopRight;
+                    break;
+
+                case RoadLocation.TopLeft:
+                    cloneTile = GetAdjacentTile(row, col, TileLocation.TopLeft);
+                    cloneLoc = RoadLocation.BottomRight;
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (cloneLoc == RoadLocation.None || cloneTile == null)
+            {
+                return null;
+            }
+
+            RoadKeyToRoadDictionary.TryGetValue(new RoadKey(cloneTile, cloneLoc), out RoadCtrl cloanRoad);
+
+            return cloanRoad; // may be null
+        }
+
+        private TileCtrl GetTileAt(int col, int row)
+        {
+            if (col < VisualTiles.Count && col >= 0)
+            {
+                if (row < VisualTiles[col].Count && row >= 0)
+                {
+                    return VisualTiles.ElementAt(col).ElementAt(row);
+                }
+            }
+
+            return null;
+        }
+
+        private void MoveHarbors()
+        {
+            if (HarborLayoutDataDictionary.Count == 0)
+            {
+                SetupHarborData();
+            }
+
+            Size desiredHarborSize = new Size(50, 50);
+
+            foreach (Harbor harbor in Harbors)
+            {
+                harbor.Arrange(new Rect(0, 0, desiredHarborSize.Width, desiredHarborSize.Height));
+                TileCtrl tile = TilesInIndexOrder[harbor.TileIndex];
+                HarborLayoutData data = HarborLayoutDataDictionary[harbor.HarborLocation];
+                GeneralTransform gtToSource = tile.TransformToVisual(HarborLayer);
+                Point to = gtToSource.TransformPoint(data.Anchor);
+                CompositeTransform transform = harbor.RenderTransform as CompositeTransform;
+                harbor.RenderTransformOrigin = data.RenderTransformOrigin;
+                transform.Rotation = data.Rotation;
+                harbor.RotateImage = -transform.Rotation;
+                transform.TranslateX = to.X;
+                transform.TranslateY = to.Y;
+                transform.ScaleX = data.Scale;
+                transform.ScaleY = data.Scale;
+                harbor.Visibility = Visibility.Visible;
             }
         }
 
@@ -955,22 +1055,169 @@ namespace Catan10
             total += (RowCounts[0] - 2) * 4;
 
             //
-            //  next the TopRight/Top, Top/TopLeft, Bottom/BottomRight, and Bottom/BottomLeft pairs around the board.  
+            //  next the TopRight/Top, Top/TopLeft, Bottom/BottomRight, and Bottom/BottomLeft pairs around the board.
             //  these are the top and bottom of the columns between the first and middle and between the middle and last column
             int middleCol = _colCount / 2;
             total += (middleCol - 1) * 8;
 
             // at this point, Total == count of roads on the perimiter...now look for the roads in the middle -- they all overlap
 
-
             return 0;
         }
 
+        private void SetBaronTile(TileCtrl tile)
+        {
+            if (_baronTile != null)
+            {
+                _baronTile.HasBaron = false;
+            }
+
+            if (tile == null)
+            {
+                _baronTile.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            tile.HasBaron = true;
+            _baronTile = tile;
+            GeneralTransform gt = tile.TransformToVisual(HarborLayer);
+
+            Point to = new Point((tile.Width - _baron.Width) * .5, (tile.Height - _baron.Height - tile.HexThickness));
+            to = gt.TransformPoint(to);
+            _baron.Visibility = Visibility.Visible;
+            _baron.MoveAsync(to);
+        }
+
+        private void SetBaronVisibility(Visibility visibility)
+        {
+            _baron.Visibility = visibility;
+        }
+
+        private void SetBuildingIndexToHarborIndex(string value)
+        {
+            if (value == null)
+            {
+                return;
+            }
+
+            if (value == "")
+            {
+                return;
+            }
+
+            //
+            //  parse this into the map of building index => Harbor Index
+            //  form: "4=0,5=0,8=1,36=2,37=2,47=3,48=3,50=4,51=4,45=5,46=5,26=6,38=6,14=7,17=7,11=8,24=8"
+            //          buildingIndex=HarborIndex,
+
+            string[] tokens = value.Split(new char[] { ',', '=' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < tokens.Length; i += 2)
+            {
+                BuildingIndexToHarborIndexDict[Int32.Parse(tokens[i])] = Int32.Parse(tokens[i + 1]);
+            }
+        }
+
+        private void SetGameType(GameType value)
+        {
+        }
+
+        private void SetIslands(string islands)
+        {
+            if (Tiles.Count == 0)
+            {
+                return;
+            }
+
+            string[] tokens = islands.Split(new char[] { '-', ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < tokens.Count(); i += 2)
+            {
+                Island island = new Island
+                {
+                    Start = int.Parse(tokens[i]),
+                    End = int.Parse(tokens[i + 1])
+                };
+                island.BonusPoint = (island.Start != 0); // no points for the default map
+                for (int count = island.Start; count <= island.End; count++)
+                {
+                    TileToIslandDictionary[TilesInIndexOrder[count]] = island;
+                }
+            }
+        }
+
+        private void SetPirateTile(TileCtrl tile)
+        {
+            if (_pirateTile != null)
+            {
+                _pirateTile.HasPirateShip = false;
+            }
+
+            if (tile == null)
+            {
+                _pirateShip.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            tile.HasPirateShip = true;
+            _pirateTile = tile;
+            GeneralTransform gt = tile.TransformToVisual(HarborLayer);
+
+            Point to = new Point((tile.Width - _pirateShip.Width) * .5, (tile.Height - _pirateShip.Height) * .5 - tile.HexThickness); // Horizontal = center and Vertical = bottom
+            to = gt.TransformPoint(to);
+            _pirateShip.Visibility = Visibility.Visible;
+            _pirateShip.MoveAsync(to);
+        }
+
+        private void SetPirateVisibility(Visibility visibility)
+        {
+            _pirateShip.Visibility = Visibility;
+        }
+
+        private void SetTileCount(int value)
+        {
+        }
+
+        private void SetupHarborData()
+        {
+            //
+            //  can't do this w/o knowing the Width, so this is called from the Width.set property
+            if (NormalWidth == 0)
+            {
+                return;
+            }
+
+            HarborLayoutDataDictionary.Clear();
+
+            double side = NormalWidth * 0.5;
+            double sinLen = Math.Round(Math.Sin(Math.PI / 3) * side, 5);
+
+            //
+            //  these are our anchor points in the local coordinates of a tile
+            Point middleLeft = new Point(0, sinLen);
+            Point topLeft = new Point(side * .5, 0);
+            Point topRight = new Point(1.5 * side, 0);
+            Point middleRight = new Point(2 * side, sinLen);
+            Point bottomRight = new Point(1.5 * side, 2 * sinLen);
+            Point bottomLeft = new Point(.5 * side, 2 * sinLen);
+
+            HarborLayoutData.AddLocation(HarborLocation.Top, new Point(0.5, 0.5), 90, 1.0, new Point(topLeft.X + 2, topLeft.Y - HarborLayoutData.Height), HarborLayoutDataDictionary);
+            HarborLayoutData.AddLocation(HarborLocation.TopRight, new Point(1, 1), 150, 1.0, new Point(topRight.X + 1 - HarborLayoutData.Width, topRight.Y - HarborLayoutData.Height + 2), HarborLayoutDataDictionary);
+            HarborLayoutData.AddLocation(HarborLocation.BottomRight, new Point(1, 1), 209.5, 1.0, new Point(middleRight.X - 1 - HarborLayoutData.Width, middleRight.Y - HarborLayoutData.Height + 2), HarborLayoutDataDictionary);
+            HarborLayoutData.AddLocation(HarborLocation.Bottom, new Point(0.5, 0.5), 270, 1.0, new Point(bottomLeft.X + 2.5, bottomLeft.Y + .5), HarborLayoutDataDictionary);
+            HarborLayoutData.AddLocation(HarborLocation.BottomLeft, new Point(1, 0), 330.5, 1.0, new Point(middleLeft.X + 1.5 - HarborLayoutData.Width, middleLeft.Y + 3), HarborLayoutDataDictionary);
+            HarborLayoutData.AddLocation(HarborLocation.TopLeft, new Point(1, 1), 29.5, 1.0, new Point(middleLeft.X + 1.5 - HarborLayoutData.Width, middleLeft.Y - HarborLayoutData.Height - 2.5), HarborLayoutDataDictionary);
+        }
+
+        private void SimpleHexPanel_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            HarborLayer.Width = e.NewSize.Width;
+            HarborLayer.Height = e.NewSize.Height;
+            RoadLayer.Width = e.NewSize.Width;
+            RoadLayer.Height = e.NewSize.Height;
+        }
 
         // Arrange the child elements to their final position
         protected override Size ArrangeOverride(Size finalSize)
         {
-
             if (DisableLayout || (RowCounts.Count == 0))
             {
                 return finalSize;
@@ -980,127 +1227,96 @@ namespace Catan10
 
             size = Update(finalSize);
 
-
             return size;
-
-
         }
 
-        private void ArrangeBuildings()
+        /// <summary>
+        ///     Fit the Tiles into the right size
+        ///     ther are also Harbors, Roads, and Buildings in the panel, but none of these take up space
+        ///     as they are implemented in their own layer
+        /// </summary>
+        /// <param name="availableSize"></param>
+        /// <returns></returns>
+        protected override Size MeasureOverride(Size availableSize)
         {
-            if (Columns == 0)
+            if (DisableLayout || (RowCounts.Count == 0) || NormalHeight == 0 || NormalWidth == 0)
             {
-                return;
+                return availableSize;
             }
 
-            if (VisualTiles.Count == 0)
+            Size maxSize = new Size();
+            int middleCol = _colCount / 2;
+
+            foreach (UIElement child in Children)
             {
-                return;
+                child.Measure(availableSize);
             }
 
-            int count = 0;
-            for (int col = 0; col < this.Columns; col++)
-            {
-                for (int row = 0; row < VisualTiles.ElementAt(col).Count; row++)
-                {
-                    TileCtrl tile = VisualTiles.ElementAt(col).ElementAt(row);
-                    GeneralTransform gt = tile.Visual.TransformToVisual(TopLayer);
+            BuildChildList();
+            //
+            //  Build the roads and buildings on the TopLayer
+            CreateBuildings();
 
-                    Point point = new Point();
-                    foreach (BuildingLocation location in Enum.GetValues(typeof(BuildingLocation)))
-                    {
-                        switch (location)
-                        {
-                            case BuildingLocation.TopRight:
-                                point.X = 81;
-                                point.Y = 3;
-                                break;
-                            case BuildingLocation.MiddleRight:
-                                point.X = 106.5;
-                                point.Y = 48;
-                                break;
-                            case BuildingLocation.BottomRight:
-                                point.X = 81;
-                                point.Y = 93;
-                                break;
-                            case BuildingLocation.BottomLeft:
-                                point.X = 29;
-                                point.Y = 93;
-                                break;
-                            case BuildingLocation.MiddleLeft:
-                                point.X = 3.5;
-                                point.Y = 48;
-                                break;
-                            case BuildingLocation.TopLeft:
-                                point.X = 29;
-                                point.Y = 3;
-                                break;
-                            case BuildingLocation.None:
-                                continue;
-                            default:
-                                continue;
-                        }
+            maxSize.Width = (_normalWidth + TileGap) * (_colCount - 1) + 2 * UniformMargin;
 
+            maxSize.Height = (_normalHeight + TileGap) * RowCounts[middleCol] + 2 * UniformMargin;
 
-
-                        point = gt.TransformPoint(point);
-
-                        //
-                        //  tag the Building with the tile and the position
-
-
-
-
-                        bool cloned = FindBuildingAtVisualLocation(point, Buildings, location, tile, out BuildingCtrl building);
-                        if (!cloned)
-                        {
-                            building = Buildings[count];
-                            building.LayoutPoint = point;
-                            building.Transform.TranslateX = point.X - .5 * building.Width;
-                            building.Transform.TranslateY = point.Y - .5 * building.Height;
-
-                            //
-                            //  add to dictionary...                            
-                            if (!building.BuildingToTileDictionary.ContainsKey(location))
-                            {
-                                building.BuildingToTileDictionary[location] = tile;
-                            }
-                            else
-                            {
-                                // this.TraceMessage($"{tile} @ {location} already in map!");
-                            }
-                            building.AddKey(tile, location);
-                            // setl2.BuildingCtrl.Show(BuildingState.City);
-                            count++;
-
-                        }
-
-                        BuildingKey key = new BuildingKey(tile, location);
-                        BuildingKeyToBuildingCtrlDictionary[key] = building;
-
-                        if (count == Buildings.Count)
-                        {
-
-                        }
-                    }
-
-                }
-
-            }
-
-            //foreach (var kvp in BuildingKeyToBuildingCtrlDictionary)
-            //{
-            //    Debug.Write($"{kvp.Key}: {kvp.Value.LayoutPoint}\t");
-            //    foreach (var clone in kvp.Value.Clones)
-            //    {
-            //        Debug.Write($"{clone}");
-            //    }
-            //    Debug.WriteLine("");
-            //}
-
-
+            return maxSize;
         }
-        public void FindRoadAdjacentToBuildings()
+
+        internal void Reset()
+        {
+            foreach (TileCtrl tile in Tiles)
+            {
+                tile.Reset();
+                if (tile.ResourceType != ResourceType.Sea)
+                {
+                    // tile.TileOrientation = TileOrientation.FaceUp;
+                    tile.TileOrientation = TileOrientation.FaceDown;
+                }
+            }
+            foreach (RoadCtrl road in Roads)
+            {
+                road.Reset();
+            }
+
+            foreach (BuildingCtrl s in Buildings)
+            {
+                s.Reset();
+            }
+
+            foreach (Harbor h in Harbors)
+            {
+                h.Reset();
+                h.SetOrientationAsync(TileOrientation.FaceUp);
+                h.SetOrientationAsync(TileOrientation.FaceDown);
+            }
+        }
+
+        public void ArrangeRoads()
+        {
+            if (RoadKeyToRoadDictionary.Count != 0)
+            {
+                return;
+            }
+
+            if (!_arrangeRoadsDone)
+            {
+                RoadKeyToRoadDictionary.Clear();
+                Roads.Clear();
+                RoadLayer.Children.Clear();
+                CreateAndArrangeRoads();
+                FindAdjacentRoads();
+                FindRoadAdjacentToBuildings();
+                _arrangeRoadsDone = true;
+            }
+        }
+
+        //
+        //  we should have all of the buildings on the board when this is called.
+        //  every tile/location combo should be in the map, or somethign screwed up.
+        //  don't use TryGet* so that you'll know when it messes up...
+        public void CalculateAdjacentBuildings()
         {
             int middleCol = VisualTiles.Count / 2;
 
@@ -1125,116 +1341,176 @@ namespace Catan10
                         switch (location)
                         {
                             case BuildingLocation.TopRight:
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Top);
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopLeft);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleRight);
                                 if (col < middleCol)
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.TopLeft);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.TopLeft); //checked
                                 }
                                 else
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row - 1), RoadLocation.BottomRight);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row - 1), BuildingLocation.TopLeft);
                                 }
                                 break;
-                            case BuildingLocation.MiddleRight:
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopRight);
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomRight);
+
+                            case BuildingLocation.MiddleRight: //checked
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomRight);
                                 if (col < middleCol)
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.Bottom);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.BottomRight); //checked
                                 }
                                 else
                                 {
-                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.Top))
-                                    {
-                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row - 1), RoadLocation.Bottom);
-                                    }
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.TopRight); // checked
                                 }
+
                                 break;
+
                             case BuildingLocation.BottomRight:
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Bottom);
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomLeft);
                                 if (col < middleCol)
                                 {
-                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row + 1), RoadLocation.BottomLeft))
-                                    {
-                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row + 1), RoadLocation.TopRight);
-                                    }
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col, row + 1), BuildingLocation.MiddleRight); //checked
                                 }
                                 else
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.BottomLeft);
-
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.BottomLeft);
                                 }
+
                                 break;
+
                             case BuildingLocation.BottomLeft:
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Bottom);
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomLeft);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleLeft);
                                 if (col <= middleCol)
                                 {
-                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.BottomRight))
-                                    {
-                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row + 1), RoadLocation.TopLeft);
-                                    }
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.BottomRight);
                                 }
                                 else
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row + 1), RoadLocation.BottomRight);
-
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.BottomRight);
                                 }
+
                                 break;
+
                             case BuildingLocation.MiddleLeft:
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopLeft);
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomLeft);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopLeft);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomLeft);
                                 if (col <= middleCol)
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.Top);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row - 1), BuildingLocation.BottomLeft);
                                 }
                                 else
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.Bottom);
-
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row + 1), BuildingLocation.TopLeft);
                                 }
+
                                 break;
+
                             case BuildingLocation.TopLeft:
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopLeft);
-                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Top);
-                                if (col <= middleCol)
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopRight);
+                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleLeft);
+                                if (col < middleCol)
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row - 1), RoadLocation.BottomLeft);
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col, row - 1), BuildingLocation.MiddleLeft);
                                 }
                                 else
                                 {
-                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.TopRight);
-
+                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.TopRight); // checked
                                 }
+
                                 break;
+
                             case BuildingLocation.None:
                                 break;
+
                             default:
                                 break;
                         }
-
                     }
                 }
             }
         }
 
-        private bool AddBuildingAdjacentRoad(BuildingCtrl building, TileCtrl tile, RoadLocation location)
+        //
+        //  Create the road if needed and build out all the road datastructures we need
+        public bool CreateAndArrangeRoads()
         {
-            if (tile == null)
+            if (Columns == 0)
             {
                 return false;
             }
 
-            RoadKey key = new RoadKey(tile, location);
-            RoadCtrl road = RoadKeyToRoadDictionary[key];
-            if (building.AdjacentRoads.Contains(road, new RoadCloneComparer()) == false)
+            if (VisualTiles.Count == 0)
             {
-                building.AdjacentRoads.Add(road);
+                return false;
             }
+
+            for (int col = 0; col < VisualTiles.Count; col++)
+            {
+                for (int row = 0; row < VisualTiles.ElementAt(col).Count; row++)
+                {
+                    TileCtrl tile = VisualTiles.ElementAt(col).ElementAt(row);
+                    GeneralTransform gt = tile.TransformToVisual(RoadLayer);
+                    Point tileZeroZero = gt.TransformPoint(new Point(0, 0));  // this is the upper left hand corner of the Tile
+
+                    foreach (RoadLocation loc in Enum.GetValues(typeof(RoadLocation)))
+                    {
+                        if (loc == RoadLocation.None)
+                        {
+                            continue;
+                        }
+
+                        RoadKey key = new RoadKey(tile, loc);
+                        RoadCtrl clone = GetCloneRoad(row, col, loc);
+                        if (clone != null)
+                        {
+                            RoadKeyToRoadDictionary[key] = clone;
+                            clone.Keys.Add(key);
+                            clone.RoadType = RoadType.Double;
+                        }
+                        else
+                        {
+                            RoadCtrl road = new RoadCtrl
+                            {
+                                Name = string.Format($"Road_{Roads.Count}"),
+                                Height = tile.HexThickness * 2 + TileGap,
+                                Width = tile.Height / 1.732, // the side of the Hexagon is the Height divided by the squareroot of 3
+                                                             //
+                                                             //  this *must* come after setting the width and Height...or you will throw
+                                RoadType = RoadType.Single, // born Single, become a Double when there is a clone
+                                Location = loc,
+                                TileZeroZero = new Point(0, 0) // force the update trigger to fire... bug?
+                            };
+
+                            Binding binding = new Binding()
+                            {
+                                Path = new PropertyPath("CurrentPlayer"),
+                                Mode = BindingMode.OneWay,
+                                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                                Source = MainPage.Current
+                            };
+
+                            road.SetBinding(RoadCtrl.CurrentPlayerProperty, binding);
+
+                            road.TileZeroZero = tileZeroZero;
+                            road.Callback = _gameCallback;
+
+                            road.Index = Roads.Count;
+                            Roads.Add(road);
+                            RoadLayer.Children.Add(road);
+                            RoadKeyToRoadDictionary[key] = road;
+                            road.Keys.Add(key);
+                        }
+                    }
+                }
+            }
+
             return true;
         }
+
         public void FindAdjacentRoads()
         {
             int middleCol = VisualTiles.Count / 2;
@@ -1282,6 +1558,7 @@ namespace Catan10
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.TopLeft));
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.TopRight));
                                 break;
+
                             case RoadLocation.TopRight:
                                 AddAdjacentRoad(road, tile, RoadLocation.Top);
                                 AddAdjacentRoad(road, tile, RoadLocation.BottomRight);
@@ -1299,13 +1576,10 @@ namespace Catan10
                                     }
                                 }
 
-
-
-
-
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.MiddleRight));
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.TopRight));
                                 break;
+
                             case RoadLocation.BottomRight:
                                 AddAdjacentRoad(road, tile, RoadLocation.TopRight);
                                 AddAdjacentRoad(road, tile, RoadLocation.Bottom);
@@ -1313,7 +1587,6 @@ namespace Catan10
                                 {
                                     AddAdjacentRoad(road, GetTileAt(col + 1, row + 1), RoadLocation.BottomLeft);
                                     AddAdjacentRoad(road, GetTileAt(col + 1, row), RoadLocation.Bottom);
-
                                 }
                                 else
                                 {
@@ -1328,6 +1601,7 @@ namespace Catan10
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.MiddleRight));
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.BottomRight));
                                 break;
+
                             case RoadLocation.Bottom:
                                 AddAdjacentRoad(road, tile, RoadLocation.BottomLeft);
                                 AddAdjacentRoad(road, tile, RoadLocation.BottomRight);
@@ -1350,6 +1624,7 @@ namespace Catan10
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.BottomRight));
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.BottomLeft));
                                 break;
+
                             case RoadLocation.BottomLeft:
                                 AddAdjacentRoad(road, tile, RoadLocation.TopLeft);
                                 AddAdjacentRoad(road, tile, RoadLocation.Bottom);
@@ -1360,7 +1635,6 @@ namespace Catan10
                                     {
                                         AddAdjacentRoad(road, GetTileAt(col, row + 1), RoadLocation.TopLeft);
                                     }
-
                                 }
                                 else
                                 {
@@ -1370,6 +1644,7 @@ namespace Catan10
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.BottomLeft));
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.MiddleLeft));
                                 break;
+
                             case RoadLocation.TopLeft:
                                 AddAdjacentRoad(road, tile, RoadLocation.Top);
                                 AddAdjacentRoad(road, tile, RoadLocation.BottomLeft);
@@ -1377,7 +1652,6 @@ namespace Catan10
                                 {
                                     AddAdjacentRoad(road, GetTileAt(col, row - 1), RoadLocation.BottomLeft);
                                     AddAdjacentRoad(road, GetTileAt(col - 1, row), RoadLocation.Top);
-
                                 }
                                 else
                                 {
@@ -1387,48 +1661,17 @@ namespace Catan10
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.TopLeft));
                                 road.AdjacentBuildings.Add(GetBuildingAt(tile, BuildingLocation.MiddleLeft));
                                 break;
+
                             default:
                                 continue;
                         }
                     }
                 }
             }
-
-
         }
 
-        private BuildingCtrl GetBuildingAt(TileCtrl tile, BuildingLocation location)
+        public void FindRoadAdjacentToBuildings()
         {
-            BuildingKey key = new BuildingKey(tile, location);
-            return BuildingKeyToBuildingCtrlDictionary[key];
-        }
-
-        private bool AddAdjacentRoad(RoadCtrl currentRoad, TileCtrl tile, RoadLocation location)
-        {
-            if (tile != null)
-            {
-                RoadKey key = new RoadKey(tile, location);
-                if (RoadKeyToRoadDictionary.TryGetValue(key, out RoadCtrl road))
-                {
-                    if (currentRoad.AdjacentRoads.Contains(road) == false)
-                    {
-                        currentRoad.AdjacentRoads.Add(road);
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        //
-        //  we should have all of the buildings on the board when this is called.
-        //  every tile/location combo should be in the map, or somethign screwed up.
-        //  don't use TryGet* so that you'll know when it messes up...
-        public void CalculateAdjacentBuildings()
-        {
-
             int middleCol = VisualTiles.Count / 2;
 
             for (int col = 0; col < VisualTiles.Count; col++)
@@ -1452,84 +1695,95 @@ namespace Catan10
                         switch (location)
                         {
                             case BuildingLocation.TopRight:
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopLeft);
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleRight);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Top);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopRight);
                                 if (col < middleCol)
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.TopLeft); //checked
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.TopLeft);
                                 }
                                 else
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row - 1), BuildingLocation.TopLeft);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row - 1), RoadLocation.BottomRight);
                                 }
                                 break;
-                            case BuildingLocation.MiddleRight: //checked
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopRight);
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomRight);
-                                if (col < middleCol)
-                                {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.BottomRight); //checked
-                                }
-                                else
-                                {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.TopRight); // checked
-                                }
 
+                            case BuildingLocation.MiddleRight:
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopRight);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomRight);
+                                if (col < middleCol)
+                                {
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.Bottom);
+                                }
+                                else
+                                {
+                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.Top))
+                                    {
+                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row - 1), RoadLocation.Bottom);
+                                    }
+                                }
                                 break;
+
                             case BuildingLocation.BottomRight:
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleRight);
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomLeft);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Bottom);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomRight);
                                 if (col < middleCol)
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col, row + 1), BuildingLocation.MiddleRight); //checked
+                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row + 1), RoadLocation.BottomLeft))
+                                    {
+                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row + 1), RoadLocation.TopRight);
+                                    }
                                 }
                                 else
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col + 1, row), BuildingLocation.BottomLeft);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col + 1, row), RoadLocation.BottomLeft);
                                 }
-
                                 break;
+
                             case BuildingLocation.BottomLeft:
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomRight);
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleLeft);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Bottom);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomLeft);
                                 if (col <= middleCol)
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.BottomRight);
+                                    if (!AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.BottomRight))
+                                    {
+                                        AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row + 1), RoadLocation.TopLeft);
+                                    }
                                 }
                                 else
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.BottomRight);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row + 1), RoadLocation.BottomRight);
                                 }
-
                                 break;
+
                             case BuildingLocation.MiddleLeft:
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopLeft);
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.BottomLeft);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopLeft);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.BottomLeft);
                                 if (col <= middleCol)
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row - 1), BuildingLocation.BottomLeft);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.Top);
                                 }
                                 else
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row + 1), BuildingLocation.TopLeft);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.Bottom);
                                 }
-
                                 break;
+
                             case BuildingLocation.TopLeft:
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.TopRight);
-                                AddAdjacentBuildings(currentBuilding, tile, BuildingLocation.MiddleLeft);
-                                if (col < middleCol)
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.TopLeft);
+                                AddBuildingAdjacentRoad(currentBuilding, tile, RoadLocation.Top);
+                                if (col <= middleCol)
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col, row - 1), BuildingLocation.MiddleLeft);
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col, row - 1), RoadLocation.BottomLeft);
                                 }
                                 else
                                 {
-                                    AddAdjacentBuildings(currentBuilding, GetTileAt(col - 1, row), BuildingLocation.TopRight); // checked
+                                    AddBuildingAdjacentRoad(currentBuilding, GetTileAt(col - 1, row), RoadLocation.TopRight);
                                 }
-
                                 break;
+
                             case BuildingLocation.None:
                                 break;
+
                             default:
                                 break;
                         }
@@ -1538,35 +1792,30 @@ namespace Catan10
             }
         }
 
-        private TileCtrl GetTileAt(int col, int row)
+        public void ShuffleHarbors(List<int> randomHarborTypeList)
         {
-            if (col < VisualTiles.Count && col >= 0)
+            for (int i = 0; i < Harbors.Count; i++)
             {
-                if (row < VisualTiles[col].Count && row >= 0)
-                {
-                    return VisualTiles.ElementAt(col).ElementAt(row);
-                }
+                Harbors[i].HarborType = StartingHarborTypes[randomHarborTypeList[i]];
             }
-
-            return null;
         }
 
-
-
-
-        private void AddAdjacentBuildings(BuildingCtrl currentBuilding, TileCtrl tile, BuildingLocation location)
+        public List<int> ShuffleTileGroup(TileGroup tileGroup, List<int> randomResourceTypeList)
         {
-            if (tile != null)
+            if (randomResourceTypeList == null)
             {
-                BuildingKey key = new BuildingKey(tile, location);
-                if (BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out BuildingCtrl adjacentBuilding))
+                randomResourceTypeList = GameContainerCtrl.GetRandomList(tileGroup.TilesToRandomize.Count - 1);
+            }
+
+            for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
+            {
+                if (tileGroup.TilesToRandomize[i].ResourceType != tileGroup.StartingResourceTypes[randomResourceTypeList[i]])
                 {
-                    if (currentBuilding.AdjacentBuildings.Contains(adjacentBuilding) == false)
-                    {
-                        currentBuilding.AdjacentBuildings.Add(adjacentBuilding);
-                    }
+                    tileGroup.TilesToRandomize[i].ResourceType = tileGroup.StartingResourceTypes[randomResourceTypeList[i]];
                 }
             }
+
+            return randomResourceTypeList;
         }
 
         public Size Update(Size finalSize)
@@ -1586,20 +1835,15 @@ namespace Catan10
                 return finalSize;
             }
 
-
-
             //
-            // 
+            //
             int middleCol = _colCount / 2;
             double left = UniformMargin + _normalWidth * 0.25;
             double top = 0;
             double gap = -TileGap / 2.0;
 
-
-
             for (int col = 0; col < _tilesInVisualLayout.Count; col++)
             {
-
                 List<TileCtrl> childColumn = _tilesInVisualLayout[col];
 
                 if (col <= middleCol)
@@ -1624,17 +1868,12 @@ namespace Catan10
                 }
                 catch { }
                 left += _normalWidth * .75 + TileGap;
-
             }
-
-
 
             MoveHarbors();
 
-
             if (!StaticHelpers.IsInVisualStudioDesignMode)
             {
-
                 //#pragma warning disable 4014
                 //                CoreWindow.GetForCurrentThread().Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 //                {
@@ -1652,241 +1891,30 @@ namespace Catan10
             CalculateAdjacentBuildings();
             return finalSize;
         }
-        private bool _arrangeRoadsDone = false;
-        public void ArrangeRoads()
-        {
-            if (RoadKeyToRoadDictionary.Count != 0)
-            {
-                return;
-            }
-
-            if (!_arrangeRoadsDone)
-            {
-                RoadKeyToRoadDictionary.Clear();
-                Roads.Clear();
-                RoadLayer.Children.Clear();
-                CreateAndArrangeRoads();
-                FindAdjacentRoads();
-                FindRoadAdjacentToBuildings();
-                _arrangeRoadsDone = true;
-            }
-        }
-
-
-        private void MoveHarbors()
-        {
-            if (HarborLayoutDataDictionary.Count == 0)
-            {
-                SetupHarborData();
-            }
-
-            Size desiredHarborSize = new Size(50, 50);
-
-            foreach (Harbor harbor in Harbors)
-            {
-                harbor.Arrange(new Rect(0, 0, desiredHarborSize.Width, desiredHarborSize.Height));
-                TileCtrl tile = TilesInIndexOrder[harbor.TileIndex];
-                HarborLayoutData data = HarborLayoutDataDictionary[harbor.HarborLocation];
-                GeneralTransform gtToSource = tile.TransformToVisual(HarborLayer);
-                Point to = gtToSource.TransformPoint(data.Anchor);
-                CompositeTransform transform = harbor.RenderTransform as CompositeTransform;
-                harbor.RenderTransformOrigin = data.RenderTransformOrigin;
-                transform.Rotation = data.Rotation;
-                harbor.RotateImage = -transform.Rotation;
-                transform.TranslateX = to.X;
-                transform.TranslateY = to.Y;
-                transform.ScaleX = data.Scale;
-                transform.ScaleY = data.Scale;
-                harbor.Visibility = Visibility.Visible;
-
-            }
-        }
-
-        //
-        //  Create the road if needed and build out all the road datastructures we need
-        public bool CreateAndArrangeRoads()
-        {
-
-            if (Columns == 0)
-            {
-                return false;
-            }
-
-            if (VisualTiles.Count == 0)
-            {
-                return false;
-            }
-
-            for (int col = 0; col < VisualTiles.Count; col++)
-            {
-                for (int row = 0; row < VisualTiles.ElementAt(col).Count; row++)
-                {
-
-                    TileCtrl tile = VisualTiles.ElementAt(col).ElementAt(row);
-                    GeneralTransform gt = tile.TransformToVisual(RoadLayer);
-                    Point tileZeroZero = gt.TransformPoint(new Point(0, 0));  // this is the upper left hand corner of the Tile
-
-
-                    foreach (RoadLocation loc in Enum.GetValues(typeof(RoadLocation)))
-                    {
-                        if (loc == RoadLocation.None)
-                        {
-                            continue;
-                        }
-
-                        RoadKey key = new RoadKey(tile, loc);
-                        RoadCtrl clone = GetCloneRoad(row, col, loc);
-                        if (clone != null)
-                        {
-                            RoadKeyToRoadDictionary[key] = clone;
-                            clone.Keys.Add(key);
-                            clone.RoadType = RoadType.Double;
-                        }
-                        else
-                        {
-                            RoadCtrl road = new RoadCtrl
-                            {
-                                Name = string.Format($"Road_{Roads.Count}"),
-                                Height = tile.HexThickness * 2 + TileGap,
-                                Width = tile.Height / 1.732, // the side of the Hexagon is the Height divided by the squareroot of 3                    
-                                                             //
-                                                             //  this *must* come after setting the width and Height...or you will throw
-                                RoadType = RoadType.Single, // born Single, become a Double when there is a clone    
-                                Location = loc,
-                                TileZeroZero = new Point(0, 0) // force the update trigger to fire... bug?
-                            };
-
-
-                            Binding binding = new Binding()
-                            {
-                                Path = new PropertyPath("CurrentPlayer"),
-                                Mode = BindingMode.OneWay,
-                                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                                Source = MainPage.Current
-                            };
-
-
-                            road.SetBinding(RoadCtrl.CurrentPlayerProperty, binding);
-
-                            road.TileZeroZero = tileZeroZero;
-                            road.Callback = _gameCallback;
-
-                            road.Index = Roads.Count;
-                            Roads.Add(road);
-                            RoadLayer.Children.Add(road);
-                            RoadKeyToRoadDictionary[key] = road;
-                            road.Keys.Add(key);
-
-
-                        }
-
-                    }
-                }
-            }
-
-
-
-            return true;
-        }
-
-
-        //
-        //  given a current tile and road location, return the Road that sits in the same place visually
-        private RoadCtrl GetCloneRoad(int row, int col, RoadLocation location)
-        {
-            TileCtrl cloneTile = null;
-            RoadLocation cloneLoc = RoadLocation.None;
-            switch (location)
-            {
-                case RoadLocation.None:
-                    cloneLoc = RoadLocation.None;
-                    break;
-                case RoadLocation.Top:
-                    cloneTile = GetAdjacentTile(row, col, TileLocation.Top);
-                    cloneLoc = RoadLocation.Bottom;
-                    break;
-                case RoadLocation.TopRight:
-                    cloneTile = GetAdjacentTile(row, col, TileLocation.TopRight);
-                    cloneLoc = RoadLocation.BottomLeft;
-                    break;
-                case RoadLocation.BottomRight:
-                    cloneTile = GetAdjacentTile(row, col, TileLocation.BottomRight);
-                    cloneLoc = RoadLocation.TopLeft;
-                    break;
-                case RoadLocation.Bottom:
-                    cloneTile = GetAdjacentTile(row, col, TileLocation.Bottom);
-                    cloneLoc = RoadLocation.Top;
-                    break;
-                case RoadLocation.BottomLeft:
-                    cloneTile = GetAdjacentTile(row, col, TileLocation.BottomLeft);
-                    cloneLoc = RoadLocation.TopRight;
-                    break;
-                case RoadLocation.TopLeft:
-                    cloneTile = GetAdjacentTile(row, col, TileLocation.TopLeft);
-                    cloneLoc = RoadLocation.BottomRight;
-                    break;
-                default:
-                    break;
-            }
-
-            if (cloneLoc == RoadLocation.None || cloneTile == null)
-            {
-                return null;
-            }
-
-            RoadKeyToRoadDictionary.TryGetValue(new RoadKey(cloneTile, cloneLoc), out RoadCtrl cloanRoad);
-
-            return cloanRoad; // may be null
-        }
-
-
-
-        //
-        //  we have here an n! algorythm where we keep a list of all of the building and then when we add one, we check to see if there is another "close" to the one
-        //  we are trying to add. if they are close, we add it to the Clone map and return "true".  if it isn't a Clone, we return false
-        //  
-        //  this makes it so that one building can "connect" to multiple tiles.
-        //
-        private bool FindBuildingAtVisualLocation(Point p, List<BuildingCtrl> buildings, BuildingLocation location, TileCtrl tile, out BuildingCtrl clone)
-        {
-
-
-            //  this.TraceMessage($"looking for a clone for {tile} at {location}");
-            foreach (BuildingCtrl s in buildings)
-            {
-                //  this.TraceMessage($"\t\tChecking {s.Clones[0].Tile} at {s.Clones[0].Location} DelatX: {Math.Abs(s.LayoutPoint.X - p.X)} DeltaY: {Math.Abs(s.LayoutPoint.Y - p.Y)}");
-                if (Math.Abs(s.LayoutPoint.X - p.X) < 20 && Math.Abs(s.LayoutPoint.Y - p.Y) < 20)
-                {
-                    //  this.TraceMessage($"found clone of {s} from {s.LayoutPoint} at {p} deltaX={Math.Abs(s.LayoutPoint.X - p.X)} deltaY={Math.Abs(s.LayoutPoint.Y - p.Y)}");
-                    if (!s.BuildingToTileDictionary.ContainsKey(location))
-                    {
-                        s.BuildingToTileDictionary[location] = tile;
-                    }
-                    else
-                    {
-                        //this.TraceMessage($"{tile} @ {location} already in map!");
-                    }
-                    clone = s;
-                    s.AddKey(tile, location);
-                    return true;
-                }
-            }
-            clone = null;
-            return false;
-        }
-
-
     }
 
     public class HarborLayoutData
     {
-        public Point RenderTransformOrigin { get; set; }
-        public double Rotation { get; set; }
-        public double Scale { get; set; } = 1.1;
-        public Point Anchor { get; set; }
+        public HarborLayoutData(Point rto, double rotate, double scale, Point anchor)
+        {
+            RenderTransformOrigin = rto;
+            Rotation = rotate;
+            Scale = scale;
+            Anchor = anchor;
+        }
 
         public static double Height { get; } = 50;
         public static double Width { get; } = 50;
+        public Point Anchor { get; set; }
+        public Point RenderTransformOrigin { get; set; }
+        public double Rotation { get; set; }
+        public double Scale { get; set; } = 1.1;
+
+        public static void AddLocation(HarborLocation location, Point rto, double rotate, double scale, Point anchor, Dictionary<HarborLocation, HarborLayoutData> harborLayoutDataDictionary)
+        {
+            HarborLayoutData data = new HarborLayoutData(rto, rotate, scale, anchor);
+            harborLayoutDataDictionary[location] = data;
+        }
 
         //
         //  move this harbor to this location on this tile
@@ -1901,29 +1929,28 @@ namespace Catan10
             harbor.Transform.TranslateY = to.Y;
             harbor.Transform.ScaleX = data.Scale;
             harbor.Transform.ScaleY = data.Scale;
-
-
         }
-
-
-
-        public static void AddLocation(HarborLocation location, Point rto, double rotate, double scale, Point anchor, Dictionary<HarborLocation, HarborLayoutData> harborLayoutDataDictionary)
-        {
-            HarborLayoutData data = new HarborLayoutData(rto, rotate, scale, anchor);
-            harborLayoutDataDictionary[location] = data;
-        }
-        public HarborLayoutData(Point rto, double rotate, double scale, Point anchor)
-        {
-            RenderTransformOrigin = rto;
-            Rotation = rotate;
-            Scale = scale;
-            Anchor = anchor;
-
-        }
-
-
     }
 
+    public class Island
+    {
+        public bool BonusPoint = false;
+        public int End = -1;
+        public int Start = -1;
+    }
 
+    public class StaticGameInfo : DependencyObject
+    {
+        public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.RegisterAttached("MaxRoads", typeof(int), typeof(StaticGameInfo), new PropertyMetadata(15));
 
+        public static int GetMaxRoads(CatanHexPanel element)
+        {
+            return (int)element.GetValue(MaxRoadsProperty);
+        }
+
+        public static void SetMaxRoads(CatanHexPanel element, int value)
+        {
+            element.SetValue(MaxRoadsProperty, value);
+        }
+    }
 }

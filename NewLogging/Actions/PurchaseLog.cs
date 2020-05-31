@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Catan.Proxy;
+using Windows.Media.PlayTo;
 
 namespace Catan10
 {
@@ -40,6 +41,11 @@ namespace Catan10
             if (PurchasedEntitlement == Entitlement.DevCard)
             {
                 DevCardType devCard = gameController.PurchaseNextDevCard();
+                if (devCard == DevCardType.Unknown) // ran out of DevCards!
+                {
+                    player.GameData.Resources.Current += cost; //refund!
+                    return Task.CompletedTask;
+                }
             }
             player.GameData.Resources.GrantEntitlement(PurchasedEntitlement);
             return Task.CompletedTask;
@@ -56,6 +62,7 @@ namespace Catan10
             PlayerModel player = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(player != null);
             Contract.Assert(player.GameData.Resources.UnspentEntitlements.Contains(PurchasedEntitlement));
+            Contract.Assert(PurchasedEntitlement != Entitlement.DevCard);
             var cost = TradeResources.GetEntitlementCost(PurchasedEntitlement);
             player.GameData.Resources.Current += cost;
             player.GameData.Resources.GrantEntitlement(PurchasedEntitlement);

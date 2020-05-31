@@ -22,6 +22,7 @@ namespace Catan10
             Description = s;
             Index = idx;
             CatanGame = gameType;
+
         }
 
         private ICatanGameData ChildControl
@@ -43,7 +44,8 @@ namespace Catan10
         public string Description { get; set; } = "Regular";
         public int Index { get; set; } = -1;
 
-        #region ICatanGameData implementation
+        
+
 
         public List<TileCtrl> DesertTiles => ChildControl.DesertTiles;
 
@@ -61,20 +63,19 @@ namespace Catan10
             }
         }
 
-        public int MaxCities => ChildControl.MaxCities;
 
-        public int MaxRoads => ChildControl.MaxRoads;
-
-        public int MaxSettlements => ChildControl.MaxSettlements;
-
-        public int MaxShips => ChildControl.MaxShips;
         public List<TileCtrl> Tiles => ChildControl.Tiles;
 
-        #endregion ICatanGameData implementation
+        public CatanGameData GameData => ChildControl.GameData;
 
         public override string ToString()
         {
             return String.Format($"{Description}.{ControlType.Name}");
+        }
+
+        internal DevCardType GetNextDevCard()
+        {
+            return ChildControl.GameData.GetNextDevCard();
         }
     }
 
@@ -916,15 +917,13 @@ namespace Catan10
             await InitialPlaceBaron();
         }
 
-        #region properties needed by MainPage
+        
 
         public List<BuildingCtrl> AllBuildings => _currentHexPanel.Buildings;
         public List<RoadCtrl> AllRoads => _currentHexPanel.Roads;
         public List<TileCtrl> AllTiles => _currentHexPanel.Tiles;
 
-        #endregion properties needed by MainPage
-
-        #region Random Number assignment
+        
 
         private bool AboveTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
         {
@@ -1117,7 +1116,7 @@ namespace Catan10
             }
         }
 
-        #endregion Random Number assignment
+   
 
         /**
         *  flip tiles to facedown, change them to temp gold, and then flip them back up

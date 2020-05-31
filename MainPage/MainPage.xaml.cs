@@ -119,20 +119,16 @@ namespace Catan10
             pData.Reset();
             //
             //  need to give the players some data about the game
-            pData.GameData.MaxCities = _gameView.CurrentGame.MaxCities;
-            pData.GameData.MaxRoads = _gameView.CurrentGame.MaxRoads;
-            pData.GameData.MaxSettlements = _gameView.CurrentGame.MaxSettlements;
-            pData.GameData.MaxShips = _gameView.CurrentGame.MaxShips;
+            pData.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
+            pData.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
+            pData.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
+            pData.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
 
             //  _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
             // await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, MainPageModel.PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
             return Task.CompletedTask;
         }
 
-        private async Task AddPlayer(LogEntry le, LogType logType)
-        {
-            await AddPlayer(le.PlayerData, logType);
-        }
 
         //
         //  this needs to be called *after* the log for the Roll because we need to undo all of these prior to undoing the Roll

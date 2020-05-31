@@ -372,23 +372,7 @@ namespace Catan10
             UnspentEntitlements.Add(entitlement);
         }
 
-        public bool BuyEntitlement(Entitlement entitlement)
-        {
-            if (!CanAfford(entitlement))
-                return false;
-
-            var cost = TradeResources.GetEntitlementCost(entitlement);
-            Current += cost.GetNegated();
-            if (entitlement == Entitlement.DevCard)
-            {
-                
-            }
-            else
-            {
-                GrantEntitlement(entitlement);
-            }
-            return true;
-        }
+        
 
         public void GrantResources(TradeResources tr)
         {
@@ -399,12 +383,12 @@ namespace Catan10
             NotifyPropertyChanged("Current");
             NotifyPropertyChanged("ResourcesThisTurn");
             NotifyPropertyChanged("TotalResources");
+            NotifyPropertyChanged("EnabledEntitlementPurchase");
 
         }
 
         public bool HasEntitlement(Entitlement entitlement)
         {
-            return UnspentEntitlements.Contains(entitlement);
         }
 
         // the list of cards that have been played.  this is public information!

@@ -37,7 +37,7 @@ namespace Catan10
         public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
         public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
         public ObservableCollection<GameInfo> Games = new ObservableCollection<GameInfo>();
-        public CatanGameInfo GameInfo { get; set; }
+        public CatanGameData GameInfo { get; set; }
         public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
         public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(GameInfo), typeof(ServiceGameDlg), new PropertyMetadata(null, SelectedGameChanged));
         public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", HostNameChanged));

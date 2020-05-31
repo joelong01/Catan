@@ -190,7 +190,7 @@ namespace Catan10
                     //  remove any tracking for roads greater than their current longest road
                     //  e.g. if they had a road of length 7 and somebody broke it, remove the
                     //  entries that said they had built roads of length 5+
-                    for (int i = p.GameData.LongestRoad + 1; i < GameContainer.CurrentGame.MaxRoads; i++)
+                    for (int i = p.GameData.LongestRoad + 1; i < GameContainer.CurrentGame.GameData.MaxRoads; i++)
                     {
                         raceTracking.RemovePlayer(p, i);
                     }
@@ -385,7 +385,7 @@ namespace Catan10
         private RoadState NextRoadState(RoadCtrl road)
         {
             bool nextToSea = false;
-            if (road.Keys.Count == 1 && _gameView.CurrentGame.MaxShips > 0)
+            if (road.Keys.Count == 1 && _gameView.CurrentGame.GameData.MaxShips > 0)
             {
                 // this means we are on an outer edge
                 nextToSea = true;
@@ -703,7 +703,7 @@ namespace Catan10
                     //  remove any tracking for roads greater than their current longest road
                     //  e.g. if they had a road of length 7 and somebody broke it, remove the
                     //  entries that said they had built roads of length 5+
-                    for (int i = p.GameData.LongestRoad + 1; i < _gameView.CurrentGame.MaxRoads; i++)
+                    for (int i = p.GameData.LongestRoad + 1; i < _gameView.CurrentGame.GameData.MaxRoads; i++)
                     {
                         _raceTracking.RemovePlayer(p, i);
                     }

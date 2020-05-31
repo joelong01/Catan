@@ -130,6 +130,7 @@
     <Compile Include="Games\ExpansionCtrl.xaml.cs">
       <DependentUpon>ExpansionCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
     <Compile Include="Logging\LogDefinitions.cs" />
     <Compile Include="Logging\LogObjects.cs" />

@@ -19,11 +19,9 @@ namespace Catan10
         GameType GameType { get; }
         CatanHexPanel HexPanel { get; }
         int Index { get; }
-        int MaxCities { get; }
-        int MaxRoads { get; }
-        int MaxSettlements { get; }
-        int MaxShips { get; }
+       
         List<TileCtrl> Tiles { get; }
+        CatanGameData GameData { get; }
     }
 
     public interface ICatanSettings

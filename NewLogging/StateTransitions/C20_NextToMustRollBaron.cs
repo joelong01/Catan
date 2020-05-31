@@ -59,7 +59,7 @@ namespace Catan10
 
         public static async Task PostLog(IGameController gameController, PlayerModel victom, int targetTileIndex, int previousIndex, TargetWeapon weapon)
         {
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForNext);
+            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
 
             MustMoveBaronToWaitingForNext logHeader = new MustMoveBaronToWaitingForNext()
             {

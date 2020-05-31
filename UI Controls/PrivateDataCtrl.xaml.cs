@@ -70,26 +70,29 @@ namespace Catan10
         {
             if (Player.GameData.Resources.CanAfford(Entitlement.Settlement))
             {
-                Contract.Assert(Player == MainPage.Current.TheHuman);
                 await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement);
             }
-            
+
 
         }
 
-        private void OnBuyCity(object sender, RoutedEventArgs e)
+        private async void OnBuyCity(object sender, RoutedEventArgs e)
         {
-            Player.GameData.Resources.BuyEntitlement(Entitlement.City);
+            if (!Player.GameData.Resources.CanAfford(Entitlement.City)) return;
+            await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.City);
+
         }
 
-        private void OnBuyRoad(object sender, RoutedEventArgs e)
+        private async void OnBuyRoad(object sender, RoutedEventArgs e)
         {
-            Player.GameData.Resources.BuyEntitlement(Entitlement.Road);
+            if (!Player.GameData.Resources.CanAfford(Entitlement.Road)) return;
+            await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Road);
         }
 
-        private void OnBuyDevCard(object sender, RoutedEventArgs e)
+        private async void OnBuyDevCard(object sender, RoutedEventArgs e)
         {
-            Player.GameData.Resources.BuyEntitlement(Entitlement.DevCard);
+            if (!Player.GameData.Resources.CanAfford(Entitlement.DevCard)) return;
+            await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.DevCard);
         }
 
         private void OnTrade(object sender, RoutedEventArgs e)
@@ -110,7 +113,7 @@ namespace Catan10
 
             return playerResources.CanAfford(entitlement);
 
-            
+
         }
 
 
