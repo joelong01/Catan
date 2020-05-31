@@ -147,10 +147,10 @@ namespace Catan10
             await ChangeGame(item.Tag as CatanGameCtrl);
         }
 
-        private async void Menu_ShowSavedGames(object sender, RoutedEventArgs e)
+        private void Menu_ShowSavedGames(object sender, RoutedEventArgs e)
         {
-            await LoadSavedGames(); // this will load the saved games into the UI control
-            _savedGameGrid.Visibility = Visibility.Visible;
+            //await LoadSavedGames(); // this will load the saved games into the UI control
+            //_savedGameGrid.Visibility = Visibility.Visible;
 
             //var folder = await StaticHelpers.GetSaveFolder();
             //var picker = new FileOpenPicker()
@@ -420,9 +420,6 @@ namespace Catan10
             await PickDefaultUser();
         }
 
-        private void OnShowMenu(object sender, RoutedEventArgs e)
-        {
-        }
 
         // DO NOT call button.IsEnabled = true; -- this is set via notification
         private async void OnUndo(object sender, RoutedEventArgs e)
@@ -448,13 +445,7 @@ namespace Catan10
             await WsConnect();
         }
 
-        /// <summary>
-        ///     we stopped tracking Winner as that drove conflict when everybody forgot to set the winner...
-        /// </summary
-        private void OnWinnerClicked(object sender, RoutedEventArgs e)
-        {
-            //  await OnWin();
-        }
+
 
         /// <summary>
         ///     Go through all the tiles and decide if it is a potential baron victim.

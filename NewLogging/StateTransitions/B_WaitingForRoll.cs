@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -13,11 +12,10 @@ namespace Catan10
     public class DoneAllocResourcesToWaitingForRoll : LogHeader, ILogController
     {
         public List<int> GoldTiles { get; set; }
+
         internal static async Task PostLog(IGameController gameController)
         {
-
             Contract.Assert(gameController.CurrentGameState == GameState.DoneResourceAllocation);
-            
 
             DoneAllocResourcesToWaitingForRoll logHeader = new DoneAllocResourcesToWaitingForRoll()
             {
@@ -35,17 +33,20 @@ namespace Catan10
             //
             //  hide the rolls in the public data control
             gameController.PlayingPlayers.ForEach((p) =>
-            {               
+            {
                 p.GameData.RollOrientation = TileOrientation.FaceDown;
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources();
+                p.GameData.KnightEligible = false;
             });
+
+            gameController.CurrentPlayer.GameData.KnightEligible = (gameController.CurrentPlayer.GameData.Resources.UnplayedKnights > 0);
             //
             // if we have a roll for this turn already, use it.
             if (gameController.RollLog.CanRedo)
             {
                 await WaitingForRollToWaitingForNext.PostLog(gameController, gameController.RollLog.NextRolls);
-
             }
+
             await gameController.SetRandomTileToGold(GoldTiles);
         }
 
@@ -59,7 +60,7 @@ namespace Catan10
             await gameController.ResetRandomGoldTiles();
             gameController.PlayingPlayers.ForEach((p) =>
             {
-                p.GameData.Resources.ResourcesThisTurn += p.GameData.Resources.Current;                
+                p.GameData.Resources.ResourcesThisTurn += p.GameData.Resources.Current;
             });
         }
     }

@@ -249,7 +249,7 @@
                     <!--  Largest Army  -->
                     <TextBlock Margin="30,0,5,0" Text="♞" FontFamily="Segoe UI Symbol" FontSize="68"
                         Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                    <TextBlock FontSize="68" Text="{x:Bind Player.GameData.KnightsPlayed, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                    <TextBlock FontSize="68" Text="{x:Bind Player.GameData.Resources.KnightsPlayed, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                     <TextBlock Margin="30,0,5,0" Text="⛏" FontSize="68" IsColorFontEnabled="False"
                         Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                     <TextBlock FontSize="68" Text="{x:Bind Player.GameData.Resources.UnspentEntitlements.Count, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />

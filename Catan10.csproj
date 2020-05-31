@@ -132,8 +132,6 @@
     </Compile>
     <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
-    <Compile Include="Logging\LogDefinitions.cs" />
-    <Compile Include="Logging\LogObjects.cs" />
     <Compile Include="MainPage\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
@@ -201,7 +199,6 @@
     <Compile Include="UI Controls\ResourceCardCtrl.xaml.cs">
       <DependentUpon>ResourceCardCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Logging\logging.cs" />
     <Compile Include="ContentDialogs\NewGameDlg.xaml.cs">
       <DependentUpon>NewGameDlg.xaml</DependentUpon>
     </Compile>

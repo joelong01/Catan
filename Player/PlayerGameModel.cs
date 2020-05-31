@@ -8,7 +8,9 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+
 using Catan.Proxy;
+
 using Windows.UI.Xaml;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -18,67 +20,36 @@ namespace Catan10
     public class PlayerGameModel : INotifyPropertyChanged
     {
         private readonly bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
-
         private int _CitiesPlayed = 0;
-
         private List<List<int>> _GoldRolls = new List<List<int>>();
-
         private bool _goodRoll = false;
-
         private bool _HasLongestRoad = false;
-
         private bool _isCurrentPlayer = false;
-
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
-
         private int _IslandsPlayed = 0;
-
-        private int _knightsPlayed = 0;
-
         private bool _LargestArmy = false;
-
         private int _LongestRoad = 0;
-
         private int _MaxCities = 0;
-
         private int _maxNoResourceRolls = 0;
-
         private int _MaxRoads = 0;
-
         private int _MaxSettlements = 0;
-
         private int _MaxShips = 0;
-
         private bool? _MovedBaronAfterRollingSeven = null;
-
         private int _noResourceCount = 0;
-
         private int _pips = 0;
-
         private bool _PlayedKnightThisTurn = false;
-
         private PlayerModel _playerData = null;
-
         private PlayerResources _resources = new PlayerResources();
-
         private int _RoadsPlayed = 0;
-
         private TileOrientation _RollOrientation = TileOrientation.FaceDown;
-
         private int _rollsWithResource = 0;
-
         private int _score = 0;
-
         private int _SettlementsPlayed = 0;
-
         private int _ShipsPlayed = 0;
-
         private int _timesTargeted = 0;
-
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
-
         public CardsLostUpdatedHandler OnCardsLost;
-
+        public bool KnightEligible { get; set; } = false; // a flag set when this player becomes Current iff they have a knight they can play.  stops us from buying and playing a knight the same turn
         public PlayerGameModel()
         {
         }
@@ -90,8 +61,7 @@ namespace Catan10
             Cities.CollectionChanged += Cities_CollectionChanged;
             Ships.CollectionChanged += Ships_CollectionChanged;
             PlayerModel = pData;
-            PlayerTurnResourceCount = new PlayerResourceModel(pData);
-            PlayerTurnResourceCount.OnPlayerResourceUpdate += OnGameModelResourceUpdate; // currently only logs that a resource was allocated
+           
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -179,20 +149,6 @@ namespace Catan10
                 if (_IslandsPlayed != value)
                 {
                     _IslandsPlayed = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int KnightsPlayed
-        {
-            get => _knightsPlayed;
-            set
-            {
-                if (_knightsPlayed != value)
-                {
-                    LogPropertyChanged(_knightsPlayed, value);
-                    _knightsPlayed = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -386,8 +342,6 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public PlayerResourceModel PlayerTurnResourceCount { get; set; } = null;
 
         public PlayerResources Resources
         {
@@ -670,7 +624,6 @@ namespace Catan10
             OwnedHarbors.Add(harbor);
         }
 
-        
         public bool Deserialize(string s, bool oneLine)
         {
             StaticHelpers.DeserializeObject<PlayerGameModel>(this, s, ":", "|");
@@ -702,7 +655,7 @@ namespace Catan10
         {
             _islands = new Dictionary<Island, int>();
             Score = 0;
-            KnightsPlayed = 0;
+
             LongestRoad = 0;
             TimesTargeted = 0;
             NoResourceCount = 0;
@@ -729,8 +682,7 @@ namespace Catan10
             MaxRoads = 0;
             MaxSettlements = 0;
             MaxCities = 0;
-            PlayerTurnResourceCount.OnPlayerResourceUpdate -= OnGameModelResourceUpdate;
-            PlayerTurnResourceCount.GameReset();
+        
             Pips = 0;
             _GoldRolls = new List<List<int>>();
 
@@ -757,22 +709,7 @@ namespace Catan10
             _RoadTie[roadCount - 5] = winTie;
         }
 
-        public void UpdateResourceCount(RollResourcesModel rrModel, LogState logState)
-        {
-            int mult = 1;
-            if (logState == LogState.Undo) mult = -1;
-
-            if (rrModel.BlockedByBaron)
-            {
-                this.TraceMessage("You deleted this.  might want to fix it.");
-                // CardsLostToBaron += (rrModel.Value * mult);
-            }
-            else
-            {
-                //  ResourcesAcquired += (rrModel.Value * mult);
-                PlayerTurnResourceCount.AddResourceCount(rrModel.ResourceType, rrModel.Value * mult);
-            }
-        }
+       
 
         public bool WinsRoadCountTie(int roadCount)
         {
@@ -781,179 +718,6 @@ namespace Catan10
         }
     }
 
-    /// <summary>
-    ///     PlayerResourceData:  a class that keeps track of the number of resources that happen on a per roll basis.
-    /// </summary>
-
-    public class PlayerResourceModel : INotifyPropertyChanged
-    {
-        private readonly PlayerModel _player = null;
-
-        private int _Brick = 0;
-        private int _Gold = 0;
-        private int _Ore = 0;
-        private int _Sheep = 0;
-        private int _Wheat = 0;
-        private int _Wood = 0;
-        public PlayerResourceUpdateHandler OnPlayerResourceUpdate;
-
-        public PlayerResourceModel(PlayerModel player)
-        {
-            _player = player;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public int Brick
-        {
-            get => _Brick;
-            private set
-            {
-                if (_Brick != value)
-                {
-                    _Brick = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Total");
-                }
-            }
-        }
-
-        public int GoldMine
-        {
-            get => _Gold;
-            private set
-            {
-                if (_Gold != value)
-                {
-                    _Gold = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Total");
-                }
-            }
-        }
-
-        public int Ore
-        {
-            get => _Ore;
-            private set
-            {
-                if (_Ore != value)
-                {
-                    _Ore = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Total");
-                }
-            }
-        }
-
-        public int Sheep
-        {
-            get => _Sheep;
-            private set
-            {
-                if (_Sheep != value)
-                {
-                    _Sheep = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Total");
-                }
-            }
-        }
-
-        public int Total => Sheep + Wood + Ore + Wheat + Brick + GoldMine;
-
-        public int Wheat
-        {
-            get => _Wheat;
-            private set
-            {
-                if (_Wheat != value)
-                {
-                    _Wheat = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Total");
-                }
-            }
-        }
-
-        public int Wood
-        {
-            get => _Wood;
-            private set
-            {
-                if (_Wood != value)
-                {
-                    _Wood = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Total");
-                }
-            }
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        internal int AddResourceCount(ResourceType resource, int count)
-        {
-            int oldVal = 0;
-            switch (resource)
-            {
-                case ResourceType.Sheep:
-                    oldVal = Sheep;
-                    Sheep += count;
-                    break;
-
-                case ResourceType.Wood:
-                    oldVal = Wood;
-                    Wood += count;
-                    break;
-
-                case ResourceType.Ore:
-                    oldVal = Ore;
-                    Ore += count;
-                    break;
-
-                case ResourceType.Wheat:
-                    oldVal = Wheat;
-                    Wheat += count;
-                    break;
-
-                case ResourceType.Brick:
-                    oldVal = Brick;
-                    Brick += count;
-                    break;
-
-                case ResourceType.GoldMine:
-                    oldVal = GoldMine;
-                    GoldMine += count;
-                    break;
-
-                default:
-                    break;
-            }
-
-            OnPlayerResourceUpdate?.Invoke(_player, resource, oldVal, oldVal + count);
-
-            return oldVal;
-        }
-
-        public void GameReset()
-        {
-            TurnReset();
-        }
-
-        public void TurnReset()
-        {
-            GoldMine = 0;
-            Wheat = 0;
-            Ore = 0;
-            Sheep = 0;
-            Brick = 0;
-            Wood = 0;
-        }
-    }
 
     /// <summary>
     ///     this class has
@@ -973,6 +737,7 @@ namespace Catan10
         {
             LatestRolls.AddRange(PickingBoardToWaitingForRollOrder.GetRollModelList()); // always have 4 Rolls in here so XAML doesn't throw
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public RollModel CurrentRoll
@@ -1028,6 +793,7 @@ namespace Catan10
             RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);
             return CurrentRoll;
         }
+
         public int CompareTo(SyncronizedPlayerRolls other)
         {
             if (this.RollValues.Count == 0)
@@ -1101,7 +867,5 @@ namespace Catan10
         {
             return base.ToString();
         }
-
-      
     }
 }

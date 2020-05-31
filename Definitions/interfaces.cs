@@ -58,7 +58,6 @@ namespace Catan10
 
     public interface IGameCallback
     {
-        Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool UIVisible, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0);
 
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
 
@@ -137,11 +136,10 @@ namespace Catan10
         /// <returns></returns>
         PlayerModel NameToPlayer(string playerName);
 
-        int PopRoll();
-
+        
         Task<bool> PostMessage(LogHeader logHeader, CatanMessageType normal);
 
-        bool PushRoll(int roll);
+        
 
         Task<bool> RedoAsync();
 
@@ -188,6 +186,7 @@ namespace Catan10
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
         TileCtrl TileFromIndex(int targetTile);
         DevCardType PurchaseNextDevCard();
+        Task ResetRollControl();
 
         GameContainerCtrl GameContainer { get; }
     }

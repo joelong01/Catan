@@ -348,10 +348,10 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        public static LogList<int> GetRandomList(int max)
+        public static List<int> GetRandomList(int max)
         {
             MersenneTwister twist = new MersenneTwister();
-            LogList<int> randomIndeces = new LogList<int>();
+            List<int> randomIndeces = new List<int>();
 
             for (int i = 0; i <= max; i++)
             {
@@ -690,7 +690,7 @@ namespace Catan10
             _currentHexPanel.TileCallback = _tileCallback;
         }
 
-        public async Task InitialPlaceBaron()
+        public Task InitialPlaceBaron()
         {
             if (_currentHexPanel.DesertTiles.Count > 0)
             {
@@ -710,7 +710,8 @@ namespace Catan10
                 }
             }
 
-            await _gameCallback.AddLogEntry(null, GameState.Unknown, CatanAction.InitialAssignBaron, true, LogType.Normal, BaronTile.Index);
+            return Task.CompletedTask;
+
         }
 
         /// <summary>
@@ -863,7 +864,7 @@ namespace Catan10
                 building.Pips = pips;
             }
 
-            await _gameCallback.AddLogEntry(null, GameState.Unknown, CatanAction.RandomizeBoard, true, LogType.Normal, -1, this.RandomBoardSettings);
+            
         }
 
         public async Task SetRandomTilesToGold(IEnumerable<int> indeces)

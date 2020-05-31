@@ -32,7 +32,7 @@ namespace Catan10
     }
 
 
-    public sealed partial class MainPage : Page, ILog
+    public sealed partial class MainPage : Page
     {
 
 
@@ -43,7 +43,7 @@ namespace Catan10
 
 
         // int toggle = 0;
-        private async void OnTest1(object sdr, RoutedEventArgs rea)
+        private void OnTest1(object sdr, RoutedEventArgs rea)
         {
            
 
@@ -157,29 +157,29 @@ namespace Catan10
 
 
         }
-        private async void OnTestExpansionGame(object sender, RoutedEventArgs e)
+        private  void OnTestExpansionGame(object sender, RoutedEventArgs e)
         {
-            AnimationSpeedBase = 10; // speed up the animations
-            RandomGoldTileCount = 3;
-            await this.Reset();
-            // await MainPageModel.Log.Init(CreateSaveFileName("Expansion Game"));
-            await SetStateAsync(null, GameState.WaitingForNewGame, true);
-            _gameView.CurrentGame = _gameView.Games[1];
+            //AnimationSpeedBase = 10; // speed up the animations
+            //RandomGoldTileCount = 3;
+            //await this.Reset();
+            //// await MainPageModel.Log.Init(CreateSaveFileName("Expansion Game"));
+            //await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            //_gameView.CurrentGame = _gameView.Games[1];
 
-            //   SavedGames.Insert(0, MainPageModel.Log);
-            //   await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
-            List<PlayerModel> PlayerDataList = new List<PlayerModel>
-            {
-                MainPageModel.AllPlayers[0],
-                MainPageModel.AllPlayers[1],
-                MainPageModel.AllPlayers[2],
-                MainPageModel.AllPlayers[3],
-                MainPageModel.AllPlayers[4],
-            };
-            await StartGame(PlayerDataList, 1);
-            await NextState(); // simluates pushing "Start"
-            CurrentPlayer = MainPageModel.PlayingPlayers[0];
-            await PickSettlementsAndRoads();
+            ////   SavedGames.Insert(0, MainPageModel.Log);
+            ////   await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
+            //List<PlayerModel> PlayerDataList = new List<PlayerModel>
+            //{
+            //    MainPageModel.AllPlayers[0],
+            //    MainPageModel.AllPlayers[1],
+            //    MainPageModel.AllPlayers[2],
+            //    MainPageModel.AllPlayers[3],
+            //    MainPageModel.AllPlayers[4],
+            //};
+            //await StartGame(PlayerDataList, 1);
+            //await NextState(); // simluates pushing "Start"
+            //CurrentPlayer = MainPageModel.PlayingPlayers[0];
+            //await PickSettlementsAndRoads();
 
 
         }

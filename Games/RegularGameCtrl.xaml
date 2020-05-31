@@ -8,9 +8,11 @@
 
     <!--  BaronTile="{Binding ElementName=_desertTile, Mode=TwoWay}"  -->
     <Viewbox>
-        <local:CatanHexPanel x:Name="_HexPanel" RowsPerColumn="3,4,5,4,3" NormalHeight="96" NormalWidth="110" local:StaticGameInfo.MaxRoads="15"
-            UniformMargin="50" TileGap="1" MaxRoads="15" MaxCities="4" VictoryPoints="5" Knights="16" YearOfPlenty="2" Monopoly="2" RoadBuilding="2"
-            MaxSettlements="5" MaxShips="0" 
+        <local:CatanHexPanel x:Name="_HexPanel" local:StaticGameInfo.MaxRoads="15" RowsPerColumn="3,4,5,4,3"
+            NormalHeight="96" NormalWidth="110" UniformMargin="50" TileGap="1"
+            MaxRoads="15" MaxCities="4" VictoryPoints="5" Knights="15"
+            YearOfPlenty="2" Monopoly="2" RoadBuilding="2" MaxSettlements="5"
+            MaxShips="0"
             BuildingIndexToHarborIndex="4=0,5=0,8=1,9=1,36=2,37=2,47=3,48=3,50=4,51=4,45=5,46=5,26=6,38=6,14=7,17=7,11=8,24=8">
             <local:TileCtrl TileOrientation="FaceDown" Number="2" UseClassic="True" ResourceType="Sheep"
                 Index="0" ShowIndex="False"

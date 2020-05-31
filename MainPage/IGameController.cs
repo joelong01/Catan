@@ -13,9 +13,9 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-    public sealed partial class MainPage : Page, ILog, IGameController
+    public sealed partial class MainPage : Page, IGameController
     {
-        private TaskCompletionSource<bool> ActionTcs { get; set; }
+       
         private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
         public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
@@ -78,18 +78,6 @@ namespace Catan10
 
         public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
 
-        
-
-        private int PlayerNameToIndex(ICollection<PlayerModel> players, string playerName)
-        {
-            int index = 0;
-            foreach (var player in players)
-            {
-                if (player.PlayerName == playerName) return index;
-                index++;
-            };
-            return -1;
-        }
 
         private async Task UpdateUiForState(GameState currentState)
         {
@@ -244,7 +232,7 @@ namespace Catan10
             Contract.Assert(playerToAdd != null);
             if (MainPageModel.PlayingPlayers.Contains(playerToAdd) == false)
             {
-                playerToAdd.GameData.OnCardsLost += OnPlayerLostCards;
+                
                 AddPlayerMenu(playerToAdd);
                 //
                 //  need to give the players some data about the game
@@ -404,6 +392,11 @@ namespace Catan10
             {
                 p.GameData.RollOrientation = TileOrientation.FaceUp;
             });
+        }
+
+        public Task ResetRollControl()
+        {
+            return _rollControl.Reset();
         }
 
         public async Task HideRollsInPublicUi()
@@ -924,49 +917,7 @@ namespace Catan10
             GameContainer.AllTiles.ForEach((tile) => tile.StopHighlightingTile());
         }
 
-         public bool PushRoll(int roll)
-        {
-
-            if (roll < 2 || roll > 12)
-            {
-                return false;
-            }
-
-            Rolls.Push(roll);
-            LastRoll = roll;
-            UpdateGlobalRollStats();
-            return true;
-        }
-
-
-
-        public int PopRoll()
-        {
-            if (Rolls.Count == 0)
-            {
-                return -1;
-            }
-
-            int lastRoll = Rolls.Pop();
-            if (Rolls.Count > 0)
-            {
-                LastRoll = Rolls.First();
-            }
-            else
-            {
-                LastRoll = 0;
-            }
-           
-            UpdateGlobalRollStats();
-            foreach (TileCtrl t in _gameView.AllTiles)
-            {
-                t.ResetOpacity();
-                t.ResetTileRotation();
-                t.StopHighlightingTile();
-
-            }
-            return lastRoll;
-        }
+       
 
         public TileCtrl TileFromIndex(int targetTile)
         {

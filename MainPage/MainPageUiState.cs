@@ -30,29 +30,6 @@ namespace Catan10
         {
             await Task.Delay(0);
             throw new NotImplementedException();
-#if false
-            foreach (CatanPlayer p in _players)
-            {
-                int gp = Int32.Parse(p.GamesPlayed);
-                gp++;
-                p.GamesPlayed = gp.ToString();
-
-            }
-
-            int gw = Int32.Parse(_players[_currentPlayerIndex].GamesWon);
-            gw++;
-            _players[_currentPlayerIndex].GamesWon = gw.ToString();
-
-
-            //
-            //  read in all the players because some might not have played
-            ObservableCollection<CatanPlayer> allPlayers = await MainPage.LoadPlayers(MainPage.PlayerDataFile);
-
-            IEnumerable<CatanPlayer> unionPlayers = MergeInto<CatanPlayer>(_players, allPlayers, new CatanPlayerComparer());
-
-            await MainPage.SavePlayers(unionPlayers, MainPage.PlayerDataFile);
-#endif
-
         }
 
         public static readonly DependencyProperty LastRollProperty = DependencyProperty.Register("LastRoll", typeof(int), typeof(MainPage), new PropertyMetadata(0));
@@ -64,17 +41,6 @@ namespace Catan10
 
        
 
-        private void UndoRoll()
-        {
-            int roll = PopRoll();
-            List<TileCtrl> tilesWithNumber = GetTilesWithNumber(roll);
-            CountResourcesForRoll(tilesWithNumber, true);
-            foreach (PlayerModel player in MainPageModel.PlayingPlayers)
-            {
-                player.GameData.PlayerTurnResourceCount.TurnReset();
-            }
-
-        }
 
 
         //

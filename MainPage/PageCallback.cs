@@ -12,7 +12,7 @@ using Windows.UI.Xaml.Input;
 
 namespace Catan10
 {
-    public sealed partial class MainPage : Page, IGameCallback, ITileControlCallback, ILogParserHelper
+    public sealed partial class MainPage : Page, IGameCallback, ITileControlCallback
     {
         private int _roadSkipped = 0;
 
@@ -48,7 +48,7 @@ namespace Catan10
         //      4. If Knight Played Increment the source player (which is always the current player) Knights played
         //      5. Log that it happened.
         //      6. check to see if we should update the Largest Army
-        private async Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
+        private  Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
         {
             bool flagState = true;
             int inc = 1;
@@ -81,7 +81,7 @@ namespace Catan10
             if (action == CatanAction.PlayedKnight)
             {
                 CurrentPlayer.GameData.PlayedKnightThisTurn = flagState;
-                CurrentPlayer.GameData.KnightsPlayed += inc;
+                CurrentPlayer.GameData.Resources.KnightsPlayed += inc;
                 AssignLargestArmy();
             }
             else
@@ -89,11 +89,11 @@ namespace Catan10
                 CurrentPlayer.GameData.MovedBaronAfterRollingSeven = flagState;
             }
 
-            await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
+          //  await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
 
             if (CurrentGameState == GameState.MustMoveBaron && logType != LogType.Undo)
             {
-                await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false, logType);
+               // await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false, logType);
             }
 
             if (CurrentGameState == GameState.WaitingForRoll)
@@ -111,6 +111,7 @@ namespace Catan10
                     CanMoveBaronBeforeRoll = false;
                 }
             }
+            return Task.CompletedTask;
         }
 
         //
@@ -121,7 +122,7 @@ namespace Catan10
         //
         private void AssignLargestArmy()
         {
-            if (CurrentPlayer.GameData.KnightsPlayed > 2)
+            if (CurrentPlayer.GameData.Resources.KnightsPlayed > 2)
             {
                 //
                 //  loop through and find who has largest army, and how many knights they've played
@@ -132,11 +133,11 @@ namespace Catan10
                     if (p.GameData.LargestArmy)
                     {
                         largestArmyPlayer = p;
-                        knightCount = p.GameData.KnightsPlayed;
+                        knightCount = p.GameData.Resources.KnightsPlayed;
                     }
                 }
 
-                if (CurrentPlayer.GameData.KnightsPlayed > knightCount)
+                if (CurrentPlayer.GameData.Resources.KnightsPlayed > knightCount)
                 {
                     if (largestArmyPlayer != null)
                     {
@@ -489,11 +490,7 @@ namespace Catan10
             return false;
         }
 
-        private async Task UndoMoveBaron(LogEntry logLine)
-        {
-            LogBaronOrPirate undoObject = logLine.Tag as LogBaronOrPirate;
-            await AssignBaronOrKnight(undoObject.TargetPlayer, undoObject.StartTile, undoObject.TargetWeapon, logLine.Action, LogType.Undo);
-        }
+     
 
         private void UpdateTileBuildingOwner(PlayerModel player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {

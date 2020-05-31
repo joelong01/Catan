@@ -17,7 +17,9 @@ namespace Catan10
         private int _PlayedMonopoly = 0;
         private int _PlayedRoadBuilding = 0;
         private int _PlayedYearOfPlenty = 0;
+        TradeResources _ResourcesLostSeven = new TradeResources();
         private TradeResources _ResourcesLostToBard = new TradeResources();
+        TradeResources _ResourcesLostToMonopoly = new TradeResources();
         private TradeResources _ResourcesThisTurn = new TradeResources();
         private int _Roads = 0;
         private int _Settlements = 0;
@@ -27,53 +29,8 @@ namespace Catan10
         private int _UnplayedMonopoly = 0;
         private int _UnplayedYearOfPlenty = 0;
         private int _VictoryPoints = 0;
-        TradeResources _ResourcesLostToMonopoly = new TradeResources();
-        TradeResources _ResourcesLostSeven = new TradeResources();
-        public TradeResources ResourcesLostSeven
-        {
-            get
-            {
-                return _ResourcesLostSeven;
-            }
-            set
-            {
-                if (_ResourcesLostSeven != value)
-                {
-                    _ResourcesLostSeven = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool CanAfford(Entitlement entitlement)
-        {
-            TradeResources cost = TradeResources.GetEntitlementCost(entitlement);
-            Contract.Assert(cost != null);
-            foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
-            {
-                if (cost.CountForResource(resourceType) > this.Current.CountForResource(resourceType))
-                    return false;
-            }
-
-            return true;
-        }
-
-        public TradeResources ResourcesLostToMonopoly
-        {
-            get
-            {
-                return _ResourcesLostToMonopoly;
-            }
-            set
-            {
-                if (_ResourcesLostToMonopoly != value)
-                {
-                    _ResourcesLostToMonopoly = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
+        private int _knightsPlayed = 0;
+        
         public PlayerResources()
         {
         }
@@ -128,7 +85,20 @@ namespace Catan10
             }
         }
 
-        public List<DevCardType> PlayedDevCards { get; set; } = new List<DevCardType>();
+        public int KnightsPlayed
+        {
+            get => _knightsPlayed;
+            set
+            {
+                if (_knightsPlayed != value)
+                {                   
+                    _knightsPlayed = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
 
         public int PlayedMonopoly
         {
@@ -178,6 +148,21 @@ namespace Catan10
             }
         }
 
+        public TradeResources ResourcesLostSeven
+        {
+            get
+            {
+                return _ResourcesLostSeven;
+            }
+            set
+            {
+                if (_ResourcesLostSeven != value)
+                {
+                    _ResourcesLostSeven = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         public TradeResources ResourcesLostToBaron
         {
             get
@@ -189,6 +174,22 @@ namespace Catan10
                 if (_ResourcesLostToBard != value)
                 {
                     _ResourcesLostToBard = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public TradeResources ResourcesLostToMonopoly
+        {
+            get
+            {
+                return _ResourcesLostToMonopoly;
+            }
+            set
+            {
+                if (_ResourcesLostToMonopoly != value)
+                {
+                    _ResourcesLostToMonopoly = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -345,6 +346,8 @@ namespace Catan10
             }
         }
 
+        public int KnightsPlayed1 { get => this.KnightsPlayed; set => this.KnightsPlayed = value; }
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -361,6 +364,46 @@ namespace Catan10
             this.ConsumeEntitlement(entitlement);
         }
 
+        public void AddDevCard(DevCardType devCard)
+        {
+            switch (devCard)
+            {
+                case DevCardType.Knight:
+                    UnplayedKnights++;                    
+                    break;
+                case DevCardType.VictoryPoint:
+                    VictoryPoints++;
+                    break;
+                case DevCardType.YearOfPlenty:
+                    UnplayedYearOfPlenty++;
+                    break;
+                case DevCardType.RoadBuilding:
+                    UnplayedRoadBuilding++;
+                    break;
+                case DevCardType.Monopoly:
+                    UnplayedMonopoly++;
+                    break;
+                case DevCardType.Unknown:                    
+                case DevCardType.Back:
+                    Contract.Assert(false, "don't pass that parameter");
+                    break;
+                default:
+                    break;
+            }
+        }
+        public bool CanAfford(Entitlement entitlement)
+        {
+            TradeResources cost = TradeResources.GetEntitlementCost(entitlement);
+            Contract.Assert(cost != null);
+            foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
+            {
+                if (cost.CountForResource(resourceType) > this.Current.CountForResource(resourceType))
+                    return false;
+            }
+
+            return true;
+        }
+
         public bool Equivalent(TradeResources tradeResources)
         {
             this.Current.Equivalent(tradeResources);
@@ -371,8 +414,6 @@ namespace Catan10
         {
             UnspentEntitlements.Add(entitlement);
         }
-
-        
 
         public void GrantResources(TradeResources tr)
         {
@@ -392,6 +433,35 @@ namespace Catan10
             return UnspentEntitlements.Contains(entitlement);
         }
 
+        public void PlayDevCard(DevCardType devCard)
+        {
+            PlayedDevCards.Add(devCard);
+            switch (devCard)
+            {
+                case DevCardType.Knight:
+                    UnplayedKnights--;
+                    
+                    break;
+                case DevCardType.VictoryPoint:
+                    VictoryPoints++;
+                    break;
+                case DevCardType.YearOfPlenty:
+                    UnplayedYearOfPlenty++;
+                    break;
+                case DevCardType.RoadBuilding:
+                    UnplayedRoadBuilding++;
+                    break;
+                case DevCardType.Monopoly:
+                    UnplayedMonopoly++;
+                    break;
+                case DevCardType.Unknown:
+                case DevCardType.Back:
+                    Contract.Assert(false, "don't pass that parameter");
+                    break;
+                default:
+                    break;
+            }
+        }
         // the list of cards that have been played.  this is public information!
         public override string ToString()
         {

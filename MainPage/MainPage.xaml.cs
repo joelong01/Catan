@@ -30,7 +30,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
-    public sealed partial class MainPage : Page, ILog
+    public sealed partial class MainPage : Page
     {
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
@@ -50,8 +50,6 @@ namespace Catan10
         /// </summary>
         private int _showPipGroupIndex = 0;
 
-        private int _supplementalStartIndex = -1;
-        private bool _undoingCardLostHack = false;
         private TaskCompletionSource<object> fileGuard = null;
         public const string PlayerDataFile = "catansettings.json";
 
@@ -70,7 +68,7 @@ namespace Catan10
             Current = this;
             this.DataContext = this;
             _raceTracking = new RoadRaceTracking(this);
-            Ctrl_PlayerResourceCountCtrl.Log = this;
+            
         }
 
         // this lets you double tap a map and then move it around
@@ -93,8 +91,7 @@ namespace Catan10
             set => SetValue(MainPageModelProperty, value);
         }
 
-        public ObservableCollection<DeprecatedLog> SavedGames { get; set; } = new ObservableCollection<DeprecatedLog>();
-
+        
         public StorageFolder SaveFolder { get; set; } = null;
 
         // a global for the game
@@ -114,7 +111,7 @@ namespace Catan10
         private Task AddPlayer(PlayerModel pData, LogType logType)
         {
             MainPageModel.PlayingPlayers.Add(pData);
-            pData.GameData.OnCardsLost += OnPlayerLostCards;
+            
             AddPlayerMenu(pData);
             pData.Reset();
             //
@@ -124,134 +121,14 @@ namespace Catan10
             pData.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
             pData.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
 
-            //  _playerToResourceCount[pData.PlayerPosition].Visibility = Visibility.Visible;
-            // await AddLogEntry(pData, GameState.Starting, CatanAction.AddPlayer, false, logType, MainPageModel.PlayingPlayers.Count, pData.AllPlayerIndex); // can't undo adding players...
+            
             return Task.CompletedTask;
         }
 
 
-        //
-        //  this needs to be called *after* the log for the Roll because we need to undo all of these prior to undoing the Roll
-        private void AddResourceCountForPlayer(PlayerModel player, ResourceType resource, int count, LogType logType = LogType.Normal)
-        {
-            int oldValPlayer = player.GameData.PlayerTurnResourceCount.AddResourceCount(resource, count); // update the player
-                                                                                                          // int oldValGlobal = Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.AddResourceCount(resource, count); // update for the game
+       
 
-            //
-            //  TODO:  log GoodRoll, RollsWithResource and NoResourceCount
-
-            // await AddLogEntry(player, this.GameState, CatanAction.AddResourceCount, false, logType, -1, new LogResourceCount(oldValPlayer, oldValPlayer + count, resource));
-        }
-
-        //
-        //  these need to be combined together because we need to know what the state is both before and *after* we move -- and
-        //  it used to be that we'd move and then set state.  this way we can do the Gold tile(s) correctly when moving to the next
-        //  player only gets gold when it is their turn to roll (e.g. not when it is supplemental)
-        //
-        private async Task ChangePlayerAndSetState(int numberofPositions, GameState newState, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            Contract.Assert(false, "this code shouldn't be called!");
-            int from = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer);
-            int to = GetNextPlayerPosition(numberofPositions);
-            _currentPlayerIndex = to;
-            GameState oldState = CurrentGameState;
-
-            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
-            List<int> newRandomGoldTiles = null;
-
-            // this is the one spot where the CurrentPlayer is changed.  it should update all the bindings
-            // the setter will update all the associated state changes that happen when the CurrentPlayer
-            // changes
-
-            CurrentPlayer = MainPageModel.PlayingPlayers[_currentPlayerIndex];
-
-            //
-            //  in supplemental, we don't show random gold tiles
-            if (newState == GameState.Supplemental)
-            {
-                await _gameView.ResetRandomGoldTiles();
-            }
-
-            //
-            // when we change player we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
-            // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
-            // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
-            // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
-            if ((newState == GameState.WaitingForRoll && logType == LogType.Normal) || (newState == GameState.WaitingForNext && logType == LogType.Undo))
-            {
-                int playerRoll = TotalRolls / MainPageModel.PlayingPlayers.Count;  // integer divide - drops remainder
-                if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
-                {
-                    newRandomGoldTiles = GetRandomGoldTiles();
-                    foreach (int i in newRandomGoldTiles)
-                    {
-                        if (_gameView.AllTiles[i].ResourceType == ResourceType.Desert)
-                        {
-                            this.TraceMessage($"Desert got added to Random Gold tiles! [Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
-                        }
-                    }
-                    CurrentPlayer.GameData.GoldRolls.Add(newRandomGoldTiles);
-                }
-                else
-                {
-                    Debug.Assert(CurrentPlayer.GameData.GoldRolls.Count > playerRoll);
-                    //
-                    //  we've already picked the tiles for this roll -- use them
-                    newRandomGoldTiles = CurrentPlayer.GameData.GoldRolls[playerRoll];
-                }
-                // this.TraceMessage($"[Player={CurrentPlayer} [PlayerRole={playerRoll}] [OldGoldTiles={StaticHelpers.SerializeList<int>(currentRandomGoldTiles)}] [NewGoldTiles={StaticHelpers.SerializeList<int>(newRandomGoldTiles)}]");
-                await SetRandomTileToGold(newRandomGoldTiles);
-            }
-
-            //
-            //  we are on the right person, now set the state
-
-            if (logType == LogType.Normal || logType == LogType.Replay)
-            {
-                await AddLogEntry(CurrentPlayer, newState, CatanAction.ChangePlayerAndSetState, true, logType, -1, new LogChangePlayer(from, to, oldState, currentRandomGoldTiles, newRandomGoldTiles));
-            }
-
-            foreach (TileCtrl t in _gameView.AllTiles)
-            {
-                t.ResetOpacity();
-                t.ResetTileRotation();
-                t.StopHighlightingTile();
-            }
-            //
-            //  on next, reset the resources for the turn to 0
-            foreach (PlayerModel player in MainPageModel.PlayingPlayers)
-            {
-                player.GameData.PlayerTurnResourceCount.TurnReset();
-            }
-        }
-
-        private async Task CopyScreenShotToClipboard(FrameworkElement element)
-        {
-            IRandomAccessStream stream = new InMemoryRandomAccessStream();
-            Windows.UI.Xaml.Media.Imaging.RenderTargetBitmap renderTargetBitmap = new Windows.UI.Xaml.Media.Imaging.RenderTargetBitmap();
-
-            await renderTargetBitmap.RenderAsync(element);
-
-            IBuffer pixelBuffer = await renderTargetBitmap.GetPixelsAsync();
-
-            float dpi = Windows.Graphics.Display.DisplayInformation.GetForCurrentView().LogicalDpi;
-
-            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-            encoder.SetPixelData(
-                BitmapPixelFormat.Bgra8,
-                BitmapAlphaMode.Ignore,
-                (uint)renderTargetBitmap.PixelWidth,
-                (uint)renderTargetBitmap.PixelHeight,
-                dpi,
-                dpi,
-                pixelBuffer.ToArray());
-            await encoder.FlushAsync();
-
-            DataPackage dp = new DataPackage();
-            RandomAccessStreamReference streamReference = RandomAccessStreamReference.CreateFromStream(stream);
-            dp.SetBitmap(streamReference);
-            Clipboard.SetContent(dp);
-        }
+       
 
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
@@ -267,18 +144,7 @@ namespace Catan10
             }
         }
 
-        //
-        //  helper function so I don't have to check the array length each time
-        private bool GetAndVerifyNumber(string[] tokens, int index, out int value)
-        {
-            value = -1;
-            if (tokens.Length < index)
-            {
-                return false;
-            }
-
-            return int.TryParse(tokens[index], out value);
-        }
+        
 
         /// <summary>
         ///     return a Dictionary of PipGroup to a List of Building that have that number of Pips
@@ -418,39 +284,7 @@ namespace Catan10
             await SaveGridLocations();
         }
 
-        //
-        //  n is verified by the caller
-        //  this adds a number to the list we use to keep track of what is rolled and updates all the statistics
-        private async Task HandleNumber(int roll)
-        {
-            bool ret = this.PushRoll(roll); // only returns false on a number outside the range...
-            if (!ret)
-            {
-                return;
-            }
-
-            List<TileCtrl> tilesWithNumber = await HighlightRolledTiles(roll);
-            foreach (TileCtrl tile in tilesWithNumber)
-            {
-                tile.HighlightTile(); // shows what was rolled
-            }
-
-            if (roll == 7)
-            {
-                CurrentPlayer.GameData.MovedBaronAfterRollingSeven = false;
-                await SetStateAsync(CurrentPlayer, GameState.MustMoveBaron, false);
-                foreach (PlayerModel player in MainPageModel.PlayingPlayers)
-                {
-                    player.GameData.NoResourceCount++;
-                }
-            }
-            else
-            {
-                CountResourcesForRoll(tilesWithNumber, false);
-                CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null;
-                await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false);
-            }
-        }
+        
 
         private async Task HideAllPipEllipses()
         {
@@ -527,18 +361,15 @@ namespace Catan10
             fList.AddRange(files);
 
             IOrderedEnumerable<StorageFile> sort = from s in files orderby s.DateCreated.Ticks descending select s;
-            SavedGames.Clear();
-            foreach (StorageFile f in sort)
-            {
-                DeprecatedLog log = new DeprecatedLog(f);
-                SavedGames.Add(log);
-            }
+            //SavedGames.Clear();
+            //foreach (StorageFile f in sort)
+            //{
+            //    DeprecatedLog log = new DeprecatedLog(f);
+            //    SavedGames.Add(log);
+            //}
         }
 
-        private async Task LogPlayerLostCards(PlayerModel player, int oldVal, int newVal, LogType logType)
-        {
-            await AddLogEntry(player, CurrentGameState, CatanAction.CardsLost, true, logType, -1, new LogCardsLost(oldVal, newVal));
-        }
+       
 
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
         {
@@ -604,29 +435,6 @@ namespace Catan10
             }
         }
 
-        /// <summary>
-        ///     this is called when you change players and you aren't in a state that rolls -- e.g. supplemenatl, the choosing, etc.
-        /// </summary>
-        /// <param name="playersToMove"></param>
-        /// <param name="logType"></param>
-        /// <returns></returns>
-        private async Task OnNext(int playersToMove = 1, LogType logType = LogType.Normal)
-        {
-            await AnimatePlayers(playersToMove, logType);
-
-            UpdateGlobalRollStats();
-            foreach (TileCtrl t in _gameView.AllTiles)
-            {
-                t.ResetOpacity();
-                t.ResetTileRotation();
-            }
-            //
-            //  on next, reset the resources for the turn to 0
-            foreach (PlayerModel player in MainPageModel.PlayingPlayers)
-            {
-                player.GameData.PlayerTurnResourceCount.TurnReset();
-            }
-        }
 
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
@@ -646,16 +454,7 @@ namespace Catan10
             }
         }
 
-        private async void OnPlayerLostCards(PlayerModel player, int oldVal, int newVal)
-        {
-            if (_undoingCardLostHack)
-            {
-                return;
-            }
-
-            await LogPlayerLostCards(player, oldVal, newVal, LogType.Normal);
-        }
-
+      
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
@@ -861,17 +660,6 @@ namespace Catan10
             await PickSettlementsAndRoads();
         }
 
-        private async Task<bool> ProcessRoll(int roll)
-        {
-            if (roll >= 2 && roll <= 12)
-            {
-                await HandleNumber(roll);
-                return true;
-            }
-
-            return false;
-        }
-
         
         private async Task<MainPageModel> ReadMainPageModelOffDisk()
         {
@@ -931,7 +719,7 @@ namespace Catan10
 
             // _lbGames.SelectedValue = MainPageModel.Log;
             await ResetTiles(true);
-            Ctrl_PlayerResourceCountCtrl.GlobalResourceCount.TurnReset();
+            
             _stateStack.Clear();
 
             foreach (PlayerModel player in MainPageModel.AllPlayers)
@@ -941,7 +729,7 @@ namespace Catan10
 
             _raceTracking.Reset();
 
-            //  await LoadPlayerData();
+            
         }
 
         private void ResetDataForNewGame()
@@ -951,7 +739,7 @@ namespace Catan10
 
             foreach (PlayerModel p in MainPageModel.PlayingPlayers)
             {
-                p.GameData.OnCardsLost -= OnPlayerLostCards;
+              
                 p.Reset();
             }
             MainPageModel.PlayingPlayers.Clear();
@@ -1131,31 +919,7 @@ namespace Catan10
             await SaveGameState();
         }
 
-        private async Task StartGame(ICollection<PlayerModel> players, int selectedIndex)
-        {
-            ResetDataForNewGame();
-
-            foreach (PlayerModel pData in players)
-            {
-                //
-                //  add it to the collection that all the views bind to
-                await AddPlayer(pData, LogType.Normal);
-            }
-
-            await VisualShuffle();
-            await SetStateAsync(null, GameState.BeginResourceAllocation, true);
-            await AnimateToPlayerIndex(_currentPlayerIndex);
-
-            //  var model = StartGameController.StartGame(this, selectedIndex, GameContainer.RandomBoardSettings, MainPageModel.PlayingPlayers);
-            //  VerifyRoundTrip<StartGamLog>(model);
-            //Log.PushAction(model);
-        }
-
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            TextBox tb = sender as TextBox;
-            tb.SelectAll();
-        }
+     
 
         private async Task VisualShuffle(RandomBoardSettings rbs = null)
         {
@@ -1190,15 +954,6 @@ namespace Catan10
             await WsConnect();
         }
 
-        public static string CreateSaveFileName(string Description)
-        {
-            DateTime dt = DateTime.Now;
-
-            string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
-            string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
-
-            return string.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {Description}");
-        }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
         {
@@ -1215,55 +970,6 @@ namespace Catan10
             // AnimationSpeedFactor is a value of 1...4
             double d = (double)speed / (baseSpeed + 2);
             return d;
-        }
-
-        public Task AddLogEntry(PlayerModel player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            //  await MainPageModel.Log.AppendLogLine(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
-            return Task.CompletedTask;
-        }
-
-        public void CountResourcesForRoll(IReadOnlyCollection<TileCtrl> tilesWithNumber, bool undo)
-        {
-            foreach (TileCtrl tile in tilesWithNumber)
-            {
-                foreach (BuildingCtrl building in tile.OwnedBuilding)
-                {
-                    if (building.Owner == null)
-                    {
-                        continue;
-                        //System.Diagnostics.Debug.Assert(false);
-                    }
-
-                    //
-                    //  this updates the *count* of resources and returns the value the user gets for the number being rolled
-                    //  int value = building.Owner.GameData.UpdateResourceCount(tile.ResourceType, building.BuildingState, tile.HasBaron, undo);
-                    int value = 0;
-                    this.TraceMessage("You changed this, now fix it");
-                    //
-                    //  need to look up the control given the player and add it to the right one
-                    AddResourceCountForPlayer(building.Owner, tile.ResourceType, value);
-                }
-            }
-            if (!undo)
-            {
-                //
-                //  go through players and update the good/bad roll count
-                foreach (var player in MainPageModel.PlayingPlayers)
-                {
-                    if (player.GameData.PlayerTurnResourceCount.Total == 0)
-                    {
-                        player.GameData.NoResourceCount++;
-                        player.GameData.GoodRoll = false;
-                    }
-                    else
-                    {
-                        player.GameData.RollsWithResource++;
-                        player.GameData.NoResourceCount = 0;
-                        player.GameData.GoodRoll = true;
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -1286,88 +992,7 @@ namespace Catan10
             return files;
         }
 
-        //
-        //  we use the build ellipses during the allocation phase to see what settlements have the most pips
-        //  when we move to the next player, hide the build ellipses
-        public async Task<List<TileCtrl>> HighlightRolledTiles(int rolledNumber)
-        {
-            List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
-
-            List<Task> tasks = new List<Task>();
-            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
-            {
-                if (t.Number == rolledNumber)
-
-                {
-                    tilesWithNumber.Add(t);
-                    if (MainPageModel.Settings.AnimateFade)
-                    {
-                        t.AnimateFadeAsync(1.0);
-                    }
-                    if (MainPageModel.Settings.RotateTile)
-                    {
-                        t.Rotate(180, tasks, true);
-                    }
-                }
-                else
-                {
-                    if (MainPageModel.Settings.AnimateFade)
-                    {
-                        t.AnimateFadeAsync(.25);
-                    }
-                }
-            }
-
-            if (tasks.Count > 0)
-            {
-                await Task.WhenAll(tasks.ToArray());
-            }
-
-            //
-            // now make sure we reverse the fade
-
-            return tilesWithNumber;
-        }
-
-        public void PostLogEntry(PlayerModel player, GameState state, CatanAction action, bool stopProcessingUndo, LogType logType = LogType.Normal, int number = -1, object tag = null, [CallerFilePath] string filePath = "", [CallerMemberName] string name = "", [CallerLineNumber] int lineNumber = 0)
-
-        {
-            //    if (MainPageModel.Log == null)
-            //    {
-            //        return;
-            //    }
-
-            //    if (state == GameState.Unknown)
-            //    {
-            //        state = this.GameStateFromOldLog;
-            //    }
-
-            //    MainPageModel.Log.AppendLogLineNoDisk(new LogEntry(player, state, action, number, stopProcessingUndo, logType, tag, name, lineNumber, filePath));
-        }
-
-        public async Task<bool> ProcessRoll(string inputText)
-        {
-            if (int.TryParse(inputText, out int roll))
-            {
-                return await ProcessRoll(roll);
-            }
-
-            return false;
-        }
-
-        public Task SetStateAsync(PlayerModel playerData, GameState newState, bool stopUndo, LogType logType = LogType.Normal, [CallerFilePath] string filePath = "", [CallerMemberName] string cmn = "", [CallerLineNumber] int lineNumber = 0)
-
-        {
-            return Task.CompletedTask;
-            //if (MainPageModel.Log == null)
-            //{
-            //    return;
-            //}
-
-            //LogStateTranstion lst = new LogStateTranstion(GameStateFromOldLog, newState);
-            //await MainPageModel.Log.AppendLogLine(new LogEntry(playerData, newState, CatanAction.ChangedState, -1, stopUndo, logType, lst, cmn, lineNumber, filePath));
-            //UpdateUiForState(newState);
-        }
+      
 
         public void UpdateBoardMeasurements()
         {
@@ -1386,25 +1011,5 @@ namespace Catan10
             MainPageModel.SetPipCount(pipCount);
         }
 
-        public void UpdateGlobalRollStats()
-        {
-            int[] roals = RollCount(Rolls);
-            double[] percent = RollPercents(Rolls, roals);
-
-            //String.Format("{0:0.#}%", percent * 100)
-            TotalRolls = Rolls.Count();
-
-            TwoPercent = string.Format($"{roals[0]} ({percent[0] * 100:0.#}%)");
-            ThreePercent = string.Format($"{roals[1]} ({percent[1] * 100:0.#}%)");
-            FourPercent = string.Format($"{roals[2]} ({percent[2] * 100:0.#}%)");
-            FivePercent = string.Format($"{roals[3]} ({percent[3] * 100:0.#}%)");
-            SixPercent = string.Format($"{roals[4]} ({percent[4] * 100:0.#}%)");
-            SevenPercent = string.Format($"{roals[5]} ({percent[5] * 100:0.#}%)");
-            EightPercent = string.Format($"{roals[6]} ({percent[6] * 100:0.#}%)");
-            NinePercent = string.Format($"{roals[7]} ({percent[7] * 100:0.#}%)");
-            TenPercent = string.Format($"{roals[8]} ({percent[8] * 100:0.#}%)");
-            ElevenPercent = string.Format($"{roals[9]} ({percent[9] * 100:0.#}%)");
-            TwelvePercent = string.Format($"{roals[10]} ({percent[10] * 100:0.#}%)");
-        }
     }
 }
