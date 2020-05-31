@@ -389,6 +389,7 @@ namespace Catan10
 
         public bool HasEntitlement(Entitlement entitlement)
         {
+            return UnspentEntitlements.Contains(entitlement);
         }
 
         // the list of cards that have been played.  this is public information!
