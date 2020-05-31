@@ -1,5 +1,4 @@
-﻿
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -11,9 +10,15 @@ namespace Catan10
     /// </summary>
     public class WaitingForNewGameToWaitingForPlayers : LogHeader, ILogController
     {
+        #region Constructors
+
         public WaitingForNewGameToWaitingForPlayers() : base()
         {
         }
+
+        #endregion Constructors
+
+        #region Methods
 
         public static async Task PostLog(IGameController gameController)
         {
@@ -22,11 +27,11 @@ namespace Catan10
             WaitingForNewGameToWaitingForPlayers logHeader = new WaitingForNewGameToWaitingForPlayers()
             {
                 CanUndo = false,
-                Action = CatanAction.ChangedState,             
+                Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForPlayers,
             };
 
-            Contract.Assert(logHeader.OldState == GameState.WaitingForNewGame);  
+            Contract.Assert(logHeader.OldState == GameState.WaitingForNewGame);
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
@@ -67,5 +72,7 @@ namespace Catan10
         {
             return Task.CompletedTask;
         }
+
+        #endregion Methods
     }
 }

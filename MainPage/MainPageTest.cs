@@ -1,57 +1,40 @@
-﻿using Catan.Proxy;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Windows.Media.Audio;
-using Windows.Networking.Sockets;
+
+using Catan.Proxy;
+
 using Windows.Storage;
-using Windows.Storage.Streams;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Shapes;
-
-
-
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
-    public class WSConnectInfo
-    {
-        public string GameId { get; set; }
-        public string PlayerName { get; set; }
-    }
-
-
     public sealed partial class MainPage : Page
     {
+        #region Fields
 
+        private readonly Random testRandom = new Random();
+
+        #endregion Fields
+
+        #region Methods
 
         private void InitTest()
         {
-
         }
-
 
         // int toggle = 0;
         private void OnTest1(object sdr, RoutedEventArgs rea)
         {
-           
-
         }
 
         private void OnTest2(object sdr, RoutedEventArgs rea)
         {
-
             TradeResources tr = new TradeResources()
             {
                 Sheep = 3,
@@ -59,16 +42,12 @@ namespace Catan10
                 Ore = 3,
                 Brick = 3,
                 Wood = 3
-
             };
 
             CurrentPlayer.GameData.Resources.GrantResources(tr);
 
             //CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Knight);
-
         }
-
-
 
         // Undo
         private async void OnTest3(object sdr, RoutedEventArgs rea)
@@ -97,67 +76,27 @@ namespace Catan10
                     case LogType.Normal:
                         await logController.Redo(this);
                         break;
+
                     case LogType.Undo:
                         //  await MainPageModel.Log.Undo(message);
                         break;
+
                     case LogType.Replay:
 
                         //  await MainPageModel.Log.Redo(message);
                         break;
+
                     case LogType.DoNotLog:
                     case LogType.DoNotUndo:
                     default:
                         throw new InvalidDataException("These Logtypes shouldn't be set in a service game");
                 }
-
             }
 
             StartMonitoring();
-
         }
 
-        private void VerifyRoundTrip<T>(T model)
-        {
-            //var options = new JsonSerializerOptions() { WriteIndented = true };
-            //options.Converters.Add(new JsonStringEnumConverter());
-            //var jsonString = JsonSerializer.Serialize<T>(model, options);
-            //T newModel = JsonSerializer.Deserialize<T>(jsonString, options);
-            //var newJsonString = JsonSerializer.Serialize<T>(newModel, options);
-            ////   this.TraceMessage(newJsonString);
-            //Debug.Assert(newJsonString == jsonString);
-
-        }
-
-        readonly Random testRandom = new Random();
-
-        private void OnTestRegularGame(object sender, RoutedEventArgs e)
-        {
-            //AnimationSpeedBase = 10; // speed up the animations
-
-
-            //await this.Reset();
-            ////   await MainPageModel.Log.Init(CreateSaveFileName("Test Game"));
-
-            //await SetStateAsync(null, GameState.WaitingForNewGame, true);
-            //_gameView.CurrentGame = _gameView.Games[0];
-
-            ////  SavedGames.Insert(0, MainPageModel.Log);
-            //await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
-            //List<PlayerModel> PlayerDataList = new List<PlayerModel>
-            //{
-            //    MainPageModel.AllPlayers[0],
-            //    MainPageModel.AllPlayers[1],
-            //    MainPageModel.AllPlayers[2],
-            //    MainPageModel.AllPlayers[3]
-            //};
-            //await StartGame(PlayerDataList, 0);
-            //await NextState(); // simluates pushing "Start"
-            //CurrentPlayer = MainPageModel.PlayingPlayers[0];
-            //await PickSettlementsAndRoads();
-
-
-        }
-        private  void OnTestExpansionGame(object sender, RoutedEventArgs e)
+        private void OnTestExpansionGame(object sender, RoutedEventArgs e)
         {
             //AnimationSpeedBase = 10; // speed up the animations
             //RandomGoldTileCount = 3;
@@ -180,8 +119,54 @@ namespace Catan10
             //await NextState(); // simluates pushing "Start"
             //CurrentPlayer = MainPageModel.PlayingPlayers[0];
             //await PickSettlementsAndRoads();
-
-
         }
+
+        private void OnTestRegularGame(object sender, RoutedEventArgs e)
+        {
+            //AnimationSpeedBase = 10; // speed up the animations
+
+            //await this.Reset();
+            ////   await MainPageModel.Log.Init(CreateSaveFileName("Test Game"));
+
+            //await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            //_gameView.CurrentGame = _gameView.Games[0];
+
+            ////  SavedGames.Insert(0, MainPageModel.Log);
+            //await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 0);
+            //List<PlayerModel> PlayerDataList = new List<PlayerModel>
+            //{
+            //    MainPageModel.AllPlayers[0],
+            //    MainPageModel.AllPlayers[1],
+            //    MainPageModel.AllPlayers[2],
+            //    MainPageModel.AllPlayers[3]
+            //};
+            //await StartGame(PlayerDataList, 0);
+            //await NextState(); // simluates pushing "Start"
+            //CurrentPlayer = MainPageModel.PlayingPlayers[0];
+            //await PickSettlementsAndRoads();
+        }
+
+        private void VerifyRoundTrip<T>(T model)
+        {
+            //var options = new JsonSerializerOptions() { WriteIndented = true };
+            //options.Converters.Add(new JsonStringEnumConverter());
+            //var jsonString = JsonSerializer.Serialize<T>(model, options);
+            //T newModel = JsonSerializer.Deserialize<T>(jsonString, options);
+            //var newJsonString = JsonSerializer.Serialize<T>(newModel, options);
+            ////   this.TraceMessage(newJsonString);
+            //Debug.Assert(newJsonString == jsonString);
+        }
+
+        #endregion Methods
+    }
+
+    public class WSConnectInfo
+    {
+        #region Properties
+
+        public string GameId { get; set; }
+        public string PlayerName { get; set; }
+
+        #endregion Properties
     }
 }

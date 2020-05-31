@@ -1,5 +1,4 @@
-﻿using Windows.UI;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
@@ -12,31 +11,52 @@ namespace Catan10
     /// </summary>
     public sealed partial class CityCtrl : UserControl
     {
+        #region Fields
+
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(new PlayerModel()));
+
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
+
+        #endregion Fields
+
+        #region Constructors
+
         public CityCtrl()
         {
             this.DataContext = this;
             this.InitializeComponent();
         }
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(new PlayerModel()));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
-        public PlayerModel Owner
-        {
-            get => (PlayerModel)GetValue(OwnerProperty);
-            set => SetValue(OwnerProperty, value);
-        }
+
+        #endregion Constructors
+
+        #region Properties
+
         public PlayerModel CurrentPlayer
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
         }
 
-        public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
+        public PlayerModel Owner
         {
-            return PlayerBindingFunctions.GetForegroundBrush(current, owner);
+            get => (PlayerModel)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
         }
+
+        #endregion Properties
+
+        #region Methods
+
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
             return PlayerBindingFunctions.GetBackgroundBrush(current, owner);
         }
+
+        public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
+        {
+            return PlayerBindingFunctions.GetForegroundBrush(current, owner);
+        }
+
+        #endregion Methods
     }
 }

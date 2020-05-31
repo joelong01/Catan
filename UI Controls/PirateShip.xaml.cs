@@ -7,17 +7,24 @@ namespace Catan10
 {
     public sealed partial class PirateShip : UserControl
     {
+        #region Constructors
+
         public PirateShip()
         {
             this.InitializeComponent();
         }
+
+        #endregion Constructors
+
+        #region Methods
+
         public void MoveAsync(Point to)
         {
             _daX.To = to.X;
             _daY.To = to.Y;
             _sbMove.Begin();
         }
+
+        #endregion Methods
     }
-
-
 }

@@ -4,13 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,16 +18,66 @@ namespace Catan10
 {
     internal class Stacks : INotifyPropertyChanged
     {
+        #region Fields
+
         private readonly Stack<LogHeader> DoneStack = new Stack<LogHeader>();
         private readonly Queue<LogHeader> PendingQueue = new Queue<LogHeader>();
         private readonly Stack<LogHeader> UndoneStack = new Stack<LogHeader>();
+
+        #endregion Fields
+
+        #region Methods
+
+        //
+        //  whenever we push or pop from the stack we should notify up
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        internal void PrintLog([CallerMemberName] string caller = "")
+        {
+            if (!PrintLogFlag) return;
+            int lines = 0;
+            string actionLine = $"[CallerFilePath={caller}][Actions={DoneStack.Count}]";
+            string undoLine = $"[CallerFilePath={caller}][Undo={UndoneStack.Count}]";
+
+            foreach (var lh in DoneStack)
+            {
+                actionLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
+                lines++;
+                if (lines == 3) break;
+            }
+            foreach (var lh in UndoneStack)
+            {
+                undoLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
+                lines++;
+                if (lines == 3) break;
+            }
+
+            Debug.WriteLine(actionLine);
+            Debug.WriteLine(undoLine + "\n");
+        }
+
+        #endregion Methods
+
+        #region Constructors
 
         public Stacks()
         {
         }
 
+        #endregion Constructors
+
+        #region Events
+
         public event PropertyChangedEventHandler PropertyChanged;
 
+        #endregion Events
+
+        #region Properties
+
+        public static bool PrintLogFlag { get; set; } = false;
         public int ActionCount => DoneStack.Count;
         public bool CanRedo => UndoneStack.Count > 0;
 
@@ -65,38 +111,7 @@ namespace Catan10
             }
         }
 
-        public static bool PrintLogFlag { get; set; } = false;
-
-        //
-        //  whenever we push or pop from the stack we should notify up
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        internal void PrintLog([CallerMemberName] string caller = "")
-        {
-            if (!PrintLogFlag) return;
-            int lines = 0;
-            string actionLine = $"[CallerFilePath={caller}][Actions={DoneStack.Count}]";
-            string undoLine = $"[CallerFilePath={caller}][Undo={UndoneStack.Count}]";
-
-            foreach (var lh in DoneStack)
-            {
-                actionLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
-                lines++;
-                if (lines == 3) break;
-            }
-            foreach (var lh in UndoneStack)
-            {
-                undoLine += $"[{lh.Action} - {lh.LogId.ToString().Substring(0, 6)}],";
-                lines++;
-                if (lines == 3) break;
-            }
-
-            Debug.WriteLine(actionLine);
-            Debug.WriteLine(undoLine + "\n");
-        }
+        #endregion Properties
 
         public void ClearUndo()
         {
@@ -151,79 +166,26 @@ namespace Catan10
 
     public class NewLog : INotifyPropertyChanged, IDisposable
     {
+        #region Fields
+
         private readonly Stacks Stacks = new Stacks();
         private bool _writing = false;
 
-        public NewLog(IGameController gameController)
-        {
-            Stacks.PropertyChanged += Stacks_PropertyChanged;
-            DateTime dt = DateTime.Now;
+        #endregion Fields
 
-            string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
-            string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
-
-            SaveFileName = String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm}{MainPage.SAVED_GAME_EXTENSION}");
-            RollLog = new RollLog(gameController);
-
-            Timer = new Timer(OnSaveTimer, this, 10 * 1000, Timeout.Infinite);
-        }
-
-        private async void OnSaveTimer(object state)
-        {
-            NewLog log = state as NewLog;
-            Contract.Assert(log != null);
-            await log.WriteToDisk();
-            log.Timer.Change(10 * 1000, Timeout.Infinite);
-        }
-
-        public event PropertyChangedEventHandler LogChanged;
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        #region Properties
 
         private ConcurrentQueue<CatanMessage> MessageLog { get; } = new ConcurrentQueue<CatanMessage>();
+
         private string SaveFileName { get; set; }
+
         private Timer Timer { get; set; }
-        public bool CanRedo => Stacks.CanRedo;
-        public bool CanUndo => Stacks.CanUndo;
-        public IGameController GameController => MainPage.Current;
 
-        public GameState GameState
-        {
-            get
-            {
-                if (Stacks.ActionCount == 0)
-                {
-                    return GameState.WaitingForNewGame;
-                }
-
-                return Stacks.PeekAction.NewState;
-            }
-        }
-
-        public LogHeader PeekAction => Stacks.PeekAction;
-        public LogHeader PeekUndo => Stacks.PeekUndo;
-        public RollLog RollLog { get; private set; }
         private bool UpdateLogFlag { get; set; } = false;
-        //
-        //  whenever we push or pop from the stack we should
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            LogChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            UpdateLogFlag = true;
-        }
 
+        #endregion Properties
 
-
-        /// <summary>
-        ///     forward the event to the Log's customers
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Stacks_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            NotifyPropertyChanged(e.PropertyName);
-        }
+        #region Methods
 
         private string GetJson()
         {
@@ -243,7 +205,33 @@ namespace Catan10
             sb.Append(Environment.NewLine);
             sb.Append("]");
             return sb.ToString();
+        }
 
+        //
+        //  whenever we push or pop from the stack we should
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            LogChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            UpdateLogFlag = true;
+        }
+
+        private async void OnSaveTimer(object state)
+        {
+            NewLog log = state as NewLog;
+            Contract.Assert(log != null);
+            await log.WriteToDisk();
+            log.Timer.Change(10 * 1000, Timeout.Infinite);
+        }
+
+        /// <summary>
+        ///     forward the event to the Log's customers
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Stacks_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            NotifyPropertyChanged(e.PropertyName);
         }
 
         private async Task WriteToDisk()
@@ -282,8 +270,56 @@ namespace Catan10
             }
 
             MessageLog.Enqueue(message);
-
         }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public NewLog(IGameController gameController)
+        {
+            Stacks.PropertyChanged += Stacks_PropertyChanged;
+            DateTime dt = DateTime.Now;
+
+            string ampm = dt.TimeOfDay.TotalMinutes > 720 ? "PM" : "AM";
+            string min = dt.TimeOfDay.Minutes.ToString().PadLeft(2, '0');
+
+            SaveFileName = String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm}{MainPage.SAVED_GAME_EXTENSION}");
+            RollLog = new RollLog(gameController);
+
+            Timer = new Timer(OnSaveTimer, this, 10 * 1000, Timeout.Infinite);
+        }
+
+        #endregion Constructors
+
+        #region Events
+
+        public event PropertyChangedEventHandler LogChanged;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Events
+
+        public bool CanRedo => Stacks.CanRedo;
+        public bool CanUndo => Stacks.CanUndo;
+        public IGameController GameController => MainPage.Current;
+
+        public GameState GameState
+        {
+            get
+            {
+                if (Stacks.ActionCount == 0)
+                {
+                    return GameState.WaitingForNewGame;
+                }
+
+                return Stacks.PeekAction.NewState;
+            }
+        }
+
+        public LogHeader PeekAction => Stacks.PeekAction;
+        public LogHeader PeekUndo => Stacks.PeekUndo;
+        public RollLog RollLog { get; private set; }
 
         public void Dispose()
         {
@@ -377,8 +413,4 @@ namespace Catan10
             }
         }
     }
-
-
-
-
 }

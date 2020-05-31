@@ -11,7 +11,7 @@ namespace Catan10
     /// </summary>
     public class DoneAllocResourcesToWaitingForRoll : LogHeader, ILogController
     {
-        public List<int> GoldTiles { get; set; }
+        #region Methods
 
         internal static async Task PostLog(IGameController gameController)
         {
@@ -27,6 +27,14 @@ namespace Catan10
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
+
+        #endregion Methods
+
+        #region Properties
+
+        public List<int> GoldTiles { get; set; }
+
+        #endregion Properties
 
         public async Task Do(IGameController gameController)
         {

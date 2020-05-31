@@ -11,15 +11,7 @@ namespace Catan10
     /// </summary>
     public class ChangePlayerLog : LogHeader, ILogController
     {
-        public ChangePlayerLog()
-        {
-        }
-
-        public List<int> HighlightedTiles { get; set; } = new List<int>();
-        public string NewCurrentPlayer { get; set; }
-        public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
-        public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
-        public string PreviousPlayer { get; set; }
+        #region Methods
 
         private bool ListsEqual(List<int> l1, List<int> l2)
         {
@@ -36,6 +28,26 @@ namespace Catan10
 
             return true;
         }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public ChangePlayerLog()
+        {
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public List<int> HighlightedTiles { get; set; } = new List<int>();
+        public string NewCurrentPlayer { get; set; }
+        public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
+        public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
+        public string PreviousPlayer { get; set; }
+
+        #endregion Properties
 
         public static async Task ChangePlayer(IGameController gameController, int numberofPositions)
         {

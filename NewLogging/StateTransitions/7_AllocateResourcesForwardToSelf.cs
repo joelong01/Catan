@@ -11,6 +11,8 @@ namespace Catan10
     /// </summary>
     public class AllocateResourcesForwardToAllocateResourcesForward : LogHeader, ILogController
     {
+        #region Methods
+
         internal static async Task PostLog(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceForward);
@@ -44,5 +46,7 @@ namespace Catan10
             AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
         }
+
+        #endregion Methods
     }
 }

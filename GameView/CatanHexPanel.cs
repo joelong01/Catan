@@ -12,6 +12,8 @@ namespace Catan10
 {
     public partial class CatanHexPanel : Canvas
     {
+        #region Fields
+
         private readonly BaronCtrl _baron = new BaronCtrl();
 
         private readonly List<TileCtrl> _desertTiles = new List<TileCtrl>();
@@ -50,471 +52,16 @@ namespace Catan10
 
         private TileCtrl[] _tilesInIndexOrder = null;
 
-        public static readonly DependencyProperty AllowShipsProperty = DependencyProperty.Register("AllowShips", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
-        public static readonly DependencyProperty BaronTileProperty = DependencyProperty.Register("BaronTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, BaronTileChanged));
+        #endregion Fields
 
-        // RowCounts[0] tells you how many rows there are in the 0th Column
-        public static readonly DependencyProperty BaronVisibilityProperty = DependencyProperty.Register("BaronVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, BaronVisibilityChanged));
-        public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
-        public static readonly DependencyProperty CatanGameProperty = DependencyProperty.Register("CatanGame", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
-        public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register("Description", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
-        public static readonly DependencyProperty DevCardsProperty = DependencyProperty.Register("DevCards", typeof(List<DevCardType>), typeof(CatanHexPanel), new PropertyMetadata(new List<DevCardType>()));
-        public static readonly DependencyProperty DisableLayoutProperty = DependencyProperty.Register("DisableLayout", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
-        public static readonly DependencyProperty GameNameProperty = DependencyProperty.Register("GameName", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
-        public static readonly DependencyProperty GameTypeProperty = DependencyProperty.Register("GameType", typeof(GameType), typeof(CatanHexPanel), new PropertyMetadata(GameType.Regular));
-        public static readonly DependencyProperty HarborCountProperty = DependencyProperty.Register("HarborCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(9));
-        public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
-        public static readonly DependencyProperty KnightsProperty = DependencyProperty.Register("Knights", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(14));
-        public static readonly DependencyProperty MaxCitiesProperty = DependencyProperty.Register("MaxCities", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(4));
-        public static readonly DependencyProperty MaxResourceAllocatedProperty = DependencyProperty.Register("MaxResourceAllocated", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
-        public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.Register("MaxRoads", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(15));
-        public static readonly DependencyProperty MaxSettlementsProperty = DependencyProperty.Register("MaxSettlements", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
-        public static readonly DependencyProperty MaxShipsProperty = DependencyProperty.Register("MaxShips", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(0));
-        public static readonly DependencyProperty MonopolyProperty = DependencyProperty.Register("Monopoly", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
-        public static readonly DependencyProperty PirateShipTileProperty = DependencyProperty.Register("PirateShipTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, PirateTileChanged));
-        public static readonly DependencyProperty PirateVisibilityProperty = DependencyProperty.Register("PirateVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, PirateVisibilityChanged));
-        public static readonly DependencyProperty RoadBuildingProperty = DependencyProperty.Register("RoadBuilding", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
-        public static readonly DependencyProperty TileCountProperty = DependencyProperty.Register("TileCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
-        public static readonly DependencyProperty TileGapProperty = DependencyProperty.Register("TileGap", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(0));
-        public static readonly DependencyProperty TileGroupsProperty = DependencyProperty.Register("TileGroups", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
-        public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(50));
-        public static readonly DependencyProperty VictoryPointsProperty = DependencyProperty.Register("VictoryPoints", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
-        public static readonly DependencyProperty YearOfPlentyProperty = DependencyProperty.Register("YearOfPlenty", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
-        public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
-
-        public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
-
-        public CatanHexPanel()
-        {
-            _pirateShip.Visibility = Visibility.Collapsed;
-            _baron.Visibility = Visibility.Collapsed;
-            _baron.Width = 50;
-            _baron.Height = 60;
-
-            HarborLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            HarborLayer.VerticalAlignment = VerticalAlignment.Stretch;
-
-            RoadLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            RoadLayer.VerticalAlignment = VerticalAlignment.Stretch;
-
-            Canvas.SetZIndex(this, 5);
-            Canvas.SetZIndex(HarborLayer, 10);
-            Canvas.SetZIndex(RoadLayer, 20);
-            Canvas.SetZIndex(TopLayer, 95);
-
-            HarborLayer.Width = 5000;
-            HarborLayer.Height = 5000;
-            HarborLayer.Opacity = 1.0;
-            RoadLayer.Width = 5000;
-            RoadLayer.Height = 5000;
-            RoadLayer.Opacity = 1.0;
-
-            TopLayer.Width = 5000;
-            TopLayer.Height = 5000;
-            TopLayer.Opacity = 1.0;
-            TopLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            TopLayer.VerticalAlignment = VerticalAlignment.Stretch;
-            TopLayer.IsHitTestVisible = true;
-            TopLayer.IsDoubleTapEnabled = true;
-            TopLayer.IsHoldingEnabled = true;
-            TopLayer.IsRightTapEnabled = true;
-            TopLayer.IsTapEnabled = true;
-
-            Canvas.SetZIndex(_baron, 5);
-            Canvas.SetZIndex(_pirateShip, 5);
-
-            HarborLayer.Children.Add(_pirateShip);
-            HarborLayer.Children.Add(_baron);
-
-            this.SizeChanged += SimpleHexPanel_SizeChanged;
-            this.Children.Add(HarborLayer);
-            this.Children.Add(RoadLayer);
-            this.Children.Add(TopLayer);
-        }
+        #region Properties
 
         private Canvas HarborLayer { get; set; } = new Canvas();
-
         private Canvas RoadLayer { get; set; } = new Canvas();
 
-        public bool AllowShips
-        {
-            get => (bool)GetValue(AllowShipsProperty);
-            set => SetValue(AllowShipsProperty, value);
-        }
+        #endregion Properties
 
-        public TileCtrl BaronTile
-        {
-            get => (TileCtrl)GetValue(BaronTileProperty);
-            set => SetValue(BaronTileProperty, value);
-        }
-
-        public Visibility BaronVisibility
-        {
-            get => (Visibility)GetValue(BaronVisibilityProperty);
-            set => SetValue(BaronVisibilityProperty, value);
-        }
-
-        public string BuildingIndexToHarborIndex
-        {
-            get => (string)GetValue(BuildingIndexToHarborIndexProperty);
-            set => SetValue(BuildingIndexToHarborIndexProperty, value);
-        }
-
-        //
-        //   UI Elements
-        public List<BuildingCtrl> Buildings { get; } = new List<BuildingCtrl>();
-
-        public CatanGames CatanGame
-        {
-            get => (CatanGames)GetValue(CatanGameProperty);
-            set => SetValue(CatanGameProperty, value);
-        }
-
-        public int Columns => RowCounts.Count();
-
-        public string Description
-        {
-            get => (string)GetValue(DescriptionProperty);
-            set => SetValue(DescriptionProperty, value);
-        }
-
-        // book keeping
-        //
-        public int DesertCount => _desertTiles.Count;
-
-        public List<TileCtrl> DesertTiles => _desertTiles;
-
-        public List<DevCardType> DevCards
-        {
-            get => (List<DevCardType>)GetValue(DevCardsProperty);
-            set => SetValue(DevCardsProperty, value);
-        }
-
-        public bool DisableLayout
-        {
-            get => (bool)GetValue(DisableLayoutProperty);
-            set => SetValue(DisableLayoutProperty, value);
-        }
-
-        public IGameCallback GameCallback
-        {
-            get => _gameCallback;
-            set
-            {
-                _gameCallback = value;
-
-                foreach (RoadCtrl road in Roads)
-                {
-                    road.Callback = _gameCallback;
-                }
-
-                foreach (BuildingCtrl s in Buildings)
-                {
-                    s.Callback = _gameCallback;
-                }
-            }
-        }
-
-        public CatanGames GameName
-        {
-            get => (CatanGames)GetValue(GameNameProperty);
-            set => SetValue(GameNameProperty, value);
-        }
-
-        public GameType GameType
-        {
-            get => (GameType)GetValue(GameTypeProperty);
-            set => SetValue(GameTypeProperty, value);
-        }
-
-        public int HarborCount
-        {
-            get => (int)GetValue(HarborCountProperty);
-            set => SetValue(HarborCountProperty, value);
-        }
-
-        public List<Harbor> Harbors { get; } = new List<Harbor>();
-
-        public bool HasIslands => TileToIslandDictionary.Keys.Count > 1;
-
-        public string Islands
-        {
-            get => (string)GetValue(IslandsProperty);
-            set => SetValue(IslandsProperty, value);
-        }
-
-        public int Knights
-        {
-            get => (int)GetValue(KnightsProperty);
-            set => SetValue(KnightsProperty, value);
-        }
-
-        public int MaxCities
-        {
-            get => (int)GetValue(MaxCitiesProperty);
-            set => SetValue(MaxCitiesProperty, value);
-        }
-
-        public int MaxResourceAllocated
-        {
-            get => (int)GetValue(MaxResourceAllocatedProperty);
-            set => SetValue(MaxResourceAllocatedProperty, value);
-        }
-
-        public int MaxRoads
-        {
-            get => (int)GetValue(MaxRoadsProperty);
-            set => SetValue(MaxRoadsProperty, value);
-        }
-
-        public int MaxSettlements
-        {
-            get => (int)GetValue(MaxSettlementsProperty);
-            set => SetValue(MaxSettlementsProperty, value);
-        }
-
-        public int MaxShips
-        {
-            get => (int)GetValue(MaxShipsProperty);
-            set => SetValue(MaxShipsProperty, value);
-        }
-
-        public int Monopoly
-        {
-            get => (int)GetValue(MonopolyProperty);
-            set => SetValue(MonopolyProperty, value);
-        }
-
-        public double NormalHeight
-        {
-            get => _normalHeight;
-
-            set => _normalHeight = value;
-        }
-
-        public double NormalWidth
-        {
-            get => _normalWidth;
-
-            set
-            {
-                _normalWidth = value;
-                SetupHarborData();
-            }
-        }
-
-        public TileCtrl PirateShipTile
-        {
-            get => (TileCtrl)GetValue(PirateShipTileProperty);
-            set => SetValue(PirateShipTileProperty, value);
-        }
-
-        public Visibility PirateVisibility
-        {
-            get => (Visibility)GetValue(PirateVisibilityProperty);
-            set => SetValue(PirateVisibilityProperty, value);
-        }
-
-        public ResourceType[] ResourceTypes
-        {
-            get
-            {
-                BuildDataLists();
-                return _resourceTypes;
-            }
-        }
-
-        public int RoadBuilding
-        {
-            get => (int)GetValue(RoadBuildingProperty);
-            set => SetValue(RoadBuildingProperty, value);
-        }
-
-        //
-        //  ways to look Road/Buildings/Tiles up
-        public Dictionary<RoadKey, RoadCtrl> RoadKeyToRoadDictionary { get; } = new Dictionary<RoadKey, RoadCtrl>(new RoadKeyComparer());
-
-        public List<RoadCtrl> Roads { get; } = new List<RoadCtrl>();
-
-        public string RowsPerColumn
-        {
-            get
-            {
-                string s = "";
-                foreach (int i in RowCounts)
-                {
-                    s += string.Format($"{i},");
-                }
-
-                return s;
-            }
-            set
-            {
-                try
-                {
-                    if (value == "")
-                    {
-                        return;
-                    }
-
-                    RowCounts.Clear();
-
-                    string[] tokens = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string s in tokens)
-                    {
-                        RowCounts.Add(int.Parse(s));
-                    }
-
-                    _colCount = RowCounts.Count();
-                }
-                catch { }
-            }
-        }
-
-        public HarborType[] StartingHarborTypes { get; private set; } = null;
-
-        public ITileControlCallback TileCallback
-        {
-            get => _tileCallback;
-            set
-            {
-                _tileCallback = value;
-                foreach (TileCtrl tile in Tiles)
-                {
-                    tile.SetTileCallback(value);
-                }
-            }
-        }
-
-        public double TileGap
-        {
-            get => (double)GetValue(TileGapProperty);
-            set => SetValue(TileGapProperty, value);
-        }
-
-        public string TileGroups
-        {
-            get => (string)GetValue(TileGroupsProperty);
-            set => SetValue(TileGroupsProperty, value);
-        }
-
-        public int[] TileNumbers
-        {
-            get
-            {
-                BuildDataLists();
-                return _tileNumbers;
-            }
-        }
-
-        public List<TileCtrl> Tiles { get; } = new List<TileCtrl>();
-
-        //
-        //  this is where be build up all the state needed in a TileGroup list
-        //  try to iterate over the tiles only once...
-        public List<TileGroup> TileSets
-        {
-            get
-            {
-                if (_tileSets.Count == 0)
-                {
-                    if (TileGroups != "")
-                    {
-                        string[] values = TileGroups.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string val in values)
-                        {
-                            TileGroup tg = new TileGroup();
-                            string[] tokens = val.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
-                            tg.Start = int.Parse(tokens[0]);
-                            tg.End = int.Parse(tokens[1]);
-                            tg.Randomize = bool.Parse(tokens[2]);
-                            for (int i = tg.Start; i <= tg.End; i++)
-                            {
-                                TileCtrl tile = TilesInIndexOrder[i];
-                                tg.AllTiles.Add(tile);
-                                tg.StartingResourceTypes.Add(tile.ResourceType);
-                                tg.StartingTileNumbers.Add(tile.Number);
-                                if (tile.ResourceType == ResourceType.Desert)
-                                {
-                                    tg.DesertCount++;
-                                }
-
-                                if (tile.ResourceType != ResourceType.Sea)
-                                {
-                                    tg.TilesToRandomize.Add(tile);
-                                    tg.OriginalNonSeaTiles.Add(tile);
-                                }
-                                //
-                                //  Bind to CurrentPlayer
-                                Binding binding = new Binding()
-                                {
-                                    Path = new PropertyPath("CurrentPlayer"),
-                                    Mode = BindingMode.OneWay,
-                                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                                    Source = MainPage.Current
-                                };
-
-                                tile.SetBinding(BuildingCtrl.CurrentPlayerProperty, binding);
-                            }
-                            _tileSets.Add(tg);
-                        }
-                    }
-                    else
-                    {
-                        TileGroup tg = new TileGroup
-                        {
-                            Start = 0,
-                            End = Tiles.Count() - 1,
-                            Randomize = true
-                        };
-                        tg.AllTiles.AddRange(Tiles);
-                        tg.TilesToRandomize.AddRange(Tiles);
-                        tg.OriginalNonSeaTiles.AddRange(Tiles);
-                        tg.StartingResourceTypes.AddRange(_resourceTypes);
-                        tg.StartingTileNumbers.AddRange(_tileNumbers);
-                        _tileSets.Add(tg);
-                    }
-                }
-                return _tileSets;
-            }
-        }
-
-        public TileCtrl[] TilesInIndexOrder
-        {
-            get
-            {
-                BuildChildList();
-                BuildDataLists();
-                return _tilesInIndexOrder;
-            }
-        }
-
-        public Dictionary<TileCtrl, Island> TileToIslandDictionary { get; set; } = new Dictionary<TileCtrl, Island>();
-
-        //
-        //  layers
-        public Grid TopLayer { get; set; } = new Grid();
-
-        // given a tile, tell me what Island it is in
-        public double UniformMargin
-        {
-            get => (double)GetValue(UniformMarginProperty);
-            set => SetValue(UniformMarginProperty, value);
-        }
-
-        public int VictoryPoints
-        {
-            get => (int)GetValue(VictoryPointsProperty);
-            set => SetValue(VictoryPointsProperty, value);
-        }
-
-        public List<List<TileCtrl>> VisualTiles => _tilesInVisualLayout;
-
-        public int YearOfPlenty
-        {
-            get => (int)GetValue(YearOfPlentyProperty);
-            set => SetValue(YearOfPlentyProperty, value);
-        }
+        #region Methods
 
         private static void BaronTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1293,6 +840,471 @@ namespace Catan10
             }
         }
 
+        #endregion Methods
+
+        public static readonly DependencyProperty AllowShipsProperty = DependencyProperty.Register("AllowShips", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
+        public static readonly DependencyProperty BaronTileProperty = DependencyProperty.Register("BaronTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, BaronTileChanged));
+
+        // RowCounts[0] tells you how many rows there are in the 0th Column
+        public static readonly DependencyProperty BaronVisibilityProperty = DependencyProperty.Register("BaronVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, BaronVisibilityChanged));
+
+        public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
+        public static readonly DependencyProperty CatanGameProperty = DependencyProperty.Register("CatanGame", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
+        public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register("Description", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
+        public static readonly DependencyProperty DevCardsProperty = DependencyProperty.Register("DevCards", typeof(List<DevCardType>), typeof(CatanHexPanel), new PropertyMetadata(new List<DevCardType>()));
+        public static readonly DependencyProperty DisableLayoutProperty = DependencyProperty.Register("DisableLayout", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
+        public static readonly DependencyProperty GameNameProperty = DependencyProperty.Register("GameName", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
+        public static readonly DependencyProperty GameTypeProperty = DependencyProperty.Register("GameType", typeof(GameType), typeof(CatanHexPanel), new PropertyMetadata(GameType.Regular));
+        public static readonly DependencyProperty HarborCountProperty = DependencyProperty.Register("HarborCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(9));
+        public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
+        public static readonly DependencyProperty KnightsProperty = DependencyProperty.Register("Knights", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(14));
+        public static readonly DependencyProperty MaxCitiesProperty = DependencyProperty.Register("MaxCities", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(4));
+        public static readonly DependencyProperty MaxResourceAllocatedProperty = DependencyProperty.Register("MaxResourceAllocated", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
+        public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.Register("MaxRoads", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(15));
+        public static readonly DependencyProperty MaxSettlementsProperty = DependencyProperty.Register("MaxSettlements", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
+        public static readonly DependencyProperty MaxShipsProperty = DependencyProperty.Register("MaxShips", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(0));
+        public static readonly DependencyProperty MonopolyProperty = DependencyProperty.Register("Monopoly", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public static readonly DependencyProperty PirateShipTileProperty = DependencyProperty.Register("PirateShipTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, PirateTileChanged));
+        public static readonly DependencyProperty PirateVisibilityProperty = DependencyProperty.Register("PirateVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, PirateVisibilityChanged));
+        public static readonly DependencyProperty RoadBuildingProperty = DependencyProperty.Register("RoadBuilding", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public static readonly DependencyProperty TileCountProperty = DependencyProperty.Register("TileCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
+        public static readonly DependencyProperty TileGapProperty = DependencyProperty.Register("TileGap", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(0));
+        public static readonly DependencyProperty TileGroupsProperty = DependencyProperty.Register("TileGroups", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
+        public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(50));
+        public static readonly DependencyProperty VictoryPointsProperty = DependencyProperty.Register("VictoryPoints", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
+        public static readonly DependencyProperty YearOfPlentyProperty = DependencyProperty.Register("YearOfPlenty", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
+
+        public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
+
+        public CatanHexPanel()
+        {
+            _pirateShip.Visibility = Visibility.Collapsed;
+            _baron.Visibility = Visibility.Collapsed;
+            _baron.Width = 50;
+            _baron.Height = 60;
+
+            HarborLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            HarborLayer.VerticalAlignment = VerticalAlignment.Stretch;
+
+            RoadLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            RoadLayer.VerticalAlignment = VerticalAlignment.Stretch;
+
+            Canvas.SetZIndex(this, 5);
+            Canvas.SetZIndex(HarborLayer, 10);
+            Canvas.SetZIndex(RoadLayer, 20);
+            Canvas.SetZIndex(TopLayer, 95);
+
+            HarborLayer.Width = 5000;
+            HarborLayer.Height = 5000;
+            HarborLayer.Opacity = 1.0;
+            RoadLayer.Width = 5000;
+            RoadLayer.Height = 5000;
+            RoadLayer.Opacity = 1.0;
+
+            TopLayer.Width = 5000;
+            TopLayer.Height = 5000;
+            TopLayer.Opacity = 1.0;
+            TopLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            TopLayer.VerticalAlignment = VerticalAlignment.Stretch;
+            TopLayer.IsHitTestVisible = true;
+            TopLayer.IsDoubleTapEnabled = true;
+            TopLayer.IsHoldingEnabled = true;
+            TopLayer.IsRightTapEnabled = true;
+            TopLayer.IsTapEnabled = true;
+
+            Canvas.SetZIndex(_baron, 5);
+            Canvas.SetZIndex(_pirateShip, 5);
+
+            HarborLayer.Children.Add(_pirateShip);
+            HarborLayer.Children.Add(_baron);
+
+            this.SizeChanged += SimpleHexPanel_SizeChanged;
+            this.Children.Add(HarborLayer);
+            this.Children.Add(RoadLayer);
+            this.Children.Add(TopLayer);
+        }
+
+        public bool AllowShips
+        {
+            get => (bool)GetValue(AllowShipsProperty);
+            set => SetValue(AllowShipsProperty, value);
+        }
+
+        public TileCtrl BaronTile
+        {
+            get => (TileCtrl)GetValue(BaronTileProperty);
+            set => SetValue(BaronTileProperty, value);
+        }
+
+        public Visibility BaronVisibility
+        {
+            get => (Visibility)GetValue(BaronVisibilityProperty);
+            set => SetValue(BaronVisibilityProperty, value);
+        }
+
+        public string BuildingIndexToHarborIndex
+        {
+            get => (string)GetValue(BuildingIndexToHarborIndexProperty);
+            set => SetValue(BuildingIndexToHarborIndexProperty, value);
+        }
+
+        //
+        //   UI Elements
+        public List<BuildingCtrl> Buildings { get; } = new List<BuildingCtrl>();
+
+        public CatanGames CatanGame
+        {
+            get => (CatanGames)GetValue(CatanGameProperty);
+            set => SetValue(CatanGameProperty, value);
+        }
+
+        public int Columns => RowCounts.Count();
+
+        public string Description
+        {
+            get => (string)GetValue(DescriptionProperty);
+            set => SetValue(DescriptionProperty, value);
+        }
+
+        // book keeping
+        //
+        public int DesertCount => _desertTiles.Count;
+
+        public List<TileCtrl> DesertTiles => _desertTiles;
+
+        public List<DevCardType> DevCards
+        {
+            get => (List<DevCardType>)GetValue(DevCardsProperty);
+            set => SetValue(DevCardsProperty, value);
+        }
+
+        public bool DisableLayout
+        {
+            get => (bool)GetValue(DisableLayoutProperty);
+            set => SetValue(DisableLayoutProperty, value);
+        }
+
+        public IGameCallback GameCallback
+        {
+            get => _gameCallback;
+            set
+            {
+                _gameCallback = value;
+
+                foreach (RoadCtrl road in Roads)
+                {
+                    road.Callback = _gameCallback;
+                }
+
+                foreach (BuildingCtrl s in Buildings)
+                {
+                    s.Callback = _gameCallback;
+                }
+            }
+        }
+
+        public CatanGames GameName
+        {
+            get => (CatanGames)GetValue(GameNameProperty);
+            set => SetValue(GameNameProperty, value);
+        }
+
+        public GameType GameType
+        {
+            get => (GameType)GetValue(GameTypeProperty);
+            set => SetValue(GameTypeProperty, value);
+        }
+
+        public int HarborCount
+        {
+            get => (int)GetValue(HarborCountProperty);
+            set => SetValue(HarborCountProperty, value);
+        }
+
+        public List<Harbor> Harbors { get; } = new List<Harbor>();
+
+        public bool HasIslands => TileToIslandDictionary.Keys.Count > 1;
+
+        public string Islands
+        {
+            get => (string)GetValue(IslandsProperty);
+            set => SetValue(IslandsProperty, value);
+        }
+
+        public int Knights
+        {
+            get => (int)GetValue(KnightsProperty);
+            set => SetValue(KnightsProperty, value);
+        }
+
+        public int MaxCities
+        {
+            get => (int)GetValue(MaxCitiesProperty);
+            set => SetValue(MaxCitiesProperty, value);
+        }
+
+        public int MaxResourceAllocated
+        {
+            get => (int)GetValue(MaxResourceAllocatedProperty);
+            set => SetValue(MaxResourceAllocatedProperty, value);
+        }
+
+        public int MaxRoads
+        {
+            get => (int)GetValue(MaxRoadsProperty);
+            set => SetValue(MaxRoadsProperty, value);
+        }
+
+        public int MaxSettlements
+        {
+            get => (int)GetValue(MaxSettlementsProperty);
+            set => SetValue(MaxSettlementsProperty, value);
+        }
+
+        public int MaxShips
+        {
+            get => (int)GetValue(MaxShipsProperty);
+            set => SetValue(MaxShipsProperty, value);
+        }
+
+        public int Monopoly
+        {
+            get => (int)GetValue(MonopolyProperty);
+            set => SetValue(MonopolyProperty, value);
+        }
+
+        public double NormalHeight
+        {
+            get => _normalHeight;
+
+            set => _normalHeight = value;
+        }
+
+        public double NormalWidth
+        {
+            get => _normalWidth;
+
+            set
+            {
+                _normalWidth = value;
+                SetupHarborData();
+            }
+        }
+
+        public TileCtrl PirateShipTile
+        {
+            get => (TileCtrl)GetValue(PirateShipTileProperty);
+            set => SetValue(PirateShipTileProperty, value);
+        }
+
+        public Visibility PirateVisibility
+        {
+            get => (Visibility)GetValue(PirateVisibilityProperty);
+            set => SetValue(PirateVisibilityProperty, value);
+        }
+
+        public ResourceType[] ResourceTypes
+        {
+            get
+            {
+                BuildDataLists();
+                return _resourceTypes;
+            }
+        }
+
+        public int RoadBuilding
+        {
+            get => (int)GetValue(RoadBuildingProperty);
+            set => SetValue(RoadBuildingProperty, value);
+        }
+
+        //
+        //  ways to look Road/Buildings/Tiles up
+        public Dictionary<RoadKey, RoadCtrl> RoadKeyToRoadDictionary { get; } = new Dictionary<RoadKey, RoadCtrl>(new RoadKeyComparer());
+
+        public List<RoadCtrl> Roads { get; } = new List<RoadCtrl>();
+
+        public string RowsPerColumn
+        {
+            get
+            {
+                string s = "";
+                foreach (int i in RowCounts)
+                {
+                    s += string.Format($"{i},");
+                }
+
+                return s;
+            }
+            set
+            {
+                try
+                {
+                    if (value == "")
+                    {
+                        return;
+                    }
+
+                    RowCounts.Clear();
+
+                    string[] tokens = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string s in tokens)
+                    {
+                        RowCounts.Add(int.Parse(s));
+                    }
+
+                    _colCount = RowCounts.Count();
+                }
+                catch { }
+            }
+        }
+
+        public HarborType[] StartingHarborTypes { get; private set; } = null;
+
+        public ITileControlCallback TileCallback
+        {
+            get => _tileCallback;
+            set
+            {
+                _tileCallback = value;
+                foreach (TileCtrl tile in Tiles)
+                {
+                    tile.SetTileCallback(value);
+                }
+            }
+        }
+
+        public double TileGap
+        {
+            get => (double)GetValue(TileGapProperty);
+            set => SetValue(TileGapProperty, value);
+        }
+
+        public string TileGroups
+        {
+            get => (string)GetValue(TileGroupsProperty);
+            set => SetValue(TileGroupsProperty, value);
+        }
+
+        public int[] TileNumbers
+        {
+            get
+            {
+                BuildDataLists();
+                return _tileNumbers;
+            }
+        }
+
+        public List<TileCtrl> Tiles { get; } = new List<TileCtrl>();
+
+        //
+        //  this is where be build up all the state needed in a TileGroup list
+        //  try to iterate over the tiles only once...
+        public List<TileGroup> TileSets
+        {
+            get
+            {
+                if (_tileSets.Count == 0)
+                {
+                    if (TileGroups != "")
+                    {
+                        string[] values = TileGroups.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string val in values)
+                        {
+                            TileGroup tg = new TileGroup();
+                            string[] tokens = val.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
+                            tg.Start = int.Parse(tokens[0]);
+                            tg.End = int.Parse(tokens[1]);
+                            tg.Randomize = bool.Parse(tokens[2]);
+                            for (int i = tg.Start; i <= tg.End; i++)
+                            {
+                                TileCtrl tile = TilesInIndexOrder[i];
+                                tg.AllTiles.Add(tile);
+                                tg.StartingResourceTypes.Add(tile.ResourceType);
+                                tg.StartingTileNumbers.Add(tile.Number);
+                                if (tile.ResourceType == ResourceType.Desert)
+                                {
+                                    tg.DesertCount++;
+                                }
+
+                                if (tile.ResourceType != ResourceType.Sea)
+                                {
+                                    tg.TilesToRandomize.Add(tile);
+                                    tg.OriginalNonSeaTiles.Add(tile);
+                                }
+                                //
+                                //  Bind to CurrentPlayer
+                                Binding binding = new Binding()
+                                {
+                                    Path = new PropertyPath("CurrentPlayer"),
+                                    Mode = BindingMode.OneWay,
+                                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                                    Source = MainPage.Current
+                                };
+
+                                tile.SetBinding(BuildingCtrl.CurrentPlayerProperty, binding);
+                            }
+                            _tileSets.Add(tg);
+                        }
+                    }
+                    else
+                    {
+                        TileGroup tg = new TileGroup
+                        {
+                            Start = 0,
+                            End = Tiles.Count() - 1,
+                            Randomize = true
+                        };
+                        tg.AllTiles.AddRange(Tiles);
+                        tg.TilesToRandomize.AddRange(Tiles);
+                        tg.OriginalNonSeaTiles.AddRange(Tiles);
+                        tg.StartingResourceTypes.AddRange(_resourceTypes);
+                        tg.StartingTileNumbers.AddRange(_tileNumbers);
+                        _tileSets.Add(tg);
+                    }
+                }
+                return _tileSets;
+            }
+        }
+
+        public TileCtrl[] TilesInIndexOrder
+        {
+            get
+            {
+                BuildChildList();
+                BuildDataLists();
+                return _tilesInIndexOrder;
+            }
+        }
+
+        public Dictionary<TileCtrl, Island> TileToIslandDictionary { get; set; } = new Dictionary<TileCtrl, Island>();
+
+        //
+        //  layers
+        public Grid TopLayer { get; set; } = new Grid();
+
+        // given a tile, tell me what Island it is in
+        public double UniformMargin
+        {
+            get => (double)GetValue(UniformMarginProperty);
+            set => SetValue(UniformMarginProperty, value);
+        }
+
+        public int VictoryPoints
+        {
+            get => (int)GetValue(VictoryPointsProperty);
+            set => SetValue(VictoryPointsProperty, value);
+        }
+
+        public List<List<TileCtrl>> VisualTiles => _tilesInVisualLayout;
+
+        public int YearOfPlenty
+        {
+            get => (int)GetValue(YearOfPlentyProperty);
+            set => SetValue(YearOfPlentyProperty, value);
+        }
+
         public void ArrangeRoads()
         {
             if (RoadKeyToRoadDictionary.Count != 0)
@@ -1895,6 +1907,8 @@ namespace Catan10
 
     public class HarborLayoutData
     {
+        #region Constructors
+
         public HarborLayoutData(Point rto, double rotate, double scale, Point anchor)
         {
             RenderTransformOrigin = rto;
@@ -1903,12 +1917,20 @@ namespace Catan10
             Anchor = anchor;
         }
 
+        #endregion Constructors
+
+        #region Properties
+
         public static double Height { get; } = 50;
         public static double Width { get; } = 50;
         public Point Anchor { get; set; }
         public Point RenderTransformOrigin { get; set; }
         public double Rotation { get; set; }
         public double Scale { get; set; } = 1.1;
+
+        #endregion Properties
+
+        #region Methods
 
         public static void AddLocation(HarborLocation location, Point rto, double rotate, double scale, Point anchor, Dictionary<HarborLocation, HarborLayoutData> harborLayoutDataDictionary)
         {
@@ -1930,18 +1952,30 @@ namespace Catan10
             harbor.Transform.ScaleX = data.Scale;
             harbor.Transform.ScaleY = data.Scale;
         }
+
+        #endregion Methods
     }
 
     public class Island
     {
+        #region Fields
+
         public bool BonusPoint = false;
         public int End = -1;
         public int Start = -1;
+
+        #endregion Fields
     }
 
     public class StaticGameInfo : DependencyObject
     {
+        #region Fields
+
         public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.RegisterAttached("MaxRoads", typeof(int), typeof(StaticGameInfo), new PropertyMetadata(15));
+
+        #endregion Fields
+
+        #region Methods
 
         public static int GetMaxRoads(CatanHexPanel element)
         {
@@ -1952,5 +1986,7 @@ namespace Catan10
         {
             element.SetValue(MaxRoadsProperty, value);
         }
+
+        #endregion Methods
     }
 }

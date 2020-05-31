@@ -1,6 +1,4 @@
-﻿using Catan.Proxy;
-
-using System;
+﻿using System;
 
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -12,54 +10,43 @@ namespace Catan10
 {
     public sealed partial class ResourceCardCtrl : UserControl
     {
-        public ResourceCardCtrl()
-        {
-            this.InitializeComponent();
-            this.DataContext = this;
+        #region Methods
 
+        private static void CountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ResourceCardCtrl depPropClass = d as ResourceCardCtrl;
+            int depPropValue = (int)e.NewValue;
+            depPropClass.SetCount(depPropValue);
         }
 
-        public static readonly DependencyProperty ResourceTypeProperty = DependencyProperty.Register("ResourceType", typeof(ResourceType), typeof(ResourceCardCtrl), new PropertyMetadata(ResourceType.None, ResourceTypeChanged));
-        public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count", typeof(int), typeof(ResourceCardCtrl), new PropertyMetadata(0, CountChanged));
-        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(ResourceCardCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
-        public static readonly DependencyProperty ReadOnlyProperty = DependencyProperty.Register("ReadOnly", typeof(bool), typeof(ResourceCardCtrl), new PropertyMetadata(false, ReadOnlyChanged));
-        public static readonly DependencyProperty DevCardTypeProperty = DependencyProperty.Register("DevCardType", typeof(DevCardType), typeof(ResourceCardCtrl), new PropertyMetadata(DevCardType.Unknown, DevCardTypeChanged));
-        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(ResourceCardCtrl), new PropertyMetadata(HarborType.Sheep, HarborTypeChanged));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(ResourceCardCtrl), new PropertyMetadata(null, OwnerChanged));
-        public static readonly DependencyProperty HarborVisibilityProperty = DependencyProperty.Register("HarborVisibility", typeof(Visibility), typeof(ResourceCardCtrl), new PropertyMetadata(Visibility.Collapsed, HarborVisibilityChanged));
-        public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(Visibility), typeof(ResourceCardCtrl), new PropertyMetadata(Visibility.Visible));
-        public static readonly DependencyProperty ShownImageProperty = DependencyProperty.Register("ShownImage", typeof(ImageBrush), typeof(ResourceCardCtrl), new PropertyMetadata(App.Current.Resources["bmResourceCardBack"]));
-        public ImageBrush ShownImage
+        private static void DevCardTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            get => (ImageBrush)GetValue(ShownImageProperty);
-            set => SetValue(ShownImageProperty, value);
+            var depPropClass = d as ResourceCardCtrl;
+            var depPropValue = (DevCardType)e.NewValue;
+            depPropClass?.SetDevCardType(depPropValue);
         }
-        public Visibility CountVisible
+
+        private static void HarborTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            get => (Visibility)GetValue(CountVisibleProperty);
-            set => SetValue(CountVisibleProperty, value);
+            var depPropClass = d as ResourceCardCtrl;
+            var depPropValue = (HarborType)e.NewValue;
+            depPropClass?.SetHarborType(depPropValue);
         }
-        public Visibility HarborVisibility
-        {
-            get => (Visibility)GetValue(HarborVisibilityProperty);
-            set => SetValue(HarborVisibilityProperty, value);
-        }
+
         private static void HarborVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as ResourceCardCtrl;
             var depPropValue = (Visibility)e.NewValue;
             depPropClass?.SetHarborVisibility(depPropValue);
         }
-        private void SetHarborVisibility(Visibility value)
+
+        private static void OrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //  Debug.WriteLine($"{Owner.ColorAsString}: ResourceType: {ResourceType} HarborType: {HarborType} Visibility: {value}");
+            ResourceCardCtrl depPropClass = d as ResourceCardCtrl;
+            TileOrientation depPropValue = (TileOrientation)e.NewValue;
+            depPropClass.SetOrientation(depPropValue);
         }
 
-        public PlayerModel Owner
-        {
-            get => (PlayerModel)GetValue(OwnerProperty);
-            set => SetValue(OwnerProperty, value);
-        }
         private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as ResourceCardCtrl;
@@ -67,6 +54,100 @@ namespace Catan10
             var oldOwner = (PlayerModel)e.OldValue;
             depPropClass?.SetOwner(oldOwner, newOwner);
         }
+
+        private static void ReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as ResourceCardCtrl;
+            var depPropValue = (bool)e.NewValue;
+            depPropClass?.SetReadOnly(depPropValue);
+        }
+
+        private static void ResourceTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ResourceCardCtrl depPropClass = d as ResourceCardCtrl;
+            ResourceType depPropValue = (ResourceType)e.NewValue;
+            depPropClass.SetResourceType(depPropValue);
+        }
+
+        private void OwnedHarbors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            //  left here ofr debugging purposes
+            //
+            //  ObservableCollection<Harbor> col = (ObservableCollection<Harbor>)sender;
+
+            if (e.NewItems != null && e.NewItems.Count == 1)
+            {
+                HarborType type = ((Harbor)e.NewItems[0]).HarborType;
+                if (StaticHelpers.HarborTypeToResourceType(type) == ResourceType)
+                {
+                    // Debug.WriteLine($" =======> Making {type} Visible for ResourceType {ResourceType}");
+                    HarborVisibility = Visibility.Visible;
+                }
+            }
+            if (e.OldItems != null && e.OldItems.Count == 1)
+            {
+                HarborType type = ((Harbor)e.OldItems[0]).HarborType;
+                if (StaticHelpers.HarborTypeToResourceType(type) == ResourceType)
+                {
+                    // Debug.WriteLine($" =======> Making {type} Collapsed for ResourceType {ResourceType}");
+                    HarborVisibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private void SetCount(int value)
+        {
+        }
+
+        private void SetDevCardType(DevCardType value)
+        {
+            if (value == DevCardType.Unknown) return;
+
+            switch (value)
+            {
+                case DevCardType.Knight:
+                    ShownImage = (ImageBrush)App.Current.Resources["bmKnight"];
+                    break;
+
+                case DevCardType.VictoryPoint:
+                    ShownImage = (ImageBrush)App.Current.Resources["bmVictoryPoint"];
+                    break;
+
+                case DevCardType.YearOfPlenty:
+                    ShownImage = (ImageBrush)App.Current.Resources["bmYearOfPlenty"];
+                    break;
+
+                case DevCardType.RoadBuilding:
+                    ShownImage = (ImageBrush)App.Current.Resources["bmRoadBuilding"];
+                    break;
+
+                case DevCardType.Monopoly:
+                    ShownImage = (ImageBrush)App.Current.Resources["bmMonopoly"];
+                    break;
+
+                case DevCardType.Back:
+                    ShownImage = (ImageBrush)App.Current.Resources["bmDevCardBack"];
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private void SetHarborType(HarborType harborType)
+        {
+        }
+
+        private void SetHarborVisibility(Visibility value)
+        {
+            //  Debug.WriteLine($"{Owner.ColorAsString}: ResourceType: {ResourceType} HarborType: {HarborType} Visibility: {value}");
+        }
+
+        private void SetOrientation(TileOrientation value)
+        {
+            SetOrientationAsync(value);
+        }
+
         private void SetOwner(PlayerModel oldOwner, PlayerModel newOwner)
         {
             if (oldOwner != null)
@@ -79,103 +160,58 @@ namespace Catan10
                 newOwner.GameData.OwnedHarbors.CollectionChanged += OwnedHarbors_CollectionChanged;
             }
         }
-        public DevCardType DevCardType
-        {
-            get => (DevCardType)GetValue(DevCardTypeProperty);
-            set => SetValue(DevCardTypeProperty, value);
-        }
-        private static void DevCardTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as ResourceCardCtrl;
-            var depPropValue = (DevCardType)e.NewValue;
-            depPropClass?.SetDevCardType(depPropValue);
-        }
 
-        private void SetDevCardType(DevCardType value)
-        {
-            if (value == DevCardType.Unknown) return;
-
-            switch (value)
-            {
-
-                case DevCardType.Knight:
-                    ShownImage = (ImageBrush)App.Current.Resources["bmKnight"];
-                    break;
-                case DevCardType.VictoryPoint:
-                    ShownImage = (ImageBrush)App.Current.Resources["bmVictoryPoint"];
-                    break;
-               
-                case DevCardType.YearOfPlenty:
-                    ShownImage = (ImageBrush)App.Current.Resources["bmYearOfPlenty"];
-                    break;
-                case DevCardType.RoadBuilding:
-                    ShownImage = (ImageBrush)App.Current.Resources["bmRoadBuilding"];
-                    break;
-                case DevCardType.Monopoly:
-                    ShownImage = (ImageBrush)App.Current.Resources["bmMonopoly"];
-                    break;
-                case DevCardType.Back:
-                    ShownImage = (ImageBrush)App.Current.Resources["bmDevCardBack"];
-                    break;
-                default:
-                    break;
-
-            }
-
-        }
-
-
-        public bool ReadOnly
-        {
-            get => (bool)GetValue(ReadOnlyProperty);
-            set => SetValue(ReadOnlyProperty, value);
-        }
-        private static void ReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as ResourceCardCtrl;
-            var depPropValue = (bool)e.NewValue;
-            depPropClass?.SetReadOnly(depPropValue);
-        }
         private void SetReadOnly(bool value)
         {
-
-            
-        }
-        //
-        //  should only be set by ResourceType
-        //
-        public HarborType HarborType
-        {
-            get => (HarborType)GetValue(HarborTypeProperty);
-            private set => SetValue(HarborTypeProperty, value);
-        }
-        private static void HarborTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as ResourceCardCtrl;
-            var depPropValue = (HarborType)e.NewValue;
-            depPropClass?.SetHarborType(depPropValue);
-        }
-        private void SetHarborType(HarborType harborType)
-        {
-
         }
 
+        private void SetResourceType(ResourceType value)
+        {
+            ShownImage = LoadResourceCardImage(value);
+        }
 
-        public TileOrientation Orientation
+        private void Text_GotFocus(object sender, RoutedEventArgs e)
         {
-            get => (TileOrientation)GetValue(OrientationProperty);
-            set => SetValue(OrientationProperty, value);
+            ((TextBox)sender)?.SelectAll();
         }
-        private static void OrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+
+        #endregion Methods
+
+        #region Fields
+
+        public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count", typeof(int), typeof(ResourceCardCtrl), new PropertyMetadata(0, CountChanged));
+
+        public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(Visibility), typeof(ResourceCardCtrl), new PropertyMetadata(Visibility.Visible));
+
+        public static readonly DependencyProperty DevCardTypeProperty = DependencyProperty.Register("DevCardType", typeof(DevCardType), typeof(ResourceCardCtrl), new PropertyMetadata(DevCardType.Unknown, DevCardTypeChanged));
+
+        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(ResourceCardCtrl), new PropertyMetadata(HarborType.Sheep, HarborTypeChanged));
+
+        public static readonly DependencyProperty HarborVisibilityProperty = DependencyProperty.Register("HarborVisibility", typeof(Visibility), typeof(ResourceCardCtrl), new PropertyMetadata(Visibility.Collapsed, HarborVisibilityChanged));
+
+        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(ResourceCardCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
+
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(ResourceCardCtrl), new PropertyMetadata(null, OwnerChanged));
+
+        public static readonly DependencyProperty ReadOnlyProperty = DependencyProperty.Register("ReadOnly", typeof(bool), typeof(ResourceCardCtrl), new PropertyMetadata(false, ReadOnlyChanged));
+
+        public static readonly DependencyProperty ResourceTypeProperty = DependencyProperty.Register("ResourceType", typeof(ResourceType), typeof(ResourceCardCtrl), new PropertyMetadata(ResourceType.None, ResourceTypeChanged));
+
+        public static readonly DependencyProperty ShownImageProperty = DependencyProperty.Register("ShownImage", typeof(ImageBrush), typeof(ResourceCardCtrl), new PropertyMetadata(App.Current.Resources["bmResourceCardBack"]));
+
+        #endregion Fields
+
+        #region Constructors
+
+        public ResourceCardCtrl()
         {
-            ResourceCardCtrl depPropClass = d as ResourceCardCtrl;
-            TileOrientation depPropValue = (TileOrientation)e.NewValue;
-            depPropClass.SetOrientation(depPropValue);
+            this.InitializeComponent();
+            this.DataContext = this;
         }
-        private void SetOrientation(TileOrientation value)
-        {
-            SetOrientationAsync(value);
-        }
+
+        #endregion Constructors
+
+        #region Properties
 
         public int Count
         {
@@ -201,17 +237,51 @@ namespace Catan10
                     SetValue(CountProperty, 0);
                 }
             }
-
         }
-        private static void CountChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ResourceCardCtrl depPropClass = d as ResourceCardCtrl;
-            int depPropValue = (int)e.NewValue;
-            depPropClass.SetCount(depPropValue);
-        }
-        private void SetCount(int value)
-        {
 
+        public Visibility CountVisible
+        {
+            get => (Visibility)GetValue(CountVisibleProperty);
+            set => SetValue(CountVisibleProperty, value);
+        }
+
+        public DevCardType DevCardType
+        {
+            get => (DevCardType)GetValue(DevCardTypeProperty);
+            set => SetValue(DevCardTypeProperty, value);
+        }
+
+        //
+        //  should only be set by ResourceType
+        //
+        public HarborType HarborType
+        {
+            get => (HarborType)GetValue(HarborTypeProperty);
+            private set => SetValue(HarborTypeProperty, value);
+        }
+
+        public Visibility HarborVisibility
+        {
+            get => (Visibility)GetValue(HarborVisibilityProperty);
+            set => SetValue(HarborVisibilityProperty, value);
+        }
+
+        public TileOrientation Orientation
+        {
+            get => (TileOrientation)GetValue(OrientationProperty);
+            set => SetValue(OrientationProperty, value);
+        }
+
+        public PlayerModel Owner
+        {
+            get => (PlayerModel)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+
+        public bool ReadOnly
+        {
+            get => (bool)GetValue(ReadOnlyProperty);
+            set => SetValue(ReadOnlyProperty, value);
         }
 
         public ResourceType ResourceType
@@ -219,18 +289,14 @@ namespace Catan10
             get => (ResourceType)GetValue(ResourceTypeProperty);
             set => SetValue(ResourceTypeProperty, value);
         }
-        private static void ResourceTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ResourceCardCtrl depPropClass = d as ResourceCardCtrl;
-            ResourceType depPropValue = (ResourceType)e.NewValue;
-            depPropClass.SetResourceType(depPropValue);
-        }
-        private void SetResourceType(ResourceType value)
-        {
-            ShownImage = LoadResourceCardImage(value);
 
+        public ImageBrush ShownImage
+        {
+            get => (ImageBrush)GetValue(ShownImageProperty);
+            set => SetValue(ShownImageProperty, value);
         }
 
+        #endregion Properties
 
         //private Dictionary<ResourceType, ImageBrush> _imageCache = new Dictionary<ResourceType, ImageBrush>();
         //public ImageBrush LoadCachedResourceCardImage(ResourceType resourceType)
@@ -242,7 +308,6 @@ namespace Catan10
         //    string bitmapPath;
         //    switch (resourceType)
         //    {
-
         //        case ResourceType.Sheep:
         //            bitmapPath = "ms-appx:Assets/SquareImages/sheep.png";
         //            break;
@@ -291,25 +356,30 @@ namespace Catan10
             {
                 case ResourceType.Sheep:
                     return (ImageBrush)App.Current.Resources["bmResourceCardSheep"];
+
                 case ResourceType.Wood:
                     return (ImageBrush)App.Current.Resources["bmResourceCardWood"];
+
                 case ResourceType.Ore:
                     return (ImageBrush)App.Current.Resources["bmResourceCardOre"];
+
                 case ResourceType.Wheat:
                     return (ImageBrush)App.Current.Resources["bmResourceCardWheat"];
+
                 case ResourceType.Brick:
                     return (ImageBrush)App.Current.Resources["bmResourceCardBrick"];
+
                 case ResourceType.Back:
                 case ResourceType.Desert:
                 case ResourceType.None:
                     return (ImageBrush)App.Current.Resources["bmResourceCardBack"];
+
                 case ResourceType.GoldMine:
                     return (ImageBrush)App.Current.Resources["bmResourceCardGoldMine"];
+
                 default:
                     throw new Exception($"Unexpected ResourceType {resource} in SetResourceType ");
-
             }
-
         }
 
         public void SetOrientationAsync(TileOrientation orientation, double startAfter = 0)
@@ -319,43 +389,12 @@ namespace Catan10
             _sbFlipTile.Begin();
         }
 
-        private void Text_GotFocus(object sender, RoutedEventArgs e)
-        {
-            ((TextBox)sender)?.SelectAll();
-        }
         //
         //  Works like this:  Onwer gets set by XAML in binding
         //  ResourceType gets set in XAML by binding
         //  ResourceType updates HarborType
         //  we suscribe to CollectionChanged so that whenever a Harbor changes Owner, we can update the visibilty flag of the Harbor
         //
-        //  
-
-        private void OwnedHarbors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            //  left here ofr debugging purposes
-            //
-            //  ObservableCollection<Harbor> col = (ObservableCollection<Harbor>)sender;
-
-
-            if (e.NewItems != null && e.NewItems.Count == 1)
-            {
-                HarborType type = ((Harbor)e.NewItems[0]).HarborType;
-                if (StaticHelpers.HarborTypeToResourceType(type) == ResourceType)
-                {
-                    // Debug.WriteLine($" =======> Making {type} Visible for ResourceType {ResourceType}");
-                    HarborVisibility = Visibility.Visible;
-                }
-            }
-            if (e.OldItems != null && e.OldItems.Count == 1)
-            {
-                HarborType type = ((Harbor)e.OldItems[0]).HarborType;
-                if (StaticHelpers.HarborTypeToResourceType(type) == ResourceType)
-                {
-                    // Debug.WriteLine($" =======> Making {type} Collapsed for ResourceType {ResourceType}");
-                    HarborVisibility = Visibility.Collapsed;
-                }
-            }
-        }
+        //
     }
 }

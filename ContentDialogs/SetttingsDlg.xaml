@@ -57,7 +57,6 @@
         </Style>
     </ContentDialog.Resources>
 
-
     <Grid Name="LayoutRoot" Background="{x:Bind TheHuman.BackgroundBrush, TargetNullValue=Black, FallbackValue=Black, Mode=OneWay}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50*" />
@@ -78,10 +77,7 @@
                         ToolTipService.ToolTip="Ask for cards lost after every roll"
                         FontFamily="Segoe UI">
                         <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Resource Tracking" />
-
                     </CheckBox>
-
-
 
                     <CheckBox x:Name="_chkShowStopwatch" Margin="5" HorizontalAlignment="Left"
                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"
@@ -89,7 +85,6 @@
                         IsChecked="{x:Bind Settings.ShowStopwatch, Mode=TwoWay, FallbackValue=True}"
                         ToolTipService.ToolTip="Shows/Hides the Stopwatch" FontFamily="Segoe UI">
                         <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Show Stopwatch" ToolTipService.ToolTip="Reqires manual updating and can lead to arguments..." />
-
                     </CheckBox>
 
                     <CheckBox x:Name="_chkUseRandomNumbers" Margin="5" HorizontalAlignment="Left"
@@ -98,7 +93,6 @@
                         IsChecked="{x:Bind Settings.RandomizeNumbers, Mode=TwoWay, FallbackValue=True}"
                         ToolTipService.ToolTip="Distribute all numbers randomly" FontFamily="Segoe UI">
                         <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Randomize Numbers" />
-
                     </CheckBox>
 
                     <CheckBox x:Name="_chkValidateBuilding" Margin="5" HorizontalAlignment="Left"
@@ -108,7 +102,6 @@
                         ToolTipService.ToolTip="Validate the building of Roads and Settlements"
                         FontFamily="Segoe UI">
                         <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Validate Building" />
-
                     </CheckBox>
                     <CheckBox x:Name="_chkAnimateFade" Margin="5"
                         IsChecked="{x:Bind Settings.AnimateFadeTiles, Mode=TwoWay, FallbackValue=True}"
@@ -117,7 +110,6 @@
                         FontFamily="Segoe UI">
                         <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Animate Fade Tiles" />
                     </CheckBox>
-
                 </StackPanel>
             </Border>
 
@@ -157,10 +149,6 @@
                         Value="{x:Bind Settings.AnimationSpeed, Mode=TwoWay, FallbackValue=4}" />
                 </StackPanel>
             </Border>
-
-
         </StackPanel>
-
-
     </Grid>
 </ContentDialog>

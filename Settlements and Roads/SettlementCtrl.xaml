@@ -8,7 +8,6 @@
     <Control.Resources>
         <Style x:Key="Settlement" TargetType="Rectangle">
 
-
             <Setter Property="Fill" Value="Red" />
             <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Stroke" Value="White" />
@@ -16,24 +15,24 @@
         <Style x:Key="SettlementPolygon" TargetType="Polygon">
 
             <!--<Setter Property="Fill" Value="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay, TargetNullValue=White}" />-->
-            <!--<Setter Property="Fill" Value="White"/>-->
+            <!--<Setter Property="Fill" Value="White" />-->
             <Setter Property="Fill" Value="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay, FallbackValue=White, TargetNullValue=White}" />
             <Setter Property="StrokeThickness" Value="1" />
         </Style>
         <Style x:Key="SettlementPath" TargetType="Path">
             <Setter Property="Fill" Value="{x:Bind GetBackgroundBrush(CurrentPlayer, Owner), Mode=OneWay, TargetNullValue=Black, FallbackValue=Black}" />
-            <!--<Setter Property="Fill" Value="Red"/>-->
+            <!--<Setter Property="Fill" Value="Red" />-->
             <Setter Property="StrokeThickness" Value="1" />
         </Style>
         <Style x:Key="SettlementRectangle" TargetType="Rectangle">
             <Setter Property="Fill" Value="{x:Bind GetBackgroundBrush(CurrentPlayer, Owner), Mode=OneWay, TargetNullValue=Black, FallbackValue=Black}" />
-            <!--<Setter Property="Fill" Value="Red"/>-->
+            <!--<Setter Property="Fill" Value="Red" />-->
             <Setter Property="StrokeThickness" Value="1" />
         </Style>
         <Style x:Key="CityEllipseStyle" TargetType="Ellipse">
 
             <Setter Property="Fill" Value="{x:Bind GetBackgroundBrush(CurrentPlayer, Owner), Mode=OneWay, TargetNullValue=Black, FallbackValue=Black}" />
-            <!--<Setter Property="Fill" Value="Red"/>-->
+            <!--<Setter Property="Fill" Value="Red" />-->
             <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Stroke" Value="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay, TargetNullValue=White, FallbackValue=White}" />
             <Setter Property="StrokeThickness" Value="2" />
@@ -69,7 +68,5 @@
                 <Polygon Style="{StaticResource SettlementPolygon}" Points="171.5,193.3 171.5,191.2 182.7,191.2 182.7,178.7 185.1,178.7 185.1,191.2 195.9,191.2 195.9,191.8 195.9,193.3 185.1,193.3 185.1,204.9 196,204.9 196,205.5 196,206.9 185.1,206.9 185.1,219.2 184.4,219.2 182.7,219.2 182.7,206.9 171.6,206.9 171.6,204.9 182.7,204.9 182.7,193.3" StrokeThickness="1" />
             </Canvas>
         </Canvas>
-
     </Viewbox>
-
 </UserControl>

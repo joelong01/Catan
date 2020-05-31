@@ -6,9 +6,10 @@ using Catan.Proxy;
 
 namespace Catan10
 {
-
     public static class AllocationPhaseHelper
     {
+        #region Methods
+
         public static void ChangePlayer(IGameController gameController, int numberofPositions)
         {
             Contract.Assert(gameController.CurrentPlayer != null);
@@ -26,7 +27,6 @@ namespace Catan10
 
             var newPlayer = playingPlayers[idx];
             gameController.CurrentPlayer = newPlayer;
-
         }
 
         public static void GrantEntitlements(IGameController gameController, string to)
@@ -36,12 +36,6 @@ namespace Catan10
             player.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
         }
 
-        public static void RevokeEntitlements(IGameController gameController, string to)
-        {
-            var player = gameController.NameToPlayer(to);
-            player.GameData.Resources.RevokeEntitlement(Entitlement.Road);
-            player.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
-        }
         public static void GrantResources(IGameController gameController, BuildingCtrl building, string to)
         {
             var player = gameController.NameToPlayer(to);
@@ -51,6 +45,13 @@ namespace Catan10
                 tr.Add(kvp.Value.ResourceType, 1);
             }
             player.GameData.Resources.GrantResources(tr);
+        }
+
+        public static void RevokeEntitlements(IGameController gameController, string to)
+        {
+            var player = gameController.NameToPlayer(to);
+            player.GameData.Resources.RevokeEntitlement(Entitlement.Road);
+            player.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
         }
 
         public static void RevokeResources(IGameController gameController, BuildingCtrl building, string to)
@@ -63,14 +64,20 @@ namespace Catan10
             }
 
             player.GameData.Resources.GrantResources(tr.GetNegated());
-        }       
+        }
+
+        #endregion Methods
+
     }
+
     /// <summary>
     ///     Allocate one road and one settlement to the player
     ///     Reset the roll control for next time
     /// </summary>
     public class BeginAllocationToAllocateResourcesForward : LogHeader, ILogController
     {
+        #region Methods
+
         internal static async Task PostLog(IGameController gameController)
         {
             //
@@ -83,7 +90,7 @@ namespace Catan10
             BeginAllocationToAllocateResourcesForward logHeader = new BeginAllocationToAllocateResourcesForward()
             {
                 CanUndo = true,
-                Action = CatanAction.ChangedState,                
+                Action = CatanAction.ChangedState,
                 NewState = GameState.AllocateResourceForward,
             };
 
@@ -91,14 +98,13 @@ namespace Catan10
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
+
         public Task Do(IGameController gameController)
         {
-            
             gameController.HideRollsInPublicUi();
-            
+
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
-
         }
 
         public Task Redo(IGameController gameController)
@@ -108,9 +114,10 @@ namespace Catan10
 
         public Task Undo(IGameController gameController)
         {
-            AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);                        
+            AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
-
         }
+
+        #endregion Methods
     }
 }

@@ -11,43 +11,47 @@ namespace Catan10
 {
     public sealed partial class PlayerPickerDlg : ContentDialog
     {
-        private readonly ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PlayerPickerDlg), new PropertyMetadata(null));
+        #region Fields
 
-        public PlayerModel Player
+        private readonly ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
+
+        #endregion Fields
+
+        #region Methods
+
+        private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            get => (PlayerModel)GetValue(PlayerProperty);
-            set => SetValue(PlayerProperty, value);
         }
+
+        private void OnPlayerPicDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            this.Hide();
+        }
+
+        private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+        }
+
+        #endregion Methods
+
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PlayerPickerDlg), new PropertyMetadata(null));
 
         public PlayerPickerDlg()
         {
             this.InitializeComponent();
             this.DataContext = Players;
         }
+
         public PlayerPickerDlg(IEnumerable<PlayerModel> players)
         {
             this.InitializeComponent();
             Players.AddRange(players);
         }
 
-
-
-        private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        public PlayerModel Player
         {
-
-        }
-
-
-        private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            
-        }
-
-        private void OnPlayerPicDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
-        {
-
-            this.Hide();
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
         }
     }
 }

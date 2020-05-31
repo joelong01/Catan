@@ -1,65 +1,69 @@
-﻿using Catan.Proxy;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
+using Catan.Proxy;
 
 namespace Catan10
 {
-
     /// <summary>
     ///     knows how to start a game
     /// </summary>
     public class NewGameLog : LogHeader, ILogController
     {
+        #region Constructors
+
         public NewGameLog() : base()
         {
             Action = CatanAction.StartGame;
         }
-        public int GameIndex { get; set; }
+
+        #endregion Constructors
+
+        #region Properties
+
         public string CreatedBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
+        public int GameIndex { get; set; }
 
-        public override string ToString()
-        {
-            return $"StartGame: [StartedBy={CreatedBy}][SendBy={SentBy}[id={LogId}]";
-        }
+        #endregion Properties
 
-        
+        #region Methods
+
         public static async Task NewGame(IGameController gameController, string startingPlayer, int gameIndex)
         {
-
             NewGameLog logHeader = new NewGameLog
             {
                 CreatedBy = startingPlayer,
-                SentBy = gameController.TheHuman.PlayerName,                
+                SentBy = gameController.TheHuman.PlayerName,
                 NewState = GameState.WaitingForPlayers,
                 OldState = (gameController.Log.PeekAction == null) ? GameState.Uninitialized : gameController.Log.PeekAction.NewState,
                 Action = CatanAction.GameCreated,
                 GameIndex = gameIndex,
                 CanUndo = false
-
             };
-           
+
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
-             
         }
 
         public async Task Do(IGameController gameController)
         {
             await gameController.StartGame(this);
             await AddPlayerLog.AddPlayer(gameController, gameController.TheHuman);
-
         }
 
         public Task Redo(IGameController gameController)
         {
-
             return gameController.StartGame(this);
+        }
+
+        public override string ToString()
+        {
+            return $"StartGame: [StartedBy={CreatedBy}][SendBy={SentBy}[id={LogId}]";
         }
 
         public Task Undo(IGameController gameController)
         {
             return Task.CompletedTask;
         }
-    }
 
+        #endregion Methods
+    }
 }

@@ -32,7 +32,6 @@
             <local:Harbor TileIndex="15" HarborLocation="BottomRight" HarborType="ThreeForOne"
                 Orientation="FaceUp" UseClassic="True" />
 
-
             <local:TileCtrl TileOrientation="FaceUp" Number="8" UseClassic="True" ResourceType="Wheat"
                 Index="0" />
             <local:TileCtrl TileOrientation="FaceUp" Number="2" UseClassic="True" ResourceType="Wood"
@@ -121,7 +120,6 @@
                 Index="26" />
             <local:TileCtrl TileOrientation="FaceUp" Number="0" UseClassic="True" ResourceType="Sea"
                 Index="43" />
-
         </local:CatanHexPanel>
     </Viewbox>
 </UserControl>

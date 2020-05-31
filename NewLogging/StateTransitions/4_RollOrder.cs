@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -9,12 +7,27 @@ using Catan.Proxy;
 namespace Catan10
 {
     /// <summary>
-    ///     This is a UI pause where 
+    ///     This is a UI pause where
     ///     1. turn off Pips
     ///     2. tell the service the game has started
     /// </summary>
     public class PickingBoardToWaitingForRollOrder : LogHeader, ILogController
     {
+        #region Methods
+
+        public static List<RollModel> GetRollModelList()
+        {
+            List<RollModel> list = new List<RollModel>();
+            for (int i = 0; i < 4; i++)
+            {
+                var model = new RollModel();
+                model.Randomize();
+                list.Add(model);
+            }
+            list[0].Selected = true;
+            return list;
+        }
+
         public static async Task PostLog(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.PickingBoard);
@@ -22,11 +35,10 @@ namespace Catan10
             PickingBoardToWaitingForRollOrder logHeader = new PickingBoardToWaitingForRollOrder()
             {
                 CanUndo = false,
-                Action = CatanAction.ChangedState,                         
+                Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForRollForOrder,
             };
 
-            
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
 
@@ -46,19 +58,6 @@ namespace Catan10
             }
         }
 
-        public static List<RollModel> GetRollModelList()
-        {
-            List<RollModel> list = new List<RollModel>();
-            for (int i = 0; i < 4; i++)
-            {
-                var model = new RollModel();
-                model.Randomize();
-                list.Add(model);
-            }
-            list[0].Selected = true;
-            return list;
-        }
-
         /// <summary>
         ///     Redo the action from the log
         ///     Don't call Do as we don't want to do the AutoRespond actions
@@ -67,7 +66,6 @@ namespace Catan10
         /// <returns></returns>
         public Task Redo(IGameController gameController)
         {
-
             gameController.ResetAllBuildings();
             MainPageModel mainPageModel = gameController.MainPageModel;
             return Task.CompletedTask;
@@ -77,5 +75,7 @@ namespace Catan10
         {
             return Task.CompletedTask;
         }
+
+        #endregion Methods
     }
 }

@@ -1,9 +1,6 @@
 ﻿namespace Catan10
 {
-    
-
-   
-    class CatanWebSocket
+    internal class CatanWebSocket
     {
         //private MessageWebSocket _webSocket = new MessageWebSocket();
         //private MainPage _mainPage = null;
@@ -68,7 +65,7 @@
         //                    await SendMessage(MessageType.Admonishment, $" {msg.User} ProcessRoll failed for {msg.Value}");
         //                }
 
-        //            });                    
+        //            });
         //            break;
 
         //        case MessageType.Next:
@@ -120,7 +117,7 @@
         //                    }
         //                }
         //            });
-        //            break;                    
+        //            break;
         //        default:
         //            break;
         //    }
@@ -152,7 +149,5 @@
         //        Debug.WriteLine($"exception thrown while sending message.  text: {ex}");
         //    }
         //}
-
-
     }
 }

@@ -1,9 +1,5 @@
-﻿using Catan.Proxy;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+
 using Windows.UI;
 using Windows.UI.Xaml.Media;
 
@@ -29,6 +25,25 @@ namespace Catan10
 
     public static class CatanColors
     {
+        #region Methods
+
+        private static string GetKnownColorName(string hexString)
+        {
+            var color = (System.Drawing.Color)new System.Drawing.ColorConverter().ConvertFromString(hexString);
+            System.Drawing.KnownColor knownColor = color.ToKnownColor();
+
+            string name = knownColor.ToString();
+            return name.Equals("0") ? "" : name;
+        }
+
+        #endregion Methods
+
+        #region Properties
+
+        public static ICollection<Color> AvailableColors => NameToColorDictionary.Values;
+
+        public static ICollection<string> ColorNames => NameToColorDictionary.Keys;
+
         public static Dictionary<string, Color> NameToColorDictionary { get; } = new Dictionary<string, Color>()
 
         {
@@ -41,8 +56,10 @@ namespace Catan10
             {"Black", Colors.Black},
             {"Purple", Colors.Purple},
             {"Blue", Colors.Blue }
-
         };
+
+        #endregion Properties
+
         public static List<SolidColorBrush> AllAvailableBrushes()
         {
             var list = new List<SolidColorBrush>();
@@ -57,16 +74,6 @@ namespace Catan10
             }
             return list;
         }
-        public static ICollection<string> ColorNames => NameToColorDictionary.Keys;
-        public static ICollection<Color> AvailableColors => NameToColorDictionary.Values;
-        private static string GetKnownColorName(string hexString)
-        {
-            var color = (System.Drawing.Color)new System.Drawing.ColorConverter().ConvertFromString(hexString);
-            System.Drawing.KnownColor knownColor = color.ToKnownColor();
-
-            string name = knownColor.ToString();
-            return name.Equals("0") ? "" : name;
-        }
 
         public static SolidColorBrush GetBackgroundBrush(string colorName)
         {
@@ -74,28 +81,31 @@ namespace Catan10
             return GetResourceBrush(colorName, color);
         }
 
-        public static (string Name, Color Color) GetForegroundColor(Color background)
-        {
-            bool isDark = (5 * background.G + 2 * background.R + background.B) <= 8 * 128;
-            return isDark ? ("White", Colors.White) : ("Black", Colors.Black);
-        }
         public static SolidColorBrush GetForegroundBrush(SolidColorBrush background)
         {
             var fgColor = GetForegroundColor(background.Color);
-            
+
             return GetResourceBrush(fgColor.Name, fgColor.Color);
         }
+
         public static SolidColorBrush GetForegroundBrush(Color background)
         {
             var fgColor = GetForegroundColor(background);
             return GetResourceBrush(fgColor.Name, fgColor.Color);
         }
+
         public static SolidColorBrush GetForegroundBrush(string background)
         {
             Color bgColor = NameToColorDictionary[background];
             return GetForegroundBrush(bgColor);
-            
         }
+
+        public static (string Name, Color Color) GetForegroundColor(Color background)
+        {
+            bool isDark = (5 * background.G + 2 * background.R + background.B) <= 8 * 128;
+            return isDark ? ("White", Colors.White) : ("Black", Colors.Black);
+        }
+
         public static SolidColorBrush GetResourceBrush(string Name, Color color)
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
@@ -106,14 +116,12 @@ namespace Catan10
             App.Current.Resources.TryGetValue(resourceName, out object ret);
             if (ret != null)
             {
-              return (SolidColorBrush)ret;
+                return (SolidColorBrush)ret;
             }
             App.Current.TraceMessage($"did NOT find {resourceName} brush in resources. Color={color}");
             SolidColorBrush brush = new SolidColorBrush(color);
             return brush;
         }
-
-       
 
         public static SolidColorBrush GetResourceBrush(string name)
         {
@@ -123,10 +131,7 @@ namespace Catan10
                 return GetResourceBrush(name, color);
             }
 
-           return new SolidColorBrush(Colors.HotPink);
+            return new SolidColorBrush(Colors.HotPink);
         }
-
-
-
     }
 }

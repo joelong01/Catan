@@ -16,6 +16,8 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        #region Fields
+
         private readonly List<PlayerModel> defaultPlayers = new List<PlayerModel>()
         {
             new PlayerModel() {PlayerName = "Joe", ImageFileName = "ms-appx:Assets/DefaultPlayers/joe.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black,PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC5}")},
@@ -26,6 +28,10 @@ namespace Catan10
             new PlayerModel() {PlayerName = "Cort", ImageFileName = "ms-appx:Assets/DefaultPlayers/cort.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Green, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACA}") },
             new PlayerModel() {PlayerName = "Adrian", ImageFileName = "ms-appx:Assets/DefaultPlayers/adrian.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Purple, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACB}") },
         };
+
+        #endregion Fields
+
+        #region Methods
 
         private void CreateMenuItems()
         {
@@ -420,7 +426,6 @@ namespace Catan10
             await PickDefaultUser();
         }
 
-
         // DO NOT call button.IsEnabled = true; -- this is set via notification
         private async void OnUndo(object sender, RoutedEventArgs e)
         {
@@ -444,8 +449,6 @@ namespace Catan10
         {
             await WsConnect();
         }
-
-
 
         /// <summary>
         ///     Go through all the tiles and decide if it is a potential baron victim.
@@ -684,7 +687,7 @@ namespace Catan10
                         break;
 
                     case GameState.AllocateResourceForward:
-                        if (MainPageModel.PlayingPlayers.Last().GameData.Score == 1) 
+                        if (MainPageModel.PlayingPlayers.Last().GameData.Score == 1)
                         {
                             await AllocateResourcesForwardToAllocateResourcesReverse.PostLog(this);
                         }
@@ -763,6 +766,7 @@ namespace Catan10
                 MainPageModel.EnableUiInteraction = true;
             }
         }
-       
+
+        #endregion Methods
     }
 }

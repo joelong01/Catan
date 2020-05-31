@@ -7,11 +7,22 @@ namespace Catan10
 {
     public class CatanGameData : INotifyPropertyChanged
     {
-        public CatanGameData()
+        #region Methods
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
-           
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        #endregion Methods
+
+        #region Constructors
+
+        public CatanGameData()
+        {
+        }
+
+        #endregion Constructors
 
         #region properties
 
@@ -26,7 +37,7 @@ namespace Catan10
         private int _maxResourceAllocated = 19;
         private int _maxRoads = 15;
         private int _maxSettlements = 5;
-        int _maxShips = 0;
+        private int _maxShips = 0;
         private int _monopoly = 2;
         private int _roadBuilding = 2;
         private int _tileCount = 19;
@@ -82,6 +93,7 @@ namespace Catan10
                 }
             }
         }
+
         public CatanGames GameName
         {
             get
@@ -193,6 +205,7 @@ namespace Catan10
                 }
             }
         }
+
         public int MaxSettlements
         {
             get
@@ -224,6 +237,7 @@ namespace Catan10
                 }
             }
         }
+
         public int Monopoly
         {
             get
@@ -319,11 +333,6 @@ namespace Catan10
             RoadBuilding = info.RoadBuilding;
             Monopoly = info.Monopoly;
             BuildDevCardList();
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         // for "Regular Game"

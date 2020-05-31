@@ -1,5 +1,4 @@
-﻿using Catan.Proxy;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,80 +12,76 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-
-
     /// <summary>
     /// This file should contain the information necessary to deal with the UI state in MainPage
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        public List<int> Rolls { get; set; } = new List<int>();
+        #region Fields
 
-        readonly Stack<GameState> _stateStack = new Stack<GameState>();
-
-
-
-        public async Task PlayerWon()
-        {
-            await Task.Delay(0);
-            throw new NotImplementedException();
-        }
-
+        private readonly Stack<GameState> _stateStack = new Stack<GameState>();
         public static readonly DependencyProperty LastRollProperty = DependencyProperty.Register("LastRoll", typeof(int), typeof(MainPage), new PropertyMetadata(0));
+
+        #endregion Fields
+
+        #region Properties
+
         public int LastRoll
         {
             get => (int)GetValue(LastRollProperty);
             set => SetValue(LastRollProperty, value);
         }
 
-       
+        public List<int> Rolls { get; set; } = new List<int>();
 
+        #endregion Properties
 
+        #region Methods
 
-        //
-        //   find the next position in the _playerViewDictionary (where "next" is defined in PLAY_ORDER) that is set
-        public int GetNextPlayerPosition(int count)
+        public static int[] RollCount(IEnumerable<int> stack)
         {
-
-            int index = _currentPlayerIndex + count;
-
-            if (index >= MainPageModel.PlayingPlayers.Count)
+            int[] counts = new int[11];
+            Array.Clear(counts, 0, 11);
+            if (stack.Count() != 0)
             {
-                index = index - MainPageModel.PlayingPlayers.Count;
+                foreach (int n in stack)
+                {
+                    counts[n - 2]++;
+                }
             }
-
-            if (index < 0)
-            {
-                index = index + MainPageModel.PlayingPlayers.Count;
-            }
-
-            return index;
+            return counts;
         }
 
-        public async Task SetFirst(PlayerModel player, LogType logType = LogType.Normal)
+        public static double[] RollPercents(IEnumerable<int> stack, int[] counts)
         {
-            int idx = MainPageModel.PlayingPlayers.IndexOf(player);
-            if (idx != -1)
+            double[] percents = new double[11];
+            Array.Clear(percents, 0, 11);
+            if (stack.Count() != 0)
             {
-                for (int i = 0; i < idx; i++)
+                int total = 0;
+                foreach (int n in counts)
                 {
-                    PlayerModel pd = MainPageModel.PlayingPlayers[0];
-                    MainPageModel.PlayingPlayers.RemoveAt(0);
-                    MainPageModel.PlayingPlayers.Add(pd);
+                    total += n;
                 }
 
-                if (MainPageModel.Log != null)
+                for (int i = 0; i < 11; i++)
                 {
-                  //  await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.SetFirstPlayer, true, logType, -1, new LogSetFirstPlayer(idx));
+                    percents[i] = counts[i] / (double)stack.Count();
                 }
             }
 
-            await AnimateToPlayerIndex(0, logType);
+            return percents;
+        }
+
+        public async Task AnimatePlayers(int numberofPositions, LogType logType = LogType.Normal)
+        {
+            int index = GetNextPlayerPosition(numberofPositions);
+
+            await AnimateToPlayerIndex(index, logType);
         }
 
         public async Task AnimateToPlayerIndex(int to, LogType logType = LogType.Normal)
         {
-
             var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
             List<int> newRandomGoldTiles = null;
 
@@ -101,8 +96,6 @@ namespace Catan10
 
             //
             //  we need to log what is the current state
-
-
 
             //
             // when we change player we optionally set tiles to be randomly gold - iff we are moving forward (not undo)
@@ -129,76 +122,67 @@ namespace Catan10
             }
             else // undoing
             {
-
             }
-
 
             if (MainPageModel.Log != null)
             {
-               // await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, GameState.Unknown, currentRandomGoldTiles, newRandomGoldTiles));
+                // await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.ChangedPlayer, true, logType, -1, new LogChangePlayer(from, to, GameState.Unknown, currentRandomGoldTiles, newRandomGoldTiles));
             }
-
         }
 
-
-
-        public async Task AnimatePlayers(int numberofPositions, LogType logType = LogType.Normal)
+        //
+        //   find the next position in the _playerViewDictionary (where "next" is defined in PLAY_ORDER) that is set
+        public int GetNextPlayerPosition(int count)
         {
-            int index = GetNextPlayerPosition(numberofPositions);
+            int index = _currentPlayerIndex + count;
 
-            await AnimateToPlayerIndex(index, logType);
-        }
-        public static double[] RollPercents(IEnumerable<int> stack, int[] counts)
-        {
-
-
-            double[] percents = new double[11];
-            Array.Clear(percents, 0, 11);
-            if (stack.Count() != 0)
+            if (index >= MainPageModel.PlayingPlayers.Count)
             {
-                int total = 0;
-                foreach (int n in counts)
-                {
-                    total += n;
-                }
-
-                for (int i = 0; i < 11; i++)
-                {
-                    percents[i] = counts[i] / (double)stack.Count();
-                }
-
+                index = index - MainPageModel.PlayingPlayers.Count;
             }
 
-            return percents;
-        }
-
-
-
-
-
-        public static int[] RollCount(IEnumerable<int> stack)
-        {
-            int[] counts = new int[11];
-            Array.Clear(counts, 0, 11);
-            if (stack.Count() != 0)
+            if (index < 0)
             {
-                foreach (int n in stack)
+                index = index + MainPageModel.PlayingPlayers.Count;
+            }
+
+            return index;
+        }
+
+        public async Task PlayerWon()
+        {
+            await Task.Delay(0);
+            throw new NotImplementedException();
+        }
+
+        public async Task SetFirst(PlayerModel player, LogType logType = LogType.Normal)
+        {
+            int idx = MainPageModel.PlayingPlayers.IndexOf(player);
+            if (idx != -1)
+            {
+                for (int i = 0; i < idx; i++)
                 {
-                    counts[n - 2]++;
+                    PlayerModel pd = MainPageModel.PlayingPlayers[0];
+                    MainPageModel.PlayingPlayers.RemoveAt(0);
+                    MainPageModel.PlayingPlayers.Add(pd);
+                }
+
+                if (MainPageModel.Log != null)
+                {
+                    //  await AddLogEntry(CurrentPlayer, MainPageModel.Log.Last().GameState, CatanAction.SetFirstPlayer, true, logType, -1, new LogSetFirstPlayer(idx));
                 }
             }
-            return counts;
+
+            await AnimateToPlayerIndex(0, logType);
         }
+
+        #endregion Methods
     }
 
     public class MenuTag
     {
-        public int Number { get; set; }
-        public StorageFile File { get; set; }
-        public IList<MenuFlyoutItemBase> PeerMenuItemList { get; set; }
+        #region Constructors
 
-        public PlayerModel Player { get; set; }
-        public bool SetKeyUpHandler { get; set; } = false;
         public MenuTag(PlayerModel p)
         {
             Player = p;
@@ -213,12 +197,27 @@ namespace Catan10
         {
             File = f;
         }
+
         public MenuTag(IList<MenuFlyoutItemBase> list)
         {
             PeerMenuItemList = list;
         }
-        public MenuTag() { }
+
+        public MenuTag()
+        {
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public StorageFile File { get; set; }
+        public int Number { get; set; }
+        public IList<MenuFlyoutItemBase> PeerMenuItemList { get; set; }
+
+        public PlayerModel Player { get; set; }
+        public bool SetKeyUpHandler { get; set; } = false;
+
+        #endregion Properties
     }
-
-
 }

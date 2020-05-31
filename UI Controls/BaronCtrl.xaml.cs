@@ -7,10 +7,16 @@ namespace Catan10
 {
     public sealed partial class BaronCtrl : UserControl
     {
+        #region Constructors
+
         public BaronCtrl()
         {
             this.InitializeComponent();
         }
+
+        #endregion Constructors
+
+        #region Methods
 
         public void MoveAsync(Point to)
         {
@@ -23,5 +29,7 @@ namespace Catan10
             _daY.To = to.Y;
             _sbMove.Begin();
         }
+
+        #endregion Methods
     }
 }

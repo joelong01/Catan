@@ -1,6 +1,4 @@
-﻿
-using Catan.Proxy;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text.Json.Serialization;
@@ -9,26 +7,38 @@ namespace Catan10
 {
     public class TileGroup
     {
-        public TileGroup() { }
+        #region Fields
 
-        public int Start { get; set; }
+        private readonly string[] SerializedProperties = new string[] { "Start", "End", "Randomize", "ResourceTypes", "NumberSequence", "HarborTypes", "RandomResourceTypeList", "RandomHarborTypeList", "TileCount" };
 
-        public int End { get; set; }
+        private int _cols = 0;
 
-        public bool Randomize { get; set; }
-        int _rows = 0;
-        public int Rows
+        private int _rows = 0;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public TileGroup()
         {
-            get
-            {
-                return _rows;
-            }
-            set
-            {
-                if (value > _rows) _rows = value;
-            }
         }
-        int _cols = 0;
+
+        public TileGroup(string s)
+        {
+            string[] tokens = s.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
+            Start = int.Parse(tokens[0]);
+            End = int.Parse(tokens[1]);
+            Randomize = bool.Parse(tokens[2]);
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public List<List<TileData>> _tilesInVisualOrder { get; private set; } = new List<List<TileData>>();
+        public List<TileCtrl> AllTiles { get; set; } = new List<TileCtrl>();
+        public List<TileData> AllTilesData { get; set; } = new List<TileData>();
+
         public int Cols
         {
             get
@@ -41,9 +51,38 @@ namespace Catan10
             }
         }
 
-        public List<List<TileData>> _tilesInVisualOrder { get; private set; } = new List<List<TileData>>();
+        public int DesertCount { get; internal set; }
+        public List<int> DesertTileIndices { get; set; } = new List<int>();
+        public int End { get; set; }
+        public List<TileCtrl> OriginalNonSeaTiles { get; set; } = new List<TileCtrl>();
+        public List<TileData> OriginalNonSeaTilesData { get; set; } = new List<TileData>();
+        public bool Randomize { get; set; }
 
-        
+        public int Rows
+        {
+            get
+            {
+                return _rows;
+            }
+            set
+            {
+                if (value > _rows) _rows = value;
+            }
+        }
+
+        public int Start { get; set; }
+        public List<ResourceType> StartingResourceTypes { get; set; } = new List<ResourceType>();
+
+        public List<int> StartingTileNumbers { get; set; } = new List<int>();
+
+        public RandomLists TileAndNumberLists { get; set; }
+
+        //
+        //  All the tiles in the Tilegroup -- including Sea Tiles that won't be randomized
+        //
+        //  the set of Tiles that particpate in Randomization and Shuffling
+        public List<TileData> TileDataToRandomize { get; set; } = new List<TileData>();
+
         [JsonIgnore]
         public List<List<TileData>> TilesInVisualOrder
         {
@@ -63,11 +102,11 @@ namespace Catan10
                        tilesInvisualOrder[tile.Col, tile.Row] = tile;
                    });
 
-                    for (int col=0; col<Cols; col++)
+                    for (int col = 0; col < Cols; col++)
                     {
                         List<TileData> columns = new List<TileData>();
                         _tilesInVisualOrder.Add(columns);
-                        for (int row=0; row<Rows; row++)
+                        for (int row = 0; row < Rows; row++)
                         {
                             TileData tileData = tilesInvisualOrder[col, row];
                             Contract.Assert(tileData != null);
@@ -79,25 +118,41 @@ namespace Catan10
             }
         }
 
-        //
-        //  All the tiles in the Tilegroup -- including Sea Tiles that won't be randomized
-
-        public List<TileData> AllTilesData { get; set; } = new List<TileData>();
-        public List<TileCtrl> AllTiles{ get; set; } = new List<TileCtrl>();
-
-        //
-        //  the set of Tiles that particpate in Randomization and Shuffling
-        public List<TileData> TileDataToRandomize { get; set; } = new List<TileData>();
         public List<TileCtrl> TilesToRandomize { get; set; } = new List<TileCtrl>();
-        public List<TileData> OriginalNonSeaTilesData { get; set; } = new List<TileData>();
-        public List<TileCtrl> OriginalNonSeaTiles { get; set; } = new List<TileCtrl>();
-        public List<int> DesertTileIndices { get; set; } = new List<int>();
 
-        public List<ResourceType> StartingResourceTypes { get; set; } = new List<ResourceType>();
-        public List<int> StartingTileNumbers { get; set; } = new List<int>();
+        #endregion Properties
 
-        public RandomLists TileAndNumberLists { get; set; }
+        #region Methods
 
+        public static List<TileGroup> BuildList(string s)
+        {
+            List<TileGroup> list = new List<TileGroup>();
+            string[] tokens = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string token in tokens)
+            {
+                TileGroup tg = new TileGroup(token);
+                list.Add(tg);
+            }
+
+            return list;
+        }
+
+        public void Deserialize(string s, Dictionary<string, string> sections, int groupIndex)
+        {
+            //StaticHelpers.DeserializeObject<TileGroup>(this, s, "=", "|");
+            //for (int i = 0; i < AllTiles.Count; i++)
+            //{
+            //    string serilizedTile = sections[$"Tile {i}.{groupIndex}"];
+            //    TileCtrl tile = new TileCtrl();
+            //    tile.Deserialize(serilizedTile, false);
+            //    AllTiles.Add(tile);
+            //    if (tile.RandomGoldEligible == false)
+            //    {
+            //        tile.TileOrientation = TileOrientation.FaceUp;
+            //    }
+            //    // Harbors.AddRange(tile.VisibleHarbors);
+            //}
+        }
 
         public void Reset()
         {
@@ -107,14 +162,6 @@ namespace Catan10
                 TilesToRandomize[i].Number = StartingTileNumbers[i];
             }
         }
-
-
-
-
-        public int DesertCount { get; internal set; }
-
-
-        private readonly string[] SerializedProperties = new string[] { "Start", "End", "Randomize", "ResourceTypes", "NumberSequence", "HarborTypes", "RandomResourceTypeList", "RandomHarborTypeList", "TileCount" };
 
         public string Serialize(int groupIndex)
         {
@@ -132,51 +179,12 @@ namespace Catan10
             //return s;
             return "oops";
         }
-        public void Deserialize(string s, Dictionary<string, string> sections, int groupIndex)
-        {
-            //StaticHelpers.DeserializeObject<TileGroup>(this, s, "=", "|");
-            //for (int i = 0; i < AllTiles.Count; i++)
-            //{
-            //    string serilizedTile = sections[$"Tile {i}.{groupIndex}"];
-            //    TileCtrl tile = new TileCtrl();
-            //    tile.Deserialize(serilizedTile, false);
-            //    AllTiles.Add(tile);
-            //    if (tile.RandomGoldEligible == false)
-            //    {
-            //        tile.TileOrientation = TileOrientation.FaceUp;
-            //    }
-            //    // Harbors.AddRange(tile.VisibleHarbors);
-            //}
-
-
-        }
 
         public override string ToString()
         {
             return string.Format($"{Start}-{End}.{Randomize}");
         }
-        
-        public TileGroup(string s)
-        {
-            string[] tokens = s.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
-            Start = int.Parse(tokens[0]);
-            End = int.Parse(tokens[1]);
-            Randomize = bool.Parse(tokens[2]);
-        }
 
-        public static List<TileGroup> BuildList(string s)
-        {
-            List<TileGroup> list = new List<TileGroup>();
-            string[] tokens = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string token in tokens)
-            {
-                TileGroup tg = new TileGroup(token);
-                list.Add(tg);
-            }
-
-            return list;
-        }
-
-
+        #endregion Methods
     }
 }

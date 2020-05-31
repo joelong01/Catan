@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -12,61 +13,90 @@ using Windows.UI.Xaml.Shapes;
 namespace Catan10
 {
     public enum NumberColorTheme { Light, Dark };
+
     public enum NumberStyle { Default, ResoureCount };
+
     public sealed partial class CatanNumber : UserControl, INotifyPropertyChanged
     {
-        public int Probability { get; set; } = 0; // the number (divided by 36) that represents the probability of this number being rolled
+        #region Fields
 
-        readonly SolidColorBrush _redBrush = CatanColors.GetResourceBrush("Red", Colors.Red);
-        readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
-        readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White", Colors.White);
-        NumberColorTheme myTheme = NumberColorTheme.Dark;
-        public NumberStyle NumberStyle { get; set; } = NumberStyle.Default;
-        bool _showEyes = false;
-        public NumberColorTheme Theme
+        private readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
+        private readonly SolidColorBrush _redBrush = CatanColors.GetResourceBrush("Red", Colors.Red);
+        private readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White", Colors.White);
+        private bool _showEyes = false;
+        private NumberColorTheme myTheme = NumberColorTheme.Dark;
+
+        #endregion Fields
+
+        #region Methods
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
-            get => myTheme;
-            set { myTheme = value; NotifyPropertyChanged(); }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private void SetEllipseColor(SolidColorBrush brush)
+        {
+            foreach (UIElement el in _oddGrid.Children)
+            {
+                if (el.GetType() == typeof(Ellipse))
+                {
+                    ((Ellipse)el).Fill = brush;
+                }
+            }
+
+            foreach (UIElement el in _evenGrid.Children)
+            {
+                if (el.GetType() == typeof(Ellipse))
+                {
+                    ((Ellipse)el).Fill = brush;
+                }
+            }
+        }
+
+        private void UseOddGrid(bool useOdd)
+        {
+            if (useOdd)
+            {
+                _oddGrid.Visibility = Visibility.Visible;
+                _evenGrid.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                _oddGrid.Visibility = Visibility.Collapsed;
+                _evenGrid.Visibility = Visibility.Visible;
+            }
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
         public CatanNumber()
         {
             this.InitializeComponent();
         }
 
-        public bool ShowEyes
-        {
-            get => _showEyes;
-            set
-            {
-                _showEyes = value;
-                _rectLeftEye.Visibility = Visibility.Collapsed;
-                _rectRightEye.Visibility = Visibility.Collapsed;
-                if ((Number == 3 || Number == 11) && _showEyes)
-                {
-                    _rectLeftEye.Visibility = Visibility.Visible;
-                    _rectRightEye.Visibility = Visibility.Visible;
-                }
+        #endregion Constructors
 
-            }
-        }
+        #region Events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Events
+
+        #region Properties
 
         public bool HideSeven { get; set; } = true;
 
         public int Number
         {
-
             get => Convert.ToInt32(_txtNumber.Text);
             set
             {
-
-
-
                 bool notifyChange = _txtNumber.Text != value.ToString();
                 try
                 {
-
-
-
                     _txtNumber.Text = value.ToString();
 
                     foreach (UIElement el in _oddGrid.Children)
@@ -93,7 +123,6 @@ namespace Catan10
                         // just take the number.  all the propability circles are hidden
                         return;
                     }
-
 
                     if (value == 6 || value == 8)
                     {
@@ -125,7 +154,6 @@ namespace Catan10
                         Probability = 1;
                         UseOddGrid(true);
                         _oddGrid.Children[2].Visibility = Visibility.Visible;
-
                     }
 
                     if (value == 3 || value == 11)
@@ -140,7 +168,6 @@ namespace Catan10
                             _rectLeftEye.Visibility = Visibility.Visible;
                             _rectRightEye.Visibility = Visibility.Visible;
                         }
-
                     }
 
                     if (value == 4 || value == 10)
@@ -150,7 +177,6 @@ namespace Catan10
                         _oddGrid.Children[1].Visibility = Visibility.Visible;
                         _oddGrid.Children[2].Visibility = Visibility.Visible;
                         _oddGrid.Children[3].Visibility = Visibility.Visible;
-
                     }
 
                     if (value == 5 || value == 9)
@@ -161,7 +187,6 @@ namespace Catan10
                         _evenGrid.Children[1].Visibility = Visibility.Visible;
                         _evenGrid.Children[2].Visibility = Visibility.Visible;
                         _evenGrid.Children[3].Visibility = Visibility.Visible;
-
                     }
 
                     if (value == 0)
@@ -176,9 +201,7 @@ namespace Catan10
                 }
                 catch (Exception)
                 {
-
                 }
-
                 finally
                 {
                     if (notifyChange)
@@ -186,50 +209,34 @@ namespace Catan10
                         NotifyPropertyChanged();
                     }
                 }
-
-
-
-            }
-
-        }
-
-        private void UseOddGrid(bool useOdd)
-        {
-            if (useOdd)
-            {
-                _oddGrid.Visibility = Visibility.Visible;
-                _evenGrid.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                _oddGrid.Visibility = Visibility.Collapsed;
-                _evenGrid.Visibility = Visibility.Visible;
             }
         }
 
-        private void SetEllipseColor(SolidColorBrush brush)
-        {
-            foreach (UIElement el in _oddGrid.Children)
-            {
-                if (el.GetType() == typeof(Ellipse))
-                {
-                    ((Ellipse)el).Fill = brush;
-                }
-            }
+        public NumberStyle NumberStyle { get; set; } = NumberStyle.Default;
+        public int Probability { get; set; } = 0; // the number (divided by 36) that represents the probability of this number being rolled
 
-            foreach (UIElement el in _evenGrid.Children)
+        public bool ShowEyes
+        {
+            get => _showEyes;
+            set
             {
-                if (el.GetType() == typeof(Ellipse))
+                _showEyes = value;
+                _rectLeftEye.Visibility = Visibility.Collapsed;
+                _rectRightEye.Visibility = Visibility.Collapsed;
+                if ((Number == 3 || Number == 11) && _showEyes)
                 {
-                    ((Ellipse)el).Fill = brush;
+                    _rectLeftEye.Visibility = Visibility.Visible;
+                    _rectRightEye.Visibility = Visibility.Visible;
                 }
             }
         }
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+
+        public NumberColorTheme Theme
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get => myTheme;
+            set { myTheme = value; NotifyPropertyChanged(); }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Properties
     }
 }

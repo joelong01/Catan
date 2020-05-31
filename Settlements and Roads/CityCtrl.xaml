@@ -18,7 +18,7 @@
         <!--  "{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay}"  -->
         <Style x:Key="CityRectangleStyle" TargetType="Rectangle">
             <Setter Property="Fill" Value="{x:Bind GetBackgroundBrush(CurrentPlayer, Owner), Mode=OneWay, FallbackValue=White}" />
-            <!--<Setter Property="Fill" Value="Black"/>-->
+            <!--<Setter Property="Fill" Value="Black" />-->
             <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Stroke" Value="Green" />
         </Style>
@@ -32,7 +32,6 @@
             <Setter Property="Stroke" Value="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay, FallbackValue=White}" />
             <Setter Property="StrokeThickness" Value="2" />
         </Style>
-
     </Control.Resources>
     <!--  Converted from svg with ViewerSvg and Ab2d.ReaderSvg  -->
     <Viewbox Stretch="Uniform">

@@ -1,10 +1,8 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-using Windows.Media.Playback;
 
 namespace Catan10
 {
@@ -12,13 +10,20 @@ namespace Catan10
     ///     1. move the player
     ///     2. set the random gold tiles
     ///     3. reset ResourcesThisTurn
-    ///     4. Reset and Show the roll UI 
+    ///     4. Reset and Show the roll UI
     /// </summary>
     public class WaitingForNextToWaitingForRoll : LogHeader, ILogController
     {
+        #region Properties
+
         public List<int> GoldTiles { get; set; }
         public bool KnightEligible { get; set; }
         public TradeResources ResourcesThisTurn { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
         public static async Task PostLog(IGameController gameController)
         {
             WaitingForNextToWaitingForRoll logHeader = new WaitingForNextToWaitingForRoll()
@@ -32,8 +37,8 @@ namespace Catan10
             };
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
-
         }
+
         public async Task Do(IGameController gameController)
         {
             //
@@ -59,8 +64,6 @@ namespace Catan10
             {
                 await WaitingForRollToWaitingForNext.PostLog(gameController, gameController.RollLog.NextRolls);
             }
-
-            
 
             await gameController.SetRandomTileToGold(gameController.NextRandomGoldTiles);
         }
@@ -93,5 +96,7 @@ namespace Catan10
 
             await gameController.SetRandomTileToGold(GoldTiles);
         }
+
+        #endregion Methods
     }
 }

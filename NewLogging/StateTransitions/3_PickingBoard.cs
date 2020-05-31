@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-using Catan10;
 
 namespace Catan10
 {
@@ -12,9 +11,15 @@ namespace Catan10
     /// </summary>
     public class WaitingForPlayersToPickingBoard : LogHeader, ILogController
     {
+        #region Constructors
+
         public WaitingForPlayersToPickingBoard() : base()
         {
         }
+
+        #endregion Constructors
+
+        #region Methods
 
         public static async Task PostLog(IGameController gameController)
         {
@@ -23,7 +28,7 @@ namespace Catan10
             WaitingForPlayersToPickingBoard logHeader = new WaitingForPlayersToPickingBoard()
             {
                 CanUndo = false,
-                Action = CatanAction.ChangedState,                
+                Action = CatanAction.ChangedState,
                 NewState = GameState.PickingBoard,
             };
 
@@ -34,7 +39,6 @@ namespace Catan10
         {
             var mainPageModel = gameController.MainPageModel;
             mainPageModel.FinishedAddingPlayers();
-            
 
             if (mainPageModel.GameStartedBy == gameController.TheHuman)
             {
@@ -48,10 +52,9 @@ namespace Catan10
                     await PickingBoardToWaitingForRollOrder.PostLog(gameController);
                 }
             }
-            
         }
 
-        public  async Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
             //
             //  do any state cleanup needed for transitioning into Pick board
@@ -68,7 +71,6 @@ namespace Catan10
                     //  simulate clicking on Next
                     await PickingBoardToWaitingForRollOrder.PostLog(gameController);
                 }
-               
             }
         }
 
@@ -81,5 +83,7 @@ namespace Catan10
         {
             return Task.CompletedTask;
         }
+
+        #endregion Methods
     }
 }

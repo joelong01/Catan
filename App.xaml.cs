@@ -13,23 +13,41 @@ namespace Catan10
     /// </summary>
     sealed partial class App : Application
     {
+        #region Methods
+
         /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
+        /// Invoked when Navigation to a certain page fails
         /// </summary>
-        public App()
+        /// <param name="sender">The Frame which failed navigation</param>
+        /// <param name="e">Details about the navigation failure</param>
+        private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
-            //Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
-            //    Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
-            //    Microsoft.ApplicationInsights.WindowsCollectors.Game);
-            this.InitializeComponent();
-            this.Suspending += OnSuspending;
-            this.RequestedTheme = ApplicationTheme.Dark;
-
-
+            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
+        /// <summary>
+        /// Invoked when application execution is being suspended.  Application state is saved
+        /// without knowing whether the application will be terminated or resumed with the contents
+        /// of memory still intact.
+        /// </summary>
+        /// <param name="sender">The source of the suspend request.</param>
+        /// <param name="e">Details about the suspend request.</param>
+        private void OnSuspending(object sender, SuspendingEventArgs e)
+        {
+            SuspendingDeferral deferral = e.SuspendingOperation.GetDeferral();
+            //TODO: Save application state and stop any background activity
+            deferral.Complete();
+        }
 
+        protected override void OnFileActivated(FileActivatedEventArgs args)
+        {
+            base.OnFileActivated(args);
+            Frame rootFrame = new Frame();
+            rootFrame.Navigate(typeof(MainPage), args);
+            rootFrame.NavigationFailed += OnNavigationFailed;
+            Window.Current.Content = rootFrame;
+            Window.Current.Activate();
+        }
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -38,8 +56,6 @@ namespace Catan10
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-
-
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -71,38 +87,24 @@ namespace Catan10
             Window.Current.Activate();
         }
 
-        protected override void OnFileActivated(FileActivatedEventArgs args)
-        {
-            base.OnFileActivated(args);
-            Frame rootFrame = new Frame();
-            rootFrame.Navigate(typeof(MainPage), args);
-            rootFrame.NavigationFailed += OnNavigationFailed;
-            Window.Current.Content = rootFrame;
-            Window.Current.Activate();
-        }
+        #endregion Methods
+
+        #region Constructors
 
         /// <summary>
-        /// Invoked when Navigation to a certain page fails
+        /// Initializes the singleton application object.  This is the first line of authored code
+        /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
-        /// <param name="sender">The Frame which failed navigation</param>
-        /// <param name="e">Details about the navigation failure</param>
-        void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        public App()
         {
-            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
+            //Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
+            //    Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
+            //    Microsoft.ApplicationInsights.WindowsCollectors.Game);
+            this.InitializeComponent();
+            this.Suspending += OnSuspending;
+            this.RequestedTheme = ApplicationTheme.Dark;
         }
 
-        /// <summary>
-        /// Invoked when application execution is being suspended.  Application state is saved
-        /// without knowing whether the application will be terminated or resumed with the contents
-        /// of memory still intact.
-        /// </summary>
-        /// <param name="sender">The source of the suspend request.</param>
-        /// <param name="e">Details about the suspend request.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
-        {
-            SuspendingDeferral deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Save application state and stop any background activity
-            deferral.Complete();
-        }
+        #endregion Constructors
     }
 }

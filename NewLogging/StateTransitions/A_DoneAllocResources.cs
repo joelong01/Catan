@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -8,11 +7,12 @@ namespace Catan10
 {
     /// <summary>
     ///     UI Pause
-    ///     wipes the resources for the turn    
+    ///     wipes the resources for the turn
     /// </summary>
-    public class AllocateResourcesReverseToDoneAllocResources :  LogHeader, ILogController
+    public class AllocateResourcesReverseToDoneAllocResources : LogHeader, ILogController
     {
-        public AllocateResourcesReverseToDoneAllocResources() { }
+        #region Methods
+
         internal static async Task PostLog(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceReverse);
@@ -27,12 +27,23 @@ namespace Catan10
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public AllocateResourcesReverseToDoneAllocResources()
+        {
+        }
+
+        #endregion Constructors
+
         /// <summary>
         ///     Just a UI pause
         /// </summary>
         /// <param name="gameController"></param>
         /// <returns></returns>
-        
+
         public Task Do(IGameController gameController)
         {
             gameController.MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.Resources.ResourcesThisTurn = new TradeResources());

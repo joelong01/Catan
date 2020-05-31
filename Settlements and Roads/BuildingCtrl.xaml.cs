@@ -21,112 +21,7 @@ namespace Catan10
 
     public sealed partial class BuildingCtrl : UserControl
     {
-        public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
-        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
-        public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
-
-        //
-        //  this the list of Tile/SettlmentLocations that are the same for this settlement
-        public List<BuildingKey> Clones = new List<BuildingKey>();
-
-        public BuildingCtrl()
-        {
-            this.InitializeComponent();
-
-            this.Width = 30;
-            this.Height = 30;
-            this.BuildingState = BuildingState.None;
-            //this..Show(BuildingState.Settlement);
-            Canvas.SetZIndex(this, 20);
-            this.RenderTransformOrigin = new Point(.5, .5);
-            this.HorizontalAlignment = HorizontalAlignment.Left;
-            this.VerticalAlignment = VerticalAlignment.Top;
-            CompositeTransform transform = new CompositeTransform
-            {
-                ScaleX = 1.0,
-                ScaleY = 1.0
-            };
-
-            this.RenderTransform = transform;
-            
-        }
-
-        public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
-
-        // the harbor that is acquired when the user gets this building
-        public Harbor AdjacentHarbor { get; set; } = null;
-
-        public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
-
-        public BuildingState BuildingState
-        {
-            get => (BuildingState)GetValue(BuildingStateProperty);
-            private set => SetValue(BuildingStateProperty, value);  // call UpdateBuildingState instead
-        }
-
-        public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
-        public IGameCallback Callback { get; internal set; }
-
-        public PlayerModel CurrentPlayer
-        {
-            get => (PlayerModel)GetValue(CurrentPlayerProperty);
-            set => SetValue(CurrentPlayerProperty, value);
-        }
-
-        // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
-        public int Index
-        {
-            get => (int)GetValue(IndexProperty);
-            set => SetValue(IndexProperty, value);
-        }
-
-        public bool IsCity => BuildingState == BuildingState.City;
-        public bool IsSettlement => BuildingState == BuildingState.Settlement;
-        public Point LayoutPoint { get; set; }
-
-        public PlayerModel Owner
-        {
-            get => (PlayerModel)GetValue(OwnerProperty);
-            set => SetValue(OwnerProperty, value);
-        }
-
-        public int PipGroup
-        {
-            get => (int)GetValue(PipGroupProperty);
-            set => SetValue(PipGroupProperty, value);
-        }
-
-        public int Pips
-        {
-            get => (int)GetValue(PipsProperty);
-            set => SetValue(PipsProperty, value);
-        }
-
-        public int ScoreValue
-        {
-            get
-            {
-                switch (BuildingState)
-                {
-                    case BuildingState.None:
-                        return 0;
-
-                    case BuildingState.Settlement:
-                        return 1;
-
-                    case BuildingState.City:
-                        return 2;
-
-                    default:
-                        return 999;
-                }
-            }
-        }
-
-        public CompositeTransform Transform => (CompositeTransform)this.RenderTransform;
+        #region Methods
 
         private static void BuildingStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -167,7 +62,7 @@ namespace Catan10
         {
             if (this.BuildingState == BuildingState.None)
             {
-                this.BuildingState= Callback.ValidateBuildingLocation(this);                
+                this.BuildingState = Callback.ValidateBuildingLocation(this);
             }
         }
 
@@ -267,6 +162,126 @@ namespace Catan10
             Owner = null;
             this.BuildingState = BuildingState.None;
         }
+
+        #endregion Methods
+
+        #region Fields
+
+        public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
+        public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
+
+        //
+        //  this the list of Tile/SettlmentLocations that are the same for this settlement
+        public List<BuildingKey> Clones = new List<BuildingKey>();
+
+        #endregion Fields
+
+        #region Constructors
+
+        public BuildingCtrl()
+        {
+            this.InitializeComponent();
+
+            this.Width = 30;
+            this.Height = 30;
+            this.BuildingState = BuildingState.None;
+            //this..Show(BuildingState.Settlement);
+            Canvas.SetZIndex(this, 20);
+            this.RenderTransformOrigin = new Point(.5, .5);
+            this.HorizontalAlignment = HorizontalAlignment.Left;
+            this.VerticalAlignment = VerticalAlignment.Top;
+            CompositeTransform transform = new CompositeTransform
+            {
+                ScaleX = 1.0,
+                ScaleY = 1.0
+            };
+
+            this.RenderTransform = transform;
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
+
+        // the harbor that is acquired when the user gets this building
+        public Harbor AdjacentHarbor { get; set; } = null;
+
+        public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
+
+        public BuildingState BuildingState
+        {
+            get => (BuildingState)GetValue(BuildingStateProperty);
+            private set => SetValue(BuildingStateProperty, value);  // call UpdateBuildingState instead
+        }
+
+        public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
+        public IGameCallback Callback { get; internal set; }
+
+        public PlayerModel CurrentPlayer
+        {
+            get => (PlayerModel)GetValue(CurrentPlayerProperty);
+            set => SetValue(CurrentPlayerProperty, value);
+        }
+
+        // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
+        public int Index
+        {
+            get => (int)GetValue(IndexProperty);
+            set => SetValue(IndexProperty, value);
+        }
+
+        public bool IsCity => BuildingState == BuildingState.City;
+        public bool IsSettlement => BuildingState == BuildingState.Settlement;
+        public Point LayoutPoint { get; set; }
+
+        public PlayerModel Owner
+        {
+            get => (PlayerModel)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+
+        public int PipGroup
+        {
+            get => (int)GetValue(PipGroupProperty);
+            set => SetValue(PipGroupProperty, value);
+        }
+
+        public int Pips
+        {
+            get => (int)GetValue(PipsProperty);
+            set => SetValue(PipsProperty, value);
+        }
+
+        public int ScoreValue
+        {
+            get
+            {
+                switch (BuildingState)
+                {
+                    case BuildingState.None:
+                        return 0;
+
+                    case BuildingState.Settlement:
+                        return 1;
+
+                    case BuildingState.City:
+                        return 2;
+
+                    default:
+                        return 999;
+                }
+            }
+        }
+
+        public CompositeTransform Transform => (CompositeTransform)this.RenderTransform;
+
+        #endregion Properties
 
         public void AddKey(TileCtrl tile, BuildingLocation loc)
         {
@@ -386,6 +401,7 @@ namespace Catan10
             return Task.CompletedTask;
         }
     }
+
     /// <summary>
     ///  This is for the "clones" support. the issue is that you can have multiple Tile/BuildingLocation pairs that map to the same
     ///  visual location for a Building.  We want to have exactly one building per location, so that datastructure allows us to find
@@ -393,23 +409,37 @@ namespace Catan10
     /// </summary>
     public class BuildingKey
     {
+        #region Constructors
+
         public BuildingKey(TileCtrl t, BuildingLocation loc)
         {
             Tile = t;
             Location = loc;
         }
 
+        #endregion Constructors
+
+        #region Properties
+
         public BuildingLocation Location { get; set; }
         public TileCtrl Tile { get; set; }
+
+        #endregion Properties
+
+        #region Methods
 
         public override string ToString()
         {
             return String.Format($"[{Tile}. IDX={Tile.Index} @ {Location}]");
         }
+
+        #endregion Methods
     }
 
     public class KeyComparer : IEqualityComparer<BuildingKey>
     {
+        #region Methods
+
         //
         //  Note:  Once the board is created, we never change the Tiles or the Location of a Settlement...
         public bool Equals(BuildingKey x, BuildingKey y)
@@ -428,6 +458,7 @@ namespace Catan10
         {
             return obj.Tile.GetHashCode() * 17 + obj.Location.GetHashCode();
         }
-    }
 
+        #endregion Methods
+    }
 }

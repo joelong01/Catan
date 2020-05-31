@@ -30,8 +30,6 @@
             <local:Harbor TileIndex="17" HarborLocation="BottomRight" HarborType="Brick"
                 Orientation="FaceUp" UseClassic="True" />
 
-
-
             <local:TileCtrl TileOrientation="FaceUp" Number="12" UseClassic="True" ResourceType="Sheep"
                 Index="0" />
             <local:TileCtrl TileOrientation="FaceUp" Number="0" UseClassic="True" ResourceType="Sea"

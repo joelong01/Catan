@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -11,10 +10,10 @@ using Windows.UI.Xaml;
 
 namespace Catan10
 {
-   
-
     public class MainPageModel : INotifyPropertyChanged
     {
+        #region Fields
+
         private bool _EnableUiInteraction = true;
         private int _FiveStarPositions = 0;
         private int _FourStarPosition = 0;
@@ -28,39 +27,9 @@ namespace Catan10
         private int _TwoStarPosition = 0;
         private bool _WebSocketConnected = false;
 
-        public MainPageModel()
-        {
-        }
+        #endregion Fields
 
-        public MainPageModel(IGameController gameController)
-        {
-            Log = new NewLog(gameController);
-            GameController = gameController;
-        }
-
-        internal void FinishedAddingPlayers()
-        {
-            //
-            //   turn on NotifyPropertyChanged() events for the model and subscribe to the entitlements changed event so that 
-            //   we can enabled/disable the next button 
-
-            PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.NotificationsEnabled = true;
-                p.GameData.Resources.UnspentEntitlements.CollectionChanged += UnspentEntitlements_CollectionChanged;
-            }
-            );
-
-        }
-
-        private void UnspentEntitlements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {             
-            NotifyPropertyChanged("EnableNextButton");
-            NotifyPropertyChanged("StateMessage");
-        }
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        #region Properties
 
         private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
 
@@ -80,6 +49,66 @@ namespace Catan10
                {GameState.WaitingForNext, "End My Turn" },
                {GameState.Supplemental, "Finished (Next)" }
         };
+
+        #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
+        ///     if we add one of these properties (which are usually the get'ers only)
+        /// </summary>
+        private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void UnspentEntitlements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            NotifyPropertyChanged("EnableNextButton");
+            NotifyPropertyChanged("StateMessage");
+        }
+
+        internal void FinishedAddingPlayers()
+        {
+            //
+            //   turn on NotifyPropertyChanged() events for the model and subscribe to the entitlements changed event so that
+            //   we can enabled/disable the next button
+
+            PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.NotificationsEnabled = true;
+                p.GameData.Resources.UnspentEntitlements.CollectionChanged += UnspentEntitlements_CollectionChanged;
+            }
+            );
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public MainPageModel()
+        {
+        }
+
+        public MainPageModel(IGameController gameController)
+        {
+            Log = new NewLog(gameController);
+            GameController = gameController;
+        }
+
+        #endregion Constructors
+
+        #region Events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Events
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
 
@@ -234,9 +263,6 @@ namespace Catan10
         [JsonIgnore]
         public IGameController GameController { get; set; }
 
-        [JsonIgnore]
-        public GameInfo ServiceGameInfo { get; set; }
-
         public TradeResources GameResources
         {
             get
@@ -349,6 +375,9 @@ namespace Catan10
                 return Visibility.Collapsed;
             }
         }
+
+        [JsonIgnore]
+        public GameInfo ServiceGameInfo { get; set; }
 
         public Settings Settings
         {
@@ -469,20 +498,6 @@ namespace Catan10
                     NotifyPropertyChanged();
                 }
             }
-        }
-
-        /// <summary>
-        ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
-        ///     if we add one of these properties (which are usually the get'ers only)
-        /// </summary>
-        private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public void SetPipCount(int[] value)

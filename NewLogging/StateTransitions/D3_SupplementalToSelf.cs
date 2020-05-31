@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Catan10
+﻿namespace Catan10
 {
-    class SupplementalToSupplemental
+    internal class SupplementalToSupplemental
     {
     }
 }

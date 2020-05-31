@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -15,69 +14,13 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
-       
+        #region Properties
+
         private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
-        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
-        public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
-        public GameState CurrentGameState
-        {
-            get
-            {
-                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
+        #endregion Properties
 
-                return MainPageModel.Log.GameState;
-            }
-        }
-
-        public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
-        public GameInfo GameInfo => MainPageModel.ServiceGameInfo;
-
-        public List<int> HighlightedTiles
-        {
-            get
-            {
-                var list = new List<int>();
-                foreach (var tile in GameContainer.AllTiles)
-                {
-                    if (tile.Highlighted)
-                    {
-                        list.Add(tile.Index);
-                    }
-                }
-                return list;
-            }
-        }
-
-        public bool IsServiceGame => MainPageModel.IsServiceGame;
-        public NewLog Log => MainPageModel.Log;
-
-        public List<int> NextRandomGoldTiles
-        {
-            get
-            {
-                int playerRoll = TotalRolls / MainPageModel.PlayingPlayers.Count;  // integer divide - drops remainder
-                if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
-                {
-                    var newRandomGoldTiles = GetRandomGoldTiles();
-                    CurrentPlayer.GameData.GoldRolls.Add(newRandomGoldTiles);
-                    return newRandomGoldTiles;
-                }
-                else
-                {
-                    Contract.Assert(CurrentPlayer.GameData.GoldRolls.Count > playerRoll);
-                    //
-                    //  we've already picked the tiles for this roll -- use them
-                    return CurrentPlayer.GameData.GoldRolls[playerRoll];
-                }
-            }
-        }
-
-        public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
-        public CatanProxy Proxy => MainPageModel.Proxy;
-
-        public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
-
+        #region Methods
 
         private async Task UpdateUiForState(GameState currentState)
         {
@@ -206,6 +149,69 @@ namespace Catan10
             }
         }
 
+        #endregion Methods
+
+        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
+        public CatanGames CatanGame { get; set; } = CatanGames.Regular;
+
+        public GameState CurrentGameState
+        {
+            get
+            {
+                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
+
+                return MainPageModel.Log.GameState;
+            }
+        }
+
+        public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
+        public GameInfo GameInfo => MainPageModel.ServiceGameInfo;
+
+        public List<int> HighlightedTiles
+        {
+            get
+            {
+                var list = new List<int>();
+                foreach (var tile in GameContainer.AllTiles)
+                {
+                    if (tile.Highlighted)
+                    {
+                        list.Add(tile.Index);
+                    }
+                }
+                return list;
+            }
+        }
+
+        public bool IsServiceGame => MainPageModel.IsServiceGame;
+        public NewLog Log => MainPageModel.Log;
+
+        public List<int> NextRandomGoldTiles
+        {
+            get
+            {
+                int playerRoll = TotalRolls / MainPageModel.PlayingPlayers.Count;  // integer divide - drops remainder
+                if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
+                {
+                    var newRandomGoldTiles = GetRandomGoldTiles();
+                    CurrentPlayer.GameData.GoldRolls.Add(newRandomGoldTiles);
+                    return newRandomGoldTiles;
+                }
+                else
+                {
+                    Contract.Assert(CurrentPlayer.GameData.GoldRolls.Count > playerRoll);
+                    //
+                    //  we've already picked the tiles for this roll -- use them
+                    return CurrentPlayer.GameData.GoldRolls[playerRoll];
+                }
+            }
+        }
+
+        public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
+        public CatanProxy Proxy => MainPageModel.Proxy;
+
+        public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
+
         /// <summary>
         ///     Called when a Player is added to a Service game
         ///
@@ -232,7 +238,6 @@ namespace Catan10
             Contract.Assert(playerToAdd != null);
             if (MainPageModel.PlayingPlayers.Contains(playerToAdd) == false)
             {
-                
                 AddPlayerMenu(playerToAdd);
                 //
                 //  need to give the players some data about the game
@@ -273,7 +278,7 @@ namespace Catan10
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
             if ((changePlayerLog.NewState == GameState.WaitingForRoll) || (changePlayerLog.NewState == GameState.WaitingForNext))
             {
-                 await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
+                await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
             }
 
             if (changePlayerLog.NewState != changePlayerLog.OldState)
@@ -301,203 +306,6 @@ namespace Catan10
         public RandomBoardSettings CurrentRandomBoard()
         {
             return _gameView.RandomBoardSettings;
-        }
-
-        public RandomBoardSettings GetRandomBoard()
-        {
-            return _gameView.GetRandomBoard();
-        }
-
-        public PlayerModel NameToPlayer(string playerName)
-        {
-            Contract.Assert(MainPageModel.AllPlayers.Count > 0);
-            foreach (var player in MainPageModel.AllPlayers)
-            {
-                if (player.PlayerName == playerName)
-                {
-                    return player;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        ///     Checks to see if it is a service game.  if it is, post a message to the service.
-        ///     if not, process the message immediately
-        /// </summary>
-        /// <param name="logHeader"></param>
-        /// <param name="normal"></param>
-        /// <returns>False if the IGameController.Do() should be executed locally </returns>
-        public async Task<bool> PostMessage(LogHeader logHeader, CatanMessageType msgType)
-        {
-            CatanMessage message = new CatanMessage()
-            {
-                Data = logHeader,
-                Origin = TheHuman.PlayerName,
-                CatanMessageType = msgType
-            };
-            if (MainPageModel.IsServiceGame)
-            {
-                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
-                //  this.TraceMessage($"Sending {message}");
-                if (!ret)
-                {
-                    await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}");
-                }
-            }
-            else
-            {
-                await ProcessMessage(message);
-            }
-
-            return MainPageModel.IsServiceGame;
-        }
-
-        public async Task<bool> RedoAsync()
-        {
-            LogHeader logHeader = Log.PeekUndo;
-            if (logHeader == null) return false;
-            UndoRedoTcs = new TaskCompletionSource<bool>();
-            if (MainPageModel.IsServiceGame)
-            {
-                CatanMessage message = new CatanMessage()
-                {
-                    Data = logHeader,
-                    Origin = TheHuman.PlayerName,
-                    CatanMessageType = CatanMessageType.Redo
-                };
-
-                await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
-            }
-            else
-            {
-                //
-                // not a service game -- do the actual undo
-
-                ILogController logController = logHeader as ILogController;
-                await logController.Redo(this);
-            }
-
-            return await UndoRedoTcs.Task;
-        }
-
-        public void ResetAllBuildings()
-        {
-            _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
-        }
-
-        public void ShowRollsInPublicUi()
-        {
-            MainPageModel.PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.RollOrientation = TileOrientation.FaceUp;
-            });
-        }
-
-        public Task ResetRollControl()
-        {
-            return _rollControl.Reset();
-        }
-
-        public async Task HideRollsInPublicUi()
-        {
-            await _rollControl.Reset();
-
-            MainPageModel.PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = 0;
-                p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = 0;
-                p.GameData.RollOrientation = TileOrientation.FaceDown;
-            }); // I hate this hack but I couldn't figure out how to do it with DataBinding
-        }
-
-        /// <summary>
-        ///     Set a random board.  Only the creator can set a random board.
-        ///
-        ///
-        /// </summary>
-        /// <param name="randomBoard"></param>
-        /// <returns></returns>
-        public async Task SetRandomBoard(RandomBoardLog randomBoard)
-        {
-            Contract.Assert(CurrentGameState == GameState.PickingBoard); // the first is true the first time through then it is the second
-            Contract.Assert(randomBoard.NewState == GameState.PickingBoard);
-
-            if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
-            {
-                await VisualShuffle(randomBoard.NewRandomBoard);
-            }
-            else
-            {
-                await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
-            }
-
-            UpdateBoardMeasurements();
-        }
-
-        public Task SetRoadState(UpdateRoadLog updateRoadModel)
-        {
-            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
-            Contract.Assert(road != null);
-            var player = NameToPlayer(updateRoadModel.SentBy);
-            Contract.Assert(player != null);
-            string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
-            RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
-            Contract.Assert(newRaceTracker != null);
-            if (road.Owner != null)
-            {
-                this.TraceMessage("Owner changing!");
-            }
-
-
-
-            UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        ///     Need to clean up any UI actions  -- e.g. if the GameStarter clicks on "Roll to See who goes first", then that will cause
-        ///     messages to be Posted to the other clients.  They end up calling this function.  it needs to be exactly the same as if the
-        ///     button was clicked on.
-        /// </summary>
-        /// <param name="logHeader"></param>
-        /// <returns></returns>
-        public async Task SetState(SetStateLog logHeader)
-        {
-            await UpdateUiForState(logHeader.NewState);
-        }
-
-        /// <summary>
-        ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
-        ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition
-        ///     of new players.
-        /// </summary>
-        /// <param name="logHeader"></param>
-        /// <returns></returns>
-        public Task StartGame(NewGameLog logHeader)
-        {
-
-
-
-            //
-            //  the issue here is that we Log StartGame, Add Player, then Monitor under normal circumstances
-            //  So when the second player does the same thing, they get all the log records for the game,
-            //  including the StartGame and AddPlayers.  so you need to be careful to start the game only once -- which often
-            //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't
-            //  in the game because this StartGame resets PlayingPlayers
-            //
-            if (logHeader.OldState != GameState.Uninitialized) return Task.CompletedTask;
-
-            ResetDataForNewGame();
-            MainPageModel.PlayingPlayers.Clear();
-            MainPageModel.IsServiceGame = true;
-            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.SentBy);            
-            Contract.Assert(MainPageModel.GameStartedBy != null);
-            _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
-            
-            return Task.CompletedTask;
-
         }
 
         /// <summary>
@@ -533,8 +341,6 @@ namespace Catan10
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
-
-            
 
             //
             //  look at all the rolls and see if the current player needs to roll again
@@ -611,6 +417,282 @@ namespace Catan10
             return false;
         }
 
+        public RandomBoardSettings GetRandomBoard()
+        {
+            return _gameView.GetRandomBoard();
+        }
+
+        public List<int> GetRandomGoldTiles()
+        {
+            if (!this.RandomGold || this.RandomGoldTileCount < 1) return new List<int>();
+            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
+            return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
+        }
+
+        public async Task HideRollsInPublicUi()
+        {
+            await _rollControl.Reset();
+
+            MainPageModel.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = 0;
+                p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = 0;
+                p.GameData.RollOrientation = TileOrientation.FaceDown;
+            }); // I hate this hack but I couldn't figure out how to do it with DataBinding
+        }
+
+        public PlayerModel NameToPlayer(string playerName)
+        {
+            Contract.Assert(MainPageModel.AllPlayers.Count > 0);
+            foreach (var player in MainPageModel.AllPlayers)
+            {
+                if (player.PlayerName == playerName)
+                {
+                    return player;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        ///     Checks to see if it is a service game.  if it is, post a message to the service.
+        ///     if not, process the message immediately
+        /// </summary>
+        /// <param name="logHeader"></param>
+        /// <param name="normal"></param>
+        /// <returns>False if the IGameController.Do() should be executed locally </returns>
+        public async Task<bool> PostMessage(LogHeader logHeader, CatanMessageType msgType)
+        {
+            CatanMessage message = new CatanMessage()
+            {
+                Data = logHeader,
+                Origin = TheHuman.PlayerName,
+                CatanMessageType = msgType
+            };
+            if (MainPageModel.IsServiceGame)
+            {
+                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
+                //  this.TraceMessage($"Sending {message}");
+                if (!ret)
+                {
+                    await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}");
+                }
+            }
+            else
+            {
+                await ProcessMessage(message);
+            }
+
+            return MainPageModel.IsServiceGame;
+        }
+
+        public DevCardType PurchaseNextDevCard()
+        {
+            return _gameView.CurrentGame.GetNextDevCard();
+        }
+
+        public async Task<bool> RedoAsync()
+        {
+            LogHeader logHeader = Log.PeekUndo;
+            if (logHeader == null) return false;
+            UndoRedoTcs = new TaskCompletionSource<bool>();
+            if (MainPageModel.IsServiceGame)
+            {
+                CatanMessage message = new CatanMessage()
+                {
+                    Data = logHeader,
+                    Origin = TheHuman.PlayerName,
+                    CatanMessageType = CatanMessageType.Redo
+                };
+
+                await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
+            }
+            else
+            {
+                //
+                // not a service game -- do the actual undo
+
+                ILogController logController = logHeader as ILogController;
+                await logController.Redo(this);
+            }
+
+            return await UndoRedoTcs.Task;
+        }
+
+        public void ResetAllBuildings()
+        {
+            _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
+        }
+
+        public async Task ResetRandomGoldTiles()
+        {
+            await _gameView.ResetRandomGoldTiles();
+        }
+
+        public Task ResetRollControl()
+        {
+            return _rollControl.Reset();
+        }
+
+        //
+        //  find all the tiles with building for this roll where the onwer == Player
+        public (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll)
+        {
+            TradeResources tr = new TradeResources();
+            TradeResources baron = new TradeResources();
+            foreach (BuildingCtrl building in _gameView.CurrentGame.HexPanel.Buildings)
+            {
+                if (building == null) continue;
+                if (building.Owner != player) continue;
+                foreach (var kvp in building.BuildingToTileDictionary)
+                {
+                    if (kvp.Value.Number == roll)
+                    {
+                        if (kvp.Value.HasBaron == false)
+                        {
+                            tr.Add(kvp.Value.ResourceType, building.ScoreValue);
+                        }
+                        else
+                        {
+                            baron.Add(kvp.Value.ResourceType, building.ScoreValue);
+                        }
+                    }
+                }
+            }
+            return (tr, baron);
+        }
+
+        public void SetHighlightedTiles(int roll)
+        {
+            foreach (var tile in _gameView.AllTiles)
+            {
+                if (tile.Number != roll)
+                {
+                    tile.AnimateFadeAsync(0.25);
+                    tile.StopHighlightingTile();
+                }
+                else
+                {
+                    tile.HighlightTile();
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Set a random board.  Only the creator can set a random board.
+        ///
+        ///
+        /// </summary>
+        /// <param name="randomBoard"></param>
+        /// <returns></returns>
+        public async Task SetRandomBoard(RandomBoardLog randomBoard)
+        {
+            Contract.Assert(CurrentGameState == GameState.PickingBoard); // the first is true the first time through then it is the second
+            Contract.Assert(randomBoard.NewState == GameState.PickingBoard);
+
+            if (this.GameContainer.AllTiles[0].TileOrientation == TileOrientation.FaceDown)
+            {
+                await VisualShuffle(randomBoard.NewRandomBoard);
+            }
+            else
+            {
+                await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
+            }
+
+            UpdateBoardMeasurements();
+        }
+
+        public async Task SetRandomTileToGold(List<int> goldTilesIndices)
+        {
+            await ResetRandomGoldTiles();
+            if (this.RandomGold && this.RandomGoldTileCount > 0)
+            {
+                await _gameView.SetRandomTilesToGold(goldTilesIndices);
+            }
+        }
+
+        public Task SetRoadState(UpdateRoadLog updateRoadModel)
+        {
+            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
+            Contract.Assert(road != null);
+            var player = NameToPlayer(updateRoadModel.SentBy);
+            Contract.Assert(player != null);
+            string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
+            RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
+            Contract.Assert(newRaceTracker != null);
+            if (road.Owner != null)
+            {
+                this.TraceMessage("Owner changing!");
+            }
+
+            UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        ///     Need to clean up any UI actions  -- e.g. if the GameStarter clicks on "Roll to See who goes first", then that will cause
+        ///     messages to be Posted to the other clients.  They end up calling this function.  it needs to be exactly the same as if the
+        ///     button was clicked on.
+        /// </summary>
+        /// <param name="logHeader"></param>
+        /// <returns></returns>
+        public async Task SetState(SetStateLog logHeader)
+        {
+            await UpdateUiForState(logHeader.NewState);
+        }
+
+        public void ShowRollsInPublicUi()
+        {
+            MainPageModel.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.RollOrientation = TileOrientation.FaceUp;
+            });
+        }
+
+        /// <summary>
+        ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
+        ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition
+        ///     of new players.
+        /// </summary>
+        /// <param name="logHeader"></param>
+        /// <returns></returns>
+        public Task StartGame(NewGameLog logHeader)
+        {
+            //
+            //  the issue here is that we Log StartGame, Add Player, then Monitor under normal circumstances
+            //  So when the second player does the same thing, they get all the log records for the game,
+            //  including the StartGame and AddPlayers.  so you need to be careful to start the game only once -- which often
+            //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't
+            //  in the game because this StartGame resets PlayingPlayers
+            //
+            if (logHeader.OldState != GameState.Uninitialized) return Task.CompletedTask;
+
+            ResetDataForNewGame();
+            MainPageModel.PlayingPlayers.Clear();
+            MainPageModel.IsServiceGame = true;
+            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.SentBy);
+            Contract.Assert(MainPageModel.GameStartedBy != null);
+            _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
+
+            return Task.CompletedTask;
+        }
+
+        public void StopHighlightingTiles()
+        {
+            GameContainer.AllTiles.ForEach((tile) => tile.StopHighlightingTile());
+        }
+
+        public async Task TellServiceGameStarted()
+        {
+            await Proxy.StartGame(MainPageModel.ServiceGameInfo);
+        }
+
+        public TileCtrl TileFromIndex(int targetTile)
+        {
+            return GameContainer.TilesInIndexOrder[targetTile];
+        }
+
         /// <summary>
         ///     we don't call the Log to push the undo action -- that is done by the log since the log
         ///     initiates all Undo
@@ -680,7 +762,6 @@ namespace Catan10
                 await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
                 UpdateBoardMeasurements();
             }
-            
         }
 
         public Task UndoSetRoadState(UpdateRoadLog updateRoadModel)
@@ -737,7 +818,6 @@ namespace Catan10
                 }
                 CurrentPlayer.GameData.Resources.GrantResources(tr);
             }
-
         }
 
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
@@ -762,7 +842,6 @@ namespace Catan10
             {
                 if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build))
                 {
-                    
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
@@ -842,91 +921,6 @@ namespace Catan10
             }
 
             CalculateAndSetLongestRoad(raceTracking);
-        }
-
-        public async Task TellServiceGameStarted()
-        {
-            await Proxy.StartGame(MainPageModel.ServiceGameInfo);
-        }
-
-        //
-        //  find all the tiles with building for this roll where the onwer == Player
-        public (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll)
-        {
-            TradeResources tr = new TradeResources();
-            TradeResources baron = new TradeResources();
-            foreach (BuildingCtrl building in _gameView.CurrentGame.HexPanel.Buildings)
-            {
-                if (building == null) continue;
-                if (building.Owner != player) continue;
-                foreach (var kvp in building.BuildingToTileDictionary)                
-                {
-                    if (kvp.Value.Number == roll)
-                    {
-
-                        if (kvp.Value.HasBaron == false)
-                        {
-                            tr.Add(kvp.Value.ResourceType, building.ScoreValue);
-                        }
-                        else
-                        {
-                            baron.Add(kvp.Value.ResourceType, building.ScoreValue);
-                        }
-                    }
-                }
-            }
-            return (tr, baron);
-        }
-        public List<int> GetRandomGoldTiles()
-        {
-            if (!this.RandomGold || this.RandomGoldTileCount < 1) return new List<int>();
-            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
-            return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
-        }
-        public async Task SetRandomTileToGold(List<int> goldTilesIndices)
-        {
-            await ResetRandomGoldTiles();
-            if (this.RandomGold && this.RandomGoldTileCount > 0)
-            {
-                await _gameView.SetRandomTilesToGold(goldTilesIndices);
-            }
-        }
-        public async Task ResetRandomGoldTiles()
-        {
-            await _gameView.ResetRandomGoldTiles();
-        }
-
-        public void SetHighlightedTiles(int roll)
-        {
-            foreach (var tile in _gameView.AllTiles)
-            {
-                if (tile.Number != roll)
-                {
-                    tile.AnimateFadeAsync(0.25);
-                    tile.StopHighlightingTile();
-                }
-                else
-                {
-                    tile.HighlightTile();
-                }
-            }
-        }
-
-        public void StopHighlightingTiles()
-        {
-            GameContainer.AllTiles.ForEach((tile) => tile.StopHighlightingTile());
-        }
-
-       
-
-        public TileCtrl TileFromIndex(int targetTile)
-        {
-            return GameContainer.TilesInIndexOrder[targetTile];
-        }
-
-        public DevCardType PurchaseNextDevCard()
-        {
-          return  _gameView.CurrentGame.GetNextDevCard();
         }
     }
 }

@@ -19,10 +19,35 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        #region Fields
+
         private Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
+
+        #endregion Fields
+
+        #region Properties
+
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         private MessageWebSocket MessageWebSocket { get; set; }
         private DataWriter MessageWriter { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
+        private async Task DeleteAllGames()
+        {
+            List<GameInfo> games = await Proxy.GetGames();
+            games.ForEach(async (game) =>
+            {
+                var s = await Proxy.DeleteGame(game.Id);
+                if (s == null)
+                {
+                    var ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+                    // this.TraceMessage(ErrorMessage);
+                }
+            });
+        }
 
         private PlayerModel FindPlayerByName(ICollection<PlayerModel> playerList, string playerName)
         {
@@ -61,12 +86,11 @@ namespace Catan10
                         if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("OnStartDefault") && TheHuman != null &&
                             gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == CatanWsMessageType.GameAdded && MainPageModel.Settings.AutoJoinGames)
                         {
-
                             var players = await Proxy.GetPlayers(gameMessage.GameInfo.Id);
                             if (players != null && players.Contains(TheHuman.PlayerName) == false && gameMessage.GameInfo.Started == false)
                             {
                                 await this.Reset();
-                                MainPageModel.ServiceGameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);                                
+                                MainPageModel.ServiceGameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
                                 StartMonitoring();
                             }
                         }
@@ -94,20 +118,6 @@ namespace Catan10
         private async void OnDeleteAllGames(object sender, RoutedEventArgs e)
         {
             await DeleteAllGames();
-        }
-
-        private async Task DeleteAllGames()
-        {
-            List<GameInfo> games = await Proxy.GetGames();
-            games.ForEach(async (game) =>
-            {
-                var s = await Proxy.DeleteGame(game.Id);
-                if (s == null)
-                {
-                    var ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-                   // this.TraceMessage(ErrorMessage);
-                }
-            });
         }
 
         private async void OnNewNetworkGame(object sender, RoutedEventArgs e)
@@ -143,7 +153,7 @@ namespace Catan10
             await _rollControl.Reset();
             MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedGame.Creator);
             await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
-            
+
             StartMonitoring();
         }
 
@@ -160,7 +170,7 @@ namespace Catan10
 
             string gameName = "OnStartDefaultNetworkGame";
 
-           // CurrentPlayer = TheHuman;
+            // CurrentPlayer = TheHuman;
 
             GameInfo gameInfo = null;
             //
@@ -296,5 +306,7 @@ namespace Catan10
                 await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message);
             }
         }
+
+        #endregion Methods
     }
 }

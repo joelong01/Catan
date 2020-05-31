@@ -62,8 +62,6 @@
             <local:TileCtrl x:Name="_desertTile" TileOrientation="FaceDown" Number="7" UseClassic="True"
                 ResourceType="Desert" Index="18" ShowIndex="False" />
 
-
-
             <local:Harbor x:Name="Harbor_Wood" TileIndex="0" HarborLocation="TopLeft" HarborType="Wood"
                 Orientation="FaceDown" Index="0" />
             <local:Harbor x:Name="Harbor_Wheat" TileIndex="1" HarborLocation="BottomLeft"
@@ -82,9 +80,6 @@
                 HarborType="ThreeForOne" Orientation="FaceDown" Index="7" />
             <local:Harbor x:Name="Harbor_TFO_4" TileIndex="6" HarborLocation="BottomLeft"
                 HarborType="ThreeForOne" Orientation="FaceDown" Index="8" />
-
-
         </local:CatanHexPanel>
     </Viewbox>
-
 </UserControl>

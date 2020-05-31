@@ -1,23 +1,60 @@
-﻿using Catan.Proxy;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+
+using Catan.Proxy;
 
 namespace Catan10
 {
+    public class KnightPlayedLog : PlayedDevCardModel
+    {
+        #region Constructors
+
+        public KnightPlayedLog() : base()
+        {
+            Action = CatanAction.PlayedDevCard;
+            DevCard = DevCardType.Knight;
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public int PickedTileIndex { get; set; } = -1;
+        public int PreviousTileIndex { get; set; } = -1;
+        public ResourceType ResourceAcquired { get; set; }
+        public string Victim { get; set; } = "";
+
+        #endregion Properties
+
+        // who got targetted
+        // what got stolen
+        // where did the Baron land
+        // where did the Baron come from
+    }
+
     public class PlayedDevCardModel : LogHeader
     {
-        public DevCardType DevCard { get; set; } = DevCardType.Unknown;
+        #region Constructors
+
         public PlayedDevCardModel() : base()
         {
             Action = CatanAction.PlayedDevCard;
         }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public DevCardType DevCard { get; set; } = DevCardType.Unknown;
+
+        #endregion Properties
+
+        #region Methods
+
         //
         //  this allows us to deal with the polymorphic deserialization of these log records
-        //  "json" has the full object graph of the LogHeader, PlayedDevCardModel, and any 
+        //  "json" has the full object graph of the LogHeader, PlayedDevCardModel, and any
         //  derived class
         //
         static public PlayedDevCardModel Deserialize(object unparsedJson)
@@ -32,14 +69,18 @@ namespace Catan10
                 case DevCardType.Knight:
                     KnightPlayedLog pk = CatanProxy.Deserialize<KnightPlayedLog>(json);
                     return pk as PlayedDevCardModel;
+
                 case DevCardType.YearOfPlenty:
                     PlayedPlayedYearOfPlentyLog yop = CatanProxy.Deserialize<PlayedPlayedYearOfPlentyLog>(json);
                     return yop as PlayedDevCardModel;
+
                 case DevCardType.RoadBuilding:
                     return CatanProxy.Deserialize<PlayedDevCardModel>(json);
+
                 case DevCardType.Monopoly:
                     PlayedMonopoly mono = CatanProxy.Deserialize<PlayedMonopoly>(json);
                     return mono as PlayedMonopoly;
+
                 case DevCardType.Back:
                 case DevCardType.Unknown:
                 case DevCardType.VictoryPoint:
@@ -49,38 +90,44 @@ namespace Catan10
 
             return null;
         }
+
+        #endregion Methods
     }
 
     public class PlayedMonopoly : PlayedDevCardModel
     {
-        public ResourceType ResourceType { get; set; } = ResourceType.None;
-        public Dictionary<string, int> PlayerToCardCount { get; set; } = new Dictionary<string, int>();
+        #region Constructors
+
         public PlayedMonopoly() : base()
         {
             DevCard = DevCardType.Monopoly;
         }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public Dictionary<string, int> PlayerToCardCount { get; set; } = new Dictionary<string, int>();
+        public ResourceType ResourceType { get; set; } = ResourceType.None;
+
+        #endregion Properties
     }
 
     public class PlayedPlayedYearOfPlentyLog : PlayedDevCardModel
     {
-        public TradeResources Acquired { get; set; } = null;
+        #region Constructors
+
         public PlayedPlayedYearOfPlentyLog() : base()
         {
             DevCard = DevCardType.YearOfPlenty;
         }
 
-    }
+        #endregion Constructors
 
-    public class KnightPlayedLog : PlayedDevCardModel
-    {
-        public string Victim { get; set; } = "";                // who got targetted
-        public ResourceType ResourceAcquired { get; set; }      // what got stolen
-        public int PreviousTileIndex { get; set; } = -1;        // where did the Baron land
-        public int PickedTileIndex { get; set; } = -1;          // where did the Baron come from
-        public KnightPlayedLog() : base()
-        {
-            Action = CatanAction.PlayedDevCard;
-            DevCard = DevCardType.Knight;
-        }
+        #region Properties
+
+        public TradeResources Acquired { get; set; } = null;
+
+        #endregion Properties
     }
 }

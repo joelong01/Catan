@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
-using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -13,75 +11,77 @@ namespace Catan10
 {
     public sealed partial class NewGameDlg : ContentDialog
     {
-        public ObservableCollection<PlayerModel> PlayingPlayers { get; } = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<PlayerModel> AvailablePlayers { get; } = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<CatanGameCtrl> AvailableGames { get; } = new ObservableCollection<CatanGameCtrl>();
+        #region Methods
 
-
-        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(CatanGameCtrl), typeof(NewGameDlg), new PropertyMetadata(null));
-        public static readonly DependencyProperty SaveFileNameProperty = DependencyProperty.Register("SaveFileName", typeof(string), typeof(NewGameDlg), new PropertyMetadata(""));
-        public string SaveFileName
+        private void GridView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
         {
-            get => (string)GetValue(SaveFileNameProperty);
-            set => SetValue(SaveFileNameProperty, value);
-        }
+            var source = PlayingPlayers;
+            var gridView = sender as GridView;
 
-        public CatanGameCtrl SelectedGame
-        {
-            get => (CatanGameCtrl)GetValue(SelectedGameProperty);
-            set => SetValue(SelectedGameProperty, value);
-        }
-
-
-        public int SelectedIndex => AvailableGames.IndexOf(SelectedGame);
-
-
-
-        public NewGameDlg()
-        {
-            this.InitializeComponent();
-            this.DataContext = PlayingPlayers;
-        }
-        public NewGameDlg(IList<PlayerModel> playerData, IList<CatanGameCtrl> games)
-        {
-            this.InitializeComponent();
-            AvailablePlayers.AddRange(playerData);
-            AvailableGames.AddRange(games);
-            SelectedGame = AvailableGames[0];
-            this.DataContext = this;
-
-
-
-        }
-
-
-        private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-
-            if (SaveFileName == "")
+            if (gridView.Name == "GridView_AvailablePlayers")
             {
-                return;
+                source = AvailablePlayers;
             }
+            List<PlayerModel> movedPlayers = new List<PlayerModel>();
+            foreach (PlayerModel p in e.Items)
+            {
+                movedPlayers.Add(p);
+            }
+            if (movedPlayers.Count == 0) return;
 
-
+            e.Data.Properties.Add("movedPlayers", movedPlayers);
+            e.Data.Properties.Add("source", source);
         }
 
         private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
         }
 
-
-
-        private void SetThickness(object target, double thickness)
+        private void OnDrageEnter(object target, DragEventArgs e)
         {
-            if (target.GetType() == typeof(Grid))
+            SetThickness(target, 3);
+        }
+
+        private void OnDragLeave(object sender, DragEventArgs e)
+        {
+            SetThickness(sender, 1);
+        }
+
+        private void OnDragOver(object sender, DragEventArgs e)
+        {
+            e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
+            e.DragUIOverride.IsGlyphVisible = false;
+            e.DragUIOverride.IsCaptionVisible = false;
+        }
+
+        private void OnDrop(object sender, DragEventArgs e)
+        {
+            var target = PlayingPlayers;
+            var gridView = sender as GridView;
+
+            if (gridView.Name == "GridView_AvailablePlayers")
             {
-                ((Grid)target).BorderThickness = new Thickness(thickness);
+                target = AvailablePlayers;
             }
-            else if (target.GetType() == typeof(GridView))
+
+            var source = e.Data.Properties["source"];
+            if (source == target)
             {
-                ((GridView)target).BorderThickness = new Thickness(thickness);
+                e.Handled = false;
+                return;
             }
+            IEnumerable<PlayerModel> movedPlayers = e.Data.Properties["movedPlayers"] as IEnumerable<PlayerModel>;
+            ObservableCollection<PlayerModel> sourcePlayers = e.Data.Properties["source"] as ObservableCollection<PlayerModel>;
+            foreach (var player in movedPlayers)
+            {
+                bool ret = sourcePlayers.Remove(player);
+                if (!ret)
+                {
+                    throw new ArgumentException("A player to be moved wasn't in the source collection.");
+                }
+                target.Add(player);
+            }
+            e.Handled = true;
         }
 
         private void OnGameChanged(object sender, SelectionChangedEventArgs e)
@@ -99,87 +99,74 @@ namespace Catan10
             SaveFileName = String.Format($"{dt.TimeOfDay.Hours % 12}.{min} {ampm} - {SelectedGame.Description}");
         }
 
-       
-
-        private void OnDragOver(object sender, DragEventArgs e)
+        private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
-            e.DragUIOverride.IsGlyphVisible = false;
-            e.DragUIOverride.IsCaptionVisible = false;
-
-        }
-
-        private void OnDrageEnter(object target, DragEventArgs e)
-        {
-            SetThickness(target, 3);
-
-        }
-
-        private void OnDragLeave(object sender, DragEventArgs e)
-        {
-            SetThickness(sender, 1);
-
-        }
-
-        private void GridView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
-        {
-            var source = PlayingPlayers;
-            var gridView = sender as GridView;
-
-            if (gridView.Name == "GridView_AvailablePlayers")
+            if (SaveFileName == "")
             {
-                source = AvailablePlayers;
-
-            }
-            List<PlayerModel> movedPlayers = new List<PlayerModel>();
-            foreach (PlayerModel p in e.Items)
-            {
-                movedPlayers.Add(p);
-            }
-            if (movedPlayers.Count == 0) return;
-
-            e.Data.Properties.Add("movedPlayers", movedPlayers);
-            e.Data.Properties.Add("source", source);
-
-        }
-
-        private void OnDrop(object sender, DragEventArgs e)
-        {
-            var target = PlayingPlayers;
-            var gridView = sender as GridView;
-
-            if (gridView.Name == "GridView_AvailablePlayers")
-            {
-                target = AvailablePlayers;
-
-            }
-
-            var source = e.Data.Properties["source"];
-            if (source == target )
-            {
-                e.Handled = false;
                 return;
             }
-            IEnumerable<PlayerModel> movedPlayers = e.Data.Properties["movedPlayers"] as IEnumerable<PlayerModel>;
-            ObservableCollection<PlayerModel> sourcePlayers = e.Data.Properties["source"] as ObservableCollection<PlayerModel>;
-            foreach (var player in movedPlayers)
-            {
-                bool ret = sourcePlayers.Remove(player);
-                if (!ret)
-                {
-                    throw new ArgumentException("A player to be moved wasn't in the source collection.");
-                }
-                target.Add(player);
-            }
-            e.Handled = true;
-
         }
 
-      
+        private void SetThickness(object target, double thickness)
+        {
+            if (target.GetType() == typeof(Grid))
+            {
+                ((Grid)target).BorderThickness = new Thickness(thickness);
+            }
+            else if (target.GetType() == typeof(GridView))
+            {
+                ((GridView)target).BorderThickness = new Thickness(thickness);
+            }
+        }
 
-       
+        #endregion Methods
 
-       
+        #region Fields
 
+        public static readonly DependencyProperty SaveFileNameProperty = DependencyProperty.Register("SaveFileName", typeof(string), typeof(NewGameDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(CatanGameCtrl), typeof(NewGameDlg), new PropertyMetadata(null));
+
+        #endregion Fields
+
+        #region Constructors
+
+        public NewGameDlg()
+        {
+            this.InitializeComponent();
+            this.DataContext = PlayingPlayers;
+        }
+
+        public NewGameDlg(IList<PlayerModel> playerData, IList<CatanGameCtrl> games)
+        {
+            this.InitializeComponent();
+            AvailablePlayers.AddRange(playerData);
+            AvailableGames.AddRange(games);
+            SelectedGame = AvailableGames[0];
+            this.DataContext = this;
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public ObservableCollection<CatanGameCtrl> AvailableGames { get; } = new ObservableCollection<CatanGameCtrl>();
+        public ObservableCollection<PlayerModel> AvailablePlayers { get; } = new ObservableCollection<PlayerModel>();
+        public ObservableCollection<PlayerModel> PlayingPlayers { get; } = new ObservableCollection<PlayerModel>();
+
+        public string SaveFileName
+        {
+            get => (string)GetValue(SaveFileNameProperty);
+            set => SetValue(SaveFileNameProperty, value);
+        }
+
+        public CatanGameCtrl SelectedGame
+        {
+            get => (CatanGameCtrl)GetValue(SelectedGameProperty);
+            set => SetValue(SelectedGameProperty, value);
+        }
+
+        public int SelectedIndex => AvailableGames.IndexOf(SelectedGame);
+
+        #endregion Properties
     }
 }

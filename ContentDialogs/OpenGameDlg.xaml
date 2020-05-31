@@ -18,9 +18,7 @@
             <Setter Property="Visibility" Value="Visible" />
             <Setter Property="RenderTransformOrigin" Value=".5 .5" />
             <Setter Property="FontSize" Value="20" />
-
         </Style>
-
     </ContentDialog.Resources>
     <Grid Name="LayoutRoot">
         <Grid.ColumnDefinitions>
@@ -28,16 +26,7 @@
             <ColumnDefinition Width="779*" />
         </Grid.ColumnDefinitions>
 
-
-
-
-
-
         <Viewbox Grid.Column="1">
-
-
-
-
 
             <local:GameContainerCtrl x:Name="_gameView" Height="629" Canvas.ZIndex="-1"
                 RenderTransformOrigin="0.5,0.5" IsEnabled="False">
@@ -45,20 +34,8 @@
                     <CompositeTransform ScaleX=".5" ScaleY=".5" />
                 </local:GameContainerCtrl.RenderTransform>
             </local:GameContainerCtrl>
-
-
-
-
-
-
         </Viewbox>
 
-
-
-
-
-
         <ListBox x:Name="_lbGames" ItemsSource="{x:Bind SavedGames}" SelectionChanged="Game_SelectionChanged" />
-
     </Grid>
 </ContentDialog>

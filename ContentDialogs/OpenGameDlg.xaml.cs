@@ -9,23 +9,42 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-
-
-
-
     public sealed partial class OpenGameDlg : ContentDialog
     {
-        public ObservableCollection<string> SavedGames { get; set; } = new ObservableCollection<string>();
+        #region Methods
 
+        private void ContentDialog_OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+        }
+
+        private void ContentDialog_OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+        }
+
+        private void Game_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+        }
+
+        #endregion Methods
+
+        #region Constructors
 
         public OpenGameDlg()
         {
             this.InitializeComponent();
         }
 
+        #endregion Constructors
+
+        #region Properties
+
+        public string SavedGame => _lbGames.SelectedValue as String;
+        public ObservableCollection<string> SavedGames { get; set; } = new ObservableCollection<string>();
+
+        #endregion Properties
+
         public async Task LoadGames()
         {
-
             QueryOptions queryOptions = new QueryOptions(CommonFileQuery.DefaultQuery, new[] { MainPage.SAVED_GAME_EXTENSION })
             {
                 FolderDepth = FolderDepth.Shallow
@@ -38,26 +57,5 @@ namespace Catan10
                 SavedGames.Add(file.Name);
             }
         }
-
-        public string SavedGame => _lbGames.SelectedValue as String;
-
-        private void ContentDialog_OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-
-        }
-
-        private void ContentDialog_OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-
-        }
-
-        private void Game_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-
     }
-
-
 }

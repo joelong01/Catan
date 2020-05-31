@@ -1,25 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
 using Catan.Proxy;
 
 namespace Catan10
 {
-
-
     public class RollOrderLog : LogHeader, ILogController
     {
+        #region Constructors
+
         public RollOrderLog() : base()
         {
-            
         }
+
+        #endregion Constructors
+
+        #region Properties
 
         public List<RollModel> Rolls { get; set; } = new List<RollModel>();
 
+        #endregion Properties
+
+        #region Methods
 
         public static async Task PostMessage(IGameController gameController, List<RollModel> rolls)
         {
@@ -28,12 +32,10 @@ namespace Catan10
             RollOrderLog logHeader = new RollOrderLog()
             {
                 CanUndo = false,
-                Action = CatanAction.Rolled,                                
+                Action = CatanAction.Rolled,
                 Rolls = rolls,
                 SentBy = gameController.TheHuman.PlayerName
-
             };
-
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
@@ -41,7 +43,7 @@ namespace Catan10
         public async Task Do(IGameController gameController)
         {
             gameController.ShowRollsInPublicUi();
-            bool finished =  await gameController.DetermineRollOrder(this);
+            bool finished = await gameController.DetermineRollOrder(this);
             if (finished)
             {
                 await WaitingForRollOrderToBeginResourceAllocation.PostLog(gameController);
@@ -57,9 +59,12 @@ namespace Catan10
         {
             return $"[DiceOne={Rolls[0].DiceOne}][DiceTwo={Rolls[0].DiceTwo}]" + base.ToString();
         }
+
         public Task Undo(IGameController gameController)
         {
             throw new NotImplementedException();
         }
+
+        #endregion Methods
     }
 }

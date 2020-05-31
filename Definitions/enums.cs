@@ -123,14 +123,17 @@
     public enum TargetWeapon { PirateShip, Baron };
 
     public enum TileDisplay { Normal, Gold };
+
     public enum TileLocation { Self = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
 
     public enum TileOrientation { FaceDown, FaceUp, None };
+
     //
     //  actions are things we can undo
 
     // typical animation speeds in ms
 
     public enum UndoOrder { PreviousThenUndo, UndoNoPrevious, None };
+
     public enum ValidNumbers { Two = 2, Three = 3, Four = 4, Five = 5, Six = 6, Seven = 7, Eight = 8, Nine = 9, Ten = 10, Eleven = 11, Twelve = 12 };
 }

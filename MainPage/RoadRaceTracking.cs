@@ -1,8 +1,7 @@
-﻿using Catan.Proxy;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+
+using Catan.Proxy;
 
 namespace Catan10
 {
@@ -13,73 +12,83 @@ namespace Catan10
     /// </summary>
     public class RoadRaceTracking
     {
+        #region Fields
+
+        // we can make lots of little changes - instead of logging all of them, we log at the end of them
+        private string _beginState = "";
+
+        private IGameController GameController = null;
+
+        #endregion Fields
+
+        #region Methods
+
+        internal void BeginChanges()
+        {
+            _beginState = this.Serialize();
+        }
+
+        internal void EndChanges(PlayerModel player, GameState gameState)
+        {
+            string newState = this.Serialize();
+            if (newState == _beginState) // no changes == don't log
+            {
+                return;
+            }
+
+            if (Log != null)
+            {
+                //  _log.PostLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
+            }
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public RoadRaceTracking(IGameController gameController)
+        {
+            GameController = gameController;
+        }
+
+        public RoadRaceTracking()
+        {
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        //
+        //  i'm trying to have the class take care of its own logging when state changes
+        private NewLog Log => GameController.Log;
+
         //
         //  given a road count, get the ordered list of players that have that many roads
         //  First() will be the one that got their first.
         //
         public Dictionary<string, List<PlayerModel>> RaceDictionary { get; set; } = new Dictionary<string, List<PlayerModel>>();
 
-        //
-        //  i'm trying to have the class take care of its own logging when state changes
+        #endregion Properties
 
-        IGameController GameController = null;
-        // we can make lots of little changes - instead of logging all of them, we log at the end of them
-        private string _beginState = "";
-
-        private NewLog Log => GameController.Log;
-
-        public RoadRaceTracking(IGameController gameController)
+        public static RoadRaceTracking Deserialize(string json)
         {
-            GameController = gameController;
+            return CatanProxy.Deserialize<RoadRaceTracking>(json);
         }
-        public RoadRaceTracking() { }
 
         public void AddPlayer(PlayerModel player, int roadCount)
         {
-
             if (!RaceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
             {
                 list = new List<PlayerModel>();
                 RaceDictionary[roadCount.ToString()] = list;
-
             }
 
             if (!list.Contains(player))
             {
                 list.Add(player);
-
             }
-
-
         }
-
-
-        //
-        //  Removes the player from the list and returns the old value it had
-        //  -1 if it wasn't there.
-        public int RemovePlayer(PlayerModel player, int roadCount)
-        {
-            int oldIndex = -1;
-
-            if (RaceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
-            {
-
-                if (list != null)
-                {
-                    oldIndex = list.IndexOf(player);
-                    list.Remove(player);
-
-
-                    if (list.Count == 0)
-                    {
-                        RaceDictionary.Remove(roadCount.ToString());
-
-                    }
-                }
-            }
-            return oldIndex;
-        }
-
 
         public PlayerModel GetRaceWinner(int roadCount)
         {
@@ -90,51 +99,49 @@ namespace Catan10
             }
             return null;
         }
+
         //
-        //  serializes into the form of 
-        //  roadCount=id1,id2,id3;roadCount=id2,id3;
-        //  5=3,2,1;6=2,1
-        //
-        //  
-        public string Serialize(bool indent = false)
+        //  Removes the player from the list and returns the old value it had
+        //  -1 if it wasn't there.
+        public int RemovePlayer(PlayerModel player, int roadCount)
         {
-            return CatanProxy.Serialize(this, indent);
-           
+            int oldIndex = -1;
+
+            if (RaceDictionary.TryGetValue(roadCount.ToString(), out List<PlayerModel> list))
+            {
+                if (list != null)
+                {
+                    oldIndex = list.IndexOf(player);
+                    list.Remove(player);
+
+                    if (list.Count == 0)
+                    {
+                        RaceDictionary.Remove(roadCount.ToString());
+                    }
+                }
+            }
+            return oldIndex;
         }
-        public override string ToString()
-        {
-            return this.Serialize(false);
-        }
+
         public void Reset()
         {
             RaceDictionary.Clear();
         }
-        public static RoadRaceTracking Deserialize(string json)
-        {
-            return CatanProxy.Deserialize<RoadRaceTracking>(json);
 
+        //
+        //  serializes into the form of
+        //  roadCount=id1,id2,id3;roadCount=id2,id3;
+        //  5=3,2,1;6=2,1
+        //
+        //
+        public string Serialize(bool indent = false)
+        {
+            return CatanProxy.Serialize(this, indent);
         }
 
-        internal void BeginChanges()
+        public override string ToString()
         {
-            _beginState = this.Serialize();
-        }
-
-        internal void EndChanges(PlayerModel player, GameState gameState)
-        {
-
-            string newState = this.Serialize();
-            if (newState == _beginState) // no changes == don't log
-            {
-                return;
-            }
-
-            if (Log != null)
-            {
-              //  _log.PostLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
-            }
+            return this.Serialize(false);
         }
     }
-
-
 }

@@ -19,6 +19,8 @@ namespace Catan10
     /// </summary>
     public class DoneAllocResourcesToWaitingForNext : LogHeader, ILogController
     {
+        #region Methods
+
         public static async Task PostLog(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.DoneResourceAllocation);
@@ -64,5 +66,7 @@ namespace Catan10
         {
             return gameController.Log.RollLog.UndoRoll();
         }
+
+        #endregion Methods
     }
 }

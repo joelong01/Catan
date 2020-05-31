@@ -3,7 +3,6 @@ using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-using Windows.Gaming.Input;
 
 namespace Catan10
 {
@@ -14,8 +13,15 @@ namespace Catan10
     /// </summary>
     public class VerifyPlayers : LogHeader, ILogController
     {
-        public List<PlayerModel> PlayingPlayers { get; set; }
+        #region Properties
+
         public PlayerModel CurrentPlayer { get; set; }
+        public List<PlayerModel> PlayingPlayers { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
         public static async Task PostMessage(IGameController gameController)
         {
             var log = new VerifyPlayers()
@@ -24,15 +30,15 @@ namespace Catan10
                 LogType = LogType.DoNotLog,
                 PlayingPlayers = gameController.PlayingPlayers,
                 CurrentPlayer = gameController.CurrentPlayer
-
             };
 
             await gameController.PostMessage(log, CatanMessageType.Normal);
         }
+
         public Task Do(IGameController gameController)
         {
             Contract.Assert(this.PlayingPlayers.Count == gameController.PlayingPlayers.Count);
-            for (int i=0; i<PlayingPlayers.Count; i++)
+            for (int i = 0; i < PlayingPlayers.Count; i++)
             {
                 Contract.Assert(this.PlayingPlayers[i].PlayerName == gameController.PlayingPlayers[i].PlayerName);
             }
@@ -49,5 +55,7 @@ namespace Catan10
         {
             throw new System.NotImplementedException();
         }
+
+        #endregion Methods
     }
 }

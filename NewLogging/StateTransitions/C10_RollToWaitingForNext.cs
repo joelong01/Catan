@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -13,18 +12,10 @@ namespace Catan10
     /// </summary>
     public class WaitingForRollToWaitingForNext : LogHeader, ILogController
     {
-        public WaitingForRollToWaitingForNext() : base()
-        {
-
-        }
-
-        public List<RollModel> Rolls { get; set; } = new List<RollModel>();
-        public List<int> GoldTiles { get; set; } // set in Do() prior to logging because we need to Push the roll before we get the Tiles
-
+        #region Methods
 
         internal static async Task PostLog(IGameController gameController, List<RollModel> rolls)
         {
-
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
 
             WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
@@ -32,14 +23,31 @@ namespace Catan10
                 CanUndo = true,
                 GoldTiles = gameController.CurrentRandomGoldTiles,
                 Rolls = rolls,
-                Action = CatanAction.ChangedState,                
+                Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForNext,
-               
-
             };
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public WaitingForRollToWaitingForNext() : base()
+        {
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public List<int> GoldTiles { get; set; }
+        public List<RollModel> Rolls { get; set; } = new List<RollModel>();
+
+        #endregion Properties
+
+        // set in Do() prior to logging because we need to Push the roll before we get the Tiles
         /// <summary>
         ///     a Roll has come in to this machine -- it can come from any machine (including this one)
         ///     update *all* players
@@ -56,7 +64,7 @@ namespace Catan10
             //  get the player and make sure they are playing
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(sentBy != null);
-            
+
             //
             //  what roll did the user pick?
             //  make sure it is valid, otherwise there is a bug
@@ -65,9 +73,8 @@ namespace Catan10
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
 
-            
             IRollLog rollLog = gameController.RollLog;
-            
+
             //
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
@@ -77,7 +84,6 @@ namespace Catan10
             {
                 await WaitingForNextToMustRollBaron.PostLog(gameController);
             }
-
         }
 
         public Task Redo(IGameController gameController)
@@ -104,10 +110,6 @@ namespace Catan10
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
 
             await gameController.Log.RollLog.UndoRoll();
-            
-        
-
-
         }
     }
 }

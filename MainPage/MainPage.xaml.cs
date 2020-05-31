@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
 
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Search;
-using Windows.Storage.Streams;
 using Windows.System;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
@@ -32,6 +26,8 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        #region Fields
+
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
         private readonly RoadRaceTracking _raceTracking = null;
@@ -51,55 +47,10 @@ namespace Catan10
         private int _showPipGroupIndex = 0;
 
         private TaskCompletionSource<object> fileGuard = null;
-        public const string PlayerDataFile = "catansettings.json";
 
-        // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
-        //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(MainPage.Current), MainPageModelChanged));
+        #endregion Fields
 
-        public static readonly string SAVED_GAME_EXTENSION = ".log.json";
-
-        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
-
-        public MainPage()
-        {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-            this.InitializeComponent();
-            Current = this;
-            this.DataContext = this;
-            _raceTracking = new RoadRaceTracking(this);
-            
-        }
-
-        // this lets you double tap a map and then move it around
-        // the index into PlayingPlayers that is the CurrentPlayer
-        public static MainPage Current { get; private set; }
-
-        public GameType GameType
-        {
-            get => _gameView.CurrentGame.GameType;
-            set
-            {
-            }
-        }
-
-        public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
-
-        public MainPageModel MainPageModel
-        {
-            get => (MainPageModel)GetValue(MainPageModelProperty);
-            set => SetValue(MainPageModelProperty, value);
-        }
-
-        
-        public StorageFolder SaveFolder { get; set; } = null;
-
-        // a global for the game
-        public PlayerModel TheHuman
-        {
-            get => (PlayerModel)GetValue(TheHumanProperty);
-            set => SetValue(TheHumanProperty, value);
-        }
+        #region Methods
 
         private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -111,7 +62,7 @@ namespace Catan10
         private Task AddPlayer(PlayerModel pData, LogType logType)
         {
             MainPageModel.PlayingPlayers.Add(pData);
-            
+
             AddPlayerMenu(pData);
             pData.Reset();
             //
@@ -121,14 +72,8 @@ namespace Catan10
             pData.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
             pData.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
 
-            
             return Task.CompletedTask;
         }
-
-
-       
-
-       
 
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
@@ -143,8 +88,6 @@ namespace Catan10
                 OnGridPositionChanged("_gameView", new GridPosition(_transformGameView));
             }
         }
-
-        
 
         /// <summary>
         ///     return a Dictionary of PipGroup to a List of Building that have that number of Pips
@@ -284,8 +227,6 @@ namespace Catan10
             await SaveGridLocations();
         }
 
-        
-
         private async Task HideAllPipEllipses()
         {
             foreach (BuildingCtrl s in _gameView.CurrentGame.HexPanel.Buildings)
@@ -369,8 +310,6 @@ namespace Catan10
             //}
         }
 
-       
-
         private async void OnAssignNumbers(object sender, RoutedEventArgs e)
         {
             if (CurrentGameState != GameState.BeginResourceAllocation)
@@ -435,7 +374,6 @@ namespace Catan10
             }
         }
 
-
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
         }
@@ -454,7 +392,6 @@ namespace Catan10
             }
         }
 
-      
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
@@ -660,7 +597,6 @@ namespace Catan10
             await PickSettlementsAndRoads();
         }
 
-        
         private async Task<MainPageModel> ReadMainPageModelOffDisk()
         {
             if (SaveFolder == null)
@@ -719,7 +655,7 @@ namespace Catan10
 
             // _lbGames.SelectedValue = MainPageModel.Log;
             await ResetTiles(true);
-            
+
             _stateStack.Clear();
 
             foreach (PlayerModel player in MainPageModel.AllPlayers)
@@ -728,8 +664,6 @@ namespace Catan10
             }
 
             _raceTracking.Reset();
-
-            
         }
 
         private void ResetDataForNewGame()
@@ -739,7 +673,6 @@ namespace Catan10
 
             foreach (PlayerModel p in MainPageModel.PlayingPlayers)
             {
-              
                 p.Reset();
             }
             MainPageModel.PlayingPlayers.Clear();
@@ -919,8 +852,6 @@ namespace Catan10
             await SaveGameState();
         }
 
-     
-
         private async Task VisualShuffle(RandomBoardSettings rbs = null)
         {
             await _gameView.VisualShuffle(rbs);
@@ -954,6 +885,55 @@ namespace Catan10
             await WsConnect();
         }
 
+        #endregion Methods
+
+        public const string PlayerDataFile = "catansettings.json";
+
+        // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
+        //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(MainPage.Current), MainPageModelChanged));
+
+        public static readonly string SAVED_GAME_EXTENSION = ".log.json";
+
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
+
+        public MainPage()
+        {
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            this.InitializeComponent();
+            Current = this;
+            this.DataContext = this;
+            _raceTracking = new RoadRaceTracking(this);
+        }
+
+        // this lets you double tap a map and then move it around
+        // the index into PlayingPlayers that is the CurrentPlayer
+        public static MainPage Current { get; private set; }
+
+        public GameType GameType
+        {
+            get => _gameView.CurrentGame.GameType;
+            set
+            {
+            }
+        }
+
+        public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
+
+        public MainPageModel MainPageModel
+        {
+            get => (MainPageModel)GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
+
+        public StorageFolder SaveFolder { get; set; } = null;
+
+        // a global for the game
+        public PlayerModel TheHuman
+        {
+            get => (PlayerModel)GetValue(TheHumanProperty);
+            set => SetValue(TheHumanProperty, value);
+        }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
         {
@@ -992,8 +972,6 @@ namespace Catan10
             return files;
         }
 
-      
-
         public void UpdateBoardMeasurements()
         {
             PipCount = GetPipCount();
@@ -1010,6 +988,5 @@ namespace Catan10
 
             MainPageModel.SetPipCount(pipCount);
         }
-
     }
 }

@@ -31,7 +31,6 @@
                 <Style TargetType="GridViewItem">
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="5" />
-
                 </Style>
             </GridView.ItemContainerStyle>
         </GridView>

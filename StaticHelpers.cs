@@ -28,6 +28,8 @@ namespace Catan10
 {
     public static class ICollectionExtensions
     {
+        #region Methods
+
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> that)
         {
             if (that == null) return;
@@ -63,10 +65,14 @@ namespace Catan10
             list[firstIndex] = list[secondIndex];
             list[secondIndex] = temp;
         }
+
+        #endregion Methods
     }
 
     public static class StaticHelpers
     {
+        #region Fields
+
         public const string kvpSeperator = "=";
 
         public const char kvpSeperatorChar = '=';
@@ -83,16 +89,32 @@ namespace Catan10
 
         public const string propertySeperator = ",";
 
+        #endregion Fields
+
+        #region Interfaces
+
         //
         //  an interface called by the drag and drop code so we can simlulate the DragOver behavior
         public interface IDragAndDropProgress
         {
+            #region Methods
+
             void PointerUp(Point value);
 
             void Report(Point value);
+
+            #endregion Methods
         }
 
+        #endregion Interfaces
+
+        #region Properties
+
         public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
+
+        #endregion Properties
+
+        #region Methods
 
         public static void AddDeltaToIntProperty<T>(this T t, string propName, int delta)
         {
@@ -1049,17 +1071,31 @@ namespace Catan10
             return false;
         }
 
+        #endregion Methods
+
+        #region Classes
+
         public class KeyValuePair
         {
+            #region Constructors
+
             public KeyValuePair(string key, string value)
             {
                 Key = key;
                 Value = value;
             }
 
+            #endregion Constructors
+
+            #region Properties
+
             public string Key { get; set; }
             public string Value { get; set; }
+
+            #endregion Properties
         }
+
+        #endregion Classes
 
         /*
                Given an file with the following form:
@@ -1337,6 +1373,8 @@ namespace Catan10
 
         #endregion File
 
+        #region Enums
+
         public enum StorageStrategies
         {
             /// <summary>Local, isolated folder</summary>
@@ -1348,6 +1386,10 @@ namespace Catan10
             /// <summary>Local, temporary folder (not for settings)</summary>
             Temporary
         }
+
+        #endregion Enums
+
+        #region Methods
 
         public static async Task DeleteFileFireAndForget(string key, StorageStrategies location)
         {
@@ -1413,6 +1455,8 @@ namespace Catan10
         {
             await WriteFileAsync(key, value, location);
         }
+
+        #endregion Methods
 
         // Usage: await button1.WhenClicked();
     }

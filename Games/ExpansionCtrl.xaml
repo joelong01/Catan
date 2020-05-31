@@ -6,8 +6,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="300" d:DesignWidth="400" mc:Ignorable="d">
 
-
-
     <Viewbox>
         <local:CatanHexPanel x:Name="_HexPanel" RowsPerColumn="3,4,5,6,5,4,3" NormalHeight="96"
             NormalWidth="110" UniformMargin="50" TileGap="1"
@@ -87,8 +85,6 @@
                 Index="29"
                 AdjacentHarbor="{Binding ElementName=Harbor_Wood}" />
 
-
-
             <local:Harbor x:Name="Harbor_Sheep" Width="50" Height="50" TileIndex="1"
                 HarborLocation="TopLeft" HarborType="Sheep" Orientation="FaceUp"
                 UseClassic="True" Index="0" />
@@ -122,8 +118,6 @@
             <local:Harbor x:Name="Harbor_TFO_6" Width="50" Height="50" TileIndex="28"
                 HarborLocation="TopRight" HarborType="ThreeForOne" Orientation="FaceUp"
                 UseClassic="True" Index="10" />
-
         </local:CatanHexPanel>
     </Viewbox>
-
 </UserControl>

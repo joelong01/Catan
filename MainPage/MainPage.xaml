@@ -13,7 +13,6 @@
                 Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
                 Storyboard.TargetName="_ctrlSettings" To="0" Duration="0:0:0.250" />
         </Storyboard>
-
         <Storyboard x:Name="_sbNumberOpacity">
             <DoubleAnimation x:Name="_daNumberOpacity" d:IsOptimized="True" AutoReverse="False"
                 Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="RollGrid"
@@ -27,7 +26,6 @@
                 Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)"
                 Storyboard.TargetName="_rollHistoryChart" To="0" Duration="0:0:1" />
         </Storyboard>
-
         <Style x:Key="RollGridTextStyle" TargetType="TextBlock">
             <Setter Property="Margin" Value="2,-2" />
             <Setter Property="HorizontalAlignment" Value="Center" />
@@ -58,7 +56,6 @@
             CornerRadius="50"
             BorderBrush="{StaticResource bmMaple}"
             BorderThickness="6">
-
             <Button Visibility="Collapsed">
                 <Button.Flyout>
                     <MenuFlyout x:Name="_menuBaron" Placement="Right" />
@@ -133,7 +130,6 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-
             <local:GameContainerCtrl x:Name="_gameView" DoubleTapped="GameViewControlDoubleTapped" Canvas.ZIndex="-1"
                 RenderTransformOrigin="0.5,0.5" IsEnabled="True"
                 PointerPressed="GameViewControlPointerPressed">
@@ -141,7 +137,6 @@
                     <CompositeTransform x:Name="_transformGameView" TranslateX="{x:Bind MainPageModel.Settings.GameViewPosition.TranslateX, Mode=TwoWay}" TranslateY="{x:Bind MainPageModel.Settings.GameViewPosition.TranslateY, Mode=TwoWay}" />
                 </local:GameContainerCtrl.RenderTransform>
             </local:GameContainerCtrl>
-
             <local:DragableGridCtrl Name="Draggable_PrivateData" Width="360" HorizontalAlignment="Center"
                 VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
                 Player="{x:Bind TheHuman, Mode=OneWay}"
@@ -174,7 +169,6 @@
                                 IsEnabled="{x:Bind MainPageModel.EnableNextButton, Mode=OneWay}" />
                             <TextBlock Style="{StaticResource ControlGridTextStyle}" Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" />
                         </StackPanel>
-
                         <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
                             <StackPanel Orientation="Vertical">
                                 <Button x:Name="_btnUndo" Content="&#xE10E;"
@@ -223,7 +217,6 @@
                     </StackPanel>
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-
             <local:DragableGridCtrl x:Name="Grid_RollStats" Width="175" HorizontalAlignment="Center"
                 VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
                 Background="{StaticResource bmMaple}"
@@ -233,7 +226,6 @@
                 Caption="{x:Bind CurrentPlayer.PlayerName, Mode=OneWay}"
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
-
                     <Viewbox Grid.Row="1" Height="400" Margin="0" HorizontalAlignment="Stretch">
                         <StackPanel>
                             <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
@@ -380,11 +372,9 @@
                             </TransitionCollection>
                         </local:BoardMeasurementCtrl.Transitions>
                     </local:BoardMeasurementCtrl>
-
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <!--  Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"  -->
-
             <local:DragableGridCtrl x:Name="SynchronizedRolls" Width="360" HorizontalAlignment="Center"
                 VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
                 Background="{StaticResource bmMaple}"
@@ -398,7 +388,6 @@
                     <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" OnShowAllRolls="OnShowAllRolls" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-
             <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"
                 HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="9999"
                 IsActive="True" Visibility="Visible" />

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -10,24 +8,22 @@ using Catan.Proxy;
 
 namespace Catan10
 {
-
     public class LogHeader
     {
+        #region Constructors
+
         public LogHeader()
         {
             TypeName = this.GetType().FullName;
         }
-        public GameState NewState { get; set; } = MainPage.Current.CurrentGameState;
-        public GameState OldState { get; set; } = (MainPage.Current.MainPageModel.Log.PeekAction == null) ? GameState.WaitingForNewGame : MainPage.Current.MainPageModel.Log.PeekAction.NewState;
+
+        #endregion Constructors
+
+        #region Properties
 
         public CatanAction Action { get; set; }
-        public string SentBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
-        public DateTime Time { get; set; } = DateTime.Now;
         public bool CanUndo { get; set; } = true;
         public CatanGames CatanGame { get; set; } = MainPage.Current.GameContainer.CurrentGame.CatanGame;
-
-        [JsonIgnore]
-        public LogHeader Previous { get; set; } = MainPage.Current.MainPageModel.Log.PeekAction; // for debugging convinience
 
         [JsonIgnore]
         public bool LocallyCreated
@@ -42,13 +38,22 @@ namespace Catan10
 
         public Guid LogId { get; set; } = Guid.NewGuid();
         public LogType LogType { get; set; } = LogType.Normal;
+        public GameState NewState { get; set; } = MainPage.Current.CurrentGameState;
+        public GameState OldState { get; set; } = (MainPage.Current.MainPageModel.Log.PeekAction == null) ? GameState.WaitingForNewGame : MainPage.Current.MainPageModel.Log.PeekAction.NewState;
 
+        [JsonIgnore]
+        public LogHeader Previous { get; set; } = MainPage.Current.MainPageModel.Log.PeekAction;
 
-
+        public string SentBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
+        public DateTime Time { get; set; } = DateTime.Now;
+        // for debugging convinience
         // if state changes, you have to set this
 
-
         public string TypeName { get; set; }
+
+        #endregion Properties
+
+        #region Methods
 
         public static LogHeader Deserialize(JsonElement element)
         {
@@ -76,12 +81,14 @@ namespace Catan10
         {
             return $"[Type={TypeName}][Action={Action}][SentBy={SentBy}][OldState={OldState}][NewState={NewState}]";
         }
+
+        #endregion Methods
     }
-
-
 
     public class RandomBoardSettings
     {
+        #region Constructors
+
         public RandomBoardSettings()
         {
         }
@@ -91,6 +98,10 @@ namespace Catan10
             RandomHarborTypeList = Harbors;
             TileGroupToRandomListsDictionary = Tiles;
         }
+
+        #endregion Constructors
+
+        #region Properties
 
         //
         //  every Board has a random list of harbors
@@ -103,6 +114,10 @@ namespace Catan10
         // the int here is the TileGroup Index - System.Text.Json currently only Deserializes Dictionaries keyed by strings.
         //
         public Dictionary<string, RandomLists> TileGroupToRandomListsDictionary { get; set; } = new Dictionary<string, RandomLists>();
+
+        #endregion Properties
+
+        #region Methods
 
         public static RandomBoardSettings Deserialize(string saved)
         {
@@ -118,10 +133,14 @@ namespace Catan10
         {
             return Serialize();
         }
+
+        #endregion Methods
     }
 
     public class RandomLists
     {
+        #region Constructors
+
         public RandomLists()
         {
         }
@@ -137,8 +156,16 @@ namespace Catan10
             NumberList = numbers;
         }
 
+        #endregion Constructors
+
+        #region Properties
+
         public List<int> NumberList { get; set; } = null;
         public List<int> TileList { get; set; } = null;
+
+        #endregion Properties
+
+        #region Methods
 
         public static RandomLists Deserialize(string saved)
         {
@@ -149,7 +176,7 @@ namespace Catan10
         {
             return CatanProxy.Serialize<RandomLists>(this);
         }
+
+        #endregion Methods
     }
-
-
 }

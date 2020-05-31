@@ -17,7 +17,13 @@ namespace Catan10
 
     public class RoadCloneComparer : IEqualityComparer<RoadCtrl>
     {
+        #region Fields
+
         private readonly RoadKeyComparer roadKeyComparer = new RoadKeyComparer();
+
+        #endregion Fields
+
+        #region Methods
 
         //
         //  when are two Roads "equal"?  When they have at least one clone that matches
@@ -38,6 +44,8 @@ namespace Catan10
         {
             return obj.GetHashCode();
         }
+
+        #endregion Methods
     }
 
     /// <summary>
@@ -45,76 +53,15 @@ namespace Catan10
     /// </summary>
     public sealed partial class RoadCtrl : UserControl
     {
+        #region Fields
+
         private readonly Dictionary<RoadLocation, RoadLocationData> _locationToRoadDataDict = new Dictionary<RoadLocation, RoadLocationData>();
 
         private Ship _ship = null;
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty LocationProperty = DependencyProperty.Register("Location", typeof(RoadLocation), typeof(RoadCtrl), new PropertyMetadata(RoadLocation.None, LocationChanged));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty RoadStateProperty = DependencyProperty.Register("RoadState", typeof(RoadState), typeof(RoadCtrl), new PropertyMetadata(RoadState.Unowned, RoadStateChanged));
-        public static readonly DependencyProperty RoadTypeProperty = DependencyProperty.Register("RoadType", typeof(RoadType), typeof(RoadCtrl), new PropertyMetadata(RoadType.Single, RoadTypeChanged));
-        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty TileZeroZeroProperty = DependencyProperty.Register("TileZeroZero", typeof(Point), typeof(RoadCtrl), new PropertyMetadata(new Point(double.NaN, double.NaN), TileZeroZeroChanged));
 
-        public RoadCtrl()
-        {
-            this.InitializeComponent();
+        #endregion Fields
 
-            _locationToRoadDataDict[RoadLocation.None] = new RoadLocationData(0, 0, 0);
-            _locationToRoadDataDict[RoadLocation.Top] = new RoadLocationData(28, -6.5, 0);
-            _locationToRoadDataDict[RoadLocation.TopRight] = new RoadLocationData(69, 17.4, 60.5);
-            _locationToRoadDataDict[RoadLocation.BottomRight] = new RoadLocationData(69.6, 65.9, 119.5);
-            _locationToRoadDataDict[RoadLocation.Bottom] = new RoadLocationData(28, 90, 180);
-            _locationToRoadDataDict[RoadLocation.BottomLeft] = new RoadLocationData(-13.7, 66.8, 240.5);
-            _locationToRoadDataDict[RoadLocation.TopLeft] = new RoadLocationData(-13.2, 18.2, -60.5);
-        }
-
-        public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
-
-        public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
-        public IGameCallback Callback { get; internal set; }
-
-        public PlayerModel CurrentPlayer
-        {
-            get => (PlayerModel)GetValue(CurrentPlayerProperty);
-            set => SetValue(CurrentPlayerProperty, value);
-        }
-
-        public int Index { get; set; } = -1;
-        public bool IsOwned => (RoadState != RoadState.Unowned);
-        public List<RoadKey> Keys { get; set; } = new List<RoadKey>();
-
-        public RoadLocation Location
-        {
-            get => (RoadLocation)GetValue(LocationProperty);
-            set => SetValue(LocationProperty, value);
-        }
-
-        public int Number { get; internal set; } = 0; // number of roads that have been created for this player
-
-        public PlayerModel Owner
-        {
-            get => (PlayerModel)GetValue(OwnerProperty);
-            set => SetValue(OwnerProperty, value);
-        }
-
-        public RoadState RoadState
-        {
-            get => (RoadState)GetValue(RoadStateProperty);
-            set => SetValue(RoadStateProperty, value);
-        }
-
-        public RoadType RoadType
-        {
-            get => (RoadType)GetValue(RoadTypeProperty);
-            set => SetValue(RoadTypeProperty, value);
-        }
-
-        public Point TileZeroZero
-        {
-            get => (Point)GetValue(TileZeroZeroProperty);
-            set => SetValue(TileZeroZeroProperty, value);
-        }
+        #region Methods
 
         private static void LocationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -423,6 +370,76 @@ namespace Catan10
             Show(false);
         }
 
+        #endregion Methods
+
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty LocationProperty = DependencyProperty.Register("Location", typeof(RoadLocation), typeof(RoadCtrl), new PropertyMetadata(RoadLocation.None, LocationChanged));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty RoadStateProperty = DependencyProperty.Register("RoadState", typeof(RoadState), typeof(RoadCtrl), new PropertyMetadata(RoadState.Unowned, RoadStateChanged));
+        public static readonly DependencyProperty RoadTypeProperty = DependencyProperty.Register("RoadType", typeof(RoadType), typeof(RoadCtrl), new PropertyMetadata(RoadType.Single, RoadTypeChanged));
+        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty TileZeroZeroProperty = DependencyProperty.Register("TileZeroZero", typeof(Point), typeof(RoadCtrl), new PropertyMetadata(new Point(double.NaN, double.NaN), TileZeroZeroChanged));
+
+        public RoadCtrl()
+        {
+            this.InitializeComponent();
+
+            _locationToRoadDataDict[RoadLocation.None] = new RoadLocationData(0, 0, 0);
+            _locationToRoadDataDict[RoadLocation.Top] = new RoadLocationData(28, -6.5, 0);
+            _locationToRoadDataDict[RoadLocation.TopRight] = new RoadLocationData(69, 17.4, 60.5);
+            _locationToRoadDataDict[RoadLocation.BottomRight] = new RoadLocationData(69.6, 65.9, 119.5);
+            _locationToRoadDataDict[RoadLocation.Bottom] = new RoadLocationData(28, 90, 180);
+            _locationToRoadDataDict[RoadLocation.BottomLeft] = new RoadLocationData(-13.7, 66.8, 240.5);
+            _locationToRoadDataDict[RoadLocation.TopLeft] = new RoadLocationData(-13.2, 18.2, -60.5);
+        }
+
+        public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
+
+        public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
+        public IGameCallback Callback { get; internal set; }
+
+        public PlayerModel CurrentPlayer
+        {
+            get => (PlayerModel)GetValue(CurrentPlayerProperty);
+            set => SetValue(CurrentPlayerProperty, value);
+        }
+
+        public int Index { get; set; } = -1;
+        public bool IsOwned => (RoadState != RoadState.Unowned);
+        public List<RoadKey> Keys { get; set; } = new List<RoadKey>();
+
+        public RoadLocation Location
+        {
+            get => (RoadLocation)GetValue(LocationProperty);
+            set => SetValue(LocationProperty, value);
+        }
+
+        public int Number { get; internal set; } = 0; // number of roads that have been created for this player
+
+        public PlayerModel Owner
+        {
+            get => (PlayerModel)GetValue(OwnerProperty);
+            set => SetValue(OwnerProperty, value);
+        }
+
+        public RoadState RoadState
+        {
+            get => (RoadState)GetValue(RoadStateProperty);
+            set => SetValue(RoadStateProperty, value);
+        }
+
+        public RoadType RoadType
+        {
+            get => (RoadType)GetValue(RoadTypeProperty);
+            set => SetValue(RoadTypeProperty, value);
+        }
+
+        public Point TileZeroZero
+        {
+            get => (Point)GetValue(TileZeroZeroProperty);
+            set => SetValue(TileZeroZeroProperty, value);
+        }
+
         public LinearGradientBrush GetBackgroundBrush(PlayerModel owner, PlayerModel current)
         {
             if (owner != null)
@@ -435,8 +452,6 @@ namespace Catan10
             }
 
             return ConverterGlobals.GetLinearGradientBrush(Colors.HotPink, Colors.Black);
-
-
         }
 
         public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
@@ -482,23 +497,37 @@ namespace Catan10
 
     public class RoadKey
     {
+        #region Constructors
+
         public RoadKey(TileCtrl tile, RoadLocation loc)
         {
             Tile = tile;
             RoadLocation = loc;
         }
 
+        #endregion Constructors
+
+        #region Properties
+
         public RoadLocation RoadLocation { get; set; }
         public TileCtrl Tile { get; set; }
+
+        #endregion Properties
+
+        #region Methods
 
         public override string ToString()
         {
             return String.Format($"{Tile} {Tile.Index} {RoadLocation}");
         }
+
+        #endregion Methods
     }
 
     public class RoadKeyComparer : IEqualityComparer<RoadKey>
     {
+        #region Methods
+
         public bool Equals(RoadKey x, RoadKey y)
         {
             if (x.Tile.Index == y.Tile.Index)
@@ -515,13 +544,21 @@ namespace Catan10
         {
             return obj.Tile.GetHashCode() * 17 + obj.RoadLocation.GetHashCode();
         }
+
+        #endregion Methods
     }
 
     public class RoadLocationData
     {
+        #region Fields
+
         public double Angle;
         public double Left;
         public double Top;
+
+        #endregion Fields
+
+        #region Constructors
 
         public RoadLocationData(double left, double top, double angle)
         {
@@ -530,9 +567,15 @@ namespace Catan10
             Angle = angle;
         }
 
+        #endregion Constructors
+
+        #region Methods
+
         public override string ToString()
         {
             return String.Format($"Left={Left} Top={Top} Angle={Angle}");
         }
+
+        #endregion Methods
     }
 }

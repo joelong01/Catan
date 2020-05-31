@@ -129,11 +129,6 @@
                     </PathGeometry>
                 </Path.Data>
             </Path>
-
-
-
-
         </Grid>
     </Canvas>
-
 </UserControl>

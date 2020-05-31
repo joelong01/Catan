@@ -15,8 +15,8 @@
             <Ellipse Name="_pipEllipse" Width="30" Height="30" Fill="{x:Bind Path=CurrentPlayer.BackgroundBrush, Mode=OneWay}">
                 <!--<Ellipse.Fill>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="Black"/>
-                        <GradientStop Color="Purple" Offset="1"/>
+                        <GradientStop Color="Black" />
+                        <GradientStop Color="Purple" Offset="1" />
                     </LinearGradientBrush>
                 </Ellipse.Fill>-->
             </Ellipse>
@@ -50,21 +50,21 @@
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Grp:"Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                   CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4"/>
+                                   CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                         <TextBlock Text="{x:Bind PipGroup, FallbackValue=2, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
                                   Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Idx:"Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                   CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4"/>
+                                   CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                         <TextBlock Text="{x:Bind Index, FallbackValue=52, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
                                   Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Pips:"Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                   CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4"/>
+                                   CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />
                         <TextBlock Text="{x:Bind Pips, FallbackValue=52, Mode=OneWay,Converter={StaticResource ResourceKey=IntToStringConverter}}"
                                   Foreground="{x:Bind Path=CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                    CharacterSpacing="0" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0"  FontSize="32" Margin="6,-9,5,-4" />

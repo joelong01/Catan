@@ -10,11 +10,22 @@ namespace Catan10
     /// </summary>
     public class AddPlayerLog : LogHeader, ILogController
     {
-        public string PlayerToAdd { get; set; }
+        #region Constructors
+
         public AddPlayerLog() : base()
         {
-
         }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public string PlayerToAdd { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
         /// <summary>
         ///     an Action to add a player -- DOES NOT CHANGE STATE
         /// </summary>
@@ -25,7 +36,7 @@ namespace Catan10
         {
             //  5/20/2020:  The state *after* the CreateGame logEntry is pused is WaitingForPlayers.  But
             //              NewGameLog.Do() calls AddPlayerLog.PostLog *before* it gets pushed to the stack.
-            //              so we have to hard code the new state because by the time we get to the log, the 
+            //              so we have to hard code the new state because by the time we get to the log, the
             //              state will change
 
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForPlayers); // you can only add players in this state
@@ -44,7 +55,6 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            
             await gameController.AddPlayer(this);
 
             if (gameController.CurrentPlayer != gameController.MainPageModel.GameStartedBy)
@@ -67,5 +77,7 @@ namespace Catan10
         {
             return gameController.UndoAddPlayer(this);
         }
+
+        #endregion Methods
     }
 }

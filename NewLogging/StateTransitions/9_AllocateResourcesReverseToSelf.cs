@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -12,7 +11,8 @@ namespace Catan10
     /// </summary>
     public class AllocateResourcesReverseToAllocateResourcesReverse : LogHeader, ILogController
     {
-        public AllocateResourcesReverseToAllocateResourcesReverse() { }
+        #region Methods
+
         internal static async Task PostLog(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceReverse);
@@ -27,6 +27,16 @@ namespace Catan10
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public AllocateResourcesReverseToAllocateResourcesReverse()
+        {
+        }
+
+        #endregion Constructors
 
         public Task Do(IGameController gameController)
         {

@@ -1,41 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+
 using Windows.UI;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
     public static class PlayerBindingFunctions
     {
-        public static Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
-        {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
-            {
-                return new SolidColorBrush(Colors.White);
-            }
+        #region Methods
 
-            if (owner != null)
-            {
-                return owner.ForegroundBrush;
-            }
-
-            if (current != null)
-            {
-                return current.ForegroundBrush;
-            }
-
-            return ConverterGlobals.GetBrush(Colors.White);
-        }
         public static LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
             {
-
                 var gradientStopCollection = new GradientStopCollection();
                 gradientStopCollection.Add(new GradientStop() { Color = Colors.Black }); ;
                 gradientStopCollection.Add(new GradientStop() { Color = Colors.DarkGray });
@@ -57,6 +34,34 @@ namespace Catan10
             return ConverterGlobals.GetLinearGradientBrush(Colors.Black, Colors.Red);
         }
 
+        public static Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
+        {
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+                return new SolidColorBrush(Colors.White);
+            }
+
+            if (owner != null)
+            {
+                return owner.ForegroundBrush;
+            }
+
+            if (current != null)
+            {
+                return current.ForegroundBrush;
+            }
+
+            return ConverterGlobals.GetBrush(Colors.White);
+        }
+
+        public static int PerceivedBrightness(Color c)
+        {
+            return (int)Math.Sqrt(
+            c.R * c.R * .299 +
+            c.G * c.G * .587 +
+            c.B * c.B * .114);
+        }
+
         public static Brush PickPlayerSolidBackground(PlayerModel owner, PlayerModel current)
         {
             if (owner != null)
@@ -72,14 +77,6 @@ namespace Catan10
             return brush;
         }
 
-        public static int PerceivedBrightness(Color c)
-        {
-            return (int)Math.Sqrt(
-            c.R * c.R * .299 +
-            c.G * c.G * .587 +
-            c.B * c.B * .114);
-        }
-
-        
+        #endregion Methods
     }
 }

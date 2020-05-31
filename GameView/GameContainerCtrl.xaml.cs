@@ -16,14 +16,7 @@ namespace Catan10
 {
     public class CatanGameCtrl : ICatanGameData
     {
-        public CatanGameCtrl(Type type, CatanGames gameType, string s, int idx)
-        {
-            ControlType = type;
-            Description = s;
-            Index = idx;
-            CatanGame = gameType;
-
-        }
+        #region Properties
 
         private ICatanGameData ChildControl
         {
@@ -37,18 +30,36 @@ namespace Catan10
             }
         }
 
+        #endregion Properties
+
+        #region Methods
+
+        internal DevCardType GetNextDevCard()
+        {
+            return ChildControl.GameData.GetNextDevCard();
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public CatanGameCtrl(Type type, CatanGames gameType, string s, int idx)
+        {
+            ControlType = type;
+            Description = s;
+            Index = idx;
+            CatanGame = gameType;
+        }
+
+        #endregion Constructors
+
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
         public UserControl Control { get; set; } = null;
         public Type ControlType { get; set; } = typeof(RegularGameCtrl);
 
         public string Description { get; set; } = "Regular";
-        public int Index { get; set; } = -1;
-
-        
-
-
         public List<TileCtrl> DesertTiles => ChildControl.DesertTiles;
-
+        public CatanGameData GameData => ChildControl.GameData;
         public GameType GameType => ChildControl.GameType;
 
         public CatanHexPanel HexPanel
@@ -63,19 +74,12 @@ namespace Catan10
             }
         }
 
-
+        public int Index { get; set; } = -1;
         public List<TileCtrl> Tiles => ChildControl.Tiles;
-
-        public CatanGameData GameData => ChildControl.GameData;
 
         public override string ToString()
         {
             return String.Format($"{Description}.{ControlType.Name}");
-        }
-
-        internal DevCardType GetNextDevCard()
-        {
-            return ChildControl.GameData.GetNextDevCard();
         }
     }
 
@@ -87,6 +91,8 @@ namespace Catan10
 
     public sealed partial class GameContainerCtrl : UserControl
     {
+        #region Fields
+
         //
         //  when you build a new Game control, add it to this list
         //
@@ -112,112 +118,36 @@ namespace Catan10
         private Dictionary<ResourceType, double> _probabilities = new Dictionary<ResourceType, double>();
         private ITileControlCallback _tileCallback = null;
 
-        public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGameCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
-        public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGameCtrl>), typeof(CatanHexPanel), new PropertyMetadata(""));
+        #endregion Fields
 
-        public GameContainerCtrl()
-        {
-            this.InitializeComponent();
-            Games = _games;
-        }
-
-        public TileCtrl BaronTile
-        {
-            get => _currentHexPanel.BaronTile;
-            set => _currentHexPanel.BaronTile = value;
-        }
-
-        public CatanGameCtrl CurrentGame
-        {
-            get => (CatanGameCtrl)GetValue(CurrentGameProperty);
-            set => SetValue(CurrentGameProperty, value);
-        }
-
-        public List<int> CurrentRandomGoldTiles
-        {
-            get
-            {
-                List<int> ret = new List<int>();
-                foreach (var tile in TilesInIndexOrder)
-                {
-                    if (tile.TemporarilyGold)
-                    {
-                        ret.Add(tile.Index);
-                    }
-                }
-                return ret;
-            }
-        }
-
-        public List<CatanGameCtrl> Games
-        {
-            get => (List<CatanGameCtrl>)GetValue(GamesProperty);
-            set => SetValue(GamesProperty, value);
-        }
-
-        public bool HasIslands => _currentHexPanel.HasIslands;
-
-        public TileCtrl PirateShipTile
-        {
-            get => _currentHexPanel.PirateShipTile;
-            set => _currentHexPanel.PirateShipTile = value;
-        }
-
-        public Dictionary<ResourceType, double> Probabilities
-        {
-            get
-            {
-                if (_probabilities.Count == 0)
-                {
-                    _probabilities = new Dictionary<ResourceType, double>();
-                    //
-                    //  next we need to add up the probabilities for each number in each tile
-                    //  as well as the count of the resource type
-                    List<int> ProbabilityList = new List<int>();
-                    Dictionary<ResourceType, List<int>> resourceToProbDict = new Dictionary<ResourceType, List<int>>();
-                    foreach (TileCtrl tile in _currentHexPanel.Tiles)
-                    {
-                        resourceToProbDict.TryGetValue(tile.ResourceType, out List<int> tempList);
-                        if (tempList == null)
-                        {
-                            tempList = new List<int>();
-                            resourceToProbDict[tile.ResourceType] = tempList;
-                        }
-
-                        tempList.Add(tile.Probability);
-                    }
-
-                    // now we have the data to calculate our probabilities
-                    foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
-                    {
-                        resourceToProbDict.TryGetValue(resourceType, out List<int> tempList);
-                        if (tempList == null)
-                        {
-                            _probabilities[resourceType] = 0;
-                            continue;
-                        }
-
-                        int sum = 0;
-                        foreach (int i in tempList)
-                        {
-                            sum += i;
-                        }
-
-                        _probabilities[resourceType] = sum / (double)tempList.Count;
-                    }
-                }
-
-                return _probabilities;
-            }
-        }
-
-        public RandomBoardSettings RandomBoardSettings { get; private set; } = null;
-        public TileCtrl[] TilesInIndexOrder => _currentHexPanel.TilesInIndexOrder;
+        #region Methods
 
         private static void OnCurrentGameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             GameContainerCtrl container = d as GameContainerCtrl;
             container.SetGame(e.NewValue as CatanGameCtrl);
+        }
+
+        private bool AboveTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
+        {
+            if (row == 0)
+            {
+                return false;
+            }
+
+            int number = visualTiles.ElementAt(col).ElementAt(row - 1).Number;
+            return IsRed(number);
+        }
+
+        private bool BelowTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
+        {
+            if (row == visualTiles.ElementAt(col).Count - 1)
+            {
+                return false;
+            }
+
+            int number = visualTiles.ElementAt(col).ElementAt(row + 1).Number;
+            return IsRed(number);
         }
 
         private string DumpTileList(List<TileCtrl> list)
@@ -228,6 +158,126 @@ namespace Catan10
                 s += $"{t},";
             }
             return s;
+        }
+
+        private bool IsRed(int i)
+        {
+            if (i == 6 || i == 8)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsValidNumberLayout()
+        {
+            List<List<TileCtrl>> visualTiles = _currentHexPanel.VisualTiles;
+
+            //
+            //  Need to check the last column to see if one red tile is below another
+            for (int col = 0; col < visualTiles.Count; col++)
+            {
+                for (int row = 0; row < visualTiles.ElementAt(col).Count; row++)
+                {
+                    TileCtrl tile = visualTiles.ElementAt(col).ElementAt(row);
+                    int number = tile.Number;
+                    if (tile.ResourceType == ResourceType.GoldMine)
+                    {
+                        if (number == 8 || number == 6)
+                        {
+                            // this.TraceMessage($"Rejected layout because Gold had a {number}");
+                            return false;
+                        }
+                    }
+                    if (IsRed(number))
+                    {
+                        if (NextLowerRightIsRed(row, col, visualTiles))
+                        {
+                            return false;
+                        }
+
+                        if (NextUpperRightIsRed(row, col, visualTiles))
+                        {
+                            return false;
+                        }
+
+                        if (BelowTileIsRed(row, col, visualTiles))
+                        {
+                            return false;
+                        }
+
+                        // shouldn't need the below, as they are next to a tile that is above
+                        //if (AboveTileIsRed(row, col, visualTiles))
+                        //    return false;
+                        //if (PreviousLowerLeftIsRed(row, col, visualTiles))
+                        //    return false;
+                        //if (PreviousUpperLeftIsRed(row, col, visualTiles))
+                        //    return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool NextLowerRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
+        {
+            if (col == visualTiles.Count - 1)
+            {
+                return false; // last column has no Next column
+            }
+
+            bool ret = false;
+
+            bool beforeMiddle = (col < visualTiles.Count / 2);
+
+            int number;
+            if (beforeMiddle)
+            {
+                number = visualTiles.ElementAt(col + 1).ElementAt(row + 1).Number;
+                ret = IsRed(number);
+                return ret;
+            }
+
+            if (row > visualTiles.ElementAt(col + 1).Count - 1)
+            {
+                return false;
+            }
+            // we are at or past the middle
+            number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;   // row + 1 is always valid after the middle
+            ret = IsRed(number);
+            return ret;
+        }
+
+        private bool NextUpperRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
+        {
+            if (col == visualTiles.Count - 1)
+            {
+                return false; // last column has no Next column
+            }
+
+            bool ret = false;
+
+            bool beforeMiddle = (col < visualTiles.Count / 2);
+
+            int number;
+            if (beforeMiddle)
+            {
+                number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;
+                ret = IsRed(number);
+                return ret;
+            }
+
+            if (row == 0)
+            {
+                return false;
+            }
+
+            // we are at or past the middle
+            number = visualTiles.ElementAt(col + 1).ElementAt(row - 1).Number;   // row + 1 is always valid after the middle
+            ret = IsRed(number);
+            return ret;
         }
 
         /// <summary>
@@ -343,10 +393,128 @@ namespace Catan10
             return _TilesWithNumbers[val];
         }
 
+        internal void Reset()
+        {
+            _currentHexPanel.Reset();
+            _probabilities.Clear();
+            RandomBoardSettings = new RandomBoardSettings();
+            _ = ResetRandomGoldTiles();
+        }
+
         internal Task RotateTiles()
         {
             throw new NotImplementedException();
         }
+
+        #endregion Methods
+
+        public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGameCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
+        public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGameCtrl>), typeof(CatanHexPanel), new PropertyMetadata(""));
+
+        public GameContainerCtrl()
+        {
+            this.InitializeComponent();
+            Games = _games;
+        }
+
+        public List<BuildingCtrl> AllBuildings => _currentHexPanel.Buildings;
+
+        public List<RoadCtrl> AllRoads => _currentHexPanel.Roads;
+
+        public List<TileCtrl> AllTiles => _currentHexPanel.Tiles;
+
+        public TileCtrl BaronTile
+        {
+            get => _currentHexPanel.BaronTile;
+            set => _currentHexPanel.BaronTile = value;
+        }
+
+        public CatanGameCtrl CurrentGame
+        {
+            get => (CatanGameCtrl)GetValue(CurrentGameProperty);
+            set => SetValue(CurrentGameProperty, value);
+        }
+
+        public List<int> CurrentRandomGoldTiles
+        {
+            get
+            {
+                List<int> ret = new List<int>();
+                foreach (var tile in TilesInIndexOrder)
+                {
+                    if (tile.TemporarilyGold)
+                    {
+                        ret.Add(tile.Index);
+                    }
+                }
+                return ret;
+            }
+        }
+
+        public List<CatanGameCtrl> Games
+        {
+            get => (List<CatanGameCtrl>)GetValue(GamesProperty);
+            set => SetValue(GamesProperty, value);
+        }
+
+        public bool HasIslands => _currentHexPanel.HasIslands;
+
+        public TileCtrl PirateShipTile
+        {
+            get => _currentHexPanel.PirateShipTile;
+            set => _currentHexPanel.PirateShipTile = value;
+        }
+
+        public Dictionary<ResourceType, double> Probabilities
+        {
+            get
+            {
+                if (_probabilities.Count == 0)
+                {
+                    _probabilities = new Dictionary<ResourceType, double>();
+                    //
+                    //  next we need to add up the probabilities for each number in each tile
+                    //  as well as the count of the resource type
+                    List<int> ProbabilityList = new List<int>();
+                    Dictionary<ResourceType, List<int>> resourceToProbDict = new Dictionary<ResourceType, List<int>>();
+                    foreach (TileCtrl tile in _currentHexPanel.Tiles)
+                    {
+                        resourceToProbDict.TryGetValue(tile.ResourceType, out List<int> tempList);
+                        if (tempList == null)
+                        {
+                            tempList = new List<int>();
+                            resourceToProbDict[tile.ResourceType] = tempList;
+                        }
+
+                        tempList.Add(tile.Probability);
+                    }
+
+                    // now we have the data to calculate our probabilities
+                    foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
+                    {
+                        resourceToProbDict.TryGetValue(resourceType, out List<int> tempList);
+                        if (tempList == null)
+                        {
+                            _probabilities[resourceType] = 0;
+                            continue;
+                        }
+
+                        int sum = 0;
+                        foreach (int i in tempList)
+                        {
+                            sum += i;
+                        }
+
+                        _probabilities[resourceType] = sum / (double)tempList.Count;
+                    }
+                }
+
+                return _probabilities;
+            }
+        }
+
+        public RandomBoardSettings RandomBoardSettings { get; private set; } = null;
+        public TileCtrl[] TilesInIndexOrder => _currentHexPanel.TilesInIndexOrder;
 
         public static List<int> GetRandomList(int max)
         {
@@ -368,6 +536,47 @@ namespace Catan10
             }
 
             return randomIndeces;
+        }
+
+        /// <summary>
+        ///     given a randomList
+        ///     1. make sure it is a valid list
+        ///     2. assign the numbers to the tiles
+        /// </summary>
+        /// <param name="tileGroup"></param>
+        /// <param name="randomList"></param>
+        public void AssignNumbersToTileGroup(TileGroup tileGroup)
+        {
+            if (tileGroup.Randomize == false)
+            {
+                return;
+            }
+
+            _currentHexPanel.DesertTiles.Clear();
+
+            for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
+            {
+                TileCtrl t = tileGroup.TilesToRandomize[i];
+                t.HasBaron = false;
+                if (t.ResourceType == ResourceType.Desert)
+                {
+                    t.Number = 7;
+                    if (_currentHexPanel.DesertTiles.Contains(t) == false) // we keep track of which Tile the desert is and here is where we set that.
+                    {
+                        _currentHexPanel.DesertTiles.Add(t);
+                    }
+                }
+                else
+                {
+                    t.Number = tileGroup.StartingTileNumbers[tileGroup.TileAndNumberLists.NumberList[i]]; // StartingTileNumbers is the Array set at runtime that has all the number for this board.
+                }
+            }
+
+            if (!IsValidNumberLayout())
+            {
+                this.TraceMessage($"Invalid! Tiles: {tileGroup.TileAndNumberLists}");
+                throw new ArgumentException("You passed in an invalid Random list for the Catan Numbers.  Call GetRandomBoard() for your random settings!");
+            }
         }
 
         public async Task FancyHarborDistribution()
@@ -711,7 +920,6 @@ namespace Catan10
             }
 
             return Task.CompletedTask;
-
         }
 
         /// <summary>
@@ -863,8 +1071,6 @@ namespace Catan10
                 }
                 building.Pips = pips;
             }
-
-            
         }
 
         public async Task SetRandomTilesToGold(IEnumerable<int> indeces)
@@ -917,207 +1123,6 @@ namespace Catan10
             await FancyHarborDistribution();
             await InitialPlaceBaron();
         }
-
-        
-
-        public List<BuildingCtrl> AllBuildings => _currentHexPanel.Buildings;
-        public List<RoadCtrl> AllRoads => _currentHexPanel.Roads;
-        public List<TileCtrl> AllTiles => _currentHexPanel.Tiles;
-
-        
-
-        private bool AboveTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
-        {
-            if (row == 0)
-            {
-                return false;
-            }
-
-            int number = visualTiles.ElementAt(col).ElementAt(row - 1).Number;
-            return IsRed(number);
-        }
-
-        private bool BelowTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
-        {
-            if (row == visualTiles.ElementAt(col).Count - 1)
-            {
-                return false;
-            }
-
-            int number = visualTiles.ElementAt(col).ElementAt(row + 1).Number;
-            return IsRed(number);
-        }
-
-        private bool IsRed(int i)
-        {
-            if (i == 6 || i == 8)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool IsValidNumberLayout()
-        {
-            List<List<TileCtrl>> visualTiles = _currentHexPanel.VisualTiles;
-
-            //
-            //  Need to check the last column to see if one red tile is below another
-            for (int col = 0; col < visualTiles.Count; col++)
-            {
-                for (int row = 0; row < visualTiles.ElementAt(col).Count; row++)
-                {
-                    TileCtrl tile = visualTiles.ElementAt(col).ElementAt(row);
-                    int number = tile.Number;
-                    if (tile.ResourceType == ResourceType.GoldMine)
-                    {
-                        if (number == 8 || number == 6)
-                        {
-                            // this.TraceMessage($"Rejected layout because Gold had a {number}");
-                            return false;
-                        }
-                    }
-                    if (IsRed(number))
-                    {
-                        if (NextLowerRightIsRed(row, col, visualTiles))
-                        {
-                            return false;
-                        }
-
-                        if (NextUpperRightIsRed(row, col, visualTiles))
-                        {
-                            return false;
-                        }
-
-                        if (BelowTileIsRed(row, col, visualTiles))
-                        {
-                            return false;
-                        }
-
-                        // shouldn't need the below, as they are next to a tile that is above
-                        //if (AboveTileIsRed(row, col, visualTiles))
-                        //    return false;
-                        //if (PreviousLowerLeftIsRed(row, col, visualTiles))
-                        //    return false;
-                        //if (PreviousUpperLeftIsRed(row, col, visualTiles))
-                        //    return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private bool NextLowerRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
-        {
-            if (col == visualTiles.Count - 1)
-            {
-                return false; // last column has no Next column
-            }
-
-            bool ret = false;
-
-            bool beforeMiddle = (col < visualTiles.Count / 2);
-
-            int number;
-            if (beforeMiddle)
-            {
-                number = visualTiles.ElementAt(col + 1).ElementAt(row + 1).Number;
-                ret = IsRed(number);
-                return ret;
-            }
-
-            if (row > visualTiles.ElementAt(col + 1).Count - 1)
-            {
-                return false;
-            }
-            // we are at or past the middle
-            number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;   // row + 1 is always valid after the middle
-            ret = IsRed(number);
-            return ret;
-        }
-
-        private bool NextUpperRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
-        {
-            if (col == visualTiles.Count - 1)
-            {
-                return false; // last column has no Next column
-            }
-
-            bool ret = false;
-
-            bool beforeMiddle = (col < visualTiles.Count / 2);
-
-            int number;
-            if (beforeMiddle)
-            {
-                number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;
-                ret = IsRed(number);
-                return ret;
-            }
-
-            if (row == 0)
-            {
-                return false;
-            }
-
-            // we are at or past the middle
-            number = visualTiles.ElementAt(col + 1).ElementAt(row - 1).Number;   // row + 1 is always valid after the middle
-            ret = IsRed(number);
-            return ret;
-        }
-
-        internal void Reset()
-        {
-            _currentHexPanel.Reset();
-            _probabilities.Clear();
-            RandomBoardSettings = new RandomBoardSettings();
-            _ = ResetRandomGoldTiles();
-        }
-
-        /// <summary>
-        ///     given a randomList
-        ///     1. make sure it is a valid list
-        ///     2. assign the numbers to the tiles
-        /// </summary>
-        /// <param name="tileGroup"></param>
-        /// <param name="randomList"></param>
-        public void AssignNumbersToTileGroup(TileGroup tileGroup)
-        {
-            if (tileGroup.Randomize == false)
-            {
-                return;
-            }
-
-            _currentHexPanel.DesertTiles.Clear();
-
-            for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
-            {
-                TileCtrl t = tileGroup.TilesToRandomize[i];
-                t.HasBaron = false;
-                if (t.ResourceType == ResourceType.Desert)
-                {
-                    t.Number = 7;
-                    if (_currentHexPanel.DesertTiles.Contains(t) == false) // we keep track of which Tile the desert is and here is where we set that.
-                    {
-                        _currentHexPanel.DesertTiles.Add(t);
-                    }
-                }
-                else
-                {
-                    t.Number = tileGroup.StartingTileNumbers[tileGroup.TileAndNumberLists.NumberList[i]]; // StartingTileNumbers is the Array set at runtime that has all the number for this board.
-                }
-            }
-
-            if (!IsValidNumberLayout())
-            {
-                this.TraceMessage($"Invalid! Tiles: {tileGroup.TileAndNumberLists}");
-                throw new ArgumentException("You passed in an invalid Random list for the Catan Numbers.  Call GetRandomBoard() for your random settings!");
-            }
-        }
-
-   
 
         /**
         *  flip tiles to facedown, change them to temp gold, and then flip them back up

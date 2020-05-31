@@ -8,15 +8,25 @@ namespace Catan10
 {
     public sealed partial class SettlementCtrl : UserControl
     {
+        #region Fields
+
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(SettlementCtrl), new PropertyMetadata(null));
 
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(SettlementCtrl), new PropertyMetadata(null));
+
+        #endregion Fields
+
+        #region Constructors
 
         public SettlementCtrl()
         {
             this.InitializeComponent();
             this.DataContext = this;
         }
+
+        #endregion Constructors
+
+        #region Properties
 
         public PlayerModel CurrentPlayer
         {
@@ -30,6 +40,10 @@ namespace Catan10
             set => SetValue(OwnerProperty, value);
         }
 
+        #endregion Properties
+
+        #region Methods
+
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
             LinearGradientBrush brush = PlayerBindingFunctions.GetBackgroundBrush(current, owner);
@@ -40,5 +54,7 @@ namespace Catan10
         {
             return PlayerBindingFunctions.GetForegroundBrush(current, owner);
         }
+
+        #endregion Methods
     }
 }

@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using System.ComponentModel;
+
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -26,114 +16,16 @@ namespace Catan10
     [ContentProperty(Name = "Child")]
     public sealed partial class DragableGridCtrl : UserControl
     {
-        public event GridPositionChangedHandler OnGridPositionChanged;
-        public DragableGridCtrl()
-        {
-            this.InitializeComponent();
+        #region Methods
 
-        }
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(DragableGridCtrl), new PropertyMetadata(new PlayerModel()));
-        public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register("Caption", typeof(string), typeof(DragableGridCtrl), new PropertyMetadata("This is the Caption"));
-        public static readonly DependencyProperty ChildProperty = DependencyProperty.Register(nameof(Child), typeof(UIElement), typeof(DragableGridCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty GridPositionProperty = DependencyProperty.Register("GridPosition", typeof(GridPosition), typeof(DragableGridCtrl), new PropertyMetadata(new GridPosition(0, 0, 1.0, 1.0), GridPositionChanged));
-        public GridPosition GridPosition
-        {
-            get => (GridPosition)GetValue(GridPositionProperty);
-            set => SetValue(GridPositionProperty, value);
-        }
         private static void GridPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as DragableGridCtrl;
             depPropClass?.SetGridPosition((GridPosition)e.OldValue, (GridPosition)e.NewValue);
         }
-        private void SetGridPosition(GridPosition oldPosition, GridPosition newPosition)
-        {
-            oldPosition.PropertyChanged -= GridPosition_Changed;
-            newPosition.PropertyChanged += GridPosition_Changed;
-            AnimateMove.Begin();
-        }
 
-        private void GridPosition_Changed(object sender, PropertyChangedEventArgs e)
-        {
-            AnimateMove.Begin();
-        }
-
-        public UIElement Child
-        {
-            get { return (UIElement)GetValue(ChildProperty); }
-            set { SetValue(ChildProperty, value); }
-        }
-
-        public string Caption
-        {
-            get => (string)GetValue(CaptionProperty);
-            set => SetValue(CaptionProperty, value);
-        }
-
-        public PlayerModel Player
-        {
-            get => (PlayerModel)GetValue(PlayerProperty);
-            set => SetValue(PlayerProperty, value);
-        }
-
-        private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-
-            UIElement uiElement = sender as UIElement;
-            int zIndex = Canvas.GetZIndex(uiElement);
-            if (e.GetCurrentPoint(uiElement).Position.Y < 30)
-            {
-                Canvas.SetZIndex(uiElement, zIndex + 1000);
-
-                if (sender.GetType() == typeof(Grid))
-                {
-                    Grid grid = sender as Grid;
-                    Point point = await StaticHelpers.DragAsync(grid, e);
-                    NotifyPositionChanged();
-                }
-
-                Canvas.SetZIndex(uiElement, zIndex);
-            }
-
-        }
-
-        private void NotifyPositionChanged()
-        {
-            //
-            //  the drag operation happens in "Visual Space", not "Animation Space" - so we need to update our animation to say where the grid really is
-
-
-            GridPosition.TranslateX = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateX;
-            GridPosition.TranslateY = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateY;
-
-           
-            OnGridPositionChanged?.Invoke(userControl.Name, GridPosition);
-           
-        }
-
-        private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
-        {
-            
-            if (GridPosition.ScaleX != 1.0)
-            {
-                GridPosition.ScaleX = 1.0;
-                GridPosition.ScaleY = 1.0;
-            }
-            else
-            {
-                GridPosition.ScaleX = 0.5;
-                GridPosition.ScaleY = 0.5;
-            }
-            AnimateMove.Begin();
-            
-            NotifyPositionChanged();
-
-        }
-
-        
         private void Border_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-
             Border border = sender as Border;
 
             Point position = e.GetCurrentPoint(border).Position;
@@ -149,7 +41,6 @@ namespace Catan10
             double originalHeight = border.Height;
             Point pointMouseDown = position;
             CompositeTransform ct = border.RenderTransform as CompositeTransform;
-
 
             pointerPressed = (object s, PointerRoutedEventArgs eMove) =>
             {
@@ -183,7 +74,6 @@ namespace Catan10
 
             pointerMoved = (object s, PointerRoutedEventArgs eMove) =>
             {
-
                 position = eMove.GetCurrentPoint(border).Position;
                 if (mouseCaptured)
                 {
@@ -228,7 +118,6 @@ namespace Catan10
                     Window.Current.CoreWindow.PointerCursor =
                         new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.SizeWestEast, 1);
                 }
-
                 else
                 {
                     sizeableX = false;
@@ -236,8 +125,6 @@ namespace Catan10
                     Window.Current.CoreWindow.PointerCursor =
                                   new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 1);
                 }
-
-
             };
 
             pointerExited = (s, eExit) =>
@@ -253,8 +140,122 @@ namespace Catan10
             border.PointerMoved += pointerMoved;
             border.PointerExited += pointerExited;
             border.PointerPressed += pointerPressed;
-
         }
 
+        private void GridPosition_Changed(object sender, PropertyChangedEventArgs e)
+        {
+            AnimateMove.Begin();
+        }
+
+        private void NotifyPositionChanged()
+        {
+            //
+            //  the drag operation happens in "Visual Space", not "Animation Space" - so we need to update our animation to say where the grid really is
+
+            GridPosition.TranslateX = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateX;
+            GridPosition.TranslateY = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateY;
+
+            OnGridPositionChanged?.Invoke(userControl.Name, GridPosition);
+        }
+
+        private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
+        {
+            if (GridPosition.ScaleX != 1.0)
+            {
+                GridPosition.ScaleX = 1.0;
+                GridPosition.ScaleY = 1.0;
+            }
+            else
+            {
+                GridPosition.ScaleX = 0.5;
+                GridPosition.ScaleY = 0.5;
+            }
+            AnimateMove.Begin();
+
+            NotifyPositionChanged();
+        }
+
+        private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            UIElement uiElement = sender as UIElement;
+            int zIndex = Canvas.GetZIndex(uiElement);
+            if (e.GetCurrentPoint(uiElement).Position.Y < 30)
+            {
+                Canvas.SetZIndex(uiElement, zIndex + 1000);
+
+                if (sender.GetType() == typeof(Grid))
+                {
+                    Grid grid = sender as Grid;
+                    Point point = await StaticHelpers.DragAsync(grid, e);
+                    NotifyPositionChanged();
+                }
+
+                Canvas.SetZIndex(uiElement, zIndex);
+            }
+        }
+
+        private void SetGridPosition(GridPosition oldPosition, GridPosition newPosition)
+        {
+            oldPosition.PropertyChanged -= GridPosition_Changed;
+            newPosition.PropertyChanged += GridPosition_Changed;
+            AnimateMove.Begin();
+        }
+
+        #endregion Methods
+
+        #region Fields
+
+        public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register("Caption", typeof(string), typeof(DragableGridCtrl), new PropertyMetadata("This is the Caption"));
+
+        public static readonly DependencyProperty ChildProperty = DependencyProperty.Register(nameof(Child), typeof(UIElement), typeof(DragableGridCtrl), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty GridPositionProperty = DependencyProperty.Register("GridPosition", typeof(GridPosition), typeof(DragableGridCtrl), new PropertyMetadata(new GridPosition(0, 0, 1.0, 1.0), GridPositionChanged));
+
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(DragableGridCtrl), new PropertyMetadata(new PlayerModel()));
+
+        #endregion Fields
+
+        #region Constructors
+
+        public DragableGridCtrl()
+        {
+            this.InitializeComponent();
+        }
+
+        #endregion Constructors
+
+        #region Events
+
+        public event GridPositionChangedHandler OnGridPositionChanged;
+
+        #endregion Events
+
+        #region Properties
+
+        public string Caption
+        {
+            get => (string)GetValue(CaptionProperty);
+            set => SetValue(CaptionProperty, value);
+        }
+
+        public UIElement Child
+        {
+            get { return (UIElement)GetValue(ChildProperty); }
+            set { SetValue(ChildProperty, value); }
+        }
+
+        public GridPosition GridPosition
+        {
+            get => (GridPosition)GetValue(GridPositionProperty);
+            set => SetValue(GridPositionProperty, value);
+        }
+
+        public PlayerModel Player
+        {
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
+        }
+
+        #endregion Properties
     }
 }

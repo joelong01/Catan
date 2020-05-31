@@ -4,13 +4,8 @@ namespace Catan10
 {
     public class Target
     {
-        public PlayerModel Player { get; private set; } = null;
-        public TileCtrl Tile { get; private set; } = null;
-        public int ResourcePotential { get; private set; } = 0;
-        public override string ToString()
-        {
-            return $"{Player,-15} | {Tile,-15} | {ResourcePotential}";
-        }
+        #region Constructors
+
         public Target(PlayerModel p, TileCtrl t)
         {
             Player = p;
@@ -29,7 +24,6 @@ namespace Catan10
                 {
                     throw new Exception("This building shouldn't be owned");
                 }
-
             }
 
             ResourcePotential *= Tile.Pips;
@@ -47,14 +41,25 @@ namespace Catan10
                     }
                 }
             }
-
-
-
-
         }
 
+        #endregion Constructors
 
+        #region Properties
 
+        public PlayerModel Player { get; private set; } = null;
+        public int ResourcePotential { get; private set; } = 0;
+        public TileCtrl Tile { get; private set; } = null;
 
+        #endregion Properties
+
+        #region Methods
+
+        public override string ToString()
+        {
+            return $"{Player,-15} | {Tile,-15} | {ResourcePotential}";
+        }
+
+        #endregion Methods
     }
 }

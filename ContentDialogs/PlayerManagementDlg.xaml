@@ -102,9 +102,7 @@
 
                 <ColumnDefinition Width="300" />
                 <ColumnDefinition Width="*" />
-
             </Grid.ColumnDefinitions>
-
 
             <StackPanel Grid.Column="0" Margin="10" HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible"
@@ -118,7 +116,6 @@
                     SelectionMode="Single"
                     ItemTemplate="{StaticResource EditPlayerDataTemplate}"
                     SelectedItem="{x:Bind SelectedPlayer, Mode=TwoWay}" />
-
 
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <Button Grid.Column="0" Style="{StaticResource PlayerDlgButton}" Content="&#xE109;" Click="OnAddPlayer" />
@@ -164,8 +161,6 @@
                             Fill="{x:Bind Path=SelectedPlayer.SolidSecondaryBrush, Mode=OneWay}" />
                         <Rectangle Grid.Row="2" Grid.Column="1" Width="100" Margin="10"
                             Fill="{x:Bind SelectedPlayer.ForegroundBrush, Mode=OneWay}" />
-
-
                     </Grid>
 
                     <Viewbox Grid.Column="1">
@@ -175,7 +170,6 @@
                             IsAlphaTextInputVisible="True"
                             Color="{x:Bind Path=GetCurrentColor(), BindBack=SetCurrentColor, Mode=TwoWay}" />
                     </Viewbox>
-
                 </Grid>
                 <!--<Viewbox Grid.Row="1" Grid.RowSpan="1" Grid.Column="2" Margin="30,50,60,0"
                 HorizontalAlignment="Center" VerticalAlignment="Top">
@@ -199,7 +193,6 @@
                                     <ItemsWrapGrid />
                                 </ItemsPanelTemplate>
                             </ComboBox.ItemsPanel>
-
                         </ComboBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -223,4 +216,3 @@
         </Grid>
     </Viewbox>
 </ContentDialog>
-

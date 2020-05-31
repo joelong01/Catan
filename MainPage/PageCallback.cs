@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Threading.Tasks;
+
 using Catan10.NewLogging.Actions;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -14,7 +15,13 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameCallback, ITileControlCallback
     {
+        #region Fields
+
         private int _roadSkipped = 0;
+
+        #endregion Fields
+
+        #region Properties
 
         private PlayerModel MaxRoadPlayer
         {
@@ -32,13 +39,9 @@ namespace Catan10
             }
         }
 
-        public GameContainerCtrl GameContainer
-        {
-            get
-            {
-                return _gameView;
-            }
-        }
+        #endregion Properties
+
+        #region Methods
 
         //
         //   when a Knight is played
@@ -48,7 +51,7 @@ namespace Catan10
         //      4. If Knight Played Increment the source player (which is always the current player) Knights played
         //      5. Log that it happened.
         //      6. check to see if we should update the Largest Army
-        private  Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
+        private Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
         {
             bool flagState = true;
             int inc = 1;
@@ -89,11 +92,11 @@ namespace Catan10
                 CurrentPlayer.GameData.MovedBaronAfterRollingSeven = flagState;
             }
 
-          //  await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
+            //  await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
 
             if (CurrentGameState == GameState.MustMoveBaron && logType != LogType.Undo)
             {
-               // await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false, logType);
+                // await SetStateAsync(CurrentPlayer, GameState.WaitingForNext, false, logType);
             }
 
             if (CurrentGameState == GameState.WaitingForRoll)
@@ -490,8 +493,6 @@ namespace Catan10
             return false;
         }
 
-     
-
         private void UpdateTileBuildingOwner(PlayerModel player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
             foreach (BuildingKey key in building.Clones)
@@ -557,6 +558,16 @@ namespace Catan10
                     return player;
             }
             throw new Exception("bad name passed PlayerNameToPlayer");
+        }
+
+        #endregion Methods
+
+        public GameContainerCtrl GameContainer
+        {
+            get
+            {
+                return _gameView;
+            }
         }
 
         /// <summary>
@@ -661,7 +672,6 @@ namespace Catan10
             if (building.BuildingState == BuildingState.NoEntitlement) return false;
             return false;
         }
-
 
         /// <summary>
         ///         this looks at the global state of all the roads and makes sure that it
@@ -1050,7 +1060,6 @@ namespace Catan10
             //  if you have a knight entitlement, you *must* be playing the knight
             bool playingKnight = CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.Knight);
 
-
             if (CurrentGameState != GameState.MustMoveBaron && CurrentGameState != GameState.WaitingForNext &&
                CurrentGameState != GameState.WaitingForRoll)
             {
@@ -1064,10 +1073,7 @@ namespace Catan10
                 return;
             }
 
-
-
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
-
 
             TargetWeapon weapon = TargetWeapon.Baron;
 
@@ -1160,7 +1166,6 @@ namespace Catan10
                 foreach (BuildingCtrl settlement in targetTile.OwnedBuilding)
                 {
                     string s = "";
-
 
                     bool found = false;
                     foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)

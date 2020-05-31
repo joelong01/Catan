@@ -1,51 +1,28 @@
-﻿using Catan.Proxy;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using Windows.Devices.Enumeration;
+
 using Windows.Storage.Pickers;
 using Windows.UI;
-using Windows.UI.Composition;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+
 using Color = Windows.UI.Color;
-
-
 
 // The Content Dialog item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
-   
     public static class BrushDependecyFunctions
     {
+        #region Methods
+
         public static SolidColorBrush ColorToBrush(Color color)
         {
             return ConverterGlobals.GetBrush(color);
-        }
-
-        public static Color CurrentPlayerToCorrectColor(PlayerManagementDlg dlg)
-        {
-            var player = dlg.SelectedPlayer;
-            if (player == null) return Colors.HotPink;
-            if (dlg.IsPrimaryChecked)
-            {
-                return player.PrimaryBackgroundColor;
-            }
-            if (dlg.IsForegroundChecked)
-            {
-                return player.ForegroundColor;
-            }
-            if (dlg.IsSecondaryChecked)
-            {
-                return player.SecondaryBackgroundColor;
-            }
-            return Colors.HotPink;
         }
 
         public static Brush CurrentColorToBrush(Color color, PlayerManagementDlg dlg)
@@ -68,150 +45,32 @@ namespace Catan10
 
             return ConverterGlobals.GetBrush(color);
         }
-    }
 
-
-    public sealed partial class PlayerManagementDlg : ContentDialog
-    {
-
-        public ObservableCollection<PlayerModel> PlayerDataList { get; } = new ObservableCollection<PlayerModel>();
-       
-        public Brush ColorToBrush(Color color)
+        public static Color CurrentPlayerToCorrectColor(PlayerManagementDlg dlg)
         {
-            return ConverterGlobals.GetBrush(color);
-        }
-
-
-        public Color GetCurrentColor()
-        {
-            var player = SelectedPlayer;
+            var player = dlg.SelectedPlayer;
             if (player == null) return Colors.HotPink;
-
-            if (IsPrimaryChecked)
+            if (dlg.IsPrimaryChecked)
             {
-               return player.PrimaryBackgroundColor;
+                return player.PrimaryBackgroundColor;
             }
-            if (IsForegroundChecked)
+            if (dlg.IsForegroundChecked)
             {
                 return player.ForegroundColor;
             }
-            if (IsSecondaryChecked)
+            if (dlg.IsSecondaryChecked)
             {
-               return  player.SecondaryBackgroundColor;
+                return player.SecondaryBackgroundColor;
             }
-
             return Colors.HotPink;
         }
-        public Brush GetCurrentBrush()
-        {
-            Color color = GetCurrentColor();
-            return ConverterGlobals.GetBrush(color);
 
-        }
+        #endregion Methods
+    }
 
-        public void SetCurrentColor(Color color)
-        {
-            var player = SelectedPlayer;
-            if (player == null) return;
-
-            if (IsPrimaryChecked)
-            {
-                player.PrimaryBackgroundColor = color;
-            }
-            if (IsForegroundChecked)
-            {
-                player.ForegroundColor = color;
-            }
-            if (IsSecondaryChecked)
-            {
-                player.SecondaryBackgroundColor = color;
-            }
-        }
-
-        public static readonly DependencyProperty SelectedPlayerProperty = DependencyProperty.Register("SelectedPlayer", typeof(PlayerModel), typeof(PlayerManagementDlg), new PropertyMetadata(null));
-        public static readonly DependencyProperty IsSecondaryCheckedProperty = DependencyProperty.Register("IsSecondaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
-        public static readonly DependencyProperty IsForegroundCheckedProperty = DependencyProperty.Register("IsForegroundChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
-        public static readonly DependencyProperty IsPrimaryCheckedProperty = DependencyProperty.Register("IsPrimaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(true));
-        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(PlayerManagementDlg), typeof(PlayerManagementDlg), new PropertyMetadata(null));
-        public PlayerManagementDlg Self
-        {
-            get => (PlayerManagementDlg)GetValue(SelfProperty);
-            set => SetValue(SelfProperty, value);
-        }
-       
-        public bool IsForegroundChecked
-        {
-            get => (bool)GetValue(IsForegroundCheckedProperty);
-            set => SetValue(IsForegroundCheckedProperty, value);
-        }
-        public bool IsSecondaryChecked
-        {
-            get => (bool)GetValue(IsSecondaryCheckedProperty);
-            set => SetValue(IsSecondaryCheckedProperty, value);
-        }
-
-        public bool IsPrimaryChecked
-        {
-            get { return (bool)GetValue(IsPrimaryCheckedProperty); }
-            set { SetValue(IsPrimaryCheckedProperty, value); }
-        }
-
-      
-        public PlayerModel SelectedPlayer
-        {
-            get => (PlayerModel)GetValue(SelectedPlayerProperty);
-            set => SetValue(SelectedPlayerProperty, value);
-        }
-       
-
-        public PlayerManagementDlg(ICollection<PlayerModel> playerData)
-        {
-            this.InitializeComponent();
-            Self = this;
-
-            foreach (var p in playerData)
-            {
-                PlayerDataList.Add(p);
-            }
-            if (PlayerDataList.Count > 0)
-            {
-                SelectedPlayer = PlayerDataList[0];
-            }            
-        }
-
-        private async void OnAddPlayer(object sender, RoutedEventArgs e)
-        {
-            PlayerModel pd = new PlayerModel();
-            await pd.LoadImage();
-            PlayerDataList.Add(pd);
-            _gvPlayers.ScrollIntoView(pd);
-        }
-
-        private void OnDeletePlayer(object sender, RoutedEventArgs e)
-        {
-            if (SelectedPlayer != null)
-            {
-                PlayerDataList.Remove(SelectedPlayer);
-                SelectedPlayer = PlayerDataList.FirstOrDefault();
-                SelectedPlayer.GameData.IsCurrentPlayer = true;
-                _gvPlayers.ScrollIntoView(SelectedPlayer);
-            }
-        }
-
-
-
-
-        private void OnSavePlayer(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private async void OnImageDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
-        {
-            PlayerModel data = ((Grid)sender).Tag as PlayerModel;
-            await LoadNewImage(data);
-
-        }
+    public sealed partial class PlayerManagementDlg : ContentDialog
+    {
+        #region Methods
 
         private async System.Threading.Tasks.Task LoadNewImage(PlayerModel player)
         {
@@ -233,15 +92,12 @@ namespace Catan10
                 Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
                 if (file != null)
                 {
-
                     if (player != null)
                     {
                         Windows.Storage.StorageFile fileCopy = await player.CopyImage(file);
                         player.ImageFileName = fileCopy.Name;
                         await player.LoadImage();
-
                     }
-
                 }
             }
             finally
@@ -250,11 +106,29 @@ namespace Catan10
             }
         }
 
-        private void OnSaveAndclose(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private async void OnAddPlayer(object sender, RoutedEventArgs e)
         {
+            PlayerModel pd = new PlayerModel();
+            await pd.LoadImage();
+            PlayerDataList.Add(pd);
+            _gvPlayers.ScrollIntoView(pd);
+        }
 
-            args.Cancel = false; // continue to close
+        private void OnDeletePlayer(object sender, RoutedEventArgs e)
+        {
+            if (SelectedPlayer != null)
+            {
+                PlayerDataList.Remove(SelectedPlayer);
+                SelectedPlayer = PlayerDataList.FirstOrDefault();
+                SelectedPlayer.GameData.IsCurrentPlayer = true;
+                _gvPlayers.ScrollIntoView(SelectedPlayer);
+            }
+        }
 
+        private async void OnImageDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            PlayerModel data = ((Grid)sender).Tag as PlayerModel;
+            await LoadNewImage(data);
         }
 
         private async void OnImageRightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -262,9 +136,132 @@ namespace Catan10
             PlayerModel data = ((Grid)sender).Tag as PlayerModel;
             await LoadNewImage(data);
         }
+
+        private void OnSaveAndclose(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            args.Cancel = false; // continue to close
+        }
+
+        private void OnSavePlayer(object sender, RoutedEventArgs e)
+        {
+        }
+
+        #endregion Methods
+
+        #region Fields
+
+        public static readonly DependencyProperty IsForegroundCheckedProperty = DependencyProperty.Register("IsForegroundChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
+        public static readonly DependencyProperty IsPrimaryCheckedProperty = DependencyProperty.Register("IsPrimaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(true));
+        public static readonly DependencyProperty IsSecondaryCheckedProperty = DependencyProperty.Register("IsSecondaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
+        public static readonly DependencyProperty SelectedPlayerProperty = DependencyProperty.Register("SelectedPlayer", typeof(PlayerModel), typeof(PlayerManagementDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(PlayerManagementDlg), typeof(PlayerManagementDlg), new PropertyMetadata(null));
+
+        #endregion Fields
+
+        #region Constructors
+
+        public PlayerManagementDlg(ICollection<PlayerModel> playerData)
+        {
+            this.InitializeComponent();
+            Self = this;
+
+            foreach (var p in playerData)
+            {
+                PlayerDataList.Add(p);
+            }
+            if (PlayerDataList.Count > 0)
+            {
+                SelectedPlayer = PlayerDataList[0];
+            }
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public bool IsForegroundChecked
+        {
+            get => (bool)GetValue(IsForegroundCheckedProperty);
+            set => SetValue(IsForegroundCheckedProperty, value);
+        }
+
+        public bool IsPrimaryChecked
+        {
+            get { return (bool)GetValue(IsPrimaryCheckedProperty); }
+            set { SetValue(IsPrimaryCheckedProperty, value); }
+        }
+
+        public bool IsSecondaryChecked
+        {
+            get => (bool)GetValue(IsSecondaryCheckedProperty);
+            set => SetValue(IsSecondaryCheckedProperty, value);
+        }
+
+        public ObservableCollection<PlayerModel> PlayerDataList { get; } = new ObservableCollection<PlayerModel>();
+
+        public PlayerModel SelectedPlayer
+        {
+            get => (PlayerModel)GetValue(SelectedPlayerProperty);
+            set => SetValue(SelectedPlayerProperty, value);
+        }
+
+        public PlayerManagementDlg Self
+        {
+            get => (PlayerManagementDlg)GetValue(SelfProperty);
+            set => SetValue(SelfProperty, value);
+        }
+
+        #endregion Properties
+
+        public Brush ColorToBrush(Color color)
+        {
+            return ConverterGlobals.GetBrush(color);
+        }
+
+        public Brush GetCurrentBrush()
+        {
+            Color color = GetCurrentColor();
+            return ConverterGlobals.GetBrush(color);
+        }
+
+        public Color GetCurrentColor()
+        {
+            var player = SelectedPlayer;
+            if (player == null) return Colors.HotPink;
+
+            if (IsPrimaryChecked)
+            {
+                return player.PrimaryBackgroundColor;
+            }
+            if (IsForegroundChecked)
+            {
+                return player.ForegroundColor;
+            }
+            if (IsSecondaryChecked)
+            {
+                return player.SecondaryBackgroundColor;
+            }
+
+            return Colors.HotPink;
+        }
+
+        public void SetCurrentColor(Color color)
+        {
+            var player = SelectedPlayer;
+            if (player == null) return;
+
+            if (IsPrimaryChecked)
+            {
+                player.PrimaryBackgroundColor = color;
+            }
+            if (IsForegroundChecked)
+            {
+                player.ForegroundColor = color;
+            }
+            if (IsSecondaryChecked)
+            {
+                player.SecondaryBackgroundColor = color;
+            }
+        }
     }
-
-
-
 }
-

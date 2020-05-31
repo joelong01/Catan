@@ -1,5 +1,4 @@
-﻿using Catan.Proxy;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using Windows.UI.Xaml.Controls;
 
@@ -9,7 +8,7 @@ namespace Catan10
 {
     public sealed partial class RegularGameCtrl : UserControl, ICatanGameData
     {
-
+        #region Constructors
 
         public RegularGameCtrl()
         {
@@ -29,19 +28,24 @@ namespace Catan10
             GameData.BuildDevCardList();
         }
 
+        #endregion Constructors
+
+        #region Properties
+
         public CatanHexPanel HexPanel => _HexPanel;
 
-        #region ICatanGameData
-        public int Index { get; set; } = -1;
-        public string Description => _HexPanel.Description;
-        public GameType GameType => _HexPanel.GameType;
-       
+        #endregion Properties
 
+        #region ICatanGameData
+
+        public CatanGames CatanGame { get => CatanGames.Regular; }
+        public string Description => _HexPanel.Description;
+        public List<TileCtrl> DesertTiles => _HexPanel.DesertTiles;
+        public CatanGameData GameData { get; } = new CatanGameData();
+        public GameType GameType => _HexPanel.GameType;
+        public int Index { get; set; } = -1;
         public List<TileCtrl> Tiles => _HexPanel.Tiles;
 
-        public List<TileCtrl> DesertTiles => _HexPanel.DesertTiles;
-        public CatanGames CatanGame{ get => CatanGames.Regular; }
-        public CatanGameData GameData { get; } = new CatanGameData();
-        #endregion
+        #endregion ICatanGameData
     }
 }

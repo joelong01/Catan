@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -13,19 +12,25 @@ namespace Catan10
     //  and exposes the data needed by the Views/Pages
     internal interface ICatanGameData
     {
+        #region Properties
+
         CatanGames CatanGame { get; }
         string Description { get; }
         List<TileCtrl> DesertTiles { get; }
+        CatanGameData GameData { get; }
         GameType GameType { get; }
         CatanHexPanel HexPanel { get; }
         int Index { get; }
-       
+
         List<TileCtrl> Tiles { get; }
-        CatanGameData GameData { get; }
+
+        #endregion Properties
     }
 
     public interface ICatanSettings
     {
+        #region Properties
+
         bool AnimateFade { get; set; }
         int AnimationSpeedBase { get; set; }
         int FadeSeconds { get; set; }
@@ -36,6 +41,10 @@ namespace Catan10
         bool UseRandomNumbers { get; set; }
         bool ValidateBuilding { get; set; }
         double Zoom { get; set; }
+
+        #endregion Properties
+
+        #region Methods
 
         void Close();
 
@@ -54,10 +63,13 @@ namespace Catan10
         Task SettingChanged();
 
         Task Winner();
+
+        #endregion Methods
     }
 
     public interface IGameCallback
     {
+        #region Methods
 
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
 
@@ -74,10 +86,14 @@ namespace Catan10
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
 
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
+
+        #endregion Methods
     }
 
     public interface IGameController
     {
+        #region Properties
+
         bool AutoRespondAndTheHuman { get; }
 
         CatanGames CatanGame { get; set; }
@@ -94,6 +110,7 @@ namespace Catan10
 
         List<int> CurrentRandomGoldTiles { get; }
 
+        GameContainerCtrl GameContainer { get; }
         List<int> HighlightedTiles { get; }
 
         bool IsServiceGame { get; }
@@ -106,9 +123,12 @@ namespace Catan10
 
         List<PlayerModel> PlayingPlayers { get; }
 
-        PlayerModel TheHuman { get; }
         IRollLog RollLog { get; }
+        PlayerModel TheHuman { get; }
 
+        #endregion Properties
+
+        #region Methods
 
         /// <summary>
         ///     Adds a player to the game.  if the Player is already in the game, return false.
@@ -125,6 +145,8 @@ namespace Catan10
 
         RandomBoardSettings CurrentRandomBoard();
 
+        Task<bool> DetermineRollOrder(RollOrderLog log);
+
         RandomBoardSettings GetRandomBoard();
 
         Task HideRollsInPublicUi();
@@ -136,16 +158,17 @@ namespace Catan10
         /// <returns></returns>
         PlayerModel NameToPlayer(string playerName);
 
-        
         Task<bool> PostMessage(LogHeader logHeader, CatanMessageType normal);
 
-        
+        DevCardType PurchaseNextDevCard();
 
         Task<bool> RedoAsync();
 
         void ResetAllBuildings();
 
         Task ResetRandomGoldTiles();
+
+        Task ResetRollControl();
 
         (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll);
 
@@ -161,13 +184,13 @@ namespace Catan10
 
         void ShowRollsInPublicUi();
 
-        Task TellServiceGameStarted();
-
         Task StartGame(NewGameLog model);
 
         void StopHighlightingTiles();
 
-        Task<bool> DetermineRollOrder(RollOrderLog log);
+        Task TellServiceGameStarted();
+
+        TileCtrl TileFromIndex(int targetTile);
 
         Task UndoAddPlayer(AddPlayerLog playerLogHeader);
 
@@ -184,15 +207,14 @@ namespace Catan10
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
-        TileCtrl TileFromIndex(int targetTile);
-        DevCardType PurchaseNextDevCard();
-        Task ResetRollControl();
 
-        GameContainerCtrl GameContainer { get; }
+        #endregion Methods
     }
 
     public interface IGameViewCallback
     {
+        #region Methods
+
         void OnGridLeftTapped(TileCtrl tile, TappedRoutedEventArgs e);
 
         void OnGridRightTapped(TileCtrl tile, RightTappedRoutedEventArgs e);
@@ -200,19 +222,29 @@ namespace Catan10
         void OnHarborRightTapped(TileCtrl tileCtrl, HarborLocation location, RightTappedRoutedEventArgs e);
 
         void OnTileDoubleTapped(object sender, DoubleTappedRoutedEventArgs e);
+
+        #endregion Methods
     }
 
     public interface ILogController
     {
+        #region Methods
+
         Task Do(IGameController gameController);
 
         Task Redo(IGameController gameController);
 
         Task Undo(IGameController gameController);
+
+        #endregion Methods
     }
 
     public interface ITileControlCallback
     {
+        #region Methods
+
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
+
+        #endregion Methods
     }
 }

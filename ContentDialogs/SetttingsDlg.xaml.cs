@@ -307,16 +307,28 @@ namespace Catan10
 
         #endregion properties
 
-        public Settings()
-        {
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        #region Methods
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion Methods
+
+        #region Constructors
+
+        public Settings()
+        {
+        }
+
+        #endregion Constructors
+
+        #region Events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Events
 
         public static Settings Deserialize(string s)
         {
@@ -331,6 +343,25 @@ namespace Catan10
 
     public sealed partial class SettingsDlg : ContentDialog
     {
+        #region Methods
+
+        private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+        }
+
+        private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+        }
+
+        private async void OnResetGridLayout(object sender, RoutedEventArgs e)
+        {
+            await MainPage.Current.ResetGridLayout();
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
         public SettingsDlg()
         {
             this.InitializeComponent();
@@ -343,7 +374,13 @@ namespace Catan10
             this.TheHuman = human;
         }
 
+        #endregion Constructors
+
+        #region Properties
+
         public ICatanSettings CatanSettingsCallback { get; set; }
+
+        #endregion Properties
 
         #region Properties
 
@@ -363,18 +400,5 @@ namespace Catan10
         }
 
         #endregion Properties
-
-        private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-        }
-
-        private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-        }
-
-        private async void OnResetGridLayout(object sender, RoutedEventArgs e)
-        {
-            await MainPage.Current.ResetGridLayout();
-        }
     }
 }

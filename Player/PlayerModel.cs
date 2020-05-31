@@ -16,20 +16,28 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
-    public delegate void CardsLostUpdatedHandler(PlayerModel player, int oldVal, int newVal);
-
-    public delegate void PlayerResourceUpdateHandler(PlayerModel player, ResourceType resource, int oldVal, int newVal);
-
     internal class ResourceCount
     {
+        #region Properties
+
         public int Acquired { get; set; } = 0;
         public int Lost { get; set; } = 0;
+
+        #endregion Properties
+
+        #region Methods
 
         public override string ToString()
         {
             return String.Format($"Acquired:{Acquired} Lost:{Lost}");
         }
+
+        #endregion Methods
     }
+
+    public delegate void CardsLostUpdatedHandler(PlayerModel player, int oldVal, int newVal);
+
+    public delegate void PlayerResourceUpdateHandler(PlayerModel player, ResourceType resource, int oldVal, int newVal);
 
     //
     //  this is where data goes that is applicable to players and all games
@@ -39,6 +47,8 @@ namespace Catan10
     //
     public class PlayerModel : INotifyPropertyChanged
     {
+        #region Fields
+
         private Color _Foreground = Colors.White;
         private ImageBrush _imageBrush = null;
         private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
@@ -47,6 +57,28 @@ namespace Catan10
         private string _playerName = "Nameless";
         private Color _primaryBackgroundColor = Colors.SlateBlue;
         private Color _secondaryBackgroundColor = Colors.Black;
+
+        #endregion Fields
+
+        #region Methods
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private int PerceivedBrightness(Color c)
+        {
+            return (int)Math.Sqrt(
+            c.R * c.R * .299 +
+            c.G * c.G * .587 +
+            c.B * c.B * .114);
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
         public PlayerModel()
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
@@ -66,7 +98,15 @@ namespace Catan10
             _playerGameData = new PlayerGameModel(this);
         }
 
+        #endregion Constructors
+
+        #region Events
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Events
+
+        #region Properties
 
         [JsonIgnore]
         public ObservableCollection<Brush> AvailableColors => new ObservableCollection<Brush>(CatanColors.AllAvailableBrushes());
@@ -190,6 +230,7 @@ namespace Catan10
                 }
             }
         }
+
         public Color PrimaryBackgroundColor
         {
             get
@@ -259,18 +300,8 @@ namespace Catan10
             }
         }
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #endregion Properties
 
-        private int PerceivedBrightness(Color c)
-        {
-            return (int)Math.Sqrt(
-            c.R * c.R * .299 +
-            c.G * c.G * .587 +
-            c.B * c.B * .114);
-        }
         public static PlayerModel Deserialize(string json)
         {
             return CatanProxy.Deserialize<PlayerModel>(json);
@@ -328,6 +359,7 @@ namespace Catan10
                 }
             }
         }
+
         /// <summary>
         ///     I've run into a bunch of problems where I add data (such as the GoldTiles list) but forget to clear it when Reset
         ///     is called.  this means state moves from one game to the next and we get funny results.  so instead i'm going to try
@@ -345,6 +377,7 @@ namespace Catan10
         {
             return CatanProxy.Serialize<PlayerModel>(this, indented);
         }
+
         public override string ToString()
         {
             return String.Format($"{PlayerName}");

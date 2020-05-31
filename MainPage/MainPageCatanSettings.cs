@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
-using Catan.Proxy;
+
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;
@@ -11,72 +10,19 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, ICatanSettings
     {
+        #region Fields
 
-        public double Zoom
-        {
-            get => _transformGameView.ScaleX;
+        private bool _initializeSettings = true;
 
-            set
-            {
-                MainPageModel.Settings.Zoom = value;
-                _transformGameView.ScaleX = value;
-                _transformGameView.ScaleY = value;
+        #endregion Fields
 
-            }
-        }
-
-        public bool RotateTile
-        {
-            get => MainPageModel.Settings.RotateTile;
-
-            set
-            {
-
-                MainPageModel.Settings.RotateTile = value;
-                if (value == false)
-                {
-                    foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
-                    {
-                        t.ResetTileRotation();
-                    }
-
-                }
-            }
-        }
+        #region Properties
 
         public bool AnimateFade
         {
             get => MainPageModel.Settings.AnimateFade;
 
             set => MainPageModel.Settings.AnimateFade = value;
-        }
-
-        public int FadeSeconds
-        {
-            get => MainPageModel.Settings.FadeSeconds;
-
-            set
-            {
-                MainPageModel.Settings.FadeSeconds = value;
-
-            }
-        }
-
-        public bool ShowStopwatch
-        {
-            get => MainPageModel.Settings.ShowStopwatch;
-
-            set => MainPageModel.Settings.ShowStopwatch = value;
-        }
-
-        public bool UseClassicTiles
-        {
-            get => true;
-
-            set
-            {
-
-            }
         }
 
         public int AnimationSpeedBase
@@ -103,13 +49,55 @@ namespace Catan10
             }
         }
 
+        public int FadeSeconds
+        {
+            get => MainPageModel.Settings.FadeSeconds;
+
+            set
+            {
+                MainPageModel.Settings.FadeSeconds = value;
+            }
+        }
+
         public bool ResourceTracking
         {
             get => true;
 
             set
             {
+            }
+        }
 
+        public bool RotateTile
+        {
+            get => MainPageModel.Settings.RotateTile;
+
+            set
+            {
+                MainPageModel.Settings.RotateTile = value;
+                if (value == false)
+                {
+                    foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
+                    {
+                        t.ResetTileRotation();
+                    }
+                }
+            }
+        }
+
+        public bool ShowStopwatch
+        {
+            get => MainPageModel.Settings.ShowStopwatch;
+
+            set => MainPageModel.Settings.ShowStopwatch = value;
+        }
+
+        public bool UseClassicTiles
+        {
+            get => true;
+
+            set
+            {
             }
         }
 
@@ -119,7 +107,6 @@ namespace Catan10
 
             set
             {
-
             }
         }
 
@@ -130,16 +117,33 @@ namespace Catan10
             set => MainPageModel.Settings.ValidateBuilding = value;
         }
 
+        public double Zoom
+        {
+            get => _transformGameView.ScaleX;
+
+            set
+            {
+                MainPageModel.Settings.Zoom = value;
+                _transformGameView.ScaleX = value;
+                _transformGameView.ScaleY = value;
+            }
+        }
+
+        #endregion Properties
+
+        #region Methods
+
+        public void Close()
+        {
+        }
+
         public async Task Explorer()
         {
-
             DataPackage dp = new DataPackage();
             dp.SetText(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
             Clipboard.SetContent(dp);
             await Launcher.LaunchFolderAsync(ApplicationData.Current.LocalFolder);
         }
-
-
 
         public async Task NewGame()
         {
@@ -151,19 +155,19 @@ namespace Catan10
             await OnOpenSavedGame();
         }
 
-        public async Task RotateTiles()
+        public async Task ResetGridLayout()
         {
-            await _gameView.RotateTiles();
-            _daRotatePlayers.To += 180;
-            _daRotateRolls.To += 180;
-            await _sbRotatePlayerAndRolls.ToTask();
-        }
+            foreach (var kvp in MainPageModel.Settings.GridPositions)
+            {
+                GridPosition pos = kvp.Value;
+                pos.TranslateX = 0;
+                pos.TranslateY = 0;
+                pos.ScaleX = 1.0;
+                pos.ScaleY = 1.0;
+            }
 
-
-
-        public async Task Winner()
-        {
-            await OnWin();
+            UpdateGridLocations();
+            await SaveGridLocations();
         }
 
         public async Task<bool> Reshuffle()
@@ -179,19 +183,20 @@ namespace Catan10
             dlg.PrimaryButtonClick += async (o, i) =>
             {
                 await _gameView.SetRandomCatanBoard(true);
-            
             };
 
             ContentDialogResult ret = await dlg.ShowAsync();
             return ret == ContentDialogResult.Primary;
         }
 
-        public void Close()
+        public async Task RotateTiles()
         {
-
+            await _gameView.RotateTiles();
+            _daRotatePlayers.To += 180;
+            _daRotateRolls.To += 180;
+            await _sbRotatePlayerAndRolls.ToTask();
         }
 
-        private bool _initializeSettings = true;
         public async Task SettingChanged()
         {
             if (_initializeSettings)
@@ -201,21 +206,12 @@ namespace Catan10
 
             await SaveGameState();
         }
-        public async Task ResetGridLayout()
+
+        public async Task Winner()
         {
-            foreach (var kvp in MainPageModel.Settings.GridPositions)
-            {
-                GridPosition pos = kvp.Value;                
-                pos.TranslateX = 0;
-                pos.TranslateY = 0;
-                pos.ScaleX = 1.0;
-                pos.ScaleY = 1.0;                
-            }
-
-            UpdateGridLocations();
-            await SaveGridLocations();
-
-
+            await OnWin();
         }
+
+        #endregion Methods
     }
 }

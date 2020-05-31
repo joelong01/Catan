@@ -7,10 +7,16 @@ namespace Catan10.NewLogging.Actions
 {
     public class PlayKnightLog : LogHeader, ILogController
     {
+        #region Properties
+
         public int PreviousTile { get; set; }
         public int TargetTile { get; set; }
         public string Victim { get; set; }
         public TargetWeapon Weapon { get; set; }
+
+        #endregion Properties
+
+        #region Methods
 
         public static async Task PostLog(IGameController gameController, PlayerModel victom, int targetTileIndex, int previousIndex, TargetWeapon weapon)
         {
@@ -74,5 +80,7 @@ namespace Catan10.NewLogging.Actions
 
             return Task.CompletedTask;
         }
+
+        #endregion Methods
     }
 }

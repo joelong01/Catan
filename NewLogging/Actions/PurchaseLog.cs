@@ -1,31 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
+
 using Catan.Proxy;
-using Windows.Media.PlayTo;
 
 namespace Catan10
 {
     /// <summary>
-    ///     this knows how to buy 
+    ///     this knows how to buy
     /// </summary>
-    public class PurchaseLog: LogHeader, ILogController
+    public class PurchaseLog : LogHeader, ILogController
     {
+        #region Properties
+
         public Entitlement PurchasedEntitlement { get; set; }
-        
-        
-        public  static async Task PostLog(IGameController gameController, PlayerModel player, Entitlement entitlement)
+
+        #endregion Properties
+
+        #region Methods
+
+        public static async Task PostLog(IGameController gameController, PlayerModel player, Entitlement entitlement)
         {
-
-
             PurchaseLog logHeader = new PurchaseLog()
             {
                 CanUndo = entitlement != Entitlement.DevCard,
-                SentBy = player.PlayerName, 
-                Action=CatanAction.Purchased,
+                SentBy = player.PlayerName,
+                Action = CatanAction.Purchased,
                 PurchasedEntitlement = entitlement
             };
 
@@ -49,7 +48,6 @@ namespace Catan10
             }
             player.GameData.Resources.GrantEntitlement(PurchasedEntitlement);
             return Task.CompletedTask;
-           
         }
 
         public Task Redo(IGameController gameController)
@@ -69,5 +67,7 @@ namespace Catan10
             player.GameData.Resources.UnspentEntitlements.Remove(PurchasedEntitlement);
             return Task.CompletedTask;
         }
+
+        #endregion Methods
     }
 }

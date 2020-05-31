@@ -1,21 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
 using Catan.Proxy;
 
 namespace Catan10
 {
     public class UpdateBuildingLog : LogHeader, ILogController
     {
+        #region Constructors
 
-        public BuildingState OldBuildingState { get; set; } = BuildingState.None;
-        public BuildingState NewBuildingState { get; set; } = BuildingState.None;
+        public UpdateBuildingLog() : base()
+        {
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
         public int BuildingIndex { get; set; } = -1;
+        public BuildingState NewBuildingState { get; set; } = BuildingState.None;
+        public BuildingState OldBuildingState { get; set; } = BuildingState.None;
 
+        #endregion Properties
 
-        public UpdateBuildingLog() : base() { }
+        #region Methods
 
         public static async Task UpdateBuildingState(IGameController gameController, BuildingCtrl building, BuildingState newState)
         {
@@ -28,6 +35,7 @@ namespace Catan10
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
+
         public Task Do(IGameController gameController)
         {
             return gameController.UpdateBuilding(this);
@@ -42,5 +50,7 @@ namespace Catan10
         {
             return gameController.UndoUpdateBuilding(this);
         }
+
+        #endregion Methods
     }
 }

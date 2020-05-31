@@ -4,9 +4,7 @@
     xmlns:local="using:Catan10" RequestedTheme="Dark">
     <Application.Resources>
         <ResourceDictionary>
-
             <!--  Other app resources here  -->
-
             <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
             <x:Double x:Key="ContentDialogMaxHeight">800</x:Double>
             <x:String x:Key="Dice_1">&#x2680;</x:String>
@@ -51,15 +49,12 @@
             <local:DiceRollToVisibilityConverter x:Key="DiceRollToVisibilityConverter" />
             <local:BoolToOrientationConverter x:Key="BoolToOrientationConverter" />
             <local:CachedColorToBrushConverter x:Key="CachedColorToBrushConverter" />
-
-
             <ImageBrush x:Key="bmDice_1" ImageSource="Assets/Dice/oneWhite.svg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmDice_2" ImageSource="Assets/Dice/twoWhite.svg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmDice_3" ImageSource="Assets/Dice/threeWhite.svg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmDice_4" ImageSource="Assets/Dice/fourWhite.svg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmDice_5" ImageSource="Assets/Dice/fiveWhite.svg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmDice_6" ImageSource="Assets/Dice/sixWhite.svg" Stretch="UniformToFill" />
-
             <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="UniformToFill" />
@@ -98,7 +93,6 @@
                 <Setter Property="FontSize" Value="48" />
                 <Setter Property="CharacterSpacing" Value="0" />
                 <Setter Property="Margin" Value="20,0,20,0" />
-
             </Style>
             <Style x:Key="GameControllerStackPanelCommand" TargetType="StackPanel">
                 <Setter Property="Orientation" Value="Horizontal" />
@@ -122,8 +116,8 @@
                 <Setter Property="FontFamily" Value="Segoe UI" />
                 <Setter Property="FontSize" Value="20" />
                 <Setter Property="Margin" Value="10,10,0,10" />
-                <!--<Setter Property="Width" Value="100"/>
-            <Setter Property="Height" Value="50"/>-->
+                <!--<Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="50" />-->
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Stretch" />
             </Style>
@@ -313,7 +307,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
             <!--  from https://msdn.microsoft.com/en-us/library/windows/apps/mt299120.aspx  -->
             <Style x:Key="CatanContentDialog" TargetType="ContentDialog">
                 <Setter Property="Foreground" Value="{ThemeResource SystemControlPageTextBaseHighBrush}" />
@@ -421,6 +414,5 @@
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-
     </Application.Resources>
 </Application>
