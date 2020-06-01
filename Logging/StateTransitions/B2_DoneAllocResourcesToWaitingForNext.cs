@@ -51,10 +51,8 @@ namespace Catan10
             {
                 p.GameData.RollOrientation = TileOrientation.FaceDown;
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources();
-                p.GameData.KnightEligible = false;
             });
 
-            gameController.CurrentPlayer.GameData.KnightEligible = (gameController.CurrentPlayer.GameData.Resources.UnplayedKnights > 0);
         }
 
         public Task Redo(IGameController gameController)

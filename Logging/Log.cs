@@ -164,7 +164,7 @@ namespace Catan10
         }
     }
 
-    public class NewLog : INotifyPropertyChanged, IDisposable
+    public class Log : INotifyPropertyChanged, IDisposable
     {
         #region Fields
 
@@ -218,7 +218,7 @@ namespace Catan10
 
         private async void OnSaveTimer(object state)
         {
-            NewLog log = state as NewLog;
+            Log log = state as Log;
             Contract.Assert(log != null);
             await log.WriteToDisk();
             log.Timer.Change(10 * 1000, Timeout.Infinite);
@@ -276,7 +276,7 @@ namespace Catan10
 
         #region Constructors
 
-        public NewLog(IGameController gameController)
+        public Log(IGameController gameController)
         {
             Stacks.PropertyChanged += Stacks_PropertyChanged;
             DateTime dt = DateTime.Now;

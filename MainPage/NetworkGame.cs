@@ -19,21 +19,11 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-        #region Fields
-
         private Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
-
-        #endregion Fields
-
-        #region Properties
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         private MessageWebSocket MessageWebSocket { get; set; }
         private DataWriter MessageWriter { get; set; }
-
-        #endregion Properties
-
-        #region Methods
 
         private async Task DeleteAllGames()
         {
@@ -166,7 +156,7 @@ namespace Catan10
             if (TheHuman == null) return;
 
             MainPageModel.PlayingPlayers.Clear();
-            MainPageModel.Log = new NewLog(this);
+            MainPageModel.Log = new Log(this);
 
             string gameName = "OnStartDefaultNetworkGame";
 
@@ -269,7 +259,13 @@ namespace Catan10
                 {
                     Type type = CurrentAssembly.GetType(message.DataTypeName);
                     if (type == null) throw new ArgumentException("Unknown type!");
-                    LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
+                    string json = message.Data.ToString();
+                    LogHeader logHeader = JsonSerializer.Deserialize(json, type, CatanProxy.GetJsonOptions()) as LogHeader;
+                    IMessageDeserializer deserializer = logHeader as IMessageDeserializer;
+                    if (deserializer != null)
+                    {
+                        logHeader = deserializer.Deserialize(json);
+                    }
                     message.Data = logHeader;
                     MainPageModel.Log.RecordMessage(message);
                     Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
@@ -306,7 +302,5 @@ namespace Catan10
                 await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message);
             }
         }
-
-        #endregion Methods
     }
 }

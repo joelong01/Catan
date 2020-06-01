@@ -26,13 +26,10 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-        #region Fields
-
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
         private readonly RoadRaceTracking _raceTracking = null;
         private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
-        private int _currentPlayerIndex = 0;
         private bool _doDragDrop = false;
         private DateTime _dt = DateTime.Now;
         private int _randomBoardListIndex = 0;
@@ -47,10 +44,6 @@ namespace Catan10
         private int _showPipGroupIndex = 0;
 
         private TaskCompletionSource<object> fileGuard = null;
-
-        #endregion Fields
-
-        #region Methods
 
         private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -413,7 +406,7 @@ namespace Catan10
                     break;
 
                 case GameState.WaitingForRoll:
-                    await WaitingForRollToWaitingForNext.PostLog(this, rolls);
+                    await WaitingForRollToWaitingForNext.PostRollMessage(this, rolls);
                     break;
 
                 default:
@@ -616,7 +609,7 @@ namespace Catan10
                 mainPageModel = CatanProxy.Deserialize<MainPageModel>(content);
                 if (mainPageModel == null) mainPageModel = new MainPageModel();
                 mainPageModel.GameController = this;
-                mainPageModel.Log = new NewLog(this);
+                mainPageModel.Log = new Log(this);
 
                 if (mainPageModel.Settings.GridPositions.Count == 0)
                 {
@@ -651,7 +644,7 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.RemoveAt(0); // the clear doesn't trigger the unsubscribe because the NewItems and the OldItems are both null
             }
 
-            MainPageModel.Log = new NewLog(this);
+            MainPageModel.Log = new Log(this);
 
             // _lbGames.SelectedValue = MainPageModel.Log;
             await ResetTiles(true);
@@ -676,7 +669,6 @@ namespace Catan10
                 p.Reset();
             }
             MainPageModel.PlayingPlayers.Clear();
-            _currentPlayerIndex = 0;
             Rolls.Clear();
             if (TheHuman != null)
             {
@@ -885,8 +877,6 @@ namespace Catan10
             await WsConnect();
         }
 
-        #endregion Methods
-
         public const string PlayerDataFile = "catansettings.json";
 
         // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
@@ -896,15 +886,6 @@ namespace Catan10
         public static readonly string SAVED_GAME_EXTENSION = ".log.json";
 
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
-
-        public MainPage()
-        {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-            this.InitializeComponent();
-            Current = this;
-            this.DataContext = this;
-            _raceTracking = new RoadRaceTracking(this);
-        }
 
         // this lets you double tap a map and then move it around
         // the index into PlayingPlayers that is the CurrentPlayer
@@ -933,6 +914,15 @@ namespace Catan10
         {
             get => (PlayerModel)GetValue(TheHumanProperty);
             set => SetValue(TheHumanProperty, value);
+        }
+
+        public MainPage()
+        {
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            this.InitializeComponent();
+            Current = this;
+            this.DataContext = this;
+            _raceTracking = new RoadRaceTracking(this);
         }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)

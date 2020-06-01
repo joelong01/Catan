@@ -41,11 +41,13 @@ namespace Catan10
         #endregion
         public PrivateDataCtrl()
         {
+            this.DataContext = this;
             this.InitializeComponent();
             this.PlayedDevCards.Add(DevCardType.Knight);
             this.PlayedDevCards.Add(DevCardType.YearOfPlenty);
             this.PlayedDevCards.Add(DevCardType.Knight);
             this.PlayedDevCards.Add(DevCardType.Monopoly);
+            
         }
 
         private async void OnPointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)

@@ -31,6 +31,21 @@ namespace Catan10
         // int toggle = 0;
         private void OnTest1(object sdr, RoutedEventArgs rea)
         {
+            CurrentPlayer.GameData.Score++;
+            
+            CurrentPlayer.GameData.RollsWithResource++;
+            CurrentPlayer.GameData.TimesTargeted++;
+            CurrentPlayer.GameData.LargestArmy = true;
+            CurrentPlayer.GameData.LongestRoad = 12;
+            CurrentPlayer.GameData.MaxNoResourceRolls++;
+            CurrentPlayer.GameData.Resources.ResourcesLostToMonopoly = new TradeResources() { Wheat = 7 };
+            CurrentPlayer.GameData.Resources.ResourcesLostSeven = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5 };
+            CurrentPlayer.GameData.Resources.ResourcesLostToBaron = new TradeResources() { Ore = 10 };
+            CurrentPlayer.GameData.NoResourceCount = 13;
+            CurrentPlayer.GameData.GoldRolls = 5;
+            CurrentPlayer.GameData.Resources.TotalResources = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5, Brick = 10 };
+
+
         }
 
         private void OnTest2(object sdr, RoutedEventArgs rea)

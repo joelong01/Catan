@@ -95,7 +95,7 @@ namespace Catan10
                 _imageBrush = new ImageBrush();
             }
 
-            _playerGameData = new PlayerGameModel(this);
+            GameData = new PlayerGameModel(this);
         }
 
         #endregion Constructors

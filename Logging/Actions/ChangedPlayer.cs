@@ -79,7 +79,7 @@ namespace Catan10
                 NewState = gameController.CurrentGameState,
                 NewCurrentPlayer = newPlayer.PlayerName,
                 OldRandomGoldTiles = gameController.CurrentRandomGoldTiles,
-                NewRandomGoldTiles = gameController.NextRandomGoldTiles,
+                //NewRandomGoldTiles = gameController.NextRandomGoldTiles,
                 HighlightedTiles = gameController.HighlightedTiles
             };
 

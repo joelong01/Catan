@@ -13,8 +13,6 @@ namespace Catan10
 {
     public sealed partial class RollCtrl : UserControl
     {
-        #region Methods
-
         private static void OrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as RollCtrl;
@@ -34,26 +32,8 @@ namespace Catan10
             }
         }
 
-        #endregion Methods
-
-        #region Fields
-
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(RollCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
         public static readonly DependencyProperty RollProperty = DependencyProperty.Register("Roll", typeof(RollModel), typeof(RollCtrl), new PropertyMetadata(new RollModel()));
-
-        #endregion Fields
-
-        #region Constructors
-
-        public RollCtrl()
-        {
-            this.InitializeComponent();
-            FlipClose.Begin();
-        }
-
-        #endregion Constructors
-
-        #region Properties
 
         public TileOrientation Orientation
         {
@@ -67,7 +47,11 @@ namespace Catan10
             set => SetValue(RollProperty, value);
         }
 
-        #endregion Properties
+        public RollCtrl()
+        {
+            this.InitializeComponent();
+            FlipClose.Begin();
+        }
 
         public Task GetFlipTask(TileOrientation orientation)
         {
@@ -84,40 +68,22 @@ namespace Catan10
 
     public class RollModel : INotifyPropertyChanged
     {
-        #region Properties
+        private int _diceOne = 2;
+
+        private int _diceTwo = 5;
+
+        private TileOrientation _Orientation = TileOrientation.FaceDown;
+
+        private bool _selected = false;
 
         static private MersenneTwister Twist { get; } = new MersenneTwister((int)DateTime.Now.Ticks);
-
-        #endregion Properties
-
-        #region Methods
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion Methods
-
-        #region Events
-
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
-
-        public void Randomize()
-        {
-            DiceOne = Twist.Next(1, 7);
-            DiceTwo = Twist.Next(1, 7);
-            Selected = false;
-        }
-
-        #region properties
-
-        private int _diceOne = 2;
-        private int _diceTwo = 5;
-        private TileOrientation _Orientation = TileOrientation.FaceDown;
-        private bool _selected = false;
 
         public int DiceOne
         {
@@ -172,8 +138,8 @@ namespace Catan10
             }
         }
 
+        [JsonIgnore]
         public int Roll => DiceOne + DiceTwo;
-        // used for binding
 
         public bool Selected
         {
@@ -192,7 +158,16 @@ namespace Catan10
             }
         }
 
-        #endregion properties
+        public RollModel()
+        {
+        }
+
+        public void Randomize()
+        {
+            DiceOne = Twist.Next(1, 7);
+            DiceTwo = Twist.Next(1, 7);
+            Selected = false;
+        }
 
         public override string ToString()
         {

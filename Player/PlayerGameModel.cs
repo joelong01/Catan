@@ -21,7 +21,7 @@ namespace Catan10
     {
         private readonly bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
         private int _CitiesPlayed = 0;
-        private List<List<int>> _GoldRolls = new List<List<int>>();
+        private int _goldRolls = 0;
         private bool _goodRoll = false;
         private bool _HasLongestRoad = false;
         private bool _isCurrentPlayer = false;
@@ -49,9 +49,10 @@ namespace Catan10
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         public CardsLostUpdatedHandler OnCardsLost;
-        public bool KnightEligible { get; set; } = false; // a flag set when this player becomes Current iff they have a knight they can play.  stops us from buying and playing a knight the same turn
+        
         public PlayerGameModel()
         {
+            NotificationsEnabled = true;
         }
 
         public PlayerGameModel(PlayerModel pData)
@@ -85,17 +86,17 @@ namespace Catan10
             }
         }
 
-        public List<List<int>> GoldRolls
+        public int GoldRolls
         {
             get
             {
-                return _GoldRolls;
+                return _goldRolls;
             }
             set
             {
-                if (_GoldRolls != value)
+                if (_goldRolls != value)
                 {
-                    _GoldRolls = value;
+                    _goldRolls = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -538,7 +539,7 @@ namespace Catan10
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
+           // if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
@@ -684,7 +685,7 @@ namespace Catan10
             MaxCities = 0;
         
             Pips = 0;
-            _GoldRolls = new List<List<int>>();
+            _goldRolls =  0;
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {

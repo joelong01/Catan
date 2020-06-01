@@ -6,6 +6,14 @@ using Catan.Proxy;
 
 namespace Catan10
 {
+    public static class ToWaitingForRoll
+    {
+        public static Task Do(IGameController gameController, RollState rollState, TradeResources resources)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
     /// <summary>
     ///     1. move the player
     ///     2. set the random gold tiles
@@ -14,24 +22,17 @@ namespace Catan10
     /// </summary>
     public class WaitingForNextToWaitingForRoll : LogHeader, ILogController
     {
-        #region Properties
+        private RollState RollState { get; set; }
 
-        public List<int> GoldTiles { get; set; }
-        public bool KnightEligible { get; set; }
         public TradeResources ResourcesThisTurn { get; set; }
-
-        #endregion Properties
-
-        #region Methods
 
         public static async Task PostLog(IGameController gameController)
         {
             WaitingForNextToWaitingForRoll logHeader = new WaitingForNextToWaitingForRoll()
             {
                 CanUndo = true,
+                RollState = gameController.GetNextRollState(),
                 ResourcesThisTurn = gameController.CurrentPlayer.GameData.Resources.ResourcesThisTurn,
-                KnightEligible = gameController.CurrentPlayer.GameData.KnightEligible, // need for undo
-                GoldTiles = gameController.CurrentRandomGoldTiles,
                 Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForRoll,
             };
@@ -53,19 +54,17 @@ namespace Catan10
             {
                 p.GameData.RollOrientation = TileOrientation.FaceDown;
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources(); // reset PublicDataCtrl resources
-                p.GameData.KnightEligible = false; // will set the current player's flag below
             });
 
-            gameController.CurrentPlayer.GameData.KnightEligible = (gameController.CurrentPlayer.GameData.Resources.UnplayedKnights > 0);
             await gameController.ResetRollControl();
+            await gameController.SetRandomTileToGold(this.RollState.GoldTiles);
+            await gameController.PushRollState(this.RollState);
             //
             // if we have a roll for this turn already, use it.
-            if (gameController.RollLog.CanRedo)
+            if (this.RollState.Rolls.Count > 0)
             {
-                await WaitingForRollToWaitingForNext.PostLog(gameController, gameController.RollLog.NextRolls);
+                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRolls);
             }
-
-            await gameController.SetRandomTileToGold(gameController.NextRandomGoldTiles);
         }
 
         public async Task Redo(IGameController gameController)
@@ -83,20 +82,14 @@ namespace Catan10
             {
                 p.GameData.RollOrientation = TileOrientation.FaceDown;
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources();
-                p.GameData.KnightEligible = false;
             });
 
-            gameController.CurrentPlayer.GameData.KnightEligible = (gameController.CurrentPlayer.GameData.Resources.UnplayedKnights > 0);
             //
             // if we have a roll for this turn already, use it.
             if (gameController.RollLog.CanRedo)
             {
-                await WaitingForRollToWaitingForNext.PostLog(gameController, gameController.RollLog.NextRolls);
+                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRolls);
             }
-
-            await gameController.SetRandomTileToGold(GoldTiles);
         }
-
-        #endregion Methods
     }
 }

@@ -20,7 +20,7 @@ namespace Catan10
         private TradeResources _gameResources = new TradeResources(); // the total number of resources that have been handed out in this game
         private string _HostName = "http://192.168.1.128:5000";
         private bool _isServiceGame = false;
-        private NewLog _newLog = null;
+        private Log _newLog = null;
         private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
         private Settings _Settings = new Settings();
         private int _ThreeStarPosition = 0;
@@ -98,7 +98,7 @@ namespace Catan10
 
         public MainPageModel(IGameController gameController)
         {
-            Log = new NewLog(gameController);
+            Log = new Log(gameController);
             GameController = gameController;
         }
 
@@ -313,7 +313,7 @@ namespace Catan10
         }
 
         [JsonIgnore]
-        public NewLog Log
+        public Log Log
         {
             get
             {

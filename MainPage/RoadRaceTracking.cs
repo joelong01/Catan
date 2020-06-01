@@ -61,7 +61,7 @@ namespace Catan10
 
         //
         //  i'm trying to have the class take care of its own logging when state changes
-        private NewLog Log => GameController.Log;
+        private Log Log => GameController.Log;
 
         //
         //  given a road count, get the ordered list of players that have that many roads

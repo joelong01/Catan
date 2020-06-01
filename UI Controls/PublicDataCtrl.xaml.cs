@@ -14,102 +14,36 @@ namespace Catan10
 {
     public sealed partial class PublicDataCtrl : UserControl
     {
+        #region Properties
+
         private ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
-        
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
-        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PublicDataCtrl), new PropertyMetadata(GameState.WaitingForNewGame, GameStateChanged));
-        public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
-        public static readonly DependencyProperty GradientStopOneColorProperty = DependencyProperty.Register("GradientStopOneColor", typeof(Color), typeof(PublicDataCtrl), new PropertyMetadata(Colors.SlateBlue));
-        public static readonly DependencyProperty GradientStopTwoColorProperty = DependencyProperty.Register("GradientStopTwoColor", typeof(Color), typeof(PublicDataCtrl), new PropertyMetadata(Colors.Black));
-        public Color GradientStopTwoColor
-        {
-            get => (Color)GetValue(GradientStopTwoColorProperty);
-            set => SetValue(GradientStopTwoColorProperty, value);
-        }
-        public Color GradientStopOneColor
-        {
-            get => (Color)GetValue(GradientStopOneColorProperty);
-            set => SetValue(GradientStopOneColorProperty, value);
-        }
-        public TileOrientation RollOrientation
-        {
-            get => (TileOrientation)GetValue(RollOrientationProperty);
-            set => SetValue(RollOrientationProperty, value);
-        }
-        private static void RollOrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as PublicDataCtrl;
-            var depPropValue = (TileOrientation)e.NewValue;
-            depPropClass?.SetRollOrientation(depPropValue);
-        }
-        private void SetRollOrientation(TileOrientation orientation)
-        {
-            if (Player == null) return;
 
-            if (orientation == TileOrientation.FaceDown) 
-                ShowStats.Begin();
-            else
-                ShowLatestRoll.Begin();
-        }
+        #endregion Properties
 
-        public GameState GameState
-        {
-            get => (GameState)GetValue(GameStateProperty);
-            set => SetValue(GameStateProperty, value);
-        }
-        private static void GameStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as PublicDataCtrl;
-            var depPropValue = (GameState)e.NewValue;
-            depPropClass?.SetGameState(depPropValue);
-        }
-        private void SetGameState(GameState state)
-        {
-            if (state == GameState.WaitingForRollForOrder)
-            {
-                ShowLatestRoll.Begin();
-            }
-            else
-            {
-                ShowStats.Begin();
-            }
-        }
+        #region Methods
 
-        public PlayerModel Player
-        {
-            get => (PlayerModel)GetValue(PlayerProperty);
-            set => SetValue(PlayerProperty, value);
-        }
+      
+
         private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as PublicDataCtrl;
             var depPropValue = (PlayerModel)e.NewValue;
             depPropClass?.SetPlayer(depPropValue);
         }
-       
-        private void SetPlayer(PlayerModel value)
+
+        private static void RollOrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (value == null) return;
-            PlayedDevCards.Clear();
-            PlayedDevCards.AddRange(value.GameData.Resources.PlayedDevCards);            
-            //
-            //  for testing...
-            //
-            this.PlayedDevCards.Add(DevCardType.Knight);
-            this.PlayedDevCards.Add(DevCardType.YearOfPlenty);
-            this.PlayedDevCards.Add(DevCardType.Knight);
-            this.PlayedDevCards.Add(DevCardType.Monopoly);
-            
+            var depPropClass = d as PublicDataCtrl;
+            var depPropValue = (TileOrientation)e.NewValue;
+            depPropClass?.SetRollOrientation(depPropValue);
         }
 
-       
-
-        public PublicDataCtrl()
+        private void OnFlipRollGrid(object sender, RoutedEventArgs e)
         {
-            this.InitializeComponent();
-            
-        }
 
+            Player.GameData.RollOrientation = (Player.GameData.RollOrientation == TileOrientation.FaceDown) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
+
+        }
 
         private async void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
@@ -133,7 +67,7 @@ namespace Catan10
 
                 if (await StaticHelpers.AskUserYesNoQuestion($"Let {player.PlayerName} go first?", "Yes", "No"))
                 {
-                    await MainPage.Current.SetFirst(player); //manipulates the shared PlayingPlayers list, but also does logging and other book keeping.
+                  //  await MainPage.Current.SetFirst(player); //manipulates the shared PlayingPlayers list, but also does logging and other book keeping.
                 }
             }
             finally
@@ -143,11 +77,54 @@ namespace Catan10
 
         }
 
-        private void OnFlipRollGrid(object sender, RoutedEventArgs e)
+        private void SetPlayer(PlayerModel value)
         {
+            if (value == null) return;
 
-            Player.GameData.RollOrientation = (Player.GameData.RollOrientation == TileOrientation.FaceDown) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
+            this.TraceMessage($"Added Player {value}");
+
+        }
+
+        private void SetRollOrientation(TileOrientation orientation)
+        {
+            if (Player == null) return;
+
+            if (orientation == TileOrientation.FaceDown)
+                ShowStats.Begin();
+            else
+                ShowLatestRoll.Begin();
+        }
+
+        #endregion Methods
+
+        #region Fields
+
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(null, PlayerChanged));
+        public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
+
+        #endregion Fields
+
+        #region Constructors
+
+        public PublicDataCtrl()
+        {
+            this.InitializeComponent();
             
+
+        }
+
+        #endregion Constructors
+
+        public PlayerModel Player
+        {
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
+        }
+
+        public TileOrientation RollOrientation
+        {
+            get => (TileOrientation)GetValue(RollOrientationProperty);
+            set => SetValue(RollOrientationProperty, value);
         }
     }
 }

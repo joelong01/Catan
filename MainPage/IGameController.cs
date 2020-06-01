@@ -14,13 +14,7 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
-        #region Properties
-
         private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
-
-        #endregion Properties
-
-        #region Methods
 
         private async Task UpdateUiForState(GameState currentState)
         {
@@ -149,8 +143,6 @@ namespace Catan10
             }
         }
 
-        #endregion Methods
-
         public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
@@ -184,28 +176,7 @@ namespace Catan10
         }
 
         public bool IsServiceGame => MainPageModel.IsServiceGame;
-        public NewLog Log => MainPageModel.Log;
-
-        public List<int> NextRandomGoldTiles
-        {
-            get
-            {
-                int playerRoll = TotalRolls / MainPageModel.PlayingPlayers.Count;  // integer divide - drops remainder
-                if (playerRoll == CurrentPlayer.GameData.GoldRolls.Count)
-                {
-                    var newRandomGoldTiles = GetRandomGoldTiles();
-                    CurrentPlayer.GameData.GoldRolls.Add(newRandomGoldTiles);
-                    return newRandomGoldTiles;
-                }
-                else
-                {
-                    Contract.Assert(CurrentPlayer.GameData.GoldRolls.Count > playerRoll);
-                    //
-                    //  we've already picked the tiles for this roll -- use them
-                    return CurrentPlayer.GameData.GoldRolls[playerRoll];
-                }
-            }
-        }
+        public Log Log => MainPageModel.Log;
 
         public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
         public CatanProxy Proxy => MainPageModel.Proxy;
@@ -239,13 +210,14 @@ namespace Catan10
             if (MainPageModel.PlayingPlayers.Contains(playerToAdd) == false)
             {
                 AddPlayerMenu(playerToAdd);
+
                 //
                 //  need to give the players some data about the game
                 playerToAdd.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
                 playerToAdd.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
                 playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
                 playerToAdd.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
-
+                playerToAdd.GameData.NotificationsEnabled = true;
                 MainPageModel.PlayingPlayers.Add(playerToAdd);
             }
 
@@ -417,6 +389,27 @@ namespace Catan10
             return false;
         }
 
+        /// <summary>
+        ///     We store Rolls as RollModels which have both the GoldTiles (set before Roll) and the Roll (set after Roll).
+        ///     Once you are assigned a Roll, that is your roll.  you can undo it, but when Redo (or even Next) happens,
+        ///     you get the same Gold Tiles and the same value of the roll.
+        /// </summary>
+        /// <returns>the rollState object to use for this turn</returns>
+        public RollState GetNextRollState()
+        {
+            var rollState = Log.RollLog.PopUndoneRoll();
+            if (rollState == null)
+            {
+                rollState = new RollState()
+                {
+                    GoldTiles = this.GetRandomGoldTiles(),
+                    PlayerName = CurrentPlayer.PlayerName
+                };
+            }
+
+            return rollState;
+        }
+
         public RandomBoardSettings GetRandomBoard()
         {
             return _gameView.GetRandomBoard();
@@ -489,6 +482,19 @@ namespace Catan10
         public DevCardType PurchaseNextDevCard()
         {
             return _gameView.CurrentGame.GetNextDevCard();
+        }
+
+        /// <summary>
+        ///     this is the second phase of doing a roll -- put it on the stack with possibly Gold Tiles only
+        ///
+        /// </summary>
+        /// <param name="rollState"></param>
+        /// <returns></returns>
+        public async Task PushRollState(RollState rollState)
+        {
+            Contract.Assert(rollState != null);
+            Contract.Assert(rollState.GoldTiles != null);
+            await Log.RollLog.PushStateNoRoll(rollState);
         }
 
         public async Task<bool> RedoAsync()

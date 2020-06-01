@@ -10,10 +10,13 @@ namespace Catan10
 {
     public class PlayerResources : INotifyPropertyChanged
     {
+        #region Fields
+
         private int _Cities = 0;
 
         private TradeResources _currentResources = new TradeResources();
         private int _GoldTotal = 0;
+        private int _knightsPlayed = 0;
         private int _PlayedMonopoly = 0;
         private int _PlayedRoadBuilding = 0;
         private int _PlayedYearOfPlenty = 0;
@@ -23,14 +26,49 @@ namespace Catan10
         private TradeResources _ResourcesThisTurn = new TradeResources();
         private int _Roads = 0;
         private int _Settlements = 0;
+        DevCardType _thisTurnsDevCard = DevCardType.Back;
         private int _TotalDevCards = 0;
         private TradeResources _TotalResources = new TradeResources();
         private int _UnplayedKnights = 0;
         private int _UnplayedMonopoly = 0;
         private int _UnplayedYearOfPlenty = 0;
         private int _VictoryPoints = 0;
-        private int _knightsPlayed = 0;
-        
+
+        #endregion Fields
+
+        #region Methods
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        internal void ConsumeEntitlement(Entitlement entitlement)
+        {
+            Contract.Assert(HasEntitlement(entitlement));
+            UnspentEntitlements.Remove(entitlement);
+        }
+
+        internal void RevokeEntitlement(Entitlement entitlement)
+        {
+            this.ConsumeEntitlement(entitlement);
+        }
+
+        #endregion Methods
+
+        #region Constructors
+
+        #endregion Constructors
+
+        #region Events
+
+        #endregion Events
+
+        #region Properties
+
+        #endregion Properties
+
+        public DevCardType PlayedThisTurn;
         public PlayerResources()
         {
         }
@@ -91,15 +129,17 @@ namespace Catan10
             set
             {
                 if (_knightsPlayed != value)
-                {                   
+                {
                     _knightsPlayed = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        public ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
-
+        public int KnightsPlayed1 { get => this.KnightsPlayed; set => this.KnightsPlayed = value; }
+        public ObservableCollection<DevCardType> NewDevCards { get; set; } = new ObservableCollection<DevCardType>() { DevCardType.Knight, DevCardType.YearOfPlenty };
+        public ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>() { DevCardType.Knight, DevCardType.Knight, DevCardType.RoadBuilding };
+        
         public int PlayedMonopoly
         {
             get
@@ -163,6 +203,7 @@ namespace Catan10
                 }
             }
         }
+
         public TradeResources ResourcesLostToBaron
         {
             get
@@ -243,6 +284,22 @@ namespace Catan10
             }
         }
 
+        public DevCardType ThisTurnsDevCard
+        {
+            get
+            {
+                return _thisTurnsDevCard;
+            }
+            set
+            {
+                if (_thisTurnsDevCard != value)
+                {
+                    _thisTurnsDevCard = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public int TotalDevCards
         {
             get
@@ -275,8 +332,8 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public int UnplayedDevCards => UnplayedKnights + VictoryPoints + UnplayedYearOfPlenty + UnplayedRoadBuilding + UnplayedMonopoly;
+        public ObservableCollection<DevCardType> UnplayedDevCards { get; set; } = new ObservableCollection<DevCardType>() { DevCardType.Knight, DevCardType.Monopoly };
+      
 
         public int UnplayedKnights
         {
@@ -345,25 +402,6 @@ namespace Catan10
                 }
             }
         }
-
-        public int KnightsPlayed1 { get => this.KnightsPlayed; set => this.KnightsPlayed = value; }
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        internal void ConsumeEntitlement(Entitlement entitlement)
-        {
-            Contract.Assert(HasEntitlement(entitlement));
-            UnspentEntitlements.Remove(entitlement);
-        }
-
-        internal void RevokeEntitlement(Entitlement entitlement)
-        {
-            this.ConsumeEntitlement(entitlement);
-        }
-
         public void AddDevCard(DevCardType devCard)
         {
             switch (devCard)
