@@ -64,7 +64,7 @@
 
     //
     // Back is needed because the resource control flips from its back to front..this makes a front look like the back of a dev card
-    public enum DevCardType { Knight, VictoryPoint, YearOfPlenty, RoadBuilding, Monopoly, Unknown, Back };
+    public enum DevCardType { Knight, VictoryPoint, YearOfPlenty, RoadBuilding, Monopoly, None, Back };
 
     public enum Entitlement
     {
@@ -102,7 +102,7 @@
 
     public enum HarborLocation { None = 0x00000000, TopRight = 0x00100000, TopLeft = 0x00010000, BottomRight = 0x00001000, BottomLeft = 0x00000100, Top = 0x00000010, Bottom = 0x00000001 };
 
-    public enum HarborType { Sheep, Wood, Ore, Wheat, Brick, ThreeForOne, Uninitialized, None };
+    public enum HarborType { Sheep, Wood, Ore, Wheat, Brick, ThreeForOne, None };
 
     public enum LogState
     {

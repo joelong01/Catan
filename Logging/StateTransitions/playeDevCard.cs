@@ -3,29 +3,25 @@ using System.Collections.Generic;
 using System.Text.Json;
 
 using Catan.Proxy;
+using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
     public class KnightPlayedLog : PlayedDevCardModel
     {
-        #region Constructors
+        public int PickedTileIndex { get; set; } = -1;
+
+        public int PreviousTileIndex { get; set; } = -1;
+
+        public ResourceType ResourceAcquired { get; set; }
+
+        public string Victim { get; set; } = "";
 
         public KnightPlayedLog() : base()
         {
             Action = CatanAction.PlayedDevCard;
             DevCard = DevCardType.Knight;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public int PickedTileIndex { get; set; } = -1;
-        public int PreviousTileIndex { get; set; } = -1;
-        public ResourceType ResourceAcquired { get; set; }
-        public string Victim { get; set; } = "";
-
-        #endregion Properties
 
         // who got targetted
         // what got stolen
@@ -35,22 +31,12 @@ namespace Catan10
 
     public class PlayedDevCardModel : LogHeader
     {
-        #region Constructors
+        public DevCardType DevCard { get; set; } = DevCardType.None;
 
         public PlayedDevCardModel() : base()
         {
             Action = CatanAction.PlayedDevCard;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public DevCardType DevCard { get; set; } = DevCardType.Unknown;
-
-        #endregion Properties
-
-        #region Methods
 
         //
         //  this allows us to deal with the polymorphic deserialization of these log records
@@ -82,7 +68,7 @@ namespace Catan10
                     return mono as PlayedMonopoly;
 
                 case DevCardType.Back:
-                case DevCardType.Unknown:
+                case DevCardType.None:
                 case DevCardType.VictoryPoint:
                 default:
                     break;
@@ -90,44 +76,27 @@ namespace Catan10
 
             return null;
         }
-
-        #endregion Methods
     }
 
     public class PlayedMonopoly : PlayedDevCardModel
     {
-        #region Constructors
+        public Dictionary<string, int> PlayerToCardCount { get; set; } = new Dictionary<string, int>();
+
+        public ResourceType ResourceType { get; set; } = ResourceType.None;
 
         public PlayedMonopoly() : base()
         {
             DevCard = DevCardType.Monopoly;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public Dictionary<string, int> PlayerToCardCount { get; set; } = new Dictionary<string, int>();
-        public ResourceType ResourceType { get; set; } = ResourceType.None;
-
-        #endregion Properties
     }
 
     public class PlayedPlayedYearOfPlentyLog : PlayedDevCardModel
     {
-        #region Constructors
+        public TradeResources Acquired { get; set; } = null;
 
         public PlayedPlayedYearOfPlentyLog() : base()
         {
             DevCard = DevCardType.YearOfPlenty;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public TradeResources Acquired { get; set; } = null;
-
-        #endregion Properties
     }
 }

@@ -14,6 +14,14 @@ namespace Catan10
     /// </summary>
     public class RollLog : INotifyPropertyChanged, IRollLog, IRollStats
     {
+        private RollLog()
+        {
+        }
+
+        private Stack<RollState> Done { get; set; } = new Stack<RollState>();
+        private IGameController GameController { get; set; }
+        private Stack<RollState> Undone { get; set; } = new Stack<RollState>();
+
         private string _eightPercent = "";
         private string _elevenPercent = "";
         private string _fivePercent = "";
@@ -27,16 +35,6 @@ namespace Catan10
         private string _twoPercent = "";
 
         private string[] DynamicPropertyNames = new string[] { "TotalRolls", "LastRoll" };
-
-        private Stack<RollState> Done { get; set; } = new Stack<RollState>();
-
-        private IGameController GameController { get; set; }
-
-        private Stack<RollState> Undone { get; set; } = new Stack<RollState>();
-
-        private RollLog()
-        {
-        }
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -129,7 +127,7 @@ namespace Catan10
                     }
 
                     player.GameData.Resources.ResourcesLostToBaron += Baroned;
-                    GameController.MainPageModel.GameResources += Granted;
+                    //                     GameController.MainPageModel.GameResources += Granted;
 
                     if (Granted.Count == 0)
                     {
@@ -195,7 +193,10 @@ namespace Catan10
             return this.UpdateUi(RollAction.Do);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public RollLog(IGameController gameController)
+        {
+            GameController = gameController;
+        }
 
         public bool CanRedo
         {
@@ -405,10 +406,7 @@ namespace Catan10
             }
         }
 
-        public RollLog(IGameController gameController)
-        {
-            GameController = gameController;
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Task DoRoll(List<RollModel> rolls, List<int> goldTiles)
         {

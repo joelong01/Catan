@@ -55,36 +55,45 @@
             <ImageBrush x:Key="bmDice_4" ImageSource="Assets/Dice/fourWhite.svg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmDice_5" ImageSource="Assets/Dice/fiveWhite.svg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmDice_6" ImageSource="Assets/Dice/sixWhite.svg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTileBack" ImageSource="Assets/Tiles/back.jpg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTileBrick" ImageSource="Assets/Tiles/brick.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTileDesert" ImageSource="Assets/Tiles/desert.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTileGoldMine" ImageSource="Assets/Tiles/goldMine.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTileOre" ImageSource="Assets/Tiles/ore.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTileSheep" ImageSource="Assets/Tiles/sheep.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTileWheat" ImageSource="Assets/Tiles/wheat.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTileWood" ImageSource="Assets/Tiles/wood.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTwoForOneBrick" ImageSource="Assets/Harbors/2 for 1 brick.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTwoForOneOre" ImageSource="Assets/Harbors/2 for 1 ore.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTwoForOneSheep" ImageSource="Assets/Harbors/2 for 1 sheep.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTwoForOneWheat" ImageSource="Assets/Harbors/2 for 1 wheat.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmTwoForOneWood" ImageSource="Assets/Harbors/2 for 1 wood.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmThreeForOne" ImageSource="Assets/Harbors/3 for 1.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmDevCardBack" ImageSource="Assets/DevCards/back.jpg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmKnight" ImageSource="Assets/DevCards/knight.jpg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmMonopoly" ImageSource="Assets/DevCards/Monopoly.jpg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmRoadBuilding" ImageSource="Assets/DevCards/RoadBuilding.jpg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmVictoryPoint" ImageSource="Assets/DevCards/VictoryPoint.jpg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmYearOfPlenty" ImageSource="Assets/DevCards/YearOfPlenty.jpg" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmResourceCardBack" ImageSource="Assets/ResourceCards/back.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmResourceCardBrick" ImageSource="Assets/ResourceCards/brick.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmResourceCardGoldMine" ImageSource="Assets/ResourceCards/goldMine.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmResourceCardOre" ImageSource="Assets/ResourceCards/ore.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmResourceCardSheep" ImageSource="Assets/ResourceCards/sheep.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmResourceCardWheat" ImageSource="Assets/ResourceCards/wheat.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="bmResourceCardWood" ImageSource="Assets/ResourceCards/wood.png" Stretch="UniformToFill" />
+            <!--  TileType Brushes - should be one per ResourceType enum value, but these are the hex images  -->
+            <ImageBrush x:Key="TileType.Back" ImageSource="Assets/Tiles/back.jpg" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.Sea" ImageSource="Assets/Tiles/back.jpg" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.Brick" ImageSource="Assets/Tiles/brick.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.GoldMine" ImageSource="Assets/Tiles/goldMine.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.Ore" ImageSource="Assets/Tiles/ore.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.Sheep" ImageSource="Assets/Tiles/sheep.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.Wheat" ImageSource="Assets/Tiles/wheat.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.Wood" ImageSource="Assets/Tiles/wood.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.Desert" ImageSource="Assets/Tiles/desert.png" Stretch="UniformToFill" />
+            <!--  ResourceType HarborType - should be one per enum value  -->
+            <ImageBrush x:Key="HarborType.Brick" ImageSource="Assets/Harbors/2 for 1 brick.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="HarborType.Ore" ImageSource="Assets/Harbors/2 for 1 ore.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="HarborType.Sheep" ImageSource="Assets/Harbors/2 for 1 sheep.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="HarborType.Wheat" ImageSource="Assets/Harbors/2 for 1 wheat.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="HarborType.Wood" ImageSource="Assets/Harbors/2 for 1 wood.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="HarborType.ThreeForOne" ImageSource="Assets/Harbors/3 for 1.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="HarborType.Back" ImageSource="Assets/water.png" Stretch="UniformToFill" />
+            <!--  ResourceType Brushes - should be one per enum value  -->
+            <ImageBrush x:Key="DevCardType.Back" ImageSource="Assets/DevCards/back.jpg" Stretch="UniformToFill" />
+            <ImageBrush x:Key="DevCardType.Knight" ImageSource="Assets/DevCards/knight.jpg" Stretch="UniformToFill" />
+            <ImageBrush x:Key="DevCardType.Monopoly" ImageSource="Assets/DevCards/Monopoly.jpg" Stretch="UniformToFill" />
+            <ImageBrush x:Key="DevCardType.RoadBuilding" ImageSource="Assets/DevCards/RoadBuilding.jpg" Stretch="UniformToFill" />
+            <ImageBrush x:Key="DevCardType.VictoryPoint" ImageSource="Assets/DevCards/VictoryPoint.jpg" Stretch="UniformToFill" />
+            <ImageBrush x:Key="DevCardType.YearOfPlenty" ImageSource="Assets/DevCards/YearOfPlenty.jpg" Stretch="UniformToFill" />
+            <SolidColorBrush x:Key="DevCardType.None" Color="Transparent" />
+            <!--  ResourceType Brushes - should be one per enum value  -->
+            <ImageBrush x:Key="ResourceType.Back" ImageSource="Assets/ResourceCards/back.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.Brick" ImageSource="Assets/ResourceCards/brick.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.GoldMine" ImageSource="Assets/ResourceCards/goldMine.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.Ore" ImageSource="Assets/ResourceCards/ore.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.Sheep" ImageSource="Assets/ResourceCards/sheep.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.Wheat" ImageSource="Assets/ResourceCards/wheat.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.Wood" ImageSource="Assets/ResourceCards/wood.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.Desert" ImageSource="Assets/Tiles/desert.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.Sea" ImageSource="Assets/water.png" Stretch="UniformToFill" />
+            <SolidColorBrush x:Key="ResourceType.None" Color="Transparent" />
             <Style x:Key="GameControllerStyle" TargetType="Button">
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />

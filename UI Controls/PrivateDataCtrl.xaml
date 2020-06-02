@@ -17,18 +17,6 @@
             <Setter Property="Foreground" Value="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
             <Setter Property="HorizontalAlignment" Value="Center" />
         </Style>
-        <Style x:Key="TEXTSTYLE_Count" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="FontSize" Value="30" />
-            <Setter Property="Foreground" Value="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Bottom" />
-            <Setter Property="Foreground" Value="Yellow" />
-            <Setter Property="LineStackingStrategy" Value="BaselineToBaseline" />
-            <Setter Property="HorizontalTextAlignment" Value="Center" />
-            <Setter Property="Margin" Value="3,5,5,5" />
-
-        </Style>
     </Control.Resources>
     <Grid Width="475" Height="305" Background="{StaticResource TransparentBrush}" CornerRadius="10">
         <Grid.RowDefinitions>
@@ -42,84 +30,82 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
             <StackPanel Orientation="Horizontal">
-                <Grid Width="70" Height="100" Margin="1"
-                    Background="{StaticResource bmResourceCardWood}"
-                    CornerRadius="10">
-                    <Viewbox Height="35" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Border Background="Black" CornerRadius="6">
-                            <TextBlock Text="{Binding Player.GameData.Resources.Current.Wood, Mode=OneWay, FallbackValue=10, TargetNullValue=0}" Style="{StaticResource TEXTSTYLE_Count}" />
-                        </Border>
-                    </Viewbox>
-                </Grid>
-                <Grid Width="70" Height="100" Margin="1"
-                    Background="{StaticResource bmResourceCardBrick}"
-                    CornerRadius="10">
-                    <Viewbox Height="35" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Border Background="Black" CornerRadius="6">
-                            <TextBlock Text="{Binding Player.GameData.Resources.Current.Brick, Mode=OneWay, FallbackValue=0, TargetNullValue=0}" Style="{StaticResource TEXTSTYLE_Count}" />
-                        </Border>
-                    </Viewbox>
-                </Grid>
-                <Grid Width="70" Height="100" Margin="1"
-                    Background="{StaticResource bmResourceCardSheep}"
-                    CornerRadius="10">
-                    <Viewbox Height="35" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Border Background="Black" CornerRadius="6">
-                            <TextBlock Text="{Binding Player.GameData.Resources.Current.Sheep, Mode=OneWay, FallbackValue=0, TargetNullValue=0}" Style="{StaticResource TEXTSTYLE_Count}" />
-                        </Border>
-                    </Viewbox>
-                </Grid>
-                <Grid Width="70" Height="100" Margin="1"
-                    Background="{StaticResource bmResourceCardWheat}"
-                    CornerRadius="10">
-                    <Viewbox Height="35" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Border Background="Black" CornerRadius="6">
-                            <TextBlock Text="{Binding Player.GameData.Resources.Current.Wheat, Mode=OneWay, FallbackValue=0, TargetNullValue=0}" Style="{StaticResource TEXTSTYLE_Count}" />
-                        </Border>
-                    </Viewbox>
-                </Grid>
-                <Grid Width="70" Height="100" Margin="1"
-                    Background="{StaticResource bmResourceCardOre}"
-                    CornerRadius="10">
-                    <Viewbox Height="35" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Border Background="Black" CornerRadius="6">
-                            <TextBlock Text="{Binding Player.GameData.Resources.Current.Ore, Mode=OneWay, FallbackValue=0, TargetNullValue=0}" Style="{StaticResource TEXTSTYLE_Count}" />
-                        </Border>
-                    </Viewbox>
-                </Grid>
-                <Grid Width="70" Height="100" Margin="1"
-                    Background="{StaticResource bmResourceCardGoldMine}"
-                    CornerRadius="10">
-                    <Viewbox Height="35" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Border Background="Black" CornerRadius="6">
-                            <TextBlock Text="{Binding Player.GameData.Resources.Current.GoldMine, Mode=OneWay, FallbackValue=0, TargetNullValue=0}" Style="{StaticResource TEXTSTYLE_Count}" />
-                        </Border>
-                    </Viewbox>
-                </Grid>
-
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wood}" Count="{x:Bind Player.GameData.Resources.Current.Wood, Mode=OneWay}" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Sheep}" Count="{x:Bind Player.GameData.Resources.Current.Sheep, Mode=OneWay}" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Brick}" Count="{x:Bind Player.GameData.Resources.Current.Brick, Mode=OneWay}" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wheat}" Count="{x:Bind Player.GameData.Resources.Current.Wheat, Mode=OneWay}" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Ore}" Count="{x:Bind Player.GameData.Resources.Current.Ore, Mode=OneWay}" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.GoldMine}" Count="{x:Bind Player.GameData.Resources.Current.GoldMine, Mode=OneWay}" />
             </StackPanel>
-            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal">
+                <Grid Height="110" Background="{StaticResource DevCardType.Back}">
+                    <FlipView Width="120" Height="100" Margin="5" HorizontalAlignment="Left"
+                        BorderBrush="Wheat" BorderThickness="2" CornerRadius="5"
+                        ItemsSource="{x:Bind Player.GameData.Resources.AvailableDevCards, Mode=OneWay}">
+                        <FlipView.ItemTemplate>
+                            <DataTemplate x:DataType="local:DevCardModel">
+                                <Grid>
+                                    <Rectangle Width="70" Height="100" Margin="2" RadiusX="5"
+                                        RadiusY="5"
+                                        Fill="{x:Bind local:DevCardModel.DevCardTypeToImage(DevCardType), Mode=OneWay}" />
+                                </Grid>
+                            </DataTemplate>
+                        </FlipView.ItemTemplate>
+                    </FlipView>
+                </Grid>
+                <Grid Height="110" Background="{StaticResource DevCardType.Back}">
+                    <FlipView Width="120" Height="100" Margin="5" HorizontalAlignment="Left"
+                        BorderBrush="Wheat" BorderThickness="2" CornerRadius="5"
+                        ItemsSource="{x:Bind Player.GameData.Resources.NewDevCards, Mode=OneWay}">
+                        <FlipView.ItemTemplate>
+                            <DataTemplate x:DataType="local:DevCardModel">
+                                <Grid>
+                                    <Rectangle Width="70" Height="100" Margin="2" RadiusX="5"
+                                        RadiusY="5"
+                                        Fill="{x:Bind local:DevCardModel.DevCardTypeToImage(DevCardType), Mode=OneWay}" />
+                                </Grid>
+                            </DataTemplate>
+                        </FlipView.ItemTemplate>
+                    </FlipView>
+                </Grid>
+                <Grid Height="110" Background="{StaticResource DevCardType.Back}">
+                    <FlipView Width="120" Height="100" Margin="5" HorizontalAlignment="Left"
+                        BorderBrush="Wheat" BorderThickness="2" CornerRadius="5"
+                        ItemsSource="{x:Bind Player.GameData.Resources.PlayedDevCards, Mode=OneWay}">
+                        <FlipView.ItemTemplate>
+                            <DataTemplate x:DataType="local:DevCardModel">
+                                <Grid>
+                                    <Rectangle Width="70" Height="100" Margin="2" RadiusX="5"
+                                        RadiusY="5"
+                                        Fill="{x:Bind local:DevCardModel.DevCardTypeToImage(DevCardType), Mode=OneWay}" />
+                                </Grid>
+                            </DataTemplate>
+                        </FlipView.ItemTemplate>
+                    </FlipView>
+                </Grid>
+                <Rectangle Width="70" Height="100" Margin="2" RadiusX="5"
+                    RadiusY="5"
+                    Fill="{x:Bind local:DevCardModel.DevCardTypeToImage(Player.GameData.Resources.ThisTurnsDevCard), Mode=OneWay}" />
+            </StackPanel>
+            <StackPanel Margin="0,5,0,0" Orientation="Horizontal" Visibility="Collapsed">
                 <Button Padding="0">
                     <Button.Content>
-                        <Grid Width="70" Height="100" Background="{StaticResource bmKnight}" CornerRadius="10">
-                             <Border Height="20" HorizontalAlignment="Center" VerticalAlignment="Top" Background="Black">
-                                        <TextBlock Text="Knight" Foreground="White" />
-                                    </Border>
-                            <Viewbox HorizontalAlignment="Left" Margin="0,20,0,0">
+                        <Grid Width="70" Height="100" Background="{StaticResource DevCardType.Knight}" CornerRadius="10">
+                            <Border Height="20" HorizontalAlignment="Center" VerticalAlignment="Top" Background="Black">
+                                <TextBlock Text="Knight" Foreground="White" />
+                            </Border>
+                            <Viewbox Margin="0,20,0,0" HorizontalAlignment="Left">
                                 <StackPanel Margin="10,0,0,0">
-                                   
-
                                     <Border Width="25" Height="40" HorizontalAlignment="Left"
-                                        Background="{StaticResource bmDevCardBack}"
+                                        Background="{StaticResource DevCardType.Back}"
                                         BorderBrush="Yellow" BorderThickness="2" CornerRadius="1" />
                                     <Border Width="25" Height="40" HorizontalAlignment="Left"
-                                        Background="{StaticResource bmKnight}"
+                                        Background="{StaticResource DevCardType.Knight}"
                                         BorderBrush="Yellow" BorderThickness="2" CornerRadius="1" />
                                     <Border Width="20" HorizontalAlignment="Left" Background="Black">
                                         <TextBlock Margin="3" Text="&#xF738;" IsColorFontEnabled="False"
                                             Foreground="White" FontFamily="Segoe MDL2 Assets" />
                                     </Border>
-
                                 </StackPanel>
                             </Viewbox>
                         </Grid>
@@ -132,15 +118,14 @@
                         </MenuFlyout>
                     </Button.ContextFlyout>
                 </Button>
-
-                <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="YearOfPlenty" Orientation="FaceUp" ReadOnly="True"
+                <local:ResourceCardSlimCtrl Margin="1,0,0,0" Image="{StaticResource DevCardType.YearOfPlenty}"
                     Count="{x:Bind Player.GameData.Resources.UnplayedYearOfPlenty, Mode=OneWay}" />
-                <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Monopoly" Orientation="FaceUp" ReadOnly="True"
+                <local:ResourceCardSlimCtrl Margin="1,0,0,0" Image="{StaticResource DevCardType.Monopoly}"
                     Count="{x:Bind Player.GameData.Resources.UnplayedMonopoly, Mode=OneWay}" />
-                <local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="RoadBuilding" Orientation="FaceUp" ReadOnly="True"
+                <local:ResourceCardSlimCtrl Margin="1,0,0,0" Image="{StaticResource DevCardType.RoadBuilding}"
                     Count="{x:Bind Player.GameData.Resources.UnplayedRoadBuilding, Mode=OneWay}" />
-                <local:ResourceCardCtrl Margin="109,0,0,0" DevCardType="VictoryPoint" Orientation="FaceUp"
-                    ReadOnly="True"
+                <local:ResourceCardSlimCtrl Margin="109,0,0,0" Image="{StaticResource DevCardType.VictoryPoint}"
+
                     Count="{x:Bind Player.GameData.Resources.VictoryPoints, Mode=OneWay}" />
             </StackPanel>
             <Rectangle Width="465" Height="4" Margin="0,5,0,5" Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
@@ -196,7 +181,7 @@
                         <Viewbox>
                             <StackPanel Width="50" Height="60">
                                 <Rectangle Width="30" Height="45" RadiusX="5" RadiusY="5"
-                                    Fill="{StaticResource bmDevCardBack}" />
+                                    Fill="{StaticResource DevCardType.Back}" />
                                 <TextBlock Text="Dev Card" Style="{StaticResource ButtonTextStyle}" />
                             </StackPanel>
                         </Viewbox>
@@ -212,8 +197,7 @@
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}">
                                 <TextBlock.RenderTransform>
                                     <CompositeTransform TranslateY="-5" />
-                                </TextBlock.RenderTransform>
-                            </TextBlock>
+                                </TextBlock.RenderTransform></TextBlock>
                             <TextBlock HorizontalAlignment="Center" Text="Trade" Style="{StaticResource ButtonTextStyle}" />
                         </StackPanel>
                     </Button.Content>

@@ -6,26 +6,36 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="100" d:DesignWidth="70" mc:Ignorable="d">
     <Control.Resources>
-        <Storyboard x:Name="_sbFlipTile">
-            <DoubleAnimation x:Name="_daFlipBackCard"
-                Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)"
-                Storyboard.TargetName="_gridBack" To="-90" Duration="0:0:2" />
-            <DoubleAnimation x:Name="_daFlipFrontCard"
-                Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)"
-                Storyboard.TargetName="_gridFront" To="0" Duration="0:0:2" />
+        <Storyboard x:Name="FlipOpen">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FaceDown" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
+                <EasingDoubleKeyFrame KeyTime="0" Value="0" />
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="90" />
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FaceUp" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="-90" />
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="FlipClose">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FaceDown" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
+                <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="90" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="0" />
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FaceUp" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
+                <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="-90" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="-90" />
+            </DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </Control.Resources>
-
     <Grid Name="LayoutRoot" Width="70" Height="100">
-        <Grid Name="_gridBack" CornerRadius="10" BorderBrush="White" BorderThickness="1"
-            Background="{StaticResource bmResourceCardBack}">
+        <Grid Name="Grid_FaceDown" CornerRadius="10" BorderBrush="White" BorderThickness="1"
+            Background="{x:Bind ResourceCardModel.BackBrush, Mode=OneWay}">
             <Grid.Projection>
                 <PlaneProjection x:Name="_ppBack" RotationY="90" />
             </Grid.Projection>
         </Grid>
-
-        <Grid Name="_gridFront" CornerRadius="10" BorderBrush="Black" BorderThickness="1"
-            Background="{Binding ShownImage, Mode=OneWay, FallbackValue={StaticResource bmResourceCardOre}}"
+        <Grid Name="Grid_FaceUp" CornerRadius="10" BorderBrush="Black" BorderThickness="1"
+            Background="{x:Bind ResourceCardModel.FrontBrush, Mode=OneWay}"
             Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
@@ -39,35 +49,33 @@
             <Grid.Projection>
                 <PlaneProjection x:Name="_ppFront" RotationY="0" />
             </Grid.Projection>
-
             <Grid Grid.RowSpan="3" Grid.ColumnSpan="3" Width="19" Height="33"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom" CornerRadius="5"
                 Background="Black"
-                Visibility="{x:Bind CountVisible, Mode=OneWay}">
+                Visibility="{x:Bind ResourceCardModel.CountVisible, Mode=OneWay}">
                 <Viewbox>
                     <TextBlock Margin="2,-4,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Text="{x:Bind Count, Mode=OneWay, FallbackValue=0, Converter={StaticResource StringToIntConverter}}"
+                        Text="{x:Bind ResourceCardModel.Count, Mode=OneWay, FallbackValue=0, Converter={StaticResource StringToIntConverter}}"
                         FontSize="30"
                         Foreground="{StaticResource YellowBrush}" />
                 </Viewbox>
             </Grid>
-
             <Viewbox Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Margin="0,0,0,0"
                 HorizontalAlignment="Left" VerticalAlignment="Top">
                 <TextBox x:Name="_txtCount" Margin="0,0,0,0" HorizontalAlignment="Left"
                     VerticalAlignment="Center" VerticalContentAlignment="Center"
                     Visibility="Collapsed" Foreground="Yellow" GotFocus="Text_GotFocus"
                     RequestedTheme="Dark" TextAlignment="Center" CharacterSpacing="0" FontSize="40"
-                    IsReadOnly="{x:Bind ReadOnly, Mode=OneWay}"
-                    Text="{x:Bind Count, Mode=TwoWay, FallbackValue=0, Converter={StaticResource StringToIntConverter}}"
+                    IsReadOnly="{x:Bind ResourceCardModel.ReadOnly, Mode=OneWay}"
+                    Text="{x:Bind ResourceCardModel.Count, Mode=TwoWay}"
                     BorderBrush="{StaticResource TransparentBrush}"
                     Background="{StaticResource BlackBrush}" />
             </Viewbox>
             <Ellipse x:Name="HarborEllipse" Grid.ColumnSpan="2" Width="30" Height="30"
                 HorizontalAlignment="Center" VerticalAlignment="Top"
-                Fill="{Binding HarborType, Converter={StaticResource HarborTypeToHarborBrushConverter}, FallbackValue={StaticResource bmThreeForOne}, Mode=OneWay}"
+                Fill="{x:Bind ResourceCardModel.HarborBrush, Mode=OneWay}"
                 Stroke="Red" StrokeThickness="2"
-                Visibility="{x:Bind HarborVisibility, Mode=OneWay, FallbackValue=Collapsed}" />
+                Visibility="{x:Bind ResourceCardModel.HarborVisibility, Mode=OneWay, FallbackValue=Collapsed}" />
         </Grid>
     </Grid>
 </UserControl>

@@ -8,8 +8,6 @@ namespace Catan10
 {
     public static class AllocationPhaseHelper
     {
-        #region Methods
-
         public static void ChangePlayer(IGameController gameController, int numberofPositions)
         {
             Contract.Assert(gameController.CurrentPlayer != null);
@@ -63,11 +61,8 @@ namespace Catan10
                 tr.Add(kvp.Value.ResourceType, 1);
             }
 
-            player.GameData.Resources.GrantResources(tr.GetNegated());
+            //player.GameData.Resources.GrantResources(tr.GetNegated());
         }
-
-        #endregion Methods
-
     }
 
     /// <summary>
@@ -76,8 +71,6 @@ namespace Catan10
     /// </summary>
     public class BeginAllocationToAllocateResourcesForward : LogHeader, ILogController
     {
-        #region Methods
-
         internal static async Task PostLog(IGameController gameController)
         {
             //
@@ -117,7 +110,5 @@ namespace Catan10
             AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
         }
-
-        #endregion Methods
     }
 }

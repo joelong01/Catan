@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -19,6 +20,51 @@ namespace Catan10
 
         private int _wood = 0;
 
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+
+        internal int GetCount(ResourceType resourceType)
+        {
+            switch (resourceType)
+            {
+                case ResourceType.Sheep:
+                    return Sheep;
+
+                case ResourceType.Wood:
+                    return Wood;
+
+                case ResourceType.Ore:
+                    return Ore;
+
+                case ResourceType.Wheat:
+                    return Wheat;
+
+                case ResourceType.Brick:
+                    return Brick;
+
+                case ResourceType.GoldMine:
+                    return GoldMine;
+
+                case ResourceType.Desert:
+                    break;
+
+                case ResourceType.Back:
+                    break;
+
+                case ResourceType.None:
+                    break;
+
+                case ResourceType.Sea:
+                    break;
+
+                default:
+                    break;
+            }
+            return 0;
+        }
+
         public TradeResources()
         {
         }
@@ -32,8 +78,6 @@ namespace Catan10
             Sheep = this.Sheep;
             GoldMine = this.GoldMine;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public int Brick
         {
@@ -140,10 +184,7 @@ namespace Catan10
             }
         }
 
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public static TradeResources GetEntitlementCost(Entitlement entitlement)
         {

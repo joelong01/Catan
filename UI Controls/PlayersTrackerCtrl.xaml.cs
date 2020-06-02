@@ -12,18 +12,33 @@ namespace Catan10
         /// <summary>
         ///     this has the *global* resource count
         /// </summary>
-        /// 
+        ///
 
-        
+        private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as PlayersTrackerCtrl;
+            var depPropValue = (MainPageModel)e.NewValue;
+            depPropClass?.SetMainPageModel(depPropValue);
+        }
 
-        public static readonly DependencyProperty GameResourcesProperty = DependencyProperty.Register("GameResources", typeof(TradeResources), typeof(PlayersTrackerCtrl), new PropertyMetadata(new TradeResources()));
-        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PlayersTrackerCtrl), new PropertyMetadata(GameState.WaitingForNewGame));
-        public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayersTrackerCtrl), new PropertyMetadata(null));
-        
+        private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as PlayersTrackerCtrl;
+            var depPropValue = (ObservableCollection<PlayerModel>)e.NewValue;
+            depPropClass?.SetPlayingPlayers(depPropValue);
+        }
+
+        private void SetMainPageModel(MainPageModel mpm)
+        {
+        }
+
+        private void SetPlayingPlayers(ObservableCollection<PlayerModel> value)
+        {
+        }
+
         public PlayersTrackerCtrl()
         {
             this.InitializeComponent();
-            this.DataContext = PlayingPlayers;
         }
 
         public TradeResources GameResources
@@ -38,29 +53,28 @@ namespace Catan10
             set => SetValue(GameStateProperty, value);
         }
 
-
         public MainPage MainPage
         {
             get => (MainPage)GetValue(MainPageProperty);
             set => SetValue(MainPageProperty, value);
         }
-        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayersTrackerCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
+
+        public MainPageModel MainPageModel
+        {
+            get => (MainPageModel)GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
+
         public ObservableCollection<PlayerModel> PlayingPlayers
         {
             get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
             set => SetValue(PlayingPlayersProperty, value);
         }
-        private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as PlayersTrackerCtrl;
-            var depPropValue = (ObservableCollection<PlayerModel>)e.NewValue;
-            depPropClass?.SetPlayingPlayers(depPropValue);
-        }
-        private void SetPlayingPlayers(ObservableCollection<PlayerModel> value)
-        {
 
-        }
-
-
+        public static readonly DependencyProperty GameResourcesProperty = DependencyProperty.Register("GameResources", typeof(TradeResources), typeof(PlayersTrackerCtrl), new PropertyMetadata(new TradeResources()));
+        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PlayersTrackerCtrl), new PropertyMetadata(GameState.WaitingForNewGame));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(PlayersTrackerCtrl), new PropertyMetadata(null, MainPageModelChanged));
+        public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayersTrackerCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayersTrackerCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
     }
 }

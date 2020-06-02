@@ -16,13 +16,7 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-        #region Fields
-
         private readonly Random testRandom = new Random();
-
-        #endregion Fields
-
-        #region Methods
 
         private void InitTest()
         {
@@ -32,7 +26,7 @@ namespace Catan10
         private void OnTest1(object sdr, RoutedEventArgs rea)
         {
             CurrentPlayer.GameData.Score++;
-            
+
             CurrentPlayer.GameData.RollsWithResource++;
             CurrentPlayer.GameData.TimesTargeted++;
             CurrentPlayer.GameData.LargestArmy = true;
@@ -44,8 +38,6 @@ namespace Catan10
             CurrentPlayer.GameData.NoResourceCount = 13;
             CurrentPlayer.GameData.GoldRolls = 5;
             CurrentPlayer.GameData.Resources.TotalResources = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5, Brick = 10 };
-
-
         }
 
         private void OnTest2(object sdr, RoutedEventArgs rea)
@@ -59,56 +51,30 @@ namespace Catan10
                 Wood = 3
             };
 
-            CurrentPlayer.GameData.Resources.GrantResources(tr);
+            // CurrentPlayer.GameData.Resources.ResourcesThisTurn2.AllUp();
 
-            //CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Knight);
+            CurrentPlayer.GameData.Resources.GrantResources(tr);
+            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.City);
+            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.City);
+            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
+            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
+            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
+            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
+
+            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.Knight);
+            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.YearOfPlenty);
+            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.Monopoly);
+            CurrentPlayer.GameData.Resources.MakeDevCardsAvailable();
+            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.RoadBuilding);
+            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.VictoryPoint);
+            CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
         }
 
         // Undo
-        private async void OnTest3(object sdr, RoutedEventArgs rea)
+        private void OnTest3(object sdr, RoutedEventArgs rea)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
-            picker.FileTypeFilter.Add(".log");
-            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
-            if (file == null) return;
-
-            string json = await FileIO.ReadTextAsync(file);
-            List<CatanMessage> messages = CatanProxy.Deserialize<List<CatanMessage>>(json);
-            foreach (var message in messages)
-            {
-                Type type = CurrentAssembly.GetType(message.DataTypeName);
-                if (type == null) throw new ArgumentException("Unknown type!");
-                LogHeader logHeader = JsonSerializer.Deserialize(message.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
-                message.Data = logHeader;
-                Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
-
-                ILogController logController = logHeader as ILogController;
-                Contract.Assert(logController != null, "every LogEntry is a LogController!");
-                switch (logHeader.LogType)
-                {
-                    case LogType.Normal:
-                        await logController.Redo(this);
-                        break;
-
-                    case LogType.Undo:
-                        //  await MainPageModel.Log.Undo(message);
-                        break;
-
-                    case LogType.Replay:
-
-                        //  await MainPageModel.Log.Redo(message);
-                        break;
-
-                    case LogType.DoNotLog:
-                    case LogType.DoNotUndo:
-                    default:
-                        throw new InvalidDataException("These Logtypes shouldn't be set in a service game");
-                }
-            }
-
-            StartMonitoring();
+            MainPageModel.PlayingPlayers[0].GameData.Resources.Current.Wood++;
+            MainPageModel.PlayingPlayers[0].GameData.Resources.Current.Ore++;
         }
 
         private void OnTestExpansionGame(object sender, RoutedEventArgs e)
@@ -171,17 +137,11 @@ namespace Catan10
             ////   this.TraceMessage(newJsonString);
             //Debug.Assert(newJsonString == jsonString);
         }
-
-        #endregion Methods
     }
 
     public class WSConnectInfo
     {
-        #region Properties
-
         public string GameId { get; set; }
         public string PlayerName { get; set; }
-
-        #endregion Properties
     }
 }

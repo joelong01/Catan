@@ -19,6 +19,22 @@ namespace Catan10
 {
     public class PlayerGameModel : INotifyPropertyChanged
     {
+        public PlayerGameModel()
+        {
+            NotificationsEnabled = true;
+        }
+
+        public PlayerGameModel(PlayerModel pData)
+        {
+            Roads.CollectionChanged += Roads_CollectionChanged;
+            Settlements.CollectionChanged += Settlements_CollectionChanged;
+            Cities.CollectionChanged += Cities_CollectionChanged;
+            Ships.CollectionChanged += Ships_CollectionChanged;
+            PlayerModel = pData;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private readonly bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
         private int _CitiesPlayed = 0;
         private int _goldRolls = 0;
@@ -49,23 +65,6 @@ namespace Catan10
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         public CardsLostUpdatedHandler OnCardsLost;
-        
-        public PlayerGameModel()
-        {
-            NotificationsEnabled = true;
-        }
-
-        public PlayerGameModel(PlayerModel pData)
-        {
-            Roads.CollectionChanged += Roads_CollectionChanged;
-            Settlements.CollectionChanged += Settlements_CollectionChanged;
-            Cities.CollectionChanged += Cities_CollectionChanged;
-            Ships.CollectionChanged += Ships_CollectionChanged;
-            PlayerModel = pData;
-           
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -343,7 +342,6 @@ namespace Catan10
             }
         }
 
-
         public PlayerResources Resources
         {
             get
@@ -539,7 +537,7 @@ namespace Catan10
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-           // if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
+            // if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
@@ -683,9 +681,9 @@ namespace Catan10
             MaxRoads = 0;
             MaxSettlements = 0;
             MaxCities = 0;
-        
+
             Pips = 0;
-            _goldRolls =  0;
+            _goldRolls = 0;
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {
@@ -710,15 +708,12 @@ namespace Catan10
             _RoadTie[roadCount - 5] = winTie;
         }
 
-       
-
         public bool WinsRoadCountTie(int roadCount)
         {
             Debug.Assert(roadCount >= 5 && roadCount <= 15, "bad roadcount");
             return _RoadTie[roadCount - 5];
         }
     }
-
 
     /// <summary>
     ///     this class has
@@ -732,14 +727,14 @@ namespace Catan10
 
     public class SyncronizedPlayerRolls : IComparable<SyncronizedPlayerRolls>, INotifyPropertyChanged
     {
-        private RollModel _rollModel = new RollModel();
-
         public SyncronizedPlayerRolls()
         {
             LatestRolls.AddRange(PickingBoardToWaitingForRollOrder.GetRollModelList()); // always have 4 Rolls in here so XAML doesn't throw
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private RollModel _rollModel = new RollModel();
 
         public RollModel CurrentRoll
         {

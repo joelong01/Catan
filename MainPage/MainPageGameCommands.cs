@@ -16,8 +16,6 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-        #region Fields
-
         private readonly List<PlayerModel> defaultPlayers = new List<PlayerModel>()
         {
             new PlayerModel() {PlayerName = "Joe", ImageFileName = "ms-appx:Assets/DefaultPlayers/joe.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black,PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC5}")},
@@ -28,10 +26,6 @@ namespace Catan10
             new PlayerModel() {PlayerName = "Cort", ImageFileName = "ms-appx:Assets/DefaultPlayers/cort.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Green, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACA}") },
             new PlayerModel() {PlayerName = "Adrian", ImageFileName = "ms-appx:Assets/DefaultPlayers/adrian.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Purple, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACB}") },
         };
-
-        #endregion Fields
-
-        #region Methods
 
         private void CreateMenuItems()
         {
@@ -713,12 +707,24 @@ namespace Catan10
                         break;
 
                     case GameState.DoneResourceAllocation:
-                        await DoneAllocResourcesToWaitingForRoll.PostLog(this);
+                        if (Log.RollLog.CanRedo)
+                        {
+                            await DoneAllocResourcesToWaitingForNext.PostLog(this); // skip the roll and use the one that is there....
+                        }
+                        else
+                        {
+                            await DoneAllocResourcesToWaitingForRoll.PostLog(this);
+                        }
                         break;
 
                     case GameState.WaitingForRoll:
+                        Contract.Assert(false, "should be done in MainPage.OnRolled");
                         //
                         //  this is called in MainPage.OnRolled
+                        break;
+
+                    case GameState.MustMoveBaron:
+                        Contract.Assert(false, "this is done in pagecallback");
                         break;
 
                     case GameState.Targeted:
@@ -745,9 +751,6 @@ namespace Catan10
                     case GameState.GamePicked:
                         break;
 
-                    case GameState.MustMoveBaron:
-                        break;
-
                     case GameState.Unknown:
                         break;
 
@@ -766,7 +769,5 @@ namespace Catan10
                 MainPageModel.EnableUiInteraction = true;
             }
         }
-
-        #endregion Methods
     }
 }

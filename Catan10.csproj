@@ -132,7 +132,7 @@
     </Compile>
     <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
-    <Compile Include="MainPage\MainPageModel.cs" />
+    <Compile Include="Models\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
     <Compile Include="MainPage\IGameController.cs" />
@@ -166,6 +166,7 @@
     <Compile Include="Logging\Actions\RollOrderLog.cs" />
     <Compile Include="Logging\StateTransitions\UpdateBuildingLog.cs" />
     <Compile Include="Logging\VerifyMessages\VerifyPlayers.cs" />
+    <Compile Include="Models\ResourceCardModel.cs" />
     <Compile Include="Player\PlayerBindingFunctions.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
     <Compile Include="Logging\Actions\AddPlayer.cs" />
@@ -210,6 +211,9 @@
     </Compile>
     <Compile Include="UI Controls\PlayerRollCtrl.xaml.cs">
       <DependentUpon>PlayerRollCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\ResourceCardSlimCtrl.xaml.cs">
+      <DependentUpon>ResourceCardSlimCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\RollCtrl.xaml.cs">
       <DependentUpon>RollCtrl.xaml</DependentUpon>
@@ -281,6 +285,9 @@
     </Compile>
     <Compile Include="Settlements and Roads\BuildingCtrl.xaml.cs">
       <DependentUpon>BuildingCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\TakeCardCtrl.xaml.cs">
+      <DependentUpon>TakeCardCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\TileCtrl.xaml.cs">
       <DependentUpon>TileCtrl.xaml</DependentUpon>
@@ -424,6 +431,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI Controls\ResourceCardSlimCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\RollCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -501,6 +512,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Settlements and Roads\BuildingCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\TakeCardCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

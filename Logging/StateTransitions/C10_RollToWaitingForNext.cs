@@ -48,7 +48,7 @@ namespace Catan10
 
         public LogHeader Deserialize(string json)
         {
-            DoneAllocResourcesToWaitingForRoll logHeader = CatanProxy.Deserialize<DoneAllocResourcesToWaitingForRoll>(json);
+            WaitingForRollToWaitingForNext logHeader = CatanProxy.Deserialize<WaitingForRollToWaitingForNext>(json);
             return logHeader;
         }
 
@@ -93,7 +93,11 @@ namespace Catan10
 
             if (rollLog.LastRoll == 7)
             {
-                await WaitingForNextToMustRollBaron.PostLog(gameController);
+                await WaitingForNextToMustMoveBaron.PostLog(gameController);
+                //
+                //  need to update statistics
+                //  need to provide a way to take a player's card
+                //  go through all the players and if the have > 7 resources, provide a way to give 1/2 to the bank
             }
         }
 

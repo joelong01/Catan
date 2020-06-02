@@ -854,7 +854,7 @@ namespace Catan10
                         tr.Add(kvp.Value.ResourceType, 1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
-                    MainPageModel.GameResources += tr;
+                    // MainPageModel.GameResources += tr;
                     // this.TraceMessage($"{CurrentPlayer.PlayerName} Granted: {CurrentPlayer.GameData.Resources.TotalResources}");
                 }
                 else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
@@ -867,7 +867,7 @@ namespace Catan10
                         tr.Add(kvp.Value.ResourceType, -1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
-                    MainPageModel.GameResources += tr;
+                    //  MainPageModel.GameResources += tr;
                 }
             }
 

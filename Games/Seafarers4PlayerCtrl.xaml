@@ -5,11 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="300" d:DesignWidth="300" mc:Ignorable="d">
-
     <Viewbox Grid.Column="0">
         <local:CatanHexPanel x:Name="_HexPanel" RowsPerColumn="5,6,7,8,7,6,5" UniformMargin="15"
             Islands="19-20, 23-27, 21-22"
-            Background="{StaticResource bmWater}"
+            Background="{StaticResource ResourceType.Sea}"
             TileGap="1" TileGroups="0-18.True;19-43.True" RenderTransformOrigin="0 0"
             PirateShipTile="{Binding ElementName=_tile33, Mode=OneTime}"
             MaxShips="15">
@@ -31,7 +30,6 @@
                 UseClassic="True" />
             <local:Harbor TileIndex="15" HarborLocation="BottomRight" HarborType="ThreeForOne"
                 Orientation="FaceUp" UseClassic="True" />
-
             <local:TileCtrl TileOrientation="FaceUp" Number="8" UseClassic="True" ResourceType="Wheat"
                 Index="0" />
             <local:TileCtrl TileOrientation="FaceUp" Number="2" UseClassic="True" ResourceType="Wood"

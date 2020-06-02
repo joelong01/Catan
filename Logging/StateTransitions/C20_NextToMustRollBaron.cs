@@ -14,16 +14,10 @@ namespace Catan10
     /// </summary>
     public class MustMoveBaronToWaitingForNext : LogHeader, ILogController
     {
-        #region Properties
-
         public int PreviousTile { get; set; }
         public int TargetTile { get; set; }
         public string Victim { get; set; }
         public TargetWeapon Weapon { get; set; }
-
-        #endregion Properties
-
-        #region Methods
 
         public static async Task PostLog(IGameController gameController, PlayerModel victom, int targetTileIndex, int previousIndex, TargetWeapon weapon)
         {
@@ -88,20 +82,16 @@ namespace Catan10
 
             return Task.CompletedTask;
         }
-
-        #endregion Methods
     }
 
     /// <summary>
     ///     UI Prompt to move the Baron or Ship
     /// </summary>
-    public class WaitingForNextToMustRollBaron : LogHeader, ILogController
+    public class WaitingForNextToMustMoveBaron : LogHeader, ILogController
     {
-        #region Methods
-
         public static Task PostLog(IGameController gameController)
         {
-            var logHeader = new WaitingForNextToMustRollBaron()
+            var logHeader = new WaitingForNextToMustMoveBaron()
             {
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
@@ -125,7 +115,5 @@ namespace Catan10
         {
             return Task.CompletedTask;
         }
-
-        #endregion Methods
     }
 }

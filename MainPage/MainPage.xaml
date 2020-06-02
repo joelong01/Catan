@@ -140,7 +140,7 @@
             <local:DragableGridCtrl Name="Draggable_PrivateData" Width="360" HorizontalAlignment="Center"
                 VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
                 Player="{x:Bind TheHuman, Mode=OneWay}"
-                Background="{StaticResource bmKnight}"
+                Background="{StaticResource DevCardType.Knight}"
                 Caption="Private Data" Canvas.ZIndex="9999" BorderThickness="2"
                 BorderBrush="{StaticResource bmMaple}"
                 CornerRadius="10">
@@ -148,9 +148,10 @@
                     <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right"                                      
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right"
                 GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
                 PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
+                MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                 GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" />
             <local:DragableGridCtrl x:Name="ControlGrid" Width="172" HorizontalAlignment="Center"
                 VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
@@ -355,7 +356,7 @@
                 OnGridPositionChanged="OnGridPositionChanged" Caption="Board Measurements"
                 Visibility="{x:Bind MainPageModel.ShowBoardMeasurements, Mode=OneWay}"
                 BorderBrush="{StaticResource bmMaple}"
-                Background="{StaticResource bmKnight}"
+                Background="{StaticResource DevCardType.Knight}"
                 Player="{x:Bind TheHuman, Mode=OneWay}"
                 CornerRadius="10" BorderThickness="4">
                 <local:DragableGridCtrl.Child>

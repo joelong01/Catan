@@ -6,7 +6,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="175" d:DesignWidth="120" mc:Ignorable="d">
     <Control.Resources>
-
         <Storyboard x:Name="FlipOpen">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FaceDown" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
                 <EasingDoubleKeyFrame KeyTime="0" Value="0" />
@@ -36,15 +35,13 @@
     </Control.Resources>
     <Viewbox Stretch="Uniform">
         <Grid Width="120" Height="170">
-            <Grid Name="Grid_FaceDown" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource bmResourceCardBack}">
-
+            <Grid Name="Grid_FaceDown" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource ResourceType.Back}">
                 <Grid.Projection>
                     <PlaneProjection x:Name="PlaneProjection_FaceDown" RotationY="0" />
                 </Grid.Projection>
-
                 <Image Width="100" Height="100" Margin="1" Source="ms-appx:///Assets/dice_dark.svg" />
             </Grid>
-            <Grid Name="Grid_FaceUp" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource bmResourceCardGoldMine}">
+            <Grid Name="Grid_FaceUp" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource ResourceType.GoldMine}">
                 <Grid.Projection>
                     <PlaneProjection x:Name="PlaneProjection_FaceUp" RotationY="-90" />
                 </Grid.Projection>
@@ -58,7 +55,6 @@
                     FillColor="{StaticResource WhiteBrush}"
                     Thickness="15"
                     Number="{x:Bind Roll.DiceTwo, Mode=OneWay}" />
-
                 <TextBlock Margin="0,-10,-10,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                     Text="⊘"
                     Visibility="{x:Bind Roll.NotSelected, Mode=OneWay}"

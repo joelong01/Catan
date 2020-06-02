@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <Grid Width="470" Margin="0"
-        Background="{StaticResource bmVictoryPoint}"
+        Background="{StaticResource DevCardType.VictoryPoint}"
         BorderBrush="{StaticResource bmMaple}"
         CornerRadius="10">
         <Grid.RowDefinitions>
@@ -17,22 +17,22 @@
             VerticalAlignment="Top">
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Wood" Margin="2,0,0,0" ResourceType="Wood" Count="{x:Bind PipCount.Wood, Mode=OneWay, FallbackValue=0}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Brick" Margin="2,0,0,0" ResourceType="Brick" Count="{x:Bind PipCount.Brick, Mode=OneWay, FallbackValue=0}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Sheep" Margin="2,0,0,0" ResourceType="Sheep" Count="{x:Bind PipCount.Sheep, Mode=OneWay, FallbackValue=0}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Wheat" Margin="2,0,0,0" ResourceType="Wheat" Count="{x:Bind PipCount.Wheat, Mode=OneWay, FallbackValue=0}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Ore" Margin="2,0,0,0" ResourceType="Ore" Count="{x:Bind PipCount.Ore, Mode=OneWay, FallbackValue=0}" />
+                    <local:ResourceCardSlimCtrl x:Name="ResourceCard_Wood" Margin="2,0,0,0" Image="{StaticResource ResourceType.Wood}" Count="{x:Bind PipCount.Wood, Mode=OneWay, FallbackValue=0}" />
+                    <local:ResourceCardSlimCtrl x:Name="ResourceCard_Brick" Margin="2,0,0,0" Image="{StaticResource ResourceType.Brick}" Count="{x:Bind PipCount.Brick, Mode=OneWay, FallbackValue=0}" />
+                    <local:ResourceCardSlimCtrl x:Name="ResourceCard_Sheep" Margin="2,0,0,0" Image="{StaticResource ResourceType.Sheep}" Count="{x:Bind PipCount.Sheep, Mode=OneWay, FallbackValue=0}" />
+                    <local:ResourceCardSlimCtrl x:Name="ResourceCard_Wheat" Margin="2,0,0,0" Image="{StaticResource ResourceType.Wheat}" Count="{x:Bind PipCount.Wheat, Mode=OneWay, FallbackValue=0}" />
+                    <local:ResourceCardSlimCtrl x:Name="ResourceCard_Ore" Margin="2,0,0,0" Image="{StaticResource ResourceType.Ore}" Count="{x:Bind PipCount.Ore, Mode=OneWay, FallbackValue=0}" />
                 </StackPanel>
                 <StackPanel Margin="0,10,0,0" HorizontalAlignment="Center" Orientation="Horizontal">
                     <Grid>
-                        <Ellipse Width="75" Height="75" Fill="{StaticResource bmTileGoldMine}" />
+                        <Ellipse Width="75" Height="75" Fill="{StaticResource ResourceType.GoldMine}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="★★★★★"
                             FontSize="16" Foreground="Red" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="13" FontSize="26" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{x:Bind Path=FiveStarPositions, Mode=OneWay, FallbackValue=0}" FontSize="26" />
                     </Grid>
                     <Grid>
-                        <Ellipse Width="75" Height="75" Fill="{StaticResource bmTileGoldMine}" />
+                        <Ellipse Width="75" Height="75" Fill="{StaticResource ResourceType.GoldMine}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="★★★★"
                             FontSize="16" Foreground="Red" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="12" FontSize="26" />
@@ -40,14 +40,14 @@
                     </Grid>
                     <Grid>
                         <Ellipse Width="75" Height="75" Fill="{Binding Path=Current.TheHuman.BackgroundBrush, Mode=OneWay}" />
-                        <Ellipse Width="75" Height="75" Fill="{StaticResource bmTileGoldMine}" />
+                        <Ellipse Width="75" Height="75" Fill="{StaticResource ResourceType.GoldMine}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="★★★" FontSize="16"
                             Foreground="Red" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="11" FontSize="26" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{x:Bind ThreeStarPositions, Mode=OneWay}" FontSize="26" />
                     </Grid>
                     <Grid>
-                        <Ellipse Width="75" Height="75" Fill="{StaticResource bmTileGoldMine}" />
+                        <Ellipse Width="75" Height="75" Fill="{StaticResource ResourceType.GoldMine}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="★★" FontSize="16"
                             Foreground="Red" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="10" FontSize="26" />

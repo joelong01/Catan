@@ -1,4 +1,5 @@
 ﻿using Catan.Proxy;
+using System;
 using System.Collections.ObjectModel;
 using Windows.Media.Playback;
 using Windows.UI;
@@ -14,16 +15,6 @@ namespace Catan10
 {
     public sealed partial class PublicDataCtrl : UserControl
     {
-        #region Properties
-
-        private ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>();
-
-        #endregion Properties
-
-        #region Methods
-
-      
-
         private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as PublicDataCtrl;
@@ -40,9 +31,7 @@ namespace Catan10
 
         private void OnFlipRollGrid(object sender, RoutedEventArgs e)
         {
-
             Player.GameData.RollOrientation = (Player.GameData.RollOrientation == TileOrientation.FaceDown) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
-
         }
 
         private async void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -67,14 +56,13 @@ namespace Catan10
 
                 if (await StaticHelpers.AskUserYesNoQuestion($"Let {player.PlayerName} go first?", "Yes", "No"))
                 {
-                  //  await MainPage.Current.SetFirst(player); //manipulates the shared PlayingPlayers list, but also does logging and other book keeping.
+                    //  await MainPage.Current.SetFirst(player); //manipulates the shared PlayingPlayers list, but also does logging and other book keeping.
                 }
             }
             finally
             {
                 ellipse.IsTapEnabled = true;
             }
-
         }
 
         private void SetPlayer(PlayerModel value)
@@ -82,7 +70,6 @@ namespace Catan10
             if (value == null) return;
 
             this.TraceMessage($"Added Player {value}");
-
         }
 
         private void SetRollOrientation(TileOrientation orientation)
@@ -95,25 +82,10 @@ namespace Catan10
                 ShowLatestRoll.Begin();
         }
 
-        #endregion Methods
-
-        #region Fields
-
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(null, PlayerChanged));
-        public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
-
-        #endregion Fields
-
-        #region Constructors
-
         public PublicDataCtrl()
         {
             this.InitializeComponent();
-            
-
         }
-
-        #endregion Constructors
 
         public PlayerModel Player
         {
@@ -125,6 +97,21 @@ namespace Catan10
         {
             get => (TileOrientation)GetValue(RollOrientationProperty);
             set => SetValue(RollOrientationProperty, value);
+        }
+
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(null, PlayerChanged));
+        public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
+
+        public string UnplayedResourceCount(ObservableCollection<Entitlement> unspent, string name)
+        {
+            var entitlement = (Entitlement)Enum.Parse(typeof(Entitlement), name);
+            var count = 0;
+            foreach (var ent in unspent)
+            {
+                if (ent == entitlement) count++;
+            }
+
+            return count.ToString();
         }
     }
 }

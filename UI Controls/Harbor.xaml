@@ -86,7 +86,7 @@
                 <Grid.RenderTransform>
                     <CompositeTransform x:Name="_gridBackTransform" ScaleX="{x:Bind HarborScale, Mode=TwoWay, FallbackValue=1.0}" ScaleY="{x:Bind HarborScale, Mode=TwoWay, FallbackValue=1.0}" />
                 </Grid.RenderTransform>
-                <Ellipse x:Name="_back" Fill="{StaticResource bmTileBack}" Stroke="White" Canvas.ZIndex="99" />
+                <Ellipse x:Name="_back" Fill="{StaticResource TileType.Back}" Stroke="White" Canvas.ZIndex="99" />
             </Grid>
 
             <Path Name="_topLeft" Grid.RowSpan="3" Grid.ColumnSpan="3" Visibility="Visible"

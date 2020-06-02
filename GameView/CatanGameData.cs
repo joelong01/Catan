@@ -7,24 +7,14 @@ namespace Catan10
 {
     public class CatanGameData : INotifyPropertyChanged
     {
-        #region Methods
-
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion Methods
-
-        #region Constructors
-
         public CatanGameData()
         {
         }
-
-        #endregion Constructors
-
-        #region properties
 
         private bool _allowShips = false;
         private RandomBoardSettings _boardSettings = new RandomBoardSettings();
@@ -318,8 +308,6 @@ namespace Catan10
             }
         }
 
-        #endregion properties
-
         public CatanGameData(CatanGameData info)
         {
             MaxRoads = info.MaxRoads;
@@ -412,7 +400,7 @@ namespace Catan10
 
         public DevCardType GetNextDevCard()
         {
-            if (DevCards.Count == 0) return DevCardType.Unknown;
+            if (DevCards.Count == 0) return DevCardType.None;
             Random rand = new Random((int)DateTime.Now.Ticks);
             int index = rand.Next(DevCards.Count);
             var devCard = DevCards[index];

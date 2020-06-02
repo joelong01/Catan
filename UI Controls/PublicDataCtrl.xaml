@@ -39,12 +39,12 @@
     <!--<Border.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                 <GradientStop Color="Black" />
-                <GradientStop Color="CadetBlue" Offset="1"/>
+                <GradientStop Color="CadetBlue" Offset="1" />
             </LinearGradientBrush>
         </Border.Background>
         <Grid Width="605" >-->
     <Border Margin="0,0,0,0" CornerRadius="30,15,15,10" BorderThickness="4" BorderBrush="{StaticResource bmMaple}">
-        <Grid Width="590" Height="250" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
+        <Grid Width="600" Height="250" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50" />
                 <RowDefinition Height="50" />
@@ -55,7 +55,7 @@
                 <ColumnDefinition Width="50" />
                 <ColumnDefinition Width="350" />
                 <ColumnDefinition Width="50" />
-                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="0" />
             </Grid.ColumnDefinitions>
             <!--  The button to flip between stats and rolls  -->
@@ -88,7 +88,7 @@
                 <Viewbox>
                     <Button Margin="0,-5,0,-5">
                         <Rectangle Width="70" Height="100"
-                            Fill="{StaticResource bmResourceCardBack}"
+                            Fill="{StaticResource ResourceType.Back}"
                             RadiusX="10" RadiusY="10" Stroke="White" StrokeThickness="1" />
                         <Button.Flyout>
                             <MenuFlyout>
@@ -111,12 +111,12 @@
                 <Viewbox>
                     <Button Margin="30,-5,0,-5">
                         <Rectangle Width="70" Height="100"
-                            Fill="{StaticResource bmDevCardBack}"
+                            Fill="{StaticResource DevCardType.Back}"
                             RadiusX="10" RadiusY="10" Stroke="White" StrokeThickness="1" />
                     </Button>
                 </Viewbox>
                 <TextBlock Margin="2,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    Text="{x:Bind Player.GameData.Resources.UnplayedDevCards.Count, Mode=OneWay, FallbackValue=0}"
+                    Text="{x:Bind Player.GameData.Resources.AvailableDevCards.Count, Mode=OneWay, FallbackValue=0}"
                     FontSize="38"
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" />
@@ -135,13 +135,13 @@
                         </ListBox.ItemsPanel>
                         <ListBox.Items>
                             <ListBoxItem>
-                                <local:ResourceCardCtrl Orientation="FaceUp" DevCardType="Monopoly" Count="{x:Bind Player.GameData.Resources.PlayedMonopoly, Mode=OneWay, FallbackValue=0}" />
+                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.Monopoly}" Count="{x:Bind Player.GameData.Resources.PlayedMonopoly, Mode=OneWay, FallbackValue=0}" />
                             </ListBoxItem>
                             <ListBoxItem>
-                                <local:ResourceCardCtrl Orientation="FaceUp" DevCardType="RoadBuilding" Count="{x:Bind Player.GameData.Resources.PlayedRoadBuilding, Mode=OneWay, FallbackValue=0}" />
+                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.RoadBuilding}" Count="{x:Bind Player.GameData.Resources.PlayedRoadBuilding, Mode=OneWay, FallbackValue=0}" />
                             </ListBoxItem>
                             <ListBoxItem>
-                                <local:ResourceCardCtrl Orientation="FaceUp" DevCardType="YearOfPlenty" Count="{x:Bind Player.GameData.Resources.PlayedYearOfPlenty, Mode=OneWay, FallbackValue=0}" />
+                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.YearOfPlenty}" Count="{x:Bind Player.GameData.Resources.PlayedYearOfPlenty, Mode=OneWay, FallbackValue=0}" />
                             </ListBoxItem>
                         </ListBox.Items>
                     </ListBox>
@@ -218,7 +218,7 @@
             <Viewbox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
                     <Rectangle Width="70" Height="100" Margin="10,0,0,0"
-                        Fill="{StaticResource bmResourceCardGoldMine}"
+                        Fill="{StaticResource ResourceType.GoldMine}"
                         RadiusX="10" RadiusY="10" Stroke="White" StrokeThickness="1"
                         ToolTipService.ToolTip="Score" />
                     <!--  Score  -->
@@ -228,13 +228,13 @@
                         ToolTipService.ToolTip="Score" />
                     <!--  Resources Acquired  -->
                     <Rectangle Width="70" Height="100" Margin="30,0,0,0"
-                        Fill="{StaticResource bmResourceCardBack}"
+                        Fill="{StaticResource ResourceType.Back}"
                         RadiusX="10" RadiusY="10" Stroke="White" StrokeThickness="1" />
                     <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"
                         FontWeight="ExtraBold" />
                     <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind Player.GameData.Resources.TotalResources.Count, Mode=OneWay, FallbackValue=68}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                     <!--  Gold Cards  -->
-                    <local:ResourceCardCtrl Margin="30,0,0,0" ResourceType="GoldMine" Orientation="FaceUp" CountVisible="Collapsed" />
+                    <local:ResourceCardSlimCtrl Margin="30,0,0,0" Image="{StaticResource ResourceType.GoldMine}" CountVisible="False" />
                     <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"
                         FontWeight="ExtraBold" />
                     <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind Player.GameData.Resources.GoldTotal, Mode=OneWay, FallbackValue=0}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
@@ -259,63 +259,93 @@
             </Viewbox>
             <!--  Third Row  -->
             <Viewbox Grid.Row="2" Grid.RowSpan="1" Grid.Column="0" Grid.ColumnSpan="2"
-                Margin="4" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal">
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Wood" Margin="2,0,0,0" ResourceType="Wood"
-                        Count="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Wood, Mode=OneWay, FallbackValue=0}"
-                        Orientation="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Wood, FallbackValue=FaceDown, Mode=OneWay, Converter={StaticResource CountToOrientationConverter}}"
-                        Owner="{x:Bind Player, Mode=OneWay}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Brick" Margin="2,0,0,0" ResourceType="Brick"
-                        Count="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Brick, Mode=OneWay, FallbackValue=0}"
-                        Orientation="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Brick, FallbackValue=FaceDown, Mode=OneWay, Converter={StaticResource CountToOrientationConverter}}"
-                        Owner="{x:Bind Player, Mode=OneWay}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Sheep" Margin="2,0,0,0" ResourceType="Sheep"
-                        Count="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Sheep, Mode=OneWay, FallbackValue=0}"
-                        Orientation="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Sheep, FallbackValue=FaceDown, Mode=OneWay, Converter={StaticResource CountToOrientationConverter}}"
-                        Owner="{x:Bind Player, Mode=OneWay}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Wheat" Margin="2,0,0,0" ResourceType="Wheat"
-                        Count="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Wheat, Mode=OneWay, FallbackValue=0}"
-                        Orientation="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Wheat, FallbackValue=FaceDown, Mode=OneWay, Converter={StaticResource CountToOrientationConverter}}"
-                        Owner="{x:Bind Player, Mode=OneWay}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_Ore" Margin="2,0,0,0" ResourceType="Ore"
-                        Count="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Ore, Mode=OneWay, FallbackValue=0}"
-                        Orientation="{x:Bind Player.GameData.Resources.ResourcesThisTurn.Ore, FallbackValue=FaceDown, Mode=OneWay, Converter={StaticResource CountToOrientationConverter}}"
-                        Owner="{x:Bind Player, Mode=OneWay}" />
-                    <local:ResourceCardCtrl x:Name="ResourceCard_GoldMine" Margin="2,0,0,0" ResourceType="GoldMine"
-                        Count="{x:Bind Player.GameData.Resources.ResourcesThisTurn.GoldMine, Mode=OneWay, FallbackValue=0}"
-                        Orientation="{x:Bind Player.GameData.Resources.ResourcesThisTurn.GoldMine, FallbackValue=FaceDown, Mode=OneWay, Converter={StaticResource CountToOrientationConverter}}"
-                        Owner="{x:Bind Player, Mode=OneWay}" />
+                Margin="4" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <GridView Grid.Row="0" Grid.RowSpan="1" Grid.Column="1" Margin="0,5,0,0"
+                    HorizontalAlignment="Left" VerticalAlignment="Stretch" Background="Transparent"
+                    SelectionMode="None" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                    BorderBrush="{StaticResource bmMaple}"
+                    BorderThickness="0"
+                    ItemsSource="{x:Bind Player.GameData.Resources.ResourcesThisTurn2}">
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="local:ResourceCardModel">
+                            <Viewbox>
+                                <local:ResourceCardCtrl ResourceCardModel="{x:Bind}" Orientation="{x:Bind CountToOrientation(Count), Mode=OneWay}" MainPageModel="{Binding Path=MainPageModel, ElementName=MainPage.Current.MainPageModel, Mode=OneWay}" />
+                            </Viewbox>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                    <GridView.ItemContainerStyle>
+                        <Style TargetType="GridViewItem">
+                            <Setter Property="Margin" Value="0,5,0,0" />
+                            <Setter Property="Padding" Value="0" />
+                        </Style>
+                    </GridView.ItemContainerStyle>
+                </GridView>
+            </Viewbox>
+            <Viewbox Grid.Row="2" Grid.RowSpan="1" Grid.Column="0" Grid.ColumnSpan="2"
+                Margin="0,0,-10,0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <local:CityCtrl Width="30" Height="30" Margin="0,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
+                        <TextBlock Margin="10,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'City'), Mode=OneWay}" FontSize="22" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <local:SettlementCtrl Width="30" Height="30" Owner="{x:Bind Player, Mode=OneWay}" />
+                        <TextBlock Margin="10,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'Settlement'), Mode=OneWay}" FontSize="22" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Grid Width="30" Background="Transparent">
+                            <Ellipse Width="30" Height="30" StrokeThickness="0"
+                                Stroke="{x:Bind Player.ForegroundBrush}"
+                                Fill="{x:Bind Player.BackgroundBrush}" />
+                            <Viewbox Width="60" Height="30" HorizontalAlignment="Center">
+                                <local:RoadCtrl Grid.Column="0" Width="50" Height="30" Margin="0,0,2,0"
+                                    Owner="{x:Bind Player, Mode=OneWay}"
+                                    Location="Top" RenderTransformOrigin=".5 .5">
+                                    <local:RoadCtrl.RenderTransform>
+                                        <CompositeTransform Rotation="90" TranslateX="6" TranslateY="1" ScaleX=".75"
+                                            ScaleY=".75" />
+                                    </local:RoadCtrl.RenderTransform>
+                                </local:RoadCtrl>
+                            </Viewbox>
+                        </Grid>
+                        <TextBlock Margin="10,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'Road'), Mode=OneWay}" FontSize="22" />
+                    </StackPanel>
                 </StackPanel>
             </Viewbox>
             <!--  <Bottom Row  -->
             <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="10" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" Orientation="Horizontal">
                 <!--  Current Turn Checkbox  -->
-                <TextBlock Margin="0,0,15,0" HorizontalAlignment="Left" Text="&#x2714;"
-                    FontSize="35"
+                <TextBlock Margin="0" HorizontalAlignment="Left" Text="&#x2714;" FontSize="35"
                     Visibility="{x:Bind Player.GameData.IsCurrentPlayer, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <!--  Times Targetted  -->
-                <TextBlock Margin="10,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                     FontSize="35" Text="&#xF272;" FontFamily="Segoe MDL2 Assets"
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                <TextBlock Margin="2,0,15,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                <TextBlock Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     FontSize="35"
                     Text="{x:Bind Player.GameData.TimesTargeted, Mode=OneWay, FallbackValue=0}"
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                     FontFamily="Century Schoolbook" />
                 <!--  Cards lost to Baron  -->
-                <Viewbox Margin="10,0,0,0">
-                    <local:ResourceCardCtrl Width="75" Height="105" Margin="10,0,0,0" Orientation="FaceDown" />
+                <Viewbox Margin="0,0,0,0">
+                    <local:ResourceCardSlimCtrl Width="70" Height="100" Margin="10,0,0,0"
+                        Image="{StaticResource ResourceType.Back}"
+                        CountVisible="False" />
                 </Viewbox>
                 <local:BaronCtrl Width="25" Height="25" Margin="-20,20,0,0" VerticalAlignment="Center" />
-                <TextBlock Margin="2,0,15,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                <TextBlock Margin="2,0,5,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     FontSize="35"
                     Text="{x:Bind Player.GameData.Resources.ResourcesLostToBaron.Count, Mode=OneWay, FallbackValue=9}"
                     FontFamily="Century Schoolbook"
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 <!--  No ResourceCount (Bad Rolls)  <Ellipse Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" />-->
-                <Grid Width="40" Height="40">
+                <Viewbox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="40"
+                    Margin="5,0,0,0">
+                    <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.Monopoly}" Count="{x:Bind Player.GameData.Resources.ResourcesLostToMonopoly.Count, Mode=OneWay}" />
+                </Viewbox>
+                <Grid Width="40" Height="40" Margin="10,0,0,0">
                     <local:DiceCtrl Width="18" Height="18" Margin="8,5,5,5" HorizontalAlignment="Left"
                         VerticalAlignment="Top" Number="4"
                         FillColor="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
@@ -360,38 +390,66 @@
                 Background="Transparent" CornerRadius="10" BorderThickness="2">
                 <Grid Name="Grid_Stats" Width="110" Margin="0" HorizontalAlignment="Left"
                     VerticalAlignment="Top" Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="55" />
+                        <ColumnDefinition Width="55" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
                     <Grid.Projection>
                         <PlaneProjection RotationY="0" />
                     </Grid.Projection>
                     <!--  Card Stats  -->
-                    <StackPanel Margin="0" Background="Transparent">
+                    <Viewbox>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="0" VerticalAlignment="Center"
+                            Text="⚃⚂" FontFamily="Segoe UI Symbol" FontSize="36"
+                            ToolTipService.ToolTip="Resources Lost to 7"
+                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                    </Viewbox>
+                    <Viewbox Grid.Row="0" Grid.Column="1">
+                        <TextBlock Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="33"
+                            Text="{x:Bind Player.GameData.Resources.ResourcesLostSeven.Count, Mode=OneWay, FallbackValue=88, Converter={StaticResource ResourceKey=IntToStringConverter}}"
+                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                    </Viewbox>
+                    <Viewbox Grid.Row="1" Grid.Column="0" Margin="0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="⚃⚂" FontFamily="Segoe UI Symbol" FontSize="36"
-                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                            <TextBlock Grid.Row="0" Grid.Column="3" Margin="33,0,0,0" VerticalAlignment="Center"
-                                FontSize="33"
-                                Text="{x:Bind Player.GameData.Resources.ResourcesLostSeven.Count, Mode=OneWay, FallbackValue=88, Converter={StaticResource ResourceKey=IntToStringConverter}}"
-                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                            <TextBlock Text="⚃⚁" FontFamily="Segoe UI Symbol" FontSize="32"
+                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
+                                HorizontalTextAlignment="Center" />
+                            <TextBlock Text="" FontFamily="Segoe UI Symbol" FontSize="18"
+                                RenderTransformOrigin=".5 .5"
+                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
+                                HorizontalTextAlignment="Center">
+                                <TextBlock.RenderTransform>
+                                    <CompositeTransform Rotation="180" TranslateY="-3" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
                         </StackPanel>
-                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
-                            <Viewbox Height="40" Margin="25,0,0,0">
-                                <local:ResourceCardCtrl DevCardType="Monopoly" Count="{x:Bind Player.GameData.Resources.ResourcesLostToMonopoly.Count, Mode=OneWay}" />
-                            </Viewbox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚃⚁&#xE007;" FontFamily="Segoe UI Symbol" FontSize="32" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                            <TextBlock Grid.Row="2" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center"
-                                FontSize="32"
-                                Text="{x:Bind Player.GameData.MaxNoResourceRolls, Mode=OneWay, FallbackValue=15}"
-                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚃⚁&#xE00B;" FontFamily="Segoe UI Symbol" FontSize="30" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                            <TextBlock Margin="46,0,0,0" VerticalAlignment="Center" FontSize="32"
-                                Text="{x:Bind Player.GameData.RollsWithResource, Mode=OneWay, FallbackValue=5}"
-                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                        </StackPanel>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1" Grid.Column="1" Margin="5">
+                        <TextBlock Margin="0" VerticalAlignment="Center" FontSize="22"
+                            Text="{x:Bind Player.GameData.MaxNoResourceRolls, Mode=OneWay, FallbackValue=15}"
+                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                    </Viewbox>
+                    <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,9,0,0" Orientation="Horizontal">
+                        <TextBlock HorizontalAlignment="Center" Text="⚃⚁" FontFamily="Segoe UI Symbol"
+                            FontSize="22"
+                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
+                            ToolTipService.ToolTip="Rolls with Resources" />
+                        <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" Text=""
+                            FontFamily="Segoe UI Symbol" FontSize="12"
+                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
+                            ToolTipService.ToolTip="Rolls with Resources" />
                     </StackPanel>
+                    <Viewbox Grid.Row="2" Grid.Column="1" Margin="5">
+                        <TextBlock Margin="0" VerticalAlignment="Center" FontSize="22"
+                            Text="{x:Bind Player.GameData.RollsWithResource, Mode=OneWay, FallbackValue=5}"
+                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                    </Viewbox>
                 </Grid>
                 <Grid Name="Grid_Roll" Width="100" Margin="0" HorizontalAlignment="Center"
                     VerticalAlignment="Center" Background="Black">

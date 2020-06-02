@@ -40,7 +40,7 @@ namespace Catan10
             if (PurchasedEntitlement == Entitlement.DevCard)
             {
                 DevCardType devCard = gameController.PurchaseNextDevCard();
-                if (devCard == DevCardType.Unknown) // ran out of DevCards!
+                if (devCard == DevCardType.None) // ran out of DevCards!
                 {
                     player.GameData.Resources.Current += cost; //refund!
                     return Task.CompletedTask;

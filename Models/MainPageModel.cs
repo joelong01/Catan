@@ -12,25 +12,6 @@ namespace Catan10
 {
     public class MainPageModel : INotifyPropertyChanged
     {
-        #region Fields
-
-        private bool _EnableUiInteraction = true;
-        private int _FiveStarPositions = 0;
-        private int _FourStarPosition = 0;
-        private TradeResources _gameResources = new TradeResources(); // the total number of resources that have been handed out in this game
-        private string _HostName = "http://192.168.1.128:5000";
-        private bool _isServiceGame = false;
-        private Log _newLog = null;
-        private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
-        private Settings _Settings = new Settings();
-        private int _ThreeStarPosition = 0;
-        private int _TwoStarPosition = 0;
-        private bool _WebSocketConnected = false;
-
-        #endregion Fields
-
-        #region Properties
-
         private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
 
         [JsonIgnore]
@@ -50,9 +31,18 @@ namespace Catan10
                {GameState.Supplemental, "Finished (Next)" }
         };
 
-        #endregion Properties
-
-        #region Methods
+        private bool _EnableUiInteraction = true;
+        private int _FiveStarPositions = 0;
+        private int _FourStarPosition = 0;
+        private TradeResources _gameResources = new TradeResources(); // the total number of resources that have been handed out in this game
+        private string _HostName = "http://192.168.1.128:5000";
+        private bool _isServiceGame = false;
+        private Log _newLog = null;
+        private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
+        private Settings _Settings = new Settings();
+        private int _ThreeStarPosition = 0;
+        private int _TwoStarPosition = 0;
+        private bool _WebSocketConnected = false;
 
         /// <summary>
         ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
@@ -88,10 +78,6 @@ namespace Catan10
             );
         }
 
-        #endregion Methods
-
-        #region Constructors
-
         public MainPageModel()
         {
         }
@@ -102,16 +88,7 @@ namespace Catan10
             GameController = gameController;
         }
 
-        #endregion Constructors
-
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
-
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
-
         public string DefaultUser { get; set; } = "";
 
         [JsonIgnore]
@@ -499,6 +476,8 @@ namespace Catan10
                 }
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public void SetPipCount(int[] value)
         {

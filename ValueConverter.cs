@@ -14,14 +14,8 @@ namespace Catan10
 {
     public static class ConverterGlobals
     {
-        #region Properties
-
         public static Dictionary<(Color, Color), LinearGradientBrush> LinearGradientBrushCache { get; } = new Dictionary<(Color, Color), LinearGradientBrush>();
         public static Dictionary<Color, SolidColorBrush> SolidColorBrushCache { get; } = new Dictionary<Color, SolidColorBrush>();
-
-        #endregion Properties
-
-        #region Methods
 
         public static SolidColorBrush GetBrush(Color color)
         {
@@ -67,8 +61,6 @@ namespace Catan10
             }
             return brush;
         }
-
-        #endregion Methods
     }
 
     //public class RoadOwnerOrVisitorColorConverter : IValueConverter
@@ -100,8 +92,6 @@ namespace Catan10
 
     public class AnimationSpeedValueConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -119,14 +109,10 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
-
-        #endregion Methods
     }
 
     public class BoolToOrientationConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             return ((bool)value) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
@@ -155,14 +141,10 @@ namespace Catan10
                 return false;
             }
         }
-
-        #endregion Methods
     }
 
     public class BoolToVisibilityConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (value is bool)
@@ -191,8 +173,6 @@ namespace Catan10
                 return false;
             }
         }
-
-        #endregion Methods
     }
 
     /// <summary>
@@ -201,8 +181,6 @@ namespace Catan10
     /// </summary>
     public class BuildingStateToVisibilityConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             BuildingState desiredState = StaticHelpers.ParseEnum<BuildingState>((string)parameter);
@@ -218,14 +196,10 @@ namespace Catan10
         {
             throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
         }
-
-        #endregion Methods
     }
 
     public class CachedColorToBrushConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             Color color = (Color)value;
@@ -237,14 +211,10 @@ namespace Catan10
             SolidColorBrush brush = (SolidColorBrush)value;
             return brush.Color;
         }
-
-        #endregion Methods
     }
 
     public class CountToOrientationConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             return ((int)value) > 0 ? TileOrientation.FaceUp : TileOrientation.FaceDown;
@@ -273,14 +243,10 @@ namespace Catan10
                 return 0;
             }
         }
-
-        #endregion Methods
     }
 
     public class DiceRollToVisibilityConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             int diceNumber = (int)Int32.Parse((string)parameter);
@@ -296,14 +262,10 @@ namespace Catan10
         {
             throw new Exception("DiceRollToVisibilityConverter cannot be used in a TwoWay binding");
         }
-
-        #endregion Methods
     }
 
     public class EnumToStringValueConverter<T>
     {
-        #region Methods
-
         public object Convert(object value)
         {
             return value.ToString();
@@ -314,8 +276,6 @@ namespace Catan10
             T t = (T)Enum.Parse(typeof(T), value.ToString());
             return t;
         }
-
-        #endregion Methods
     }
 
     /// <summary>
@@ -324,8 +284,6 @@ namespace Catan10
     /// </summary>
     public class GameStateToBooleanConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             var tokens = (parameter as string).Split('|', StringSplitOptions.RemoveEmptyEntries);
@@ -347,8 +305,6 @@ namespace Catan10
         {
             throw new Exception("GameStateToBooleanConverter cannot be used in a TwoWay binding");
         }
-
-        #endregion Methods
     }
 
     /// <summary>
@@ -358,8 +314,6 @@ namespace Catan10
     /// </summary>
     public class GameStateToVisibilityConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             GameState desiredState = StaticHelpers.ParseEnum<GameState>((string)parameter);
@@ -375,19 +329,11 @@ namespace Catan10
         {
             throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
         }
-
-        #endregion Methods
     }
 
     public class GameStateValueConverter : IValueConverter
     {
-        #region Fields
-
         private readonly EnumToStringValueConverter<GameState> _converter = new EnumToStringValueConverter<GameState>();
-
-        #endregion Fields
-
-        #region Methods
 
         public object Convert(object value, Type targetType, object parameter,
                               string language)
@@ -400,19 +346,11 @@ namespace Catan10
         {
             return _converter.ConvertBack(value);
         }
-
-        #endregion Methods
     }
 
     public class HarborLocationValueConverter : IValueConverter
     {
-        #region Fields
-
         private readonly EnumToStringValueConverter<HarborLocation> _converter = new EnumToStringValueConverter<HarborLocation>();
-
-        #endregion Fields
-
-        #region Methods
 
         public object Convert(object value, Type targetType, object parameter,
                               string language)
@@ -425,8 +363,6 @@ namespace Catan10
         {
             return _converter.ConvertBack(value);
         }
-
-        #endregion Methods
     }
 
     /// <summary>
@@ -434,54 +370,22 @@ namespace Catan10
     /// </summary>
     public class HarborTypeToHarborBrushConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             HarborType harbor = (HarborType)value;
-
-            switch (harbor)
-            {
-                case HarborType.ThreeForOne:
-                    return App.Current.Resources["bmThreeForOne"];
-
-                case HarborType.Brick:
-                    return App.Current.Resources["bmTwoForOneBrick"];
-
-                case HarborType.Ore:
-                    return App.Current.Resources["bmTwoForOneOre"];
-
-                case HarborType.Sheep:
-                    return App.Current.Resources["bmTwoForOneSheep"];
-
-                case HarborType.Wood:
-                    return App.Current.Resources["bmTwoForOneWood"];
-
-                case HarborType.Wheat:
-                    return App.Current.Resources["bmTwoForOneWheat"];
-
-                default:
-                    throw new Exception($"Unexpected Harbor Type {harbor} in value HarborTypeToHarborBrushConverter");
-            }
+            string key = "HarborType." + harbor.ToString();
+            return (Brush)App.Current.Resources[key];
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             throw new Exception("HarborTypeToHarborBrush cannot be used in a TwoWay binding");
         }
-
-        #endregion Methods
     }
 
     public class HarborTypeValueConverter : IValueConverter
     {
-        #region Fields
-
         private readonly EnumToStringValueConverter<HarborType> _converter = new EnumToStringValueConverter<HarborType>();
-
-        #endregion Fields
-
-        #region Methods
 
         public object Convert(object value, Type targetType, object parameter,
                               string language)
@@ -494,14 +398,10 @@ namespace Catan10
         {
             return _converter.ConvertBack(value);
         }
-
-        #endregion Methods
     }
 
     public class IntToStringConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             return value.ToString();
@@ -518,14 +418,10 @@ namespace Catan10
                 return 0;
             }
         }
-
-        #endregion Methods
     }
 
     public class IntToVisibilityConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if ((int)value > 0)
@@ -538,16 +434,12 @@ namespace Catan10
         {
             throw new NotImplementedException("IntToVisibilityConverter can't convert back");
         }
-
-        #endregion Methods
     }
 
     //
     //  used to bind to IsEnabled - e.g. "if the CurrentTile == null, the control is disabled"
     public class NullToBoolConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -564,14 +456,10 @@ namespace Catan10
         {
             return value;
         }
-
-        #endregion Methods
     }
 
     public class ObjectToObjectValueConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -583,60 +471,21 @@ namespace Catan10
         {
             return value;
         }
-
-        #endregion Methods
     }
 
     public class ResourceTypeToTileBrushConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             ResourceType resource = (ResourceType)value;
-            switch (resource)
-            {
-                case ResourceType.Sheep:
-                    return (ImageBrush)App.Current.Resources["bmTileSheep"];
-
-                case ResourceType.Wood:
-                    return (ImageBrush)App.Current.Resources["bmTileWood"];
-
-                case ResourceType.Ore:
-                    return (ImageBrush)App.Current.Resources["bmTileOre"];
-
-                case ResourceType.Wheat:
-                    return (ImageBrush)App.Current.Resources["bmTileWheat"];
-
-                case ResourceType.Brick:
-                    return (ImageBrush)App.Current.Resources["bmTileBrick"];
-
-                case ResourceType.GoldMine:
-                    return (ImageBrush)App.Current.Resources["bmTileGoldMine"];
-
-                case ResourceType.Desert:
-                    return (ImageBrush)App.Current.Resources["bmTileDesert"];
-
-                case ResourceType.Back:
-                    return (ImageBrush)App.Current.Resources["bmTileBack"];
-
-                case ResourceType.Sea:
-                    return (ImageBrush)App.Current.Resources["bmTileSheep"];
-
-                case ResourceType.None:
-                    return (ImageBrush)App.Current.Resources["TransparentBrush"];
-
-                default:
-                    throw new Exception($"Unexpected value type in ResourceType {resource} in LoadTileImage");
-            }
+            string key = "TileType." + resource.ToString();
+            return App.Current.Resources[key];
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             throw new Exception("HarborTypeToHarborBrush cannot be used in a TwoWay binding");
         }
-
-        #endregion Methods
     }
 
     /// <summary>
@@ -645,8 +494,6 @@ namespace Catan10
     /// </summary>
     public class ResourceTypeToVisibilityConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             ResourceType desiredState = StaticHelpers.ParseEnum<ResourceType>((string)parameter);
@@ -662,19 +509,11 @@ namespace Catan10
         {
             throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
         }
-
-        #endregion Methods
     }
 
     public class ResourceTypeValueConverter : IValueConverter
     {
-        #region Fields
-
         private readonly EnumToStringValueConverter<ResourceType> _converter = new EnumToStringValueConverter<ResourceType>();
-
-        #endregion Fields
-
-        #region Methods
 
         public object Convert(object value, Type targetType, object parameter,
                               string language)
@@ -687,8 +526,6 @@ namespace Catan10
         {
             return _converter.ConvertBack(value);
         }
-
-        #endregion Methods
     }
 
     /// <summary>
@@ -697,8 +534,6 @@ namespace Catan10
     /// </summary>
     public class RoadStateToVisibilityConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             RoadState desiredState = StaticHelpers.ParseEnum<RoadState>((string)parameter);
@@ -714,14 +549,10 @@ namespace Catan10
         {
             throw new Exception("BuildingStateToVisibilityConverter cannot be used in a TwoWay binding");
         }
-
-        #endregion Methods
     }
 
     public class ScoreIntToStringConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             return "Score: " + value.ToString();
@@ -739,14 +570,10 @@ namespace Catan10
                 return 0;
             }
         }
-
-        #endregion Methods
     }
 
     public class StorageFileToString : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -784,14 +611,10 @@ namespace Catan10
 
             return null;
         }
-
-        #endregion Methods
     }
 
     public class StorageFileValueConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             throw new NotImplementedException();
@@ -801,14 +624,10 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
-
-        #endregion Methods
     }
 
     public class StringToImageBrushConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (string.IsNullOrEmpty(value as string))
@@ -838,14 +657,10 @@ namespace Catan10
 
             return ((BitmapImage)value).UriSource.ToString();
         }
-
-        #endregion Methods
     }
 
     public class StringToImageSourceConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (string.IsNullOrEmpty(value as string))
@@ -867,16 +682,12 @@ namespace Catan10
 
             return ((BitmapImage)value).UriSource.ToString();
         }
-
-        #endregion Methods
     }
 
     //
     //  DON'T FORGET: add your converter class to app.xaml as a resource...
     public class StringToIntConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (value is Int32)
@@ -889,16 +700,12 @@ namespace Catan10
         {
             return Int32.TryParse((string)value, out int result) ? result : 0;
         }
-
-        #endregion Methods
     }
 
     //
     //  pass in a list like "1,2,3,4" and convert it to a List<int> {1, 2, 3, 4}
     public class StringToIntListConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             string s = "";
@@ -929,8 +736,6 @@ namespace Catan10
                 return 0;
             }
         }
-
-        #endregion Methods
     }
 
     /// <summary>
@@ -939,8 +744,6 @@ namespace Catan10
     /// </summary>
     public class StringToTileGroup : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             string s = "";
@@ -975,14 +778,10 @@ namespace Catan10
                 return 0;
             }
         }
-
-        #endregion Methods
     }
 
     public class StringToVisibilityConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (value is string)
@@ -997,14 +796,10 @@ namespace Catan10
         {
             throw new Exception("One Way only");
         }
-
-        #endregion Methods
     }
 
     public class TileOrientationToObjectConverter : IValueConverter
     {
-        #region Methods
-
         public object Convert(object value, Type targetType, object parameter,
                               string language)
         {
@@ -1016,19 +811,11 @@ namespace Catan10
         {
             return value;
         }
-
-        #endregion Methods
     }
 
     public class TileOrientationValueConverter : IValueConverter
     {
-        #region Fields
-
         private readonly EnumToStringValueConverter<TileOrientation> _converter = new EnumToStringValueConverter<TileOrientation>();
-
-        #endregion Fields
-
-        #region Methods
 
         public object Convert(object value, Type targetType, object parameter,
                               string language)
@@ -1041,7 +828,5 @@ namespace Catan10
         {
             return _converter.ConvertBack(value);
         }
-
-        #endregion Methods
     }
 }

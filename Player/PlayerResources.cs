@@ -5,13 +5,68 @@ using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using Windows.UI.Xaml.Media;
+using Windows.Web.AtomPub;
 
 namespace Catan10
 {
+    public class DevCardModel : INotifyPropertyChanged
+    {
+        private DevCardType _devCardType = DevCardType.None;
+        private bool _played = false;
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public DevCardType DevCardType
+        {
+            get
+            {
+                return _devCardType;
+            }
+            set
+            {
+                if (_devCardType != value)
+                {
+                    _devCardType = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool Played
+        {
+            get
+            {
+                return _played;
+            }
+            set
+            {
+                if (_played != value)
+                {
+                    _played = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public static ImageBrush DevCardTypeToImage(DevCardType devCardType)
+        {
+            string key = "DevCardType." + devCardType.ToString();
+            if (devCardType == DevCardType.Back)
+            {
+                return App.Current.Resources["DevCardType.Back"] as ImageBrush;
+            }
+            return App.Current.Resources[key] as ImageBrush;
+        }
+    }
+
     public class PlayerResources : INotifyPropertyChanged
     {
-        #region Fields
-
         private int _Cities = 0;
 
         private TradeResources _currentResources = new TradeResources();
@@ -20,23 +75,19 @@ namespace Catan10
         private int _PlayedMonopoly = 0;
         private int _PlayedRoadBuilding = 0;
         private int _PlayedYearOfPlenty = 0;
-        TradeResources _ResourcesLostSeven = new TradeResources();
-        private TradeResources _ResourcesLostToBard = new TradeResources();
-        TradeResources _ResourcesLostToMonopoly = new TradeResources();
+        private TradeResources _ResourcesLostSeven = new TradeResources();
+        private TradeResources _ResourcesLostToBaron = new TradeResources();
+        private TradeResources _ResourcesLostToMonopoly = new TradeResources();
         private TradeResources _ResourcesThisTurn = new TradeResources();
         private int _Roads = 0;
         private int _Settlements = 0;
-        DevCardType _thisTurnsDevCard = DevCardType.Back;
+        private DevCardType _thisTurnsDevCard = DevCardType.Back;
         private int _TotalDevCards = 0;
         private TradeResources _TotalResources = new TradeResources();
         private int _UnplayedKnights = 0;
         private int _UnplayedMonopoly = 0;
         private int _UnplayedYearOfPlenty = 0;
         private int _VictoryPoints = 0;
-
-        #endregion Fields
-
-        #region Methods
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -54,26 +105,13 @@ namespace Catan10
             this.ConsumeEntitlement(entitlement);
         }
 
-        #endregion Methods
-
-        #region Constructors
-
-        #endregion Constructors
-
-        #region Events
-
-        #endregion Events
-
-        #region Properties
-
-        #endregion Properties
-
-        public DevCardType PlayedThisTurn;
         public PlayerResources()
         {
+            ResourcesThisTurn2.InitWithAllResources();
+            ResourcesThisTurn2.Add(ResourceType.GoldMine);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public ObservableCollection<DevCardModel> AvailableDevCards { get; set; } = new ObservableCollection<DevCardModel>();
 
         public int Cities
         {
@@ -137,9 +175,9 @@ namespace Catan10
         }
 
         public int KnightsPlayed1 { get => this.KnightsPlayed; set => this.KnightsPlayed = value; }
-        public ObservableCollection<DevCardType> NewDevCards { get; set; } = new ObservableCollection<DevCardType>() { DevCardType.Knight, DevCardType.YearOfPlenty };
-        public ObservableCollection<DevCardType> PlayedDevCards { get; set; } = new ObservableCollection<DevCardType>() { DevCardType.Knight, DevCardType.Knight, DevCardType.RoadBuilding };
-        
+        public ObservableCollection<DevCardModel> NewDevCards { get; set; } = new ObservableCollection<DevCardModel>();
+        public ObservableCollection<DevCardModel> PlayedDevCards { get; set; } = new ObservableCollection<DevCardModel>();
+
         public int PlayedMonopoly
         {
             get
@@ -208,13 +246,13 @@ namespace Catan10
         {
             get
             {
-                return _ResourcesLostToBard;
+                return _ResourcesLostToBaron;
             }
             set
             {
-                if (_ResourcesLostToBard != value)
+                if (_ResourcesLostToBaron != value)
                 {
-                    _ResourcesLostToBard = value;
+                    _ResourcesLostToBaron = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -251,6 +289,8 @@ namespace Catan10
                 }
             }
         }
+
+        public ResourceCardCollection ResourcesThisTurn2 { get; } = new ResourceCardCollection();
 
         public int Roads
         {
@@ -332,9 +372,6 @@ namespace Catan10
             }
         }
 
-        public ObservableCollection<DevCardType> UnplayedDevCards { get; set; } = new ObservableCollection<DevCardType>() { DevCardType.Knight, DevCardType.Monopoly };
-      
-
         public int UnplayedKnights
         {
             get
@@ -402,33 +439,51 @@ namespace Catan10
                 }
             }
         }
-        public void AddDevCard(DevCardType devCard)
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public DevCardType PlayedThisTurn;
+
+        public void AddDevCard(DevCardType devCardType)
         {
-            switch (devCard)
-            {
-                case DevCardType.Knight:
-                    UnplayedKnights++;                    
-                    break;
-                case DevCardType.VictoryPoint:
-                    VictoryPoints++;
-                    break;
-                case DevCardType.YearOfPlenty:
-                    UnplayedYearOfPlenty++;
-                    break;
-                case DevCardType.RoadBuilding:
-                    UnplayedRoadBuilding++;
-                    break;
-                case DevCardType.Monopoly:
-                    UnplayedMonopoly++;
-                    break;
-                case DevCardType.Unknown:                    
-                case DevCardType.Back:
-                    Contract.Assert(false, "don't pass that parameter");
-                    break;
-                default:
-                    break;
-            }
+            DevCardModel model = new DevCardModel() { DevCardType = devCardType };
+            NewDevCards.Add(model);
         }
+
+        //public void AddDevCard(DevCardType devCard)
+        //{
+        //    switch (devCard)
+        //    {
+        //        case DevCardType.Knight:
+        //            UnplayedKnights++;
+        //            break;
+
+        //        case DevCardType.VictoryPoint:
+        //            VictoryPoints++;
+        //            break;
+
+        //        case DevCardType.YearOfPlenty:
+        //            UnplayedYearOfPlenty++;
+        //            break;
+
+        //        case DevCardType.RoadBuilding:
+        //            UnplayedRoadBuilding++;
+        //            break;
+
+        //        case DevCardType.Monopoly:
+        //            UnplayedMonopoly++;
+        //            break;
+
+        //        case DevCardType.Unknown:
+        //        case DevCardType.Back:
+        //            Contract.Assert(false, "don't pass that parameter");
+        //            break;
+
+        //        default:
+        //            break;
+        //    }
+        //}
+
         public bool CanAfford(Entitlement entitlement)
         {
             TradeResources cost = TradeResources.GetEntitlementCost(entitlement);
@@ -457,13 +512,15 @@ namespace Catan10
         {
             Current += tr;
             ResourcesThisTurn += tr;
+            ResourcesThisTurn2.AddResources(tr);
             TotalResources += tr;
+            MainPage.Current.MainPageModel.GameResources += tr;
+
             NotifyPropertyChanged("PlayerResources");
             NotifyPropertyChanged("Current");
             NotifyPropertyChanged("ResourcesThisTurn");
             NotifyPropertyChanged("TotalResources");
             NotifyPropertyChanged("EnabledEntitlementPurchase");
-
         }
 
         public bool HasEntitlement(Entitlement entitlement)
@@ -471,35 +528,65 @@ namespace Catan10
             return UnspentEntitlements.Contains(entitlement);
         }
 
-        public void PlayDevCard(DevCardType devCard)
+        public void MakeDevCardsAvailable()
         {
-            PlayedDevCards.Add(devCard);
-            switch (devCard)
-            {
-                case DevCardType.Knight:
-                    UnplayedKnights--;
-                    
-                    break;
-                case DevCardType.VictoryPoint:
-                    VictoryPoints++;
-                    break;
-                case DevCardType.YearOfPlenty:
-                    UnplayedYearOfPlenty++;
-                    break;
-                case DevCardType.RoadBuilding:
-                    UnplayedRoadBuilding++;
-                    break;
-                case DevCardType.Monopoly:
-                    UnplayedMonopoly++;
-                    break;
-                case DevCardType.Unknown:
-                case DevCardType.Back:
-                    Contract.Assert(false, "don't pass that parameter");
-                    break;
-                default:
-                    break;
-            }
+            NewDevCards.ForEach((dc) => AvailableDevCards.Add(dc));
+            NewDevCards.Clear();
         }
+
+        public bool PlayDevCard(DevCardType devCardType)
+        {
+            for (int i = AvailableDevCards.Count - 1; i >= 0; i--)
+            {
+                DevCardModel card = AvailableDevCards[i];
+                if (card.DevCardType == devCardType)
+                {
+                    PlayedDevCards.Add(card);
+                    AvailableDevCards.RemoveAt(i);
+                    PlayedThisTurn = card.DevCardType;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        //public void PlayDevCard(DevCardType devCard)
+        //{
+        //    PlayedDevCards.Add(devCard);
+        //    switch (devCard)
+        //    {
+        //        case DevCardType.Knight:
+        //            UnplayedKnights--;
+
+        //            break;
+
+        //        case DevCardType.VictoryPoint:
+        //            VictoryPoints++;
+        //            break;
+
+        //        case DevCardType.YearOfPlenty:
+        //            UnplayedYearOfPlenty++;
+        //            break;
+
+        //        case DevCardType.RoadBuilding:
+        //            UnplayedRoadBuilding++;
+        //            break;
+
+        //        case DevCardType.Monopoly:
+        //            UnplayedMonopoly++;
+        //            break;
+
+        //        case DevCardType.Unknown:
+        //        case DevCardType.Back:
+        //            Contract.Assert(false, "don't pass that parameter");
+        //            break;
+
+        //        default:
+        //            break;
+        //    }
+        //}
+
         // the list of cards that have been played.  this is public information!
         public override string ToString()
         {
