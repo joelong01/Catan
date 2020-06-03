@@ -17,8 +17,6 @@ namespace Catan10
 {
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
-        #region Fields
-
         private readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
 
         private readonly string[] _savePropName = new string[] { "HarborLocation" };
@@ -30,10 +28,6 @@ namespace Catan10
         private TileOrientation _orientation = TileOrientation.FaceDown;
 
         private bool _useClassic = true;
-
-        #endregion Fields
-
-        #region Methods
 
         private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -67,21 +61,11 @@ namespace Catan10
             }
         }
 
-        #endregion Methods
-
-        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
-
-        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
-
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
-
         public Harbor()
         {
             this.InitializeComponent();
             this.DataContext = this;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public FrameworkElement AnimationObject => _backGrid;
 
@@ -203,7 +187,6 @@ namespace Catan10
         }
 
         public int TileIndex { get; set; } = 0;
-
         public CompositeTransform Transform => _gridTransform;
 
         public bool UseClassic
@@ -212,6 +195,14 @@ namespace Catan10
 
             set => _useClassic = value;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
+
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
+
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
 
         public Task AnimateMoveTask(Point to, double ms, double startAfter)
         {
@@ -223,11 +214,6 @@ namespace Catan10
             _daToX.BeginTime = TimeSpan.FromMilliseconds(startAfter);
             _daToY.BeginTime = TimeSpan.FromMilliseconds(startAfter);
             return _sbMoveTile.ToTask();
-        }
-
-        public void Deserialize(string s)
-        {
-            this.DeserializeObject<Harbor>(s, "=", "|");
         }
 
         public void Reset()
@@ -244,11 +230,6 @@ namespace Catan10
             _daRotate.To += angle;
             _daRotate.Duration = TimeSpan.FromMilliseconds(ms);
             return _sbRotate.ToTask();
-        }
-
-        public string Serialize()
-        {
-            return this.SerializeObject<Harbor>(_savePropName, "=", "|");
         }
 
         public void SetHarborImage(HarborType value)

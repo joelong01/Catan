@@ -19,6 +19,136 @@ namespace Catan10
 {
     public class PlayerGameModel : INotifyPropertyChanged
     {
+        private readonly bool[] _RoadTie = new bool[10];
+
+        // does this instance win the ties for this count of roads?
+        private int _CitiesPlayed = 0;
+
+        private int _goldRolls = 0;
+
+        private bool _goodRoll = false;
+
+        private bool _HasLongestRoad = false;
+
+        private bool _isCurrentPlayer = false;
+
+        private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
+
+        private int _IslandsPlayed = 0;
+
+        private bool _LargestArmy = false;
+
+        private int _LongestRoad = 0;
+
+        private int _MaxCities = 0;
+
+        private int _maxNoResourceRolls = 0;
+
+        private int _MaxRoads = 0;
+
+        private int _MaxSettlements = 0;
+
+        private int _MaxShips = 0;
+
+        private bool? _MovedBaronAfterRollingSeven = null;
+
+        private int _noResourceCount = 0;
+
+        private int _pips = 0;
+
+        private bool _PlayedKnightThisTurn = false;
+
+        private PlayerModel _playerData = null;
+
+        private PlayerResources _resources = new PlayerResources();
+
+        private int _RoadsPlayed = 0;
+
+        private TileOrientation _RollOrientation = TileOrientation.FaceDown;
+
+        private int _rollsWithResource = 0;
+
+        private int _score = 0;
+
+        private int _SettlementsPlayed = 0;
+
+        private int _ShipsPlayed = 0;
+
+        private int _timesTargeted = 0;
+
+        private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
+
+        private void Cities_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            CitiesPlayed = Cities.Count;
+            UpdateScore();
+            Pips = CalculatePips(Settlements, Cities);
+        }
+
+        private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
+        {
+            //_playerData.Log?.PostLogEntry(_playerData, GameState.Unknown,
+            //                                                 CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
+            //                                                 new LogPropertyChanged(propertyName, oldVal, newVal));
+        }
+
+        private void LogPropertyChanged(int oldVal, int newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+
+        private void LogPropertyChanged(bool oldVal, bool newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+
+        private void LogPropertyChanged(bool? oldVal, bool? newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            // if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void OnGameModelResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
+        {
+            // _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
+        }
+
+        private void Roads_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RoadsPlayed = Roads.Count();
+        }
+
+        private void Settlements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            SettlementsPlayed = Settlements.Count;
+            UpdateScore();
+            Pips = CalculatePips(Settlements, Cities);
+        }
+
+        private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ShipsPlayed = Ships.Count;
+        }
+
+        private void UpdateScore()
+        {
+            int score = CitiesPlayed * 2 + SettlementsPlayed;
+
+            score += HasLongestRoad ? 2 : 0;
+            score += LargestArmy ? 2 : 0;
+
+            IslandsPlayed = _islands.Count;
+
+            score += _islands.Count;
+
+            Score = score;
+        }
+
         public PlayerGameModel()
         {
             NotificationsEnabled = true;
@@ -32,39 +162,6 @@ namespace Catan10
             Ships.CollectionChanged += Ships_CollectionChanged;
             PlayerModel = pData;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private readonly bool[] _RoadTie = new bool[10]; // does this instance win the ties for this count of roads?
-        private int _CitiesPlayed = 0;
-        private int _goldRolls = 0;
-        private bool _goodRoll = false;
-        private bool _HasLongestRoad = false;
-        private bool _isCurrentPlayer = false;
-        private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
-        private int _IslandsPlayed = 0;
-        private bool _LargestArmy = false;
-        private int _LongestRoad = 0;
-        private int _MaxCities = 0;
-        private int _maxNoResourceRolls = 0;
-        private int _MaxRoads = 0;
-        private int _MaxSettlements = 0;
-        private int _MaxShips = 0;
-        private bool? _MovedBaronAfterRollingSeven = null;
-        private int _noResourceCount = 0;
-        private int _pips = 0;
-        private bool _PlayedKnightThisTurn = false;
-        private PlayerModel _playerData = null;
-        private PlayerResources _resources = new PlayerResources();
-        private int _RoadsPlayed = 0;
-        private TileOrientation _RollOrientation = TileOrientation.FaceDown;
-        private int _rollsWithResource = 0;
-        private int _score = 0;
-        private int _SettlementsPlayed = 0;
-        private int _ShipsPlayed = 0;
-        private int _timesTargeted = 0;
-        private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
-        public CardsLostUpdatedHandler OnCardsLost;
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -506,76 +603,9 @@ namespace Catan10
             }
         }
 
-        private void Cities_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            CitiesPlayed = Cities.Count;
-            UpdateScore();
-            Pips = CalculatePips(Settlements, Cities);
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
-        {
-            //_playerData.Log?.PostLogEntry(_playerData, GameState.Unknown,
-            //                                                 CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
-            //                                                 new LogPropertyChanged(propertyName, oldVal, newVal));
-        }
-
-        private void LogPropertyChanged(int oldVal, int newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
-        {
-            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
-        }
-
-        private void LogPropertyChanged(bool oldVal, bool newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
-        {
-            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
-        }
-
-        private void LogPropertyChanged(bool? oldVal, bool? newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
-        {
-            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            // if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void OnGameModelResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
-        {
-            // _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
-        }
-
-        private void Roads_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RoadsPlayed = Roads.Count();
-        }
-
-        private void Settlements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            SettlementsPlayed = Settlements.Count;
-            UpdateScore();
-            Pips = CalculatePips(Settlements, Cities);
-        }
-
-        private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            ShipsPlayed = Ships.Count;
-        }
-
-        private void UpdateScore()
-        {
-            int score = CitiesPlayed * 2 + SettlementsPlayed;
-
-            score += HasLongestRoad ? 2 : 0;
-            score += LargestArmy ? 2 : 0;
-
-            IslandsPlayed = _islands.Count;
-
-            score += _islands.Count;
-
-            Score = score;
-        }
+        public CardsLostUpdatedHandler OnCardsLost;
 
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
         {
@@ -621,12 +651,6 @@ namespace Catan10
         public void AddOwnedHarbor(Harbor harbor)
         {
             OwnedHarbors.Add(harbor);
-        }
-
-        public bool Deserialize(string s, bool oneLine)
-        {
-            StaticHelpers.DeserializeObject<PlayerGameModel>(this, s, ":", "|");
-            return true;
         }
 
         public void RemoveIsland(Island island)
@@ -727,14 +751,18 @@ namespace Catan10
 
     public class SyncronizedPlayerRolls : IComparable<SyncronizedPlayerRolls>, INotifyPropertyChanged
     {
+        private RollModel _rollModel = new RollModel();
+
+        // a list of the chosen roll values -- used to break ties
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public SyncronizedPlayerRolls()
         {
             LatestRolls.AddRange(PickingBoardToWaitingForRollOrder.GetRollModelList()); // always have 4 Rolls in here so XAML doesn't throw
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private RollModel _rollModel = new RollModel();
 
         public RollModel CurrentRoll
         {
@@ -755,6 +783,7 @@ namespace Catan10
         }
 
         public ObservableCollection<RollModel> LatestRolls { get; set; } = new ObservableCollection<RollModel>();
+
         public List<int> RollValues { get; set; } = new List<int>();
 
         public bool ShowLatestRoll
@@ -765,11 +794,7 @@ namespace Catan10
             }
         }
 
-        // a list of the chosen roll values -- used to break ties
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public RollModel AddRolls(List<RollModel> rolls)
         {
