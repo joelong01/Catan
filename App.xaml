@@ -98,7 +98,8 @@
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
-                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Foreground" Value="Black" />
+                <Setter Property="Background" Value="SlateGray" />
                 <Setter Property="FontSize" Value="48" />
                 <Setter Property="CharacterSpacing" Value="0" />
                 <Setter Property="Margin" Value="20,0,20,0" />
@@ -113,6 +114,7 @@
                 <Setter Property="Margin" Value="0,0,0,10" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
                 <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="Black" />
             </Style>
             <Style x:Key="DesignerTextBoxStyle" TargetType="TextBox">
                 <Setter Property="FontFamily" Value="Segoe UI" />

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using Windows.UI;
 using Windows.UI.Xaml.Media;
 using Windows.Web.AtomPub;
 
@@ -54,8 +55,13 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public static ImageBrush DevCardTypeToImage(DevCardType devCardType)
+        public static Brush DevCardTypeToImage(DevCardType devCardType)
         {
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+                return new SolidColorBrush(Colors.AliceBlue);
+            }
+
             string key = "DevCardType." + devCardType.ToString();
             if (devCardType == DevCardType.Back)
             {

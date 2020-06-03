@@ -19,6 +19,9 @@ namespace Catan10
 
         private bool EnabledEntitlementPurchase(string entitlementValue, PlayerResources playerResources)
         {
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+                return false;
+
             if (MainPage.Current.CurrentGameState != GameState.WaitingForNext && MainPage.Current.CurrentGameState != GameState.Supplemental)
                 return false;
 

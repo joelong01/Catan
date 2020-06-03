@@ -59,7 +59,7 @@
                 <ColumnDefinition Width="0" />
             </Grid.ColumnDefinitions>
             <!--  The button to flip between stats and rolls  -->
-            <Button Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="42,0,0,0"
+            <Button Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="60,0,0,0"
                 HorizontalAlignment="Left" VerticalAlignment="Top"
                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                 BorderBrush="Transparent" Visibility="Visible" Background="Transparent"
@@ -147,14 +147,24 @@
                     </ListBox>
                 </Viewbox>
                 <!--  Roads  -->
-                <local:RoadCtrl Grid.Column="0" Width="50" Height="30" Margin="0,0,2,0"
+                <!--<local:RoadCtrl Grid.Column="0" Width="50" Height="30" Margin="0,0,2,0"
                     Owner="{x:Bind Player, Mode=OneWay}"
                     Location="Top" RenderTransformOrigin=".5 .5">
                     <local:RoadCtrl.RenderTransform>
                         <CompositeTransform Rotation="90" TranslateX="0" TranslateY="6" />
                     </local:RoadCtrl.RenderTransform>
-                </local:RoadCtrl>
-                <TextBlock Grid.Column="1" Margin="-20,0,0,0" HorizontalAlignment="Left"
+                </local:RoadCtrl>-->
+                <Viewbox Width="30" Height="40">
+                    <Grid Margin="-10,-2,0,0" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
+                        <Line X1="15" Y1="5" X2="15" Y2="45"
+                            Stroke="White" StrokeThickness="2" />
+                        <Line X1="25" Y1="5" X2="25" Y2="45"
+                            Stroke="White" StrokeThickness="3" StrokeDashArray="2 1" />
+                        <Line X1="35" Y1="5" X2="35" Y2="45"
+                            Stroke="White" StrokeThickness="2" />
+                    </Grid>
+                </Viewbox>
+                <TextBlock Grid.Column="1" Margin="0,0,0,0" HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     Text="{x:Bind Player.GameData.RoadsPlayed, Mode=OneWay, FallbackValue=7}"
                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
@@ -252,9 +262,6 @@
                     <TextBlock Margin="3,0,0,0" Text="✔" FontSize="68"
                         Visibility="{x:Bind Player.GameData.LargestArmy, FallbackValue=Visible, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"
                         Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                    <TextBlock Margin="30,0,5,0" Text="⛏" FontSize="68" IsColorFontEnabled="False"
-                        Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
-                    <TextBlock FontSize="68" Text="{x:Bind Player.GameData.Resources.UnspentEntitlements.Count, Mode=OneWay, FallbackValue=12}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                 </StackPanel>
             </Viewbox>
             <!--  Third Row  -->
@@ -281,39 +288,48 @@
                     </GridView.ItemContainerStyle>
                 </GridView>
             </Viewbox>
-            <Viewbox Grid.Row="2" Grid.RowSpan="1" Grid.Column="0" Grid.ColumnSpan="2"
-                Margin="0,0,-10,0" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <local:CityCtrl Width="30" Height="30" Margin="0,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
-                        <TextBlock Margin="10,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'City'), Mode=OneWay}" FontSize="22" />
+
+            <StackPanel Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="2"
+                Margin="-50" HorizontalAlignment="Right" VerticalAlignment="Center" Height="85"
+                Background="Transparent" BorderBrush="White" BorderThickness="1"
+                CornerRadius="5">
+                <TextBlock HorizontalAlignment="Left" Text="⛏" FontSize="12" Margin="0,0,0,4"
+                    IsColorFontEnabled="False"
+                    Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,5,0">
+                    <local:CityCtrl Width="30" Height="30" Margin="5,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
+                    <local:SettlementCtrl Width="30" Height="30" Owner="{x:Bind Player, Mode=OneWay}" Margin="5,0,0,0" />
+                    <Grid Width="30" Height="30" Margin="5,0,0,0" Background="Transparent">
+                        <Ellipse Width="30" Height="30" StrokeThickness=".25"
+                            Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                            Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
+                        <Viewbox Width="60" Height="30" HorizontalAlignment="Center">
+                            <Grid Margin="-15,-2,0,0">
+                                <Line X1="15" Y1="5" X2="15" Y2="45"
+                                    Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" />
+                                <Line X1="25" Y1="5" X2="25" Y2="45"
+                                    Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="3" StrokeDashArray="2 1" />
+                                <Line X1="35" Y1="5" X2="35" Y2="45"
+                                    Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" />
+                            </Grid>
+                        </Viewbox>
+                    </Grid>
                     </StackPanel>
+               
                     <StackPanel Orientation="Horizontal">
-                        <local:SettlementCtrl Width="30" Height="30" Owner="{x:Bind Player, Mode=OneWay}" />
-                        <TextBlock Margin="10,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'Settlement'), Mode=OneWay}" FontSize="22" />
+                        <!--<TextBlock Margin="12,0,0,0" Text="0" FontSize="22"/>
+                        <TextBlock Margin="22,0,0,0" Text="1" FontSize="22"/>
+                        <TextBlock Margin="26,0,0,0" Text="2" FontSize="22"/>-->
+                        
+                        <TextBlock Margin="12,0,0,0"  Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'City'), Mode=OneWay}" FontSize="22" />
+                        <TextBlock Margin="22,0,0,0"  Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'Settlement'), Mode=OneWay}" FontSize="22" />
+                        <TextBlock Margin="26,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'Road'), Mode=OneWay}" FontSize="22" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Grid Width="30" Background="Transparent">
-                            <Ellipse Width="30" Height="30" StrokeThickness="0"
-                                Stroke="{x:Bind Player.ForegroundBrush}"
-                                Fill="{x:Bind Player.BackgroundBrush}" />
-                            <Viewbox Width="60" Height="30" HorizontalAlignment="Center">
-                                <local:RoadCtrl Grid.Column="0" Width="50" Height="30" Margin="0,0,2,0"
-                                    Owner="{x:Bind Player, Mode=OneWay}"
-                                    Location="Top" RenderTransformOrigin=".5 .5">
-                                    <local:RoadCtrl.RenderTransform>
-                                        <CompositeTransform Rotation="90" TranslateX="6" TranslateY="1" ScaleX=".75"
-                                            ScaleY=".75" />
-                                    </local:RoadCtrl.RenderTransform>
-                                </local:RoadCtrl>
-                            </Viewbox>
-                        </Grid>
-                        <TextBlock Margin="10,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'Road'), Mode=OneWay}" FontSize="22" />
-                    </StackPanel>
-                </StackPanel>
-            </Viewbox>
+               
+                
+            </StackPanel>
             <!--  <Bottom Row  -->
-            <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="10" HorizontalAlignment="Stretch"
+            <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom" Orientation="Horizontal">
                 <!--  Current Turn Checkbox  -->
                 <TextBlock Margin="0" HorizontalAlignment="Left" Text="&#x2714;" FontSize="35"
@@ -358,7 +374,7 @@
                         Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
                         StrokeThickness="1" />
                 </Grid>
-                <TextBlock Margin="2,0,15,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                <TextBlock Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                     FontSize="35"
                     Text="{x:Bind Player.GameData.NoResourceCount, Mode=OneWay, FallbackValue=7}"
                     FontFamily="Century Schoolbook"
@@ -384,7 +400,7 @@
             </StackPanel>
             <!--  these 3 grids all need to be exactly the same size so the flip animation looks right  -->
             <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="3" Grid.ColumnSpan="1"
-                Width="120" Margin="0,10,0,0" HorizontalAlignment="Right"
+                Width="110" Margin="0,10,10,0" HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                 Background="Transparent" CornerRadius="10" BorderThickness="2">
@@ -480,3 +496,5 @@
         </Grid>
     </Border>
 </UserControl>
+
+    
