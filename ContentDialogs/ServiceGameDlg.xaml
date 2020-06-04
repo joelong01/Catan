@@ -21,153 +21,154 @@
             <Setter Property="Orientation" Value="Horizontal" />
         </Style>
     </ContentDialog.Resources>
-    <Grid Width="1000" Height="590">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="60" />
-            <RowDefinition Height="60" />
-            <RowDefinition Height="100*" />
-            <RowDefinition Height="60" />
-            <RowDefinition Height="10" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="50*" />
-            <ColumnDefinition Width="100*" />
-            <ColumnDefinition Width="35*" />
-        </Grid.ColumnDefinitions>
-        <Grid Name="ErrorGrid" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1"
-            Grid.ColumnSpan="2"
-            Background="{StaticResource BlackBrush}"
-            Canvas.ZIndex="999"
-            Visibility="{x:Bind ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}">
+    <Viewbox>
+        <Grid Width="1000" Height="590" HorizontalAlignment="Left">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="100" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="60" />
+                <RowDefinition Height="60" />
+                <RowDefinition Height="100*" />
+                <RowDefinition Height="60" />
+                <RowDefinition Height="10" />
             </Grid.RowDefinitions>
-            <TextBox HorizontalAlignment="Stretch"
-                Text="{x:Bind ErrorMessage, Mode=OneWay}"
-                FontSize="22" IsReadOnly="True" AcceptsReturn="True" />
-            <Button Grid.Row="1" Width="100" Margin="-220,0,0,0" HorizontalAlignment="Center"
-                Content="Ok" Click="OnOkError" />
-            <Button Grid.Row="1" Width="100" Margin="220,0,0,0" HorizontalAlignment="Center"
-                Content="Cancel" Click="OnCancelError" />
-        </Grid>
-        <Rectangle Grid.RowSpan="6" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
-            Fill="{StaticResource bmCherry}"
-            RadiusX="168.5" RadiusY="168.5"
-            Stroke="{StaticResource bmMaple}"
-            StrokeThickness="5" />
-        <Rectangle Grid.Row="0" Grid.RowSpan="6" Grid.Column="1" Grid.ColumnSpan="2"
-            Margin="0,10,0,10"
-            Fill="{StaticResource bmMaple}" />
-        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,10,0,10" HorizontalAlignment="Center"
-            VerticalAlignment="Center" Text="Games" FontFamily="Segoe UI" FontSize="32"
-            Foreground="Black" />
-        <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"
-            VerticalAlignment="Center" Text="Players" FontFamily="Segoe UI" FontSize="32"
-            Foreground="Black" />
-        <Viewbox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,0"
-            HorizontalAlignment="Stretch">
-            <StackPanel Margin="0,0,0,0" Orientation="Horizontal" BorderBrush="Black" BorderThickness="0">
-                <TextBlock Margin="5,0,15,0" VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="36"
-                    Text="Game Name: " Foreground="Black" />
-                <TextBox Width="250" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                    VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="52"
-                    Text="{x:Bind NewGameName, Mode=TwoWay}"
-                    Foreground="Black" BorderBrush="Black" />
-                <Button Margin="0,0,0,0" HorizontalAlignment="Left" Click="OnNew">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="100*" />
+                <ColumnDefinition Width="35*" />
+            </Grid.ColumnDefinitions>
+            <Grid Name="ErrorGrid" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Background="{StaticResource BlackBrush}"
+                Canvas.ZIndex="999"
+                Visibility="{x:Bind ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="100" />
+                </Grid.RowDefinitions>
+                <TextBox HorizontalAlignment="Stretch"
+                    Text="{x:Bind ErrorMessage, Mode=OneWay}"
+                    FontSize="22" IsReadOnly="True" AcceptsReturn="True" />
+                <Button Grid.Row="1" Width="100" Margin="-220,0,0,0" HorizontalAlignment="Center"
+                    Content="Ok" Click="OnOkError" />
+                <Button Grid.Row="1" Width="100" Margin="220,0,0,0" HorizontalAlignment="Center"
+                    Content="Cancel" Click="OnCancelError" />
+            </Grid>
+            <Rectangle Grid.RowSpan="6" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
+                Fill="{StaticResource bmCherry}"
+                RadiusX="168.5" RadiusY="168.5"
+                Stroke="{StaticResource bmMaple}"
+                StrokeThickness="5" />
+            <Rectangle Grid.Row="0" Grid.RowSpan="6" Grid.Column="1" Grid.ColumnSpan="2"
+                Margin="0,10,0,10"
+                Fill="{StaticResource bmMaple}" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,10,0,10" HorizontalAlignment="Center"
+                VerticalAlignment="Center" Text="Games" FontFamily="Segoe UI" FontSize="32"
+                Foreground="Black" />
+            <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"
+                VerticalAlignment="Center" Text="Players" FontFamily="Segoe UI" FontSize="32"
+                Foreground="Black" />
+            <Viewbox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,0"
+                HorizontalAlignment="Stretch">
+                <StackPanel Margin="0,0,0,0" Orientation="Horizontal" BorderBrush="Black" BorderThickness="0">
+                    <TextBlock Margin="5,0,15,0" VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="36"
+                        Text="Game Name: " Foreground="Black" />
+                    <TextBox Width="250" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                        VerticalContentAlignment="Center" FontFamily="Segoe UI" FontSize="52"
+                        Text="{x:Bind NewGameName, Mode=TwoWay}"
+                        Foreground="Black" BorderBrush="Black" />
+                    <Button Margin="0,0,0,0" HorizontalAlignment="Left" Click="OnNew">
+                        <Button.Content>
+                            <StackPanel Margin="0" Orientation="Horizontal" BorderThickness="1">
+                                <TextBlock Margin="2" HorizontalAlignment="Center" Text="Create" Foreground="Black"
+                                    FontSize="36" />
+                                <TextBlock Margin="0" HorizontalAlignment="Center" Text="&#xE1DA;"
+                                    FontFamily="Segoe UI Symbol" Foreground="Black" FontSize="36" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+            </Viewbox>
+            <StackPanel Grid.Row="2" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="1"
+                Margin="15,0,10,0" HorizontalAlignment="Center">
+                <Button Style="{StaticResource BtnStyle}" Click="OnRefresh">
                     <Button.Content>
-                        <StackPanel Margin="0" Orientation="Horizontal" BorderThickness="1">
-                            <TextBlock Margin="2" HorizontalAlignment="Center" Text="Create" Foreground="Black"
+                        <StackPanel Style="{StaticResource StkPnlStyle}">
+                            <TextBlock Margin="10,0,80,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                Text="Refresh" Foreground="Black" FontSize="22" />
+                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Text="&#xE895;" FontFamily="Segoe MDL2 Assets" Foreground="Black"
                                 FontSize="36" />
-                            <TextBlock Margin="0" HorizontalAlignment="Center" Text="&#xE1DA;"
-                                FontFamily="Segoe UI Symbol" Foreground="Black" FontSize="36" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Style="{StaticResource BtnStyle}" Click="OnJoin">
+                    <Button.Content>
+                        <StackPanel Style="{StaticResource StkPnlStyle}">
+                            <TextBlock Margin="10,0,107,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Text="Join" Foreground="Black" FontSize="22" />
+                            <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="&#xEBDA;"
+                                FontFamily="Segoe MDL2 Assets" Foreground="Black" FontSize="36" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Style="{StaticResource BtnStyle}" Click="OnDelete">
+                    <Button.Content>
+                        <StackPanel Style="{StaticResource StkPnlStyle}">
+                            <TextBlock Margin="10,0,81,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Text="Delete" Foreground="Black" FontSize="22" />
+                            <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="&#xE74D;"
+                                FontFamily="Segoe MDL2 Assets" Foreground="Black" FontSize="36" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Margin="0,20,0,0" Style="{StaticResource BtnStyle}" Click="OnDeleteAll" Background="{StaticResource bmMaple}">
+                    <Button.Content>
+                        <StackPanel Style="{StaticResource StkPnlStyle}">
+                            <TextBlock Margin="10,0,81,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Text="Delete All" Foreground="Red" FontSize="22" />
+                            <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="☬" Foreground="Red"
+                                FontSize="36" />
                         </StackPanel>
                     </Button.Content>
                 </Button>
             </StackPanel>
-        </Viewbox>
-        <StackPanel Grid.Row="2" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="1"
-            Margin="15,0,10,0" HorizontalAlignment="Center">
-            <Button Style="{StaticResource BtnStyle}" Click="OnRefresh">
-                <Button.Content>
-                    <StackPanel Style="{StaticResource StkPnlStyle}">
-                        <TextBlock Margin="10,0,80,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                            Text="Refresh" Foreground="Black" FontSize="22" />
-                        <TextBlock Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
-                            Text="&#xE895;" FontFamily="Segoe MDL2 Assets" Foreground="Black"
-                            FontSize="36" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-            <Button Style="{StaticResource BtnStyle}" Click="OnJoin">
-                <Button.Content>
-                    <StackPanel Style="{StaticResource StkPnlStyle}">
-                        <TextBlock Margin="10,0,107,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                            Text="Join" Foreground="Black" FontSize="22" />
-                        <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="&#xEBDA;"
-                            FontFamily="Segoe MDL2 Assets" Foreground="Black" FontSize="36" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-            <Button Style="{StaticResource BtnStyle}" Click="OnDelete">
-                <Button.Content>
-                    <StackPanel Style="{StaticResource StkPnlStyle}">
-                        <TextBlock Margin="10,0,81,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                            Text="Delete" Foreground="Black" FontSize="22" />
-                        <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="&#xE74D;"
-                            FontFamily="Segoe MDL2 Assets" Foreground="Black" FontSize="36" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-
-            <Button Margin="0,20,0,0" Style="{StaticResource BtnStyle}" Click="OnDeleteAll" Background="{StaticResource bmMaple}">
-                <Button.Content>
-                    <StackPanel Style="{StaticResource StkPnlStyle}">
-                        <TextBlock Margin="10,0,81,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                            Text="Delete All" Foreground="Red" FontSize="22" />
-                        <TextBlock Margin="5,2,0,0" VerticalAlignment="Center" Text="☬" Foreground="Red"
-                            FontSize="36" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-        </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,10,0"
-            Orientation="Horizontal" Canvas.ZIndex="99">
-            <TextBlock Margin="5,0,15,0" VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="32"
-                Text="Host: " Foreground="Black" />
-            <TextBox Width="500" Margin="0,15,0,10" HorizontalAlignment="Right"
-                VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="22"
-                Text="{x:Bind HostName, Mode=TwoWay}" />
-        </StackPanel>
-        <ListBox Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="5"
-            Background="Transparent"
-            ItemsSource="{x:Bind Games, Mode=OneWay}"
-            BorderBrush="{StaticResource bmCherry}"
-            SelectedItem="{x:Bind SelectedGame, Mode=TwoWay}"
-            SelectionChanged="List_GameChanged">
-            <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="proxy:GameInfo">
-                    <TextBlock Text="{x:Bind Name}" FontSize="33" Foreground="Black" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <GridView Grid.Row="2" Grid.RowSpan="2" Grid.Column="2" Margin="5"
-            Background="Transparent"
-            BorderBrush="{StaticResource bmCherry}"
-            ItemsSource="{x:Bind PlayersInGame, Mode=OneWay}">
-            <GridView.ItemTemplate>
-                <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PlayerPickerItemCtrl Player="{x:Bind}" FocusVisualPrimaryBrush="HotPink" />
-                </DataTemplate>
-            </GridView.ItemTemplate>
-            <GridView.ItemContainerStyle>
-                <Style TargetType="GridViewItem">
-                    <Setter Property="Margin" Value="0" />
-                    <Setter Property="Padding" Value="5" />
-                </Style>
-            </GridView.ItemContainerStyle>
-        </GridView>
-    </Grid>
+            <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,10,0"
+                Orientation="Horizontal" Canvas.ZIndex="99">
+                <TextBlock Margin="5,0,15,0" VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="32"
+                    Text="Host: " Foreground="Black" />
+                <TextBox Width="500" Margin="0,15,0,10" HorizontalAlignment="Right"
+                    VerticalAlignment="Center" FontFamily="Segoe UI" FontSize="22"
+                    Text="{x:Bind HostName, Mode=TwoWay}" />
+            </StackPanel>
+            <ListBox Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Margin="5"
+                Background="Transparent"
+                ItemsSource="{x:Bind Games, Mode=OneWay}"
+                BorderBrush="{StaticResource bmCherry}"
+                SelectedItem="{x:Bind SelectedGame, Mode=TwoWay}"
+                SelectionChanged="List_GameChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="proxy:GameInfo">
+                        <TextBlock Text="{x:Bind Name}" FontSize="33" Foreground="Black" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <GridView Grid.Row="2" Grid.RowSpan="2" Grid.Column="2" Margin="5"
+                Background="Transparent"
+                BorderBrush="{StaticResource bmCherry}"
+                ItemsSource="{x:Bind PlayersInGame, Mode=OneWay}">
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="local:PlayerModel">
+                        <local:PlayerPickerItemCtrl Player="{x:Bind}" FocusVisualPrimaryBrush="HotPink" />
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+                <GridView.ItemContainerStyle>
+                    <Style TargetType="GridViewItem">
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="Padding" Value="5" />
+                    </Style>
+                </GridView.ItemContainerStyle>
+            </GridView>
+        </Grid>
+    </Viewbox>
 </ContentDialog>

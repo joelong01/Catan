@@ -1,48 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 using Catan.Proxy;
-
+using Windows.UI;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
     public class MainPageModel : INotifyPropertyChanged
     {
-        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
-
-        [JsonIgnore]
-        private Dictionary<GameState, string> StateMessages { get; } = new Dictionary<GameState, string>()
+        private void InitBank()
         {
-               {GameState.Uninitialized, "" },
-               {GameState.WaitingForNewGame, "New Game" },
-               {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
-               {GameState.PickingBoard, "Roll for Order" },
-               {GameState.WaitingForRollForOrder, "Select Roll!" },
-               {GameState.BeginResourceAllocation, "Start Game" },
-               {GameState.AllocateResourceForward, "Next (Forward)" },
-               {GameState.AllocateResourceReverse, "Next (Back)" },
-               {GameState.DoneResourceAllocation, "Click To Start Game" },
-               {GameState.WaitingForRoll, "Select Roll" },
-               {GameState.WaitingForNext, "End My Turn" },
-               {GameState.Supplemental, "Finished (Next)" }
-        };
-
-        private bool _EnableUiInteraction = true;
-        private int _FiveStarPositions = 0;
-        private int _FourStarPosition = 0;
-        private TradeResources _gameResources = new TradeResources(); // the total number of resources that have been handed out in this game
-        private string _HostName = "http://192.168.1.128:5000";
-        private bool _isServiceGame = false;
-        private Log _newLog = null;
-        private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
-        private Settings _Settings = new Settings();
-        private int _ThreeStarPosition = 0;
-        private int _TwoStarPosition = 0;
-        private bool _WebSocketConnected = false;
+            Bank = new PlayerModel()
+            {
+                PlayerName = "Bank",
+                ImageFileName = "ms-appx:Assets/bank.png",
+                ForegroundColor = Colors.White,
+                PrimaryBackgroundColor = Colors.Gold,
+                SecondaryBackgroundColor = Colors.Black,
+                PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACC}")
+            };
+            TradeResources tr = new TradeResources()
+            {
+                Wood = 19,
+                Wheat = 19,
+                Brick = 19,
+                Ore = 19,
+                Sheep = 19
+            };
+            Bank.GameData.Resources.TotalResourcesCollection.InitalizeResources(tr);
+        }
 
         /// <summary>
         ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
@@ -64,6 +56,50 @@ namespace Catan10
             NotifyPropertyChanged("StateMessage");
         }
 
+        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
+
+        [JsonIgnore]
+        private Dictionary<GameState, string> StateMessages { get; } = new Dictionary<GameState, string>()
+        {
+               {GameState.Uninitialized, "" },
+               {GameState.WaitingForNewGame, "New Game" },
+               {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
+               {GameState.PickingBoard, "Roll for Order" },
+               {GameState.WaitingForRollForOrder, "Select Roll!" },
+               {GameState.BeginResourceAllocation, "Start Game" },
+               {GameState.AllocateResourceForward, "Next (Forward)" },
+               {GameState.AllocateResourceReverse, "Next (Back)" },
+               {GameState.DoneResourceAllocation, "Click To Start Game" },
+               {GameState.WaitingForRoll, "Select Roll" },
+               {GameState.WaitingForNext, "End My Turn" },
+               {GameState.Supplemental, "Finished (Next)" }
+        };
+
+        private bool _EnableUiInteraction = true;
+
+        private int _FiveStarPositions = 0;
+
+        private int _FourStarPosition = 0;
+
+        private TradeResources _gameResources = new TradeResources();
+
+        // the total number of resources that have been handed out in this game
+        private string _HostName = "http://192.168.1.128:5000";
+
+        private bool _isServiceGame = false;
+
+        private Log _newLog = null;
+
+        private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
+
+        private Settings _Settings = new Settings();
+
+        private int _ThreeStarPosition = 0;
+
+        private int _TwoStarPosition = 0;
+
+        private bool _WebSocketConnected = false;
+
         internal void FinishedAddingPlayers()
         {
             //
@@ -78,17 +114,28 @@ namespace Catan10
             );
         }
 
+        public void SetPipCount(int[] value)
+        {
+            FiveStarPositions = value[0];
+            FourStarPositions = value[1];
+            ThreeStarPositions = value[2];
+            TwoStarPositions = value[3];
+        }
+
         public MainPageModel()
         {
+            InitBank();
+            Log = new Log(MainPage.Current);
+            GameController = MainPage.Current;
         }
 
-        public MainPageModel(IGameController gameController)
-        {
-            Log = new Log(gameController);
-            GameController = gameController;
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
+
+        [JsonIgnore]
+        public PlayerModel Bank { get; private set; }
+
         public string DefaultUser { get; set; } = "";
 
         [JsonIgnore]
@@ -475,16 +522,6 @@ namespace Catan10
                     NotifyPropertyChanged();
                 }
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void SetPipCount(int[] value)
-        {
-            FiveStarPositions = value[0];
-            FourStarPositions = value[1];
-            ThreeStarPositions = value[2];
-            TwoStarPositions = value[3];
         }
     }
 }

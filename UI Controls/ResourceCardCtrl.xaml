@@ -27,11 +27,12 @@
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </Control.Resources>
-    <Grid Name="LayoutRoot" Width="70" Height="100">
-        <Grid Name="Grid_FaceDown" CornerRadius="10" BorderBrush="White" BorderThickness="1"
+
+    <Grid Name="LayoutRoot" Height="105" Width="75">
+        <Grid Name="Grid_FaceDown" CornerRadius="10" BorderBrush="Black" BorderThickness="1"
             Background="{x:Bind ResourceCardModel.BackBrush, Mode=OneWay}">
             <Grid.Projection>
-                <PlaneProjection x:Name="_ppBack" RotationY="90" />
+                <PlaneProjection x:Name="_ppBack" RotationY="0" />
             </Grid.Projection>
         </Grid>
         <Grid Name="Grid_FaceUp" CornerRadius="10" BorderBrush="Black" BorderThickness="1"
@@ -39,15 +40,15 @@
             Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
-                <RowDefinition Height="15*" />
-                <RowDefinition Height="10*" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="30" />
             </Grid.ColumnDefinitions>
             <Grid.Projection>
-                <PlaneProjection x:Name="_ppFront" RotationY="0" />
+                <PlaneProjection x:Name="_ppFront" RotationY="90" />
             </Grid.Projection>
             <Grid Grid.RowSpan="3" Grid.ColumnSpan="3" Width="19" Height="33"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom" CornerRadius="5"

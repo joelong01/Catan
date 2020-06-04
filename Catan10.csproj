@@ -301,6 +301,7 @@
     <None Include="Catan10_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\bank.png" />
     <Content Include="Assets\dice_stop_dark.svg" />
     <Content Include="Assets\dice_stop_light.svg" />
     <Content Include="Assets\Tiles\back.jpg" />

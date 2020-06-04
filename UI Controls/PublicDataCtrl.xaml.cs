@@ -25,8 +25,7 @@ namespace Catan10
         private static void RollOrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as PublicDataCtrl;
-            var depPropValue = (TileOrientation)e.NewValue;
-            depPropClass?.SetRollOrientation(depPropValue);
+            depPropClass?.SetRollOrientation((TileOrientation)e.OldValue, (TileOrientation)e.NewValue);
         }
 
         private void OnFlipRollGrid(object sender, RoutedEventArgs e)
@@ -72,14 +71,27 @@ namespace Catan10
             this.TraceMessage($"Added Player {value}");
         }
 
-        private void SetRollOrientation(TileOrientation orientation)
+        private void SetRollOrientation(TileOrientation oldValue, TileOrientation newValue)
         {
             if (Player == null) return;
+            if (oldValue == newValue) return;
 
-            if (orientation == TileOrientation.FaceDown)
+            if (newValue == TileOrientation.FaceDown)
                 ShowStats.Begin();
             else
                 ShowLatestRoll.Begin();
+        }
+
+        public string UnplayedResourceCount(ObservableCollection<Entitlement> unspent, string name)
+        {
+            var entitlement = (Entitlement)Enum.Parse(typeof(Entitlement), name);
+            var count = 0;
+            foreach (var ent in unspent)
+            {
+                if (ent == entitlement) count++;
+            }
+
+            return count.ToString();
         }
 
         public PublicDataCtrl()
@@ -101,17 +113,5 @@ namespace Catan10
 
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(null, PlayerChanged));
         public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
-
-        public string UnplayedResourceCount(ObservableCollection<Entitlement> unspent, string name)
-        {
-            var entitlement = (Entitlement)Enum.Parse(typeof(Entitlement), name);
-            var count = 0;
-            foreach (var ent in unspent)
-            {
-                if (ent == entitlement) count++;
-            }
-
-            return count.ToString();
-        }
     }
 }

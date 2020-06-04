@@ -4,28 +4,87 @@
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="540" d:DesignWidth="960" mc:Ignorable="d">
-    <Grid Width="960" Height="540" Background="{StaticResource DevCardType.Back}" CornerRadius="50">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
-            <RowDefinition Height="220" />
-            <RowDefinition Height="30" />
-            <RowDefinition Height="220" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Viewbox Grid.Row="1">
-            <TextBlock Text="Source" Foreground="White" />
-        </Viewbox>
-        <GridView Grid.Row="2">
+    d:DesignHeight="600" d:DesignWidth="675" mc:Ignorable="d">
+    <Control.Resources></Control.Resources>
+    <StackPanel Width="720" Height="550" Background="{StaticResource bmMaple}">
+        <GridView Name="GridView_Source" Grid.Row="2" Height="240" CornerRadius="15" Margin="5"
+            Background="{x:Bind From.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Transparent}"
+            BorderBrush="{x:Bind From.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Black}"
+            BorderThickness="2"
+            DragOver="OnDragOver" CanReorderItems="True" DragEnter="OnDrageEnter" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            DragLeave="OnDragLeave" ScrollViewer.VerticalScrollBarVisibility="Auto"
+            Drop="OnDrop" CanDragItems="True" DragItemsStarting="GridView_DragItemsStarting"
+            IsSynchronizedWithCurrentItem="False" SelectionMode="Extended" AllowDrop="True"
+            IsHitTestVisible="True"
+            ItemsSource="{x:Bind Source, Mode=OneWay}">
+            <GridView.Header>
+                <Border Margin="5,0,0,0" Background="{x:Bind From.BackgroundBrush, Mode=OneWay}">
+                    <Grid>
+                        <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind From.ImageBrush, Mode=OneWay}" />
+                        <TextBlock HorizontalAlignment="Center" Text="{x:Bind From.PlayerName, Mode=OneWay}" Foreground="{x:Bind From.ForegroundBrush, Mode=OneWay}" FontSize="22" FontWeight="Bold" />
+                    </Grid>
+                </Border>
+            </GridView.Header>
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:ResourceCardModel">
-                    <local:ResourceCardCtrl ResourceCardModel="{x:Bind Mode=OneWay}" />
+                    <Viewbox>
+                        <local:ResourceCardCtrl IsHitTestVisible="True" ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
+                    </Viewbox>
                 </DataTemplate>
             </GridView.ItemTemplate>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="5" />
+                    <Setter Property="Width" Value="140" />
+                </Style>
+            </GridView.ItemContainerStyle>
         </GridView>
-        <Viewbox Grid.Row="3">
-            <TextBlock Text="Desination" Foreground="White" />
-        </Viewbox>
-    </Grid>
+        <GridView Name="GridView_Destination"
+            Height="240" HorizontalAlignment="Stretch" CornerRadius="10" Margin="5"
+            IsHitTestVisible="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            Background="{x:Bind To.BackgroundBrush, Mode=OneWay}"
+            DragOver="OnDragOver" CanReorderItems="True" DragEnter="OnDrageEnter"
+            DragLeave="OnDragLeave" Drop="OnDrop" CanDragItems="True"
+            DragItemsStarting="GridView_DragItemsStarting"
+            IsSynchronizedWithCurrentItem="False" SelectionMode="Extended" AllowDrop="True"
+            BorderBrush="{x:Bind To.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}"
+            BorderThickness="2"
+            ItemsSource="{x:Bind Destination, Mode=OneWay}">
+            <GridView.Header>
+                <Border Margin="5,0,0,0" Background="{x:Bind To.BackgroundBrush, Mode=OneWay}">
+                    <Grid>
+                        <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind To.ImageBrush, Mode=OneWay}" />
+                        <TextBlock HorizontalAlignment="Center" Text="{x:Bind To.PlayerName, Mode=OneWay}" Foreground="{x:Bind To.ForegroundBrush, Mode=OneWay}" FontSize="22" FontWeight="Bold" />
+                    </Grid>
+                </Border>
+            </GridView.Header>
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:ResourceCardModel">
+                    <Viewbox>
+                        <local:ResourceCardCtrl ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
+                    </Viewbox>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="5" />
+                    <Setter Property="Width" Value="140" />
+                </Style>
+            </GridView.ItemContainerStyle>
+        </GridView>
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <AppBarButton Grid.Row="5" Margin="5,0,5,0" Padding="0" HorizontalAlignment="Right"
+                Background="{x:Bind To.BackgroundBrush, Mode=OneWay}"
+                Foreground="{x:Bind To.ForegroundBrush, Mode=OneWay}"
+                Click="OnOk" Icon="Accept" Label="Du-it!" FontSize="22" IsEnabled="{x:Bind EnableOkButton(HowMany), Mode=OneWay}"
+                ToolTipService.Placement="Left" />
+            <AppBarButton Grid.Row="5" Margin="5,0,5,0" Padding="0" HorizontalAlignment="Right"
+                Background="{x:Bind To.BackgroundBrush, Mode=OneWay}"
+                Foreground="{x:Bind To.ForegroundBrush, Mode=OneWay}"
+                Click="OnCancel" Icon="Cancel" Label="Cancel" FontSize="22"
+                ToolTipService.Placement="Left" />
+        </StackPanel>
+    </StackPanel>
 </UserControl>

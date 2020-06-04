@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text.Json;
-
+using System.Threading.Tasks;
 using Catan.Proxy;
 
 using Windows.Storage;
@@ -16,10 +17,30 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-        private readonly Random testRandom = new Random();
-
         private void InitTest()
         {
+        }
+
+        private async Task LoseHalfYourCards()
+        {
+            int loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
+            if (loss >= 4)
+            {
+                ResourceCardCollection rc = new ResourceCardCollection();
+                rc.InitalizeResources(CurrentPlayer.GameData.Resources.Current);
+                TakeCardControl.To = MainPageModel.Bank;
+                TakeCardControl.From = CurrentPlayer;
+                TakeCardControl.FaceUp = true;
+                TakeCardControl.HowMany = loss;
+                TakeCardControl.Source = rc;
+                TakeCardControl.Destination = new ResourceCardCollection();
+                Grid_TakeCard.Visibility = Visibility.Visible;
+                (bool ret, TradeResources trAdded) = await TakeCardControl.GetCards();
+                if (ret)
+                {
+                    CurrentPlayer.GameData.Resources.GrantResources(trAdded.GetNegated());
+                }
+            }
         }
 
         // int toggle = 0;
@@ -71,10 +92,9 @@ namespace Catan10
         }
 
         // Undo
-        private void OnTest3(object sdr, RoutedEventArgs rea)
+        private async void OnTest3(object sdr, RoutedEventArgs rea)
         {
-            MainPageModel.PlayingPlayers[0].GameData.Resources.Current.Wood++;
-            MainPageModel.PlayingPlayers[0].GameData.Resources.Current.Ore++;
+            await LoseHalfYourCards();
         }
 
         private void OnTestExpansionGame(object sender, RoutedEventArgs e)
@@ -127,6 +147,50 @@ namespace Catan10
             //await PickSettlementsAndRoads();
         }
 
+        private async Task TestPickTwoCards()
+        {
+            var source = new ResourceCardCollection();
+            source.Add(ResourceType.Wheat, false);
+            source.Add(ResourceType.Wheat, false);
+            source.Add(ResourceType.Wood, false);
+            source.Add(ResourceType.Brick, false);
+            var destination = new ResourceCardCollection();
+            TakeCardControl.From = MainPageModel.AllPlayers[0];
+            TakeCardControl.To = MainPageModel.AllPlayers[1];
+            Grid_TakeCard.Visibility = Visibility.Visible;
+            TakeCardControl.HowMany = 2;
+            TakeCardControl.Source = source;
+            TakeCardControl.Destination = destination;
+            (bool ret, TradeResources trAdded) = await TakeCardControl.GetCards();
+
+            this.TraceMessage($"ret= {ret} Cards={trAdded}");
+        }
+
+        private async Task TestYearOfPlenty()
+        {
+            TradeResources tr = new TradeResources()
+            {
+                Wood = 2,
+                Wheat = 2,
+                Brick = 2,
+                Ore = 2,
+                Sheep = 2
+            };
+
+            ResourceCardCollection rc = new ResourceCardCollection();
+            rc.InitalizeResources(tr);
+            Grid_TakeCard.Visibility = Visibility.Visible;
+            TakeCardControl.To = CurrentPlayer;
+            TakeCardControl.From = MainPageModel.Bank;
+            TakeCardControl.FaceUp = true;
+            TakeCardControl.HowMany = 2;
+            TakeCardControl.Source = rc;
+            TakeCardControl.Destination = new ObservableCollection<ResourceCardModel>();
+            (bool ret, TradeResources addedResources) = await TakeCardControl.GetCards();
+
+            CurrentPlayer.GameData.Resources.GrantResources(addedResources);
+        }
+
         private void VerifyRoundTrip<T>(T model)
         {
             //var options = new JsonSerializerOptions() { WriteIndented = true };
@@ -137,6 +201,8 @@ namespace Catan10
             ////   this.TraceMessage(newJsonString);
             //Debug.Assert(newJsonString == jsonString);
         }
+
+        private readonly Random testRandom = new Random();
     }
 
     public class WSConnectInfo

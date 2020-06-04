@@ -12,8 +12,8 @@ namespace Catan10
         private static void OrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as ResourceCardCtrl;
-            var depPropValue = (TileOrientation)e.NewValue;
-            depPropClass?.SetOrientation(depPropValue);
+
+            depPropClass?.SetOrientation((TileOrientation)e.OldValue, (TileOrientation)e.NewValue);
         }
 
         //    if (e.NewItems != null && e.NewItems.Count == 1)
@@ -47,9 +47,11 @@ namespace Catan10
         //    //  left here for debugging purposes
         //    //
         //    //  ObservableCollection<Harbor> col = (ObservableCollection<Harbor>)sender;
-        private void SetOrientation(TileOrientation orientation)
+        private void SetOrientation(TileOrientation oldValue, TileOrientation newValue)
         {
-            if (orientation == TileOrientation.FaceUp)
+            if (oldValue == newValue) return;
+
+            if (newValue == TileOrientation.FaceUp)
             {
                 FlipOpen.Begin();
             }
@@ -65,6 +67,17 @@ namespace Catan10
 
         private void Text_GotFocus(object sender, RoutedEventArgs e)
         {
+        }
+
+        /// <summary>
+        ///     a XAML x:Bind called function to set the visibility of the harbor based on the resource type of the model
+        /// </summary>
+        /// <returns></returns>
+        //
+        public bool HarborTypeOwned()
+        {
+            ResourceType resType = ResourceCardModel.ResourceType;
+            return false;
         }
 
         public ResourceCardCtrl()
@@ -95,16 +108,5 @@ namespace Catan10
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(ResourceCardCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
 
         public static readonly DependencyProperty ResourceCardModelProperty = DependencyProperty.Register("ResourceCardModel", typeof(ResourceCardModel), typeof(ResourceCardCtrl), new PropertyMetadata(null, ResourceCardModelChanged));
-
-        /// <summary>
-        ///     a XAML x:Bind called function to set the visibility of the harbor based on the resource type of the model
-        /// </summary>
-        /// <returns></returns>
-        //
-        public bool HarborTypeOwned()
-        {
-            ResourceType resType = ResourceCardModel.ResourceType;
-            return false;
-        }
     }
 }

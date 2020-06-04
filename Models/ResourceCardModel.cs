@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -12,32 +14,45 @@ namespace Catan10
 {
     public class ResourceCardCollection : ObservableCollection<ResourceCardModel>
     {
-        internal void AddResources(TradeResources tr)
+        public static TradeResources ToTradeResources(IEnumerable<ResourceCardModel> resourceCards)
+        {
+            TradeResources tr = new TradeResources();
+            foreach (var card in resourceCards)
+            {
+                tr.Add(card.ResourceType, 1);
+            }
+            return tr;
+        }
+
+        public void Add(ResourceType resource, bool countVisible = true)
+        {
+            ResourceCardModel model = new ResourceCardModel()
+            {
+                ResourceType = resource,
+                Orientation = TileOrientation.FaceDown,
+                CountVisible = countVisible
+            };
+
+            this.Add(model);
+        }
+
+        public void Add(DevCardType resource, bool countVisible = false)
+        {
+            ResourceCardModel model = new ResourceCardModel()
+            {
+                DevCardType = resource,
+                CountVisible = countVisible
+            };
+
+            this.Add(model);
+        }
+
+        public void AddResources(TradeResources tr)
         {
             foreach (var res in this)
             {
                 res.Count += tr.GetCount(res.ResourceType);
             }
-        }
-
-        public void Add(ResourceType resource)
-        {
-            ResourceCardModel model = new ResourceCardModel()
-            {
-                ResourceType = resource
-            };
-
-            this.Add(model);
-        }
-
-        public void Add(DevCardType resource)
-        {
-            ResourceCardModel model = new ResourceCardModel()
-            {
-                DevCardType = resource
-            };
-
-            this.Add(model);
         }
 
         public void AllDown()
@@ -48,6 +63,18 @@ namespace Catan10
         public void AllUp()
         {
             this.ForEach((model) => model.Orientation = TileOrientation.FaceUp);
+        }
+
+        public void InitalizeResources(TradeResources tr)
+        {
+            foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
+            {
+                int count = tr.GetCount(resourceType);
+                for (int i = 0; i < count; i++)
+                {
+                    Add(resourceType, false);
+                }
+            }
         }
 
         public void InitWithAllResources()
@@ -65,6 +92,11 @@ namespace Catan10
     /// </summary>
     public class ResourceCardModel : INotifyPropertyChanged
     {
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         private int _count = 0;                                 // the number of this type
 
         private bool _countVisible = true;                      // do you want to show the Count in a UI?
@@ -83,15 +115,17 @@ namespace Catan10
 
         private ResourceType _resourceType = ResourceType.Back;
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        public TileOrientation CountToOrientation(int count)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return count == 0 ? TileOrientation.FaceDown : TileOrientation.FaceUp;
         }
 
         // ResourceType.None means it is a DevCard
         public ResourceCardModel()
         {
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Brush BackBrush
         {
@@ -283,13 +317,6 @@ namespace Catan10
                     NotifyPropertyChanged("FrontBrush");
                 }
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public TileOrientation CountToOrientation(int count)
-        {
-            return count == 0 ? TileOrientation.FaceDown : TileOrientation.FaceUp;
         }
     }
 }

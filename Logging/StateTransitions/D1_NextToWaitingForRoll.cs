@@ -52,7 +52,6 @@ namespace Catan10
             //  hide the rolls in the public data control
             gameController.PlayingPlayers.ForEach((p) =>
             {
-                p.GameData.RollOrientation = TileOrientation.FaceDown;
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources(); // reset PublicDataCtrl resources
             });
 
@@ -80,7 +79,6 @@ namespace Catan10
             //  hide the rolls in the public data control
             gameController.PlayingPlayers.ForEach((p) =>
             {
-                p.GameData.RollOrientation = TileOrientation.FaceDown;
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources();
             });
 

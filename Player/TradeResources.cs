@@ -8,6 +8,11 @@ namespace Catan10
 {
     public class TradeResources : INotifyPropertyChanged
     {
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+
         private int _brick = 0;
 
         private int _goldMine = 0;
@@ -19,11 +24,6 @@ namespace Catan10
         private int _wheat = 0;
 
         private int _wood = 0;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-        }
 
         internal int GetCount(ResourceType resourceType)
         {
@@ -64,127 +64,6 @@ namespace Catan10
             }
             return 0;
         }
-
-        public TradeResources()
-        {
-        }
-
-        public TradeResources(TradeResources tradeResources)
-        {
-            Wheat = this.Wheat;
-            Wood = this.Wood;
-            Brick = this.Brick;
-            Ore = this.Ore;
-            Sheep = this.Sheep;
-            GoldMine = this.GoldMine;
-        }
-
-        public int Brick
-        {
-            get
-            {
-                return _brick;
-            }
-            set
-            {
-                if (value != _brick)
-                {
-                    _brick = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Count");
-                }
-            }
-        }
-
-        [JsonIgnore]
-        public int Count => Wheat + Wood + Brick + Ore + Sheep + GoldMine;
-
-        public int GoldMine
-        {
-            get
-            {
-                return _goldMine;
-            }
-            set
-            {
-                if (value != _goldMine)
-                {
-                    _goldMine = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Count");
-                }
-            }
-        }
-
-        public int Ore
-        {
-            get
-            {
-                return _ore;
-            }
-            set
-            {
-                if (value != _ore)
-                {
-                    _ore = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Count");
-                }
-            }
-        }
-
-        public int Sheep
-        {
-            get
-            {
-                return _sheep;
-            }
-            set
-            {
-                if (value != _sheep)
-                {
-                    _sheep = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Count");
-                }
-            }
-        }
-
-        public int Wheat
-        {
-            get
-            {
-                return _wheat;
-            }
-            set
-            {
-                if (value != _wheat)
-                {
-                    _wheat = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Count");
-                }
-            }
-        }
-
-        public int Wood
-        {
-            get
-            {
-                return _wood;
-            }
-            set
-            {
-                if (value != _wood)
-                {
-                    _wood = value;
-                    NotifyPropertyChanged();
-                    NotifyPropertyChanged("Count");
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public static TradeResources GetEntitlementCost(Entitlement entitlement)
         {
@@ -360,6 +239,127 @@ namespace Catan10
         public override string ToString()
         {
             return $"[Count={Count}][Ore={Ore}][Brick={Brick}][Wheat={Wheat}][Wood={Wood}][Sheep={Sheep}]";
+        }
+
+        public TradeResources()
+        {
+        }
+
+        public TradeResources(TradeResources tradeResources)
+        {
+            Wheat = this.Wheat;
+            Wood = this.Wood;
+            Brick = this.Brick;
+            Ore = this.Ore;
+            Sheep = this.Sheep;
+            GoldMine = this.GoldMine;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public int Brick
+        {
+            get
+            {
+                return _brick;
+            }
+            set
+            {
+                if (value != _brick)
+                {
+                    _brick = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public int Count => Wheat + Wood + Brick + Ore + Sheep + GoldMine;
+
+        public int GoldMine
+        {
+            get
+            {
+                return _goldMine;
+            }
+            set
+            {
+                if (value != _goldMine)
+                {
+                    _goldMine = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
+
+        public int Ore
+        {
+            get
+            {
+                return _ore;
+            }
+            set
+            {
+                if (value != _ore)
+                {
+                    _ore = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
+
+        public int Sheep
+        {
+            get
+            {
+                return _sheep;
+            }
+            set
+            {
+                if (value != _sheep)
+                {
+                    _sheep = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
+
+        public int Wheat
+        {
+            get
+            {
+                return _wheat;
+            }
+            set
+            {
+                if (value != _wheat)
+                {
+                    _wheat = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
+
+        public int Wood
+        {
+            get
+            {
+                return _wood;
+            }
+            set
+            {
+                if (value != _wood)
+                {
+                    _wood = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
         }
     }
 }

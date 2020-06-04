@@ -17,7 +17,7 @@
             <Setter Property="Margin" Value="3,5,5,5" />
         </Style>
     </Control.Resources>
-    <Grid Width="70" Height="100" Margin="1"
+    <Grid Width="67" Height="100" Margin="1"
         Background="{x:Bind Image, Mode=OneWay, TargetNullValue={StaticResource ResourceKey=ResourceType.Back}}"
         CornerRadius="10">
         <Viewbox Width="20" Height="35" HorizontalAlignment="Right" VerticalAlignment="Bottom">

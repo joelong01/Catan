@@ -44,8 +44,7 @@ namespace Catan10
             //  hide the rolls in the public data control
             gameController.PlayingPlayers.ForEach((p) =>
             {
-                p.GameData.RollOrientation = TileOrientation.FaceDown;
-                p.GameData.Resources.ResourcesThisTurn = new TradeResources();
+                p.GameData.Resources.ResourcesThisTurn = new TradeResources(); // you don't have to set Orientation because setting Count to 0 sets orientation = facedown
             });
 
             await gameController.PushRollState(RollState); // also set RandomGold tiles in the UI
