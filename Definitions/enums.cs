@@ -108,22 +108,25 @@ namespace Catan10
         [Description("Pick Resources")]
         BeginResourceAllocation,
 
-        [Description("Pick Board")]
+        [Description("Done With Players.  Pick Board...")]
         WaitingForPlayers,
 
-        [Description("Select Roll")]
+        [Description("Acceptable. Roll For Order...")]
+        PickingBoard,
+
+        [Description("Select Roll...")]
         WaitingForRollForOrder,
 
-        [Description("Next (Forward)")]
+        [Description("Next (Forward)...")]
         AllocateResourceForward,
 
-        [Description("Next (Back)")]
+        [Description("Next (Back)...")]
         AllocateResourceReverse,
 
-        [Description("Start Game")]
+        [Description("Start Game...")]
         DoneResourceAllocation,
 
-        [Description("Select Roll")]
+        [Description("Select Roll...")]
         WaitingForRoll,
 
         [Description("Done - Next Player")]
@@ -133,10 +136,7 @@ namespace Catan10
         Supplemental,
 
         [Description("Move Baron")]
-        MustMoveBaron,
-
-        [Description("Roll For Order")]
-        PickingBoard
+        MustMoveBaron
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

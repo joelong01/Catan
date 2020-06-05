@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -14,27 +15,39 @@ namespace Catan10
     /// </summary>
     public class RollLog : INotifyPropertyChanged, IRollLog, IRollStats
     {
-        private RollLog()
-        {
-        }
-
         private Stack<RollState> Done { get; set; } = new Stack<RollState>();
+
         private IGameController GameController { get; set; }
+
         private Stack<RollState> Undone { get; set; } = new Stack<RollState>();
 
         private string _eightPercent = "";
+
         private string _elevenPercent = "";
+
         private string _fivePercent = "";
+
         private string _fourPercent = "";
+
         private string _ninePercent = "";
+
         private string _sevenPercent = "";
+
         private string _sixPercent = "";
+
         private string _tenPercent = "";
+
         private string _threePercent = "";
+
         private string _twelvePercent = "";
+
         private string _twoPercent = "";
 
         private string[] DynamicPropertyNames = new string[] { "TotalRolls", "LastRoll" };
+
+        private RollLog()
+        {
+        }
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -43,12 +56,15 @@ namespace Catan10
 
         private int[] RollCount(IEnumerable<RollState> stack)
         {
-            int[] counts = new int[11];
+            int[] counts = new int[11]; // yes, there really are 11 different possible rolls
             Array.Clear(counts, 0, 11);
             if (Done.Count != 0)
             {
+                //
+                //  go through each roll and fill in the array with the count of what was rolled
                 foreach (var rollState in stack)
                 {
+                    Debug.Assert(rollState.SelectedRoll > 1 && rollState.SelectedRoll < 13);
                     counts[rollState.SelectedRoll - 2]++;
                 }
             }
@@ -191,11 +207,6 @@ namespace Catan10
         internal Task UpdateUiForRoll(RollState rollState)
         {
             return this.UpdateUi(RollAction.Do);
-        }
-
-        public RollLog(IGameController gameController)
-        {
-            GameController = gameController;
         }
 
         public bool CanRedo
@@ -406,6 +417,11 @@ namespace Catan10
             }
         }
 
+        public RollLog(IGameController gameController)
+        {
+            GameController = gameController;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Task DoRoll(List<RollModel> rolls, List<int> goldTiles)
@@ -463,6 +479,7 @@ namespace Catan10
         {
             RollState rollState = Done.Peek();
             RollModel selected = rolls.Find((roll) => roll.Selected == true);
+            Debug.Assert(selected.Roll > 1 && selected.Roll < 13);
             rollState.SelectedRoll = selected.Roll;
             UpdatePlayerStats(RollAction.Do);
             return UpdateUi(RollAction.Do);

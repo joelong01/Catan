@@ -5,9 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="230" d:DesignWidth="530" mc:Ignorable="d">
-
     <Control.Resources />
-
     <Grid Width="530" Height="230" Margin="0"
         Background="{StaticResource bmMaple}"
         CornerRadius="0,0,10,10">
@@ -33,8 +31,8 @@
                 </GridView.ItemContainerStyle>
             </GridView>
             <StackPanel Margin="0,10,10,0" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Width="100" Content="Reset" Click="OnReset" Foreground="White"
-                    Visibility="Visible" />
+                <Button Width="100" Content="Reset the Rolls!" Click="OnReset" Foreground="White"
+                    Visibility="Collapsed" />
                 <Button Width="100" Content="FaceUp" Click="OnFaceUp" Foreground="White"
                     Visibility="Collapsed" />
                 <Button Width="100" Content="FaceDown" Click="OnFaceDown" Foreground="White"
