@@ -206,6 +206,9 @@ namespace Catan10
 
         internal Task UpdateUiForRoll(RollState rollState)
         {
+            var top = Done.Pop();
+            Contract.Assert(top.PlayerName == rollState.PlayerName);
+            Done.Push(rollState);
             return this.UpdateUi(RollAction.Do);
         }
 
