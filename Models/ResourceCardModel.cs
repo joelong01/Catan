@@ -92,40 +92,42 @@ namespace Catan10
     /// </summary>
     public class ResourceCardModel : INotifyPropertyChanged
     {
+        private int _count = 0;
+
+        private bool _countVisible = true;
+
+        private DevCardType _devCardType = DevCardType.None;
+
+        private HarborType _harborType = HarborType.None;
+
+        private Visibility _harborVisibility = Visibility.Collapsed;
+
+        private TileOrientation _orientation = TileOrientation.FaceDown;
+
+        private PlayerModel _owner = null;
+
+        private bool _readOnly = false;
+
+        private ResourceType _resourceType = ResourceType.Back;
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private int _count = 0;                                 // the number of this type
+        // the number of this type
 
-        private bool _countVisible = true;                      // do you want to show the Count in a UI?
+        // do you want to show the Count in a UI?
 
-        private DevCardType _devCardType = DevCardType.None; // DevCardType.Unknown means this is a ResourceType
+        // DevCardType.Unknown means this is a ResourceType
 
-        private HarborType _harborType = HarborType.None;       // ??
+        // ??
 
-        private Visibility _harborVisibility = Visibility.Collapsed; // ??
+        // ??
 
-        private TileOrientation _orientation = TileOrientation.FaceDown; // should you show this face up or face down
+        // should you show this face up or face down
 
-        private PlayerModel _owner = null;          // who owns this (back pointer)
-
-        private bool _readOnly = false;     // should you be able to update the Count?
-
-        private ResourceType _resourceType = ResourceType.Back;
-
-        public TileOrientation CountToOrientation(int count)
-        {
-            return count == 0 ? TileOrientation.FaceDown : TileOrientation.FaceUp;
-        }
-
-        // ResourceType.None means it is a DevCard
-        public ResourceCardModel()
-        {
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        // who owns this (back pointer)
 
         public Brush BackBrush
         {
@@ -317,6 +319,23 @@ namespace Catan10
                     NotifyPropertyChanged("FrontBrush");
                 }
             }
+        }
+
+        // ResourceType.None means it is a DevCard
+        public ResourceCardModel()
+        {
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public TileOrientation CountToOrientation(int count)
+        {
+            if (count > 0)
+            {
+                return TileOrientation.FaceUp;
+            }
+
+            return TileOrientation.FaceDown;
         }
     }
 }

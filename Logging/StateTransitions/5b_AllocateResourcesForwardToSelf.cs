@@ -6,41 +6,29 @@ using Catan.Proxy;
 namespace Catan10
 {
     /// <summary>
-    ///     Move player
-    ///     Grant entitlement
+    ///     Move to the Next Player (Previous on Undo)
+    ///     Allocate (Revoke) one road and one settlement to the player
     /// </summary>
-    public class AllocateResourcesReverseToAllocateResourcesReverse : LogHeader, ILogController
+    public class AllocateResourcesForwardToAllocateResourcesForward : LogHeader, ILogController
     {
-        #region Methods
-
         internal static async Task PostLog(IGameController gameController)
         {
-            Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceReverse);
+            Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceForward);
 
-            AllocateResourcesReverseToAllocateResourcesReverse logHeader = new AllocateResourcesReverseToAllocateResourcesReverse()
+            AllocateResourcesForwardToAllocateResourcesForward logHeader = new AllocateResourcesForwardToAllocateResourcesForward()
             {
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
-                OldState = GameState.AllocateResourceReverse,
-                NewState = GameState.AllocateResourceReverse,
+                OldState = GameState.AllocateResourceForward,
+                NewState = GameState.AllocateResourceForward,
             };
 
             await gameController.PostMessage(logHeader, CatanMessageType.Normal);
         }
 
-        #endregion Methods
-
-        #region Constructors
-
-        public AllocateResourcesReverseToAllocateResourcesReverse()
-        {
-        }
-
-        #endregion Constructors
-
         public Task Do(IGameController gameController)
         {
-            AllocationPhaseHelper.ChangePlayer(gameController, -1);
+            ChangePlayerHelper.ChangePlayer(gameController, 1);
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
         }
@@ -52,7 +40,7 @@ namespace Catan10
 
         public Task Undo(IGameController gameController)
         {
-            AllocationPhaseHelper.ChangePlayer(gameController, 1);
+            ChangePlayerHelper.ChangePlayer(gameController, -1);
             AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
         }

@@ -33,11 +33,6 @@ namespace Catan10
         {
             if (player == null) return;
 
-            //
-            //  the next player can always play a baron once
-            player.GameData.PlayedKnightThisTurn = false;
-            player.GameData.MovedBaronAfterRollingSeven = null;
-
             UpdateTurnFlag();
 
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
@@ -65,14 +60,6 @@ namespace Catan10
         {
         }
 
-        public static readonly DependencyProperty CanMoveBaronBeforeRollProperty = DependencyProperty.Register("CanMoveBaronBeforeRoll", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(new PlayerModel() { PlayerName = "Unset" }, CurrentPlayerChanged));
-        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
-        public static readonly DependencyProperty PipCountProperty = DependencyProperty.Register("PipCount", typeof(TradeResources), typeof(MainPage), new PropertyMetadata(new TradeResources()));
-        public static readonly DependencyProperty RandomGoldProperty = DependencyProperty.Register("RandomGold", typeof(bool), typeof(MainPage), new PropertyMetadata(true, RandomGoldChanged));
-
-        public static readonly DependencyProperty RandomGoldTileCountProperty = DependencyProperty.Register("RandomGoldTileCount", typeof(int), typeof(MainPage), new PropertyMetadata(1, RandomGoldTileCountChanged));
-
         public bool CanMoveBaronBeforeRoll
         {
             get => (bool)GetValue(CanMoveBaronBeforeRollProperty);
@@ -83,24 +70,6 @@ namespace Catan10
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
-        }
-
-        public TradeResources PipCount
-        {
-            get => (TradeResources)GetValue(PipCountProperty);
-            set => SetValue(PipCountProperty, value);
-        }
-
-        public bool RandomGold
-        {
-            get => (bool)GetValue(RandomGoldProperty);
-            set => SetValue(RandomGoldProperty, value);
-        }
-
-        public int RandomGoldTileCount
-        {
-            get => (int)GetValue(RandomGoldTileCountProperty);
-            set => SetValue(RandomGoldTileCountProperty, value);
         }
 
         public string EightPercent
@@ -131,6 +100,24 @@ namespace Catan10
         {
             get => (string)GetValue(NinePercentProperty);
             set => SetValue(NinePercentProperty, value);
+        }
+
+        public TradeResources PipCount
+        {
+            get => (TradeResources)GetValue(PipCountProperty);
+            set => SetValue(PipCountProperty, value);
+        }
+
+        public bool RandomGold
+        {
+            get => (bool)GetValue(RandomGoldProperty);
+            set => SetValue(RandomGoldProperty, value);
+        }
+
+        public int RandomGoldTileCount
+        {
+            get => (int)GetValue(RandomGoldTileCountProperty);
+            set => SetValue(RandomGoldTileCountProperty, value);
         }
 
         public string SevenPercent
@@ -175,11 +162,18 @@ namespace Catan10
             set => SetValue(TwoPercentProperty, value);
         }
 
+        public static readonly DependencyProperty CanMoveBaronBeforeRollProperty = DependencyProperty.Register("CanMoveBaronBeforeRoll", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(new PlayerModel() { PlayerName = "Unset" }, CurrentPlayerChanged));
         public static readonly DependencyProperty EightPercentProperty = DependencyProperty.Register("EightPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
         public static readonly DependencyProperty ElevenPercentProperty = DependencyProperty.Register("ElevenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
         public static readonly DependencyProperty FivePercentProperty = DependencyProperty.Register("FivePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
         public static readonly DependencyProperty FourPercentProperty = DependencyProperty.Register("FourPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
+        public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(MainPage), new PropertyMetadata(GameState.WaitingForNewGame));
         public static readonly DependencyProperty NinePercentProperty = DependencyProperty.Register("NinePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
+        public static readonly DependencyProperty PipCountProperty = DependencyProperty.Register("PipCount", typeof(TradeResources), typeof(MainPage), new PropertyMetadata(new TradeResources()));
+        public static readonly DependencyProperty RandomGoldProperty = DependencyProperty.Register("RandomGold", typeof(bool), typeof(MainPage), new PropertyMetadata(true, RandomGoldChanged));
+
+        public static readonly DependencyProperty RandomGoldTileCountProperty = DependencyProperty.Register("RandomGoldTileCount", typeof(int), typeof(MainPage), new PropertyMetadata(1, RandomGoldTileCountChanged));
         public static readonly DependencyProperty SevenPercentProperty = DependencyProperty.Register("SevenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
         public static readonly DependencyProperty SixPercentProperty = DependencyProperty.Register("SixPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
         public static readonly DependencyProperty TenPercentProperty = DependencyProperty.Register("TenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));

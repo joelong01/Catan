@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -26,6 +27,22 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace Catan10
 {
+    public static class EnumExtensions
+    {
+        public static string Description(this Enum instance)
+        {
+            string output = "";
+            Type type = instance.GetType();
+            FieldInfo fi = type.GetField(instance.ToString());
+            DescriptionAttribute[] attrs = fi.GetCustomAttributes(attributeType: typeof(DescriptionAttribute), false) as DescriptionAttribute[];
+            if (attrs.Length > 0)
+            {
+                output = attrs[0].Description;
+            }
+            return output;
+        }
+    }
+
     public static class ICollectionExtensions
     {
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> that)
@@ -67,8 +84,6 @@ namespace Catan10
 
     public static class StaticHelpers
     {
-        public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
-
         public static void AddRange<T>(this ObservableCollection<T> oc, IEnumerable<T> collection)
         {
             if (collection == null)
@@ -472,6 +487,8 @@ namespace Catan10
             return false;
         }
 
+        public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
+
         public class KeyValuePair
         {
             public KeyValuePair(string key, string value)
@@ -492,5 +509,15 @@ namespace Catan10
 
             void Report(Point value);
         }
+    }
+
+    public class EnumDescription : Attribute
+    {
+        public EnumDescription(string description)
+        {
+            Description = description;
+        }
+
+        public string Description { get; }
     }
 }

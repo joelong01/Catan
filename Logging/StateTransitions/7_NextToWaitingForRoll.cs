@@ -6,14 +6,6 @@ using Catan.Proxy;
 
 namespace Catan10
 {
-    public static class ToWaitingForRoll
-    {
-        public static Task Do(IGameController gameController, RollState rollState, TradeResources resources)
-        {
-            return Task.CompletedTask;
-        }
-    }
-
     /// <summary>
     ///     1. move the player
     ///     2. set the random gold tiles
@@ -23,8 +15,6 @@ namespace Catan10
     public class WaitingForNextToWaitingForRoll : LogHeader, ILogController
     {
         private RollState RollState { get; set; }
-
-        public TradeResources ResourcesThisTurn { get; set; }
 
         public static async Task PostLog(IGameController gameController)
         {
@@ -46,14 +36,7 @@ namespace Catan10
             //  remember the log is already written!
 
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
-            AllocationPhaseHelper.ChangePlayer(gameController, 1);
-
-            //
-            //  hide the rolls in the public data control
-            gameController.PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.Resources.ResourcesThisTurn = new TradeResources(); // reset PublicDataCtrl resources
-            });
+            ChangePlayerHelper.ChangePlayer(gameController, 1);
 
             await gameController.ResetRollControl();
             await gameController.SetRandomTileToGold(this.RollState.GoldTiles);
@@ -73,7 +56,7 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
-            AllocationPhaseHelper.ChangePlayer(gameController, -1);
+            ChangePlayerHelper.ChangePlayer(gameController, -1);
 
             //
             //  hide the rolls in the public data control
@@ -89,5 +72,7 @@ namespace Catan10
                 await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRolls);
             }
         }
+
+        public TradeResources ResourcesThisTurn { get; set; }
     }
 }

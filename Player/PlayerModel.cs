@@ -18,21 +18,13 @@ namespace Catan10
 {
     internal class ResourceCount
     {
-        #region Properties
-
-        public int Acquired { get; set; } = 0;
-        public int Lost { get; set; } = 0;
-
-        #endregion Properties
-
-        #region Methods
-
         public override string ToString()
         {
             return String.Format($"Acquired:{Acquired} Lost:{Lost}");
         }
 
-        #endregion Methods
+        public int Acquired { get; set; } = 0;
+        public int Lost { get; set; } = 0;
     }
 
     public delegate void CardsLostUpdatedHandler(PlayerModel player, int oldVal, int newVal);
@@ -47,21 +39,6 @@ namespace Catan10
     //
     public class PlayerModel : INotifyPropertyChanged
     {
-        #region Fields
-
-        private Color _Foreground = Colors.White;
-        private ImageBrush _imageBrush = null;
-        private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
-        private PlayerGameModel _playerGameData = null;
-        private Guid _PlayerIdentifier;
-        private string _playerName = "Nameless";
-        private Color _primaryBackgroundColor = Colors.SlateBlue;
-        private Color _secondaryBackgroundColor = Colors.Black;
-
-        #endregion Fields
-
-        #region Methods
-
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -75,9 +52,118 @@ namespace Catan10
             c.B * c.B * .114);
         }
 
-        #endregion Methods
+        private Color _Foreground = Colors.White;
+        private ImageBrush _imageBrush = null;
+        private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
+        private PlayerGameModel _playerGameData = null;
+        private Guid _PlayerIdentifier;
+        private string _playerName = "Nameless";
+        private Color _primaryBackgroundColor = Colors.SlateBlue;
+        private Color _secondaryBackgroundColor = Colors.Black;
 
-        #region Constructors
+        /// <summary>
+        ///     put anything that needs to happen when the turn ended
+        /// </summary>
+        internal void TurnEnded()
+        {
+            //
+            //  hide the rolls in the public data control
+            GameData.Resources.ResourcesThisTurn = new TradeResources(); // reset PublicDataCtrl resources
+            GameData.Resources.ThisTurnsDevCard = DevCardType.None;     // flips the "Dev Card Played this turn" in public data ctrl and in PrivateDataCtrl
+            //
+            //  the next player can always play a baron once
+            //  TODO: these should probably be deleted and we control if a Knight is played via knowing a dev card is played
+            GameData.PlayedKnightThisTurn = false;
+            GameData.MovedBaronAfterRollingSeven = null;
+        }
+
+        /// <summary>
+        ///     put anything that needs to happen when a turn starts here
+        /// </summary>
+        internal void TurnStarted()
+        {
+        }
+
+        public static PlayerModel Deserialize(string json)
+        {
+            return CatanProxy.Deserialize<PlayerModel>(json);
+        }
+
+        public async Task<StorageFile> CopyImage(StorageFile file)
+        {
+            StorageFolder folder = await StaticHelpers.GetSaveFolder();
+            StorageFolder imageFolder = await folder.CreateFolderAsync("Player Images", CreationCollisionOption.OpenIfExists);
+            return await file.CopyAsync(imageFolder, file.Name, NameCollisionOption.ReplaceExisting);
+        }
+
+        public async Task LoadImage()
+        {
+            try
+            {
+                if (ImageFileName.Contains("ms-appx"))
+                {
+                    BitmapImage bitmapImage = new BitmapImage(new Uri(ImageFileName, UriKind.RelativeOrAbsolute));
+                    ImageBrush brush = new ImageBrush
+                    {
+                        AlignmentX = AlignmentX.Left,
+                        AlignmentY = AlignmentY.Top,
+                        Stretch = Stretch.UniformToFill,
+                        ImageSource = bitmapImage
+                    };
+                    ImageBrush = brush;
+                    return;
+                }
+
+                StorageFolder folder = await StaticHelpers.GetSaveFolder();
+                StorageFolder imageFolder = await folder.GetFolderAsync("Player Images");
+                StorageFile file = await imageFolder.CreateFileAsync(ImageFileName, CreationCollisionOption.OpenIfExists);
+
+                using (Windows.Storage.Streams.IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    // Set the image source to the selected bitmap.
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.SetSource(fileStream);
+
+                    ImageBrush brush = new ImageBrush
+                    {
+                        AlignmentX = AlignmentX.Left,
+                        AlignmentY = AlignmentY.Top,
+                        Stretch = Stretch.UniformToFill,
+                        ImageSource = bitmapImage
+                    };
+                    ImageBrush = brush;
+                }
+            }
+            catch
+            {
+                if (await StaticHelpers.AskUserYesNoQuestion($"Problem loading player {PlayerName}.\nDelete it?", "yes", "no") == true)
+                {
+                }
+            }
+        }
+
+        /// <summary>
+        ///     I've run into a bunch of problems where I add data (such as the GoldTiles list) but forget to clear it when Reset
+        ///     is called.  this means state moves from one game to the next and we get funny results.  so instead i'm going to try
+        ///     to just create a new game model when this is reset and see how it goes.
+        ///
+        ///    4/13/2020 - Nasty bug here.  by wiping  GameData() we broke all bindings.  4 hours to debug. The change was to start
+        ///                a new game by loading the PlayerData from disk in MainPage.LoadPlayerData();
+        /// </summary>
+        public void Reset()
+        {
+            GameData = new PlayerGameModel(this);
+        }
+
+        public string Serialize(bool indented)
+        {
+            return CatanProxy.Serialize<PlayerModel>(this, indented);
+        }
+
+        public override string ToString()
+        {
+            return String.Format($"{PlayerName}");
+        }
 
         public PlayerModel()
         {
@@ -98,15 +184,7 @@ namespace Catan10
             GameData = new PlayerGameModel(this);
         }
 
-        #endregion Constructors
-
-        #region Events
-
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
-
-        #region Properties
 
         [JsonIgnore]
         public ObservableCollection<Brush> AvailableColors => new ObservableCollection<Brush>(CatanColors.AllAvailableBrushes());
@@ -298,89 +376,6 @@ namespace Catan10
             {
                 return PerceivedBrightness(PrimaryBackgroundColor) > 130 ? true : false;
             }
-        }
-
-        #endregion Properties
-
-        public static PlayerModel Deserialize(string json)
-        {
-            return CatanProxy.Deserialize<PlayerModel>(json);
-        }
-
-        public async Task<StorageFile> CopyImage(StorageFile file)
-        {
-            StorageFolder folder = await StaticHelpers.GetSaveFolder();
-            StorageFolder imageFolder = await folder.CreateFolderAsync("Player Images", CreationCollisionOption.OpenIfExists);
-            return await file.CopyAsync(imageFolder, file.Name, NameCollisionOption.ReplaceExisting);
-        }
-
-        public async Task LoadImage()
-        {
-            try
-            {
-                if (ImageFileName.Contains("ms-appx"))
-                {
-                    BitmapImage bitmapImage = new BitmapImage(new Uri(ImageFileName, UriKind.RelativeOrAbsolute));
-                    ImageBrush brush = new ImageBrush
-                    {
-                        AlignmentX = AlignmentX.Left,
-                        AlignmentY = AlignmentY.Top,
-                        Stretch = Stretch.UniformToFill,
-                        ImageSource = bitmapImage
-                    };
-                    ImageBrush = brush;
-                    return;
-                }
-
-                StorageFolder folder = await StaticHelpers.GetSaveFolder();
-                StorageFolder imageFolder = await folder.GetFolderAsync("Player Images");
-                StorageFile file = await imageFolder.CreateFileAsync(ImageFileName, CreationCollisionOption.OpenIfExists);
-
-                using (Windows.Storage.Streams.IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
-                {
-                    // Set the image source to the selected bitmap.
-                    BitmapImage bitmapImage = new BitmapImage();
-                    bitmapImage.SetSource(fileStream);
-
-                    ImageBrush brush = new ImageBrush
-                    {
-                        AlignmentX = AlignmentX.Left,
-                        AlignmentY = AlignmentY.Top,
-                        Stretch = Stretch.UniformToFill,
-                        ImageSource = bitmapImage
-                    };
-                    ImageBrush = brush;
-                }
-            }
-            catch
-            {
-                if (await StaticHelpers.AskUserYesNoQuestion($"Problem loading player {PlayerName}.\nDelete it?", "yes", "no") == true)
-                {
-                }
-            }
-        }
-
-        /// <summary>
-        ///     I've run into a bunch of problems where I add data (such as the GoldTiles list) but forget to clear it when Reset
-        ///     is called.  this means state moves from one game to the next and we get funny results.  so instead i'm going to try
-        ///     to just create a new game model when this is reset and see how it goes.
-        ///
-        ///    4/13/2020 - Nasty bug here.  by wiping  GameData() we broke all bindings.  4 hours to debug. The change was to start
-        ///                a new game by loading the PlayerData from disk in MainPage.LoadPlayerData();
-        /// </summary>
-        public void Reset()
-        {
-            GameData = new PlayerGameModel(this);
-        }
-
-        public string Serialize(bool indented)
-        {
-            return CatanProxy.Serialize<PlayerModel>(this, indented);
-        }
-
-        public override string ToString()
-        {
-            return String.Format($"{PlayerName}");
         }
     }
 }

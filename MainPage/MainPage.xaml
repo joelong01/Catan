@@ -391,18 +391,6 @@
                     </local:BoardMeasurementCtrl>
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:DragableGridCtrl x:Name="Grid_TakeCard" Grid.Row="1" Grid.RowSpan="10" Width="360"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                OnGridPositionChanged="OnGridPositionChanged" Caption="Card Acquisition Dialog"
-                Visibility="{x:Bind MainPageModel.ShowBoardMeasurements, Mode=OneWay}"
-                BorderBrush="{StaticResource bmMaple}"
-                Background="{StaticResource DevCardType.Knight}"
-                Player="{x:Bind TheHuman, Mode=OneWay}"
-                CornerRadius="10" BorderThickness="4">
-                <local:DragableGridCtrl.Child>
-                    <local:TakeCardCtrl x:Name="TakeCardControl" />
-                </local:DragableGridCtrl.Child>
-            </local:DragableGridCtrl>
             <!--  Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"  -->
             <local:DragableGridCtrl x:Name="SynchronizedRolls" Width="360" HorizontalAlignment="Center"
                 VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"

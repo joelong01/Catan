@@ -5,8 +5,6 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
-using Catan10.NewLogging.Actions;
-
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -15,13 +13,7 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameCallback, ITileControlCallback
     {
-        #region Fields
-
         private int _roadSkipped = 0;
-
-        #endregion Fields
-
-        #region Properties
 
         private PlayerModel MaxRoadPlayer
         {
@@ -38,10 +30,6 @@ namespace Catan10
                 return null;
             }
         }
-
-        #endregion Properties
-
-        #region Methods
 
         //
         //   when a Knight is played
@@ -558,16 +546,6 @@ namespace Catan10
                     return player;
             }
             throw new Exception("bad name passed PlayerNameToPlayer");
-        }
-
-        #endregion Methods
-
-        public GameContainerCtrl GameContainer
-        {
-            get
-            {
-                return _gameView;
-            }
         }
 
         /// <summary>
@@ -1358,6 +1336,14 @@ namespace Catan10
             }
 
             return BuildingState.Error;
+        }
+
+        public GameContainerCtrl GameContainer
+        {
+            get
+            {
+                return _gameView;
+            }
         }
     }
 }

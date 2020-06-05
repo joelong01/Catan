@@ -1,38 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
-// The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
+// The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Catan10
 {
-    public sealed partial class TakeCardCtrl : UserControl
+    public sealed partial class TakeCardDlg : ContentDialog
     {
-        private static void FromBankChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as TakeCardCtrl;
-            var depPropValue = (bool)e.NewValue;
-            depPropClass?.SetFromBank(depPropValue);
-        }
-
         private static void HowManyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var depPropClass = d as TakeCardCtrl;
+            var depPropClass = d as TakeCardDlg;
             var depPropValue = (int)e.NewValue;
             depPropClass?.SetHowMany(depPropValue);
+        }
+
+        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            if (Destination.Count != HowMany)
+            {
+                args.Cancel = true;
+            }
+        }
+
+        private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
         }
 
         private bool EnableOkButton(int count)
@@ -58,14 +53,6 @@ namespace Catan10
 
             e.Data.Properties.Add("movedCards", movedCards);
             e.Data.Properties.Add("source", source);
-        }
-
-        private void OnCancel(object sender, RoutedEventArgs e)
-        {
-            if (TCS != null && TCS.Task.IsCompleted == false)
-            {
-                TCS.SetResult(false);
-            }
         }
 
         private void OnDrageEnter(object target, DragEventArgs e)
@@ -129,21 +116,11 @@ namespace Catan10
             e.Handled = true;
         }
 
-        private void OnOk(object sender, RoutedEventArgs e)
+        private void OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
         {
-            if (TCS != null && TCS.Task.IsCompleted == false)
+            foreach (var card in Source)
             {
-                Destination.ForEach((c) => c.Orientation = TileOrientation.FaceUp);
-                TCS.SetResult(true);
-                // await Task.Delay(2000).ContinueWith((t) => TCS.SetResult(true));
-            }
-        }
-
-        private void SetFromBank(bool value)
-        {
-            if (value && Source != null)
-            {
-                Source.ForEach((c) => c.Orientation = TileOrientation.FaceUp);
+                card.Orientation = SourceOrientation;
             }
         }
 
@@ -163,42 +140,10 @@ namespace Catan10
             }
         }
 
-        private TaskCompletionSource<bool> TCS { get; set; } = new TaskCompletionSource<bool>();
-
-        /// <summary>
-        ///     Set data and then call GetCards
-        /// </summary>
-        /// <returns></returns>
-        public async Task<(bool, TradeResources)> GetCards()
-        {
-            this.Visibility = Visibility.Visible;
-            if (FaceUp && Source != null)
-            {
-                Source.ForEach((c) => c.Orientation = TileOrientation.FaceUp);
-            }
-
-            TCS = new TaskCompletionSource<bool>();
-            var ret = await TCS.Task;
-
-            TradeResources tr = ResourceCardCollection.ToTradeResources(Destination);
-            return (ret, tr);
-        }
-
-        public TakeCardCtrl()
-        {
-            this.InitializeComponent();
-        }
-
         public ObservableCollection<ResourceCardModel> Destination
         {
             get => (ObservableCollection<ResourceCardModel>)GetValue(DestinationProperty);
             set => SetValue(DestinationProperty, value);
-        }
-
-        public bool FaceUp
-        {
-            get => (bool)GetValue(FromBankProperty);
-            set => SetValue(FromBankProperty, value);
         }
 
         public PlayerModel From
@@ -225,18 +170,29 @@ namespace Catan10
             set => SetValue(SourceProperty, value);
         }
 
+        public TileOrientation SourceOrientation
+        {
+            get => (TileOrientation)GetValue(SourceOrientationProperty);
+            set => SetValue(SourceOrientationProperty, value);
+        }
+
         public PlayerModel To
         {
             get => (PlayerModel)GetValue(ToProperty);
             set => SetValue(ToProperty, value);
         }
 
-        public static readonly DependencyProperty DestinationProperty = DependencyProperty.Register("Destination", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty FromBankProperty = DependencyProperty.Register("FromBank", typeof(bool), typeof(TakeCardCtrl), new PropertyMetadata(false, FromBankChanged));
-        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof(PlayerModel), typeof(TakeCardCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty HowManyProperty = DependencyProperty.Register("HowMany", typeof(int), typeof(TakeCardCtrl), new PropertyMetadata(1, HowManyChanged));
-        public static readonly DependencyProperty InstructionsProperty = DependencyProperty.Register("Instructions", typeof(string), typeof(TakeCardCtrl), new PropertyMetadata(""));
-        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(PlayerModel), typeof(TakeCardCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty DestinationProperty = DependencyProperty.Register("Destination", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof(PlayerModel), typeof(TakeCardDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty HowManyProperty = DependencyProperty.Register("HowMany", typeof(int), typeof(TakeCardDlg), new PropertyMetadata(1, HowManyChanged));
+        public static readonly DependencyProperty InstructionsProperty = DependencyProperty.Register("Instructions", typeof(string), typeof(TakeCardDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty SourceOrientationProperty = DependencyProperty.Register("SourceOrientation", typeof(TileOrientation), typeof(TakeCardDlg), new PropertyMetadata(TileOrientation.FaceDown));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(PlayerModel), typeof(TakeCardDlg), new PropertyMetadata(null));
+
+        public TakeCardDlg()
+        {
+            this.InitializeComponent();
+        }
     }
 }

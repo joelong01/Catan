@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
-
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -15,6 +17,72 @@ namespace Catan10
             var depPropClass = d as PrivateDataCtrl;
             var depPropValue = (PlayerModel)e.NewValue;
             depPropClass?.SetPlayer(depPropValue);
+        }
+
+        private async Task<TradeResources> DoMonopoly()
+        {
+            TradeResources tr = new TradeResources()
+            {
+                Wood = 1,
+                Wheat = 1,
+                Brick = 1,
+                Ore = 1,
+                Sheep = 1
+            };
+
+            ResourceCardCollection rc = new ResourceCardCollection();
+            rc.InitalizeResources(tr);
+            TakeCardDlg dlg = new TakeCardDlg()
+            {
+                To = Player,
+                From = MainPage.Current.MainPageModel.Bank,
+                SourceOrientation = TileOrientation.FaceUp,
+                HowMany = 1,
+                Source = rc,
+                Instructions = "Take 2 cards from the bank.",
+                Destination = new ObservableCollection<ResourceCardModel>(),
+            };
+
+            var ret = await dlg.ShowAsync();
+            if (ret == ContentDialogResult.Primary)
+            {
+                return ResourceCardCollection.ToTradeResources(dlg.Destination);
+            }
+
+            return null;
+        }
+
+        private async Task<TradeResources> DoYearOfPlenty()
+        {
+            TradeResources tr = new TradeResources()
+            {
+                Wood = 2,
+                Wheat = 2,
+                Brick = 2,
+                Ore = 2,
+                Sheep = 2
+            };
+
+            ResourceCardCollection rc = new ResourceCardCollection();
+            rc.InitalizeResources(tr);
+            TakeCardDlg dlg = new TakeCardDlg()
+            {
+                To = Player,
+                From = MainPage.Current.MainPageModel.Bank,
+                SourceOrientation = TileOrientation.FaceUp,
+                HowMany = 2,
+                Source = rc,
+                Instructions = "Take 2 cards from the bank.",
+                Destination = new ObservableCollection<ResourceCardModel>(),
+            };
+
+            var ret = await dlg.ShowAsync();
+            if (ret == ContentDialogResult.Primary)
+            {
+                return ResourceCardCollection.ToTradeResources(dlg.Destination);
+            }
+
+            return null;
         }
 
         private bool EnabledEntitlementPurchase(string entitlementValue, PlayerResources playerResources)
@@ -32,6 +100,34 @@ namespace Catan10
             Contract.Assert(playerResources != null);
 
             return playerResources.CanAfford(entitlement);
+        }
+
+        private async void OnAvailableCardPressed(object sender, RoutedEventArgs e)
+        {
+            DevCardType devCardType = (DevCardType)((MenuFlyoutItem)sender).Tag;
+            Contract.Assert(SelectedAvailableDevCard != null);
+            Contract.Assert(SelectedAvailableDevCard.DevCardType == devCardType);
+            Contract.Assert(SelectedAvailableDevCard.Played == false);
+
+            if (devCardType == DevCardType.YearOfPlenty)
+            {
+                TradeResources tr = await DoYearOfPlenty();
+                await PlayDevCardLog.PostLog(MainPage.Current, DevCardType.YearOfPlenty, tr);
+                return;
+            }
+
+            if (devCardType == DevCardType.Monopoly)
+            {
+                TradeResources tr = await DoMonopoly();
+                await PlayDevCardLog.PostLog(MainPage.Current, DevCardType.Monopoly, tr);
+                return;
+            }
+
+            if (devCardType == DevCardType.RoadBuilding)
+            {
+                await PlayDevCardLog.PostLog(MainPage.Current, DevCardType.RoadBuilding, null);
+                return;
+            }
         }
 
         private async void OnBuyCity(object sender, RoutedEventArgs e)
@@ -87,18 +183,32 @@ namespace Catan10
             if (value == null) return;
         }
 
-        public PrivateDataCtrl()
-        {
-            this.DataContext = this;
-            this.InitializeComponent();
-        }
-
         public PlayerModel Player
         {
             get => (PlayerModel)GetValue(PlayerProperty);
             set => SetValue(PlayerProperty, value);
         }
 
+        public DevCardModel SelectedAvailableDevCard
+        {
+            get => (DevCardModel)GetValue(SelectedAvailableDevCardProperty);
+            set => SetValue(SelectedAvailableDevCardProperty, value);
+        }
+
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PrivateDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
+
+        public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
+
+        public PrivateDataCtrl()
+        {
+            this.DataContext = this;
+            this.InitializeComponent();
+        }
+
+        public static string MenuPlayString(DevCardType devCardType)
+        {
+            string description = devCardType.Description();
+            return $"Play {description}?";
+        }
     }
 }

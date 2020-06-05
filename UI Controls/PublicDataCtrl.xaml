@@ -70,8 +70,7 @@
                         LineStackingStrategy="BaselineToBaseline" TextLineBounds="Tight" LineHeight="0">
                         <TextBlock.RenderTransform>
                             <CompositeTransform ScaleX="1.25" ScaleY="1.25" />
-                        </TextBlock.RenderTransform>
-                    </TextBlock>
+                        </TextBlock.RenderTransform></TextBlock>
                 </Button.Content>
             </Button>
             <Ellipse Margin="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -135,13 +134,13 @@
                         </ListBox.ItemsPanel>
                         <ListBox.Items>
                             <ListBoxItem>
-                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.Monopoly}" Count="{x:Bind Player.GameData.Resources.PlayedMonopoly, Mode=OneWay, FallbackValue=0}" />
+                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.Monopoly}" Count="{x:Bind DevCardCount(Player.GameData.Resources.PlayedDevCards, 'Monopoly'), Mode=OneWay, FallbackValue=0}" />
                             </ListBoxItem>
                             <ListBoxItem>
-                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.RoadBuilding}" Count="{x:Bind Player.GameData.Resources.PlayedRoadBuilding, Mode=OneWay, FallbackValue=0}" />
+                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.RoadBuilding}" Count="{x:Bind DevCardCount(Player.GameData.Resources.PlayedDevCards, 'RoadBuilding'), Mode=OneWay, FallbackValue=0}" />
                             </ListBoxItem>
                             <ListBoxItem>
-                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.YearOfPlenty}" Count="{x:Bind Player.GameData.Resources.PlayedYearOfPlenty, Mode=OneWay, FallbackValue=0}" />
+                                <local:ResourceCardSlimCtrl Image="{StaticResource DevCardType.YearOfPlenty}" Count="{x:Bind DevCardCount(Player.GameData.Resources.PlayedDevCards, 'YearOfPlenty'), Mode=OneWay, FallbackValue=0}" />
                             </ListBoxItem>
                         </ListBox.Items>
                     </ListBox>
@@ -276,7 +275,6 @@
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="local:ResourceCardModel">
                             <Viewbox>
-
                                 <local:ResourceCardCtrl ResourceCardModel="{x:Bind}" Orientation="{x:Bind CountToOrientation(Count), Mode=OneWay}" MainPageModel="{Binding Path=MainPageModel, ElementName=MainPage.Current.MainPageModel, Mode=OneWay}" />
                             </Viewbox>
                         </DataTemplate>
@@ -290,7 +288,6 @@
                     </GridView.ItemContainerStyle>
                 </GridView>
             </Viewbox>
-
             <StackPanel Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="2"
                 Height="85" Margin="-70" HorizontalAlignment="Right" VerticalAlignment="Center"
                 Background="Transparent" BorderBrush="White" BorderThickness="1"
@@ -320,20 +317,19 @@
                         </Viewbox>
                     </Grid>
                 </StackPanel>
-
                 <StackPanel Orientation="Horizontal">
                     <!--<TextBlock Margin="12,0,0,0" Text="0" FontSize="22" />
                         <TextBlock Margin="22,0,0,0" Text="1" FontSize="22" />
                         <TextBlock Margin="26,0,0,0" Text="2" FontSize="22" />-->
-
                     <TextBlock Margin="12,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'City'), Mode=OneWay}" FontSize="22" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                     <TextBlock Margin="22,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'Settlement'), Mode=OneWay}" FontSize="22" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                     <TextBlock Margin="26,0,0,0" Text="{x:Bind UnplayedResourceCount(Player.GameData.Resources.UnspentEntitlements, 'Road'), Mode=OneWay}" FontSize="22" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                 </StackPanel>
             </StackPanel>
             <!--  <Bottom Row  -->
-            <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="0,-10,0,0"
-                VerticalAlignment="Bottom" Orientation="Horizontal">
+            <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,-10,0,0"
+                HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
+                Orientation="Horizontal">
                 <!--  Current Turn Checkbox  -->
                 <TextBlock Margin="0" HorizontalAlignment="Left" Text="&#x2714;" FontSize="35"
                     Visibility="{x:Bind Player.GameData.IsCurrentPlayer, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"
@@ -407,8 +403,8 @@
                 VerticalAlignment="Top"
                 BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                 Background="Transparent" CornerRadius="10" BorderThickness="2">
-                <Grid Name="Grid_Stats" Width="110" Margin="0" HorizontalAlignment="Left"
-                    VerticalAlignment="Top" Background="Transparent">
+                <Grid Name="Grid_Stats" Width="110" Margin="2,0,0,0" HorizontalAlignment="Left"
+                    VerticalAlignment="Center" Background="Transparent">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="55" />
                         <ColumnDefinition Width="55" />
@@ -445,8 +441,7 @@
                                 HorizontalTextAlignment="Center">
                                 <TextBlock.RenderTransform>
                                     <CompositeTransform Rotation="180" TranslateY="-3" />
-                                </TextBlock.RenderTransform>
-                            </TextBlock>
+                                </TextBlock.RenderTransform></TextBlock>
                         </StackPanel>
                     </Viewbox>
                     <Viewbox Grid.Row="1" Grid.Column="1" Margin="5">

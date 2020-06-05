@@ -26,6 +26,31 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        private const int MAX_SAVE_FILES_RETAINED = 5;
+
+        private const int SMALLEST_STATE_COUNT = 8;
+
+        private readonly RoadRaceTracking _raceTracking = null;
+
+        private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
+
+        private bool _doDragDrop = false;
+
+        private DateTime _dt = DateTime.Now;
+
+        private int _randomBoardListIndex = 0;
+
+        /// <summary>
+        ///     This will go through all the buildings and find the ones that are
+        ///        1. Buildable
+        ///        2. in the "none" state (e.g. not already shown in some way)
+        ///      and then have them show the PipGroup.
+        ///      you have to do this every time because people might have built in locations that change the PipGroup
+        /// </summary>
+        private int _showPipGroupIndex = 0;
+
+        private TaskCompletionSource<object> fileGuard = null;
+
         private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as MainPage;
@@ -653,6 +678,7 @@ namespace Catan10
             }
             MainPageModel.PlayingPlayers.Clear();
             Rolls.Clear();
+            _rollControl.Reset();
             if (TheHuman != null)
             {
                 CurrentPlayer = TheHuman; // for color updates in UI
@@ -835,25 +861,6 @@ namespace Catan10
             _randomBoardListIndex = 0;
         }
 
-        private const int MAX_SAVE_FILES_RETAINED = 5;
-        private const int SMALLEST_STATE_COUNT = 8;
-        private readonly RoadRaceTracking _raceTracking = null;
-        private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
-        private bool _doDragDrop = false;
-        private DateTime _dt = DateTime.Now;
-        private int _randomBoardListIndex = 0;
-
-        /// <summary>
-        ///     This will go through all the buildings and find the ones that are
-        ///        1. Buildable
-        ///        2. in the "none" state (e.g. not already shown in some way)
-        ///      and then have them show the PipGroup.
-        ///      you have to do this every time because people might have built in locations that change the PipGroup
-        /// </summary>
-        private int _showPipGroupIndex = 0;
-
-        private TaskCompletionSource<object> fileGuard = null;
-
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -877,6 +884,54 @@ namespace Catan10
             InitTest();
             ResetDataForNewGame();
             await WsConnect();
+        }
+
+        // this lets you double tap a map and then move it around
+        // the index into PlayingPlayers that is the CurrentPlayer
+        public static MainPage Current { get; private set; }
+
+        public GameType GameType
+        {
+            get => _gameView.CurrentGame.GameType;
+            set
+            {
+            }
+        }
+
+        public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
+
+        public MainPageModel MainPageModel
+        {
+            get => (MainPageModel)GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
+
+        public StorageFolder SaveFolder { get; set; } = null;
+
+        // a global for the game
+        public PlayerModel TheHuman
+        {
+            get => (PlayerModel)GetValue(TheHumanProperty);
+            set => SetValue(TheHumanProperty, value);
+        }
+
+        public const string PlayerDataFile = "catansettings.json";
+
+        // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
+        //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(), MainPageModelChanged));
+
+        public static readonly string SAVED_GAME_EXTENSION = ".log.json";
+
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
+
+        public MainPage()
+        {
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            this.InitializeComponent();
+            Current = this;
+            this.DataContext = this;
+            _raceTracking = new RoadRaceTracking(this);
         }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
@@ -932,53 +987,5 @@ namespace Catan10
 
             MainPageModel.SetPipCount(pipCount);
         }
-
-        public MainPage()
-        {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-            this.InitializeComponent();
-            Current = this;
-            this.DataContext = this;
-            _raceTracking = new RoadRaceTracking(this);
-        }
-
-        // this lets you double tap a map and then move it around
-        // the index into PlayingPlayers that is the CurrentPlayer
-        public static MainPage Current { get; private set; }
-
-        public GameType GameType
-        {
-            get => _gameView.CurrentGame.GameType;
-            set
-            {
-            }
-        }
-
-        public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
-
-        public MainPageModel MainPageModel
-        {
-            get => (MainPageModel)GetValue(MainPageModelProperty);
-            set => SetValue(MainPageModelProperty, value);
-        }
-
-        public StorageFolder SaveFolder { get; set; } = null;
-
-        // a global for the game
-        public PlayerModel TheHuman
-        {
-            get => (PlayerModel)GetValue(TheHumanProperty);
-            set => SetValue(TheHumanProperty, value);
-        }
-
-        public const string PlayerDataFile = "catansettings.json";
-
-        // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
-        //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(), MainPageModelChanged));
-
-        public static readonly string SAVED_GAME_EXTENSION = ".log.json";
-
-        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
     }
 }

@@ -17,84 +17,62 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        private readonly Random testRandom = new Random();
+
         private void InitTest()
         {
         }
 
         private async Task LoseHalfYourCards()
         {
+            TradeResources tr = new TradeResources()
+            {
+                Sheep = 3,
+                Wheat = 3,
+                Ore = 2,
+                Brick = 0,
+                Wood = 0
+            };
+            CurrentPlayer.GameData.Resources.GrantResources(tr);
+
             int loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
             if (loss >= 4)
             {
                 ResourceCardCollection rc = new ResourceCardCollection();
                 rc.InitalizeResources(CurrentPlayer.GameData.Resources.Current);
-                TakeCardControl.To = MainPageModel.Bank;
-                TakeCardControl.From = CurrentPlayer;
-                TakeCardControl.FaceUp = true;
-                TakeCardControl.HowMany = loss;
-                TakeCardControl.Source = rc;
-                TakeCardControl.Destination = new ResourceCardCollection();
-                Grid_TakeCard.Visibility = Visibility.Visible;
-                (bool ret, TradeResources trAdded) = await TakeCardControl.GetCards();
-                if (ret)
+                TakeCardDlg dlg = new TakeCardDlg()
                 {
-                    CurrentPlayer.GameData.Resources.GrantResources(trAdded.GetNegated());
+                    To = MainPageModel.Bank,
+                    From = CurrentPlayer,
+                    SourceOrientation = TileOrientation.FaceUp,
+                    HowMany = loss,
+                    Source = rc,
+                    Destination = new ResourceCardCollection(),
+                    Instructions = $"Give {loss} cards to the bank."
+                };
+                var ret = await dlg.ShowAsync();
+                if (ret == ContentDialogResult.Primary)
+                {
+                    CurrentPlayer.GameData.Resources.GrantResources(ResourceCardCollection.ToTradeResources(dlg.Destination).GetNegated());
                 }
             }
         }
 
         // int toggle = 0;
-        private void OnTest1(object sdr, RoutedEventArgs rea)
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            CurrentPlayer.GameData.Score++;
-
-            CurrentPlayer.GameData.RollsWithResource++;
-            CurrentPlayer.GameData.TimesTargeted++;
-            CurrentPlayer.GameData.LargestArmy = true;
-            CurrentPlayer.GameData.LongestRoad = 12;
-            CurrentPlayer.GameData.MaxNoResourceRolls++;
-            CurrentPlayer.GameData.Resources.ResourcesLostToMonopoly = new TradeResources() { Wheat = 7 };
-            CurrentPlayer.GameData.Resources.ResourcesLostSeven = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5 };
-            CurrentPlayer.GameData.Resources.ResourcesLostToBaron = new TradeResources() { Ore = 10 };
-            CurrentPlayer.GameData.NoResourceCount = 13;
-            CurrentPlayer.GameData.GoldRolls = 5;
-            CurrentPlayer.GameData.Resources.TotalResources = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5, Brick = 10 };
+            await TestTargetPlayer();
         }
 
-        private void OnTest2(object sdr, RoutedEventArgs rea)
+        private async void OnTest2(object sdr, RoutedEventArgs rea)
         {
-            TradeResources tr = new TradeResources()
-            {
-                Sheep = 3,
-                Wheat = 3,
-                Ore = 3,
-                Brick = 3,
-                Wood = 3
-            };
-
-            // CurrentPlayer.GameData.Resources.ResourcesThisTurn2.AllUp();
-
-            CurrentPlayer.GameData.Resources.GrantResources(tr);
-            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.City);
-            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.City);
-            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
-            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
-            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
-            CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Road);
-
-            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.Knight);
-            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.YearOfPlenty);
-            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.Monopoly);
-            CurrentPlayer.GameData.Resources.MakeDevCardsAvailable();
-            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.RoadBuilding);
-            CurrentPlayer.GameData.Resources.AddDevCard(DevCardType.VictoryPoint);
-            CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
+            await LoseHalfYourCards();
         }
 
         // Undo
         private async void OnTest3(object sdr, RoutedEventArgs rea)
         {
-            await LoseHalfYourCards();
+            await TestGrantEntitlementMessage();
         }
 
         private void OnTestExpansionGame(object sender, RoutedEventArgs e)
@@ -147,7 +125,51 @@ namespace Catan10
             //await PickSettlementsAndRoads();
         }
 
-        private async Task TestPickTwoCards()
+        private async Task TestGrantEntitlementMessage()
+        {
+            TradeResources tr = new TradeResources()
+            {
+                Sheep = 3,
+                Wheat = 3,
+                Ore = 3,
+                Brick = 3,
+                Wood = 3
+            };
+
+            List<Entitlement> entitlements = new List<Entitlement>()
+            {
+                Entitlement.City,
+                Entitlement.Road,
+                Entitlement.Road,
+                Entitlement.Settlement
+            };
+
+            List<DevCardType> devCards = new List<DevCardType>()
+            {
+                DevCardType.Knight, DevCardType.RoadBuilding, DevCardType.YearOfPlenty, DevCardType.Monopoly, DevCardType.VictoryPoint
+            };
+
+            await TestGrantEntitlements.Post(this, tr, entitlements, devCards);
+        }
+
+        private void TestStats()
+        {
+            CurrentPlayer.GameData.Score++;
+
+            CurrentPlayer.GameData.RollsWithResource++;
+            CurrentPlayer.GameData.TimesTargeted++;
+            CurrentPlayer.GameData.LargestArmy = true;
+            CurrentPlayer.GameData.LongestRoad = 12;
+            CurrentPlayer.GameData.MaxNoResourceRolls++;
+            CurrentPlayer.GameData.Resources.ResourcesLostToMonopoly = new TradeResources() { Wheat = 7 };
+            CurrentPlayer.GameData.Resources.ResourcesLostSeven = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5 };
+            CurrentPlayer.GameData.Resources.ResourcesLostToBaron = new TradeResources() { Ore = 10 };
+            CurrentPlayer.GameData.NoResourceCount = 13;
+            CurrentPlayer.GameData.GoldRolls = 5;
+            CurrentPlayer.GameData.Resources.TotalResources = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5, Brick = 10 };
+        }
+
+        private async Task TestTargetPlayer()
         {
             var source = new ResourceCardCollection();
             source.Add(ResourceType.Wheat, false);
@@ -155,15 +177,24 @@ namespace Catan10
             source.Add(ResourceType.Wood, false);
             source.Add(ResourceType.Brick, false);
             var destination = new ResourceCardCollection();
-            TakeCardControl.From = MainPageModel.AllPlayers[0];
-            TakeCardControl.To = MainPageModel.AllPlayers[1];
-            Grid_TakeCard.Visibility = Visibility.Visible;
-            TakeCardControl.HowMany = 2;
-            TakeCardControl.Source = source;
-            TakeCardControl.Destination = destination;
-            (bool ret, TradeResources trAdded) = await TakeCardControl.GetCards();
+            source.ForEach((c) => c.Orientation = TileOrientation.FaceDown);
+            TakeCardDlg dlg = new TakeCardDlg()
+            {
+                To = MainPageModel.Bank,
+                From = CurrentPlayer,
+                SourceOrientation = TileOrientation.FaceDown,
+                HowMany = 1,
+                Source = source,
+                Destination = new ResourceCardCollection(),
+                Instructions = $"Take a card from {CurrentPlayer.PlayerName}"
+            };
+            var ret = await dlg.ShowAsync();
+            if (ret == ContentDialogResult.Primary)
+            {
+                CurrentPlayer.GameData.Resources.GrantResources(ResourceCardCollection.ToTradeResources(dlg.Destination).GetNegated());
+            }
 
-            this.TraceMessage($"ret= {ret} Cards={trAdded}");
+            this.TraceMessage($"ret= {ret} Cards={ResourceCardCollection.ToTradeResources(dlg.Destination)}");
         }
 
         private async Task TestYearOfPlenty()
@@ -179,16 +210,22 @@ namespace Catan10
 
             ResourceCardCollection rc = new ResourceCardCollection();
             rc.InitalizeResources(tr);
-            Grid_TakeCard.Visibility = Visibility.Visible;
-            TakeCardControl.To = CurrentPlayer;
-            TakeCardControl.From = MainPageModel.Bank;
-            TakeCardControl.FaceUp = true;
-            TakeCardControl.HowMany = 2;
-            TakeCardControl.Source = rc;
-            TakeCardControl.Destination = new ObservableCollection<ResourceCardModel>();
-            (bool ret, TradeResources addedResources) = await TakeCardControl.GetCards();
+            TakeCardDlg dlg = new TakeCardDlg()
+            {
+                To = CurrentPlayer,
+                From = MainPageModel.Bank,
+                SourceOrientation = TileOrientation.FaceUp,
+                HowMany = 2,
+                Source = rc,
+                Instructions = "Take 2 cards from the bank.",
+                Destination = new ObservableCollection<ResourceCardModel>(),
+            };
 
-            CurrentPlayer.GameData.Resources.GrantResources(addedResources);
+            var ret = await dlg.ShowAsync();
+            if (ret == ContentDialogResult.Primary)
+            {
+                CurrentPlayer.GameData.Resources.GrantResources(ResourceCardCollection.ToTradeResources(dlg.Destination));
+            }
         }
 
         private void VerifyRoundTrip<T>(T model)
@@ -201,8 +238,6 @@ namespace Catan10
             ////   this.TraceMessage(newJsonString);
             //Debug.Assert(newJsonString == jsonString);
         }
-
-        private readonly Random testRandom = new Random();
     }
 
     public class WSConnectInfo

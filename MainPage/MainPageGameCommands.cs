@@ -16,17 +16,6 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-        private readonly List<PlayerModel> defaultPlayers = new List<PlayerModel>()
-        {
-            new PlayerModel() {PlayerName = "Joe", ImageFileName = "ms-appx:Assets/DefaultPlayers/joe.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black,PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC5}")},
-            new PlayerModel() {PlayerName = "Dodgy", ImageFileName = "ms-appx:Assets/DefaultPlayers/dodgy.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Red, SecondaryBackgroundColor = Colors.Black , PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC6}")},
-            new PlayerModel() {PlayerName = "Doug", ImageFileName = "ms-appx:Assets/DefaultPlayers/doug.jpg", ForegroundColor=Colors.Black, PrimaryBackgroundColor=Colors.DarkGray, SecondaryBackgroundColor = Colors.LightGray, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC7}") },
-            new PlayerModel() {PlayerName = "Robert", ImageFileName = "ms-appx:Assets/DefaultPlayers/robert.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Black, SecondaryBackgroundColor = Colors.DarkGray, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC8}")},
-            new PlayerModel() {PlayerName = "Chris", ImageFileName = "ms-appx:Assets/DefaultPlayers/chris.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Teal, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC9}") },
-            new PlayerModel() {PlayerName = "Cort", ImageFileName = "ms-appx:Assets/DefaultPlayers/cort.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Green, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACA}") },
-            new PlayerModel() {PlayerName = "Adrian", ImageFileName = "ms-appx:Assets/DefaultPlayers/adrian.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Purple, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACB}") },
-        };
-
         private void CreateMenuItems()
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
@@ -611,6 +600,17 @@ namespace Catan10
             }
         }
 
+        private readonly List<PlayerModel> defaultPlayers = new List<PlayerModel>()
+        {
+            new PlayerModel() {PlayerName = "Joe", ImageFileName = "ms-appx:Assets/DefaultPlayers/joe.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black,PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC5}")},
+            new PlayerModel() {PlayerName = "Dodgy", ImageFileName = "ms-appx:Assets/DefaultPlayers/dodgy.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Red, SecondaryBackgroundColor = Colors.Black , PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC6}")},
+            new PlayerModel() {PlayerName = "Doug", ImageFileName = "ms-appx:Assets/DefaultPlayers/doug.jpg", ForegroundColor=Colors.Black, PrimaryBackgroundColor=Colors.DarkGray, SecondaryBackgroundColor = Colors.LightGray, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC7}") },
+            new PlayerModel() {PlayerName = "Robert", ImageFileName = "ms-appx:Assets/DefaultPlayers/robert.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Black, SecondaryBackgroundColor = Colors.DarkGray, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC8}")},
+            new PlayerModel() {PlayerName = "Chris", ImageFileName = "ms-appx:Assets/DefaultPlayers/chris.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Teal, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC9}") },
+            new PlayerModel() {PlayerName = "Cort", ImageFileName = "ms-appx:Assets/DefaultPlayers/cort.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Green, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACA}") },
+            new PlayerModel() {PlayerName = "Adrian", ImageFileName = "ms-appx:Assets/DefaultPlayers/adrian.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Purple, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACB}") },
+        };
+
         internal void AddPlayerMenu(PlayerModel player)
         {
         }
@@ -727,31 +727,7 @@ namespace Catan10
                         Contract.Assert(false, "this is done in pagecallback");
                         break;
 
-                    case GameState.Targeted:
-                        break;
-
-                    case GameState.LostToCardsLikeMonopoly:
-                        break;
-
-                    case GameState.Supplemental:
-                        break;
-
-                    case GameState.DoneSupplemental:
-                        break;
-
                     case GameState.WaitingForNext:
-                        break;
-
-                    case GameState.LostCardsToSeven:
-                        break;
-
-                    case GameState.MissedOpportunity:
-                        break;
-
-                    case GameState.GamePicked:
-                        break;
-
-                    case GameState.Unknown:
                         break;
 
                     //

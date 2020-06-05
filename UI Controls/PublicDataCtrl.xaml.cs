@@ -1,5 +1,6 @@
 ﻿using Catan.Proxy;
 using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using Windows.Media.Playback;
 using Windows.UI;
@@ -74,29 +75,28 @@ namespace Catan10
         private void SetRollOrientation(TileOrientation oldValue, TileOrientation newValue)
         {
             if (Player == null) return;
-            if (oldValue == newValue) return;
 
-            if (newValue == TileOrientation.FaceDown)
-                ShowStats.Begin();
-            else
-                ShowLatestRoll.Begin();
-        }
+            GameState state = MainPage.Current.CurrentGameState;
 
-        public string UnplayedResourceCount(ObservableCollection<Entitlement> unspent, string name)
-        {
-            var entitlement = (Entitlement)Enum.Parse(typeof(Entitlement), name);
-            var count = 0;
-            foreach (var ent in unspent)
+            if (state == GameState.AllocateResourceForward)
             {
-                if (ent == entitlement) count++;
+                ShowStats.Begin();
+                return;
+            }
+            if (state != GameState.WaitingForRollForOrder && state != GameState.WaitingForRoll && state != GameState.BeginResourceAllocation)
+            {
+                this.TraceMessage($"rejecting call to SetOrientation for state={MainPage.Current.CurrentGameState}");
+                return;
             }
 
-            return count.ToString();
-        }
-
-        public PublicDataCtrl()
-        {
-            this.InitializeComponent();
+            if (newValue == TileOrientation.FaceDown)
+            {
+                ShowStats.Begin();
+            }
+            else
+            {
+                ShowLatestRoll.Begin();
+            }
         }
 
         public PlayerModel Player
@@ -112,6 +112,41 @@ namespace Catan10
         }
 
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(null, PlayerChanged));
+
         public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
+
+        public PublicDataCtrl()
+        {
+            this.InitializeComponent();
+        }
+
+        /// <summary>
+        ///     given a collection and the value of the type, return how many dev cards are in the collection
+        /// </summary>
+        /// <param name="devCards"></param>
+        /// <param name="cardType"></param>
+        /// <returns></returns>
+        public int DevCardCount(ObservableCollection<DevCardModel> devCards, string cardType)
+        {
+            DevCardType card = Enum.Parse<DevCardType>(cardType);
+            int count = 0;
+            foreach (var model in devCards)
+            {
+                if (model.DevCardType == card) count++;
+            }
+            return count;
+        }
+
+        public string UnplayedResourceCount(ObservableCollection<Entitlement> unspent, string name)
+        {
+            var entitlement = (Entitlement)Enum.Parse(typeof(Entitlement), name);
+            var count = 0;
+            foreach (var ent in unspent)
+            {
+                if (ent == entitlement) count++;
+            }
+
+            return count.ToString();
+        }
     }
 }

@@ -14,8 +14,6 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
-        private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
-
         private async Task UpdateUiForState(GameState currentState)
         {
             switch (currentState)
@@ -114,74 +112,12 @@ namespace Catan10
                 case GameState.Supplemental:
                     break;
 
-                case GameState.Targeted:
-                    break;
-
-                case GameState.LostToCardsLikeMonopoly:
-                    break;
-
-                case GameState.DoneSupplemental:
-                    break;
-
-                case GameState.LostCardsToSeven:
-                    break;
-
-                case GameState.MissedOpportunity:
-                    break;
-
-                case GameState.GamePicked:
-                    break;
-
-                case GameState.MustMoveBaron:
-                    break;
-
-                case GameState.Unknown:
-                    break;
-
                 default:
                     break;
             }
         }
 
-        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
-        public CatanGames CatanGame { get; set; } = CatanGames.Regular;
-
-        public GameState CurrentGameState
-        {
-            get
-            {
-                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
-
-                return MainPageModel.Log.GameState;
-            }
-        }
-
-        public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
-        public GameInfo GameInfo => MainPageModel.ServiceGameInfo;
-
-        public List<int> HighlightedTiles
-        {
-            get
-            {
-                var list = new List<int>();
-                foreach (var tile in GameContainer.AllTiles)
-                {
-                    if (tile.Highlighted)
-                    {
-                        list.Add(tile.Index);
-                    }
-                }
-                return list;
-            }
-        }
-
-        public bool IsServiceGame => MainPageModel.IsServiceGame;
-        public Log Log => MainPageModel.Log;
-
-        public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
-        public CatanProxy Proxy => MainPageModel.Proxy;
-
-        public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
+        private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
 
         /// <summary>
         ///     Called when a Player is added to a Service game
@@ -928,5 +864,45 @@ namespace Catan10
 
             CalculateAndSetLongestRoad(raceTracking);
         }
+
+        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
+        public CatanGames CatanGame { get; set; } = CatanGames.Regular;
+
+        public GameState CurrentGameState
+        {
+            get
+            {
+                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
+
+                return MainPageModel.Log.GameState;
+            }
+        }
+
+        public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
+        public GameInfo GameInfo => MainPageModel.ServiceGameInfo;
+
+        public List<int> HighlightedTiles
+        {
+            get
+            {
+                var list = new List<int>();
+                foreach (var tile in GameContainer.AllTiles)
+                {
+                    if (tile.Highlighted)
+                    {
+                        list.Add(tile.Index);
+                    }
+                }
+                return list;
+            }
+        }
+
+        public bool IsServiceGame => MainPageModel.IsServiceGame;
+        public Log Log => MainPageModel.Log;
+
+        public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
+        public CatanProxy Proxy => MainPageModel.Proxy;
+
+        public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Catan10
+﻿using System.ComponentModel;
+
+namespace Catan10
 {
     public enum AnimationSpeed { Ultra = 5, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 };
 
@@ -64,7 +66,29 @@
 
     //
     // Back is needed because the resource control flips from its back to front..this makes a front look like the back of a dev card
-    public enum DevCardType { Knight, VictoryPoint, YearOfPlenty, RoadBuilding, Monopoly, None, Back };
+    public enum DevCardType
+    {
+        [Description("Knight")]
+        Knight,
+
+        [Description("Victory Point")]
+        VictoryPoint,
+
+        [Description("Year Of Plenty")]
+        YearOfPlenty,
+
+        [Description("Road Building")]
+        RoadBuilding,
+
+        [Description("Monopoly")]
+        Monopoly,
+
+        [Description("")]
+        None,
+
+        [Description("")]
+        Back
+    };
 
     public enum Entitlement
     {
@@ -75,27 +99,44 @@
 
     public enum GameState
     {
+        [Description("Uninitialized")]
         Uninitialized,
+
+        [Description("New Game")]
         WaitingForNewGame,
+
+        [Description("Pick Resources")]
         BeginResourceAllocation,
+
+        [Description("Pick Board")]
         WaitingForPlayers,
+
+        [Description("Select Roll")]
         WaitingForRollForOrder,
+
+        [Description("Next (Forward)")]
         AllocateResourceForward,
+
+        [Description("Next (Back)")]
         AllocateResourceReverse,
+
+        [Description("Start Game")]
         DoneResourceAllocation,
+
+        [Description("Select Roll")]
         WaitingForRoll,
+
+        [Description("Done - Next Player")]
         WaitingForNext,
+
+        [Description("Done - Next Player")]
         Supplemental,
 
-        Targeted,
-        LostToCardsLikeMonopoly,
-        DoneSupplemental,
-        LostCardsToSeven,
-        MissedOpportunity,
-        GamePicked,
+        [Description("Move Baron")]
         MustMoveBaron,
-        Unknown,
-        PickingBoard,
+
+        [Description("Roll For Order")]
+        PickingBoard
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

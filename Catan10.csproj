@@ -124,6 +124,9 @@
     <Compile Include="ContentDialogs\ServiceGameDlg.xaml.cs">
       <DependentUpon>ServiceGameDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ContentDialogs\TakeCardDlg.xaml.cs">
+      <DependentUpon>TakeCardDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Definitions\enums.cs" />
     <Compile Include="Definitions\interfaces.cs" />
     <Compile Include="Definitions\oldDefinitions.cs" />
@@ -132,6 +135,11 @@
     </Compile>
     <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
+    <Compile Include="Logging\Actions\PlayDevCardLog.cs" />
+    <Compile Include="Logging\Actions\TestGrantEntitlements.cs" />
+    <Compile Include="Logging\Actions\YearOfPlentyLog.cs" />
+    <Compile Include="Logging\Helpers\AllocationPhaseHelper.cs" />
+    <Compile Include="Logging\Helpers\ChangePlayerHelper.cs" />
     <Compile Include="Models\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
@@ -146,23 +154,23 @@
     <Compile Include="Logging\StateTransitions\SetStateLog.cs" />
     <Compile Include="Logging\Actions\ShowAllRollsLog.cs" />
     <Compile Include="Logging\RollLog.cs" />
-    <Compile Include="Logging\StateTransitions\7_AllocateResourcesForwardToSelf.cs" />
-    <Compile Include="Logging\StateTransitions\8_AllocateResourcesReverse.cs" />
-    <Compile Include="Logging\StateTransitions\9_AllocateResourcesReverseToSelf.cs" />
-    <Compile Include="Logging\StateTransitions\A_DoneAllocResources.cs" />
-    <Compile Include="Logging\StateTransitions\B_WaitingForRoll.cs" />
-    <Compile Include="Logging\StateTransitions\4_RollOrder.cs" />
-    <Compile Include="Logging\StateTransitions\B2_DoneAllocResourcesToWaitingForNext.cs" />
-    <Compile Include="Logging\StateTransitions\D3_SupplementalToSelf.cs" />
-    <Compile Include="Logging\StateTransitions\D4_SupToWaitingForRoll.cs" />
+    <Compile Include="Logging\StateTransitions\5b_AllocateResourcesForwardToSelf.cs" />
+    <Compile Include="Logging\StateTransitions\5c_AllocateResourcesReverse.cs" />
+    <Compile Include="Logging\StateTransitions\5d_AllocateResourcesReverseToSelf.cs" />
+    <Compile Include="Logging\StateTransitions\5e_DoneAllocResources.cs" />
+    <Compile Include="Logging\StateTransitions\6a_WaitingForRoll.cs" />
+    <Compile Include="Logging\StateTransitions\3_RollOrder.cs" />
+    <Compile Include="Logging\StateTransitions\6b_DoneAllocResourcesToWaitingForNext.cs" />
+    <Compile Include="Logging\StateTransitions\8b_SupplementalToSelf.cs" />
+    <Compile Include="Logging\StateTransitions\8c_SupToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\1_WaitingForPlayers.cs" />
-    <Compile Include="Logging\StateTransitions\C20_NextToMustRollBaron.cs" />
-    <Compile Include="Logging\StateTransitions\D2_Supplemental.cs" />
-    <Compile Include="Logging\StateTransitions\D1_NextToWaitingForRoll.cs" />
-    <Compile Include="Logging\StateTransitions\3_PickingBoard.cs" />
-    <Compile Include="Logging\StateTransitions\5_BeginResourceAllocation.cs" />
-    <Compile Include="Logging\StateTransitions\C10_RollToWaitingForNext.cs" />
-    <Compile Include="Logging\StateTransitions\6_AllocateResourcesForward.cs" />
+    <Compile Include="Logging\StateTransitions\7a_NextToMustRollBaron.cs" />
+    <Compile Include="Logging\StateTransitions\8a_Supplemental.cs" />
+    <Compile Include="Logging\StateTransitions\7_NextToWaitingForRoll.cs" />
+    <Compile Include="Logging\StateTransitions\2_PickingBoard.cs" />
+    <Compile Include="Logging\StateTransitions\4_BeginResourceAllocation.cs" />
+    <Compile Include="Logging\StateTransitions\6_RollToWaitingForNext.cs" />
+    <Compile Include="Logging\StateTransitions\5a_AllocateResourcesForward.cs" />
     <Compile Include="Logging\Actions\RollOrderLog.cs" />
     <Compile Include="Logging\StateTransitions\UpdateBuildingLog.cs" />
     <Compile Include="Logging\VerifyMessages\VerifyPlayers.cs" />
@@ -381,6 +389,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ContentDialogs\ServiceGameDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentDialogs\TakeCardDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

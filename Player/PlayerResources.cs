@@ -30,7 +30,7 @@ namespace Catan10
             }
 
             string key = "DevCardType." + devCardType.ToString();
-            if (devCardType == DevCardType.Back)
+            if (devCardType == DevCardType.Back || devCardType == DevCardType.None)
             {
                 return App.Current.Resources["DevCardType.Back"] as ImageBrush;
             }
@@ -92,7 +92,7 @@ namespace Catan10
         private TradeResources _resourcesThisTurn = new TradeResources();
         private int _Roads = 0;
         private int _Settlements = 0;
-        private DevCardType _thisTurnsDevCard = DevCardType.Back;
+        private DevCardType _thisTurnsDevCard = DevCardType.None;
         private int _TotalDevCards = 0;
         private TradeResources _totalResources = new TradeResources();
         private int _UnplayedKnights = 0;

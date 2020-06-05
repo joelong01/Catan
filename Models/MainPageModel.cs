@@ -14,66 +14,7 @@ namespace Catan10
 {
     public class MainPageModel : INotifyPropertyChanged
     {
-        private void InitBank()
-        {
-            Bank = new PlayerModel()
-            {
-                PlayerName = "Bank",
-                ImageFileName = "ms-appx:Assets/bank.png",
-                ForegroundColor = Colors.White,
-                PrimaryBackgroundColor = Colors.Gold,
-                SecondaryBackgroundColor = Colors.Black,
-                PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACC}")
-            };
-            TradeResources tr = new TradeResources()
-            {
-                Wood = 19,
-                Wheat = 19,
-                Brick = 19,
-                Ore = 19,
-                Sheep = 19
-            };
-            Bank.GameData.Resources.TotalResourcesCollection.InitalizeResources(tr);
-        }
-
-        /// <summary>
-        ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
-        ///     if we add one of these properties (which are usually the get'ers only)
-        /// </summary>
-        private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void UnspentEntitlements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            NotifyPropertyChanged("EnableNextButton");
-            NotifyPropertyChanged("StateMessage");
-        }
-
         private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
-
-        [JsonIgnore]
-        private Dictionary<GameState, string> StateMessages { get; } = new Dictionary<GameState, string>()
-        {
-               {GameState.Uninitialized, "" },
-               {GameState.WaitingForNewGame, "New Game" },
-               {GameState.WaitingForPlayers, "Pick Board" },  // you stay in this state until you hit the button.  while in this state, the button stays this...
-               {GameState.PickingBoard, "Roll for Order" },
-               {GameState.WaitingForRollForOrder, "Select Roll!" },
-               {GameState.BeginResourceAllocation, "Start Game" },
-               {GameState.AllocateResourceForward, "Next (Forward)" },
-               {GameState.AllocateResourceReverse, "Next (Back)" },
-               {GameState.DoneResourceAllocation, "Click To Start Game" },
-               {GameState.WaitingForRoll, "Select Roll" },
-               {GameState.WaitingForNext, "End My Turn" },
-               {GameState.Supplemental, "Finished (Next)" }
-        };
 
         private bool _EnableUiInteraction = true;
 
@@ -100,6 +41,48 @@ namespace Catan10
 
         private bool _WebSocketConnected = false;
 
+        private void InitBank()
+        {
+            Bank = new PlayerModel()
+            {
+                PlayerName = "Bank",
+                ImageFileName = "ms-appx:Assets/bank.png",
+                ForegroundColor = Colors.White,
+                PrimaryBackgroundColor = Colors.Gold,
+                SecondaryBackgroundColor = Colors.Black,
+                PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACC}")
+            };
+            TradeResources tr = new TradeResources()
+            {
+                Wood = 0,
+                Wheat = 0,
+                Brick = 0,
+                Ore = 0,
+                Sheep = 0
+            };
+            Bank.GameData.Resources.TotalResourcesCollection.InitalizeResources(tr);
+        }
+
+        /// <summary>
+        ///     We listent to changes from the Log.  We have "Dynamic Properties" which is where we apply logic to make decisions about what to show in the UI
+        ///     if we add one of these properties (which are usually the get'ers only)
+        /// </summary>
+        private void Log_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void UnspentEntitlements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            NotifyPropertyChanged("EnableNextButton");
+            NotifyPropertyChanged("StateMessage");
+        }
+
         internal void FinishedAddingPlayers()
         {
             //
@@ -113,23 +96,6 @@ namespace Catan10
             }
             );
         }
-
-        public void SetPipCount(int[] value)
-        {
-            FiveStarPositions = value[0];
-            FourStarPositions = value[1];
-            ThreeStarPositions = value[2];
-            TwoStarPositions = value[3];
-        }
-
-        public MainPageModel()
-        {
-            InitBank();
-            Log = new Log(MainPage.Current);
-            GameController = MainPage.Current;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
 
@@ -166,7 +132,7 @@ namespace Catan10
                     }
 
                     ret = (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.BeginResourceAllocation || state == GameState.PickingBoard ||
-                            state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
+                            state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
                             state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers);
                     return ret;
                 }
@@ -287,6 +253,7 @@ namespace Catan10
         [JsonIgnore]
         public IGameController GameController { get; set; }
 
+        [JsonIgnore]
         public TradeResources GameResources
         {
             get
@@ -375,6 +342,25 @@ namespace Catan10
         public CatanProxy Proxy { get; } = new CatanProxy() { HostName = "http://192.168.1.128:5000" };
 
         [JsonIgnore]
+        public TradeResources ResourcesLeftInBank
+        {
+            get
+            {
+                TradeResources tr = new TradeResources();
+
+                foreach (ResourceType resType in Enum.GetValues(typeof(ResourceType)))
+                {
+                    int total = 0;
+                    PlayingPlayers.ForEach((p) => total += p.GameData.Resources.Current.CountForResource(resType));
+                    total = MainPage.Current.GameContainer.CurrentGame.GameData.MaxResourceAllocated - total;
+                    tr.Add(resType, total);
+                }
+
+                return tr;
+            }
+        }
+
+        [JsonIgnore]
         public bool RollGridEnabled
         {
             get
@@ -460,14 +446,7 @@ namespace Catan10
             get
             {
                 if (Log == null) return "New Game";
-
-                if (StateMessages.TryGetValue(Log.GameState, out string msg))
-                {
-                    // this.TraceMessage($"[State={Log.GameState}][StateMessage={msg}]");
-                    return msg;
-                }
-
-                return $"GameStart.{Log.GameState}";
+                return Log.GameState.Description();
             }
         }
 
@@ -522,6 +501,23 @@ namespace Catan10
                     NotifyPropertyChanged();
                 }
             }
+        }
+
+        public MainPageModel()
+        {
+            InitBank();
+            Log = new Log(MainPage.Current);
+            GameController = MainPage.Current;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void SetPipCount(int[] value)
+        {
+            FiveStarPositions = value[0];
+            FourStarPositions = value[1];
+            ThreeStarPositions = value[2];
+            TwoStarPositions = value[3];
         }
     }
 }
