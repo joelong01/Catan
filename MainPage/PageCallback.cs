@@ -13,8 +13,6 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameCallback, ITileControlCallback
     {
-        private int _roadSkipped = 0;
-
         private PlayerModel MaxRoadPlayer
         {
             get
@@ -30,6 +28,8 @@ namespace Catan10
                 return null;
             }
         }
+
+        private int _roadSkipped = 0;
 
         //
         //   when a Knight is played
@@ -548,6 +548,14 @@ namespace Catan10
             throw new Exception("bad name passed PlayerNameToPlayer");
         }
 
+        public GameContainerCtrl GameContainer
+        {
+            get
+            {
+                return _gameView;
+            }
+        }
+
         /// <summary>
         ///     called after the settlement status has been updated.  the PlayerData has already been fixed to represent the new state
         ///     the Views bind directly to the PlayerData, so we don't do anything with the Score (or anything else with PlayerData)
@@ -1034,9 +1042,7 @@ namespace Catan10
         //
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
-            //
-            //  if you have a knight entitlement, you *must* be playing the knight
-            bool playingKnight = CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.Knight);
+            bool playingKnight = MainPageModel.Log.LastAction != CatanAction.RolledSeven;
 
             if (CurrentGameState != GameState.MustMoveBaron && CurrentGameState != GameState.WaitingForNext &&
                CurrentGameState != GameState.WaitingForRoll)
@@ -1336,14 +1342,6 @@ namespace Catan10
             }
 
             return BuildingState.Error;
-        }
-
-        public GameContainerCtrl GameContainer
-        {
-            get
-            {
-                return _gameView;
-            }
         }
     }
 }

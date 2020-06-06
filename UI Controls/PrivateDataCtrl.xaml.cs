@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -17,6 +17,39 @@ namespace Catan10
             var depPropClass = d as PrivateDataCtrl;
             var depPropValue = (PlayerModel)e.NewValue;
             depPropClass?.SetPlayer(depPropValue);
+        }
+
+        private bool AtMaxEntitlement(PlayerModel player, Entitlement entitlement)
+        {
+            switch (entitlement)
+            {
+                case Entitlement.Settlement:
+                    if (player.GameData.Settlements.Count - 1 == MainPage.Current.GameData.MaxSettlements)
+                        return true;
+                    break;
+
+                case Entitlement.City:
+                    if (player.GameData.Cities.Count - 1 == MainPage.Current.GameData.MaxCities)
+                        return true;
+                    break;
+
+                case Entitlement.Road:
+                    if (player.GameData.Roads.Count - 1 == MainPage.Current.GameData.MaxRoads)
+                        return true; ;
+                    break;
+
+                case Entitlement.Ship:
+                    if (player.GameData.Settlements.Count - 1 == MainPage.Current.GameData.MaxSettlements)
+                        return true; ;
+                    break;
+
+                case Entitlement.Knight:
+                    break;
+
+                default:
+                    break;
+            }
+            return false;
         }
 
         private async Task<TradeResources> DoMonopoly()
@@ -85,21 +118,26 @@ namespace Catan10
             return null;
         }
 
-        private bool EnabledEntitlementPurchase(string entitlementValue, PlayerResources playerResources)
+        private bool EnabledEntitlementPurchase(string entitlementValue, TradeResources tradeResources, GameState gameState)
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
                 return false;
 
-            if (MainPage.Current.CurrentGameState != GameState.WaitingForNext && MainPage.Current.CurrentGameState != GameState.Supplemental)
+            if (MainPage.Current.CurrentPlayer != MainPage.Current.TheHuman) return false; // you can only buy on your turn
+
+            if (gameState != GameState.WaitingForNext && gameState != GameState.Supplemental)
+            {
                 return false;
+            }
 
             if (!Enum.TryParse(entitlementValue, out Entitlement entitlement))
             {
-                Contract.Assert(false, "back string in xaml passed to EnableEntitlement");
+                Contract.Assert(false, "bad string in xaml passed to EnableEntitlement");
             }
-            Contract.Assert(playerResources != null);
+            Contract.Assert(tradeResources != null);
 
-            return playerResources.CanAfford(entitlement);
+            bool ret = tradeResources.CanAfford(entitlement);
+            return ret;
         }
 
         private async void OnAvailableCardPressed(object sender, RoutedEventArgs e)
@@ -133,6 +171,10 @@ namespace Catan10
         private async void OnBuyCity(object sender, RoutedEventArgs e)
         {
             if (!Player.GameData.Resources.CanAfford(Entitlement.City)) return;
+            if (AtMaxEntitlement(Player, Entitlement.City))
+            {
+                await StaticHelpers.ShowErrorText($"You have purchased all available cities.", "Catan");
+            }
             await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.City);
         }
 
@@ -145,6 +187,10 @@ namespace Catan10
         private async void OnBuyRoad(object sender, RoutedEventArgs e)
         {
             if (!Player.GameData.Resources.CanAfford(Entitlement.Road)) return;
+            if (AtMaxEntitlement(Player, Entitlement.Road))
+            {
+                await StaticHelpers.ShowErrorText($"You have purchased all available roads.", "Catan");
+            }
             await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Road);
         }
 
@@ -152,6 +198,10 @@ namespace Catan10
         {
             if (Player.GameData.Resources.CanAfford(Entitlement.Settlement))
             {
+                if (AtMaxEntitlement(Player, Entitlement.Settlement))
+                {
+                    await StaticHelpers.ShowErrorText($"You have purchased all available Settlements.", "Catan");
+                }
                 await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement);
             }
         }
@@ -183,6 +233,24 @@ namespace Catan10
             if (value == null) return;
         }
 
+        public int AvailableDevCardIndex
+        {
+            get => (int)GetValue(AvailableDevCardIndexProperty);
+            set => SetValue(AvailableDevCardIndexProperty, value);
+        }
+
+        public int NewDevCardsIndex
+        {
+            get => (int)GetValue(NewDevCardsIndexProperty);
+            set => SetValue(NewDevCardsIndexProperty, value);
+        }
+
+        public int PlayedDevCardIndex
+        {
+            get => (int)GetValue(PlayedDevCardIndexProperty);
+            set => SetValue(PlayedDevCardIndexProperty, value);
+        }
+
         public PlayerModel Player
         {
             get => (PlayerModel)GetValue(PlayerProperty);
@@ -195,6 +263,10 @@ namespace Catan10
             set => SetValue(SelectedAvailableDevCardProperty, value);
         }
 
+        public static readonly DependencyProperty AvailableDevCardIndexProperty = DependencyProperty.Register("AvailableDevCardIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
+        public static readonly DependencyProperty NewDevCardsIndexProperty = DependencyProperty.Register("NewDevCardsIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
+
+        public static readonly DependencyProperty PlayedDevCardIndexProperty = DependencyProperty.Register("PlayedDevCardIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PrivateDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
 
         public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
@@ -209,6 +281,12 @@ namespace Catan10
         {
             string description = devCardType.Description();
             return $"Play {description}?";
+        }
+
+        public string XOfYText(int index, int count)
+        {
+            int i = index + 1;
+            return $"{i} of {count}";
         }
     }
 }

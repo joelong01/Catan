@@ -70,7 +70,8 @@
                         LineStackingStrategy="BaselineToBaseline" TextLineBounds="Tight" LineHeight="0">
                         <TextBlock.RenderTransform>
                             <CompositeTransform ScaleX="1.25" ScaleY="1.25" />
-                        </TextBlock.RenderTransform></TextBlock>
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
                 </Button.Content>
             </Button>
             <Ellipse Margin="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -441,7 +442,8 @@
                                 HorizontalTextAlignment="Center">
                                 <TextBlock.RenderTransform>
                                     <CompositeTransform Rotation="180" TranslateY="-3" />
-                                </TextBlock.RenderTransform></TextBlock>
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
                         </StackPanel>
                     </Viewbox>
                     <Viewbox Grid.Row="1" Grid.Column="1" Margin="5">

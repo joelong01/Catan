@@ -13,20 +13,15 @@ using System.Threading.Tasks;
 using Catan.Proxy;
 
 using Windows.Storage;
+using Windows.System.Diagnostics;
 
 namespace Catan10
 {
     internal class Stacks : INotifyPropertyChanged
     {
-        #region Fields
-
         private readonly Stack<LogHeader> DoneStack = new Stack<LogHeader>();
         private readonly Queue<LogHeader> PendingQueue = new Queue<LogHeader>();
         private readonly Stack<LogHeader> UndoneStack = new Stack<LogHeader>();
-
-        #endregion Fields
-
-        #region Methods
 
         //
         //  whenever we push or pop from the stack we should notify up
@@ -59,23 +54,11 @@ namespace Catan10
             Debug.WriteLine(undoLine + "\n");
         }
 
-        #endregion Methods
-
-        #region Constructors
-
         public Stacks()
         {
         }
 
-        #endregion Constructors
-
-        #region Events
-
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
-
-        #region Properties
 
         public static bool PrintLogFlag { get; set; } = false;
         public int ActionCount => DoneStack.Count;
@@ -110,8 +93,6 @@ namespace Catan10
                 return null;
             }
         }
-
-        #endregion Properties
 
         public void ClearUndo()
         {
@@ -166,26 +147,14 @@ namespace Catan10
 
     public class Log : INotifyPropertyChanged, IDisposable
     {
-        #region Fields
-
         private readonly Stacks Stacks = new Stacks();
         private bool _writing = false;
 
-        #endregion Fields
-
-        #region Properties
-
         private ConcurrentQueue<CatanMessage> MessageLog { get; } = new ConcurrentQueue<CatanMessage>();
-
         private string SaveFileName { get; set; }
-
         private Timer Timer { get; set; }
-
         private bool UpdateLogFlag { get; set; } = false;
-
-        #endregion Properties
-
-        #region Methods
+        public CatanAction LastAction => Stacks.PeekAction.Action;
 
         private string GetJson()
         {
@@ -272,10 +241,6 @@ namespace Catan10
             MessageLog.Enqueue(message);
         }
 
-        #endregion Methods
-
-        #region Constructors
-
         public Log(IGameController gameController)
         {
             Stacks.PropertyChanged += Stacks_PropertyChanged;
@@ -290,15 +255,9 @@ namespace Catan10
             Timer = new Timer(OnSaveTimer, this, 10 * 1000, Timeout.Infinite);
         }
 
-        #endregion Constructors
-
-        #region Events
-
         public event PropertyChangedEventHandler LogChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
 
         public bool CanRedo => Stacks.CanRedo;
         public bool CanUndo => Stacks.CanUndo;

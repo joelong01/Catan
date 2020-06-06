@@ -77,7 +77,6 @@ namespace Catan10
     public interface IGameController
     {
         bool AutoRespondAndTheHuman { get; }
-
         CatanGames CatanGame { get; set; }
 
         /// <summary>
@@ -91,8 +90,8 @@ namespace Catan10
         PlayerModel CurrentPlayer { get; set; }
 
         List<int> CurrentRandomGoldTiles { get; }
-
         GameContainerCtrl GameContainer { get; }
+        CatanGameData GameData { get; }
         List<int> HighlightedTiles { get; }
 
         bool IsServiceGame { get; }

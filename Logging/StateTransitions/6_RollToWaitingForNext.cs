@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
+using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
@@ -93,11 +95,53 @@ namespace Catan10
 
             if (rollLog.LastRoll == 7)
             {
-                await WaitingForNextToMustMoveBaron.PostLog(gameController);
                 //
-                //  need to update statistics
+                //  we explicity discard before we target!
+
+                if (gameController.TheHuman.GameData.Resources.Current.Count > 7)
+                {
+                    gameController.TheHuman.GameData.Resources.ResourcesThisTurn = new TradeResources();
+                    int loss = (int)gameController.TheHuman.GameData.Resources.Current.Count / 2;
+                    TradeResources lost = new TradeResources();
+                    ResourceCardCollection source = new ResourceCardCollection();
+                    source.InitalizeResources(gameController.TheHuman.GameData.Resources.Current);
+                    TakeCardDlg dlg = new TakeCardDlg()
+                    {
+                        To = gameController.MainPageModel.Bank,
+                        From = gameController.TheHuman,
+                        SourceOrientation = TileOrientation.FaceUp,
+                        HowMany = loss,
+                        Source = source,
+                        Destination = new ResourceCardCollection(),
+                        Instructions = $"Give {loss} cards to the bank."
+                    };
+                    var ret = await dlg.ShowAsync();
+                    if (ret == ContentDialogResult.Primary)
+                    {
+                        lost = ResourceCardCollection.ToTradeResources(dlg.Destination);
+                    }
+                    else
+                    {
+                        await StaticHelpers.ShowErrorText($"Since you cancelled out of the dialog (I assume it was you Dodgy) the game will now pick {loss} random cards.", "Catan");
+                        var list = gameController.TheHuman.GameData.Resources.Current.ToList();
+                        Random rand = new Random((int)DateTime.Now.Ticks);
+
+                        for (int i = 0; i < loss; i++)
+                        {
+                            int index = rand.Next(list.Count);
+                            lost.Add(list[index], 1);
+                            list.RemoveAt(index);
+                        }
+                    }
+
+                    Contract.Assert(lost.Count == loss);
+                    gameController.TheHuman.GameData.Resources.GrantResources(lost.GetNegated());
+                    gameController.TheHuman.GameData.Resources.ResourcesLostSeven += lost;
+                }
+
+                await WaitingForNextToMustMoveBaron.PostLog(gameController);
+
                 //  need to provide a way to take a player's card
-                //  go through all the players and if the have > 7 resources, provide a way to give 1/2 to the bank
             }
         }
 

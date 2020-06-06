@@ -32,9 +32,6 @@ namespace Catan10
             }
         }
 
-        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(RollCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
-        public static readonly DependencyProperty RollProperty = DependencyProperty.Register("Roll", typeof(RollModel), typeof(RollCtrl), new PropertyMetadata(new RollModel()));
-
         public TileOrientation Orientation
         {
             get => (TileOrientation)GetValue(OrientationProperty);
@@ -46,6 +43,9 @@ namespace Catan10
             get => (RollModel)GetValue(RollProperty);
             set => SetValue(RollProperty, value);
         }
+
+        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(RollCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
+        public static readonly DependencyProperty RollProperty = DependencyProperty.Register("Roll", typeof(RollModel), typeof(RollCtrl), new PropertyMetadata(new RollModel()));
 
         public RollCtrl()
         {
@@ -68,6 +68,7 @@ namespace Catan10
 
     public class RollModel : INotifyPropertyChanged
     {
+        static private MersenneTwister Twist { get; } = new MersenneTwister((int)DateTime.Now.Ticks);
         private int _diceOne = 2;
 
         private int _diceTwo = 5;
@@ -76,14 +77,10 @@ namespace Catan10
 
         private bool _selected = false;
 
-        static private MersenneTwister Twist { get; } = new MersenneTwister((int)DateTime.Now.Ticks);
-
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public int DiceOne
         {
@@ -162,6 +159,8 @@ namespace Catan10
         {
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public void Randomize()
         {
             DiceOne = Twist.Next(1, 7);
@@ -171,7 +170,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return $"[Roll={Roll}][One={DiceOne}][Two={DiceTwo}][Selected={Selected}][Orientation={Orientation}]";
+            return $"[Selected={Selected}][Roll={Roll}][One={DiceOne}][Two={DiceTwo}][Orientation={Orientation}]";
         }
     }
 }

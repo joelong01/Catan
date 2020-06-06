@@ -68,8 +68,6 @@ namespace Catan10
         private void SetPlayer(PlayerModel value)
         {
             if (value == null) return;
-
-            this.TraceMessage($"Added Player {value}");
         }
 
         private void SetRollOrientation(TileOrientation oldValue, TileOrientation newValue)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -14,14 +15,16 @@ namespace Catan10
     /// </summary>
     public class WaitingForNextToWaitingForRoll : LogHeader, ILogController
     {
-        private RollState RollState { get; set; }
+        public TradeResources ResourcesThisTurn { get; set; }
+        public RollState RollState { get; set; }
 
         public static async Task PostLog(IGameController gameController)
         {
+            var rollState = gameController.GetNextRollState();
             WaitingForNextToWaitingForRoll logHeader = new WaitingForNextToWaitingForRoll()
             {
                 CanUndo = true,
-                RollState = gameController.GetNextRollState(),
+                RollState = rollState,
                 ResourcesThisTurn = gameController.CurrentPlayer.GameData.Resources.ResourcesThisTurn,
                 Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForRoll,
@@ -37,13 +40,13 @@ namespace Catan10
 
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
             ChangePlayerHelper.ChangePlayer(gameController, 1);
-
+            Debug.Assert(this.RollState != null);
             await gameController.ResetRollControl();
-            await gameController.SetRandomTileToGold(this.RollState.GoldTiles);
+
             await gameController.PushRollState(this.RollState);
             //
             // if we have a roll for this turn already, use it.
-            if (this.RollState.Rolls.Count > 0)
+            if (this.RollState.Rolls != null && this.RollState.Rolls.Count > 0)
             {
                 await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRolls);
             }
@@ -72,7 +75,5 @@ namespace Catan10
                 await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRolls);
             }
         }
-
-        public TradeResources ResourcesThisTurn { get; set; }
     }
 }

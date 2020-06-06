@@ -58,6 +58,25 @@ namespace Catan10
             }
         }
 
+        private async void OnGrantEntitlements(object sender, RoutedEventArgs e)
+        {
+            await TestGrantEntitlementMessage();
+        }
+
+        private async void OnGrantResources(object sender, RoutedEventArgs e)
+        {
+            TradeResources tr = new TradeResources()
+            {
+                Sheep = 3,
+                Wheat = 3,
+                Ore = 3,
+                Brick = 3,
+                Wood = 3
+            };
+
+            await TestGrantEntitlements.Post(this, tr, new List<Entitlement>(), new List<DevCardType>());
+        }
+
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {

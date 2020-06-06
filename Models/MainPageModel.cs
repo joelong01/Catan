@@ -14,7 +14,7 @@ namespace Catan10
 {
     public class MainPageModel : INotifyPropertyChanged
     {
-        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo" };
+        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
 
         private bool _EnableUiInteraction = true;
 
@@ -125,7 +125,7 @@ namespace Catan10
                         return ret;
                     }
 
-                    if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll)
+                    if (state == GameState.WaitingForNext)
                     {
                         ret = (MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer); // only the person whose turn it is can hit "Next"
                         return ret;
@@ -272,6 +272,8 @@ namespace Catan10
 
         [JsonIgnore]
         public PlayerModel GameStartedBy { get; internal set; }
+
+        public GameState GameState => Log.GameState;
 
         public string HostName
         {

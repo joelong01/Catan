@@ -14,30 +14,14 @@ namespace Catan10
 {
     public class DevCardModel : INotifyPropertyChanged
     {
+        private DevCardType _devCardType = DevCardType.None;
+
+        private bool _played = false;
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private DevCardType _devCardType = DevCardType.None;
-        private bool _played = false;
-
-        public static Brush DevCardTypeToImage(DevCardType devCardType)
-        {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
-            {
-                return new SolidColorBrush(Colors.AliceBlue);
-            }
-
-            string key = "DevCardType." + devCardType.ToString();
-            if (devCardType == DevCardType.Back || devCardType == DevCardType.None)
-            {
-                return App.Current.Resources["DevCardType.Back"] as ImageBrush;
-            }
-            return App.Current.Resources[key] as ImageBrush;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public DevCardType DevCardType
         {
@@ -70,35 +54,73 @@ namespace Catan10
                 }
             }
         }
+
+        public DevCardModel Self => this;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public static Brush DevCardTypeToImage(DevCardType devCardType)
+        {
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+                return new SolidColorBrush(Colors.AliceBlue);
+            }
+
+            string key = "DevCardType." + devCardType.ToString();
+            if (devCardType == DevCardType.Back || devCardType == DevCardType.None)
+            {
+                return App.Current.Resources["DevCardType.Back"] as ImageBrush;
+            }
+            return App.Current.Resources[key] as ImageBrush;
+        }
     }
 
     public class PlayerResources : INotifyPropertyChanged
     {
+        private int _Cities = 0;
+
+        private TradeResources _currentResources = new TradeResources();
+
+        private int _GoldTotal = 0;
+
+        private int _knightsPlayed = 0;
+
+        private int _PlayedMonopoly = 0;
+
+        private int _PlayedRoadBuilding = 0;
+
+        private int _PlayedYearOfPlenty = 0;
+
+        private TradeResources _resourcesLostSeven = new TradeResources();
+
+        private TradeResources _resourcesLostToBaron = new TradeResources();
+
+        private TradeResources _resourcesLostToMonopoly = new TradeResources();
+
+        private TradeResources _resourcesThisTurn = new TradeResources();
+
+        private int _Roads = 0;
+
+        private int _Settlements = 0;
+
+        private DevCardType _thisTurnsDevCard = DevCardType.None;
+
+        private int _TotalDevCards = 0;
+
+        private TradeResources _totalResources = new TradeResources();
+
+        private int _UnplayedKnights = 0;
+
+        private int _UnplayedMonopoly = 0;
+
+        private int _UnplayedYearOfPlenty = 0;
+
+        private int _VictoryPoints = 0;
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private int _Cities = 0;
-        private TradeResources _currentResources = new TradeResources();
-        private int _GoldTotal = 0;
-        private int _knightsPlayed = 0;
-        private int _PlayedMonopoly = 0;
-        private int _PlayedRoadBuilding = 0;
-        private int _PlayedYearOfPlenty = 0;
-        private TradeResources _resourcesLostSeven = new TradeResources();
-        private TradeResources _resourcesLostToBaron = new TradeResources();
-        private TradeResources _resourcesLostToMonopoly = new TradeResources();
-        private TradeResources _resourcesThisTurn = new TradeResources();
-        private int _Roads = 0;
-        private int _Settlements = 0;
-        private DevCardType _thisTurnsDevCard = DevCardType.None;
-        private int _TotalDevCards = 0;
-        private TradeResources _totalResources = new TradeResources();
-        private int _UnplayedKnights = 0;
-        private int _UnplayedMonopoly = 0;
-        private int _UnplayedYearOfPlenty = 0;
-        private int _VictoryPoints = 0;
 
         internal void ConsumeEntitlement(Entitlement entitlement)
         {
@@ -110,114 +132,6 @@ namespace Catan10
         {
             this.ConsumeEntitlement(entitlement);
         }
-
-        public void AddDevCard(DevCardType devCardType)
-        {
-            DevCardModel model = new DevCardModel() { DevCardType = devCardType };
-            NewDevCards.Add(model);
-        }
-
-        public bool CanAfford(Entitlement entitlement)
-        {
-            TradeResources cost = TradeResources.GetEntitlementCost(entitlement);
-            Contract.Assert(cost != null);
-            foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
-            {
-                if (cost.CountForResource(resourceType) > this.Current.CountForResource(resourceType))
-                    return false;
-            }
-
-            return true;
-        }
-
-        //        default:
-        //            break;
-        //    }
-        //}
-        public bool Equivalent(TradeResources tradeResources)
-        {
-            this.Current.Equivalent(tradeResources);
-            return true;
-        }
-
-        //        case DevCardType.Unknown:
-        //        case DevCardType.Back:
-        //            Contract.Assert(false, "don't pass that parameter");
-        //            break;
-        public void GrantEntitlement(Entitlement entitlement)
-        {
-            UnspentEntitlements.Add(entitlement);
-        }
-
-        //        case DevCardType.Monopoly:
-        //            UnplayedMonopoly++;
-        //            break;
-        public void GrantResources(TradeResources tr)
-        {
-            Current += tr;
-            ResourcesThisTurn += tr;
-            ResourcesThisTurn2.AddResources(tr);
-            TotalResources += tr;
-            MainPage.Current.MainPageModel.GameResources += tr;
-            TotalResourcesCollection.AddResources(tr);
-
-            NotifyPropertyChanged("PlayerResources");
-            NotifyPropertyChanged("Current");
-            NotifyPropertyChanged("ResourcesThisTurn");
-            NotifyPropertyChanged("TotalResources");
-            NotifyPropertyChanged("EnabledEntitlementPurchase");
-        }
-
-        //        case DevCardType.RoadBuilding:
-        //            UnplayedRoadBuilding++;
-        //            break;
-        public bool HasEntitlement(Entitlement entitlement)
-        {
-            return UnspentEntitlements.Contains(entitlement);
-        }
-
-        //        case DevCardType.YearOfPlenty:
-        //            UnplayedYearOfPlenty++;
-        //            break;
-        public void MakeDevCardsAvailable()
-        {
-            NewDevCards.ForEach((dc) => AvailableDevCards.Add(dc));
-            NewDevCards.Clear();
-        }
-
-        //        case DevCardType.VictoryPoint:
-        //            VictoryPoints++;
-        //            break;
-        public bool PlayDevCard(DevCardType devCardType)
-        {
-            for (int i = AvailableDevCards.Count - 1; i >= 0; i--)
-            {
-                DevCardModel card = AvailableDevCards[i];
-                if (card.DevCardType == devCardType)
-                {
-                    PlayedDevCards.Add(card);
-                    AvailableDevCards.RemoveAt(i);
-                    PlayedThisTurn = card.DevCardType;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        // the list of cards that have been played.  this is public information!
-        public override string ToString()
-        {
-            return $"[Total={Current}][Ore={Current.Ore}][Brick={Current.Brick}][Wheat={Current.Wheat}][Wood={Current.Wood}][Sheep={Current.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
-        }
-
-        public PlayerResources()
-        {
-            ResourcesThisTurn2.InitWithAllResources();
-            ResourcesThisTurn2.Add(ResourceType.GoldMine);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<DevCardModel> AvailableDevCards { get; set; } = new ObservableCollection<DevCardModel>();
 
@@ -283,7 +197,9 @@ namespace Catan10
         }
 
         public int KnightsPlayed1 { get => this.KnightsPlayed; set => this.KnightsPlayed = value; }
+
         public ObservableCollection<DevCardModel> NewDevCards { get; set; } = new ObservableCollection<DevCardModel>();
+
         public ObservableCollection<DevCardModel> PlayedDevCards { get; set; } = new ObservableCollection<DevCardModel>();
 
         public int PlayedMonopoly
@@ -551,6 +467,117 @@ namespace Catan10
         }
 
         public DevCardType PlayedThisTurn;
+
+        public PlayerResources()
+        {
+            ResourcesThisTurn2.InitWithAllResources();
+            ResourcesThisTurn2.Add(ResourceType.GoldMine);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void AddDevCard(DevCardType devCardType)
+        {
+            DevCardModel model = new DevCardModel() { DevCardType = devCardType };
+            NewDevCards.Add(model);
+        }
+
+        public bool CanAfford(Entitlement entitlement)
+        {
+            TradeResources cost = TradeResources.GetEntitlementCost(entitlement);
+            Contract.Assert(cost != null);
+            foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
+            {
+                if (cost.CountForResource(resourceType) > this.Current.CountForResource(resourceType))
+                    return false;
+            }
+
+            return true;
+        }
+
+        //        default:
+        //            break;
+        //    }
+        //}
+        public bool Equivalent(TradeResources tradeResources)
+        {
+            this.Current.Equivalent(tradeResources);
+            return true;
+        }
+
+        //        case DevCardType.Unknown:
+        //        case DevCardType.Back:
+        //            Contract.Assert(false, "don't pass that parameter");
+        //            break;
+        public void GrantEntitlement(Entitlement entitlement)
+        {
+            UnspentEntitlements.Add(entitlement);
+        }
+
+        //        case DevCardType.Monopoly:
+        //            UnplayedMonopoly++;
+        //            break;
+        public void GrantResources(TradeResources tr)
+        {
+            Current += tr;
+            ResourcesThisTurn += tr;
+            ResourcesThisTurn2.AddResources(tr);
+            if (tr.Count > 0)
+            {
+                TotalResources += tr;
+                MainPage.Current.MainPageModel.GameResources += tr;
+                TotalResourcesCollection.AddResources(tr);
+            }
+            NotifyPropertyChanged("PlayerResources");
+            NotifyPropertyChanged("Current");
+            NotifyPropertyChanged("ResourcesThisTurn");
+            NotifyPropertyChanged("TotalResources");
+            NotifyPropertyChanged("EnabledEntitlementPurchase");
+        }
+
+        //        case DevCardType.RoadBuilding:
+        //            UnplayedRoadBuilding++;
+        //            break;
+        public bool HasEntitlement(Entitlement entitlement)
+        {
+            return UnspentEntitlements.Contains(entitlement);
+        }
+
+        //        case DevCardType.YearOfPlenty:
+        //            UnplayedYearOfPlenty++;
+        //            break;
+        public void MakeDevCardsAvailable()
+        {
+            NewDevCards.ForEach((dc) => AvailableDevCards.Add(dc));
+            NewDevCards.Clear();
+        }
+
+        //        case DevCardType.VictoryPoint:
+        //            VictoryPoints++;
+        //            break;
+        public bool PlayDevCard(DevCardType devCardType)
+        {
+            for (int i = AvailableDevCards.Count - 1; i >= 0; i--)
+            {
+                DevCardModel card = AvailableDevCards[i];
+                if (card.DevCardType == devCardType)
+                {
+                    PlayedDevCards.Add(card);
+                    AvailableDevCards.RemoveAt(i);
+                    PlayedThisTurn = card.DevCardType;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // the list of cards that have been played.  this is public information!
+        public override string ToString()
+        {
+            return $"[Total={Current}][Ore={Current.Ore}][Brick={Current.Brick}][Wheat={Current.Wheat}][Wood={Current.Wood}][Sheep={Current.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
+        }
+
         //public void AddDevCard(DevCardType devCard)
         //{
         //    switch (devCard)

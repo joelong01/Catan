@@ -10,13 +10,7 @@ namespace Catan10
     /// </summary>
     public class PurchaseLog : LogHeader, ILogController
     {
-        #region Properties
-
         public Entitlement PurchasedEntitlement { get; set; }
-
-        #endregion Properties
-
-        #region Methods
 
         public static async Task PostLog(IGameController gameController, PlayerModel player, Entitlement entitlement)
         {
@@ -45,8 +39,13 @@ namespace Catan10
                     player.GameData.Resources.Current += cost; //refund!
                     return Task.CompletedTask;
                 }
+
+                player.GameData.Resources.AddDevCard(devCard);
             }
-            player.GameData.Resources.GrantEntitlement(PurchasedEntitlement);
+            else
+            {
+                player.GameData.Resources.GrantEntitlement(PurchasedEntitlement);
+            }
             return Task.CompletedTask;
         }
 
@@ -63,11 +62,9 @@ namespace Catan10
             Contract.Assert(PurchasedEntitlement != Entitlement.DevCard);
             var cost = TradeResources.GetEntitlementCost(PurchasedEntitlement);
             player.GameData.Resources.Current += cost;
-            player.GameData.Resources.GrantEntitlement(PurchasedEntitlement);
-            player.GameData.Resources.UnspentEntitlements.Remove(PurchasedEntitlement);
+            player.GameData.Resources.RevokeEntitlement(PurchasedEntitlement);
+
             return Task.CompletedTask;
         }
-
-        #endregion Methods
     }
 }

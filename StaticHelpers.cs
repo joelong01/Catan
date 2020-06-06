@@ -84,6 +84,8 @@ namespace Catan10
 
     public static class StaticHelpers
     {
+        public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
+
         public static void AddRange<T>(this ObservableCollection<T> oc, IEnumerable<T> collection)
         {
             if (collection == null)
@@ -421,9 +423,13 @@ namespace Catan10
             return animationTimeInMs;
         }
 
-        public static async Task ShowErrorText(string s)
+        public static async Task ShowErrorText(string s, string title)
         {
-            MessageDialog dlg = new MessageDialog(s);
+            MessageDialog dlg = new MessageDialog(s)
+            {
+                Title = title
+            };
+
             await dlg.ShowAsync();
         }
 
@@ -487,18 +493,17 @@ namespace Catan10
             return false;
         }
 
-        public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
-
         public class KeyValuePair
         {
+            public string Key { get; set; }
+
+            public string Value { get; set; }
+
             public KeyValuePair(string key, string value)
             {
                 Key = key;
                 Value = value;
             }
-
-            public string Key { get; set; }
-            public string Value { get; set; }
         }
 
         //
@@ -513,11 +518,11 @@ namespace Catan10
 
     public class EnumDescription : Attribute
     {
+        public string Description { get; }
+
         public EnumDescription(string description)
         {
             Description = description;
         }
-
-        public string Description { get; }
     }
 }

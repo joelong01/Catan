@@ -12,16 +12,10 @@ namespace Catan10
     /// </summary>
     public class RoadRaceTracking
     {
-        #region Fields
-
         // we can make lots of little changes - instead of logging all of them, we log at the end of them
         private string _beginState = "";
 
         private IGameController GameController = null;
-
-        #endregion Fields
-
-        #region Methods
 
         internal void BeginChanges()
         {
@@ -35,16 +29,7 @@ namespace Catan10
             {
                 return;
             }
-
-            if (Log != null)
-            {
-                //  _log.PostLogEntry(player, gameState, CatanAction.RoadTrackingChanged, false, logType, -1, new LogRoadTrackingChanged(_beginState, newState));
-            }
         }
-
-        #endregion Methods
-
-        #region Constructors
 
         public RoadRaceTracking(IGameController gameController)
         {
@@ -55,21 +40,11 @@ namespace Catan10
         {
         }
 
-        #endregion Constructors
-
-        #region Properties
-
-        //
-        //  i'm trying to have the class take care of its own logging when state changes
-        private Log Log => GameController.Log;
-
         //
         //  given a road count, get the ordered list of players that have that many roads
         //  First() will be the one that got their first.
         //
         public Dictionary<string, List<PlayerModel>> RaceDictionary { get; set; } = new Dictionary<string, List<PlayerModel>>();
-
-        #endregion Properties
 
         public static RoadRaceTracking Deserialize(string json)
         {

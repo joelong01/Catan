@@ -14,6 +14,8 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
+        private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
+
         private async Task UpdateUiForState(GameState currentState)
         {
             switch (currentState)
@@ -117,7 +119,51 @@ namespace Catan10
             }
         }
 
-        private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
+        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
+
+        public CatanGames CatanGame { get; set; } = CatanGames.Regular;
+
+        public GameState CurrentGameState
+        {
+            get
+            {
+                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
+
+                return MainPageModel.Log.GameState;
+            }
+        }
+
+        public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
+
+        public CatanGameData GameData => this.GameContainer.CurrentGame.GameData;
+
+        public GameInfo GameInfo => MainPageModel.ServiceGameInfo;
+
+        public List<int> HighlightedTiles
+        {
+            get
+            {
+                var list = new List<int>();
+                foreach (var tile in GameContainer.AllTiles)
+                {
+                    if (tile.Highlighted)
+                    {
+                        list.Add(tile.Index);
+                    }
+                }
+                return list;
+            }
+        }
+
+        public bool IsServiceGame => MainPageModel.IsServiceGame;
+
+        public Log Log => MainPageModel.Log;
+
+        public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
+
+        public CatanProxy Proxy => MainPageModel.Proxy;
+
+        public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
 
         /// <summary>
         ///     Called when a Player is added to a Service game
@@ -404,7 +450,7 @@ namespace Catan10
                 //  this.TraceMessage($"Sending {message}");
                 if (!ret)
                 {
-                    await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}");
+                    await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}", "Catan");
                 }
             }
             else
@@ -864,45 +910,5 @@ namespace Catan10
 
             CalculateAndSetLongestRoad(raceTracking);
         }
-
-        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
-        public CatanGames CatanGame { get; set; } = CatanGames.Regular;
-
-        public GameState CurrentGameState
-        {
-            get
-            {
-                if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
-
-                return MainPageModel.Log.GameState;
-            }
-        }
-
-        public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
-        public GameInfo GameInfo => MainPageModel.ServiceGameInfo;
-
-        public List<int> HighlightedTiles
-        {
-            get
-            {
-                var list = new List<int>();
-                foreach (var tile in GameContainer.AllTiles)
-                {
-                    if (tile.Highlighted)
-                    {
-                        list.Add(tile.Index);
-                    }
-                }
-                return list;
-            }
-        }
-
-        public bool IsServiceGame => MainPageModel.IsServiceGame;
-        public Log Log => MainPageModel.Log;
-
-        public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
-        public CatanProxy Proxy => MainPageModel.Proxy;
-
-        public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
     }
 }

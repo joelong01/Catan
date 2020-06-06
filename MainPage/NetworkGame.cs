@@ -19,11 +19,10 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-        private Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
-
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         private MessageWebSocket MessageWebSocket { get; set; }
         private DataWriter MessageWriter { get; set; }
+        private Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
 
         private async Task DeleteAllGames()
         {
@@ -299,7 +298,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message);
+                await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message, "Catan");
             }
         }
     }

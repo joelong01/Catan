@@ -135,11 +135,14 @@
     </Compile>
     <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
+    <Compile Include="Logging\Actions\LoseCardsToSeven.cs" />
     <Compile Include="Logging\Actions\PlayDevCardLog.cs" />
     <Compile Include="Logging\Actions\TestGrantEntitlements.cs" />
     <Compile Include="Logging\Actions\YearOfPlentyLog.cs" />
     <Compile Include="Logging\Helpers\AllocationPhaseHelper.cs" />
+    <Compile Include="Logging\Helpers\BaronLogHelpers.cs" />
     <Compile Include="Logging\Helpers\ChangePlayerHelper.cs" />
+    <Compile Include="Logging\StateTransitions\6c_MoveBaronToWaitingForNext.cs" />
     <Compile Include="Models\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
@@ -158,13 +161,13 @@
     <Compile Include="Logging\StateTransitions\5c_AllocateResourcesReverse.cs" />
     <Compile Include="Logging\StateTransitions\5d_AllocateResourcesReverseToSelf.cs" />
     <Compile Include="Logging\StateTransitions\5e_DoneAllocResources.cs" />
-    <Compile Include="Logging\StateTransitions\6a_WaitingForRoll.cs" />
+    <Compile Include="Logging\StateTransitions\5f_DoneAllocSkipRoll.cs" />
     <Compile Include="Logging\StateTransitions\3_RollOrder.cs" />
-    <Compile Include="Logging\StateTransitions\6b_DoneAllocResourcesToWaitingForNext.cs" />
+    <Compile Include="Logging\StateTransitions\5g_DoneAllocResourcesToWaitingForNext.cs" />
     <Compile Include="Logging\StateTransitions\8b_SupplementalToSelf.cs" />
     <Compile Include="Logging\StateTransitions\8c_SupToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\1_WaitingForPlayers.cs" />
-    <Compile Include="Logging\StateTransitions\7a_NextToMustRollBaron.cs" />
+    <Compile Include="Logging\StateTransitions\6b_NextToMustRollBaron.cs" />
     <Compile Include="Logging\StateTransitions\8a_Supplemental.cs" />
     <Compile Include="Logging\StateTransitions\7_NextToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\2_PickingBoard.cs" />
