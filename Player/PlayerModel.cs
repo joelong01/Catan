@@ -96,6 +96,29 @@ namespace Catan10
             GameData.Resources.NewDevCards.Clear();
         }
 
+        public PlayerModel()
+        {
+            if (StaticHelpers.IsInVisualStudioDesignMode)
+            {
+                BitmapImage bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/DefaultPlayers/guest.jpg", UriKind.RelativeOrAbsolute));
+                ImageBrush brush = new ImageBrush
+                {
+                    AlignmentX = AlignmentX.Left,
+                    AlignmentY = AlignmentY.Top,
+                    Stretch = Stretch.UniformToFill,
+                    ImageSource = bitmapImage
+                };
+                ImageBrush = brush;
+                _imageBrush = new ImageBrush();
+            }
+
+            GameData = new PlayerGameModel(this);
+        }
+
+        //
+        //  what time the AddPlayer message was sent
+        public DateTime AddedTime { get; set; }
+
         [JsonIgnore]
         public ObservableCollection<Brush> AvailableColors => new ObservableCollection<Brush>(CatanColors.AllAvailableBrushes());
 
@@ -286,25 +309,6 @@ namespace Catan10
             {
                 return PerceivedBrightness(PrimaryBackgroundColor) > 130 ? true : false;
             }
-        }
-
-        public PlayerModel()
-        {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
-            {
-                BitmapImage bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/DefaultPlayers/guest.jpg", UriKind.RelativeOrAbsolute));
-                ImageBrush brush = new ImageBrush
-                {
-                    AlignmentX = AlignmentX.Left,
-                    AlignmentY = AlignmentY.Top,
-                    Stretch = Stretch.UniformToFill,
-                    ImageSource = bitmapImage
-                };
-                ImageBrush = brush;
-                _imageBrush = new ImageBrush();
-            }
-
-            GameData = new PlayerGameModel(this);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

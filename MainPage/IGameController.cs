@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -183,7 +184,7 @@ namespace Catan10
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
-        public Task AddPlayer(AddPlayerLog playerLogHeader)
+        public async Task AddPlayer(AddPlayerLog playerLogHeader)
         {
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
@@ -200,10 +201,33 @@ namespace Catan10
                 playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
                 playerToAdd.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
                 playerToAdd.GameData.NotificationsEnabled = true;
-                MainPageModel.PlayingPlayers.Add(playerToAdd);
-            }
+                playerToAdd.AddedTime = playerLogHeader.Time;
+                int playerCount = MainPageModel.PlayingPlayers.Count;
 
-            return Task.CompletedTask;
+                //
+                //  insert based on the time the message was sent
+                bool added = false;
+                for (int i = 0; i < MainPageModel.PlayingPlayers.Count; i++)
+                {
+                    if (playerToAdd.AddedTime < MainPageModel.PlayingPlayers[i].AddedTime)
+                    {
+                        MainPageModel.PlayingPlayers.Insert(i, playerToAdd);
+                        added = true;
+                        break;
+                    }
+                }
+                if (!added) // put at end
+                {
+                    MainPageModel.PlayingPlayers.Add(playerToAdd);
+                }
+
+                //
+                //  if we don't have them, they might not have us
+                if (playerLogHeader.SentBy != TheHuman.PlayerName)
+                {
+                    await AddPlayerLog.AddPlayer(this, TheHuman);
+                }
+            }
         }
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)

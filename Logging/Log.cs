@@ -233,11 +233,6 @@ namespace Catan10
 
         internal void RecordMessage(CatanMessage message)
         {
-            if (MessageLog.Count > 1)
-            {
-                Contract.Assert(message.Sequence - 1 == MessageLog.Last().Sequence);
-            }
-
             MessageLog.Enqueue(message);
         }
 

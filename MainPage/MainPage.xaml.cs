@@ -829,11 +829,6 @@ namespace Catan10
             }
         }
 
-        private async void ServiceHub_OnMessageReceived(CatanMessage message)
-        {
-            await ProcessMessage(message);
-        }
-
         private async Task SetBuildingAndRoad()
         {
             // pick a tile with the highest pips and put a settlement on it

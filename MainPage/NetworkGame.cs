@@ -248,6 +248,12 @@ namespace Catan10
             //   var messages = await Proxy.
         }
 
+        private async void ServiceHub_OnMessageReceived(CatanMessage message)
+        {
+            MainPageModel.Log.RecordMessage(message);
+            await ProcessMessage(message);
+        }
+
         private async void StartMonitoring()
         {
             var proxy = MainPageModel.Proxy;
