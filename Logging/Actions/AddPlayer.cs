@@ -46,13 +46,6 @@ namespace Catan10
         public async Task Do(IGameController gameController)
         {
             await gameController.AddPlayer(this);
-
-            if (gameController.CurrentPlayer != gameController.MainPageModel.GameStartedBy)
-            {
-                //
-                //  Whoever starts the game controls the game until a first player is picked
-                await ChangePlayerLog.SetCurrentPlayer(gameController, gameController.MainPageModel.GameStartedBy);
-            }
         }
 
         public Task Redo(IGameController gameController)

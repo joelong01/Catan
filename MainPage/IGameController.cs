@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -219,6 +218,15 @@ namespace Catan10
                 if (!added) // put at end
                 {
                     MainPageModel.PlayingPlayers.Add(playerToAdd);
+                }
+                //
+                //  Whoever starts the game controls the game until a first player is picked -- this doesn't have to happen
+                //  as a message because we assume the clocks are shared
+                //
+                MainPageModel.GameStartedBy = PlayingPlayers[0];
+                if (CurrentPlayer != MainPageModel.GameStartedBy)
+                {
+                    CurrentPlayer = MainPageModel.GameStartedBy;
                 }
 
                 //
