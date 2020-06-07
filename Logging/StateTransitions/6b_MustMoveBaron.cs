@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -7,28 +8,30 @@ using Catan.Proxy;
 namespace Catan10
 {
     /// <summary>
-    ///     this sets the state to M
+    ///
     /// </summary>
 
-    public class MustMoveBaronToWaitingForNext : LogHeader, ILogController
+    public class MoveBaronLog : LogHeader, ILogController
     {
         public BaronModel BaronModel { get; set; }
 
         public static async Task PostLog(IGameController gameController, PlayerModel victim, int targetTileIndex, int previousIndex, TargetWeapon weapon)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.MustMoveBaron);
+            GameState previousState = gameController.MainPageModel.Log.PeekAction.OldState;
+            Debug.Assert(((MustMoveBaronLog)gameController.MainPageModel.Log.PeekAction).StartingState == previousState);
 
-            MustMoveBaronToWaitingForNext logHeader = new MustMoveBaronToWaitingForNext()
+            MoveBaronLog logHeader = new MoveBaronLog()
             {
                 CanUndo = true,
-                Action = CatanAction.AssignedBaron,
-                NewState = GameState.WaitingForNext,
+                Action = CatanAction.MovingBaron,
+                NewState = previousState,
                 BaronModel = new BaronModel()
                 {
                     Victim = (victim == null) ? "" : victim.PlayerName,
                     Weapon = weapon,
                     PreviousTile = previousIndex,
-                    TargetTile = targetTileIndex
+                    TargetTile = targetTileIndex,
                 }
             };
 
@@ -73,7 +76,10 @@ namespace Catan10
             var previousTile = gameController.TileFromIndex(this.BaronModel.PreviousTile);
             var weapon = this.BaronModel.Weapon;
 
-            targetPlayer.GameData.TimesTargeted--;
+            if (targetPlayer != null)
+            {
+                targetPlayer.GameData.TimesTargeted--;
+            }
 
             if (weapon == TargetWeapon.PirateShip)
             {

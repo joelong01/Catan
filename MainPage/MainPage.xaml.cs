@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        private CatanSignalRClient ServiceHub { get; set; }
+
         private const int MAX_SAVE_FILES_RETAINED = 5;
 
         private const int SMALLEST_STATE_COUNT = 8;
@@ -72,6 +75,16 @@ namespace Catan10
             pData.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
 
             return Task.CompletedTask;
+        }
+
+        private async Task ConnectToServiceHub()
+        {
+            //string serviceUrl = "http://localhost:53353/ChatHub";
+            // string serviceUrl = "http://localhost:5000/catan";
+            string serviceUrl = "https://jdlgameservice.azurewebsites.net/catan";
+            ServiceHub = new CatanSignalRClient(serviceUrl);
+            await ServiceHub.StartConnection();
+            ServiceHub.OnMessageReceived += ServiceHub_OnMessageReceived;
         }
 
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -250,7 +263,7 @@ namespace Catan10
                     {
                         AllPlayers = list,
                         Settings = new Settings(),
-                        HostName = "http://192.168.1.128:5000",
+                        HostName = "https://jdlgameservice.azurewebsites.net/",
                         TheHuman = "",
                     };
 
@@ -816,6 +829,11 @@ namespace Catan10
             }
         }
 
+        private async void ServiceHub_OnMessageReceived(CatanMessage message)
+        {
+            await ProcessMessage(message);
+        }
+
         private async Task SetBuildingAndRoad()
         {
             // pick a tile with the highest pips and put a settlement on it
@@ -883,7 +901,17 @@ namespace Catan10
 
             InitTest();
             ResetDataForNewGame();
-            await WsConnect();
+            await ConnectToServiceHub();
+            //  await WsConnect();
+        }
+
+        public MainPage()
+        {
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            this.InitializeComponent();
+            Current = this;
+            this.DataContext = this;
+            _raceTracking = new RoadRaceTracking(this);
         }
 
         // this lets you double tap a map and then move it around
@@ -924,15 +952,6 @@ namespace Catan10
         public static readonly string SAVED_GAME_EXTENSION = ".log.json";
 
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
-
-        public MainPage()
-        {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-            this.InitializeComponent();
-            Current = this;
-            this.DataContext = this;
-            _raceTracking = new RoadRaceTracking(this);
-        }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
         {

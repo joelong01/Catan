@@ -446,12 +446,13 @@ namespace Catan10
             };
             if (MainPageModel.IsServiceGame)
             {
-                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
-                //  this.TraceMessage($"Sending {message}");
-                if (!ret)
-                {
-                    await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}", "Catan");
-                }
+                await ServiceHub.SendMessage(TheHuman.PlayerName, message);
+                //bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
+                ////  this.TraceMessage($"Sending {message}");
+                //if (!ret)
+                //{
+                //    await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}", "Catan");
+                //}
             }
             else
             {
@@ -673,6 +674,8 @@ namespace Catan10
 
         public async Task TellServiceGameStarted()
         {
+            if (Proxy == null) return;
+
             await Proxy.StartGame(MainPageModel.ServiceGameInfo);
         }
 

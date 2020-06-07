@@ -26,7 +26,7 @@ namespace Catan10
         DoneSupplemental,
         DoneResourceAllocation,
         RolledSeven,
-        AssignedBaron,
+        MovingBaron,
         UpdatedRoadState,
         UpdateBuildingState,
         AssignedPirateShip,
@@ -154,6 +154,8 @@ namespace Catan10
     }
 
     public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo, Redo };
+
+    public enum MoveBaronReason { PlayedDevCard, Rolled7 };
 
     public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea };
 

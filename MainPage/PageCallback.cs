@@ -1042,20 +1042,12 @@ namespace Catan10
         //
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
-            bool playingKnight = MainPageModel.Log.LastAction != CatanAction.RolledSeven;
+            MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
+            if (log == null) return; // probably the wrong state
 
-            if (CurrentGameState != GameState.MustMoveBaron && CurrentGameState != GameState.WaitingForNext &&
-               CurrentGameState != GameState.WaitingForRoll)
-            {
-                return;
-            }
+            bool playingKnight = log.Reason == MoveBaronReason.PlayedDevCard;
 
-            //
-            //  must have an entitlement to play before roll
-            if (CurrentGameState == GameState.WaitingForRoll && playingKnight == false)
-            {
-                return;
-            }
+            this.TraceMessage($"PlayingKnight = {playingKnight}");
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
 
@@ -1066,15 +1058,7 @@ namespace Catan10
             async void Baron_MenuClicked(object s, RoutedEventArgs e)
             {
                 PlayerModel player = (PlayerModel)((MenuFlyoutItem)s).Tag;
-                await MustMoveBaronToWaitingForNext.PostLog(this, player, targetTile.Index, weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index, weapon);
-            }
-
-            //
-            //  I made this a local function to capture the stack variables.
-            async void KnightPlayed_MenuClicked(object s, RoutedEventArgs e)
-            {
-                PlayerModel player = (PlayerModel)((MenuFlyoutItem)s).Tag;
-                await PlayKnightLog.PostLog(this, player, targetTile.Index, weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index, weapon);
+                await MoveBaronLog.PostLog(this, player, targetTile.Index, weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index, weapon);
             }
 
             _menuBaron.Items.Clear();
@@ -1112,19 +1096,21 @@ namespace Catan10
                     }
                     if (!found)
                     {
+                        if (playingKnight)
+                        {
+                            s = "Playing Knight to Target: " + s;
+                        }
+                        else
+                        {
+                            s = "Targetting " + s;
+                        }
+
                         item = new MenuFlyoutItem
                         {
                             Text = s,
                             Tag = road.Owner
                         };
-                        if (playingKnight)
-                        {
-                            item.Click += KnightPlayed_MenuClicked;
-                        }
-                        else
-                        {
-                            item.Click += Baron_MenuClicked;
-                        }
+                        item.Click += Baron_MenuClicked;
                         _menuBaron.Items.Add(item);
                     }
                 }
@@ -1162,19 +1148,15 @@ namespace Catan10
                     }
                     if (!found)  // this is so we only add each person once in case they have multiple settlements on the same tile
                     {
-                        item = new MenuFlyoutItem
-                        {
-                            Text = s,
-                            Tag = settlement.Owner
-                        };
                         if (playingKnight)
                         {
-                            item.Click += KnightPlayed_MenuClicked;
+                            s = "Playing Knight to Target: " + s;
                         }
                         else
                         {
-                            item.Click += Baron_MenuClicked;
+                            s = "Targetting " + s;
                         }
+                        item.Click += Baron_MenuClicked;
                         _menuBaron.Items.Add(item);
                     }
                 }

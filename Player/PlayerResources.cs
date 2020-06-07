@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
+
 using Windows.UI;
-using Windows.UI.WebUI;
 using Windows.UI.Xaml.Media;
-using Windows.Web.AtomPub;
 
 namespace Catan10
 {
@@ -103,7 +100,7 @@ namespace Catan10
 
         private int _Settlements = 0;
 
-        private DevCardType _thisTurnsDevCard = DevCardType.None;
+        private DevCardModel _thisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None };
 
         private int _TotalDevCards = 0;
 
@@ -348,7 +345,7 @@ namespace Catan10
             }
         }
 
-        public DevCardType ThisTurnsDevCard
+        public DevCardModel ThisTurnsDevCard
         {
             get
             {
@@ -466,8 +463,6 @@ namespace Catan10
             }
         }
 
-        public DevCardType PlayedThisTurn;
-
         public PlayerResources()
         {
             ResourcesThisTurn2.InitWithAllResources();
@@ -564,7 +559,7 @@ namespace Catan10
                 {
                     PlayedDevCards.Add(card);
                     AvailableDevCards.RemoveAt(i);
-                    PlayedThisTurn = card.DevCardType;
+                    ThisTurnsDevCard = card;
                     return true;
                 }
             }

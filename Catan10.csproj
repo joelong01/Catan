@@ -150,7 +150,7 @@
     <Compile Include="MainPage\NetworkGame.cs" />
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\webSocket.cs" />
-    <Compile Include="Logging\Actions\PlayKnight.cs" />
+    <Compile Include="Logging\Actions\MustMoveBaron.cs" />
     <Compile Include="Logging\Actions\PurchaseLog.cs" />
     <Compile Include="Logging\StateTransitions\playeDevCard.cs" />
     <Compile Include="Logging\Actions\randomizedBoard.cs" />
@@ -167,7 +167,7 @@
     <Compile Include="Logging\StateTransitions\8b_SupplementalToSelf.cs" />
     <Compile Include="Logging\StateTransitions\8c_SupToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\1_WaitingForPlayers.cs" />
-    <Compile Include="Logging\StateTransitions\6b_NextToMustRollBaron.cs" />
+    <Compile Include="Logging\StateTransitions\6b_MustMoveBaron.cs" />
     <Compile Include="Logging\StateTransitions\8a_Supplemental.cs" />
     <Compile Include="Logging\StateTransitions\7_NextToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\2_PickingBoard.cs" />
@@ -187,6 +187,7 @@
     <Compile Include="Logging\StateTransitions\0_NewGame.cs" />
     <Compile Include="Player\PlayerResources.cs" />
     <Compile Include="Player\TradeResources.cs" />
+    <Compile Include="SignalR\CatanSignalRClient.cs" />
     <Compile Include="State\GridPosition.cs" />
     <Compile Include="State\TargetTracking.cs" />
     <Compile Include="Logging\StateTransitions\UpdateRoadState.cs" />
@@ -545,10 +546,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.5.21.62105</Version>
+      <Version>2020.6.4.140554</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client">
+      <Version>3.1.4</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.10</Version>

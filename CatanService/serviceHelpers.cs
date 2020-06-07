@@ -42,7 +42,7 @@ namespace Catan10
                 case CatanAction.RolledSeven:
                     break;
 
-                case CatanAction.AssignedBaron:
+                case CatanAction.MovingBaron:
                     break;
 
                 case CatanAction.UpdatedRoadState:

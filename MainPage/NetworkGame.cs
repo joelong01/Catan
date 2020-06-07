@@ -22,10 +22,13 @@ namespace Catan10
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         private MessageWebSocket MessageWebSocket { get; set; }
         private DataWriter MessageWriter { get; set; }
+
         private Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
 
         private async Task DeleteAllGames()
         {
+            if (Proxy == null) return;
+
             List<GameInfo> games = await Proxy.GetGames();
             games.ForEach(async (game) =>
             {
@@ -52,6 +55,7 @@ namespace Catan10
 
         private void MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
         {
+            if (Proxy == null) return;
             var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
                 using (DataReader reader = args.GetDataReader())
@@ -164,29 +168,39 @@ namespace Catan10
             GameInfo gameInfo = null;
             //
             //  delete the game if it exists
-            List<GameInfo> games = await Proxy.GetGames();
-            foreach (var game in games)
+            if (Proxy != null)
             {
-                if (game.Name == gameName)
+                List<GameInfo> games = await Proxy.GetGames();
+                foreach (var game in games)
                 {
-                    gameInfo = game;
-                    await Proxy.DeleteGame(game.Id);
-                    break;
-                }
-            };
+                    if (game.Name == gameName)
+                    {
+                        gameInfo = game;
+                        await Proxy.DeleteGame(game.Id);
+                        break;
+                    }
+                };
+            }
 
             // create a new game
             gameInfo = new GameInfo() { Id = Guid.NewGuid().ToString(), Name = gameName, Creator = CurrentPlayer.PlayerName, RequestAutoJoin = true };
-            games = await Proxy.CreateGame(gameInfo);
-            Contract.Assert(games != null);
+            if (Proxy != null)
+            {
+                List<GameInfo> games = await Proxy.CreateGame(gameInfo);
 
-            MainPageModel.ServiceGameInfo = gameInfo;
-            MainPageModel.IsServiceGame = true;
+                Contract.Assert(games != null);
+
+                MainPageModel.ServiceGameInfo = gameInfo;
+                MainPageModel.IsServiceGame = true;
+            }
             //
             //  start the game
-            await NewGameLog.NewGame(this, MainPageModel.ServiceGameInfo.Creator, 0);
-            await Proxy.JoinGame(gameInfo.Id, TheHuman.PlayerName);
-            StartMonitoring();
+            await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
+            if (Proxy != null)
+            {
+                await Proxy.JoinGame(gameInfo.Id, TheHuman.PlayerName);
+                StartMonitoring();
+            }
         }
 
         private async Task ProcessMessage(CatanMessage message)
@@ -282,7 +296,8 @@ namespace Catan10
                 {
                     await DeleteAllGames();
                 }
-                Uri server = new Uri("ws://192.168.1.128:5000/catan/game/monitor/ws");
+
+                Uri server = new Uri($"ws://{MainPageModel.HostName}/catan/game/monitor/ws");
                 MessageWebSocket = new MessageWebSocket();
                 MessageWebSocket.Control.MessageType = SocketMessageType.Utf8;
                 MessageWebSocket.MessageReceived += MessageReceived;

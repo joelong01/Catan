@@ -29,11 +29,20 @@ namespace Catan10
             depPropClass?.SetRandomGoldTileCount(depPropValue);
         }
 
+        /// <summary>
+        ///     A place to update the GameUI when it is a new player's turn.
+        /// </summary>
+        /// <param name="player"></param>
         private void SetCurrentPlayer(PlayerModel player)
         {
             if (player == null) return;
 
             UpdateTurnFlag();
+
+            if (player == TheHuman)
+            {
+                ResetRollControl();
+            }
 
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
             _stopWatchForTurn.StartTimer();

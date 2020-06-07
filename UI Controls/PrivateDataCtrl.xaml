@@ -101,7 +101,7 @@
                         Background="{StaticResource DevCardType.Back}"
                         BorderBrush="Wheat" BorderThickness="2" CornerRadius="5"
                         ItemsSource="{x:Bind Player.GameData.Resources.PlayedDevCards, Mode=OneWay}"
-                              SelectedIndex="{x:Bind PlayedDevCardIndex, Mode=TwoWay}">
+                        SelectedIndex="{x:Bind PlayedDevCardIndex, Mode=TwoWay}">
                         <FlipView.ItemTemplate>
                             <DataTemplate x:DataType="local:DevCardModel">
                                 <Grid>
@@ -126,7 +126,7 @@
                     <Rectangle Width="70" Height="100" Margin="0,20,0,0" HorizontalAlignment="Center"
                         VerticalAlignment="Center" RadiusX="5" Stroke="White" StrokeThickness="1"
                         RadiusY="5"
-                        Fill="{x:Bind local:DevCardModel.DevCardTypeToImage(Player.GameData.Resources.ThisTurnsDevCard), Mode=OneWay}"
+                        Fill="{x:Bind local:DevCardModel.DevCardTypeToImage(Player.GameData.Resources.ThisTurnsDevCard.DevCardType), Mode=OneWay}"
                         ToolTipService.ToolTip="{x:Bind Player.GameData.Resources.ThisTurnsDevCard}" />
                 </Grid>
             </StackPanel>
@@ -173,7 +173,7 @@
                 BorderThickness="2" CornerRadius="10">
                 <Button Margin="5,0,5,0" Padding="0" Background="Transparent"
                     ToolTipService.ToolTip="Buy Settlement" Click="OnBuySettlement"
-                    IsEnabled="{x:Bind EnabledEntitlementPurchase('Settlement', Player.GameData.Resources.Current,local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}">
+                    IsEnabled="{x:Bind EnabledEntitlementPurchase('Settlement', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}">
                     <Button.Content>
                         <StackPanel Padding="0" CornerRadius="10">
                             <Viewbox Margin="0,0,0,0">
@@ -184,7 +184,7 @@
                     </Button.Content>
                 </Button>
                 <Button Margin="5,0,5,0" Padding="0" Background="Transparent"
-                    IsEnabled="{x:Bind EnabledEntitlementPurchase('City', Player.GameData.Resources.Current,local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
+                    IsEnabled="{x:Bind EnabledEntitlementPurchase('City', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
                     ToolTipService.ToolTip="Buy City" Click="OnBuyCity">
                     <Button.Content>
                         <StackPanel>
@@ -198,7 +198,7 @@
                     </Button.Content>
                 </Button>
                 <Button Margin="5,0,5,0" Padding="0" Background="Transparent"
-                    IsEnabled="{x:Bind EnabledEntitlementPurchase('Road', Player.GameData.Resources.Current,local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
+                    IsEnabled="{x:Bind EnabledEntitlementPurchase('Road', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
                     ToolTipService.ToolTip="Buy Road" Click="OnBuyRoad">
                     <Button.Content>
                         <StackPanel Width="50" Height="60" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">

@@ -25,7 +25,8 @@ namespace Catan10
         private TradeResources _gameResources = new TradeResources();
 
         // the total number of resources that have been handed out in this game
-        private string _HostName = "http://192.168.1.128:5000";
+        //private string _HostName = "http://192.168.1.128:5000";
+        private string _HostName = "https://jdlgameservice.azurewebsites.net/";
 
         private bool _isServiceGame = false;
 
@@ -95,6 +96,13 @@ namespace Catan10
                 p.GameData.Resources.UnspentEntitlements.CollectionChanged += UnspentEntitlements_CollectionChanged;
             }
             );
+        }
+
+        public MainPageModel()
+        {
+            InitBank();
+            Log = new Log(MainPage.Current);
+            GameController = MainPage.Current;
         }
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
@@ -341,7 +349,7 @@ namespace Catan10
         }
 
         [JsonIgnore]
-        public CatanProxy Proxy { get; } = new CatanProxy() { HostName = "http://192.168.1.128:5000" };
+        public CatanProxy Proxy { get; } = null; // new CatanProxy() { HostName = "https://jdlgameservice.azurewebsites.net/" };
 
         [JsonIgnore]
         public TradeResources ResourcesLeftInBank
@@ -503,13 +511,6 @@ namespace Catan10
                     NotifyPropertyChanged();
                 }
             }
-        }
-
-        public MainPageModel()
-        {
-            InitBank();
-            Log = new Log(MainPage.Current);
-            GameController = MainPage.Current;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

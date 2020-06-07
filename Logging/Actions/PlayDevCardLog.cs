@@ -22,7 +22,7 @@ namespace Catan10
 
         public static async Task PostLog(IGameController gameController, DevCardType devCardType, TradeResources resources)
         {
-            Contract.Assert(gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard == DevCardType.None);
+            Contract.Assert(gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None);
             Contract.Assert(devCardType == DevCardType.YearOfPlenty || devCardType == DevCardType.Monopoly || devCardType == DevCardType.RoadBuilding);
 
             PlayDevCardLog logHeader = new PlayDevCardLog()
@@ -49,7 +49,7 @@ namespace Catan10
 
             var sentBy = gameController.NameToPlayer(this.SentBy);
 
-            Contract.Assert(sentBy.GameData.Resources.ThisTurnsDevCard == DevCardType.None);
+            Contract.Assert(sentBy.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None);
             Contract.Assert(sentBy == gameController.CurrentPlayer); // only current players can play dev cards
 
             DevCardModel localDevCard = ((ICollection<DevCardModel>)sentBy.GameData.Resources.AvailableDevCards).First((dcm) => dcm.DevCardType == this.DevCardType);
@@ -57,7 +57,7 @@ namespace Catan10
 
             sentBy.GameData.Resources.AvailableDevCards.Remove(localDevCard);
             sentBy.GameData.Resources.PlayedDevCards.Add(localDevCard);
-            sentBy.GameData.Resources.ThisTurnsDevCard = localDevCard.DevCardType;
+            sentBy.GameData.Resources.ThisTurnsDevCard.DevCardType = localDevCard.DevCardType;
             localDevCard.Played = true;
 
             if (DevCardType == DevCardType.YearOfPlenty)

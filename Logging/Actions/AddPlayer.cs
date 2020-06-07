@@ -10,21 +10,11 @@ namespace Catan10
     /// </summary>
     public class AddPlayerLog : LogHeader, ILogController
     {
-        #region Constructors
-
         public AddPlayerLog() : base()
         {
         }
 
-        #endregion Constructors
-
-        #region Properties
-
         public string PlayerToAdd { get; set; }
-
-        #endregion Properties
-
-        #region Methods
 
         /// <summary>
         ///     an Action to add a player -- DOES NOT CHANGE STATE
@@ -59,6 +49,8 @@ namespace Catan10
 
             if (gameController.CurrentPlayer != gameController.MainPageModel.GameStartedBy)
             {
+                //
+                //  Whoever starts the game controls the game until a first player is picked
                 await ChangePlayerLog.SetCurrentPlayer(gameController, gameController.MainPageModel.GameStartedBy);
             }
         }
@@ -77,7 +69,5 @@ namespace Catan10
         {
             return gameController.UndoAddPlayer(this);
         }
-
-        #endregion Methods
     }
 }

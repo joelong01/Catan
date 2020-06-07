@@ -321,7 +321,7 @@ namespace Catan10
             TargetWeapon weapon = TargetWeapon.Baron;
             if (CurrentGameState == GameState.MustMoveBaron)
             {
-                action = CatanAction.AssignedBaron;
+                action = CatanAction.MovingBaron;
             }
 
             await AssignBaronOrKnight(target.Player, target.Tile, weapon, action, LogType.Normal);
@@ -367,7 +367,7 @@ namespace Catan10
             TargetWeapon weapon = TargetWeapon.Baron;
             if (CurrentGameState == GameState.MustMoveBaron)
             {
-                action = CatanAction.AssignedBaron;
+                action = CatanAction.MovingBaron;
             }
 
             await AssignBaronOrKnight(target.Player, target.Tile, weapon, action, LogType.Normal);
@@ -439,9 +439,9 @@ namespace Catan10
             await dlg.ShowAsync();
         }
 
-        private async void OnWebSocketConnect(object sender, RoutedEventArgs e)
+        private void OnWebSocketConnect(object sender, RoutedEventArgs e)
         {
-            await WsConnect();
+            // await WsConnect();
         }
 
         /// <summary>
@@ -664,7 +664,7 @@ namespace Catan10
                         OnStartDefaultNetworkGame(null, null);
                         break;
 
-                    case GameState.WaitingForPlayers: // while you are waiting for players you can also select the board
+                    case GameState.WaitingForPlayers:
                         await WaitingForPlayersToPickingBoard.PostLog(this);
                         break;
 
