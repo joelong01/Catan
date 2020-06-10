@@ -10,25 +10,21 @@ namespace Catan10
 
     public class ChangeGameEventArgs
     {
-        #region Constructors
+        public StorageFile File { get; set; }
 
         public ChangeGameEventArgs(StorageFile f)
         {
             File = f;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public StorageFile File { get; set; }
-
-        #endregion Properties
     }
 
     public class LogStateTranstion
     {
-        #region Constructors
+        public GameState NewState { get; set; } = GameState.Uninitialized;
+
+        public GameState OldState { get; set; } = GameState.Uninitialized;
+
+        public List<int> RandomGoldTiles { get; set; } = new List<int>();
 
         public LogStateTranstion()
         {
@@ -45,18 +41,6 @@ namespace Catan10
             Deserialize(saved);
         }
 
-        #endregion Constructors
-
-        #region Properties
-
-        public GameState NewState { get; set; } = GameState.Uninitialized;
-        public GameState OldState { get; set; } = GameState.Uninitialized;
-        public List<int> RandomGoldTiles { get; set; } = new List<int>();
-
-        #endregion Properties
-
-        #region Methods
-
         public static LogStateTranstion Deserialize(string json)
         {
             return CatanProxy.Deserialize<LogStateTranstion>(json);
@@ -66,16 +50,10 @@ namespace Catan10
         {
             return CatanProxy.Serialize(this);
         }
-
-        #endregion Methods
     }
 
     public class UndoEventArgs
     {
-        #region Properties
-
         public UndoOrder UndoOrder { get; set; } = UndoOrder.None;
-
-        #endregion Properties
     }
 }

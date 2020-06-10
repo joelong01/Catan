@@ -8,7 +8,21 @@ namespace Catan10
 {
     public sealed partial class FourIsland3Ctrl : UserControl, ICatanGameData
     {
-        #region Constructors
+        public CatanGames CatanGame { get => CatanGames.Regular; }
+
+        public string Description => _HexPanel.Description;
+
+        public List<TileCtrl> DesertTiles => _HexPanel.DesertTiles;
+
+        public CatanGameData GameData { get; } = new CatanGameData();
+
+        public GameType GameType => _HexPanel.GameType;
+
+        public CatanHexPanel HexPanel => _HexPanel;
+
+        public int Index { get; set; } = -1;
+
+        public List<TileCtrl> Tiles => _HexPanel.Tiles;
 
         public FourIsland3Ctrl()
         {
@@ -27,25 +41,5 @@ namespace Catan10
             GameData.MaxShips = _HexPanel.MaxShips;
             GameData.BuildDevCardList();
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public CatanHexPanel HexPanel => _HexPanel;
-
-        #endregion Properties
-
-        #region ICatanGameData
-
-        public CatanGames CatanGame { get => CatanGames.Regular; }
-        public string Description => _HexPanel.Description;
-        public List<TileCtrl> DesertTiles => _HexPanel.DesertTiles;
-        public CatanGameData GameData { get; } = new CatanGameData();
-        public GameType GameType => _HexPanel.GameType;
-        public int Index { get; set; } = -1;
-        public List<TileCtrl> Tiles => _HexPanel.Tiles;
-
-        #endregion ICatanGameData
     }
 }

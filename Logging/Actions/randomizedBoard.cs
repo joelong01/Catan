@@ -7,23 +7,15 @@ namespace Catan10
 {
     public class RandomBoardLog : LogHeader, ILogController
     {
-        #region Constructors
+        public int GameIndex { get; set; }
+
+        public RandomBoardSettings NewRandomBoard { get; set; }
+
+        public RandomBoardSettings PreviousRandomBoard { get; set; }
 
         public RandomBoardLog() : base()
         {
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public int GameIndex { get; set; }
-        public RandomBoardSettings NewRandomBoard { get; set; }
-        public RandomBoardSettings PreviousRandomBoard { get; set; }
-
-        #endregion Properties
-
-        #region Methods
 
         public static Task LogRedoAction(IGameController gameController)
         {
@@ -51,7 +43,6 @@ namespace Catan10
         /// <returns></returns>
         public static async Task RandomizeBoard(IGameController gameController, int gameIndex)
         {
-            
             RandomBoardLog logHeader = new RandomBoardLog()
             {
                 Action = CatanAction.RandomizeBoard,
@@ -87,7 +78,5 @@ namespace Catan10
         {
             return gameController.UndoSetRandomBoard(this);
         }
-
-        #endregion Methods
     }
 }

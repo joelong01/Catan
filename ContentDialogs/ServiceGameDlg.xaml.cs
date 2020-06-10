@@ -16,12 +16,16 @@ namespace Catan10
 {
     public sealed partial class ServiceGameDlg : ContentDialog
     {
-        #region properties
+        #region Properties + Fields 
 
-        private TaskCompletionSource<bool> _tcs = null;
         private List<PlayerModel> AllPlayers { get; set; } = null;
         private PlayerModel CurrentPlayer { get; set; } = null;
-        private CatanProxy Proxy { get; } 
+        private CatanProxy Proxy { get; }
+        private TaskCompletionSource<bool> _tcs = null;
+
+        #endregion Properties + Fields 
+
+        #region Methods
 
         private static void HostNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -36,57 +40,6 @@ namespace Catan10
             var depPropValue = (GameInfo)e.NewValue;
             depPropClass?.SetSelectedGame(depPropValue);
         }
-
-        private void SetHostName(string value)
-        {
-            Proxy.HostName = value;
-        }
-
-        private void SetSelectedGame(GameInfo value)
-        {
-            // this.TraceMessage($"New Game: {value?.Description}");
-        }
-
-        public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register("ErrorMessage", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
-        public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", HostNameChanged));
-        public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
-        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(GameInfo), typeof(ServiceGameDlg), new PropertyMetadata(null, SelectedGameChanged));
-        public ObservableCollection<GameInfo> Games = new ObservableCollection<GameInfo>();
-        public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
-
-        public string ErrorMessage
-        {
-            get => (string)GetValue(ErrorMessageProperty);
-            set => SetValue(ErrorMessageProperty, value);
-        }
-
-        public CatanGameData GameInfo { get; set; }
-
-        public string HostName
-        {
-            get => (string)GetValue(HostNameProperty);
-            set => SetValue(HostNameProperty, value);
-        }
-
-        public bool IsCanceled { get; private set; } = false;
-        public bool JoinedExistingGame { get; private set; } = false;
-
-        public string NewGameName
-        {
-            get => (string)GetValue(NewGameNameProperty);
-            set => SetValue(NewGameNameProperty, value);
-        }
-
-        public GameInfo SelectedGame
-        {
-            get => (GameInfo)GetValue(SelectedGameProperty);
-            set => SetValue(SelectedGameProperty, value);
-        }
-
-        #endregion properties
-
-        #region Methods
 
         private async Task<bool> AskUserQuestion(string question)
         {
@@ -296,9 +249,58 @@ namespace Catan10
             await GetGames();
         }
 
+        private void SetHostName(string value)
+        {
+            Proxy.HostName = value;
+        }
+
+        private void SetSelectedGame(GameInfo value)
+        {
+            // this.TraceMessage($"New Game: {value?.Description}");
+        }
+
         #endregion Methods
 
         #region Constructors
+
+        #endregion Constructors
+
+        public string ErrorMessage
+        {
+            get => (string)GetValue(ErrorMessageProperty);
+            set => SetValue(ErrorMessageProperty, value);
+        }
+
+        public CatanGameData GameInfo { get; set; }
+
+        public string HostName
+        {
+            get => (string)GetValue(HostNameProperty);
+            set => SetValue(HostNameProperty, value);
+        }
+
+        public bool IsCanceled { get; private set; } = false;
+        public bool JoinedExistingGame { get; private set; } = false;
+
+        public string NewGameName
+        {
+            get => (string)GetValue(NewGameNameProperty);
+            set => SetValue(NewGameNameProperty, value);
+        }
+
+        public GameInfo SelectedGame
+        {
+            get => (GameInfo)GetValue(SelectedGameProperty);
+            set => SetValue(SelectedGameProperty, value);
+        }
+
+        public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register("ErrorMessage", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", HostNameChanged));
+        public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(GameInfo), typeof(ServiceGameDlg), new PropertyMetadata(null, SelectedGameChanged));
+        public ObservableCollection<GameInfo> Games = new ObservableCollection<GameInfo>();
+        public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
+        public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
 
         public ServiceGameDlg()
         {
@@ -316,8 +318,6 @@ namespace Catan10
                 SelectedGame = Games[0];
             }
         }
-
-        #endregion Constructors
     }
 
     public class ServiceGameDlgModel : INotifyPropertyChanged
@@ -331,10 +331,10 @@ namespace Catan10
 
         #endregion Methods
 
-        #region Events
+        #region Delegates  + Events + Enums
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        #endregion Events
+        #endregion Delegates  + Events + Enums
     }
 }

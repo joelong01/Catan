@@ -9,29 +9,7 @@ namespace Catan10
 {
     public sealed partial class DiceCtrl : UserControl
     {
-        #region Fields
-
         private string[] diceNames = new string[] { "one", "two", "three", "four", "five", "six" };
-
-        public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("FillColor", typeof(SolidColorBrush), typeof(DiceCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
-
-        public static readonly DependencyProperty NumberProperty = DependencyProperty.Register("Number", typeof(int), typeof(DiceCtrl), new PropertyMetadata(2));
-
-        public static readonly DependencyProperty ThicknessProperty = DependencyProperty.Register("Thickness", typeof(Thickness), typeof(DiceCtrl), new PropertyMetadata(new Thickness(5)));
-
-        #endregion Fields
-
-        #region Constructors
-
-        public DiceCtrl()
-        {
-            this.InitializeComponent();
-            this.DataContext = this;
-        }
-
-        #endregion Constructors
-
-        #region Properties
 
         public SolidColorBrush FillColor
         {
@@ -51,6 +29,16 @@ namespace Catan10
             set => SetValue(ThicknessProperty, value);
         }
 
-        #endregion Properties
+        public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("FillColor", typeof(SolidColorBrush), typeof(DiceCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
+
+        public static readonly DependencyProperty NumberProperty = DependencyProperty.Register("Number", typeof(int), typeof(DiceCtrl), new PropertyMetadata(2));
+
+        public static readonly DependencyProperty ThicknessProperty = DependencyProperty.Register("Thickness", typeof(Thickness), typeof(DiceCtrl), new PropertyMetadata(new Thickness(5)));
+
+        public DiceCtrl()
+        {
+            this.InitializeComponent();
+            this.DataContext = this;
+        }
     }
 }

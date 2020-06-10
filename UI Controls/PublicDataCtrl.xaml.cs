@@ -1,9 +1,6 @@
-﻿using Catan.Proxy;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.ObjectModel;
-using Windows.Media.Playback;
-using Windows.UI;
+
 using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;

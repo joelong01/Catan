@@ -10,13 +10,9 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, ICatanSettings
     {
-        #region Fields
-
         private bool _initializeSettings = true;
 
-        #endregion Fields
-
-        #region Properties
+        private bool DO_NOT_SAVE_FLAG = false;
 
         public bool AnimateFade
         {
@@ -129,10 +125,6 @@ namespace Catan10
             }
         }
 
-        #endregion Properties
-
-        #region Methods
-
         public void Close()
         {
         }
@@ -154,7 +146,7 @@ namespace Catan10
         {
             await OnOpenSavedGame();
         }
-        private bool DO_NOT_SAVE_FLAG = false;
+
         public async Task ResetGridLayout()
         {
             DO_NOT_SAVE_FLAG = true;
@@ -170,7 +162,6 @@ namespace Catan10
             UpdateGridLocations();
             DO_NOT_SAVE_FLAG = false;
             await SaveGridLocations();
-
         }
 
         public async Task<bool> Reshuffle()
@@ -214,7 +205,5 @@ namespace Catan10
         {
             await OnWin();
         }
-
-        #endregion Methods
     }
 }

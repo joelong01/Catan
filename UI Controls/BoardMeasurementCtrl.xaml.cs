@@ -7,27 +7,6 @@ namespace Catan10
 {
     public sealed partial class BoardMeasurementCtrl : UserControl
     {
-        #region Fields
-
-        public static readonly DependencyProperty FiveStarPositionsProperty = DependencyProperty.Register("FiveStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
-        public static readonly DependencyProperty FourStarPositionsProperty = DependencyProperty.Register("FourStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
-        public static readonly DependencyProperty PipCountProperty = DependencyProperty.Register("PipCount", typeof(TradeResources), typeof(BoardMeasurementCtrl), new PropertyMetadata(new TradeResources()));
-        public static readonly DependencyProperty ThreeStarPositionsProperty = DependencyProperty.Register("ThreeStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
-        public static readonly DependencyProperty TwoStarPositionsProperty = DependencyProperty.Register("TwoStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
-
-        #endregion Fields
-
-        #region Constructors
-
-        public BoardMeasurementCtrl()
-        {
-            this.InitializeComponent();
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
         public int FiveStarPositions
         {
             get => (int)GetValue(FiveStarPositionsProperty);
@@ -58,6 +37,15 @@ namespace Catan10
             set => SetValue(TwoStarPositionsProperty, value);
         }
 
-        #endregion Properties
+        public static readonly DependencyProperty FiveStarPositionsProperty = DependencyProperty.Register("FiveStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
+        public static readonly DependencyProperty FourStarPositionsProperty = DependencyProperty.Register("FourStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
+        public static readonly DependencyProperty PipCountProperty = DependencyProperty.Register("PipCount", typeof(TradeResources), typeof(BoardMeasurementCtrl), new PropertyMetadata(new TradeResources()));
+        public static readonly DependencyProperty ThreeStarPositionsProperty = DependencyProperty.Register("ThreeStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
+        public static readonly DependencyProperty TwoStarPositionsProperty = DependencyProperty.Register("TwoStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
+
+        public BoardMeasurementCtrl()
+        {
+            this.InitializeComponent();
+        }
     }
 }

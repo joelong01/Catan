@@ -12,8 +12,8 @@ namespace Catan10
 {
     public partial class CatanHexPanel : Canvas
     {
-        #region Fields
-
+        private Canvas HarborLayer { get; set; } = new Canvas();
+        private Canvas RoadLayer { get; set; } = new Canvas();
         private readonly BaronCtrl _baron = new BaronCtrl();
 
         private readonly List<TileCtrl> _desertTiles = new List<TileCtrl>();
@@ -51,17 +51,6 @@ namespace Catan10
         private int[] _tileNumbers = null;
 
         private TileCtrl[] _tilesInIndexOrder = null;
-
-        #endregion Fields
-
-        #region Properties
-
-        private Canvas HarborLayer { get; set; } = new Canvas();
-        private Canvas RoadLayer { get; set; } = new Canvas();
-
-        #endregion Properties
-
-        #region Methods
 
         private static void BaronTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -840,91 +829,6 @@ namespace Catan10
             }
         }
 
-        #endregion Methods
-
-        public static readonly DependencyProperty AllowShipsProperty = DependencyProperty.Register("AllowShips", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
-        public static readonly DependencyProperty BaronTileProperty = DependencyProperty.Register("BaronTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, BaronTileChanged));
-
-        // RowCounts[0] tells you how many rows there are in the 0th Column
-        public static readonly DependencyProperty BaronVisibilityProperty = DependencyProperty.Register("BaronVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, BaronVisibilityChanged));
-
-        public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
-        public static readonly DependencyProperty CatanGameProperty = DependencyProperty.Register("CatanGame", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
-        public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register("Description", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
-        public static readonly DependencyProperty DevCardsProperty = DependencyProperty.Register("DevCards", typeof(List<DevCardType>), typeof(CatanHexPanel), new PropertyMetadata(new List<DevCardType>()));
-        public static readonly DependencyProperty DisableLayoutProperty = DependencyProperty.Register("DisableLayout", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
-        public static readonly DependencyProperty GameNameProperty = DependencyProperty.Register("GameName", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
-        public static readonly DependencyProperty GameTypeProperty = DependencyProperty.Register("GameType", typeof(GameType), typeof(CatanHexPanel), new PropertyMetadata(GameType.Regular));
-        public static readonly DependencyProperty HarborCountProperty = DependencyProperty.Register("HarborCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(9));
-        public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
-        public static readonly DependencyProperty KnightsProperty = DependencyProperty.Register("Knights", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(14));
-        public static readonly DependencyProperty MaxCitiesProperty = DependencyProperty.Register("MaxCities", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(4));
-        public static readonly DependencyProperty MaxResourceAllocatedProperty = DependencyProperty.Register("MaxResourceAllocated", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
-        public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.Register("MaxRoads", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(15));
-        public static readonly DependencyProperty MaxSettlementsProperty = DependencyProperty.Register("MaxSettlements", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
-        public static readonly DependencyProperty MaxShipsProperty = DependencyProperty.Register("MaxShips", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(0));
-        public static readonly DependencyProperty MonopolyProperty = DependencyProperty.Register("Monopoly", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
-        public static readonly DependencyProperty PirateShipTileProperty = DependencyProperty.Register("PirateShipTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, PirateTileChanged));
-        public static readonly DependencyProperty PirateVisibilityProperty = DependencyProperty.Register("PirateVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, PirateVisibilityChanged));
-        public static readonly DependencyProperty RoadBuildingProperty = DependencyProperty.Register("RoadBuilding", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
-        public static readonly DependencyProperty TileCountProperty = DependencyProperty.Register("TileCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
-        public static readonly DependencyProperty TileGapProperty = DependencyProperty.Register("TileGap", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(0));
-        public static readonly DependencyProperty TileGroupsProperty = DependencyProperty.Register("TileGroups", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
-        public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(50));
-        public static readonly DependencyProperty VictoryPointsProperty = DependencyProperty.Register("VictoryPoints", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
-        public static readonly DependencyProperty YearOfPlentyProperty = DependencyProperty.Register("YearOfPlenty", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
-        public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
-
-        public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
-
-        public CatanHexPanel()
-        {
-            _pirateShip.Visibility = Visibility.Collapsed;
-            _baron.Visibility = Visibility.Collapsed;
-            _baron.Width = 50;
-            _baron.Height = 60;
-
-            HarborLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            HarborLayer.VerticalAlignment = VerticalAlignment.Stretch;
-
-            RoadLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            RoadLayer.VerticalAlignment = VerticalAlignment.Stretch;
-
-            Canvas.SetZIndex(this, 5);
-            Canvas.SetZIndex(HarborLayer, 10);
-            Canvas.SetZIndex(RoadLayer, 20);
-            Canvas.SetZIndex(TopLayer, 95);
-
-            HarborLayer.Width = 5000;
-            HarborLayer.Height = 5000;
-            HarborLayer.Opacity = 1.0;
-            RoadLayer.Width = 5000;
-            RoadLayer.Height = 5000;
-            RoadLayer.Opacity = 1.0;
-
-            TopLayer.Width = 5000;
-            TopLayer.Height = 5000;
-            TopLayer.Opacity = 1.0;
-            TopLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
-            TopLayer.VerticalAlignment = VerticalAlignment.Stretch;
-            TopLayer.IsHitTestVisible = true;
-            TopLayer.IsDoubleTapEnabled = true;
-            TopLayer.IsHoldingEnabled = true;
-            TopLayer.IsRightTapEnabled = true;
-            TopLayer.IsTapEnabled = true;
-
-            Canvas.SetZIndex(_baron, 5);
-            Canvas.SetZIndex(_pirateShip, 5);
-
-            HarborLayer.Children.Add(_pirateShip);
-            HarborLayer.Children.Add(_baron);
-
-            this.SizeChanged += SimpleHexPanel_SizeChanged;
-            this.Children.Add(HarborLayer);
-            this.Children.Add(RoadLayer);
-            this.Children.Add(TopLayer);
-        }
-
         public bool AllowShips
         {
             get => (bool)GetValue(AllowShipsProperty);
@@ -1023,7 +927,6 @@ namespace Catan10
         }
 
         public List<Harbor> Harbors { get; } = new List<Harbor>();
-
         public bool HasIslands => TileToIslandDictionary.Keys.Count > 1;
 
         public string Islands
@@ -1303,6 +1206,89 @@ namespace Catan10
         {
             get => (int)GetValue(YearOfPlentyProperty);
             set => SetValue(YearOfPlentyProperty, value);
+        }
+
+        public static readonly DependencyProperty AllowShipsProperty = DependencyProperty.Register("AllowShips", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
+        public static readonly DependencyProperty BaronTileProperty = DependencyProperty.Register("BaronTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, BaronTileChanged));
+
+        // RowCounts[0] tells you how many rows there are in the 0th Column
+        public static readonly DependencyProperty BaronVisibilityProperty = DependencyProperty.Register("BaronVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, BaronVisibilityChanged));
+
+        public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
+        public static readonly DependencyProperty CatanGameProperty = DependencyProperty.Register("CatanGame", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
+        public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register("Description", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
+        public static readonly DependencyProperty DevCardsProperty = DependencyProperty.Register("DevCards", typeof(List<DevCardType>), typeof(CatanHexPanel), new PropertyMetadata(new List<DevCardType>()));
+        public static readonly DependencyProperty DisableLayoutProperty = DependencyProperty.Register("DisableLayout", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
+        public static readonly DependencyProperty GameNameProperty = DependencyProperty.Register("GameName", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
+        public static readonly DependencyProperty GameTypeProperty = DependencyProperty.Register("GameType", typeof(GameType), typeof(CatanHexPanel), new PropertyMetadata(GameType.Regular));
+        public static readonly DependencyProperty HarborCountProperty = DependencyProperty.Register("HarborCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(9));
+        public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
+        public static readonly DependencyProperty KnightsProperty = DependencyProperty.Register("Knights", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(14));
+        public static readonly DependencyProperty MaxCitiesProperty = DependencyProperty.Register("MaxCities", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(4));
+        public static readonly DependencyProperty MaxResourceAllocatedProperty = DependencyProperty.Register("MaxResourceAllocated", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
+        public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.Register("MaxRoads", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(15));
+        public static readonly DependencyProperty MaxSettlementsProperty = DependencyProperty.Register("MaxSettlements", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
+        public static readonly DependencyProperty MaxShipsProperty = DependencyProperty.Register("MaxShips", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(0));
+        public static readonly DependencyProperty MonopolyProperty = DependencyProperty.Register("Monopoly", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public static readonly DependencyProperty PirateShipTileProperty = DependencyProperty.Register("PirateShipTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, PirateTileChanged));
+        public static readonly DependencyProperty PirateVisibilityProperty = DependencyProperty.Register("PirateVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, PirateVisibilityChanged));
+        public static readonly DependencyProperty RoadBuildingProperty = DependencyProperty.Register("RoadBuilding", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public static readonly DependencyProperty TileCountProperty = DependencyProperty.Register("TileCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
+        public static readonly DependencyProperty TileGapProperty = DependencyProperty.Register("TileGap", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(0));
+        public static readonly DependencyProperty TileGroupsProperty = DependencyProperty.Register("TileGroups", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
+        public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(50));
+        public static readonly DependencyProperty VictoryPointsProperty = DependencyProperty.Register("VictoryPoints", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
+        public static readonly DependencyProperty YearOfPlentyProperty = DependencyProperty.Register("YearOfPlenty", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
+
+        public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
+
+        public CatanHexPanel()
+        {
+            _pirateShip.Visibility = Visibility.Collapsed;
+            _baron.Visibility = Visibility.Collapsed;
+            _baron.Width = 50;
+            _baron.Height = 60;
+
+            HarborLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            HarborLayer.VerticalAlignment = VerticalAlignment.Stretch;
+
+            RoadLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            RoadLayer.VerticalAlignment = VerticalAlignment.Stretch;
+
+            Canvas.SetZIndex(this, 5);
+            Canvas.SetZIndex(HarborLayer, 10);
+            Canvas.SetZIndex(RoadLayer, 20);
+            Canvas.SetZIndex(TopLayer, 95);
+
+            HarborLayer.Width = 5000;
+            HarborLayer.Height = 5000;
+            HarborLayer.Opacity = 1.0;
+            RoadLayer.Width = 5000;
+            RoadLayer.Height = 5000;
+            RoadLayer.Opacity = 1.0;
+
+            TopLayer.Width = 5000;
+            TopLayer.Height = 5000;
+            TopLayer.Opacity = 1.0;
+            TopLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
+            TopLayer.VerticalAlignment = VerticalAlignment.Stretch;
+            TopLayer.IsHitTestVisible = true;
+            TopLayer.IsDoubleTapEnabled = true;
+            TopLayer.IsHoldingEnabled = true;
+            TopLayer.IsRightTapEnabled = true;
+            TopLayer.IsTapEnabled = true;
+
+            Canvas.SetZIndex(_baron, 5);
+            Canvas.SetZIndex(_pirateShip, 5);
+
+            HarborLayer.Children.Add(_pirateShip);
+            HarborLayer.Children.Add(_baron);
+
+            this.SizeChanged += SimpleHexPanel_SizeChanged;
+            this.Children.Add(HarborLayer);
+            this.Children.Add(RoadLayer);
+            this.Children.Add(TopLayer);
         }
 
         public void ArrangeRoads()
@@ -1907,7 +1893,17 @@ namespace Catan10
 
     public class HarborLayoutData
     {
-        #region Constructors
+        public static double Height { get; } = 50;
+
+        public static double Width { get; } = 50;
+
+        public Point Anchor { get; set; }
+
+        public Point RenderTransformOrigin { get; set; }
+
+        public double Rotation { get; set; }
+
+        public double Scale { get; set; } = 1.1;
 
         public HarborLayoutData(Point rto, double rotate, double scale, Point anchor)
         {
@@ -1916,21 +1912,6 @@ namespace Catan10
             Scale = scale;
             Anchor = anchor;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public static double Height { get; } = 50;
-        public static double Width { get; } = 50;
-        public Point Anchor { get; set; }
-        public Point RenderTransformOrigin { get; set; }
-        public double Rotation { get; set; }
-        public double Scale { get; set; } = 1.1;
-
-        #endregion Properties
-
-        #region Methods
 
         public static void AddLocation(HarborLocation location, Point rto, double rotate, double scale, Point anchor, Dictionary<HarborLocation, HarborLayoutData> harborLayoutDataDictionary)
         {
@@ -1952,30 +1933,18 @@ namespace Catan10
             harbor.Transform.ScaleX = data.Scale;
             harbor.Transform.ScaleY = data.Scale;
         }
-
-        #endregion Methods
     }
 
     public class Island
     {
-        #region Fields
-
         public bool BonusPoint = false;
         public int End = -1;
         public int Start = -1;
-
-        #endregion Fields
     }
 
     public class StaticGameInfo : DependencyObject
     {
-        #region Fields
-
         public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.RegisterAttached("MaxRoads", typeof(int), typeof(StaticGameInfo), new PropertyMetadata(15));
-
-        #endregion Fields
-
-        #region Methods
 
         public static int GetMaxRoads(CatanHexPanel element)
         {
@@ -1986,7 +1955,5 @@ namespace Catan10
         {
             element.SetValue(MaxRoadsProperty, value);
         }
-
-        #endregion Methods
     }
 }

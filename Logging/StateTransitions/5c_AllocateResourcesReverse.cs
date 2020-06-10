@@ -10,8 +10,6 @@ namespace Catan10
     /// </summary>
     public class AllocateResourcesForwardToAllocateResourcesReverse : LogHeader, ILogController
     {
-        #region Methods
-
         internal static async Task PostLog(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.AllocateResourceForward);
@@ -27,15 +25,9 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        #endregion Methods
-
-        #region Constructors
-
         public AllocateResourcesForwardToAllocateResourcesReverse()
         {
         }
-
-        #endregion Constructors
 
         public Task Do(IGameController gameController)
         {

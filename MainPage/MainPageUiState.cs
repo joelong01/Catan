@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 using Windows.Storage;
@@ -17,14 +15,7 @@ namespace Catan10
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        #region Fields
-
         private readonly Stack<GameState> _stateStack = new Stack<GameState>();
-        public static readonly DependencyProperty LastRollProperty = DependencyProperty.Register("LastRoll", typeof(int), typeof(MainPage), new PropertyMetadata(0));
-
-        #endregion Fields
-
-        #region Properties
 
         public int LastRoll
         {
@@ -33,27 +24,26 @@ namespace Catan10
         }
 
         public List<int> Rolls { get; set; } = new List<int>();
-
-        #endregion Properties
-
-        #region Methods
-
-      
+        public static readonly DependencyProperty LastRollProperty = DependencyProperty.Register("LastRoll", typeof(int), typeof(MainPage), new PropertyMetadata(0));
 
         public async Task PlayerWon()
         {
             await Task.Delay(0);
             throw new NotImplementedException();
         }
-
-       
-
-        #endregion Methods
     }
 
     public class MenuTag
     {
-        #region Constructors
+        public StorageFile File { get; set; }
+
+        public int Number { get; set; }
+
+        public IList<MenuFlyoutItemBase> PeerMenuItemList { get; set; }
+
+        public PlayerModel Player { get; set; }
+
+        public bool SetKeyUpHandler { get; set; } = false;
 
         public MenuTag(PlayerModel p)
         {
@@ -78,18 +68,5 @@ namespace Catan10
         public MenuTag()
         {
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public StorageFile File { get; set; }
-        public int Number { get; set; }
-        public IList<MenuFlyoutItemBase> PeerMenuItemList { get; set; }
-
-        public PlayerModel Player { get; set; }
-        public bool SetKeyUpHandler { get; set; } = false;
-
-        #endregion Properties
     }
 }

@@ -12,20 +12,6 @@ namespace Catan10
 {
     public sealed partial class PrivateDataCtrl : UserControl
     {
-        #region Properties + Fields 
-
-        #endregion Properties + Fields 
-
-        #region Constructors
-
-        #endregion Constructors
-
-        #region Delegates  + Events + Enums
-
-        #endregion Delegates  + Events + Enums
-
-        #region Methods
-
         private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as PrivateDataCtrl;
@@ -190,14 +176,11 @@ namespace Catan10
                 /**
                  *  1. send a message that a knight was played
                  *  2. change the state so that the UI says "Much move baron"
-                 *  3. pick the target tile 
+                 *  3. pick the target tile
                  *  4. Send a message to move Baron to the target tile
                  *  5. show the UI to pick one of the victim's cards
                  *  6. Send a message to update the resources for each player
                  */
-
-                
-                 
             }
         }
 
@@ -265,28 +248,6 @@ namespace Catan10
         {
             if (value == null) return;
         }
-
-        #endregion Methods
-
-        #region Destructors
-
-        #endregion Destructors
-
-        #region Indexers
-
-        #endregion Indexers
-
-        #region Structs
-
-        #endregion Structs
-
-        #region Classes
-
-        #endregion Classes
-
-        #region Interfaces
-
-        #endregion Interfaces
 
         public int AvailableDevCardIndex
         {

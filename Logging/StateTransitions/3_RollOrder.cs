@@ -13,8 +13,6 @@ namespace Catan10
     /// </summary>
     public class PickingBoardToWaitingForRollOrder : LogHeader, ILogController
     {
-        #region Methods
-
         public static List<RollModel> GetRollModelList()
         {
             List<RollModel> list = new List<RollModel>();
@@ -75,7 +73,5 @@ namespace Catan10
         {
             return Task.CompletedTask;
         }
-
-        #endregion Methods
     }
 }

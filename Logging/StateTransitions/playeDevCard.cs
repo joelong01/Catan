@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.Json;
 
 using Catan.Proxy;
-using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {

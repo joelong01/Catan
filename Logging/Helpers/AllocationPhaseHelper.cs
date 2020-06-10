@@ -1,13 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Threading.Tasks;
-
-using Catan.Proxy;
-
-namespace Catan10
+﻿namespace Catan10
 {
     public static class AllocationPhaseHelper
     {
+        #region Methods
+
         public static void GrantEntitlements(IGameController gameController, string to)
         {
             var player = gameController.NameToPlayer(to);
@@ -21,5 +17,7 @@ namespace Catan10
             player.GameData.Resources.RevokeEntitlement(Entitlement.Road);
             player.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
         }
+
+        #endregion Methods
     }
 }

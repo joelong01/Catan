@@ -10,14 +10,15 @@ namespace Catan10
 {
     public class GridPosition : INotifyPropertyChanged
     {
-        #region properties
-
         private double _scaleX = 1.0;
         private double _scaleY = 1.0;
         private double _translateX = 0.0;
         private double _translateY = 0.0;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public double ScaleX
         {
@@ -86,8 +87,6 @@ namespace Catan10
             }
         }
 
-        #endregion properties
-
         public GridPosition(double X, double Y, double scaleX = 1.0, double scaleY = 1.0)
         {
             TranslateX = X;
@@ -108,10 +107,7 @@ namespace Catan10
             TranslateY = ct.TranslateY;
         }
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         new public virtual bool Equals(Object obj)
         {

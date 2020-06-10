@@ -7,21 +7,11 @@ namespace Catan10
 {
     public class SetStateLog : LogHeader, ILogController
     {
-        #region Constructors
+        public List<int> RandomGoldTiles { get; set; } = new List<int>();
 
         public SetStateLog() : base()
         {
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public List<int> RandomGoldTiles { get; set; } = new List<int>();
-
-        #endregion Properties
-
-        #region Methods
 
         public static async Task SetState(IGameController gameController, GameState newState)
         {
@@ -62,7 +52,5 @@ namespace Catan10
         {
             return gameController.UndoSetState(this);
         }
-
-        #endregion Methods
     }
 }

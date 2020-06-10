@@ -11,15 +11,9 @@ namespace Catan10
     /// </summary>
     public class WaitingForPlayersToPickingBoard : LogHeader, ILogController
     {
-        #region Constructors
-
         public WaitingForPlayersToPickingBoard() : base()
         {
         }
-
-        #endregion Constructors
-
-        #region Methods
 
         public static async Task PostLog(IGameController gameController)
         {
@@ -83,7 +77,5 @@ namespace Catan10
         {
             return Task.CompletedTask;
         }
-
-        #endregion Methods
     }
 }

@@ -11,8 +11,6 @@ namespace Catan10
 {
     public sealed partial class OpenGameDlg : ContentDialog
     {
-        #region Methods
-
         private void ContentDialog_OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
         }
@@ -25,23 +23,14 @@ namespace Catan10
         {
         }
 
-        #endregion Methods
+        public string SavedGame => _lbGames.SelectedValue as String;
 
-        #region Constructors
+        public ObservableCollection<string> SavedGames { get; set; } = new ObservableCollection<string>();
 
         public OpenGameDlg()
         {
             this.InitializeComponent();
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public string SavedGame => _lbGames.SelectedValue as String;
-        public ObservableCollection<string> SavedGames { get; set; } = new ObservableCollection<string>();
-
-        #endregion Properties
 
         public async Task LoadGames()
         {

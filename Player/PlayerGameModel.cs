@@ -149,20 +149,6 @@ namespace Catan10
             Score = score;
         }
 
-        public PlayerGameModel()
-        {
-            NotificationsEnabled = true;
-        }
-
-        public PlayerGameModel(PlayerModel pData)
-        {
-            Roads.CollectionChanged += Roads_CollectionChanged;
-            Settlements.CollectionChanged += Settlements_CollectionChanged;
-            Cities.CollectionChanged += Cities_CollectionChanged;
-            Ships.CollectionChanged += Ships_CollectionChanged;
-            PlayerModel = pData;
-        }
-
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
 
@@ -603,9 +589,23 @@ namespace Catan10
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public CardsLostUpdatedHandler OnCardsLost;
+
+        public PlayerGameModel()
+        {
+            NotificationsEnabled = true;
+        }
+
+        public PlayerGameModel(PlayerModel pData)
+        {
+            Roads.CollectionChanged += Roads_CollectionChanged;
+            Settlements.CollectionChanged += Settlements_CollectionChanged;
+            Cities.CollectionChanged += Cities_CollectionChanged;
+            Ships.CollectionChanged += Ships_CollectionChanged;
+            PlayerModel = pData;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
         {
@@ -759,11 +759,6 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public SyncronizedPlayerRolls()
-        {
-            LatestRolls.AddRange(PickingBoardToWaitingForRollOrder.GetRollModelList()); // always have 4 Rolls in here so XAML doesn't throw
-        }
-
         public RollModel CurrentRoll
         {
             get
@@ -792,6 +787,11 @@ namespace Catan10
             {
                 return ((CurrentRoll.DiceOne > 0 && CurrentRoll.DiceTwo > 0));
             }
+        }
+
+        public SyncronizedPlayerRolls()
+        {
+            LatestRolls.AddRange(PickingBoardToWaitingForRollOrder.GetRollModelList()); // always have 4 Rolls in here so XAML doesn't throw
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -9,12 +9,8 @@ namespace Catan10
     //  they might previously have had 10)
     public class PlayerRollData
     {
-        #region Properties
-
         public int MaxRollNoResources { get; set; } = 0;
         public List<RollResourcesModel> ResourceList { get; set; } = new List<RollResourcesModel>();
-
-        #endregion Properties
     }
 
     /// <summary>
@@ -22,7 +18,11 @@ namespace Catan10
     /// </summary>
     public class RolledModel : LogHeader
     {
-        #region Constructors
+        //
+        //  there is a limitation in the system.text.json serializer in 3.0 where it will only serialize Dictionary<string, TValue>
+        public Dictionary<string, PlayerRollData> PlayerToResources { get; set; }
+
+        public int Rolled { get; set; } = -1;
 
         public RolledModel()
         {
@@ -32,20 +32,6 @@ namespace Catan10
         {
             Rolled = n;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        //
-        //  there is a limitation in the system.text.json serializer in 3.0 where it will only serialize Dictionary<string, TValue>
-        public Dictionary<string, PlayerRollData> PlayerToResources { get; set; }
-
-        public int Rolled { get; set; } = -1;
-
-        #endregion Properties
-
-        #region Methods
 
         //
         //  compares 2 RolledModel objects for identity.  used for testing Redo.
@@ -75,8 +61,6 @@ namespace Catan10
 
             return true;
         }
-
-        #endregion Methods
     }
 
     /// <summary>
@@ -84,7 +68,11 @@ namespace Catan10
     /// </summary>
     public class RollResourcesModel
     {
-        #region Constructors
+        public bool BlockedByBaron { get; set; }
+
+        public ResourceType ResourceType { get; set; }
+
+        public int Value { get; set; }
 
         public RollResourcesModel()
         {
@@ -97,16 +85,6 @@ namespace Catan10
             Value = value;
             BlockedByBaron = blocked;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public bool BlockedByBaron { get; set; }
-        public ResourceType ResourceType { get; set; }
-        public int Value { get; set; }
-
-        #endregion Properties
     }
 
     /// <summary>

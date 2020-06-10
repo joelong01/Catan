@@ -4,7 +4,11 @@ namespace Catan10
 {
     public class Target
     {
-        #region Constructors
+        public PlayerModel Player { get; private set; } = null;
+
+        public int ResourcePotential { get; private set; } = 0;
+
+        public TileCtrl Tile { get; private set; } = null;
 
         public Target(PlayerModel p, TileCtrl t)
         {
@@ -43,23 +47,9 @@ namespace Catan10
             }
         }
 
-        #endregion Constructors
-
-        #region Properties
-
-        public PlayerModel Player { get; private set; } = null;
-        public int ResourcePotential { get; private set; } = 0;
-        public TileCtrl Tile { get; private set; } = null;
-
-        #endregion Properties
-
-        #region Methods
-
         public override string ToString()
         {
             return $"{Player,-15} | {Tile,-15} | {ResourcePotential}";
         }
-
-        #endregion Methods
     }
 }

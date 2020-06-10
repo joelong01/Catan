@@ -36,11 +36,6 @@ namespace Catan10
         {
         }
 
-        public PlayersTrackerCtrl()
-        {
-            this.InitializeComponent();
-        }
-
         public TradeResources GameResources
         {
             get => (TradeResources)GetValue(GameResourcesProperty);
@@ -72,9 +67,18 @@ namespace Catan10
         }
 
         public static readonly DependencyProperty GameResourcesProperty = DependencyProperty.Register("GameResources", typeof(TradeResources), typeof(PlayersTrackerCtrl), new PropertyMetadata(new TradeResources()));
+
         public static readonly DependencyProperty GameStateProperty = DependencyProperty.Register("GameState", typeof(GameState), typeof(PlayersTrackerCtrl), new PropertyMetadata(GameState.WaitingForNewGame));
+
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(PlayersTrackerCtrl), new PropertyMetadata(null, MainPageModelChanged));
+
         public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayersTrackerCtrl), new PropertyMetadata(null));
+
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayersTrackerCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
+
+        public PlayersTrackerCtrl()
+        {
+            this.InitializeComponent();
+        }
     }
 }

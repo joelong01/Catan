@@ -1,9 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using System.Threading.Tasks;
-
-using Catan.Proxy;
-
-namespace Catan10
+﻿namespace Catan10
 {
     public class BaronModel
     {

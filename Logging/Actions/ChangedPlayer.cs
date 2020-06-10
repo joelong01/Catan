@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -12,43 +11,29 @@ namespace Catan10
     /// </summary>
     public class ChangePlayerLog : LogHeader, ILogController
     {
-        #region Methods
+        #region Properties
 
-        private bool ListsEqual(List<int> l1, List<int> l2)
-        {
-            if (l1.Count != l2.Count)
-                return false;
+        public List<int> HighlightedTiles { get; set; } = new List<int>();
 
-            for (int i = 0; i < l1.Count; i++)
-            {
-                if (l1[i] != l2[i])
-                {
-                    return false;
-                }
-            }
+        public string NewCurrentPlayer { get; set; }
 
-            return true;
-        }
+        public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
 
-        #endregion Methods
+        public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
 
-        #region Constructors
+        public string PreviousPlayer { get; set; }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
 
         public ChangePlayerLog()
         {
         }
 
-        #endregion Constructors
+        #endregion Constructors + Destructors
 
-        #region Properties
-
-        public List<int> HighlightedTiles { get; set; } = new List<int>();
-        public string NewCurrentPlayer { get; set; }
-        public List<int> NewRandomGoldTiles { get; set; } = new List<int>();
-        public List<int> OldRandomGoldTiles { get; set; } = new List<int>();
-        public string PreviousPlayer { get; set; }
-
-        #endregion Properties
+        #region Methods
 
         public static async Task ChangePlayer(IGameController gameController, int numberofPositions)
         {
@@ -84,7 +69,7 @@ namespace Catan10
                 HighlightedTiles = gameController.HighlightedTiles
             };
 
-            await gameController.PostMessage(logHeader, ActionType.Normal );
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)
@@ -112,5 +97,23 @@ namespace Catan10
         {
             return gameController.UndoChangePlayer(this);
         }
+
+        private bool ListsEqual(List<int> l1, List<int> l2)
+        {
+            if (l1.Count != l2.Count)
+                return false;
+
+            for (int i = 0; i < l1.Count; i++)
+            {
+                if (l1[i] != l2[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        #endregion Methods
     }
 }

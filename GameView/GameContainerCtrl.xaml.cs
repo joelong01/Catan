@@ -16,8 +16,6 @@ namespace Catan10
 {
     public class CatanGameCtrl : ICatanGameData
     {
-        #region Properties
-
         private ICatanGameData ChildControl
         {
             get
@@ -30,36 +28,23 @@ namespace Catan10
             }
         }
 
-        #endregion Properties
-
-        #region Methods
-
         internal DevCardType GetNextDevCard()
         {
             return ChildControl.GameData.GetNextDevCard();
         }
 
-        #endregion Methods
-
-        #region Constructors
-
-        public CatanGameCtrl(Type type, CatanGames gameType, string s, int idx)
-        {
-            ControlType = type;
-            Description = s;
-            Index = idx;
-            CatanGame = gameType;
-        }
-
-        #endregion Constructors
-
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
+
         public UserControl Control { get; set; } = null;
+
         public Type ControlType { get; set; } = typeof(RegularGameCtrl);
 
         public string Description { get; set; } = "Regular";
+
         public List<TileCtrl> DesertTiles => ChildControl.DesertTiles;
+
         public CatanGameData GameData => ChildControl.GameData;
+
         public GameType GameType => ChildControl.GameType;
 
         public CatanHexPanel HexPanel
@@ -75,7 +60,16 @@ namespace Catan10
         }
 
         public int Index { get; set; } = -1;
+
         public List<TileCtrl> Tiles => ChildControl.Tiles;
+
+        public CatanGameCtrl(Type type, CatanGames gameType, string s, int idx)
+        {
+            ControlType = type;
+            Description = s;
+            Index = idx;
+            CatanGame = gameType;
+        }
 
         public override string ToString()
         {
@@ -91,8 +85,6 @@ namespace Catan10
 
     public sealed partial class GameContainerCtrl : UserControl
     {
-        #region Fields
-
         //
         //  when you build a new Game control, add it to this list
         //
@@ -117,10 +109,6 @@ namespace Catan10
         private IGameCallback _gameCallback = null;
         private Dictionary<ResourceType, double> _probabilities = new Dictionary<ResourceType, double>();
         private ITileControlCallback _tileCallback = null;
-
-        #endregion Fields
-
-        #region Methods
 
         private static void OnCurrentGameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -406,21 +394,8 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        #endregion Methods
-
-        public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGameCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
-        public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGameCtrl>), typeof(CatanHexPanel), new PropertyMetadata(""));
-
-        public GameContainerCtrl()
-        {
-            this.InitializeComponent();
-            Games = _games;
-        }
-
         public List<BuildingCtrl> AllBuildings => _currentHexPanel.Buildings;
-
         public List<RoadCtrl> AllRoads => _currentHexPanel.Roads;
-
         public List<TileCtrl> AllTiles => _currentHexPanel.Tiles;
 
         public TileCtrl BaronTile
@@ -515,6 +490,14 @@ namespace Catan10
 
         public RandomBoardSettings RandomBoardSettings { get; private set; } = null;
         public TileCtrl[] TilesInIndexOrder => _currentHexPanel.TilesInIndexOrder;
+        public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGameCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
+        public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGameCtrl>), typeof(CatanHexPanel), new PropertyMetadata(""));
+
+        public GameContainerCtrl()
+        {
+            this.InitializeComponent();
+            Games = _games;
+        }
 
         public static List<int> GetRandomList(int max)
         {

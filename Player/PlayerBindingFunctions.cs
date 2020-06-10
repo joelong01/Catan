@@ -7,8 +7,6 @@ namespace Catan10
 {
     public static class PlayerBindingFunctions
     {
-        #region Methods
-
         public static LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
@@ -76,7 +74,5 @@ namespace Catan10
             var brush = ConverterGlobals.GetBrush(Colors.Purple);
             return brush;
         }
-
-        #endregion Methods
     }
 }

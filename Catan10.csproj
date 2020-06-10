@@ -188,8 +188,8 @@
     <Compile Include="Logging\StateTransitions\0_NewGame.cs" />
     <Compile Include="Player\PlayerResources.cs" />
     <Compile Include="Player\TradeResources.cs" />
-    <Compile Include="SignalR\CatanRestService.cs" />
-    <Compile Include="SignalR\CatanSignalRClient.cs" />
+    <Compile Include="CatanService\CatanRestService.cs" />
+    <Compile Include="CatanService\CatanSignalRClient.cs" />
     <Compile Include="State\GridPosition.cs" />
     <Compile Include="State\TargetTracking.cs" />
     <Compile Include="Logging\StateTransitions\UpdateRoadState.cs" />

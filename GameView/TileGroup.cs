@@ -7,36 +7,16 @@ namespace Catan10
 {
     public class TileGroup
     {
-        #region Fields
-
         private readonly string[] SerializedProperties = new string[] { "Start", "End", "Randomize", "ResourceTypes", "NumberSequence", "HarborTypes", "RandomResourceTypeList", "RandomHarborTypeList", "TileCount" };
 
         private int _cols = 0;
 
         private int _rows = 0;
 
-        #endregion Fields
-
-        #region Constructors
-
-        public TileGroup()
-        {
-        }
-
-        public TileGroup(string s)
-        {
-            string[] tokens = s.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
-            Start = int.Parse(tokens[0]);
-            End = int.Parse(tokens[1]);
-            Randomize = bool.Parse(tokens[2]);
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
         public List<List<TileData>> _tilesInVisualOrder { get; private set; } = new List<List<TileData>>();
+
         public List<TileCtrl> AllTiles { get; set; } = new List<TileCtrl>();
+
         public List<TileData> AllTilesData { get; set; } = new List<TileData>();
 
         public int Cols
@@ -52,10 +32,15 @@ namespace Catan10
         }
 
         public int DesertCount { get; internal set; }
+
         public List<int> DesertTileIndices { get; set; } = new List<int>();
+
         public int End { get; set; }
+
         public List<TileCtrl> OriginalNonSeaTiles { get; set; } = new List<TileCtrl>();
+
         public List<TileData> OriginalNonSeaTilesData { get; set; } = new List<TileData>();
+
         public bool Randomize { get; set; }
 
         public int Rows
@@ -71,6 +56,7 @@ namespace Catan10
         }
 
         public int Start { get; set; }
+
         public List<ResourceType> StartingResourceTypes { get; set; } = new List<ResourceType>();
 
         public List<int> StartingTileNumbers { get; set; } = new List<int>();
@@ -120,9 +106,17 @@ namespace Catan10
 
         public List<TileCtrl> TilesToRandomize { get; set; } = new List<TileCtrl>();
 
-        #endregion Properties
+        public TileGroup()
+        {
+        }
 
-        #region Methods
+        public TileGroup(string s)
+        {
+            string[] tokens = s.Split(new char[] { '-', '.' }, StringSplitOptions.RemoveEmptyEntries);
+            Start = int.Parse(tokens[0]);
+            End = int.Parse(tokens[1]);
+            Randomize = bool.Parse(tokens[2]);
+        }
 
         public static List<TileGroup> BuildList(string s)
         {
@@ -184,7 +178,5 @@ namespace Catan10
         {
             return string.Format($"{Start}-{End}.{Randomize}");
         }
-
-        #endregion Methods
     }
 }

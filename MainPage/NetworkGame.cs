@@ -19,11 +19,17 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        #region Properties + Fields 
+
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         private MessageWebSocket MessageWebSocket { get; set; }
         private DataWriter MessageWriter { get; set; }
 
         private Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
+
+        #endregion Properties + Fields 
+
+        #region Methods
 
         private async Task DeleteAllGames()
         {
@@ -251,14 +257,6 @@ namespace Catan10
             //   var messages = await Proxy.
         }
 
-        private async void Service_OnGameDeleted(GameInfo gameInfo)
-        {
-            if (CurrentGameState != GameState.Uninitialized && CurrentGameState != GameState.WaitingForNewGame)
-            {
-                await this.Reset();
-            }
-        }
-
         private async void Service_OnBroadcastMessageReceived(CatanMessage message)
         {
             MainPageModel.Log.RecordMessage(message);
@@ -282,10 +280,19 @@ namespace Catan10
             }
         }
 
+        private async void Service_OnGameDeleted(GameInfo gameInfo)
+        {
+            if (CurrentGameState != GameState.Uninitialized && CurrentGameState != GameState.WaitingForNewGame)
+            {
+                await this.Reset();
+            }
+        }
         private void Service_OnPrivateMessage(CatanMessage message)
         {
             throw new NotImplementedException();
         }
+
+        #endregion Methods
 
         //private async void StartMonitoring()
         //{

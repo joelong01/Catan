@@ -5,8 +5,6 @@ namespace Catan10
 {
     internal class CatanAttachedProperties : DependencyObject
     {
-        #region Methods
-
         private static void PlayerModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (e.NewValue != null && d != null)
@@ -16,14 +14,8 @@ namespace Catan10
             }
         }
 
-        #endregion Methods
-
-        #region Fields
-
         public static DependencyProperty CurrentPlayerForegroundBrushProperty = DependencyProperty.RegisterAttached("GetCurrentPlayerForegroundBrush", typeof(Color), typeof(CatanAttachedProperties), new PropertyMetadata(Colors.White));
         public static DependencyProperty CurrentPlayerModelProperty = DependencyProperty.RegisterAttached("GetCurrentPlayerModel", typeof(PlayerModel), typeof(CatanAttachedProperties), new PropertyMetadata(new PlayerModel(), PlayerModelChanged));
-
-        #endregion Fields
 
         public static Color GetCurrentPlayerForegroundBrush(DependencyObject obj)
         {

@@ -5,15 +5,18 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
 using Catan.Proxy;
+
 using Windows.UI;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
     public class MainPageModel : INotifyPropertyChanged
     {
+        #region Properties + Fields 
+
         private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
 
         private bool _EnableUiInteraction = true;
@@ -36,12 +39,11 @@ namespace Catan10
 
         private int _TwoStarPosition = 0;
 
-
-
         private bool _WebSocketConnected = false;
-        [JsonIgnore] public GameInfo DefaultGame { get; } = new GameInfo() { Name = "DefaultGame", Started = false, Creator = "", Id = Guid.Parse("F070F8DA-A5FD-4957-A528-0B915930123F") };
 
+        #endregion Properties + Fields 
 
+        #region Methods
 
         private void InitBank()
         {
@@ -79,7 +81,6 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
         private void UnspentEntitlements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             NotifyPropertyChanged("EnableNextButton");
@@ -100,23 +101,25 @@ namespace Catan10
             );
         }
 
-        public MainPageModel()
-        {
-            InitBank();
-            Log = new Log(MainPage.Current);
-            GameController = MainPage.Current;
-        }
+        #endregion Methods
 
-        public async Task InitServiceHub()
-        {
-           
-        }
+        #region Constructors
+
+        #endregion Constructors
+
+        #region Delegates  + Events + Enums
+
+        #endregion Delegates  + Events + Enums
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
 
         [JsonIgnore]
         public PlayerModel Bank { get; private set; }
 
+        [JsonIgnore]
+        public ICatanService CatanService { get; set; }
+
+        [JsonIgnore] public GameInfo DefaultGame { get; } = new GameInfo() { Name = "DefaultGame", Started = false, Creator = "", Id = Guid.Parse("F070F8DA-A5FD-4957-A528-0B915930123F") };
         public string DefaultUser { get; set; } = "";
 
         [JsonIgnore]
@@ -290,8 +293,6 @@ namespace Catan10
 
         public GameState GameState => Log.GameState;
 
-      
-
         [JsonIgnore]
         public bool IsServiceGame
         {
@@ -340,10 +341,6 @@ namespace Catan10
                 }
             }
         }
-
-        
-        [JsonIgnore]
-        public ICatanService CatanService { get; set; }
 
         [JsonIgnore]
         public TradeResources ResourcesLeftInBank
@@ -507,8 +504,16 @@ namespace Catan10
             }
         }
 
+        public MainPageModel()
+        {
+            InitBank();
+            Log = new Log(MainPage.Current);
+            GameController = MainPage.Current;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
+ 
         public void SetPipCount(int[] value)
         {
             FiveStarPositions = value[0];

@@ -6,23 +6,15 @@ namespace Catan10
 {
     public class UpdateBuildingLog : LogHeader, ILogController
     {
-        #region Constructors
+        public int BuildingIndex { get; set; } = -1;
+
+        public BuildingState NewBuildingState { get; set; } = BuildingState.None;
+
+        public BuildingState OldBuildingState { get; set; } = BuildingState.None;
 
         public UpdateBuildingLog() : base()
         {
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public int BuildingIndex { get; set; } = -1;
-        public BuildingState NewBuildingState { get; set; } = BuildingState.None;
-        public BuildingState OldBuildingState { get; set; } = BuildingState.None;
-
-        #endregion Properties
-
-        #region Methods
 
         public static async Task UpdateBuildingState(IGameController gameController, BuildingCtrl building, BuildingState newState)
         {
@@ -50,7 +42,5 @@ namespace Catan10
         {
             return gameController.UndoUpdateBuilding(this);
         }
-
-        #endregion Methods
     }
 }

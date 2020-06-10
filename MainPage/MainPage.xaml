@@ -70,8 +70,8 @@
                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
                         <MenuFlyoutSubItem Text="Game Type">
                             <ToggleMenuFlyoutItem Text="Regular Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
-                            <ToggleMenuFlyoutItem Text="SignalR Game" IsChecked="{x:Bind MainPageModel.Settings.IsSignalRGame, Mode=TwoWay}"  />
-                            <ToggleMenuFlyoutItem Text="REST Game"    IsChecked="{x:Bind MainPageModel.Settings.IsHomegrownGame, Mode=TwoWay}"  />
+                            <ToggleMenuFlyoutItem Text="SignalR Game" IsChecked="{x:Bind MainPageModel.Settings.IsSignalRGame, Mode=TwoWay}" />
+                            <ToggleMenuFlyoutItem Text="REST Game" IsChecked="{x:Bind MainPageModel.Settings.IsHomegrownGame, Mode=TwoWay}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
                         <MenuFlyoutSeparator />

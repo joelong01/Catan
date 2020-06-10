@@ -12,6 +12,8 @@ namespace Catan10
     //  and exposes the data needed by the Views/Pages
     internal interface ICatanGameData
     {
+        #region Properties + Fields 
+
         CatanGames CatanGame { get; }
         string Description { get; }
         List<TileCtrl> DesertTiles { get; }
@@ -21,6 +23,8 @@ namespace Catan10
         int Index { get; }
 
         List<TileCtrl> Tiles { get; }
+
+        #endregion Properties + Fields 
     }
 
     public delegate void BroadcastMessageReceivedHandler(CatanMessage message);
@@ -30,22 +34,43 @@ namespace Catan10
 
     public interface ICatanService
     {
+        #region Delegates  + Events + Enums
+
         /// <summary>
         ///     a message is recieved that was sent to all clients
         /// </summary>
         event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
         /// <summary>
+        ///    a game as created
+        /// </summary>
+        event CreateGameHandler OnGameCreated;
+
+        /// <summary>
         ///    a game was deleted
         /// </summary>
         event DeleteGameHandler OnGameDeleted;
         /// <summary>
-        ///    a game as created
-        /// </summary>
-        event CreateGameHandler OnGameCreated;
-        /// <summary>
         ///     a message was sent to only this client
         /// </summary>
         event PrivateMessageReceivedHandler OnPrivateMessage;
+
+        #endregion Delegates  + Events + Enums
+
+        #region Methods
+
+        Task BroadcastMessage(CatanMessage message);
+
+        Task CreateGame();
+
+        /// <summary>
+        ///     Tell the service to delete the game with this ID
+        /// </summary>
+        /// <param name="gameName"></param>
+        /// <returns></returns>
+        Task DeleteGame(GameInfo gameInfo, string by);
+
+        Task<List<GameInfo>> GetAllGames();
+
         /// <summary>
         ///     Connect to the service and start listening for updates.  events will fire.
         /// </summary>
@@ -53,24 +78,19 @@ namespace Catan10
         /// <param name="gameInfo"></param>
         /// <returns></returns>
         Task Initialize(string hostName, GameInfo gameInfo);
-        /// <summary>
-        ///     Tell the service to delete the game with this ID
-        /// </summary>
-        /// <param name="gameName"></param>
-        /// <returns></returns>
-        Task DeleteGame(GameInfo gameInfo, string by);
         Task JoinGame(string playerName);
-        Task CreateGame();
-        Task BroadcastMessage(CatanMessage message);
         Task SendPrivateMessage(string user, CatanMessage message);
-        Task<List<GameInfo>> GetAllGames();
         Task StartConnection(string playerName);
-        
-        
+
+        #endregion Methods
+
+
     }
 
     public interface ICatanSettings
     {
+        #region Properties + Fields 
+
         bool AnimateFade { get; set; }
         int AnimationSpeedBase { get; set; }
         int FadeSeconds { get; set; }
@@ -81,6 +101,10 @@ namespace Catan10
         bool UseRandomNumbers { get; set; }
         bool ValidateBuilding { get; set; }
         double Zoom { get; set; }
+
+        #endregion Properties + Fields 
+
+        #region Methods
 
         void Close();
 
@@ -99,10 +123,14 @@ namespace Catan10
         Task SettingChanged();
 
         Task Winner();
+
+        #endregion Methods
     }
 
     public interface IGameCallback
     {
+        #region Methods
+
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
 
         bool BuildingStateChangeOk(BuildingCtrl building);
@@ -118,10 +146,14 @@ namespace Catan10
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
 
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
+
+        #endregion Methods
     }
 
     public interface IGameController
     {
+        #region Properties + Fields 
+
         bool AutoRespondAndTheHuman { get; }
         CatanGames CatanGame { get; set; }
 
@@ -150,6 +182,10 @@ namespace Catan10
 
         IRollLog RollLog { get; }
         PlayerModel TheHuman { get; }
+
+        #endregion Properties + Fields 
+
+        #region Methods
 
         /// <summary>
         ///     Adds a player to the game.  if the Player is already in the game, return false.
@@ -232,10 +268,14 @@ namespace Catan10
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
+
+        #endregion Methods
     }
 
     public interface IGameViewCallback
     {
+        #region Methods
+
         void OnGridLeftTapped(TileCtrl tile, TappedRoutedEventArgs e);
 
         void OnGridRightTapped(TileCtrl tile, RightTappedRoutedEventArgs e);
@@ -243,24 +283,38 @@ namespace Catan10
         void OnHarborRightTapped(TileCtrl tileCtrl, HarborLocation location, RightTappedRoutedEventArgs e);
 
         void OnTileDoubleTapped(object sender, DoubleTappedRoutedEventArgs e);
+
+        #endregion Methods
     }
 
     public interface ILogController
     {
+        #region Methods
+
         Task Do(IGameController gameController);
 
         Task Redo(IGameController gameController);
 
         Task Undo(IGameController gameController);
+
+        #endregion Methods
     }
 
     public interface IMessageDeserializer
     {
+        #region Methods
+
         LogHeader Deserialize(string json);
+
+        #endregion Methods
     }
 
     public interface ITileControlCallback
     {
+        #region Methods
+
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
+
+        #endregion Methods
     }
 }

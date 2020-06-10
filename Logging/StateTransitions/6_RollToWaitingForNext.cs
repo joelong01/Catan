@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
+
 using Windows.UI.Xaml.Controls;
 
 namespace Catan10

@@ -18,8 +18,6 @@ namespace Catan10
 {
     public static class BrushDependecyFunctions
     {
-        #region Methods
-
         public static SolidColorBrush ColorToBrush(Color color)
         {
             return ConverterGlobals.GetBrush(color);
@@ -64,14 +62,10 @@ namespace Catan10
             }
             return Colors.HotPink;
         }
-
-        #endregion Methods
     }
 
     public sealed partial class PlayerManagementDlg : ContentDialog
     {
-        #region Methods
-
         private async System.Threading.Tasks.Task LoadNewImage(PlayerModel player)
         {
             _gvPlayers.IsEnabled = false;
@@ -146,39 +140,6 @@ namespace Catan10
         {
         }
 
-        #endregion Methods
-
-        #region Fields
-
-        public static readonly DependencyProperty IsForegroundCheckedProperty = DependencyProperty.Register("IsForegroundChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
-        public static readonly DependencyProperty IsPrimaryCheckedProperty = DependencyProperty.Register("IsPrimaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(true));
-        public static readonly DependencyProperty IsSecondaryCheckedProperty = DependencyProperty.Register("IsSecondaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
-        public static readonly DependencyProperty SelectedPlayerProperty = DependencyProperty.Register("SelectedPlayer", typeof(PlayerModel), typeof(PlayerManagementDlg), new PropertyMetadata(null));
-        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(PlayerManagementDlg), typeof(PlayerManagementDlg), new PropertyMetadata(null));
-
-        #endregion Fields
-
-        #region Constructors
-
-        public PlayerManagementDlg(ICollection<PlayerModel> playerData)
-        {
-            this.InitializeComponent();
-            Self = this;
-
-            foreach (var p in playerData)
-            {
-                PlayerDataList.Add(p);
-            }
-            if (PlayerDataList.Count > 0)
-            {
-                SelectedPlayer = PlayerDataList[0];
-            }
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
         public bool IsForegroundChecked
         {
             get => (bool)GetValue(IsForegroundCheckedProperty);
@@ -211,7 +172,26 @@ namespace Catan10
             set => SetValue(SelfProperty, value);
         }
 
-        #endregion Properties
+        public static readonly DependencyProperty IsForegroundCheckedProperty = DependencyProperty.Register("IsForegroundChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
+        public static readonly DependencyProperty IsPrimaryCheckedProperty = DependencyProperty.Register("IsPrimaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(true));
+        public static readonly DependencyProperty IsSecondaryCheckedProperty = DependencyProperty.Register("IsSecondaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
+        public static readonly DependencyProperty SelectedPlayerProperty = DependencyProperty.Register("SelectedPlayer", typeof(PlayerModel), typeof(PlayerManagementDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(PlayerManagementDlg), typeof(PlayerManagementDlg), new PropertyMetadata(null));
+
+        public PlayerManagementDlg(ICollection<PlayerModel> playerData)
+        {
+            this.InitializeComponent();
+            Self = this;
+
+            foreach (var p in playerData)
+            {
+                PlayerDataList.Add(p);
+            }
+            if (PlayerDataList.Count > 0)
+            {
+                SelectedPlayer = PlayerDataList[0];
+            }
+        }
 
         public Brush ColorToBrush(Color color)
         {

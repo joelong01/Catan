@@ -4,8 +4,6 @@ namespace Catan10
 {
     public class CatanServiceHelpers
     {
-        #region Methods
-
         static public LogHeader DeserializeLogHeader(string json)
         {
             LogHeader logHeader = CatanProxy.Deserialize<LogHeader>(json);
@@ -96,7 +94,5 @@ namespace Catan10
 
             return null;
         }
-
-        #endregion Methods
     }
 }

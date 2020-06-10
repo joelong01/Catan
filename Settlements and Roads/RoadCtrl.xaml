@@ -50,9 +50,9 @@
         <Grid Name="_gridRoads" Visibility="{x:Bind GetStateBasedVisibility(RoadState, 'road'),Mode=OneWay}">
             <!--  0    1    2       3    4       5  -->
             <!--<Polygon Name="_doublePolygon" Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,15" Stroke="BurlyWood" Fill="Blue" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" StrokeThickness="0" />
-            <Line Name="_lineTop" X1="4.5" Y1="2" X2="63.5" Y2="2" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle"/>
-            <Line  Name="_doubleMiddleLine" X1="4.5" Y1="8" X2="63.5" Y2="8" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle" StrokeDashArray="4"/>
-            <Line Name="_doubleBottomLine" X1="4.5" Y1="14" X2="63.5" Y2="14" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle"/>-->
+            <Line Name="_lineTop" X1="4.5" Y1="2" X2="63.5" Y2="2" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle" />
+            <Line  Name="_doubleMiddleLine" X1="4.5" Y1="8" X2="63.5" Y2="8" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle" StrokeDashArray="4" />
+            <Line Name="_doubleBottomLine" X1="4.5" Y1="14" X2="63.5" Y2="14" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle" />-->
 
             <Polygon Name="_doublePolygon" Grid.Column="1" Margin="0" HorizontalAlignment="Left"
                 VerticalAlignment="Top" Points=".5,8 68,8 63.5,16 4,16"
@@ -74,12 +74,6 @@
                 VerticalAlignment="Top" Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,15"
                 Style="{StaticResource RoadPolyStyle}"
                 StrokeThickness="1" />
-
-
         </Grid>
-
-
-
     </Grid>
-
 </UserControl>

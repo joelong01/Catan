@@ -10,19 +10,12 @@ namespace Catan10
 {
     public class LogHeader
     {
-        #region Constructors
-
-        public LogHeader()
-        {
-            TypeName = this.GetType().FullName;
-        }
-
-        #endregion Constructors
-
-        #region Properties
+        #region Properties + Fields 
 
         public CatanAction Action { get; set; }
+
         public bool CanUndo { get; set; } = true;
+
         public CatanGames CatanGame { get; set; } = MainPage.Current.GameContainer.CurrentGame.CatanGame;
 
         [JsonIgnore]
@@ -37,24 +30,37 @@ namespace Catan10
         }
 
         public Guid LogId { get; set; } = Guid.NewGuid();
+
         public LogType LogType { get; set; } = LogType.Normal;
+
         public GameState NewState { get; set; } = MainPage.Current.CurrentGameState;
+
         public GameState OldState { get; set; } = (MainPage.Current.MainPageModel.Log.PeekAction == null) ? GameState.WaitingForNewGame : MainPage.Current.MainPageModel.Log.PeekAction.NewState;
 
         [JsonIgnore]
         public LogHeader Previous { get; set; } = MainPage.Current.MainPageModel.Log.PeekAction;
 
         public string SentBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
+
         public DateTime Time { get; set; } = DateTime.Now;
-        // for debugging convinience
-        // if state changes, you have to set this
 
         public string TypeName { get; set; }
 
-        #endregion Properties
+        #endregion Properties + Fields 
+
+        #region Constructors
+
+        public LogHeader()
+        {
+            TypeName = this.GetType().FullName;
+        }
+
+        #endregion Constructors
 
         #region Methods
 
+        // for debugging convinience
+        // if state changes, you have to set this
         public static LogHeader Deserialize(JsonElement element)
         {
             var typeName = element.GetProperty("typeName").GetString();
@@ -87,21 +93,7 @@ namespace Catan10
 
     public class RandomBoardSettings
     {
-        #region Constructors
-
-        public RandomBoardSettings()
-        {
-        }
-
-        public RandomBoardSettings(Dictionary<string, RandomLists> Tiles, List<int> Harbors)
-        {
-            RandomHarborTypeList = Harbors;
-            TileGroupToRandomListsDictionary = Tiles;
-        }
-
-        #endregion Constructors
-
-        #region Properties
+        #region Properties + Fields 
 
         //
         //  every Board has a random list of harbors
@@ -115,7 +107,21 @@ namespace Catan10
         //
         public Dictionary<string, RandomLists> TileGroupToRandomListsDictionary { get; set; } = new Dictionary<string, RandomLists>();
 
-        #endregion Properties
+        #endregion Properties + Fields 
+
+        #region Constructors
+
+        public RandomBoardSettings()
+        {
+        }
+
+        public RandomBoardSettings(Dictionary<string, RandomLists> Tiles, List<int> Harbors)
+        {
+            RandomHarborTypeList = Harbors;
+            TileGroupToRandomListsDictionary = Tiles;
+        }
+
+        #endregion Constructors
 
         #region Methods
 
@@ -139,6 +145,14 @@ namespace Catan10
 
     public class RandomLists
     {
+        #region Properties + Fields 
+
+        public List<int> NumberList { get; set; } = null;
+
+        public List<int> TileList { get; set; } = null;
+
+        #endregion Properties + Fields 
+
         #region Constructors
 
         public RandomLists()
@@ -157,13 +171,6 @@ namespace Catan10
         }
 
         #endregion Constructors
-
-        #region Properties
-
-        public List<int> NumberList { get; set; } = null;
-        public List<int> TileList { get; set; } = null;
-
-        #endregion Properties
 
         #region Methods
 

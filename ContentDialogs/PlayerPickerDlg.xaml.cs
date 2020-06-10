@@ -11,13 +11,7 @@ namespace Catan10
 {
     public sealed partial class PlayerPickerDlg : ContentDialog
     {
-        #region Fields
-
         private readonly ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
-
-        #endregion Fields
-
-        #region Methods
 
         private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
@@ -32,7 +26,11 @@ namespace Catan10
         {
         }
 
-        #endregion Methods
+        public PlayerModel Player
+        {
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
+        }
 
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PlayerPickerDlg), new PropertyMetadata(null));
 
@@ -46,12 +44,6 @@ namespace Catan10
         {
             this.InitializeComponent();
             Players.AddRange(players);
-        }
-
-        public PlayerModel Player
-        {
-            get => (PlayerModel)GetValue(PlayerProperty);
-            set => SetValue(PlayerProperty, value);
         }
     }
 }

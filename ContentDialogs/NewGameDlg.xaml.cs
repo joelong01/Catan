@@ -11,8 +11,6 @@ namespace Catan10
 {
     public sealed partial class NewGameDlg : ContentDialog
     {
-        #region Methods
-
         private void GridView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
         {
             var source = PlayingPlayers;
@@ -119,36 +117,6 @@ namespace Catan10
             }
         }
 
-        #endregion Methods
-
-        #region Fields
-
-        public static readonly DependencyProperty SaveFileNameProperty = DependencyProperty.Register("SaveFileName", typeof(string), typeof(NewGameDlg), new PropertyMetadata(""));
-        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(CatanGameCtrl), typeof(NewGameDlg), new PropertyMetadata(null));
-
-        #endregion Fields
-
-        #region Constructors
-
-        public NewGameDlg()
-        {
-            this.InitializeComponent();
-            this.DataContext = PlayingPlayers;
-        }
-
-        public NewGameDlg(IList<PlayerModel> playerData, IList<CatanGameCtrl> games)
-        {
-            this.InitializeComponent();
-            AvailablePlayers.AddRange(playerData);
-            AvailableGames.AddRange(games);
-            SelectedGame = AvailableGames[0];
-            this.DataContext = this;
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
         public ObservableCollection<CatanGameCtrl> AvailableGames { get; } = new ObservableCollection<CatanGameCtrl>();
         public ObservableCollection<PlayerModel> AvailablePlayers { get; } = new ObservableCollection<PlayerModel>();
         public ObservableCollection<PlayerModel> PlayingPlayers { get; } = new ObservableCollection<PlayerModel>();
@@ -166,7 +134,22 @@ namespace Catan10
         }
 
         public int SelectedIndex => AvailableGames.IndexOf(SelectedGame);
+        public static readonly DependencyProperty SaveFileNameProperty = DependencyProperty.Register("SaveFileName", typeof(string), typeof(NewGameDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(CatanGameCtrl), typeof(NewGameDlg), new PropertyMetadata(null));
 
-        #endregion Properties
+        public NewGameDlg()
+        {
+            this.InitializeComponent();
+            this.DataContext = PlayingPlayers;
+        }
+
+        public NewGameDlg(IList<PlayerModel> playerData, IList<CatanGameCtrl> games)
+        {
+            this.InitializeComponent();
+            AvailablePlayers.AddRange(playerData);
+            AvailableGames.AddRange(games);
+            SelectedGame = AvailableGames[0];
+            this.DataContext = this;
+        }
     }
 }

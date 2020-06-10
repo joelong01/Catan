@@ -14,25 +14,9 @@ namespace Catan10
 
     public sealed partial class PlayerRollCtrl : UserControl
     {
+        private ObservableCollection<RollModel> Rolls { get; } = new ObservableCollection<RollModel>();
         private bool _rolled = false;
         private bool clicked = false;
-
-        public PlayerRollCtrl()
-        {
-            this.InitializeComponent();
-            
-            for (int i = 0; i < 4; i++)
-            {
-                Rolls.Add(new RollModel());
-            }
-
-            Randomize();
-        }
-
-        public event OnRolledHandler OnRolled;
-        public event OnRolledHandler OnShowAllRolls;
-
-        private ObservableCollection<RollModel> Rolls { get; } = new ObservableCollection<RollModel>();
 
         private void OnFaceDown(object sender, RoutedEventArgs e)
         {
@@ -54,8 +38,6 @@ namespace Catan10
 
         private void OnShowAll(object sender, RoutedEventArgs e)
         {
-            
-
             if (!_rolled) return;
 
             if (clicked) return;
@@ -85,9 +67,24 @@ namespace Catan10
             }
             finally
             {
-                
             }
         }
+
+        public PlayerRollCtrl()
+        {
+            this.InitializeComponent();
+
+            for (int i = 0; i < 4; i++)
+            {
+                Rolls.Add(new RollModel());
+            }
+
+            Randomize();
+        }
+
+        public event OnRolledHandler OnRolled;
+
+        public event OnRolledHandler OnShowAllRolls;
 
         public void Randomize()
         {

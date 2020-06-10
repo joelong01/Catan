@@ -61,12 +61,6 @@ namespace Catan10
             }
         }
 
-        public Harbor()
-        {
-            this.InitializeComponent();
-            this.DataContext = this;
-        }
-
         public FrameworkElement AnimationObject => _backGrid;
 
         public bool Flip
@@ -187,6 +181,7 @@ namespace Catan10
         }
 
         public int TileIndex { get; set; } = 0;
+
         public CompositeTransform Transform => _gridTransform;
 
         public bool UseClassic
@@ -196,13 +191,19 @@ namespace Catan10
             set => _useClassic = value;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
 
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
 
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
+
+        public Harbor()
+        {
+            this.InitializeComponent();
+            this.DataContext = this;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Task AnimateMoveTask(Point to, double ms, double startAfter)
         {

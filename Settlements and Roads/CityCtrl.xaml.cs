@@ -11,26 +11,6 @@ namespace Catan10
     /// </summary>
     public sealed partial class CityCtrl : UserControl
     {
-        #region Fields
-
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(new PlayerModel()));
-
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
-
-        #endregion Fields
-
-        #region Constructors
-
-        public CityCtrl()
-        {
-            this.DataContext = this;
-            this.InitializeComponent();
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
         public PlayerModel CurrentPlayer
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
@@ -43,9 +23,15 @@ namespace Catan10
             set => SetValue(OwnerProperty, value);
         }
 
-        #endregion Properties
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(new PlayerModel()));
 
-        #region Methods
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
+
+        public CityCtrl()
+        {
+            this.DataContext = this;
+            this.InitializeComponent();
+        }
 
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
@@ -56,7 +42,5 @@ namespace Catan10
         {
             return PlayerBindingFunctions.GetForegroundBrush(current, owner);
         }
-
-        #endregion Methods
     }
 }

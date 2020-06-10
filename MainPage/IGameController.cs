@@ -14,7 +14,14 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
+
+        #region Properties + Fields 
+
         private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
+
+        #endregion Properties + Fields 
+
+        #region Methods
 
         private async Task UpdateUiForState(GameState currentState)
         {
@@ -118,6 +125,8 @@ namespace Catan10
                     break;
             }
         }
+
+        #endregion Methods
 
         public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
 

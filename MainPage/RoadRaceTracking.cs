@@ -31,6 +31,12 @@ namespace Catan10
             }
         }
 
+        //
+        //  given a road count, get the ordered list of players that have that many roads
+        //  First() will be the one that got their first.
+        //
+        public Dictionary<string, List<PlayerModel>> RaceDictionary { get; set; } = new Dictionary<string, List<PlayerModel>>();
+
         public RoadRaceTracking(IGameController gameController)
         {
             GameController = gameController;
@@ -39,12 +45,6 @@ namespace Catan10
         public RoadRaceTracking()
         {
         }
-
-        //
-        //  given a road count, get the ordered list of players that have that many roads
-        //  First() will be the one that got their first.
-        //
-        public Dictionary<string, List<PlayerModel>> RaceDictionary { get; set; } = new Dictionary<string, List<PlayerModel>>();
 
         public static RoadRaceTracking Deserialize(string json)
         {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -27,20 +26,12 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-
-        private Dictionary<Guid, TaskCompletionSource<object>> MessageCompletionDictionary = new Dictionary<Guid, TaskCompletionSource<object>>();
         private const int MAX_SAVE_FILES_RETAINED = 5;
-
         private const int SMALLEST_STATE_COUNT = 8;
-
         private readonly RoadRaceTracking _raceTracking = null;
-
         private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
-
         private bool _doDragDrop = false;
-
         private DateTime _dt = DateTime.Now;
-
         private int _randomBoardListIndex = 0;
 
         /// <summary>
@@ -53,6 +44,7 @@ namespace Catan10
         private int _showPipGroupIndex = 0;
 
         private TaskCompletionSource<object> fileGuard = null;
+        private Dictionary<Guid, TaskCompletionSource<object>> MessageCompletionDictionary = new Dictionary<Guid, TaskCompletionSource<object>>();
 
         private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -75,21 +67,6 @@ namespace Catan10
             pData.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
 
             return Task.CompletedTask;
-        }
-
-        private Task InitMainPageModel()
-        {
-            return Task.CompletedTask;
-            
-            //await MainPageModel.InitServiceHub();
-            //if (MainPageModel.Settings.IsSignalRGame)
-            //{
-            //    MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
-            //    MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
-            //    MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
-            //    MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
-            //}
-           
         }
 
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -255,6 +232,20 @@ namespace Catan10
             }
         }
 
+        private Task InitMainPageModel()
+        {
+            return Task.CompletedTask;
+
+            //await MainPageModel.InitServiceHub();
+            //if (MainPageModel.Settings.IsSignalRGame)
+            //{
+            //    MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
+            //    MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
+            //    MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
+            //    MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
+            //}
+        }
+
         private async Task LoadMainPageModel()
         {
             try
@@ -267,10 +258,10 @@ namespace Catan10
                     MainPageModel = new MainPageModel()
                     {
                         AllPlayers = list,
-                        Settings = new Settings(),                        
+                        Settings = new Settings(),
                         TheHuman = "",
                     };
-                    
+
                     await SaveGameState();
                     MainPageModel = await ReadMainPageModelOffDisk(); // just verifying round trip...
                     Contract.Assert(MainPageModel != null);
@@ -635,7 +626,7 @@ namespace Catan10
                 if (mainPageModel == null) mainPageModel = new MainPageModel();
                 mainPageModel.GameController = this;
                 mainPageModel.Log = new Log(this);
-                
+
                 if (mainPageModel.Settings.GridPositions.Count == 0)
                 {
                     foreach (FrameworkElement child in ContentRoot.Children)
@@ -904,17 +895,8 @@ namespace Catan10
             InitTest();
             ResetDataForNewGame();
             await InitMainPageModel();
-            
-            //  await WsConnect();
-        }
 
-        public MainPage()
-        {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-            this.InitializeComponent();
-            Current = this;
-            this.DataContext = this;
-            _raceTracking = new RoadRaceTracking(this);
+            //  await WsConnect();
         }
 
         // this lets you double tap a map and then move it around
@@ -955,6 +937,15 @@ namespace Catan10
         public static readonly string SAVED_GAME_EXTENSION = ".log.json";
 
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
+
+        public MainPage()
+        {
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            this.InitializeComponent();
+            Current = this;
+            this.DataContext = this;
+            _raceTracking = new RoadRaceTracking(this);
+        }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
         {

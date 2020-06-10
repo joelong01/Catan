@@ -9,21 +9,22 @@ namespace Catan10
     /// </summary>
     public class NewGameLog : LogHeader, ILogController
     {
-        #region Constructors
+        #region Properties
+
+        public string CreatedBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
+
+        public int GameIndex { get; set; }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
 
         public NewGameLog() : base()
         {
             Action = CatanAction.StartGame;
         }
 
-        #endregion Constructors
-
-        #region Properties
-
-        public string CreatedBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
-        public int GameIndex { get; set; }
-
-        #endregion Properties
+        #endregion Constructors + Destructors
 
         #region Methods
 

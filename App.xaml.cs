@@ -13,8 +13,6 @@ namespace Catan10
     /// </summary>
     sealed partial class App : Application
     {
-        #region Methods
-
         /// <summary>
         /// Invoked when Navigation to a certain page fails
         /// </summary>
@@ -87,10 +85,6 @@ namespace Catan10
             Window.Current.Activate();
         }
 
-        #endregion Methods
-
-        #region Constructors
-
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -104,7 +98,5 @@ namespace Catan10
             this.Suspending += OnSuspending;
             this.RequestedTheme = ApplicationTheme.Dark;
         }
-
-        #endregion Constructors
     }
 }

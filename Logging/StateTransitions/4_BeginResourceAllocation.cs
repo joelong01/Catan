@@ -10,15 +10,9 @@ namespace Catan10
     /// </summary>
     public class WaitingForRollOrderToBeginResourceAllocation : LogHeader, ILogController
     {
-        #region Constructors
-
         public WaitingForRollOrderToBeginResourceAllocation()
         {
         }
-
-        #endregion Constructors
-
-        #region Methods
 
         public static async Task PostLog(IGameController gameController)
         {
@@ -58,7 +52,5 @@ namespace Catan10
         {
             return Task.CompletedTask;
         }
-
-        #endregion Methods
     }
 }

@@ -7,34 +7,60 @@ namespace Catan10
 {
     public class CatanGameData : INotifyPropertyChanged
     {
+        #region Properties + Fields 
+
+        private bool _allowShips = false;
+
+        private RandomBoardSettings _boardSettings = new RandomBoardSettings();
+
+        private List<DevCardType> _devCards = new List<DevCardType>();
+
+        private CatanGames _gameName = CatanGames.Regular;
+
+        private GameType _gameType = GameType.Regular;
+
+        private int _harborCount = 9;
+
+        private int _knight = 14;
+
+        private int _maxCities = 4;
+
+        private int _maxResourceAllocated = 19;
+
+        private int _maxRoads = 15;
+
+        private int _maxSettlements = 5;
+
+        private int _maxShips = 0;
+
+        private int _monopoly = 2;
+
+        private int _roadBuilding = 2;
+
+        private int _tileCount = 19;
+
+        private int _victoryPoint = 5;
+
+        private int _yearOfPlenty = 2;
+
+        #endregion Properties + Fields 
+
+        #region Methods
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public CatanGameData()
-        {
-        }
+        #endregion Methods
 
-        private bool _allowShips = false;
-        private RandomBoardSettings _boardSettings = new RandomBoardSettings();
-        private List<DevCardType> _devCards = new List<DevCardType>();
-        private CatanGames _gameName = CatanGames.Regular;
-        private GameType _gameType = GameType.Regular;
-        private int _harborCount = 9;
-        private int _knight = 14;
-        private int _maxCities = 4;
-        private int _maxResourceAllocated = 19;
-        private int _maxRoads = 15;
-        private int _maxSettlements = 5;
-        private int _maxShips = 0;
-        private int _monopoly = 2;
-        private int _roadBuilding = 2;
-        private int _tileCount = 19;
-        private int _victoryPoint = 5;
-        private int _yearOfPlenty = 2;
+        #region Constructors
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors
+
+        #region Delegates  + Events + Enums
+
+        #endregion Delegates  + Events + Enums
 
         public bool AllowShips
         {
@@ -308,6 +334,10 @@ namespace Catan10
             }
         }
 
+        public CatanGameData()
+        {
+        }
+
         public CatanGameData(CatanGameData info)
         {
             MaxRoads = info.MaxRoads;
@@ -322,6 +352,8 @@ namespace Catan10
             Monopoly = info.Monopoly;
             BuildDevCardList();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         // for "Regular Game"
         // most aggregate resource per type

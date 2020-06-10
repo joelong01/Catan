@@ -18,17 +18,11 @@ namespace Catan10
 
     public sealed partial class CatanNumber : UserControl, INotifyPropertyChanged
     {
-        #region Fields
-
         private readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
         private readonly SolidColorBrush _redBrush = CatanColors.GetResourceBrush("Red", Colors.Red);
         private readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White", Colors.White);
         private bool _showEyes = false;
         private NumberColorTheme myTheme = NumberColorTheme.Dark;
-
-        #endregion Fields
-
-        #region Methods
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -67,25 +61,6 @@ namespace Catan10
                 _evenGrid.Visibility = Visibility.Visible;
             }
         }
-
-        #endregion Methods
-
-        #region Constructors
-
-        public CatanNumber()
-        {
-            this.InitializeComponent();
-        }
-
-        #endregion Constructors
-
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
-
-        #region Properties
 
         public bool HideSeven { get; set; } = true;
 
@@ -213,7 +188,8 @@ namespace Catan10
         }
 
         public NumberStyle NumberStyle { get; set; } = NumberStyle.Default;
-        public int Probability { get; set; } = 0; // the number (divided by 36) that represents the probability of this number being rolled
+
+        public int Probability { get; set; } = 0;
 
         public bool ShowEyes
         {
@@ -231,12 +207,18 @@ namespace Catan10
             }
         }
 
+        // the number (divided by 36) that represents the probability of this number being rolled
         public NumberColorTheme Theme
         {
             get => myTheme;
             set { myTheme = value; NotifyPropertyChanged(); }
         }
 
-        #endregion Properties
+        public CatanNumber()
+        {
+            this.InitializeComponent();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

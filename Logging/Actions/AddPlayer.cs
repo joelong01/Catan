@@ -10,11 +10,23 @@ namespace Catan10
     /// </summary>
     public class AddPlayerLog : LogHeader, ILogController
     {
+        #region Properties + Fields
+
+        public string PlayerToAdd { get; set; }
+
+        #endregion Properties + Fields
+
+
+
+        #region Constructors
+
         public AddPlayerLog() : base()
         {
         }
 
-        public string PlayerToAdd { get; set; }
+        #endregion Constructors
+
+        #region Methods
 
         /// <summary>
         ///     an Action to add a player -- DOES NOT CHANGE STATE
@@ -62,5 +74,7 @@ namespace Catan10
         {
             return gameController.UndoAddPlayer(this);
         }
+
+        #endregion Methods
     }
 }

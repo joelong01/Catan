@@ -13,14 +13,8 @@ namespace Catan10
     /// </summary>
     public class VerifyPlayers : LogHeader, ILogController
     {
-        #region Properties
-
         public PlayerModel CurrentPlayer { get; set; }
         public List<PlayerModel> PlayingPlayers { get; set; }
-
-        #endregion Properties
-
-        #region Methods
 
         public static async Task PostMessage(IGameController gameController)
         {
@@ -55,7 +49,5 @@ namespace Catan10
         {
             throw new System.NotImplementedException();
         }
-
-        #endregion Methods
     }
 }

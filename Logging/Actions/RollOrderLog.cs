@@ -9,21 +9,11 @@ namespace Catan10
 {
     public class RollOrderLog : LogHeader, ILogController
     {
-        #region Constructors
+        public List<RollModel> Rolls { get; set; } = new List<RollModel>();
 
         public RollOrderLog() : base()
         {
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public List<RollModel> Rolls { get; set; } = new List<RollModel>();
-
-        #endregion Properties
-
-        #region Methods
 
         public static async Task PostMessage(IGameController gameController, List<RollModel> rolls)
         {
@@ -64,7 +54,5 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
-
-        #endregion Methods
     }
 }

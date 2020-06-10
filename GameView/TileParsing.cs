@@ -7,8 +7,6 @@ namespace Catan10
 {
     public partial class CatanHexPanel : Canvas
     {
-        #region Methods
-
         private TileCtrl AboveTile(int row, int col)
         {
             List<List<TileCtrl>> visualTiles = this.VisualTiles;
@@ -138,7 +136,5 @@ namespace Catan10
 
             return null;
         }
-
-        #endregion Methods
     }
 }

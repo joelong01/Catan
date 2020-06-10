@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Catan.Proxy;
 
-using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -81,7 +76,6 @@ namespace Catan10
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
             await TestTargetPlayer();
-        
         }
 
         private async void OnTest2(object sdr, RoutedEventArgs rea)

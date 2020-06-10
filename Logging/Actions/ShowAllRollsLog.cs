@@ -9,22 +9,12 @@ namespace Catan10
 {
     public class ShowAllRollsLog : LogHeader, ILogController
     {
-        #region Constructors
+        public List<RollModel> Rolls { get; set; } = new List<RollModel>();
 
         public ShowAllRollsLog() : base()
         {
             Action = CatanAction.Rolled;
         }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public List<RollModel> Rolls { get; set; } = new List<RollModel>();
-
-        #endregion Properties
-
-        #region Methods
 
         public static async Task Post(IGameController gameController, List<RollModel> rolls)
         {
@@ -65,7 +55,5 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
-
-        #endregion Methods
     }
 }

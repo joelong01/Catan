@@ -25,8 +25,6 @@ namespace Catan10
 
     public static class CatanColors
     {
-        #region Methods
-
         private static string GetKnownColorName(string hexString)
         {
             var color = (System.Drawing.Color)new System.Drawing.ColorConverter().ConvertFromString(hexString);
@@ -35,10 +33,6 @@ namespace Catan10
             string name = knownColor.ToString();
             return name.Equals("0") ? "" : name;
         }
-
-        #endregion Methods
-
-        #region Properties
 
         public static ICollection<Color> AvailableColors => NameToColorDictionary.Values;
 
@@ -57,8 +51,6 @@ namespace Catan10
             {"Purple", Colors.Purple},
             {"Blue", Colors.Blue }
         };
-
-        #endregion Properties
 
         public static List<SolidColorBrush> AllAvailableBrushes()
         {

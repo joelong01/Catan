@@ -11,15 +11,19 @@ namespace Catan10
     /// </summary>
     public class UpdateRoadLog : LogHeader, ILogController
     {
+        public RoadRaceTracking NewRaceTracking { get; set; } = new RoadRaceTracking(MainPage.Current);
+
+        public RoadState NewRoadState { get; set; } = RoadState.Unowned;
+
+        public RoadRaceTracking OldRaceTracking { get; set; } = new RoadRaceTracking(MainPage.Current);
+
+        public RoadState OldRoadState { get; set; } = RoadState.Unowned;
+
+        public int RoadIndex { get; set; } = -1;
+
         public UpdateRoadLog() : base()
         {
         }
-
-        public RoadRaceTracking NewRaceTracking { get; set; } = new RoadRaceTracking(MainPage.Current);
-        public RoadState NewRoadState { get; set; } = RoadState.Unowned;
-        public RoadRaceTracking OldRaceTracking { get; set; } = new RoadRaceTracking(MainPage.Current);
-        public RoadState OldRoadState { get; set; } = RoadState.Unowned;
-        public int RoadIndex { get; set; } = -1;
 
         public static async Task SetRoadState(IGameController gameController, RoadCtrl road, RoadState newRoadState, RoadRaceTracking raceTracker)
         {

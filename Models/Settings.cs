@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+
 using Catan.Proxy;
 
 namespace Catan10
 {
     public class Settings : INotifyPropertyChanged
     {
-
-        #region Properties + Fields 
-
         private bool _animateFade = true;
         private bool _AnimateFadeTiles = true;
         private int _animationSpeed = 3;
@@ -27,31 +21,17 @@ namespace Catan10
         private bool _RandomizeNumbers = true;
         private bool _resourceTracking = true;
         private bool _rotateTile = false;
-        string _serviceUri = "jdlgameservice.azurewebsites.net";
+        private string _serviceUri = "jdlgameservice.azurewebsites.net";
         private bool _showStopwatch = true;
         private bool _useClassicTiles = true;
         private bool _useRandomNumbers = true;
         private bool _validateBuilding = true;
         private double _zoom = 1.0;
 
-        #endregion Properties + Fields 
-
-        #region Methods
-
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        #endregion Methods
-
-        #region Constructors
-
-        #endregion Constructors
-
-        #region Delegates  + Events + Enums
-
-        #endregion Delegates  + Events + Enums
 
         public bool AnimateFade
         {
@@ -197,6 +177,22 @@ namespace Catan10
             }
         }
 
+        public string HostName
+        {
+            get
+            {
+                return _serviceUri;
+            }
+            set
+            {
+                if (_serviceUri != value)
+                {
+                    _serviceUri = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public bool IsHomegrownGame
         {
             get
@@ -206,7 +202,6 @@ namespace Catan10
 
             set
             {
-
                 {
                     if (_comStrat != GameCommunicationStrategy.Homegrown && value)
                     {
@@ -216,7 +211,6 @@ namespace Catan10
                     }
 
                     NotifyPropertyChanged();
-
                 }
             }
         }
@@ -305,21 +299,6 @@ namespace Catan10
             }
         }
 
-        public string HostName
-        {
-            get
-            {
-                return _serviceUri;
-            }
-            set
-            {
-                if (_serviceUri != value)
-                {
-                    _serviceUri = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
         public bool ShowStopwatch
         {
             get
@@ -399,6 +378,7 @@ namespace Catan10
                 }
             }
         }
+
         public Settings()
         {
         }

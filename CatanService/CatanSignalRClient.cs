@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
@@ -12,33 +11,31 @@ using Catan.Proxy;
 
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
+
 using Windows.UI.Core;
 
 namespace Catan10
 {
-   
     public class CatanSignalRClient : IDisposable, ICatanService
     {
-
         #region Properties + Fields 
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         private GameInfo GameInfo { get; set; }
         private HubConnection HubConnection { get; set; }
 
+        private string ServiceUrl { get; set; } = "";
+
         #endregion Properties + Fields 
 
         #region Methods
 
-        public HubConnectionState ConnectionState => HubConnection.State;
         private async void BroadcastMessageReceived(string from, string jsonMessage)
         {
-
             if (OnBroadcastMessageReceived != null)
             {
                 try
                 {
-
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         var message = ParseMessage(jsonMessage);
@@ -51,7 +48,6 @@ namespace Catan10
                 }
             }
         }
-
 
         private CatanMessage ParseMessage(string jsonMessage)
         {
@@ -98,28 +94,91 @@ namespace Catan10
 
         #endregion Delegates  + Events + Enums
 
-
-
-        private string ServiceUrl { get; set; } = "";
+        public HubConnectionState ConnectionState => HubConnection.State;
 
         public CatanSignalRClient()
         {
-
         }
-        
+
+        public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
+
+        public event CreateGameHandler OnGameCreated;
+
+        public event DeleteGameHandler OnGameDeleted;
+
+        public event PrivateMessageReceivedHandler OnPrivateMessage;
+
+        public static JsonSerializerOptions GetJsonOptions(bool indented = false)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                WriteIndented = indented
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            return options;
+        }
+
+        public async Task BroadcastMessage(CatanMessage message)
+        {
+            try
+            {
+                string json = JsonSerializer.Serialize(message, GetJsonOptions());
+                await HubConnection.InvokeAsync("BroadcastMessage", GameInfo.Name, message.Origin, json);
+            }
+            catch (Exception ex)
+            {
+                this.TraceMessage($"Exception! [Message={ex.Message}");
+            }
+        }
+
+        public async Task CreateGame()
+        {
+            Contract.Assert(!String.IsNullOrEmpty(GameInfo.Name));
+            try
+            {
+                var json = JsonSerializer.Serialize(GameInfo, GetJsonOptions());
+
+                await HubConnection.InvokeAsync("CreateGame", GameInfo.Name, GameInfo.Started, json);
+            }
+            catch (Exception ex)
+            {
+                this.TraceMessage($"Exception! [Message={ex.Message}");
+            }
+        }
+
+        public async Task DeleteGame(GameInfo gameInfo, string by)
+        {
+            try
+            {
+                await HubConnection.InvokeAsync("DeleteGame", gameInfo.Name);
+            }
+            catch (Exception ex)
+            {
+                this.TraceMessage($"Exception! [Message={ex.Message}");
+            }
+        }
+
+        public void Dispose()
+        {
+            HubConnection.DisposeAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public Task<List<GameInfo>> GetAllGames()
+        {
+            return null;
+        }
+
         public Task Initialize(string host, GameInfo gameInfo)
         {
-          
             ServiceUrl = host + "/catan";
             GameInfo = gameInfo;
-            
-            HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging( (logging) =>
-            {
-                logging.AddConsole();
-                logging.SetMinimumLevel(LogLevel.Debug);
 
-            }).Build();
-
+            HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging((logging) =>
+           {
+               logging.AddConsole();
+               logging.SetMinimumLevel(LogLevel.Debug);
+           }).Build();
 
             HubConnection.Reconnecting += error =>
             {
@@ -155,62 +214,21 @@ namespace Catan10
                     this.TraceMessage($"DeletedGame: [GameName={gameName}]");
                     OnGameDeleted?.Invoke(GameInfo);
                 });
-                
-             });
+            });
             HubConnection.On("JoinedGame", (string gameName, string playerName) =>
             {
                 this.TraceMessage($"JoinGame: [GameName={gameName}] [By={playerName}]");
                 this.TraceMessage($"{playerName} joined {gameName}");
-                
             });
 
             return Task.CompletedTask;
-        }
-
-        
-        public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
-
-        public event DeleteGameHandler OnGameDeleted;
-
-        public event CreateGameHandler OnGameCreated;
-
-        public event PrivateMessageReceivedHandler OnPrivateMessage;
-
-        public static JsonSerializerOptions GetJsonOptions(bool indented = false)
-        {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = indented
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            return options;
-        }
-
-        public async Task DeleteGame(GameInfo gameInfo, string by)
-        {
-           
-            try
-            {                
-                await HubConnection.InvokeAsync("DeleteGame", gameInfo.Name);
-            }
-            catch (Exception ex)
-            {
-                this.TraceMessage($"Exception! [Message={ex.Message}");
-            }
-        }
-
-        public void Dispose()
-        {
-            HubConnection.DisposeAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         public async Task JoinGame(string playerName)
         {
             try
             {
-                
-                await HubConnection.InvokeAsync("JoinGame", GameInfo.Name, playerName );
+                await HubConnection.InvokeAsync("JoinGame", GameInfo.Name, playerName);
             }
             catch (Exception ex)
             {
@@ -218,33 +236,6 @@ namespace Catan10
             }
         }
 
-        public async Task CreateGame()
-        {
-            Contract.Assert(!String.IsNullOrEmpty(GameInfo.Name));
-            try
-            {
-                var json = JsonSerializer.Serialize(GameInfo, GetJsonOptions());
-                
-                await HubConnection.InvokeAsync("CreateGame", GameInfo.Name, GameInfo.Started, json);
-            }
-            catch (Exception ex)
-            {
-                this.TraceMessage($"Exception! [Message={ex.Message}");
-            }
-        }
-
-        public async Task BroadcastMessage(CatanMessage message)
-        {
-            try
-            {
-                string json = JsonSerializer.Serialize(message, GetJsonOptions());
-                await HubConnection.InvokeAsync("BroadcastMessage", GameInfo.Name, message.Origin, json);
-            }
-            catch (Exception ex)
-            {
-                this.TraceMessage($"Exception! [Message={ex.Message}");
-            }
-        }
         public async Task SendPrivateMessage(string to, CatanMessage message)
         {
             if (string.IsNullOrEmpty(to))
@@ -263,7 +254,7 @@ namespace Catan10
             }
         }
 
-        public  async Task StartConnection(string playerName)
+        public async Task StartConnection(string playerName)
         {
             try
             {
@@ -274,11 +265,6 @@ namespace Catan10
                 this.TraceMessage(ex.Message);
                 await StaticHelpers.ShowErrorText(ex.Message, "Connect to SignalR");
             }
-        }
-
-        public Task<List<GameInfo>> GetAllGames()
-        {
-            return null;
         }
     }
 }

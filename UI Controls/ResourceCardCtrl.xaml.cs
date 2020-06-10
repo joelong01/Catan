@@ -1,7 +1,5 @@
-﻿using System;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -69,22 +67,6 @@ namespace Catan10
         {
         }
 
-        /// <summary>
-        ///     a XAML x:Bind called function to set the visibility of the harbor based on the resource type of the model
-        /// </summary>
-        /// <returns></returns>
-        //
-        public bool HarborTypeOwned()
-        {
-            ResourceType resType = ResourceCardModel.ResourceType;
-            return false;
-        }
-
-        public ResourceCardCtrl()
-        {
-            this.InitializeComponent();
-        }
-
         public MainPageModel MainPageModel
         {
             get => (MainPageModel)GetValue(MainPageModelProperty);
@@ -108,5 +90,21 @@ namespace Catan10
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(ResourceCardCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
 
         public static readonly DependencyProperty ResourceCardModelProperty = DependencyProperty.Register("ResourceCardModel", typeof(ResourceCardModel), typeof(ResourceCardCtrl), new PropertyMetadata(null, ResourceCardModelChanged));
+
+        public ResourceCardCtrl()
+        {
+            this.InitializeComponent();
+        }
+
+        /// <summary>
+        ///     a XAML x:Bind called function to set the visibility of the harbor based on the resource type of the model
+        /// </summary>
+        /// <returns></returns>
+        //
+        public bool HarborTypeOwned()
+        {
+            ResourceType resType = ResourceCardModel.ResourceType;
+            return false;
+        }
     }
 }

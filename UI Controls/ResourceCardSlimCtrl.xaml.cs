@@ -8,10 +8,7 @@ namespace Catan10
 {
     public sealed partial class ResourceCardSlimCtrl : UserControl
     {
-        public ResourceCardSlimCtrl()
-        {
-            this.InitializeComponent();
-        }
+        #region Properties + Fields 
 
         public int Count
         {
@@ -32,7 +29,20 @@ namespace Catan10
         }
 
         public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count", typeof(int), typeof(ResourceCardSlimCtrl), new PropertyMetadata(0));
+
         public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(bool), typeof(ResourceCardSlimCtrl), new PropertyMetadata(true));
+
         public static readonly DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof(Brush), typeof(ResourceCardSlimCtrl), new PropertyMetadata(null));
+
+        #endregion Properties + Fields 
+
+        #region Constructors
+
+        public ResourceCardSlimCtrl()
+        {
+            this.InitializeComponent();
+        }
+
+        #endregion Constructors
     }
 }
