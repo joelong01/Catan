@@ -35,7 +35,7 @@ namespace Catan10
                 }
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

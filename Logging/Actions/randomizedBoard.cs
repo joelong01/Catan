@@ -51,17 +51,18 @@ namespace Catan10
         /// <returns></returns>
         public static async Task RandomizeBoard(IGameController gameController, int gameIndex)
         {
+            
             RandomBoardLog logHeader = new RandomBoardLog()
             {
                 Action = CatanAction.RandomizeBoard,
-                CanUndo = true,
+                CanUndo = true, // gameController.Log.PeekAction.NewState == GameState.PickingBoard,
                 NewState = GameState.PickingBoard,
                 NewRandomBoard = gameController.GetRandomBoard(),
                 PreviousRandomBoard = gameController.CurrentRandomBoard(),
                 GameIndex = gameIndex
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

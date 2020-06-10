@@ -19,7 +19,7 @@ namespace Catan10
                 NewState = GameState.MustMoveBaron,
             };
 
-            return gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            return gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

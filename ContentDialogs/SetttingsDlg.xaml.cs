@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -11,335 +13,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-    public class Settings : INotifyPropertyChanged
-    {
-        #region properties
 
-        private bool _animateFade = true;
-        private bool _AnimateFadeTiles = true;
-        private int _animationSpeed = 3;
-        private bool _AutoJoinGames = false;
-        private bool _AutoRespond = false;
-        private int _fadeSeconds = 3;
-        private int _FadeTime = 0;
-        private GridPosition _GameViewPosition = new GridPosition();
-        private Dictionary<string, GridPosition> _gridPosition = new Dictionary<string, GridPosition>();
-        private bool _RandomizeNumbers = true;
-        private bool _resourceTracking = true;
-        private bool _rotateTile = false;
-        private bool _showStopwatch = true;
-        private bool _useClassicTiles = true;
-        private bool _useRandomNumbers = true;
-        private bool _validateBuilding = true;
-        private double _zoom = 1.0;
-
-        public bool AnimateFade
-        {
-            get
-            {
-                return _animateFade;
-            }
-            set
-            {
-                if (value != _animateFade)
-                {
-                    _animateFade = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool AnimateFadeTiles
-        {
-            get
-            {
-                return _AnimateFadeTiles;
-            }
-            set
-            {
-                if (_AnimateFadeTiles != value)
-                {
-                    _AnimateFadeTiles = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int AnimationSpeed
-        {
-            get
-            {
-                return _animationSpeed;
-            }
-            set
-            {
-                if (value != _animationSpeed)
-                {
-                    _animationSpeed = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool AutoJoinGames
-        {
-            get
-            {
-                return _AutoJoinGames;
-            }
-            set
-            {
-                if (value != _AutoJoinGames)
-                {
-                    _AutoJoinGames = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool AutoRespond
-        {
-            get
-            {
-                return _AutoRespond;
-            }
-            set
-            {
-                if (value != _AutoRespond)
-                {
-                    _AutoRespond = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int FadeSeconds
-        {
-            get
-            {
-                return _fadeSeconds;
-            }
-            set
-            {
-                if (value != _fadeSeconds)
-                {
-                    _fadeSeconds = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int FadeTime
-        {
-            get
-            {
-                return _FadeTime;
-            }
-            set
-            {
-                if (_FadeTime != value)
-                {
-                    _FadeTime = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public GridPosition GameViewPosition
-        {
-            get
-            {
-                return _GameViewPosition;
-            }
-            set
-            {
-                if (_GameViewPosition != value)
-                {
-                    _GameViewPosition = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public Dictionary<string, GridPosition> GridPositions
-        {
-            get
-            {
-                return _gridPosition;
-            }
-            set
-            {
-                if (value != _gridPosition)
-                {
-                    _gridPosition = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool RandomizeNumbers
-        {
-            get
-            {
-                return _RandomizeNumbers;
-            }
-            set
-            {
-                if (_RandomizeNumbers != value)
-                {
-                    _RandomizeNumbers = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool ResourceTracking
-        {
-            get
-            {
-                return _resourceTracking;
-            }
-            set
-            {
-                if (value != _resourceTracking)
-                {
-                    _resourceTracking = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool RotateTile
-        {
-            get
-            {
-                return _rotateTile;
-            }
-            set
-            {
-                if (value != _rotateTile)
-                {
-                    _rotateTile = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool ShowStopwatch
-        {
-            get
-            {
-                return _showStopwatch;
-            }
-            set
-            {
-                if (value != _showStopwatch)
-                {
-                    _showStopwatch = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool UseClassicTiles
-        {
-            get
-            {
-                return _useClassicTiles;
-            }
-            set
-            {
-                if (value != _useClassicTiles)
-                {
-                    _useClassicTiles = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool UseRandomNumbers
-        {
-            get
-            {
-                return _useRandomNumbers;
-            }
-            set
-            {
-                if (value != _useRandomNumbers)
-                {
-                    _useRandomNumbers = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool ValidateBuilding
-        {
-            get
-            {
-                return _validateBuilding;
-            }
-            set
-            {
-                if (value != _validateBuilding)
-                {
-                    _validateBuilding = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public double Zoom
-        {
-            get
-            {
-                return _zoom;
-            }
-            set
-            {
-                if (value != _zoom)
-                {
-                    _zoom = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        #endregion properties
-
-        #region Methods
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion Methods
-
-        #region Constructors
-
-        public Settings()
-        {
-        }
-
-        #endregion Constructors
-
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
-
-        public static Settings Deserialize(string s)
-        {
-            return CatanProxy.Deserialize<Settings>(s);
-        }
-
-        public string Serialize()
-        {
-            return CatanProxy.Serialize(this);
-        }
-    }
 
     public sealed partial class SettingsDlg : ContentDialog
     {
@@ -361,10 +35,13 @@ namespace Catan10
         #endregion Methods
 
         #region Constructors
-
+        ObservableCollection<string> ValidServiceUris { get; set; } = new ObservableCollection<string>();
         public SettingsDlg()
         {
             this.InitializeComponent();
+            ValidServiceUris.Add("localhost:5000");
+            ValidServiceUris.Add("jdlgameservice.azurewebsites.net");
+
         }
 
         public SettingsDlg(Settings settings, PlayerModel human)
@@ -372,6 +49,8 @@ namespace Catan10
             this.InitializeComponent();
             this.Settings = settings;
             this.TheHuman = human;
+            ValidServiceUris.Add("localhost:5000");
+            ValidServiceUris.Add("jdlgameservice.azurewebsites.net");
         }
 
         #endregion Constructors
@@ -400,5 +79,16 @@ namespace Catan10
         }
 
         #endregion Properties
+
+        private void OnServiceUriChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //if (e.AddedItems.Count > 0)
+            //{                
+            //    this.Settings.HostName = e.AddedItems[0].ToString();
+            //}
+
+            this.TraceMessage($"{e.AddedItems[0]}");
+
+        }
     }
 }

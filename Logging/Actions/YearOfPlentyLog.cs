@@ -18,7 +18,7 @@ namespace Catan10
                 TradeResources = tr,
                 SentBy = gameController.CurrentPlayer.PlayerName
             };
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

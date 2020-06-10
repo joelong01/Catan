@@ -37,7 +37,7 @@ namespace Catan10
                 SentBy = gameController.TheHuman.PlayerName
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public async Task Do(IGameController gameController)

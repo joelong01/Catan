@@ -40,7 +40,7 @@ namespace Catan10
                 RandomGoldTiles = gameController.CurrentRandomGoldTiles
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

@@ -80,10 +80,8 @@ namespace Catan10
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            // await TestTargetPlayer();
-            CatanSignalRClient client = new CatanSignalRClient("http://localhost:53353/ChatHub");
-            await client.StartConnection();
-            //await client.SendMessage("CatanClient", "test message");
+            await TestTargetPlayer();
+        
         }
 
         private async void OnTest2(object sdr, RoutedEventArgs rea)

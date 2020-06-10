@@ -30,7 +30,7 @@ namespace Catan10
 
             Contract.Assert(logHeader.OldState == GameState.BeginResourceAllocation);
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

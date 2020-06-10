@@ -23,6 +23,52 @@ namespace Catan10
         List<TileCtrl> Tiles { get; }
     }
 
+    public delegate void BroadcastMessageReceivedHandler(CatanMessage message);
+    public delegate void CreateGameHandler(GameInfo gameInfo, string playerName);
+    public delegate void DeleteGameHandler(GameInfo gameInfo);
+    public delegate void PrivateMessageReceivedHandler(CatanMessage message);
+
+    public interface ICatanService
+    {
+        /// <summary>
+        ///     a message is recieved that was sent to all clients
+        /// </summary>
+        event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
+        /// <summary>
+        ///    a game was deleted
+        /// </summary>
+        event DeleteGameHandler OnGameDeleted;
+        /// <summary>
+        ///    a game as created
+        /// </summary>
+        event CreateGameHandler OnGameCreated;
+        /// <summary>
+        ///     a message was sent to only this client
+        /// </summary>
+        event PrivateMessageReceivedHandler OnPrivateMessage;
+        /// <summary>
+        ///     Connect to the service and start listening for updates.  events will fire.
+        /// </summary>
+        /// <param name="hostName"></param>
+        /// <param name="gameInfo"></param>
+        /// <returns></returns>
+        Task Initialize(string hostName, GameInfo gameInfo);
+        /// <summary>
+        ///     Tell the service to delete the game with this ID
+        /// </summary>
+        /// <param name="gameName"></param>
+        /// <returns></returns>
+        Task DeleteGame(GameInfo gameInfo, string by);
+        Task JoinGame(string playerName);
+        Task CreateGame();
+        Task BroadcastMessage(CatanMessage message);
+        Task SendPrivateMessage(string user, CatanMessage message);
+        Task<List<GameInfo>> GetAllGames();
+        Task StartConnection(string playerName);
+        
+        
+    }
+
     public interface ICatanSettings
     {
         bool AnimateFade { get; set; }
@@ -135,7 +181,7 @@ namespace Catan10
         /// <returns></returns>
         PlayerModel NameToPlayer(string playerName);
 
-        Task<bool> PostMessage(LogHeader logHeader, CatanMessageType normal);
+        Task<bool> PostMessage(LogHeader logHeader, ActionType actionType);
 
         DevCardType PurchaseNextDevCard();
 

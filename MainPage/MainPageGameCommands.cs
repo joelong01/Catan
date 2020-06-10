@@ -432,7 +432,8 @@ namespace Catan10
             _initializeSettings = true;
             if (TheHuman.PlayerName == "")
             {
-                await PickDefaultUser();
+                bool ret = await PickDefaultUser();
+                if (!ret) return;
             }
             SettingsDlg dlg = new SettingsDlg(MainPageModel.Settings, TheHuman);
             _initializeSettings = false;
@@ -496,14 +497,14 @@ namespace Catan10
             return targetList;
         }
 
-        private async Task PickDefaultUser()
+        private async Task<bool> PickDefaultUser()
         {
             var picker = new PlayerPickerDlg(MainPageModel.AllPlayers);
-            _ = await picker.ShowAsync();
+            var ret = await picker.ShowAsync();
             if (picker.Player == null)
             {
                 await StaticHelpers.ShowErrorText("You have to pick a player!  Stop messing around Dodgy!", "Catan");
-                return;
+                return false;
             }
 
             TheHuman = picker.Player;
@@ -514,6 +515,7 @@ namespace Catan10
             MainPageModel.TheHuman = TheHuman.PlayerName;
             MainPageModel.DefaultUser = TheHuman.PlayerName;
             await SaveGameState();
+            return true;
         }
 
         /// <summary>

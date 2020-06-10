@@ -24,7 +24,7 @@ namespace Catan10
                 NewState = GameState.AllocateResourceReverse,
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         #endregion Methods

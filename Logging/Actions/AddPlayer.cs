@@ -40,7 +40,7 @@ namespace Catan10
                 CanUndo = false
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public async Task Do(IGameController gameController)

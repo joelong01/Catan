@@ -34,7 +34,7 @@ namespace Catan10
                 TradeResources = resources
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         /// <summary>

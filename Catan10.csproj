@@ -178,6 +178,7 @@
     <Compile Include="Logging\StateTransitions\UpdateBuildingLog.cs" />
     <Compile Include="Logging\VerifyMessages\VerifyPlayers.cs" />
     <Compile Include="Models\ResourceCardModel.cs" />
+    <Compile Include="Models\Settings.cs" />
     <Compile Include="Player\PlayerBindingFunctions.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
     <Compile Include="Logging\Actions\AddPlayer.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="Logging\StateTransitions\0_NewGame.cs" />
     <Compile Include="Player\PlayerResources.cs" />
     <Compile Include="Player\TradeResources.cs" />
+    <Compile Include="SignalR\CatanRestService.cs" />
     <Compile Include="SignalR\CatanSignalRClient.cs" />
     <Compile Include="State\GridPosition.cs" />
     <Compile Include="State\TargetTracking.cs" />
@@ -546,12 +548,15 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.6.4.140554</Version>
+      <Version>2020.6.10.74241</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client">
+      <Version>3.1.4</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console">
       <Version>3.1.4</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">

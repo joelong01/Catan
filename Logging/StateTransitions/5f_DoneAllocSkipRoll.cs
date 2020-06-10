@@ -23,7 +23,7 @@ namespace Catan10
                 NewState = GameState.WaitingForRoll,
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public RollState RollState { get; set; } = null;

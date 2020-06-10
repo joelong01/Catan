@@ -23,7 +23,7 @@ namespace Catan10
                 NewState = GameState.AllocateResourceForward,
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

@@ -154,9 +154,10 @@ namespace Catan10
         {
             await OnOpenSavedGame();
         }
-
+        private bool DO_NOT_SAVE_FLAG = false;
         public async Task ResetGridLayout()
         {
+            DO_NOT_SAVE_FLAG = true;
             foreach (var kvp in MainPageModel.Settings.GridPositions)
             {
                 GridPosition pos = kvp.Value;
@@ -167,7 +168,9 @@ namespace Catan10
             }
 
             UpdateGridLocations();
+            DO_NOT_SAVE_FLAG = false;
             await SaveGridLocations();
+
         }
 
         public async Task<bool> Reshuffle()

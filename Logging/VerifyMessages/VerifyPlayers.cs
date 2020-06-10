@@ -32,7 +32,7 @@ namespace Catan10
                 CurrentPlayer = gameController.CurrentPlayer
             };
 
-            await gameController.PostMessage(log, CatanMessageType.Normal);
+            await gameController.PostMessage(log, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

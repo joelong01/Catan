@@ -39,7 +39,7 @@ namespace Catan10
                 logHeader.TraceMessage("Find a better way to make sure the rolls are the same");
             }
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public RollState RollState { get; set; } = null;

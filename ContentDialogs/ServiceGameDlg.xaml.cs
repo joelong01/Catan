@@ -21,7 +21,7 @@ namespace Catan10
         private TaskCompletionSource<bool> _tcs = null;
         private List<PlayerModel> AllPlayers { get; set; } = null;
         private PlayerModel CurrentPlayer { get; set; } = null;
-        private CatanProxy Proxy { get; } = MainPage.Current.MainPageModel.Proxy;
+        private CatanProxy Proxy { get; } 
 
         private static void HostNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -177,7 +177,7 @@ namespace Catan10
                 bool ret = await AskUserQuestion($"Are you sure want to delete the game named \"{SelectedGame.Name}\"?");
                 if (ret)
                 {
-                    var games = await Proxy.DeleteGame(SelectedGame.Id);
+                    var games = await Proxy.DeleteGame(SelectedGame.Id, MainPage.Current.TheHuman.PlayerName);
                     if (games == null)
                     {
                         ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
@@ -201,7 +201,7 @@ namespace Catan10
             {
                 Games.ForEach(async (game) =>
                 {
-                    var games = await Proxy.DeleteGame(game.Id);
+                    var games = await Proxy.DeleteGame(game.Id, MainPage.Current.TheHuman.PlayerName);
                     if (games == null)
                     {
                         ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
@@ -214,41 +214,41 @@ namespace Catan10
             }
         }
 
-        private async void OnJoin(object sender, RoutedEventArgs re)
+        private void OnJoin(object sender, RoutedEventArgs re)
         {
-            ErrorMessage = "";
-            try
-            {
-                foreach (var player in PlayersInGame)
-                {
-                    if (player.PlayerName == CurrentPlayer.PlayerName)
-                    {
-                        JoinedExistingGame = true;
-                        this.Hide();
-                        return;
-                    }
-                }
+            //ErrorMessage = "";
+            //try
+            //{
+            //    foreach (var player in PlayersInGame)
+            //    {
+            //        if (player.PlayerName == CurrentPlayer.PlayerName)
+            //        {
+            //            JoinedExistingGame = true;
+            //            this.Hide();
+            //            return;
+            //        }
+            //    }
 
-                var gameInfo = await Proxy.JoinGame(SelectedGame.Id, CurrentPlayer.PlayerName);
-                if (gameInfo != null)
-                {
-                    SelectedGame = gameInfo;
-                    this.Hide();
-                }
+            //    var gameInfo = await Proxy.JoinGame(SelectedGame.Id, CurrentPlayer.PlayerName);
+            //    if (gameInfo != null)
+            //    {
+            //        SelectedGame = gameInfo;
+            //        this.Hide();
+            //    }
 
-                if (Proxy.LastError != null)
-                {
-                    ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-                }
-                else
-                {
-                    ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
-                }
-            }
-            catch (Exception e)
-            {
-                ErrorMessage = e.Message;
-            }
+            //    if (Proxy.LastError != null)
+            //    {
+            //        ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+            //    }
+            //    else
+            //    {
+            //        ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    ErrorMessage = e.Message;
+            //}
         }
 
         private async void OnNew(object sender, RoutedEventArgs re)
@@ -256,7 +256,7 @@ namespace Catan10
             ErrorMessage = "";
             try
             {
-                GameInfo gameInfo = new GameInfo() { Id = Guid.NewGuid().ToString(), Name = NewGameName, Creator = CurrentPlayer.PlayerName };
+                GameInfo gameInfo = new GameInfo() { Id = Guid.NewGuid(), Name = NewGameName, Creator = CurrentPlayer.PlayerName };
 
                 List<GameInfo> games = await Proxy.CreateGame(gameInfo);
                 if (games == null)

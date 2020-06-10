@@ -36,7 +36,7 @@ namespace Catan10
                 Rolls = rolls,
                 SentBy = gameController.TheHuman.PlayerName
             };
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

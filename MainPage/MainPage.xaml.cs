@@ -27,8 +27,8 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
-        private CatanSignalRClient ServiceHub { get; set; }
 
+        private Dictionary<Guid, TaskCompletionSource<object>> MessageCompletionDictionary = new Dictionary<Guid, TaskCompletionSource<object>>();
         private const int MAX_SAVE_FILES_RETAINED = 5;
 
         private const int SMALLEST_STATE_COUNT = 8;
@@ -77,14 +77,19 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
-        private async Task ConnectToServiceHub()
+        private Task InitMainPageModel()
         {
-            //string serviceUrl = "http://localhost:53353/ChatHub";
-            // string serviceUrl = "http://localhost:5000/catan";
-            string serviceUrl = "https://jdlgameservice.azurewebsites.net/catan";
-            ServiceHub = new CatanSignalRClient(serviceUrl);
-            await ServiceHub.StartConnection();
-            ServiceHub.OnMessageReceived += ServiceHub_OnMessageReceived;
+            return Task.CompletedTask;
+            
+            //await MainPageModel.InitServiceHub();
+            //if (MainPageModel.Settings.IsSignalRGame)
+            //{
+            //    MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
+            //    MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
+            //    MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
+            //    MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
+            //}
+           
         }
 
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -262,11 +267,10 @@ namespace Catan10
                     MainPageModel = new MainPageModel()
                     {
                         AllPlayers = list,
-                        Settings = new Settings(),
-                        HostName = "https://jdlgameservice.azurewebsites.net/",
+                        Settings = new Settings(),                        
                         TheHuman = "",
                     };
-
+                    
                     await SaveGameState();
                     MainPageModel = await ReadMainPageModelOffDisk(); // just verifying round trip...
                     Contract.Assert(MainPageModel != null);
@@ -631,7 +635,7 @@ namespace Catan10
                 if (mainPageModel == null) mainPageModel = new MainPageModel();
                 mainPageModel.GameController = this;
                 mainPageModel.Log = new Log(this);
-
+                
                 if (mainPageModel.Settings.GridPositions.Count == 0)
                 {
                     foreach (FrameworkElement child in ContentRoot.Children)
@@ -762,6 +766,8 @@ namespace Catan10
         {
             try
             {
+                if (DO_NOT_SAVE_FLAG) return;
+
                 if (fileGuard != null)
                 {
                     await fileGuard.Task;
@@ -777,13 +783,14 @@ namespace Catan10
                 }
 
                 badGridNames.ForEach((name) => MainPageModel.Settings.GridPositions.Remove(name));
-
-                this.TraceMessage($"Saving GameState");
                 fileGuard = new TaskCompletionSource<object>();
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
                 var content = CatanProxy.Serialize<MainPageModel>(MainPageModel, true);
                 StorageFile file = await folder.CreateFileAsync(PlayerDataFile, CreationCollisionOption.ReplaceExisting);
+                Debug.Assert(content.Length > 100);
+
                 await FileIO.WriteTextAsync(file, content);
+
                 if (fileGuard != null)
                 {
                     fileGuard.SetResult(null);
@@ -803,7 +810,7 @@ namespace Catan10
         /// <returns></returns>
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
-            if (TheHuman.PlayerName != MainPageModel.ServiceGameInfo.Creator) return;
+            if (TheHuman.PlayerName != CurrentPlayer.PlayerName) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
@@ -896,7 +903,8 @@ namespace Catan10
 
             InitTest();
             ResetDataForNewGame();
-            await ConnectToServiceHub();
+            await InitMainPageModel();
+            
             //  await WsConnect();
         }
 

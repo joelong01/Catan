@@ -28,7 +28,7 @@ namespace Catan10
                 StartingState = gameController.CurrentGameState,
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

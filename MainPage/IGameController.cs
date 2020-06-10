@@ -161,7 +161,7 @@ namespace Catan10
 
         public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
 
-        public CatanProxy Proxy => MainPageModel.Proxy;
+
 
         public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
 
@@ -468,30 +468,25 @@ namespace Catan10
         /// <param name="logHeader"></param>
         /// <param name="normal"></param>
         /// <returns>False if the IGameController.Do() should be executed locally </returns>
-        public async Task<bool> PostMessage(LogHeader logHeader, CatanMessageType msgType)
+        public async Task<bool> PostMessage(LogHeader logHeader, ActionType msgType)
         {
             CatanMessage message = new CatanMessage()
             {
                 Data = logHeader,
                 Origin = TheHuman.PlayerName,
-                CatanMessageType = msgType
+                ActionType = msgType
             };
-            if (MainPageModel.IsServiceGame)
-            {
-                await ServiceHub.SendMessage(TheHuman.PlayerName, message);
-                //bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
-                ////  this.TraceMessage($"Sending {message}");
-                //if (!ret)
-                //{
-                //    await StaticHelpers.ShowErrorText($"Failed to Post Message to service.{Environment.NewLine}Error: {MainPageModel.Proxy.LastErrorString}", "Catan");
-                //}
-            }
-            else
-            {
-                await ProcessMessage(message);
-            }
+            //  var tcs = new TaskCompletionSource<object>();
+            //    MessageCompletionDictionary.Add(logHeader.LogId, tcs);
+            await MainPageModel.CatanService.BroadcastMessage(message);
+            //if (MainPageModel.Settings.IsLocalGame)
+            //{
+            //    await ProcessMessage(message);
+            //}
 
-            return MainPageModel.IsServiceGame;
+            // await tcs.Task;
+
+            return (!MainPageModel.Settings.IsLocalGame);
         }
 
         public DevCardType PurchaseNextDevCard()
@@ -517,25 +512,24 @@ namespace Catan10
             LogHeader logHeader = Log.PeekUndo;
             if (logHeader == null) return false;
             UndoRedoTcs = new TaskCompletionSource<bool>();
-            if (MainPageModel.IsServiceGame)
-            {
-                CatanMessage message = new CatanMessage()
-                {
-                    Data = logHeader,
-                    Origin = TheHuman.PlayerName,
-                    CatanMessageType = CatanMessageType.Redo
-                };
 
-                await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
-            }
-            else
+            CatanMessage message = new CatanMessage()
             {
-                //
-                // not a service game -- do the actual undo
+                Data = logHeader,
+                Origin = TheHuman.PlayerName,
+                ActionType = ActionType.Redo
+            };
 
-                ILogController logController = logHeader as ILogController;
-                await logController.Redo(this);
-            }
+
+            await MainPageModel.CatanService.BroadcastMessage(message);
+
+
+            //if (MainPageModel.Settings.IsLocalGame)
+            //{
+            //    ILogController logController = logHeader as ILogController;
+            //    await logController.Redo(this);
+            //}
+
 
             return await UndoRedoTcs.Task;
         }
@@ -704,11 +698,12 @@ namespace Catan10
             GameContainer.AllTiles.ForEach((tile) => tile.StopHighlightingTile());
         }
 
-        public async Task TellServiceGameStarted()
+        public Task TellServiceGameStarted()
         {
-            if (Proxy == null) return;
-
-            await Proxy.StartGame(MainPageModel.ServiceGameInfo);
+            if (MainPageModel.CatanService == null) return Task.CompletedTask;
+            this.TraceMessage("you took this out.  put it back or delete it.");
+            // await MainPageModel.CatanService.StartGame(MainPageModel.ServiceGameInfo);
+            return Task.CompletedTask;
         }
 
         public TileCtrl TileFromIndex(int targetTile)
@@ -735,26 +730,28 @@ namespace Catan10
             LogHeader logHeader = Log.PeekAction;
             if (logHeader == null || logHeader.CanUndo == false) return false;
             UndoRedoTcs = new TaskCompletionSource<bool>();
-            if (MainPageModel.IsServiceGame)
+            CatanMessage message = new CatanMessage()
             {
-                CatanMessage message = new CatanMessage()
-                {
-                    Data = logHeader,
-                    Origin = TheHuman.PlayerName,
-                    CatanMessageType = CatanMessageType.Undo
-                };
+                Data = logHeader,
+                Origin = TheHuman.PlayerName,
+                ActionType = ActionType.Undo
+            };
+            if (MainPageModel.Settings.IsSignalRGame)
+            {
+                await MainPageModel.CatanService.BroadcastMessage(message);
 
-                bool ret = await MainPageModel.Proxy.PostLogMessage(MainPageModel.ServiceGameInfo.Id, message);
-                if (!ret) return false; // this is very bad! :(
             }
-            else
+            if (MainPageModel.Settings.IsHomegrownGame)
             {
-                //
-                // not a service game -- do the actual undo
+                await MainPageModel.CatanService.BroadcastMessage(message);
 
+            }
+            if (MainPageModel.Settings.IsLocalGame)
+            {
                 ILogController logController = logHeader as ILogController;
                 await logController.Undo(this);
             }
+
 
             return await UndoRedoTcs.Task;
         }

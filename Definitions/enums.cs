@@ -12,6 +12,7 @@ namespace Catan10
         TradeResourcesList
     }
 
+    public enum  GameCommunicationStrategy { Local, SignalR, Homegrown};
     public enum BuildingLocation { TopRight, MiddleRight, BottomRight, BottomLeft, MiddleLeft, TopLeft, None };
 
     public enum CatanAction

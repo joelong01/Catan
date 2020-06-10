@@ -33,7 +33,7 @@ namespace Catan10
                 BuildingIndex = building.Index
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public Task Do(IGameController gameController)

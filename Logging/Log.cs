@@ -23,6 +23,38 @@ namespace Catan10
         private readonly Queue<LogHeader> PendingQueue = new Queue<LogHeader>();
         private readonly Stack<LogHeader> UndoneStack = new Stack<LogHeader>();
 
+        public string Serialize()
+        {
+            StringBuilder sb = new StringBuilder();
+            ToJson(DoneStack, sb, "DoneStack");            
+            sb.Append(",");
+            sb.Append(Environment.NewLine);
+            ToJson(UndoneStack, sb, "UndoneStack");
+            return sb.ToString();
+        }
+
+        private string ToJson(Stack<LogHeader> stack, StringBuilder sb, string name)
+        {
+            sb.Append($"\"{name}\":");
+            sb.Append("[");
+            sb.Append(Environment.NewLine);
+
+            foreach (var message in stack)
+            {
+                string json = CatanProxy.Serialize(message);
+                sb.Append(json);
+                sb.Append(",");
+                sb.Append(Environment.NewLine);
+            }
+            if (stack.Count > 0)
+            {
+                sb.Length -= (1 + Environment.NewLine.Length); // remove trailing comma
+                sb.Append(Environment.NewLine);
+            }
+            sb.Append("]");
+            return sb.ToString();
+        }
+
         //
         //  whenever we push or pop from the stack we should notify up
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -176,6 +208,8 @@ namespace Catan10
             return sb.ToString();
         }
 
+       
+
         //
         //  whenever we push or pop from the stack we should
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -211,7 +245,14 @@ namespace Catan10
                 if (_writing) return;
                 _writing = true;
 
-                string json = GetJson();
+                string json = Stacks.Serialize();
+                
+                json = "{" + Environment.NewLine + json;
+                json += "," + Environment.NewLine;
+                json += "\"MessageLog\":";
+                json += GetJson();
+                json += "}" + Environment.NewLine;
+                
                 var folder = MainPage.Current.SaveFolder;
                 var file = await folder.CreateFileAsync(SaveFileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(file, json).AsTask().ConfigureAwait(false);
@@ -350,6 +391,7 @@ namespace Catan10
             try
             {
                 var logHeader = Stacks.PeekAction;
+                
                 Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
                 if (!logHeader.CanUndo)
                 {

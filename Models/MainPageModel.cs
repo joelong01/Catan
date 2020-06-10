@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-
+using System.Threading.Tasks;
 using Catan.Proxy;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -24,10 +24,6 @@ namespace Catan10
 
         private TradeResources _gameResources = new TradeResources();
 
-        // the total number of resources that have been handed out in this game
-        //private string _HostName = "http://192.168.1.128:5000";
-        private string _HostName = "https://jdlgameservice.azurewebsites.net/";
-
         private bool _isServiceGame = false;
 
         private Log _newLog = null;
@@ -40,7 +36,12 @@ namespace Catan10
 
         private int _TwoStarPosition = 0;
 
+
+
         private bool _WebSocketConnected = false;
+        [JsonIgnore] public GameInfo DefaultGame { get; } = new GameInfo() { Name = "DefaultGame", Started = false, Creator = "", Id = Guid.Parse("F070F8DA-A5FD-4957-A528-0B915930123F") };
+
+
 
         private void InitBank()
         {
@@ -78,6 +79,7 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+
         private void UnspentEntitlements_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             NotifyPropertyChanged("EnableNextButton");
@@ -103,6 +105,11 @@ namespace Catan10
             InitBank();
             Log = new Log(MainPage.Current);
             GameController = MainPage.Current;
+        }
+
+        public async Task InitServiceHub()
+        {
+           
         }
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
@@ -283,21 +290,7 @@ namespace Catan10
 
         public GameState GameState => Log.GameState;
 
-        public string HostName
-        {
-            get
-            {
-                return _HostName;
-            }
-            set
-            {
-                if (_HostName != value)
-                {
-                    _HostName = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+      
 
         [JsonIgnore]
         public bool IsServiceGame
@@ -348,8 +341,9 @@ namespace Catan10
             }
         }
 
+        
         [JsonIgnore]
-        public CatanProxy Proxy { get; } = null; // new CatanProxy() { HostName = "https://jdlgameservice.azurewebsites.net/" };
+        public ICatanService CatanService { get; set; }
 
         [JsonIgnore]
         public TradeResources ResourcesLeftInBank

@@ -33,7 +33,7 @@ namespace Catan10
 
             Contract.Assert(logHeader.OldState == GameState.WaitingForNewGame);
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         /// <summary>

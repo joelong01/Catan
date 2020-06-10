@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -83,7 +84,7 @@ namespace Catan10
                 HighlightedTiles = gameController.HighlightedTiles
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal );
         }
 
         public Task Do(IGameController gameController)

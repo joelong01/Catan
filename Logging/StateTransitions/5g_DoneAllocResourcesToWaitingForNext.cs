@@ -32,7 +32,7 @@ namespace Catan10
                 NewState = GameState.WaitingForNext,
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public async Task Do(IGameController gameController)

@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
+using Microsoft.AspNetCore.SignalR.Client;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
@@ -27,18 +27,20 @@ namespace Catan10
 
         private async Task DeleteAllGames()
         {
-            if (Proxy == null) return;
+            if (MainPageModel.CatanService == null) return;
 
-            List<GameInfo> games = await Proxy.GetGames();
-            games.ForEach(async (game) =>
+            if (MainPageModel.Settings.IsHomegrownGame)
             {
-                var s = await Proxy.DeleteGame(game.Id);
-                if (s == null)
+
+                List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
+                if (games != null)
                 {
-                    var ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-                    // this.TraceMessage(ErrorMessage);
+                    games.ForEach(async (game) =>
+                    {
+                        await MainPageModel.CatanService.DeleteGame(game, TheHuman.PlayerName);                        
+                    });
                 }
-            });
+            }
         }
 
         private PlayerModel FindPlayerByName(ICollection<PlayerModel> playerList, string playerName)
@@ -55,51 +57,52 @@ namespace Catan10
 
         private void MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
         {
-            if (Proxy == null) return;
-            var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-            {
-                using (DataReader reader = args.GetDataReader())
-                {
-                    reader.UnicodeEncoding = UnicodeEncoding.Utf8;
 
-                    try
-                    {
-                        string json = reader.ReadString(reader.UnconsumedBufferLength);
-                        //
-                        //  get our message, which now is only a WsGameMessage
-                        WsMessage message = CatanProxy.Deserialize<WsMessage>(json);
-                        var gameMessage = CatanProxy.Deserialize<WsGameMessage>(message.Data.ToString());
-                        //
-                        //  ack back to the service
-                        var ack = new WsMessage() { MessageType = CatanWsMessageType.Ack };
-                        json = CatanProxy.Serialize<WsMessage>(ack);
-                        MessageWriter.WriteString(json);
-                        await MessageWriter.StoreAsync();
+            //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            //{
+            //    if (Proxy == null) return;
+            //    using (DataReader reader = args.GetDataReader())
+            //    {
+            //        reader.UnicodeEncoding = UnicodeEncoding.Utf8;
 
-                        if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("OnStartDefault") && TheHuman != null &&
-                            gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == CatanWsMessageType.GameAdded && MainPageModel.Settings.AutoJoinGames)
-                        {
-                            var players = await Proxy.GetPlayers(gameMessage.GameInfo.Id);
-                            if (players != null && players.Contains(TheHuman.PlayerName) == false && gameMessage.GameInfo.Started == false)
-                            {
-                                await this.Reset();
-                                MainPageModel.ServiceGameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
-                                StartMonitoring();
-                            }
-                        }
+            //        try
+            //        {
+            //            string json = reader.ReadString(reader.UnconsumedBufferLength);
+            //            //
+            //            //  get our message, which now is only a WsGameMessage
+            //            WsMessage message = CatanProxy.Deserialize<WsMessage>(json);
+            //            var gameMessage = CatanProxy.Deserialize<WsGameMessage>(message.Data.ToString());
+            //            //
+            //            //  ack back to the service
+            //            var ack = new WsMessage() { MessageType = CatanWsMessageType.Ack };
+            //            json = CatanProxy.Serialize<WsMessage>(ack);
+            //            MessageWriter.WriteString(json);
+            //            await MessageWriter.StoreAsync();
 
-                        if (message.MessageType == CatanWsMessageType.GameDeleted && gameMessage.GameInfo.Id == this.GameInfo?.Id) // deleting the game I'm playing!
-                        {
-                            await this.Reset();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        this.TraceMessage(ex.ToString());
-                        this.TraceMessage(ex.Message);
-                    }
-                }
-            });
+            //            if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("OnStartDefault") && TheHuman != null &&
+            //                gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == CatanWsMessageType.GameAdded && MainPageModel.Settings.AutoJoinGames)
+            //            {
+            //                var players = await Proxy.GetPlayers(gameMessage.GameInfo.Id);
+            //                if (players != null && players.Contains(TheHuman.PlayerName) == false && gameMessage.GameInfo.Started == false)
+            //                {
+            //                    await this.Reset();
+            //                    MainPageModel.ServiceGameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
+            //                    StartMonitoring();
+            //                }
+            //            }
+
+            //            if (message.MessageType == CatanWsMessageType.GameDeleted && gameMessage.GameInfo.Id == this.GameInfo?.Id) // deleting the game I'm playing!
+            //            {
+            //                await this.Reset();
+            //            }
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            this.TraceMessage(ex.ToString());
+            //            this.TraceMessage(ex.Message);
+            //        }
+            //    }
+            //});
         }
 
         private void OnClosed(IWebSocket sender, WebSocketClosedEventArgs args)
@@ -113,42 +116,43 @@ namespace Catan10
             await DeleteAllGames();
         }
 
-        private async void OnNewNetworkGame(object sender, RoutedEventArgs e)
+        private void OnNewNetworkGame(object sender, RoutedEventArgs e)
         {
-            await PickDefaultUser();
-            if (TheHuman == null)
-            {
-                await PickDefaultUser();
-            };
-            if (TheHuman == null)
-            {
-                return;
-            }
+            OnStartDefaultNetworkGame(sender, e);
 
-            var proxy = MainPageModel.Proxy;
+            //await PickDefaultUser();
+            //if (TheHuman == null)
+            //{
+            //    bool ret = await PickDefaultUser();
+            //    if (!ret) return;
+            //};
 
-            var existingGames = await proxy.GetGames();
-            ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, MainPageModel.AllPlayers, existingGames)
-            {
-                HostName = proxy.HostName
-            };
-            // this.TraceMessage($"Human={TheHuman}");
-            await dlg.ShowAsync();
-            if (dlg.IsCanceled) return;
+            //var proxy = MainPageModel.Proxy;
 
-            if (dlg.SelectedGame == null)
-            {
-                dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
-                return;
-            }
+            //var existingGames = await proxy.GetGames();
+            //ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, MainPageModel.AllPlayers, existingGames)
+            //{
+            //    HostName = proxy.HostName
+            //};
+            //// this.TraceMessage($"Human={TheHuman}");
+            //await dlg.ShowAsync();
+            //if (dlg.IsCanceled) return;
 
-            MainPageModel.ServiceGameInfo = dlg.SelectedGame;
-            await _rollControl.Reset();
-            MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedGame.Creator);
-            await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
+            //if (dlg.SelectedGame == null)
+            //{
+            //    dlg.ErrorMessage = "Pick a game. Stop messing around Dodgy!";
+            //    return;
+            //}
 
-            StartMonitoring();
+            //MainPageModel.ServiceGameInfo = dlg.SelectedGame;
+            //await _rollControl.Reset();
+            //MainPageModel.GameStartedBy = NameToPlayer(dlg.SelectedGame.Creator);
+            //await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
+
+            //StartMonitoring();
         }
+
+
 
         private async void OnStartDefaultNetworkGame(object sender, RoutedEventArgs e)
         {
@@ -158,49 +162,43 @@ namespace Catan10
             }
             if (TheHuman == null) return;
 
+            MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame;
+            MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
+
+            if (MainPageModel.CatanService != null)
+            {
+                MainPageModel.CatanService.OnBroadcastMessageReceived -= Service_OnBroadcastMessageReceived;
+                MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
+                MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
+                MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
+                MainPageModel.CatanService = null;
+            }
+
+            if (MainPageModel.Settings.IsSignalRGame)
+            {
+                MainPageModel.CatanService = new CatanSignalRClient();                                
+            }
+            else if (MainPageModel.Settings.IsHomegrownGame)
+            {
+                MainPageModel.CatanService = new CatanRestService();
+            }
+
+            MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
+            MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
+            MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
+            MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
+            
             MainPageModel.PlayingPlayers.Clear();
             MainPageModel.Log = new Log(this);
 
-            string gameName = "OnStartDefaultNetworkGame";
+            await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.ServiceGameInfo);
+            await MainPageModel.CatanService.StartConnection(TheHuman.PlayerName);
 
-            // CurrentPlayer = TheHuman;
 
-            GameInfo gameInfo = null;
-            //
-            //  delete the game if it exists
-            if (Proxy != null)
-            {
-                List<GameInfo> games = await Proxy.GetGames();
-                foreach (var game in games)
-                {
-                    if (game.Name == gameName)
-                    {
-                        gameInfo = game;
-                        await Proxy.DeleteGame(game.Id);
-                        break;
-                    }
-                };
-            }
 
-            // create a new game
-            gameInfo = new GameInfo() { Id = Guid.NewGuid().ToString(), Name = gameName, Creator = CurrentPlayer.PlayerName, RequestAutoJoin = true };
-            if (Proxy != null)
-            {
-                List<GameInfo> games = await Proxy.CreateGame(gameInfo);
-
-                Contract.Assert(games != null);
-
-                MainPageModel.ServiceGameInfo = gameInfo;
-                MainPageModel.IsServiceGame = true;
-            }
             //
             //  start the game
             await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
-            if (Proxy != null)
-            {
-                await Proxy.JoinGame(gameInfo.Id, TheHuman.PlayerName);
-                StartMonitoring();
-            }
         }
 
         private async Task ProcessMessage(CatanMessage message)
@@ -208,9 +206,9 @@ namespace Catan10
             LogHeader logHeader = message.Data as LogHeader;
             ILogController logController = logHeader as ILogController;
             Contract.Assert(logController != null, "every LogEntry is a LogController!");
-            switch (message.CatanMessageType)
+            switch (message.ActionType)
             {
-                case CatanMessageType.Normal:
+                case ActionType.Normal:
                     //
                     //  5/20/2020: we are logging first so that the Do() method has the correct current state of the system
                     //             instead of the *anticipated* correct state.
@@ -221,106 +219,147 @@ namespace Catan10
                     await logController.Do(this);
                     break;
 
-                case CatanMessageType.Undo:
+                case ActionType.Undo:
                     await logController.Undo(this);
                     await Log.Undo(logHeader);
                     break;
 
-                case CatanMessageType.Redo:
+                case ActionType.Redo:
                     await logController.Redo(this);
                     await Log.Redo(logHeader);
                     break;
 
-                case CatanMessageType.Replay:
+                case ActionType.Replay:
                     Contract.Assert(false, "You haven't implemented this yet!");
                     break;
 
                 default:
                     break;
             }
+            //
+            //  done processing release calling thread - if we end up doing an ACK message, we'd do this after counting up the number of 
+            //  ACKS to the number of clients
+            ////
+            //MessageCompletionDictionary[logHeader.LogId].SetResult(null);
+            //MessageCompletionDictionary.Remove(logHeader.LogId);
         }
 
         private Task ReplayGame(GameInfo game, string playerName)
         {
-            var Proxy = MainPageModel.Proxy;
-            Contract.Assert(Proxy != null);
+            this.TraceMessage("You need to build this...");
             return Task.CompletedTask;
             //   var messages = await Proxy.
         }
 
-        private async void ServiceHub_OnMessageReceived(CatanMessage message)
+        private async void Service_OnGameDeleted(GameInfo gameInfo)
+        {
+            if (CurrentGameState != GameState.Uninitialized && CurrentGameState != GameState.WaitingForNewGame)
+            {
+                await this.Reset();
+            }
+        }
+
+        private async void Service_OnBroadcastMessageReceived(CatanMessage message)
         {
             MainPageModel.Log.RecordMessage(message);
             await ProcessMessage(message);
         }
 
-        private async void StartMonitoring()
+        private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
         {
-            var proxy = MainPageModel.Proxy;
-            var gameId = MainPageModel.ServiceGameInfo.Id;
-
-            var players = await proxy.GetPlayers(gameId);
-            Contract.Assert(players.Contains(TheHuman.PlayerName), "You need to join the game before you can monitor it!");
-
-            while (true)
+            if (MainPageModel.Settings.AutoJoinGames)
             {
-                List<CatanMessage> messages;
-                try
+                if (TheHuman == null)
                 {
-                    messages = await proxy.Monitor(gameId, TheHuman.PlayerName);
+                    bool ret = await PickDefaultUser();
+                    if (!ret) return;
                 }
-                catch (Exception e)
+                if (playerName != TheHuman.PlayerName)
                 {
-                    this.TraceMessage($"{e}");
-                    return;
-                }
-                foreach (var message in messages)
-                {
-                    Type type = CurrentAssembly.GetType(message.DataTypeName);
-                    if (type == null) throw new ArgumentException("Unknown type!");
-                    string json = message.Data.ToString();
-                    LogHeader logHeader = JsonSerializer.Deserialize(json, type, CatanProxy.GetJsonOptions()) as LogHeader;
-                    IMessageDeserializer deserializer = logHeader as IMessageDeserializer;
-                    if (deserializer != null)
-                    {
-                        logHeader = deserializer.Deserialize(json);
-                    }
-                    message.Data = logHeader;
-                    MainPageModel.Log.RecordMessage(message);
-                    Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
-
-                    await ProcessMessage(message);
+                    await MainPageModel.CatanService.JoinGame(TheHuman.PlayerName);
+                    await AddPlayerLog.AddPlayer(this, TheHuman);
                 }
             }
         }
 
-        private async Task WsConnect()
+        private void Service_OnPrivateMessage(CatanMessage message)
         {
-            try
-            {
-                if (TheHuman.PlayerName == "Joe")
-                {
-                    await DeleteAllGames();
-                }
-
-                Uri server = new Uri($"ws://{MainPageModel.HostName}/catan/game/monitor/ws");
-                MessageWebSocket = new MessageWebSocket();
-                MessageWebSocket.Control.MessageType = SocketMessageType.Utf8;
-                MessageWebSocket.MessageReceived += MessageReceived;
-                MessageWebSocket.Closed += OnClosed;
-                await MessageWebSocket.ConnectAsync(server);
-                MessageWriter = new DataWriter(MessageWebSocket.OutputStream);
-
-                WsMessage message = new WsMessage() { MessageType = CatanWsMessageType.RegisterForGameNotifications };
-                var json = CatanProxy.Serialize<WsMessage>(message);
-                MessageWriter.WriteString(json);
-                await MessageWriter.StoreAsync();
-                MainPageModel.WebSocketConnected = true;
-            }
-            catch (Exception e)
-            {
-                await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message, "Catan");
-            }
+            throw new NotImplementedException();
         }
+
+        //private async void StartMonitoring()
+        //{
+        //    var proxy = MainPageModel.Proxy;
+        //    var gameId = MainPageModel.ServiceGameInfo.Id;
+
+        //    var players = await proxy.GetPlayers(gameId);
+        //    Contract.Assert(players.Contains(TheHuman.PlayerName), "You need to join the game before you can monitor it!");
+
+        //    while (true)
+        //    {
+        //        List<CatanMessage> messages;
+        //        try
+        //        {
+        //            messages = await proxy.Monitor(gameId, TheHuman.PlayerName);
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            this.TraceMessage($"{e}");
+        //            return;
+        //        }
+        //        foreach (var message in messages)
+        //        {
+        //            Type type = CurrentAssembly.GetType(message.DataTypeName);
+        //            if (type == null) throw new ArgumentException("Unknown type!");
+        //            string json = message.Data.ToString();
+        //            LogHeader logHeader = JsonSerializer.Deserialize(json, type, CatanProxy.GetJsonOptions()) as LogHeader;
+        //            IMessageDeserializer deserializer = logHeader as IMessageDeserializer;
+        //            if (deserializer != null)
+        //            {
+        //                logHeader = deserializer.Deserialize(json);
+        //            }
+        //            message.Data = logHeader;
+        //            MainPageModel.Log.RecordMessage(message);
+        //            Contract.Assert(logHeader != null, "All messages must have a LogEntry as their Data object!");
+
+        //            await ProcessMessage(message);
+        //        }
+        //    }
+        //}
+
+        //private async Task WsConnect()
+        //{
+        //    try
+        //    {
+        //        if (MainPageModel.Proxy == null)
+        //        {
+        //            string hostName = "http://" + MainPageModel.Settings.HostName;
+        //            MainPageModel.Proxy = new CatanProxy() { HostName = hostName };
+        //        }
+
+        //        if (TheHuman.PlayerName == "Joe")
+        //        {
+        //            await DeleteAllGames();
+        //        }
+
+        //        Uri server = new Uri($"ws://{MainPageModel.Settings.HostName}/ws");
+        //        MessageWebSocket = new MessageWebSocket();
+        //        MessageWebSocket.Control.MessageType = SocketMessageType.Utf8;
+        //        MessageWebSocket.MessageReceived += MessageReceived;
+        //        MessageWebSocket.Closed += OnClosed;
+        //        await MessageWebSocket.ConnectAsync(server);
+        //        MessageWriter = new DataWriter(MessageWebSocket.OutputStream);
+
+        //        WsMessage message = new WsMessage() { MessageType = CatanWsMessageType.RegisterForGameNotifications };
+        //        var json = CatanProxy.Serialize<WsMessage>(message);
+        //        MessageWriter.WriteString(json);
+        //        await MessageWriter.StoreAsync();
+        //        MainPageModel.WebSocketConnected = true;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message, "Catan");
+        //    }
+        //}
     }
 }

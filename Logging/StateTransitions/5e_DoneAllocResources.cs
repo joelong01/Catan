@@ -23,7 +23,7 @@ namespace Catan10
                 NewState = GameState.DoneResourceAllocation,
             };
 
-            await gameController.PostMessage(logHeader, CatanMessageType.Normal);
+            await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public AllocateResourcesReverseToDoneAllocResources()
