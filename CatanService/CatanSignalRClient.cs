@@ -107,6 +107,7 @@ namespace Catan10
         public event DeleteGameHandler OnGameDeleted;
 
         public event PrivateMessageReceivedHandler OnPrivateMessage;
+        public event JoinedGameHandler OnGameJoined;
 
         public static JsonSerializerOptions GetJsonOptions(bool indented = false)
         {

@@ -18,6 +18,7 @@ namespace Catan10
         public event CreateGameHandler OnGameCreated;
         public event DeleteGameHandler OnGameDeleted;
         public event PrivateMessageReceivedHandler OnPrivateMessage;
+        public event JoinedGameHandler OnGameJoined;
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         private MessageWebSocket MessageWebSocket { get; set; }

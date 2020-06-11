@@ -30,6 +30,7 @@ namespace Catan10
     public delegate void BroadcastMessageReceivedHandler(CatanMessage message);
     public delegate void CreateGameHandler(GameInfo gameInfo, string playerName);
     public delegate void DeleteGameHandler(GameInfo gameInfo);
+    public delegate void JoinedGameHandler(GameInfo gameInfo, string playerName);
     public delegate void PrivateMessageReceivedHandler(CatanMessage message);
 
     public interface ICatanService
@@ -53,6 +54,10 @@ namespace Catan10
         ///     a message was sent to only this client
         /// </summary>
         event PrivateMessageReceivedHandler OnPrivateMessage;
+        /// <summary>
+        ///     a game was joined.  will be sent to the one that joined the game     
+        /// </summary>
+        event JoinedGameHandler OnGameJoined;
 
         #endregion Delegates  + Events + Enums
 

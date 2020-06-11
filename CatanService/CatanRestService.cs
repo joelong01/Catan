@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Catan10
 {
     internal class CatanRestService : ICatanService
     {
-        #region Properties + Fields 
+        #region Properties + Fields
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
 
@@ -21,7 +22,9 @@ namespace Catan10
 
         private CatanProxy Proxy { get; } = new CatanProxy();
 
-        #endregion Properties + Fields 
+        #endregion Properties + Fields
+
+
 
         #region Methods
 
@@ -84,6 +87,7 @@ namespace Catan10
                             break;
 
                         case MessageType.JoinGame:
+                            OnGameJoined?.Invoke(serviceMessage.GameInfo, serviceMessage.PlayerName);
                             break;
 
                         default:
@@ -102,6 +106,8 @@ namespace Catan10
         public event CreateGameHandler OnGameCreated;
 
         public event DeleteGameHandler OnGameDeleted;
+
+        public event JoinedGameHandler OnGameJoined;
 
         public event PrivateMessageReceivedHandler OnPrivateMessage;
 
@@ -146,6 +152,7 @@ namespace Catan10
 
         public async Task StartConnection(string playerName)
         {
+            Contract.Assert(OnBroadcastMessageReceived != null);
             if (OnBroadcastMessageReceived != null)
             {
                 try

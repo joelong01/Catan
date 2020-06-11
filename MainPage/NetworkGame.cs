@@ -130,6 +130,7 @@ namespace Catan10
                 MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
                 MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
                 MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
+                
                 MainPageModel.CatanService = null;
             }
 
@@ -146,7 +147,9 @@ namespace Catan10
             MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
             MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
             MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
-            
+            MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
+
+
             MainPageModel.PlayingPlayers.Clear();
             MainPageModel.Log = new Log(this);
 
@@ -158,6 +161,11 @@ namespace Catan10
             //
             //  start the game
             await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
+        }
+
+        private void Service_OnGameJoined(GameInfo gameInfo, string playerName)
+        {
+            this.TraceMessage($"{gameInfo}:{playerName}");
         }
 
         private async Task ProcessMessage(CatanMessage message)
@@ -212,6 +220,7 @@ namespace Catan10
 
         private async void Service_OnBroadcastMessageReceived(CatanMessage message)
         {
+          //  this.TraceMessage($"{TheHuman.PlayerName}: {message.From} - {message.MessageType} : {message.Data}");
             MainPageModel.Log.RecordMessage(message);
             await ProcessMessage(message);
         }
@@ -235,6 +244,8 @@ namespace Catan10
 
         private async void Service_OnGameDeleted(GameInfo gameInfo)
         {
+            if (gameInfo.Creator == TheHuman.PlayerName) return; // don't reset games started by me!
+
             if (CurrentGameState != GameState.Uninitialized && CurrentGameState != GameState.WaitingForNewGame)
             {
                 await this.Reset();
