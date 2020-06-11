@@ -9,7 +9,7 @@
         <!--<Ellipse Width="50" Height="50" Margin="25,25,0,0" HorizontalAlignment="Left"
                 VerticalAlignment="Top" Fill="{Binding Path=FillColor, Mode=OneWay, FallbackValue=White}" />-->
         <Style x:Key="Dice_EllipseStyle" TargetType="Ellipse">
-            <Setter Property="Fill" Value="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red}" />
+            <Setter Property="Fill" Value="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}" />
             <Setter Property="Height" Value="50" />
             <Setter Property="Width" Value="50" />
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -18,7 +18,7 @@
     </Control.Resources>
     <Viewbox>
         <Grid Width="250" Height="250" CornerRadius="20"
-            BorderBrush="{Binding Path=FillColor, Mode=OneWay, FallbackValue=Red}"
+            BorderBrush="{Binding Path=FillColor, Mode=OneWay, TargetNullValue=Blue, FallbackValue=Red}"
             BorderThickness="{Binding Path=Thickness, Mode=OneWay, FallbackValue=10}">
             <Grid Name="one" Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=1, Mode=OneWay, FallbackValue=Visible}">
                 <Ellipse HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Dice_EllipseStyle}" />

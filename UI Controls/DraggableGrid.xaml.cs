@@ -155,20 +155,32 @@ namespace Catan10
 
             OnGridPositionChanged?.Invoke(userControl.Name, GridPosition);
         }
-
+        private int fullSize = 1;
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
-            if (GridPosition.ScaleX != 1.0)
+            fullSize = 1 - fullSize;
+            if (fullSize == 0)
             {
-                GridPosition.ScaleX = 1.0;
-                GridPosition.ScaleY = 1.0;
+                this.Width = this.ActualWidth * 0.5;
+                this.Height = this.ActualHeight * 0.5;
+
             }
             else
             {
-                GridPosition.ScaleX = 0.5;
-                GridPosition.ScaleY = 0.5;
+                this.Width = this.ActualWidth * 2;
+                this.Height = this.ActualHeight * 2;
             }
-            AnimateMove.Begin();
+            //if (GridPosition.ScaleX != 1.0)
+            //{
+            //    GridPosition.ScaleX = 1.0;
+            //    GridPosition.ScaleY = 1.0;
+            //}
+            //else
+            //{
+            //    GridPosition.ScaleX = 0.5;
+            //    GridPosition.ScaleY = 0.5;
+            //}
+            //AnimateMove.Begin();
 
             NotifyPositionChanged();
         }
@@ -176,10 +188,11 @@ namespace Catan10
         private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
             UIElement uiElement = sender as UIElement;
-            int zIndex = Canvas.GetZIndex(uiElement);
+            int zIndex = Canvas.GetZIndex(this);
+
             if (e.GetCurrentPoint(uiElement).Position.Y < 30)
             {
-                Canvas.SetZIndex(uiElement, zIndex + 1000);
+                Canvas.SetZIndex(this, zIndex + 1000);
 
                 if (sender.GetType() == typeof(Grid))
                 {
@@ -188,7 +201,7 @@ namespace Catan10
                     NotifyPositionChanged();
                 }
 
-                Canvas.SetZIndex(uiElement, zIndex);
+                Canvas.SetZIndex(this, zIndex + 1); // 6/11/2020
             }
         }
 

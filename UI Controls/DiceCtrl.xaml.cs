@@ -29,7 +29,7 @@ namespace Catan10
             set => SetValue(ThicknessProperty, value);
         }
 
-        public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("FillColor", typeof(SolidColorBrush), typeof(DiceCtrl), new PropertyMetadata(new SolidColorBrush(Colors.HotPink)));
+        public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("FillColor", typeof(SolidColorBrush), typeof(DiceCtrl), new PropertyMetadata(null));
 
         public static readonly DependencyProperty NumberProperty = DependencyProperty.Register("Number", typeof(int), typeof(DiceCtrl), new PropertyMetadata(2));
 

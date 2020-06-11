@@ -241,7 +241,8 @@
                                 Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}">
                                 <TextBlock.RenderTransform>
                                     <CompositeTransform TranslateY="-5" />
-                                </TextBlock.RenderTransform></TextBlock>
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
                             <TextBlock HorizontalAlignment="Center" Text="Trade" Style="{StaticResource ButtonTextStyle}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                         </StackPanel>
                     </Button.Content>

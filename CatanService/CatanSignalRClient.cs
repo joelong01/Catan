@@ -169,59 +169,67 @@ namespace Catan10
             return null;
         }
 
-        public Task Initialize(string host, GameInfo gameInfo)
+        public async Task Initialize(string host, GameInfo gameInfo)
         {
-            ServiceUrl = host + "/catan";
-            GameInfo = gameInfo;
-
-            HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging((logging) =>
-           {
-               logging.AddConsole();
-               logging.SetMinimumLevel(LogLevel.Debug);
-           }).Build();
-
-            HubConnection.Reconnecting += error =>
+            try
             {
-                Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
+                ServiceUrl = "http://" + host + "/catan";
+                ServiceUrl = host + "/catan";
+                GameInfo = gameInfo;
+
+                HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging((logging) =>
+               {
+                   logging.AddConsole();
+                   logging.SetMinimumLevel(LogLevel.Debug);
+               }).Build();
+
+                HubConnection.Reconnecting += error =>
+                {
+                    Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
 
                 // Notify users the connection was lost and the client is reconnecting.
                 // Start queuing or dropping messages.
 
                 return Task.CompletedTask;
-            };
+                };
 
-            HubConnection.Closed += async (error) =>
-            {
-                await Task.Delay(new Random().Next(0, 5) * 1000);
-                await HubConnection.StartAsync();
-            };
-
-            HubConnection.On("BroadcastMessage", (string name, string json) => BroadcastMessageReceived(name, json));
-            HubConnection.On("SendPrivateMessage", (string message) => PrivateMessage(message));
-
-            HubConnection.On("CreateGame", async (string gameName, string playerName, string jsonGameInfo) =>
-            {
-                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                HubConnection.Closed += async (error) =>
                 {
-                    this.TraceMessage($"CreateGame: [GameName={gameName}] [By={playerName}] [info={jsonGameInfo}]");
-                    OnGameCreated?.Invoke(GameInfo, playerName);
-                });
-            });
-            HubConnection.On("DeleteGame", async (string gameName) =>
-            {
-                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    this.TraceMessage($"DeletedGame: [GameName={gameName}]");
-                    OnGameDeleted?.Invoke(GameInfo);
-                });
-            });
-            HubConnection.On("JoinedGame", (string gameName, string playerName) =>
-            {
-                this.TraceMessage($"JoinGame: [GameName={gameName}] [By={playerName}]");
-                this.TraceMessage($"{playerName} joined {gameName}");
-            });
+                    await Task.Delay(new Random().Next(0, 5) * 1000);
+                    await HubConnection.StartAsync();
+                };
 
-            return Task.CompletedTask;
+                HubConnection.On("BroadcastMessage", (string name, string json) => BroadcastMessageReceived(name, json));
+                HubConnection.On("SendPrivateMessage", (string message) => PrivateMessage(message));
+
+                HubConnection.On("CreateGame", async (string gameName, string playerName, string jsonGameInfo) =>
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        this.TraceMessage($"CreateGame: [GameName={gameName}] [By={playerName}] [info={jsonGameInfo}]");
+                        OnGameCreated?.Invoke(GameInfo, playerName);
+                    });
+                });
+                HubConnection.On("DeleteGame", async (string gameName) =>
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        this.TraceMessage($"DeletedGame: [GameName={gameName}]");
+                        OnGameDeleted?.Invoke(GameInfo);
+                    });
+                });
+                HubConnection.On("JoinedGame", (string gameName, string playerName) =>
+                {
+                    this.TraceMessage($"JoinGame: [GameName={gameName}] [By={playerName}]");
+                    this.TraceMessage($"{playerName} joined {gameName}");
+                });
+
+                
+            }
+            catch(Exception e)
+            {
+                await StaticHelpers.ShowErrorText($"Error connection to SignalR.  ServiceUrl: {ServiceUrl}\nGameInfo:\n{CatanProxy.Serialize(gameInfo, true)}\nException:{e}", "Catan");
+            }
         }
 
         public async Task JoinGame(string playerName)

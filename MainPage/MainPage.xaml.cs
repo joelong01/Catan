@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -26,6 +25,16 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        #region Delegates + Fields + Events + Enums
+
+        public const string PlayerDataFile = "catansettings.json";
+
+        // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
+        //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(), MainPageModelChanged));
+
+        public static readonly string SAVED_GAME_EXTENSION = ".log.json";
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
         private readonly RoadRaceTracking _raceTracking = null;
@@ -43,8 +52,139 @@ namespace Catan10
         /// </summary>
         private int _showPipGroupIndex = 0;
 
-        private TaskCompletionSource<object> fileGuard = null;
-        private Dictionary<Guid, TaskCompletionSource<object>> MessageCompletionDictionary = new Dictionary<Guid, TaskCompletionSource<object>>();
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        // this lets you double tap a map and then move it around
+        // the index into PlayingPlayers that is the CurrentPlayer
+        public static MainPage Current { get; private set; }
+
+        public GameType GameType
+        {
+            get => _gameView.CurrentGame.GameType;
+            set
+            {
+            }
+        }
+
+        public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
+        public MainPageModel MainPageModel
+        {
+            get => (MainPageModel)GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
+
+        public StorageFolder SaveFolder { get; set; } = null;
+        // a global for the game
+        public PlayerModel TheHuman
+        {
+            get => (PlayerModel)GetValue(TheHumanProperty);
+            set => SetValue(TheHumanProperty, value);
+        }
+
+        private DispatcherTimer SaveSettingsTimer { get; set; }
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+        public MainPage()
+        {
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            this.InitializeComponent();
+            Current = this;
+            this.DataContext = this;
+            _raceTracking = new RoadRaceTracking(this);
+        }
+
+        #endregion Constructors + Destructors
+
+        #region Methods
+
+        public static double GetAnimationSpeed(AnimationSpeed speed)
+        {
+            double baseSpeed = 2;
+            if (Current != null)
+            {
+                baseSpeed = Current.AnimationSpeedBase;
+            }
+
+            if (speed == AnimationSpeed.Ultra)
+            {
+                return (double)speed;
+            }
+            // AnimationSpeedFactor is a value of 1...4
+            double d = (double)speed / (baseSpeed + 2);
+            return d;
+        }
+
+        /// <summary>
+        /// Update this because you did the sorting work in the dialog
+        /// hide all positions and then loop through the array to make them visible
+        ///
+        /// </summary>
+        /// <param name="players"></param>
+        /// <returns></returns>
+        public async Task<IReadOnlyList<StorageFile>> GetSavedFilesInternal()
+        {
+            QueryOptions queryOptions = new QueryOptions(CommonFileQuery.DefaultQuery, new[] { $"{SAVED_GAME_EXTENSION}" })
+            {
+                FolderDepth = FolderDepth.Shallow
+            };
+            StorageFolder folder = await StaticHelpers.GetSaveFolder();
+            StorageFileQueryResult query = folder.CreateFileQueryWithOptions(queryOptions);
+            IReadOnlyList<StorageFile> files = await query.GetFilesAsync();
+
+            return files;
+        }
+
+        public void UpdateBoardMeasurements()
+        {
+            PipCount = GetPipCount();
+            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
+            buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
+            Dictionary<int, int> pipCountDictionary = new Dictionary<int, int>();
+            int[] pipCount = new int[4] { 0, 0, 0, 0 };
+
+            foreach (var building in buildingsOrderedByPips)
+            {
+                if (13 - building.Pips > pipCount.Length - 1) break;
+                pipCount[13 - building.Pips]++;
+            }
+
+            MainPageModel.SetPipCount(pipCount);
+        }
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            if (e.NavigationMode == NavigationMode.New)
+            {
+                _progress.IsActive = true;
+                _progress.Visibility = Visibility.Visible;
+
+                _gameView.Init(this, this);
+                CreateMenuItems();
+
+                await LoadMainPageModel();
+                UpdateGridLocations();
+                _progress.Visibility = Visibility.Collapsed;
+                _progress.IsActive = false;
+
+                Ctrl_PlayerResourceCountCtrl.MainPage = this;
+            }
+
+            InitTest();
+            ResetDataForNewGame();
+            await InitMainPageModel();
+
+            SaveSettingsTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(5)
+            };
+            SaveSettingsTimer.Tick += SaveSettingsTimer_Tick;
+        }
 
         private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -263,8 +403,6 @@ namespace Catan10
                     };
 
                     await SaveGameState();
-                    MainPageModel = await ReadMainPageModelOffDisk(); // just verifying round trip...
-                    Contract.Assert(MainPageModel != null);
                     await ResetGridLayout();
                 }
 
@@ -662,10 +800,7 @@ namespace Catan10
 
             MainPageModel.Log = new Log(this);
 
-            // _lbGames.SelectedValue = MainPageModel.Log;
             await ResetTiles(true);
-
-            _stateStack.Clear();
 
             foreach (PlayerModel player in MainPageModel.AllPlayers)
             {
@@ -685,7 +820,6 @@ namespace Catan10
                 p.Reset();
             }
             MainPageModel.PlayingPlayers.Clear();
-            Rolls.Clear();
             _rollControl.Reset();
             if (TheHuman != null)
             {
@@ -719,50 +853,30 @@ namespace Catan10
             await Task.WhenAll(tasks.ToArray());
         }
 
-        // can only undo to the first resource allocation
-        private void SavedGame_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private Task SaveGameState()
         {
-            //try
-            //{
-            //    if (e.AddedItems.Count > 0)
-            //    {
-            //        DeprecatedLog newLog = e.AddedItems[0] as DeprecatedLog;
-            //        if (MainPageModel.Log == newLog)
-            //        {
-            //            return;
-            //        }
-
-            //        if (await StaticHelpers.AskUserYesNoQuestion($"Switch to {newLog.File.DisplayName}?", "Yes", "No"))
-            //        {
-            //            MainPageModel.Log = newLog;
-            //            //   await newLog.Parse(this);
-            //            // TODO:...
-            //            await ReplayLog(newLog);
-            //            UpdateUiForState(MainPageModel.Log.Last().GameState);
-            //        }
-            //        else
-            //        {
-            //            _lbGames.SelectedItem = MainPageModel.Log;
-            //        }
-
-            //    }
-            //}
-            //catch (Exception exception)
-            //{
-            //    MessageDialog dlg = new MessageDialog($"Error loading file {e.AddedItems[0]}\nMessage:\n{exception.Message}");
-            //}
+            if (SaveSettingsTimer.IsEnabled) return Task.CompletedTask;
+            SaveSettingsTimer.Start();
+            return Task.CompletedTask;
         }
 
-        private async Task SaveGameState()
+        /// <summary>
+        ///     a Dispatch timer callback that saves the Game's players and settings.
+        ///     The way it works is that whenever a setting changes, the Timer starts.
+        ///     after 5 seconds, we write the file to the disk.  we only write every 5
+        ///     seconds.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void SaveSettingsTimer_Tick(object sender, object obj)
         {
+            int count = 0;
+            SaveSettingsTimer.Stop();
             try
             {
-                if (DO_NOT_SAVE_FLAG) return;
-
-                if (fileGuard != null)
-                {
-                    await fileGuard.Task;
-                }
+                //
+                //  on occasion, i've had to rename grids in mainpage -- but their position might be in the saved file.
+                //  this will remove the ones that don't exist anymore
                 List<string> badGridNames = new List<string>();
                 foreach (var name in MainPageModel.Settings.GridPositions.Keys)
                 {
@@ -772,28 +886,43 @@ namespace Catan10
                         badGridNames.Add(name);
                     }
                 }
-
                 badGridNames.ForEach((name) => MainPageModel.Settings.GridPositions.Remove(name));
-                fileGuard = new TaskCompletionSource<object>();
+
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
                 var content = CatanProxy.Serialize<MainPageModel>(MainPageModel, true);
                 StorageFile file = await folder.CreateFileAsync(PlayerDataFile, CreationCollisionOption.ReplaceExisting);
                 Debug.Assert(content.Length > 100);
 
-                await FileIO.WriteTextAsync(file, content);
-
-                if (fileGuard != null)
+                do
                 {
-                    fileGuard.SetResult(null);
-                    fileGuard = null;
+                    count++;
+                    await FileIO.WriteTextAsync(file, content);
+                    await Task.Delay(50);
+                    string verify = await FileIO.ReadTextAsync(file);
+                    if (verify != content)
+                    {
+                        await Task.Delay(100);                        
+                        if (count == 1)
+                        {
+                            Debugger.Break();
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
+                while (count < 5);
             }
             catch (Exception e)
             {
                 this.TraceMessage($"eating exception: {e}");
             }
+            finally
+            {
+                this.TraceMessage($"Saved Settings file. saved {count} times");
+            }
         }
-
         /// <summary>
         ///     Unlike previsous implementations, the use the Action/Undo stacks in the log to store the random boards.
         /// </summary>
@@ -872,133 +1001,28 @@ namespace Catan10
             _randomBoardListIndex = 0;
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        #endregion Methods
+
+
+        private void Draggable_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            base.OnNavigatedTo(e);
-
-            if (e.NavigationMode == NavigationMode.New)
+            e.Handled = false; // bubble up
+            //
+            //  set everybody's zIndex
+            foreach (var name in MainPageModel.Settings.GridPositions.Keys)
             {
-                _progress.IsActive = true;
-                _progress.Visibility = Visibility.Visible;
-
-                _gameView.Init(this, this);
-                CreateMenuItems();
-
-                await LoadMainPageModel();
-                UpdateGridLocations();
-                _progress.Visibility = Visibility.Collapsed;
-                _progress.IsActive = false;
-
-                Ctrl_PlayerResourceCountCtrl.MainPage = this;
+                FrameworkElement ctrl = this.FindName(name) as FrameworkElement;
+                if (ctrl != null)
+                {
+                    Canvas.SetZIndex(ctrl, 10);
+                }
             }
 
-            InitTest();
-            ResetDataForNewGame();
-            await InitMainPageModel();
+            //
+            //  boost the one clicked
+            Canvas.SetZIndex(((FrameworkElement)sender), 11);
+            
 
-            //  await WsConnect();
-        }
-
-        // this lets you double tap a map and then move it around
-        // the index into PlayingPlayers that is the CurrentPlayer
-        public static MainPage Current { get; private set; }
-
-        public GameType GameType
-        {
-            get => _gameView.CurrentGame.GameType;
-            set
-            {
-            }
-        }
-
-        public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
-
-        public MainPageModel MainPageModel
-        {
-            get => (MainPageModel)GetValue(MainPageModelProperty);
-            set => SetValue(MainPageModelProperty, value);
-        }
-
-        public StorageFolder SaveFolder { get; set; } = null;
-
-        // a global for the game
-        public PlayerModel TheHuman
-        {
-            get => (PlayerModel)GetValue(TheHumanProperty);
-            set => SetValue(TheHumanProperty, value);
-        }
-
-        public const string PlayerDataFile = "catansettings.json";
-
-        // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
-        //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(), MainPageModelChanged));
-
-        public static readonly string SAVED_GAME_EXTENSION = ".log.json";
-
-        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
-
-        public MainPage()
-        {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-            this.InitializeComponent();
-            Current = this;
-            this.DataContext = this;
-            _raceTracking = new RoadRaceTracking(this);
-        }
-
-        public static double GetAnimationSpeed(AnimationSpeed speed)
-        {
-            double baseSpeed = 2;
-            if (Current != null)
-            {
-                baseSpeed = Current.AnimationSpeedBase;
-            }
-
-            if (speed == AnimationSpeed.Ultra)
-            {
-                return (double)speed;
-            }
-            // AnimationSpeedFactor is a value of 1...4
-            double d = (double)speed / (baseSpeed + 2);
-            return d;
-        }
-
-        /// <summary>
-        /// Update this because you did the sorting work in the dialog
-        /// hide all positions and then loop through the array to make them visible
-        ///
-        /// </summary>
-        /// <param name="players"></param>
-        /// <returns></returns>
-        public async Task<IReadOnlyList<StorageFile>> GetSavedFilesInternal()
-        {
-            QueryOptions queryOptions = new QueryOptions(CommonFileQuery.DefaultQuery, new[] { $"{SAVED_GAME_EXTENSION}" })
-            {
-                FolderDepth = FolderDepth.Shallow
-            };
-            StorageFolder folder = await StaticHelpers.GetSaveFolder();
-            StorageFileQueryResult query = folder.CreateFileQueryWithOptions(queryOptions);
-            IReadOnlyList<StorageFile> files = await query.GetFilesAsync();
-
-            return files;
-        }
-
-        public void UpdateBoardMeasurements()
-        {
-            PipCount = GetPipCount();
-            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
-            buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
-            Dictionary<int, int> pipCountDictionary = new Dictionary<int, int>();
-            int[] pipCount = new int[4] { 0, 0, 0, 0 };
-
-            foreach (var building in buildingsOrderedByPips)
-            {
-                if (13 - building.Pips > pipCount.Length - 1) break;
-                pipCount[13 - building.Pips]++;
-            }
-
-            MainPageModel.SetPipCount(pipCount);
         }
     }
 }

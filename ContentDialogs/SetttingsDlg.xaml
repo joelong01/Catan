@@ -112,37 +112,45 @@
                     <Button Height="60" Style="{StaticResource SettingsButtonStyle}" Content="Reset Grid Layout" Click="OnResetGridLayout" FontSize="22" />
                 </StackPanel>
             </Border>
+             <Border Style="{StaticResource SettingBorderStyle}">
+                <StackPanel HorizontalAlignment="Stretch">
+                    <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Game Name" Margin="10,5" />
+                    <TextBox Text="{x:Bind Settings.DefaultGameName, Mode=TwoWay}" FontSize="22" Margin="5"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <Border Style="{StaticResource SettingBorderStyle}">
+             <Border Margin="10,10,5,5" Style="{StaticResource SettingBorderStyle}">
+            <StackPanel>
                 <StackPanel Margin="10,10,10,0">
                     <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Fade Time (s):" />
-                    <Slider Name="_sliderFadeTime" Margin="10,-10,10,10" Padding="0" LargeChange="5"
+                    <Slider Name="_sliderFadeTime" Margin="0,5,10,10" Padding="0" LargeChange="5"
                         Maximum="30" TickPlacement="Inline" FontFamily="Segoe UI" TickFrequency="5"
                         Value="{x:Bind Settings.FadeTime, Mode=TwoWay, FallbackValue=5}" />
                 </StackPanel>
-            </Border>
-            <Border Style="{StaticResource SettingBorderStyle}">
+            
                 <StackPanel Margin="10,10,10,0">
                     <TextBlock Text="Zoom: " Style="{StaticResource SettingsTextBlockStyle}" />
-                    <Slider Name="_sliderZoom" Margin="0,-10,10,10" Padding="0" LargeChange=".1"
+                    <Slider Name="_sliderZoom" Margin="0,5,10,10" Padding="0" LargeChange=".1"
                         Maximum="2" TickPlacement="Inline" FontFamily="Segoe UI" SmallChange="0.1"
                         StepFrequency="0.1" TickFrequency="0.5"
                         Value="{x:Bind Settings.Zoom, Mode=TwoWay, FallbackValue=1.0}" />
                 </StackPanel>
-            </Border>
-            <Border Margin="10" Style="{StaticResource SettingBorderStyle}">
+            
+            
                 <StackPanel Margin="10,10,10,0">
                     <TextBlock Text="Animation Speed: " Style="{StaticResource SettingsTextBlockStyle}" />
-                    <Slider Name="_sliderAnimationSpeed" Margin="0,0,10,10" Padding="0" LargeChange="1"
+                    <Slider Name="_sliderAnimationSpeed" Margin="0,5,10,10" Padding="0" LargeChange="1"
                         FontSize="22" Maximum="4" Minimum="1" SmallChange="1"
                         StepFrequency="1" TickFrequency="1" FontFamily="Segoe UI" TickPlacement="Inline"
                         ThumbToolTipValueConverter="{StaticResource AnimationSpeedValueConverter}"
                         Value="{x:Bind Settings.AnimationSpeed, Mode=TwoWay, FallbackValue=4}" />
                 </StackPanel>
-            </Border>
-            <Border Margin="10,0,10,10" Style="{StaticResource SettingBorderStyle}">
-                <StackPanel Margin="10">
+            </StackPanel>
+                 </Border>
+            <Border Margin="10,0,5,5" Style="{StaticResource SettingBorderStyle}">
+                <StackPanel Margin="5">
+                    <TextBlock Text="HostName" Style="{StaticResource SettingsTextBlockStyle}" Margin="5"/>
                     <ComboBox Name="_cmbServiceUri" Width="235" ItemsSource="{x:Bind ValidServiceUris, Mode=OneWay}" SelectionChanged="OnServiceUriChanged"
                               SelectedItem="{x:Bind Settings.HostName, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>

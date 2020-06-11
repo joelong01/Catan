@@ -8,12 +8,17 @@ namespace Catan10
 {
     public class Settings : INotifyPropertyChanged
     {
+        #region Delegates + Fields + Events + Enums
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private bool _animateFade = true;
         private bool _AnimateFadeTiles = true;
         private int _animationSpeed = 3;
         private bool _AutoJoinGames = false;
         private bool _AutoRespond = false;
         private GameCommunicationStrategy _comStrat = GameCommunicationStrategy.Homegrown;
+        string _defaultGameName = "DefaultGame";
         private int _fadeSeconds = 3;
         private int _FadeTime = 0;
         private GridPosition _GameViewPosition = new GridPosition();
@@ -28,10 +33,9 @@ namespace Catan10
         private bool _validateBuilding = true;
         private double _zoom = 1.0;
 
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
 
         public bool AnimateFade
         {
@@ -108,6 +112,22 @@ namespace Catan10
                 if (value != _AutoRespond)
                 {
                     _AutoRespond = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public string DefaultGameName
+        {
+            get
+            {
+                return _defaultGameName;
+            }
+            set
+            {
+                if (_defaultGameName != value)
+                {
+                    _defaultGameName = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -379,11 +399,17 @@ namespace Catan10
             }
         }
 
+        #endregion Properties
+
+        #region Constructors + Destructors
+
         public Settings()
         {
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors + Destructors
+
+        #region Methods
 
         public static Settings Deserialize(string s)
         {
@@ -394,5 +420,12 @@ namespace Catan10
         {
             return CatanProxy.Serialize(this);
         }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion Methods
     }
 }

@@ -111,8 +111,17 @@ namespace Catan10
                 await PickDefaultUser();
             }
             if (TheHuman == null) return;
+            
+            GameNameDlg dlg = new GameNameDlg() { MainPageModel = MainPageModel, Player = TheHuman };
+            
+            var ret = await dlg.ShowAsync();
+            if (ret != ContentDialogResult.Primary  || String.IsNullOrEmpty(MainPageModel.Settings.DefaultGameName))
+            {
+                return;
+            }
 
-            MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame;
+            MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
+            MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
             MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
 
             if (MainPageModel.CatanService != null)

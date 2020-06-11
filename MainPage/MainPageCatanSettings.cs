@@ -12,9 +12,7 @@ namespace Catan10
     {
         private bool _initializeSettings = true;
 
-        private bool DO_NOT_SAVE_FLAG = false;
-
-        public bool AnimateFade
+          public bool AnimateFade
         {
             get => MainPageModel.Settings.AnimateFade;
 
@@ -149,7 +147,6 @@ namespace Catan10
 
         public async Task ResetGridLayout()
         {
-            DO_NOT_SAVE_FLAG = true;
             foreach (var kvp in MainPageModel.Settings.GridPositions)
             {
                 GridPosition pos = kvp.Value;
@@ -160,7 +157,6 @@ namespace Catan10
             }
 
             UpdateGridLocations();
-            DO_NOT_SAVE_FLAG = false;
             await SaveGridLocations();
         }
 

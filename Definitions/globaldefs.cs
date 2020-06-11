@@ -10,7 +10,7 @@ namespace Catan10
 {
     public class LogHeader
     {
-        #region Properties + Fields 
+        #region Properties + Fields
 
         public CatanAction Action { get; set; }
 
@@ -46,7 +46,9 @@ namespace Catan10
 
         public string TypeName { get; set; }
 
-        #endregion Properties + Fields 
+        #endregion Properties + Fields
+
+
 
         #region Constructors
 
@@ -93,7 +95,7 @@ namespace Catan10
 
     public class RandomBoardSettings
     {
-        #region Properties + Fields 
+        #region Properties + Fields
 
         //
         //  every Board has a random list of harbors
@@ -107,7 +109,9 @@ namespace Catan10
         //
         public Dictionary<string, RandomLists> TileGroupToRandomListsDictionary { get; set; } = new Dictionary<string, RandomLists>();
 
-        #endregion Properties + Fields 
+        #endregion Properties + Fields
+
+
 
         #region Constructors
 
@@ -145,13 +149,15 @@ namespace Catan10
 
     public class RandomLists
     {
-        #region Properties + Fields 
+        #region Properties + Fields
 
         public List<int> NumberList { get; set; } = null;
 
         public List<int> TileList { get; set; } = null;
 
-        #endregion Properties + Fields 
+        #endregion Properties + Fields
+
+
 
         #region Constructors
 
