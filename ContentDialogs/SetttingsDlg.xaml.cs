@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-using Catan.Proxy;
+﻿using System.Collections.ObjectModel;
 
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -13,8 +7,6 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-
-
     public sealed partial class SettingsDlg : ContentDialog
     {
         #region Methods
@@ -35,13 +27,15 @@ namespace Catan10
         #endregion Methods
 
         #region Constructors
-        ObservableCollection<string> ValidServiceUris { get; set; } = new ObservableCollection<string>();
+
+        private ObservableCollection<string> ValidServiceUris { get; set; } = new ObservableCollection<string>();
+
         public SettingsDlg()
         {
             this.InitializeComponent();
             ValidServiceUris.Add("localhost:5000");
+            ValidServiceUris.Add("192.168.1.128:5000");
             ValidServiceUris.Add("jdlgameservice.azurewebsites.net");
-
         }
 
         public SettingsDlg(Settings settings, PlayerModel human)
@@ -50,6 +44,7 @@ namespace Catan10
             this.Settings = settings;
             this.TheHuman = human;
             ValidServiceUris.Add("localhost:5000");
+            ValidServiceUris.Add("192.168.1.128:5000");
             ValidServiceUris.Add("jdlgameservice.azurewebsites.net");
         }
 
@@ -83,12 +78,11 @@ namespace Catan10
         private void OnServiceUriChanged(object sender, SelectionChangedEventArgs e)
         {
             //if (e.AddedItems.Count > 0)
-            //{                
+            //{
             //    this.Settings.HostName = e.AddedItems[0].ToString();
             //}
 
             this.TraceMessage($"{e.AddedItems[0]}");
-
         }
     }
 }

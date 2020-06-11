@@ -124,7 +124,7 @@ namespace Catan10
             try
             {
                 string json = JsonSerializer.Serialize(message, GetJsonOptions());
-                await HubConnection.InvokeAsync("BroadcastMessage", GameInfo.Name, message.Origin, json);
+                await HubConnection.InvokeAsync("BroadcastMessage", GameInfo.Name, message.From, json);
             }
             catch (Exception ex)
             {
@@ -236,17 +236,17 @@ namespace Catan10
             }
         }
 
-        public async Task SendPrivateMessage(string to, CatanMessage message)
+        public async Task SendPrivateMessage(CatanMessage message)
         {
-            if (string.IsNullOrEmpty(to))
+            if (string.IsNullOrEmpty(message.To))
             {
-                throw new ArgumentException("message", nameof(to));
+                throw new ArgumentException("message", nameof(message));
             }
 
             try
             {
                 string json = JsonSerializer.Serialize(message, GetJsonOptions());
-                await HubConnection.InvokeAsync("PrivateMessage", to, json);
+                await HubConnection.InvokeAsync("PrivateMessage", message.To, json);
             }
             catch (Exception ex)
             {

@@ -44,7 +44,10 @@ namespace Catan10
             gameController.PlayingPlayers.ForEach((p) =>
             {
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources(); // you don't have to set Orientation because setting Count to 0 sets orientation = facedown
+                p.GameData.Resources.ResourcesThisTurn2.Reset();
             });
+
+            
 
             await gameController.PushRollState(RollState); // also set RandomGold tiles in the UI
 

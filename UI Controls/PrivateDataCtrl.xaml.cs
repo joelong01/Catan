@@ -181,6 +181,8 @@ namespace Catan10
                  *  5. show the UI to pick one of the victim's cards
                  *  6. Send a message to update the resources for each player
                  */
+
+                await MustMoveBaronLog.PostLog(MainPage.Current, MoveBaronReason.PlayedDevCard);
             }
         }
 
@@ -301,8 +303,8 @@ namespace Catan10
 
         public string XOfYText(int index, int count)
         {
-            int i = index + 1;
-            return $"{i} of {count}";
+            if (count == 0) return "";
+            return $"{index + 1} of {count}";
         }
     }
 }

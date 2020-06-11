@@ -482,7 +482,7 @@ namespace Catan10
             CatanMessage message = new CatanMessage()
             {
                 Data = logHeader,
-                Origin = TheHuman.PlayerName,
+                From = TheHuman.PlayerName,
                 ActionType = msgType
             };
             //  var tcs = new TaskCompletionSource<object>();
@@ -525,7 +525,7 @@ namespace Catan10
             CatanMessage message = new CatanMessage()
             {
                 Data = logHeader,
-                Origin = TheHuman.PlayerName,
+                From = TheHuman.PlayerName,
                 ActionType = ActionType.Redo
             };
 
@@ -742,7 +742,7 @@ namespace Catan10
             CatanMessage message = new CatanMessage()
             {
                 Data = logHeader,
-                Origin = TheHuman.PlayerName,
+                From = TheHuman.PlayerName,
                 ActionType = ActionType.Undo
             };
             if (MainPageModel.Settings.IsSignalRGame)

@@ -40,7 +40,7 @@ namespace Catan10
             await gameController.Log.RollLog.RedoRoll();
             if (gameController.Log.RollLog.LastRoll == 7)
             {
-                await WaitingForNextToMustMoveBaron.PostLog(gameController);
+                await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
             }
 
             //
@@ -48,6 +48,7 @@ namespace Catan10
             gameController.PlayingPlayers.ForEach((p) =>
             {
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources();
+                p.GameData.Resources.ResourcesThisTurn2.Reset();
             });
         }
 

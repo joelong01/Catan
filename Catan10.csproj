@@ -118,6 +118,7 @@
     <Compile Include="attachedProperties.cs" />
     <Compile Include="CatanColors.cs" />
     <Compile Include="CatanService\serviceHelpers.cs" />
+    <Compile Include="CatanService\WebSocketClient.cs" />
     <Compile Include="ContentDialogs\PlayerPickerDlg.xaml.cs">
       <DependentUpon>PlayerPickerDlg.xaml</DependentUpon>
     </Compile>
@@ -142,7 +143,6 @@
     <Compile Include="Logging\Helpers\AllocationPhaseHelper.cs" />
     <Compile Include="Logging\Helpers\BaronLogHelpers.cs" />
     <Compile Include="Logging\Helpers\ChangePlayerHelper.cs" />
-    <Compile Include="Logging\StateTransitions\6c_MoveBaronToWaitingForNext.cs" />
     <Compile Include="Models\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />
@@ -150,7 +150,7 @@
     <Compile Include="MainPage\NetworkGame.cs" />
     <Compile Include="MainPage\RoadRaceTracking.cs" />
     <Compile Include="MainPage\webSocket.cs" />
-    <Compile Include="Logging\Actions\MustMoveBaron.cs" />
+    <Compile Include="Logging\StateTransitions\6a_ToMustMoveBaron.cs" />
     <Compile Include="Logging\Actions\PurchaseLog.cs" />
     <Compile Include="Logging\StateTransitions\playeDevCard.cs" />
     <Compile Include="Logging\Actions\randomizedBoard.cs" />
@@ -167,7 +167,7 @@
     <Compile Include="Logging\StateTransitions\8b_SupplementalToSelf.cs" />
     <Compile Include="Logging\StateTransitions\8c_SupToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\1_WaitingForPlayers.cs" />
-    <Compile Include="Logging\StateTransitions\6b_MustMoveBaron.cs" />
+    <Compile Include="Logging\StateTransitions\6b_MovedBaron.cs" />
     <Compile Include="Logging\StateTransitions\8a_Supplemental.cs" />
     <Compile Include="Logging\StateTransitions\7_NextToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\2_PickingBoard.cs" />
@@ -548,7 +548,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.6.10.74241</Version>
+      <Version>2020.6.10.113159</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>

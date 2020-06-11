@@ -117,11 +117,11 @@
                         <TextBlock HorizontalAlignment="Center" Text="{x:Bind XOfYText(PlayedDevCardIndex, Player.GameData.Resources.PlayedDevCards.Count), Mode=OneWay}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                     </Border>
                 </StackPanel>
-                <Grid Height="140">
-                    <Border Height="20" Margin="-10,0,0,0" HorizontalAlignment="Center"
+                <Grid Height="140" VerticalAlignment="Top">
+                    <Border Height="20" Margin="0,0,0,0" HorizontalAlignment="Center"
                         VerticalAlignment="Top" CornerRadius="2"
                         Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
-                        <TextBlock HorizontalAlignment="Center" Text=" Played This Turn " Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+                        <TextBlock HorizontalAlignment="Center" Text="Played This Turn " Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                     </Border>
                     <Rectangle Width="70" Height="100" Margin="0,20,0,0" HorizontalAlignment="Center"
                         VerticalAlignment="Center" RadiusX="5" Stroke="White" StrokeThickness="1"

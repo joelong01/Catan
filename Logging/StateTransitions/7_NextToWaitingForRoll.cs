@@ -65,6 +65,7 @@ namespace Catan10
             gameController.PlayingPlayers.ForEach((p) =>
             {
                 p.GameData.Resources.ResourcesThisTurn = new TradeResources();
+                p.GameData.Resources.ResourcesThisTurn2.Reset();
             });
 
             //

@@ -547,9 +547,6 @@ namespace Catan10
             NewDevCards.Clear();
         }
 
-        //        case DevCardType.VictoryPoint:
-        //            VictoryPoints++;
-        //            break;
         public bool PlayDevCard(DevCardType devCardType)
         {
             for (int i = AvailableDevCards.Count - 1; i >= 0; i--)
@@ -560,11 +557,28 @@ namespace Catan10
                     PlayedDevCards.Add(card);
                     AvailableDevCards.RemoveAt(i);
                     ThisTurnsDevCard = card;
+                    card.Played = true;
                     return true;
                 }
             }
 
             return false;
+        }
+        /// <summary>
+        ///     Move the DevCardPlayedThisTurn back and reset it
+        /// </summary>
+        /// <returns></returns>
+        public bool UndoPlayDevCard(DevCardType type)
+        {
+            Contract.Assert(ThisTurnsDevCard.Played);
+            Contract.Assert(type == ThisTurnsDevCard.DevCardType);
+            ThisTurnsDevCard.Played = false;
+            PlayedDevCards.Remove(ThisTurnsDevCard);
+            AvailableDevCards.Add(ThisTurnsDevCard);
+            ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None }; ;
+            return true;
+
+            
         }
 
         // the list of cards that have been played.  this is public information!

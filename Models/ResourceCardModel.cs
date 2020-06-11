@@ -75,6 +75,15 @@ namespace Catan10
             }
         }
 
+        public void Reset()
+        {
+            this.ForEach((resourceCard) =>
+           {
+               resourceCard.Count = 0;
+               resourceCard.Orientation = TileOrientation.FaceDown;
+           });
+        }
+
         public void InitWithAllResources()
         {
             this.Add(ResourceType.Wood);
@@ -82,6 +91,16 @@ namespace Catan10
             this.Add(ResourceType.Wheat);
             this.Add(ResourceType.Sheep);
             this.Add(ResourceType.Ore);
+        }
+
+        internal void Shuffle()
+        {
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            for (int i = 0; i< this.Count; i++)
+            {
+                int index = rand.Next(this.Count);
+                this.Swap(i, index);
+            }
         }
     }
 
@@ -112,20 +131,6 @@ namespace Catan10
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        // the number of this type
-
-        // do you want to show the Count in a UI?
-
-        // DevCardType.Unknown means this is a ResourceType
-
-        // ??
-
-        // ??
-
-        // should you show this face up or face down
-
-        // who owns this (back pointer)
 
         public Brush BackBrush
         {

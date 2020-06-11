@@ -79,7 +79,7 @@ namespace Catan10
         /// <returns></returns>
         Task Initialize(string hostName, GameInfo gameInfo);
         Task JoinGame(string playerName);
-        Task SendPrivateMessage(string user, CatanMessage message);
+        Task SendPrivateMessage(CatanMessage message);
         Task StartConnection(string playerName);
 
         #endregion Methods

@@ -13,6 +13,22 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameCallback, ITileControlCallback
     {
+        #region Delegates + Fields + Events + Enums
+
+        private int _roadSkipped = 0;
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public GameContainerCtrl GameContainer
+        {
+            get
+            {
+                return _gameView;
+            }
+        }
+
         private PlayerModel MaxRoadPlayer
         {
             get
@@ -29,7 +45,835 @@ namespace Catan10
             }
         }
 
-        private int _roadSkipped = 0;
+        #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        ///     called after the settlement status has been updated.  the PlayerData has already been fixed to represent the new state
+        ///     the Views bind directly to the PlayerData, so we don't do anything with the Score (or anything else with PlayerData)
+        ///     This View knows how to Log and about the other Buildings and Roads, so put anything in here that is impacted by building something (or "unbuilding" it)
+        ///     in this case, recalc the longest road (a buidling can "break" a road) and then log it.
+        ///     we also clear all the Pip ellipses if we are in the allocating phase
+        /// </summary>
+        public async Task BuildingStateChanged(PlayerModel player, BuildingCtrl building, BuildingState oldState)
+        {
+            if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
+            {
+                await HideAllPipEllipses();
+                _showPipGroupIndex = 0;
+            }
+
+            if (CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips))
+                {
+                    TradeResources tr = new TradeResources();
+                    foreach (var kvp in building.BuildingToTileDictionary)
+                    {
+                        tr.Add(kvp.Value.ResourceType, 1);
+                    }
+                    CurrentPlayer.GameData.Resources.GrantResources(tr);
+                }
+                else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
+                {
+                    //
+                    //  user did an undo
+                    TradeResources tr = new TradeResources();
+                    foreach (var kvp in building.BuildingToTileDictionary)
+                    {
+                        tr.Add(kvp.Value.ResourceType, -1);
+                    }
+                    CurrentPlayer.GameData.Resources.GrantResources(tr);
+                }
+            }
+
+            //
+            //  NOTE:  these have to be called in this order so that the undo works correctly
+            //  await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
+            UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
+            CalculateAndSetLongestRoad();
+        }
+
+        /// <summary>
+        ///     called by the BuildingCtrl during PointerPressed to see if it is ok to change the state of the building.
+        ///     we can only do that if the state is WaitingForNext and the CurrentPlayer == the owner of the building
+        /// </summary>
+        /// <returns></returns>
+        public bool BuildingStateChangeOk(BuildingCtrl building)
+        {
+            if (!ValidateBuilding) return true;
+            if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
+            Contract.Assert(CurrentPlayer == TheHuman);
+
+            if (building.Owner != null)
+            {
+                if (building.Owner != CurrentPlayer) // you can only click on your own stuff and when it is your turn
+                {
+                    return false;
+                }
+                else
+                {
+                    //
+                    //  they clicked on one of their own cities to upgrade it -- make sure they have a City to go to
+                    if (building.BuildingState == BuildingState.Settlement)
+                    {
+                        if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.City))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse || CurrentGameState == GameState.Supplemental || CurrentGameState == GameState.WaitingForNext)
+            {
+                if (building.BuildingState == BuildingState.Settlement)
+                {
+                    if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.City))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                if (building.BuildingState == BuildingState.Build || building.BuildingState == BuildingState.Pips) // would be NoEntitlement if they didn't have the entitlement
+                {
+                    Contract.Assert(CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement));
+                    return true;
+                }
+            }
+            if (building.BuildingState == BuildingState.NoEntitlement) return false;
+            return false;
+        }
+
+        /// <summary>
+        ///         this looks at the global state of all the roads and makes sure that it
+        ///         1. keeps track of who gets to a road count >= 5 first
+        ///         2. makes sure that the right player gets the longest road
+        ///         3. works when an Undo action happens
+        ///         5. works when a road is "broken"
+        /// </summary>
+        public void CalculateAndSetLongestRoad()
+
+        {
+            //
+            //  make the compiler error go away
+            // await Task.Delay(0);
+
+            PlayerModel longestRoadPlayer = null;
+            int maxRoads = -1;
+            List<PlayerModel> tiedPlayers = new List<PlayerModel>();
+
+            try
+            {
+                _raceTracking.BeginChanges();
+                //
+                //  first loop over the players and find the set of players that have the longest road
+                //
+                foreach (PlayerModel p in MainPageModel.PlayingPlayers)
+                {
+                    if (p.GameData.HasLongestRoad)
+                    {
+                        longestRoadPlayer = p;  // this one currently has the longest road bit -- it may or may not be correct now
+                    }
+                    // calculate the longest road each player has -- we do this for *every* road/bulding state transition as one person can impact another (e.g. break a road)
+                    p.GameData.LongestRoad = CalculateLongestRoad(p, p.GameData.RoadsAndShips);
+
+                    //
+                    //  remove any tracking for roads greater than their current longest road
+                    //  e.g. if they had a road of length 7 and somebody broke it, remove the
+                    //  entries that said they had built roads of length 5+
+                    for (int i = p.GameData.LongestRoad + 1; i < _gameView.CurrentGame.GameData.MaxRoads; i++)
+                    {
+                        _raceTracking.RemovePlayer(p, i);
+                    }
+
+                    if (p.GameData.LongestRoad >= 5)
+                    {
+                        //
+                        //  Now we add everybody who has more than 5 rows to the "race" tracking --
+                        //  this has a Dictionary<int, List> where the list is ordered by road count
+                        _raceTracking.AddPlayer(p, p.GameData.LongestRoad); // throws away duplicates
+                    }
+                    if (p.GameData.LongestRoad > maxRoads)
+                    {
+                        tiedPlayers.Clear();
+                        tiedPlayers.Add(p);
+                        maxRoads = p.GameData.LongestRoad;
+                    }
+                    else if (p.GameData.LongestRoad == maxRoads)
+                    {
+                        tiedPlayers.Add(p);
+                    }
+                }
+
+                //
+                //  somebody had longest road, but they are not tied for max roads - turn off the bit
+                if (longestRoadPlayer != null && !tiedPlayers.Contains(longestRoadPlayer))
+                {
+                    longestRoadPlayer.GameData.HasLongestRoad = false;
+                    longestRoadPlayer = null;
+                }
+
+                //
+                //  can't have longest road if there aren't enough of them
+                if (maxRoads < 5) // "5" is a "magic" Catan number - you need at least 5 roads to get Longest Road
+                {
+                    if (longestRoadPlayer != null)
+                    {
+                        longestRoadPlayer.GameData.HasLongestRoad = false;
+                    }
+                    return;
+                }
+
+                //
+                //  if only one person has longest road
+                if (tiedPlayers.Count == 1)
+                {
+                    tiedPlayers[0].GameData.HasLongestRoad = true;
+                    return;
+                }
+
+                //
+                //  more than one player has it -- give it to the one that has won the tie
+                //  first turn it off for everybody...this is needed because somebody might
+                //  be tied, but second in the race. they get the next number of roads and then undo it.
+                //  we need to give the longest road back to the first player to get to the road count
+                foreach (PlayerModel p in tiedPlayers)
+                {
+                    p.GameData.HasLongestRoad = false;
+                }
+                //
+                //  now turn it on for the winner!
+                _raceTracking.GetRaceWinner(maxRoads).GameData.HasLongestRoad = true;
+            }
+            finally
+            {
+                //
+                //  this pattern makes it so we can change race tracking multiple times but only end up with
+                //  one log write
+                _raceTracking.EndChanges(CurrentPlayer, this.CurrentGameState);
+            }
+        }
+
+        //
+        //  loop through all the players roads calculating the longest road from that point and then return the max found
+        public int CalculateLongestRoad(PlayerModel player, ObservableCollection<RoadCtrl> roads)
+        {
+            int max = 0;
+            RoadCtrl maxRoadStartedAt = null;
+            foreach (RoadCtrl startRoad in roads)
+            {
+                {
+                    int count = CalculateLongestRoad(startRoad, new List<RoadCtrl>(), null);
+                    if (count > max)
+                    {
+                        max = count;
+                        maxRoadStartedAt = startRoad;
+                        if (max == player.GameData.Roads.Count) // the most roads you can have…only count once
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            return max;
+        }
+
+        public bool CanBuildRoad()
+
+        {
+            if (ValidateBuilding == false) return true;
+            if (MainPageModel.Log == null)
+            {
+                return false;
+            }
+
+            if (CurrentPlayer != TheHuman) return false;
+
+            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Road))
+            {
+                return false;
+            }
+
+            GameState state = CurrentGameState;
+
+            if (state == GameState.WaitingForNext || // I can build after I roll
+                state == GameState.AllocateResourceForward || // I can build during the initial phase )
+                state == GameState.AllocateResourceReverse || state == GameState.Supplemental ||
+                state == GameState.PickingBoard)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task ChangeGame(CatanGameCtrl game)
+        {
+            if (game == _gameView.CurrentGame)
+            {
+                return;
+            }
+
+            if (CurrentGameState == GameState.WaitingForNewGame)
+            {
+                _gameView.CurrentGame = game;
+
+                return;
+            }
+            if (await StaticHelpers.AskUserYesNoQuestion("Are you sure you want to change the game?  The board will reshuffle and you won't be able to get back to this game.", "Yes", "No"))
+            {
+                _gameView.CurrentGame = game;
+
+                await VisualShuffle();
+            }
+        }
+
+        public async Task CurrentPlayerChanged()
+        {
+            //
+            //  the next player can always play a baron once
+            CurrentPlayer.GameData.PlayedKnightThisTurn = false;
+            CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null;
+
+            UpdateTurnFlag();
+
+            _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
+            _stopWatchForTurn.StartTimer();
+
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                await HideAllPipEllipses();
+                _showPipGroupIndex = 0;
+            }
+
+            // tell all the Buildings that the CurrentPlayer has changed
+            foreach (BuildingCtrl building in _gameView.AllBuildings)
+            {
+                building.CurrentPlayer = CurrentPlayer;
+            }
+        }
+
+        public BuildingCtrl GetBuilding(int settlementIndex)
+        {
+            return _gameView.GetBuilding(settlementIndex);
+        }
+
+        public PlayerModel GetPlayerData(int playerIndex)
+        {
+            return MainPageModel.AllPlayers[playerIndex];
+        }
+
+        public RoadCtrl GetRoad(int roadIndex)
+        {
+            return _gameView.GetRoad(roadIndex);
+        }
+
+        public TileCtrl GetTile(int tileIndex)
+        {
+            return _gameView.GetTile(tileIndex);
+        }
+
+        public Task OnNewGame()
+        {
+            return Task.CompletedTask;
+            //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
+            //{
+            //    if (State.GameState != GameState.WaitingForNewGame)
+            //    {
+            //        if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
+            //        {
+            //            return;
+            //        }
+            //    }
+            //}
+
+            //try
+            //{
+            //    if (MainPageModel.AllPlayers.Count == 0)
+            //    {
+            //        await LoadGameData();
+            //    }
+
+            //    Debug.Assert(MainPageModel.AllPlayers.Count > 0);
+
+            //    NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
+
+            //    ContentDialogResult result = await dlg.ShowAsync();
+            //    if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
+            //    {
+            //        string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
+            //        MessageDialog msgDlg = new MessageDialog(content);
+            //        await msgDlg.ShowAsync();
+            //        return;
+            //    }
+
+            //    if (dlg.SelectedGame == null)
+            //    {
+            //        string content = String.Format($"Pick a game!!");
+            //        MessageDialog msgDlg = new MessageDialog(content);
+            //        await msgDlg.ShowAsync();
+            //        return;
+            //    }
+
+            //    if (result != ContentDialogResult.Secondary)
+            //    {
+            //        _gameView.Reset();
+            //        await this.Reset();
+            //        await MainPageModel.Log.Init(dlg.SaveFileName);
+            //        await SetStateAsync(null, GameState.WaitingForNewGame, true);
+            //        _gameView.CurrentGame = dlg.SelectedGame;
+
+            //        SavedGames.Insert(0, MainPageModel.Log);
+            //        await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
+            //        await StartGame(dlg.PlayingPlayers, dlg.SelectedIndex);
+            //    }
+
+            //}
+            //finally
+            //{
+            //    VerifyRoundTrip<MainPageModel>(MainPageModel);
+            //}
+        }
+
+        public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
+        {
+            if (!CanBuildRoad())
+            {
+                return;
+            }
+
+            if (road.IsOwned)
+            {
+                return;
+            }
+
+            road.CurrentPlayer = CurrentPlayer;
+
+            road.Show(true, RoadAllowed(road));
+
+            //
+            //   if you forgot, this is good for debugging the layout -- left here in case you change it...again.
+
+            //foreach (var r in road.AdjacentRoads)
+            //{
+            //    r.Show(true);
+            //}
+            //foreach (var s in road.AdjacentBuildings)
+            //{
+            //    s.ShowBuildEllipse();
+            //}
+        }
+
+        public void RoadExited(RoadCtrl road, PointerRoutedEventArgs e)
+        {
+            if (!CanBuildRoad())
+            {
+                return;
+            }
+
+            if (road.IsOwned)
+            {
+                return;
+            }
+
+            road.Show(false);
+
+            //
+            //  if you forgot, this is good for debugging the layout -- left here in case you change it...again.
+
+            //foreach (var r in road.AdjacentRoads)
+            //{
+            //    r.Show(false);
+            //}
+            //foreach (var s in road.AdjacentSettlements)
+            //{
+            //    s.HideBuildEllipse();
+            //}
+        }
+
+        public async void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e)
+        {
+            if (!CanBuildRoad())
+            {
+                return;
+            }
+
+            if (!RoadAllowed(road)) // clicked on a random road away from a settlement or road
+            {
+                return;
+            }
+
+            if (road.IsOwned)
+            {
+                if (road.Owner != CurrentPlayer) // this is not my road I'm clicking on -- bail
+                {
+                    return;
+                }
+            }
+            await UpdateRoadLog.SetRoadState(this, road, NextRoadState(road), _raceTracking);
+            //
+            //  UpdateRoad state will be done in the IGameController
+        }
+
+        //
+        //  this is where the CurrentPlayer can pick somebody to target for the Baron.  this is always called from the tile, so first
+        //  make sure that the user is elligible to move baron/ship
+        //
+        //  it can happen because the user rolled 7 or they played a Knight, or they could do both in the same turn
+        //
+        //  if there is a knight entitlement, then they played a knight
+        //  if there is not, then they rolled 7
+        //
+        //
+        public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
+        {
+            MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
+            if (log == null) return; // probably the wrong state
+
+            this.TraceMessage($"Reason = {log.Reason}");
+
+            PlayerGameModel playerGameData = CurrentPlayer.GameData;
+
+            TargetWeapon weapon = TargetWeapon.Baron;
+
+            //
+            //  I made this a local function to capture the stack variables.
+            async void Baron_MenuClicked(object s, RoutedEventArgs e)
+            {
+                //
+                //  pop the dialog to pick a card
+                //
+                PlayerModel victim = (PlayerModel)((MenuFlyoutItem)s).Tag;                
+                var source = new ResourceCardCollection();
+
+                source.InitalizeResources(victim.GameData.Resources.Current);
+                ResourceType stolenResource = ResourceType.None;
+                if (source.Count > 0) // it is ok to target a player with no cards
+                {
+                    source.Shuffle();
+                    var destination = new ResourceCardCollection();
+
+                    TakeCardDlg dlg = new TakeCardDlg()
+                    {
+                        To = CurrentPlayer,
+                        From = victim,
+                        SourceOrientation = TileOrientation.FaceDown,
+                        HowMany = 1,
+                        Source = source,
+                        Destination = new ResourceCardCollection(),
+                        Instructions = $"Take a card from {victim.PlayerName}"
+                    };
+
+                    var ret = await dlg.ShowAsync();
+                    if (ret != ContentDialogResult.Primary)
+                    {
+                        await StaticHelpers.ShowErrorText("You cancelled out of the dialog.  I'll pick a Random card for you.", "Catan");
+                        Random rand = new Random((int)DateTime.Now.Ticks);
+                        int index = rand.Next(source.Count);
+                        destination.Add(source[index]);
+                    }
+
+                    Contract.Assert(destination.Count == 1);
+                    stolenResource = destination[0].ResourceType;
+                }
+                //
+                //  log to tell the other clients what we did
+                await MovedBaronLog.PostLog(this,
+                                            victim,
+                                            targetTile.Index,
+                                            weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index,  // the previous index
+                                            weapon,
+                                            log.Reason,
+                                            stolenResource);
+            }
+
+            _menuBaron.Items.Clear();
+            MenuFlyoutItem item = null;
+            if (targetTile.ResourceType == ResourceType.Sea) // we move pirate instead of Baron
+            { // this means we are moving the pirate ship
+                weapon = TargetWeapon.PirateShip;
+                List<RoadCtrl> roads = new List<RoadCtrl>();
+                foreach (RoadLocation location in Enum.GetValues(typeof(RoadLocation)))
+                {
+                    if (location == RoadLocation.None)
+                    {
+                        continue;
+                    }
+
+                    RoadCtrl r = _gameView.GetRoadAt(targetTile, location);
+                    if (r.IsOwned && r.RoadState == RoadState.Ship)
+                    {
+                        roads.Add(r);
+                    }
+                }
+
+                foreach (RoadCtrl road in roads)
+                {
+                    string s = "";
+
+                    bool found = false;
+                    foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
+                    {
+                        if (mnuItem.Text == s)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        if (log.Reason == MoveBaronReason.PlayedDevCard)
+                        {
+                            s = "Playing Knight to Target: " + s;
+                        }
+                        else
+                        {
+                            s = "Targetting " + s;
+                        }
+
+                        item = new MenuFlyoutItem
+                        {
+                            Text = s,
+                            Tag = road.Owner
+                        };
+                        item.Click += Baron_MenuClicked;
+                        _menuBaron.Items.Add(item);
+                    }
+                }
+
+                if (roads.Count == 0)
+                {
+                    item = new MenuFlyoutItem
+                    {
+                        Text = "Pirate Targets Nobody (how nice!)"
+                    };
+                    item.Click += Baron_MenuClicked;
+                    _menuBaron.Items.Add(item);
+                }
+                item = new MenuFlyoutItem
+                {
+                    Text = "Cancel"
+                };
+                _menuBaron.Items.Add(item);
+                _menuBaron.ShowAt(targetTile, rte.GetPosition(targetTile));
+            }
+            else
+            {
+                foreach (BuildingCtrl settlement in targetTile.OwnedBuilding)
+                {
+                    string s = "";
+
+                    bool found = false;
+                    // is it already there?
+                    foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
+                    {
+                        if (mnuItem.Tag == (object)settlement.Owner)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)  // this is so we only add each person once in case they have multiple settlements on the same tile
+                    {
+                        // create it
+                        item = new MenuFlyoutItem();
+                        if (log.Reason == MoveBaronReason.PlayedDevCard)
+                        {
+                            s = "Playing Knight to Target: " + settlement.Owner.PlayerName;
+                        }
+                        else
+                        {
+                            s = "Targetting " + settlement.Owner.PlayerName; ;
+                        }
+                        item.Text = s;
+                        item.Tag = settlement.Owner;
+                        item.Click += Baron_MenuClicked;
+                        _menuBaron.Items.Add(item);
+                    }
+                }
+
+                if (targetTile.OwnedBuilding.Count == 0)
+                {
+                    item = new MenuFlyoutItem
+                    {
+                        Text = "Target Nobody (how nice!)"
+                    };
+                    item.Click += Baron_MenuClicked;
+                    _menuBaron.Items.Add(item);
+                }
+                item = new MenuFlyoutItem
+                {
+                    Text = "Cancel"
+                };
+                _menuBaron.Items.Add(item);
+                _menuBaron.ShowAt(targetTile, rte.GetPosition(targetTile));
+            }
+        }
+
+        //
+        //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
+        ///
+        public Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
+        {
+            if (newState == oldState)
+            {
+                return Task.CompletedTask;
+            }
+
+            road.RoadState = newState;
+            switch (newState)
+            {
+                case RoadState.Unowned:
+                    if (oldState == RoadState.Ship)
+                    {
+                        CurrentPlayer.GameData.Ships.Remove(road);
+                    }
+                    else
+                    {
+                        CurrentPlayer.GameData.Roads.Remove(road);
+                    }
+
+                    road.Owner = null;
+                    road.Number = -1;
+                    break;
+
+                case RoadState.Road:
+                    road.Number = CurrentPlayer.GameData.Roads.Count; // undo-able
+                    CurrentPlayer.GameData.Roads.Add(road);
+                    road.Owner = CurrentPlayer;
+                    break;
+
+                case RoadState.Ship:
+                    CurrentPlayer.GameData.Roads.Remove(road); // can't be a ship if you aren't a road
+                    CurrentPlayer.GameData.Ships.Add(road);
+                    break;
+
+                default:
+                    break;
+            }
+
+            CalculateAndSetLongestRoad();
+            return Task.CompletedTask;
+        }
+
+        //
+        //
+        //
+        public BuildingState ValidateBuildingLocation(BuildingCtrl building)
+        {
+            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.BeginResourceAllocation) && ValidateBuilding)
+            {
+                return BuildingState.None;
+            }
+
+            if (!ValidateBuilding)
+            {
+                return BuildingState.Build;
+            }
+
+            //if (!CanBuildRoad())
+            //{
+            //    return BuildingState.None;
+            //}
+
+            if (CurrentPlayer == null) // this happens if you move the mouse over the board before a new game is started
+            {
+                return BuildingState.None;
+            }
+
+            if (CurrentGameState == GameState.PickingBoard)
+            {
+                return BuildingState.Pips;
+            }
+
+            bool allocationPhase = false;
+
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                allocationPhase = true;
+            }
+
+            bool error = SettlementsWithinOneSpace(building);
+
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                if (building.BuildingToTileDictionary.Count > 0)
+                {
+                    if (_gameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
+                    {
+                        //  we are on an island - you can't build on an island when you are allocating resources
+                        return BuildingState.Error;
+                    }
+                }
+            }
+
+            //
+            //  make sure that we have at least one buildable tile
+            bool buildableTile = false;
+            foreach (KeyValuePair<BuildingLocation, TileCtrl> kvp in building.BuildingToTileDictionary)
+            {
+                if (kvp.Value.ResourceType != ResourceType.Sea)
+                {
+                    buildableTile = true;
+                    break;
+                }
+            }
+
+            if (!buildableTile)
+            {
+                return BuildingState.None;
+            }
+
+            if (!allocationPhase && error == false)
+            {
+                error = true;
+                //
+                //   if the settlement is not next to another settlement and we are not in allocation phase, we have to be next to a road
+                foreach (RoadCtrl road in building.AdjacentRoads)
+                {
+                    if (road.Owner == CurrentPlayer && road.RoadState != RoadState.Unowned)
+                    {
+                        error = false;
+                        break;
+                    }
+                }
+            }
+
+            //
+            //  if we get here, we have a valid place to build (or we've bypassed the business logic)...make sure there is an entitlement
+
+            if (error == false)
+            {
+                if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement))
+                {
+                    return BuildingState.Build;
+                }
+                else
+                {
+                    return BuildingState.NoEntitlement;
+                }
+            }
+
+            return BuildingState.Error;
+        }
+
+        internal PlayerModel PlayerNameToPlayer(string name, ICollection<PlayerModel> players)
+        {
+            foreach (var player in players)
+            {
+                if (player.PlayerName == name)
+                    return player;
+            }
+            throw new Exception("bad name passed PlayerNameToPlayer");
+        }
 
         //
         //   when a Knight is played
@@ -538,792 +1382,6 @@ namespace Catan10
             CurrentPlayer.GameData.IsCurrentPlayer = true; // this should start the timer for this view
         }
 
-        internal PlayerModel PlayerNameToPlayer(string name, ICollection<PlayerModel> players)
-        {
-            foreach (var player in players)
-            {
-                if (player.PlayerName == name)
-                    return player;
-            }
-            throw new Exception("bad name passed PlayerNameToPlayer");
-        }
-
-        public GameContainerCtrl GameContainer
-        {
-            get
-            {
-                return _gameView;
-            }
-        }
-
-        /// <summary>
-        ///     called after the settlement status has been updated.  the PlayerData has already been fixed to represent the new state
-        ///     the Views bind directly to the PlayerData, so we don't do anything with the Score (or anything else with PlayerData)
-        ///     This View knows how to Log and about the other Buildings and Roads, so put anything in here that is impacted by building something (or "unbuilding" it)
-        ///     in this case, recalc the longest road (a buidling can "break" a road) and then log it.
-        ///     we also clear all the Pip ellipses if we are in the allocating phase
-        /// </summary>
-        public async Task BuildingStateChanged(PlayerModel player, BuildingCtrl building, BuildingState oldState)
-        {
-            if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
-            {
-                await HideAllPipEllipses();
-                _showPipGroupIndex = 0;
-            }
-
-            if (CurrentGameState == GameState.AllocateResourceReverse)
-            {
-                if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips))
-                {
-                    TradeResources tr = new TradeResources();
-                    foreach (var kvp in building.BuildingToTileDictionary)
-                    {
-                        tr.Add(kvp.Value.ResourceType, 1);
-                    }
-                    CurrentPlayer.GameData.Resources.GrantResources(tr);
-                }
-                else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
-                {
-                    //
-                    //  user did an undo
-                    TradeResources tr = new TradeResources();
-                    foreach (var kvp in building.BuildingToTileDictionary)
-                    {
-                        tr.Add(kvp.Value.ResourceType, -1);
-                    }
-                    CurrentPlayer.GameData.Resources.GrantResources(tr);
-                }
-            }
-
-            //
-            //  NOTE:  these have to be called in this order so that the undo works correctly
-            //  await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
-            UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
-            CalculateAndSetLongestRoad();
-        }
-
-        /// <summary>
-        ///     called by the BuildingCtrl during PointerPressed to see if it is ok to change the state of the building.
-        ///     we can only do that if the state is WaitingForNext and the CurrentPlayer == the owner of the building
-        /// </summary>
-        /// <returns></returns>
-        public bool BuildingStateChangeOk(BuildingCtrl building)
-        {
-            if (!ValidateBuilding) return true;
-            if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
-            Contract.Assert(CurrentPlayer == TheHuman);
-
-            if (building.Owner != null)
-            {
-                if (building.Owner != CurrentPlayer) // you can only click on your own stuff and when it is your turn
-                {
-                    return false;
-                }
-                else
-                {
-                    //
-                    //  they clicked on one of their own cities to upgrade it -- make sure they have a City to go to
-                    if (building.BuildingState == BuildingState.Settlement)
-                    {
-                        if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.City))
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse || CurrentGameState == GameState.Supplemental || CurrentGameState == GameState.WaitingForNext)
-            {
-                if (building.BuildingState == BuildingState.Settlement)
-                {
-                    if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.City))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                if (building.BuildingState == BuildingState.Build || building.BuildingState == BuildingState.Pips) // would be NoEntitlement if they didn't have the entitlement
-                {
-                    Contract.Assert(CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement));
-                    return true;
-                }
-            }
-            if (building.BuildingState == BuildingState.NoEntitlement) return false;
-            return false;
-        }
-
-        /// <summary>
-        ///         this looks at the global state of all the roads and makes sure that it
-        ///         1. keeps track of who gets to a road count >= 5 first
-        ///         2. makes sure that the right player gets the longest road
-        ///         3. works when an Undo action happens
-        ///         5. works when a road is "broken"
-        /// </summary>
-        public void CalculateAndSetLongestRoad()
-
-        {
-            //
-            //  make the compiler error go away
-            // await Task.Delay(0);
-
-            PlayerModel longestRoadPlayer = null;
-            int maxRoads = -1;
-            List<PlayerModel> tiedPlayers = new List<PlayerModel>();
-
-            try
-            {
-                _raceTracking.BeginChanges();
-                //
-                //  first loop over the players and find the set of players that have the longest road
-                //
-                foreach (PlayerModel p in MainPageModel.PlayingPlayers)
-                {
-                    if (p.GameData.HasLongestRoad)
-                    {
-                        longestRoadPlayer = p;  // this one currently has the longest road bit -- it may or may not be correct now
-                    }
-                    // calculate the longest road each player has -- we do this for *every* road/bulding state transition as one person can impact another (e.g. break a road)
-                    p.GameData.LongestRoad = CalculateLongestRoad(p, p.GameData.RoadsAndShips);
-
-                    //
-                    //  remove any tracking for roads greater than their current longest road
-                    //  e.g. if they had a road of length 7 and somebody broke it, remove the
-                    //  entries that said they had built roads of length 5+
-                    for (int i = p.GameData.LongestRoad + 1; i < _gameView.CurrentGame.GameData.MaxRoads; i++)
-                    {
-                        _raceTracking.RemovePlayer(p, i);
-                    }
-
-                    if (p.GameData.LongestRoad >= 5)
-                    {
-                        //
-                        //  Now we add everybody who has more than 5 rows to the "race" tracking --
-                        //  this has a Dictionary<int, List> where the list is ordered by road count
-                        _raceTracking.AddPlayer(p, p.GameData.LongestRoad); // throws away duplicates
-                    }
-                    if (p.GameData.LongestRoad > maxRoads)
-                    {
-                        tiedPlayers.Clear();
-                        tiedPlayers.Add(p);
-                        maxRoads = p.GameData.LongestRoad;
-                    }
-                    else if (p.GameData.LongestRoad == maxRoads)
-                    {
-                        tiedPlayers.Add(p);
-                    }
-                }
-
-                //
-                //  somebody had longest road, but they are not tied for max roads - turn off the bit
-                if (longestRoadPlayer != null && !tiedPlayers.Contains(longestRoadPlayer))
-                {
-                    longestRoadPlayer.GameData.HasLongestRoad = false;
-                    longestRoadPlayer = null;
-                }
-
-                //
-                //  can't have longest road if there aren't enough of them
-                if (maxRoads < 5) // "5" is a "magic" Catan number - you need at least 5 roads to get Longest Road
-                {
-                    if (longestRoadPlayer != null)
-                    {
-                        longestRoadPlayer.GameData.HasLongestRoad = false;
-                    }
-                    return;
-                }
-
-                //
-                //  if only one person has longest road
-                if (tiedPlayers.Count == 1)
-                {
-                    tiedPlayers[0].GameData.HasLongestRoad = true;
-                    return;
-                }
-
-                //
-                //  more than one player has it -- give it to the one that has won the tie
-                //  first turn it off for everybody...this is needed because somebody might
-                //  be tied, but second in the race. they get the next number of roads and then undo it.
-                //  we need to give the longest road back to the first player to get to the road count
-                foreach (PlayerModel p in tiedPlayers)
-                {
-                    p.GameData.HasLongestRoad = false;
-                }
-                //
-                //  now turn it on for the winner!
-                _raceTracking.GetRaceWinner(maxRoads).GameData.HasLongestRoad = true;
-            }
-            finally
-            {
-                //
-                //  this pattern makes it so we can change race tracking multiple times but only end up with
-                //  one log write
-                _raceTracking.EndChanges(CurrentPlayer, this.CurrentGameState);
-            }
-        }
-
-        //
-        //  loop through all the players roads calculating the longest road from that point and then return the max found
-        public int CalculateLongestRoad(PlayerModel player, ObservableCollection<RoadCtrl> roads)
-        {
-            int max = 0;
-            RoadCtrl maxRoadStartedAt = null;
-            foreach (RoadCtrl startRoad in roads)
-            {
-                {
-                    int count = CalculateLongestRoad(startRoad, new List<RoadCtrl>(), null);
-                    if (count > max)
-                    {
-                        max = count;
-                        maxRoadStartedAt = startRoad;
-                        if (max == player.GameData.Roads.Count) // the most roads you can have…only count once
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            return max;
-        }
-
-        public bool CanBuildRoad()
-
-        {
-            if (ValidateBuilding == false) return true;
-            if (MainPageModel.Log == null)
-            {
-                return false;
-            }
-
-            if (CurrentPlayer != TheHuman) return false;
-
-            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Road))
-            {
-                return false;
-            }
-
-            GameState state = CurrentGameState;
-
-            if (state == GameState.WaitingForNext || // I can build after I roll
-                state == GameState.AllocateResourceForward || // I can build during the initial phase )
-                state == GameState.AllocateResourceReverse || state == GameState.Supplemental ||
-                state == GameState.PickingBoard)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public async Task ChangeGame(CatanGameCtrl game)
-        {
-            if (game == _gameView.CurrentGame)
-            {
-                return;
-            }
-
-            if (CurrentGameState == GameState.WaitingForNewGame)
-            {
-                _gameView.CurrentGame = game;
-
-                return;
-            }
-            if (await StaticHelpers.AskUserYesNoQuestion("Are you sure you want to change the game?  The board will reshuffle and you won't be able to get back to this game.", "Yes", "No"))
-            {
-                _gameView.CurrentGame = game;
-
-                await VisualShuffle();
-            }
-        }
-
-        public async Task CurrentPlayerChanged()
-        {
-            //
-            //  the next player can always play a baron once
-            CurrentPlayer.GameData.PlayedKnightThisTurn = false;
-            CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null;
-
-            UpdateTurnFlag();
-
-            _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
-            _stopWatchForTurn.StartTimer();
-
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
-            {
-                await HideAllPipEllipses();
-                _showPipGroupIndex = 0;
-            }
-
-            // tell all the Buildings that the CurrentPlayer has changed
-            foreach (BuildingCtrl building in _gameView.AllBuildings)
-            {
-                building.CurrentPlayer = CurrentPlayer;
-            }
-        }
-
-        public BuildingCtrl GetBuilding(int settlementIndex)
-        {
-            return _gameView.GetBuilding(settlementIndex);
-        }
-
-        public PlayerModel GetPlayerData(int playerIndex)
-        {
-            return MainPageModel.AllPlayers[playerIndex];
-        }
-
-        public RoadCtrl GetRoad(int roadIndex)
-        {
-            return _gameView.GetRoad(roadIndex);
-        }
-
-        public TileCtrl GetTile(int tileIndex)
-        {
-            return _gameView.GetTile(tileIndex);
-        }
-
-        public Task OnNewGame()
-        {
-            return Task.CompletedTask;
-            //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
-            //{
-            //    if (State.GameState != GameState.WaitingForNewGame)
-            //    {
-            //        if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
-            //        {
-            //            return;
-            //        }
-            //    }
-            //}
-
-            //try
-            //{
-            //    if (MainPageModel.AllPlayers.Count == 0)
-            //    {
-            //        await LoadGameData();
-            //    }
-
-            //    Debug.Assert(MainPageModel.AllPlayers.Count > 0);
-
-            //    NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
-
-            //    ContentDialogResult result = await dlg.ShowAsync();
-            //    if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
-            //    {
-            //        string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
-            //        MessageDialog msgDlg = new MessageDialog(content);
-            //        await msgDlg.ShowAsync();
-            //        return;
-            //    }
-
-            //    if (dlg.SelectedGame == null)
-            //    {
-            //        string content = String.Format($"Pick a game!!");
-            //        MessageDialog msgDlg = new MessageDialog(content);
-            //        await msgDlg.ShowAsync();
-            //        return;
-            //    }
-
-            //    if (result != ContentDialogResult.Secondary)
-            //    {
-            //        _gameView.Reset();
-            //        await this.Reset();
-            //        await MainPageModel.Log.Init(dlg.SaveFileName);
-            //        await SetStateAsync(null, GameState.WaitingForNewGame, true);
-            //        _gameView.CurrentGame = dlg.SelectedGame;
-
-            //        SavedGames.Insert(0, MainPageModel.Log);
-            //        await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
-            //        await StartGame(dlg.PlayingPlayers, dlg.SelectedIndex);
-            //    }
-
-            //}
-            //finally
-            //{
-            //    VerifyRoundTrip<MainPageModel>(MainPageModel);
-            //}
-        }
-
-        public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
-        {
-            if (!CanBuildRoad())
-            {
-                return;
-            }
-
-            if (road.IsOwned)
-            {
-                return;
-            }
-
-            road.CurrentPlayer = CurrentPlayer;
-
-            road.Show(true, RoadAllowed(road));
-
-            //
-            //   if you forgot, this is good for debugging the layout -- left here in case you change it...again.
-
-            //foreach (var r in road.AdjacentRoads)
-            //{
-            //    r.Show(true);
-            //}
-            //foreach (var s in road.AdjacentBuildings)
-            //{
-            //    s.ShowBuildEllipse();
-            //}
-        }
-
-        public void RoadExited(RoadCtrl road, PointerRoutedEventArgs e)
-        {
-            if (!CanBuildRoad())
-            {
-                return;
-            }
-
-            if (road.IsOwned)
-            {
-                return;
-            }
-
-            road.Show(false);
-
-            //
-            //  if you forgot, this is good for debugging the layout -- left here in case you change it...again.
-
-            //foreach (var r in road.AdjacentRoads)
-            //{
-            //    r.Show(false);
-            //}
-            //foreach (var s in road.AdjacentSettlements)
-            //{
-            //    s.HideBuildEllipse();
-            //}
-        }
-
-        public async void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e)
-        {
-            if (!CanBuildRoad())
-            {
-                return;
-            }
-
-            if (!RoadAllowed(road)) // clicked on a random road away from a settlement or road
-            {
-                return;
-            }
-
-            if (road.IsOwned)
-            {
-                if (road.Owner != CurrentPlayer) // this is not my road I'm clicking on -- bail
-                {
-                    return;
-                }
-            }
-            await UpdateRoadLog.SetRoadState(this, road, NextRoadState(road), _raceTracking);
-            //
-            //  UpdateRoad state will be done in the IGameController
-        }
-
-        //
-        //  this is where the CurrentPlayer can pick somebody to target for the Baron.  this is always called from the tile, so first
-        //  make sure that the user is elligible to move baron/ship
-        //
-        //  it can happen because the user rolled 7 or they played a Knight, or they could do both in the same turn
-        //
-        //  if there is a knight entitlement, then they played a knight
-        //  if there is not, then they rolled 7
-        //
-        //
-        public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
-        {
-            MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
-            if (log == null) return; // probably the wrong state
-
-            bool playingKnight = log.Reason == MoveBaronReason.PlayedDevCard;
-
-            this.TraceMessage($"PlayingKnight = {playingKnight}");
-
-            PlayerGameModel playerGameData = CurrentPlayer.GameData;
-
-            TargetWeapon weapon = TargetWeapon.Baron;
-
-            //
-            //  I made this a local function to capture the stack variables.
-            async void Baron_MenuClicked(object s, RoutedEventArgs e)
-            {
-                PlayerModel player = (PlayerModel)((MenuFlyoutItem)s).Tag;
-                await MoveBaronLog.PostLog(this, player, targetTile.Index, weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index, weapon);
-            }
-
-            _menuBaron.Items.Clear();
-            MenuFlyoutItem item = null;
-            if (targetTile.ResourceType == ResourceType.Sea) // we move pirate instead of Baron
-            { // this means we are moving the pirate ship
-                weapon = TargetWeapon.PirateShip;
-                List<RoadCtrl> roads = new List<RoadCtrl>();
-                foreach (RoadLocation location in Enum.GetValues(typeof(RoadLocation)))
-                {
-                    if (location == RoadLocation.None)
-                    {
-                        continue;
-                    }
-
-                    RoadCtrl r = _gameView.GetRoadAt(targetTile, location);
-                    if (r.IsOwned && r.RoadState == RoadState.Ship)
-                    {
-                        roads.Add(r);
-                    }
-                }
-
-                foreach (RoadCtrl road in roads)
-                {
-                    string s = "";
-
-                    bool found = false;
-                    foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
-                    {
-                        if (mnuItem.Text == s)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        if (playingKnight)
-                        {
-                            s = "Playing Knight to Target: " + s;
-                        }
-                        else
-                        {
-                            s = "Targetting " + s;
-                        }
-
-                        item = new MenuFlyoutItem
-                        {
-                            Text = s,
-                            Tag = road.Owner
-                        };
-                        item.Click += Baron_MenuClicked;
-                        _menuBaron.Items.Add(item);
-                    }
-                }
-
-                if (roads.Count == 0)
-                {
-                    item = new MenuFlyoutItem
-                    {
-                        Text = "Pirate Targets Nobody (how nice!)"
-                    };
-                    item.Click += Baron_MenuClicked;
-                    _menuBaron.Items.Add(item);
-                }
-                item = new MenuFlyoutItem
-                {
-                    Text = "Cancel"
-                };
-                _menuBaron.Items.Add(item);
-                _menuBaron.ShowAt(targetTile, rte.GetPosition(targetTile));
-            }
-            else
-            {
-                foreach (BuildingCtrl settlement in targetTile.OwnedBuilding)
-                {
-                    string s = "";
-
-                    bool found = false;
-                    foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
-                    {
-                        if (mnuItem.Text == s)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)  // this is so we only add each person once in case they have multiple settlements on the same tile
-                    {
-                        if (playingKnight)
-                        {
-                            s = "Playing Knight to Target: " + s;
-                        }
-                        else
-                        {
-                            s = "Targetting " + s;
-                        }
-                        item.Click += Baron_MenuClicked;
-                        _menuBaron.Items.Add(item);
-                    }
-                }
-
-                if (targetTile.OwnedBuilding.Count == 0)
-                {
-                    item = new MenuFlyoutItem
-                    {
-                        Text = "Target Nobody (how nice!)"
-                    };
-                    item.Click += Baron_MenuClicked;
-                    _menuBaron.Items.Add(item);
-                }
-                item = new MenuFlyoutItem
-                {
-                    Text = "Cancel"
-                };
-                _menuBaron.Items.Add(item);
-                _menuBaron.ShowAt(targetTile, rte.GetPosition(targetTile));
-            }
-        }
-
-        //
-        //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
-        ///
-        public Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
-        {
-            if (newState == oldState)
-            {
-                return Task.CompletedTask;
-            }
-
-            road.RoadState = newState;
-            switch (newState)
-            {
-                case RoadState.Unowned:
-                    if (oldState == RoadState.Ship)
-                    {
-                        CurrentPlayer.GameData.Ships.Remove(road);
-                    }
-                    else
-                    {
-                        CurrentPlayer.GameData.Roads.Remove(road);
-                    }
-
-                    road.Owner = null;
-                    road.Number = -1;
-                    break;
-
-                case RoadState.Road:
-                    road.Number = CurrentPlayer.GameData.Roads.Count; // undo-able
-                    CurrentPlayer.GameData.Roads.Add(road);
-                    road.Owner = CurrentPlayer;
-                    break;
-
-                case RoadState.Ship:
-                    CurrentPlayer.GameData.Roads.Remove(road); // can't be a ship if you aren't a road
-                    CurrentPlayer.GameData.Ships.Add(road);
-                    break;
-
-                default:
-                    break;
-            }
-
-            CalculateAndSetLongestRoad();
-            return Task.CompletedTask;
-        }
-
-        //
-        //
-        //
-        public BuildingState ValidateBuildingLocation(BuildingCtrl building)
-        {
-            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.BeginResourceAllocation) && ValidateBuilding)
-            {
-                return BuildingState.None;
-            }
-
-            if (!ValidateBuilding)
-            {
-                return BuildingState.Build;
-            }
-
-            //if (!CanBuildRoad())
-            //{
-            //    return BuildingState.None;
-            //}
-
-            if (CurrentPlayer == null) // this happens if you move the mouse over the board before a new game is started
-            {
-                return BuildingState.None;
-            }
-
-            if (CurrentGameState == GameState.PickingBoard)
-            {
-                return BuildingState.Pips;
-            }
-
-            bool allocationPhase = false;
-
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
-            {
-                allocationPhase = true;
-            }
-
-            bool error = SettlementsWithinOneSpace(building);
-
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
-            {
-                if (building.BuildingToTileDictionary.Count > 0)
-                {
-                    if (_gameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
-                    {
-                        //  we are on an island - you can't build on an island when you are allocating resources
-                        return BuildingState.Error;
-                    }
-                }
-            }
-
-            //
-            //  make sure that we have at least one buildable tile
-            bool buildableTile = false;
-            foreach (KeyValuePair<BuildingLocation, TileCtrl> kvp in building.BuildingToTileDictionary)
-            {
-                if (kvp.Value.ResourceType != ResourceType.Sea)
-                {
-                    buildableTile = true;
-                    break;
-                }
-            }
-
-            if (!buildableTile)
-            {
-                return BuildingState.None;
-            }
-
-            if (!allocationPhase && error == false)
-            {
-                error = true;
-                //
-                //   if the settlement is not next to another settlement and we are not in allocation phase, we have to be next to a road
-                foreach (RoadCtrl road in building.AdjacentRoads)
-                {
-                    if (road.Owner == CurrentPlayer && road.RoadState != RoadState.Unowned)
-                    {
-                        error = false;
-                        break;
-                    }
-                }
-            }
-
-            //
-            //  if we get here, we have a valid place to build (or we've bypassed the business logic)...make sure there is an entitlement
-
-            if (error == false)
-            {
-                if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement))
-                {
-                    return BuildingState.Build;
-                }
-                else
-                {
-                    return BuildingState.NoEntitlement;
-                }
-            }
-
-            return BuildingState.Error;
-        }
+        #endregion Methods
     }
 }

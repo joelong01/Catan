@@ -21,10 +21,6 @@ namespace Catan10
     {
         #region Properties + Fields 
 
-        private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
-        private MessageWebSocket MessageWebSocket { get; set; }
-        private DataWriter MessageWriter { get; set; }
-
         private Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
 
         #endregion Properties + Fields 
@@ -61,61 +57,9 @@ namespace Catan10
             return null;
         }
 
-        private void MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
-        {
+       
 
-            //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-            //{
-            //    if (Proxy == null) return;
-            //    using (DataReader reader = args.GetDataReader())
-            //    {
-            //        reader.UnicodeEncoding = UnicodeEncoding.Utf8;
-
-            //        try
-            //        {
-            //            string json = reader.ReadString(reader.UnconsumedBufferLength);
-            //            //
-            //            //  get our message, which now is only a WsGameMessage
-            //            WsMessage message = CatanProxy.Deserialize<WsMessage>(json);
-            //            var gameMessage = CatanProxy.Deserialize<WsGameMessage>(message.Data.ToString());
-            //            //
-            //            //  ack back to the service
-            //            var ack = new WsMessage() { MessageType = CatanWsMessageType.Ack };
-            //            json = CatanProxy.Serialize<WsMessage>(ack);
-            //            MessageWriter.WriteString(json);
-            //            await MessageWriter.StoreAsync();
-
-            //            if (gameMessage.GameInfo.RequestAutoJoin && gameMessage.GameInfo.Name.Contains("OnStartDefault") && TheHuman != null &&
-            //                gameMessage.GameInfo.Creator != TheHuman.PlayerName && message.MessageType == CatanWsMessageType.GameAdded && MainPageModel.Settings.AutoJoinGames)
-            //            {
-            //                var players = await Proxy.GetPlayers(gameMessage.GameInfo.Id);
-            //                if (players != null && players.Contains(TheHuman.PlayerName) == false && gameMessage.GameInfo.Started == false)
-            //                {
-            //                    await this.Reset();
-            //                    MainPageModel.ServiceGameInfo = await Proxy.JoinGame(gameMessage.GameInfo.Id, TheHuman.PlayerName);
-            //                    StartMonitoring();
-            //                }
-            //            }
-
-            //            if (message.MessageType == CatanWsMessageType.GameDeleted && gameMessage.GameInfo.Id == this.GameInfo?.Id) // deleting the game I'm playing!
-            //            {
-            //                await this.Reset();
-            //            }
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            this.TraceMessage(ex.ToString());
-            //            this.TraceMessage(ex.Message);
-            //        }
-            //    }
-            //});
-        }
-
-        private void OnClosed(IWebSocket sender, WebSocketClosedEventArgs args)
-        {
-            MainPageModel.WebSocketConnected = true;
-            this.TraceMessage("closed");
-        }
+       
 
         private async void OnDeleteAllGames(object sender, RoutedEventArgs e)
         {
@@ -334,39 +278,6 @@ namespace Catan10
         //    }
         //}
 
-        //private async Task WsConnect()
-        //{
-        //    try
-        //    {
-        //        if (MainPageModel.Proxy == null)
-        //        {
-        //            string hostName = "http://" + MainPageModel.Settings.HostName;
-        //            MainPageModel.Proxy = new CatanProxy() { HostName = hostName };
-        //        }
-
-        //        if (TheHuman.PlayerName == "Joe")
-        //        {
-        //            await DeleteAllGames();
-        //        }
-
-        //        Uri server = new Uri($"ws://{MainPageModel.Settings.HostName}/ws");
-        //        MessageWebSocket = new MessageWebSocket();
-        //        MessageWebSocket.Control.MessageType = SocketMessageType.Utf8;
-        //        MessageWebSocket.MessageReceived += MessageReceived;
-        //        MessageWebSocket.Closed += OnClosed;
-        //        await MessageWebSocket.ConnectAsync(server);
-        //        MessageWriter = new DataWriter(MessageWebSocket.OutputStream);
-
-        //        WsMessage message = new WsMessage() { MessageType = CatanWsMessageType.RegisterForGameNotifications };
-        //        var json = CatanProxy.Serialize<WsMessage>(message);
-        //        MessageWriter.WriteString(json);
-        //        await MessageWriter.StoreAsync();
-        //        MainPageModel.WebSocketConnected = true;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message, "Catan");
-        //    }
-        //}
+       
     }
 }

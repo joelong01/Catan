@@ -5,6 +5,17 @@ using Catan.Proxy;
 
 namespace Catan10
 {
+    /// <summary>
+    /// 
+    /// the general flow is 
+    /// 
+    ///     WaitingForRoll => Rolled 7 => MustMoveBaronLog => MoveBaronLog => WaitingForNext
+    ///                             or
+    ///     WaitingForRoll => PlayedKnight => MustMoveBaronLog => MoveBaronLog => WaitingForRoll
+    ///                             or
+    ///     WaitingForRoll => WaitingForNext => PlayedKnight => MustMoveBaronLog => MoveBaronLog => WaitingForRoll
+    ///     
+    /// </summary>
     public class MustMoveBaronLog : LogHeader, ILogController
     {
         public MoveBaronReason Reason { get; set; }
@@ -35,6 +46,8 @@ namespace Catan10
         {
             //
             //   nothing to do -- we just want the state and state message set
+            //   the code to move the Baron isin PageCallback.cs in the TileRightTapped method 
+            //
 
             return Task.CompletedTask;
         }

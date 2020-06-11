@@ -139,7 +139,7 @@ namespace Catan10
             return Proxy.JoinGame(GameInfo, playerName);
         }
 
-        public Task SendPrivateMessage(string to, CatanMessage message)
+        public Task SendPrivateMessage(CatanMessage message)
         {
             return Proxy.BroadcastMessage(GameInfo.Id, message);
         }

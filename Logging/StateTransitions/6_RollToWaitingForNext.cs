@@ -96,7 +96,9 @@ namespace Catan10
             if (rollLog.LastRoll == 7)
             {
                 //
-                //  we explicity discard before we target!
+                //  we explicity discard before we target! -- this is *not* about the Baron, so don't move it.
+                //  this is about having too many cards
+                //  
 
                 if (gameController.TheHuman.GameData.Resources.Current.Count > 7)
                 {
@@ -138,10 +140,12 @@ namespace Catan10
                     gameController.TheHuman.GameData.Resources.GrantResources(lost.GetNegated());
                     gameController.TheHuman.GameData.Resources.ResourcesLostSeven += lost;
                 }
+                //
+                //  Now transition to the state
+                //
 
-                await WaitingForNextToMustMoveBaron.PostLog(gameController);
-
-                //  need to provide a way to take a player's card
+                await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
+                
             }
         }
 
