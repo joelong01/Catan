@@ -84,7 +84,7 @@ namespace Catan10
         /// <param name="gameInfo"></param>
         /// <returns></returns>
         Task Initialize(string hostName);
-        Task JoinGame(GameInfo info, string playerName);
+        Task<GameInfo> JoinGame(GameInfo info, string playerName);
         Task SendPrivateMessage(Guid id, CatanMessage message);
         Task StartConnection(GameInfo info, string playerName);
 

@@ -296,7 +296,7 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        public Task JoinGame(GameInfo info, string playerName)
+        public Task<GameInfo> JoinGame(GameInfo info, string playerName)
         {
             throw new NotImplementedException();
         }

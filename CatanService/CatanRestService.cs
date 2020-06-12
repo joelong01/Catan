@@ -143,7 +143,7 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
-        public Task JoinGame(GameInfo gameInfo, string playerName)
+        public Task<GameInfo> JoinGame(GameInfo gameInfo, string playerName)
         {
             return Proxy.JoinGame(gameInfo, playerName);
         }

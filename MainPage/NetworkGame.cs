@@ -154,7 +154,7 @@ namespace Catan10
             MainPageModel.Log = new Log(this);
 
             await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-            await CreateOfJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+            await CreateOrJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
             await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
 
 
@@ -168,7 +168,7 @@ namespace Catan10
             this.TraceMessage($"{gameInfo}:{playerName}");
         }
 
-        private async Task CreateOfJoinGame(ICatanService gameService, GameInfo gameInfo, string me)
+        private async Task CreateOrJoinGame(ICatanService gameService, GameInfo gameInfo, string me)
         {
             var games = await gameService.GetAllGames();            
             bool exists = false;
@@ -191,8 +191,8 @@ namespace Catan10
             {
                 await gameService.CreateGame(gameInfo);
             }
-            await gameService.JoinGame(gameInfo, me);
-            
+            GameInfo serverGameInfo =  await gameService.JoinGame(gameInfo, me);
+            gameInfo.Creator = serverGameInfo.Creator;
                 
         }
 
