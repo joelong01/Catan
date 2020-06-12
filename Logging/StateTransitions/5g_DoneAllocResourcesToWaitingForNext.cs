@@ -47,8 +47,7 @@ namespace Catan10
             //  hide the rolls in the public data control
             gameController.PlayingPlayers.ForEach((p) =>
             {
-                p.GameData.Resources.ResourcesThisTurn = new TradeResources();
-                p.GameData.Resources.ResourcesThisTurn2.Reset();
+                p.GameData.Resources.ResourcesThisTurn.Reset();                
             });
         }
 

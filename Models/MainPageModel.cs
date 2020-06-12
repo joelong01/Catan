@@ -56,15 +56,7 @@ namespace Catan10
                 SecondaryBackgroundColor = Colors.Black,
                 PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACC}")
             };
-            TradeResources tr = new TradeResources()
-            {
-                Wood = 0,
-                Wheat = 0,
-                Brick = 0,
-                Ore = 0,
-                Sheep = 0
-            };
-            Bank.GameData.Resources.TotalResourcesCollection.InitalizeResources(tr);
+            Bank.GameData.Resources.TotalResourcesCollection.RemoveGold();
         }
 
         /// <summary>

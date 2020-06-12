@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -63,16 +64,16 @@ namespace Catan10
 
         #region Methods
 
-        Task BroadcastMessage(CatanMessage message);
+        Task BroadcastMessage(Guid id, CatanMessage message);
 
-        Task CreateGame();
+        Task CreateGame(GameInfo gameInfo);
 
         /// <summary>
         ///     Tell the service to delete the game with this ID
         /// </summary>
         /// <param name="gameName"></param>
         /// <returns></returns>
-        Task DeleteGame(GameInfo gameInfo, string by);
+        Task DeleteGame(Guid id, string by);
 
         Task<List<GameInfo>> GetAllGames();
 
@@ -82,10 +83,10 @@ namespace Catan10
         /// <param name="hostName"></param>
         /// <param name="gameInfo"></param>
         /// <returns></returns>
-        Task Initialize(string hostName, GameInfo gameInfo);
-        Task JoinGame(string playerName);
-        Task SendPrivateMessage(CatanMessage message);
-        Task StartConnection(string playerName);
+        Task Initialize(string hostName);
+        Task JoinGame(GameInfo info, string playerName);
+        Task SendPrivateMessage(Guid id, CatanMessage message);
+        Task StartConnection(GameInfo info, string playerName);
 
         #endregion Methods
 

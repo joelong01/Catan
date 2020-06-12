@@ -3,13 +3,21 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-
+using System.Text.Json.Serialization;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
+    /// <summary>
+    ///     this class exists so that we can bind UI to a *list* of ResourceCards
+    ///     It is born with 
+    ///         - 0 dev cards
+    ///         - Brick, Wood, wheat, Shee, Ore => all 0 count and facedown
+    ///         - note: NO GOLDMINE.
+    ///         
+    /// </summary>
     public class ResourceCardCollection : ObservableCollection<ResourceCardModel>
     {
         public static TradeResources ToTradeResources(IEnumerable<ResourceCardModel> resourceCards)
@@ -22,7 +30,15 @@ namespace Catan10
             return tr;
         }
 
-        public void Add(ResourceType resource, bool countVisible = true)
+        public ResourceCardCollection()
+        {
+            //
+            //  put the right resources in the collection and set them to 0 count
+            this.Reset();
+        }
+
+
+        private void Add(ResourceType resource, bool countVisible = true)
         {
             ResourceCardModel model = new ResourceCardModel()
             {
@@ -45,11 +61,22 @@ namespace Catan10
             this.Add(model);
         }
 
+        ResourceCardModel ModelForResource(ResourceType resourceType)
+        {
+            foreach (var model in this)
+            {
+                if (model.ResourceType == resourceType) return model;
+            }
+
+            throw new ArgumentException("bad resource type", nameof(resourceType));
+        }
+
         public void AddResources(TradeResources tr)
         {
-            foreach (var res in this)
+            foreach (var resType in tr.NonZeroResources)
             {
-                res.Count += tr.GetCount(res.ResourceType);
+                var model = ModelForResource(resType);
+                model.Count = tr.CountForResource(resType);
             }
         }
 
@@ -58,40 +85,40 @@ namespace Catan10
             this.ForEach((model) => model.Orientation = TileOrientation.FaceDown);
         }
 
+        internal void RemoveGold()
+        {
+            for (int i = this.Count -1; i >= 0;  i--)
+            {
+                if (this[i].ResourceType == ResourceType.GoldMine)
+                {
+                    this.RemoveAt(i);
+                    return;
+                }
+            }
+
+        }
+
         public void AllUp()
         {
             this.ForEach((model) => model.Orientation = TileOrientation.FaceUp);
         }
 
-        public void InitalizeResources(TradeResources tr)
-        {
-            foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
-            {
-                int count = tr.GetCount(resourceType);
-                for (int i = 0; i < count; i++)
-                {
-                    Add(resourceType, false);
-                }
-            }
-        }
+       
 
         public void Reset()
         {
-            this.ForEach((resourceCard) =>
-           {
-               resourceCard.Count = 0;
-               resourceCard.Orientation = TileOrientation.FaceDown;
-           });
-        }
-
-        public void InitWithAllResources()
-        {
+            this.Clear();
             this.Add(ResourceType.Wood);
             this.Add(ResourceType.Brick);
             this.Add(ResourceType.Wheat);
             this.Add(ResourceType.Sheep);
             this.Add(ResourceType.Ore);
+
+
+          
         }
+
+    
 
         internal void Shuffle()
         {
@@ -101,6 +128,11 @@ namespace Catan10
                 int index = rand.Next(this.Count);
                 this.Swap(i, index);
             }
+        }
+
+        internal void AddGoldMine()
+        {
+            this.Add(ResourceType.GoldMine);
         }
     }
 
@@ -121,7 +153,7 @@ namespace Catan10
 
         private TileOrientation _orientation = TileOrientation.FaceDown;
 
-        private PlayerModel _owner = null;
+        private string _ownerName = null;
 
         private bool _readOnly = false;
 
@@ -132,6 +164,15 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        [JsonIgnore]
+        public PlayerModel Owner
+        {
+            get
+            {
+                return MainPage.Current.NameToPlayer(_ownerName);
+            }
+        }
+        [JsonIgnore]
         public Brush BackBrush
         {
             get
@@ -194,7 +235,7 @@ namespace Catan10
                 }
             }
         }
-
+        [JsonIgnore]
         public Brush FrontBrush
         {
             get
@@ -212,7 +253,7 @@ namespace Catan10
                 return (Brush)App.Current.Resources["ResourceType." + ResourceType.ToString()];
             }
         }
-
+        [JsonIgnore]
         public Brush HarborBrush
         {
             get
@@ -274,17 +315,17 @@ namespace Catan10
             }
         }
 
-        public PlayerModel Owner
+        public string OwnerName
         {
             get
             {
-                return _owner;
+                return _ownerName;
             }
             set
             {
-                if (_owner != value)
+                if (_ownerName != value)
                 {
-                    _owner = value;
+                    _ownerName = value;
                     NotifyPropertyChanged();
                 }
             }

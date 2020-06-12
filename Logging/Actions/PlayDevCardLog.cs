@@ -88,7 +88,7 @@ namespace Catan10
 
                 foreach (var player in gameController.PlayingPlayers)
                 {
-                    player.GameData.Resources.ResourcesThisTurn = new TradeResources(); // we want to see the full effect of this change...
+                    player.GameData.Resources.ResourcesThisTurn.Reset();
                     if (player == sentBy) continue;
 
                     int count = player.GameData.Resources.Current.CountForResource(pickedResourceType);

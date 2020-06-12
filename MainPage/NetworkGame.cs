@@ -39,7 +39,7 @@ namespace Catan10
                 {
                     games.ForEach(async (game) =>
                     {
-                        await MainPageModel.CatanService.DeleteGame(game, TheHuman.PlayerName);                        
+                        await MainPageModel.CatanService.DeleteGame(game.Id, TheHuman.PlayerName);                        
                     });
                 }
             }
@@ -153,9 +153,9 @@ namespace Catan10
             MainPageModel.PlayingPlayers.Clear();
             MainPageModel.Log = new Log(this);
 
-            await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.ServiceGameInfo);
-            await MainPageModel.CatanService.StartConnection(TheHuman.PlayerName);
-
+            await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+            await CreateOfJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+            await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
 
 
             //
@@ -166,6 +166,34 @@ namespace Catan10
         private void Service_OnGameJoined(GameInfo gameInfo, string playerName)
         {
             this.TraceMessage($"{gameInfo}:{playerName}");
+        }
+
+        private async Task CreateOfJoinGame(ICatanService gameService, GameInfo gameInfo, string me)
+        {
+            var games = await gameService.GetAllGames();            
+            bool exists = false;
+            
+            foreach (var game in games)
+            {
+                if (game.Id == gameInfo.Id)
+                {
+                    exists = true;
+
+                    if (game.Creator == me)
+                    {
+                        await gameService.DeleteGame(gameInfo.Id, me);
+                        exists = false;
+                        break;
+                    }
+                }
+            }
+            if (!exists)
+            {
+                await gameService.CreateGame(gameInfo);
+            }
+            await gameService.JoinGame(gameInfo, me);
+            
+                
         }
 
         private async Task ProcessMessage(CatanMessage message)
@@ -236,7 +264,7 @@ namespace Catan10
                 }
                 if (playerName != TheHuman.PlayerName)
                 {
-                    await MainPageModel.CatanService.JoinGame(TheHuman.PlayerName);
+                    await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);
                     await AddPlayerLog.AddPlayer(this, TheHuman);
                 }
             }

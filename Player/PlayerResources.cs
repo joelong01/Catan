@@ -295,23 +295,8 @@ namespace Catan10
             }
         }
 
-        public TradeResources ResourcesThisTurn
-        {
-            get
-            {
-                return _resourcesThisTurn;
-            }
-            set
-            {
-                if (_resourcesThisTurn != value)
-                {
-                    _resourcesThisTurn = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public ResourceCardCollection ResourcesThisTurn2 { get; } = new ResourceCardCollection();
+     
+        public ResourceCardCollection ResourcesThisTurn { get;  } = new ResourceCardCollection();
 
         public int Roads
         {
@@ -465,8 +450,8 @@ namespace Catan10
 
         public PlayerResources()
         {
-            ResourcesThisTurn2.InitWithAllResources();
-            ResourcesThisTurn2.Add(ResourceType.GoldMine);
+            ResourcesThisTurn.AddGoldMine();
+            
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -515,8 +500,7 @@ namespace Catan10
         public void GrantResources(TradeResources tr)
         {
             Current += tr;
-            ResourcesThisTurn += tr;
-            ResourcesThisTurn2.AddResources(tr);
+            ResourcesThisTurn.AddResources(tr);
             if (tr.Count > 0)
             {
                 TotalResources += tr;
@@ -530,17 +514,13 @@ namespace Catan10
             NotifyPropertyChanged("EnabledEntitlementPurchase");
         }
 
-        //        case DevCardType.RoadBuilding:
-        //            UnplayedRoadBuilding++;
-        //            break;
+      
         public bool HasEntitlement(Entitlement entitlement)
         {
             return UnspentEntitlements.Contains(entitlement);
         }
 
-        //        case DevCardType.YearOfPlenty:
-        //            UnplayedYearOfPlenty++;
-        //            break;
+      
         public void MakeDevCardsAvailable()
         {
             NewDevCards.ForEach((dc) => AvailableDevCards.Add(dc));

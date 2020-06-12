@@ -75,7 +75,7 @@
                 </Button.Content>
             </Button>
             <Ellipse Margin="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                Stroke="White"
+                Stroke="{x:Bind Player.ForegroundBrush}"
                 Tag="{x:Bind Player, Mode=OneTime}"
                 IsTapEnabled="True" IsRightTapEnabled="True"
                 Fill="{x:Bind Player.ImageBrush, Mode=OneWay, FallbackValue=Blue, TargetNullValue=Blue}"
@@ -89,7 +89,7 @@
                     <Button Margin="0,-5,0,-5">
                         <Rectangle Width="70" Height="100"
                             Fill="{StaticResource ResourceType.Back}"
-                            RadiusX="10" RadiusY="10" Stroke="White" StrokeThickness="1" />
+                            RadiusX="10" RadiusY="10" Stroke="{x:Bind Player.ForegroundBrush}" StrokeThickness="1" />
                         <Button.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem Text="Buy Dev Card" />
@@ -112,7 +112,7 @@
                     <Button Margin="30,-5,0,-5">
                         <Rectangle Width="70" Height="100"
                             Fill="{StaticResource DevCardType.Back}"
-                            RadiusX="10" RadiusY="10" Stroke="White" StrokeThickness="1" />
+                            RadiusX="10" RadiusY="10" Stroke="{x:Bind Player.ForegroundBrush}" StrokeThickness="1" />
                     </Button>
                 </Viewbox>
                 <TextBlock Margin="2,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
@@ -157,11 +157,11 @@
                 <Viewbox Width="30" Height="40">
                     <Grid Margin="-10,-2,0,0" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
                         <Line X1="15" Y1="5" X2="15" Y2="45"
-                            Stroke="White" StrokeThickness="2" />
+                            Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" />
                         <Line X1="25" Y1="5" X2="25" Y2="45"
-                            Stroke="White" StrokeThickness="3" StrokeDashArray="2 1" />
+                            Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="3" StrokeDashArray="2 1" />
                         <Line X1="35" Y1="5" X2="35" Y2="45"
-                            Stroke="White" StrokeThickness="2" />
+                            Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" />
                     </Grid>
                 </Viewbox>
                 <TextBlock Grid.Column="1" Margin="0,0,0,0" HorizontalAlignment="Left"
@@ -229,7 +229,7 @@
                 <StackPanel Orientation="Horizontal">
                     <Rectangle Width="70" Height="100" Margin="10,0,0,0"
                         Fill="{StaticResource ResourceType.GoldMine}"
-                        RadiusX="10" RadiusY="10" Stroke="White" StrokeThickness="1"
+                        RadiusX="10" RadiusY="10" Stroke="{x:Bind Player.ForegroundBrush}" StrokeThickness="1"
                         ToolTipService.ToolTip="Score" />
                     <!--  Score  -->
                     <TextBlock Margin="10,0,0,0" FontSize="72"
@@ -239,7 +239,7 @@
                     <!--  Resources Acquired  -->
                     <Rectangle Width="70" Height="100" Margin="30,0,0,0"
                         Fill="{StaticResource ResourceType.Back}"
-                        RadiusX="10" RadiusY="10" Stroke="White" StrokeThickness="1" />
+                        RadiusX="10" RadiusY="10" Stroke="{x:Bind Player.ForegroundBrush}" StrokeThickness="1" />
                     <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"
                         FontWeight="ExtraBold" />
                     <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind Player.GameData.Resources.TotalResources.Count, Mode=OneWay, FallbackValue=68}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
@@ -272,7 +272,7 @@
                     SelectionMode="None" ScrollViewer.VerticalScrollBarVisibility="Disabled"
                     BorderBrush="{StaticResource bmMaple}"
                     BorderThickness="0"
-                    ItemsSource="{x:Bind Player.GameData.Resources.ResourcesThisTurn2}">
+                    ItemsSource="{x:Bind Player.GameData.Resources.ResourcesThisTurn, Mode=OneWay}">
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="local:ResourceCardModel">
                             <Viewbox>
@@ -291,7 +291,7 @@
             </Viewbox>
             <StackPanel Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="2"
                 Height="85" Margin="-70" HorizontalAlignment="Right" VerticalAlignment="Center"
-                Background="Transparent" BorderBrush="White" BorderThickness="1"
+                Background="Transparent" BorderBrush="{x:Bind Player.ForegroundBrush}" BorderThickness="1"
                 CornerRadius="5">
                 <TextBlock Margin="0,0,0,4" HorizontalAlignment="Left" Text="⛏" FontSize="12"
                     IsColorFontEnabled="False"

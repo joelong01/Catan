@@ -64,7 +64,8 @@ namespace Catan10
             };
 
             ResourceCardCollection rc = new ResourceCardCollection();
-            rc.InitalizeResources(tr);
+            rc.RemoveGold();
+            rc.AddResources(tr);
             TakeCardDlg dlg = new TakeCardDlg()
             {
                 To = Player,
@@ -97,7 +98,8 @@ namespace Catan10
             };
 
             ResourceCardCollection rc = new ResourceCardCollection();
-            rc.InitalizeResources(tr);
+            rc.RemoveGold();
+            rc.AddResources(tr);
             TakeCardDlg dlg = new TakeCardDlg()
             {
                 To = Player,

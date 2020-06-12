@@ -551,38 +551,42 @@ namespace Catan10
                 //
                 //  pop the dialog to pick a card
                 //
-                PlayerModel victim = (PlayerModel)((MenuFlyoutItem)s).Tag;                
-                var source = new ResourceCardCollection();
-
-                source.InitalizeResources(victim.GameData.Resources.Current);
+                PlayerModel victim = (PlayerModel)((MenuFlyoutItem)s).Tag;
                 ResourceType stolenResource = ResourceType.None;
-                if (source.Count > 0) // it is ok to target a player with no cards
+                if (victim != null) // targeted nobody
                 {
-                    source.Shuffle();
-                    var destination = new ResourceCardCollection();
+                    var source = new ResourceCardCollection();
 
-                    TakeCardDlg dlg = new TakeCardDlg()
+                    source.AddResources(victim.GameData.Resources.Current);
+                    
+                    if (source.Count > 0) // it is ok to target a player with no cards
                     {
-                        To = CurrentPlayer,
-                        From = victim,
-                        SourceOrientation = TileOrientation.FaceDown,
-                        HowMany = 1,
-                        Source = source,
-                        Destination = new ResourceCardCollection(),
-                        Instructions = $"Take a card from {victim.PlayerName}"
-                    };
+                        source.Shuffle();
+                        var destination = new ResourceCardCollection();
 
-                    var ret = await dlg.ShowAsync();
-                    if (ret != ContentDialogResult.Primary)
-                    {
-                        await StaticHelpers.ShowErrorText("You cancelled out of the dialog.  I'll pick a Random card for you.", "Catan");
-                        Random rand = new Random((int)DateTime.Now.Ticks);
-                        int index = rand.Next(source.Count);
-                        destination.Add(source[index]);
+                        TakeCardDlg dlg = new TakeCardDlg()
+                        {
+                            To = CurrentPlayer,
+                            From = victim,
+                            SourceOrientation = TileOrientation.FaceDown,
+                            HowMany = 1,
+                            Source = source,
+                            Destination = new ResourceCardCollection(),
+                            Instructions = $"Take a card from {victim.PlayerName}"
+                        };
+
+                        var ret = await dlg.ShowAsync();
+                        if (ret != ContentDialogResult.Primary)
+                        {
+                            await StaticHelpers.ShowErrorText("You cancelled out of the dialog.  I'll pick a Random card for you.", "Catan");
+                            Random rand = new Random((int)DateTime.Now.Ticks);
+                            int index = rand.Next(source.Count);
+                            destination.Add(source[index]);
+                        }
+
+                        Contract.Assert(destination.Count == 1);
+                        stolenResource = destination[0].ResourceType;
                     }
-
-                    Contract.Assert(destination.Count == 1);
-                    stolenResource = destination[0].ResourceType;
                 }
                 //
                 //  log to tell the other clients what we did

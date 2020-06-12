@@ -487,7 +487,7 @@ namespace Catan10
             };
             //  var tcs = new TaskCompletionSource<object>();
             //    MessageCompletionDictionary.Add(logHeader.LogId, tcs);
-            await MainPageModel.CatanService.BroadcastMessage(message);
+            await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
             //if (MainPageModel.Settings.IsLocalGame)
             //{
             //    await ProcessMessage(message);
@@ -530,7 +530,7 @@ namespace Catan10
             };
 
 
-            await MainPageModel.CatanService.BroadcastMessage(message);
+            await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
 
 
             //if (MainPageModel.Settings.IsLocalGame)
@@ -745,16 +745,10 @@ namespace Catan10
                 From = TheHuman.PlayerName,
                 ActionType = ActionType.Undo
             };
-            if (MainPageModel.Settings.IsSignalRGame)
-            {
-                await MainPageModel.CatanService.BroadcastMessage(message);
 
-            }
-            if (MainPageModel.Settings.IsHomegrownGame)
-            {
-                await MainPageModel.CatanService.BroadcastMessage(message);
+            await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
 
-            }
+
             if (MainPageModel.Settings.IsLocalGame)
             {
                 ILogController logController = logHeader as ILogController;

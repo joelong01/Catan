@@ -148,24 +148,29 @@
                         ScaleY="{x:Bind MainPageModel.Settings.Zoom, Mode=OneWay}" />
                 </local:GameContainerCtrl.RenderTransform>
             </local:GameContainerCtrl>
-            <local:DragableGridCtrl x:Name="Draggable_PrivateData" Width="360" HorizontalAlignment="Center" Canvas.ZIndex="10" PointerPressed="Draggable_PointerPressed" 
-                VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
+            <local:DragableGridCtrl x:Name="Draggable_PrivateData" Width="360" HorizontalAlignment="Center"
+                VerticalAlignment="Center" Canvas.ZIndex="10"
+                PointerPressed="Draggable_PointerPressed"
+                OnGridPositionChanged="OnGridPositionChanged"
                 Player="{x:Bind TheHuman, Mode=OneWay}"
                 Background="{StaticResource DevCardType.Knight}"
-                Caption="Private Data"  BorderThickness="2"
+                Caption="Private Data" BorderThickness="2"
                 BorderBrush="{StaticResource bmMaple}"
                 CornerRadius="10">
                 <local:DragableGridCtrl.Child>
                     <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right" Canvas.ZIndex="5"
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right"
+                Canvas.ZIndex="5"
                 GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
                 PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
                 MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                 GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" />
-            <local:DragableGridCtrl x:Name="ControlGrid" Width="172" HorizontalAlignment="Center" Canvas.ZIndex="10" PointerPressed="Draggable_PointerPressed"
-                VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
+            <local:DragableGridCtrl x:Name="ControlGrid" Width="172" HorizontalAlignment="Center"
+                VerticalAlignment="Center" Canvas.ZIndex="10"
+                PointerPressed="Draggable_PointerPressed"
+                OnGridPositionChanged="OnGridPositionChanged"
                 Background="{StaticResource bmMaple}"
                 Foreground="Black" Visibility="Visible" CornerRadius="10"
                 Player="{x:Bind CurrentPlayer, Mode=OneWay}"
@@ -244,8 +249,10 @@
                     </StackPanel>
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:DragableGridCtrl x:Name="Grid_RollStats" Width="175" HorizontalAlignment="Center" Canvas.ZIndex="10" PointerPressed="Draggable_PointerPressed"
-                VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged" 
+            <local:DragableGridCtrl x:Name="Grid_RollStats" Width="175" HorizontalAlignment="Center"
+                VerticalAlignment="Center" Canvas.ZIndex="10"
+                PointerPressed="Draggable_PointerPressed"
+                OnGridPositionChanged="OnGridPositionChanged"
                 Background="{StaticResource bmMaple}"
                 CornerRadius="10"
                 Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
@@ -341,9 +348,10 @@
                     </Viewbox>
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <Grid Name="_savedGameGrid" Grid.Row="1" Width="383" Height="280" Canvas.ZIndex="10"
+            <Grid Name="_savedGameGrid" Grid.Row="1" Width="383" Height="280"
                 Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                x:Load="False" PointerPressed="OnPointerPressed" Visibility="Collapsed"
+                x:Load="False" Canvas.ZIndex="10" PointerPressed="OnPointerPressed"
+                Visibility="Collapsed"
                 Background="{StaticResource bmCherry}"
                 BorderBrush="{StaticResource bmMaple}"
                 BorderThickness="4" CornerRadius="4">
@@ -377,8 +385,9 @@
                 </ListBox.ItemTemplate>
             </ListBox>-->
             </Grid>
-            <local:DragableGridCtrl x:Name="Grid_BoardMeasurement" Grid.Row="1" Grid.RowSpan="10" Width="360" Canvas.ZIndex="10" PointerPressed="Draggable_PointerPressed" 
-                HorizontalAlignment="Center" VerticalAlignment="Center"
+            <local:DragableGridCtrl x:Name="Grid_BoardMeasurement" Grid.Row="1" Grid.RowSpan="10" Width="360"
+                HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="10"
+                PointerPressed="Draggable_PointerPressed"
                 OnGridPositionChanged="OnGridPositionChanged" Caption="Board Measurements"
                 Visibility="{x:Bind MainPageModel.ShowBoardMeasurements, Mode=OneWay}"
                 BorderBrush="{StaticResource bmMaple}"
@@ -402,8 +411,10 @@
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <!--  Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"  -->
-            <local:DragableGridCtrl x:Name="SynchronizedRolls" Width="360" HorizontalAlignment="Center" Canvas.ZIndex="10" PointerPressed="Draggable_PointerPressed"
-                VerticalAlignment="Center" OnGridPositionChanged="OnGridPositionChanged"
+            <local:DragableGridCtrl x:Name="SynchronizedRolls" Width="360" HorizontalAlignment="Center"
+                VerticalAlignment="Center" Canvas.ZIndex="10"
+                PointerPressed="Draggable_PointerPressed"
+                OnGridPositionChanged="OnGridPositionChanged"
                 Background="{StaticResource bmMaple}"
                 Foreground="Black"
                 Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"

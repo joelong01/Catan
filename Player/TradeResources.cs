@@ -26,6 +26,22 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
         }
 
+        [JsonIgnore]
+        public List<ResourceType> NonZeroResources
+        {
+            get
+            {
+                List<ResourceType> list = new List<ResourceType>();
+                if (Brick != 0) list.Add(ResourceType.Brick);
+                if (Wood != 0) list.Add(ResourceType.Wood);
+                if (Wheat != 0) list.Add(ResourceType.Wheat);
+                if (Sheep != 0) list.Add(ResourceType.Sheep);
+                if (Ore != 0) list.Add(ResourceType.Ore);
+                if (GoldMine != 0) list.Add(ResourceType.GoldMine);
+                return list;
+            }
+        }
+
         internal int GetCount(ResourceType resourceType)
         {
             switch (resourceType)

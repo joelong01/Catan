@@ -275,5 +275,40 @@ namespace Catan10
                 await StaticHelpers.ShowErrorText(ex.Message, "Connect to SignalR");
             }
         }
+
+        public Task BroadcastMessage(Guid id, CatanMessage message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task CreateGame(GameInfo gameInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteGame(Guid id, string by)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Initialize(string hostName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task JoinGame(GameInfo info, string playerName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendPrivateMessage(Guid id, CatanMessage message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task StartConnection(GameInfo info, string playerName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

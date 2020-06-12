@@ -14,7 +14,7 @@ namespace Catan10
     /// </summary>
     public class WaitingForNextToWaitingForRoll : LogHeader, ILogController
     {
-        public TradeResources ResourcesThisTurn { get; set; }
+        public ResourceCardCollection ResourcesThisTurn { get; set; }
         public RollState RollState { get; set; }
 
         public static async Task PostLog(IGameController gameController)
@@ -43,6 +43,7 @@ namespace Catan10
             await gameController.ResetRollControl();
 
             await gameController.PushRollState(this.RollState);
+            gameController.StopHighlightingTiles();
             //
             // if we have a roll for this turn already, use it.
             if (this.RollState.Rolls != null && this.RollState.Rolls.Count > 0)
@@ -64,8 +65,7 @@ namespace Catan10
             //  hide the rolls in the public data control
             gameController.PlayingPlayers.ForEach((p) =>
             {
-                p.GameData.Resources.ResourcesThisTurn = new TradeResources();
-                p.GameData.Resources.ResourcesThisTurn2.Reset();
+                p.GameData.Resources.ResourcesThisTurn.Reset();
             });
 
             //

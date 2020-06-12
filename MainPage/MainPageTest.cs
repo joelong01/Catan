@@ -34,7 +34,7 @@ namespace Catan10
             if (loss >= 4)
             {
                 ResourceCardCollection rc = new ResourceCardCollection();
-                rc.InitalizeResources(CurrentPlayer.GameData.Resources.Current);
+                rc.AddResources(CurrentPlayer.GameData.Resources.Current);
                 TakeCardDlg dlg = new TakeCardDlg()
                 {
                     To = MainPageModel.Bank,
@@ -75,6 +75,19 @@ namespace Catan10
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
+
+            TradeResources tr = new TradeResources()
+            {
+                Sheep = 3,
+                Wheat = 3,
+                Ore = 3,
+                Brick = 3,
+                Wood = 3
+            };
+            ResourceCardCollection col = new ResourceCardCollection();
+            col.AddResources(tr);
+            
+            var json = Catan.Proxy.CatanProxy.Serialize(col, true);
             await TestTargetPlayer();
         }
 
@@ -185,11 +198,7 @@ namespace Catan10
 
         private async Task TestTargetPlayer()
         {
-            var source = new ResourceCardCollection();
-            source.Add(ResourceType.Wheat, false);
-            source.Add(ResourceType.Wheat, false);
-            source.Add(ResourceType.Wood, false);
-            source.Add(ResourceType.Brick, false);
+            var source = new ResourceCardCollection();            
             var destination = new ResourceCardCollection();
             source.ForEach((c) => c.Orientation = TileOrientation.FaceDown);
             TakeCardDlg dlg = new TakeCardDlg()
@@ -223,7 +232,7 @@ namespace Catan10
             };
 
             ResourceCardCollection rc = new ResourceCardCollection();
-            rc.InitalizeResources(tr);
+            rc.AddResources(tr);
             TakeCardDlg dlg = new TakeCardDlg()
             {
                 To = CurrentPlayer,

@@ -38,7 +38,7 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            gameController.MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.Resources.ResourcesThisTurn = new TradeResources());
+            gameController.MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.Resources.ResourcesThisTurn.Reset());
             return Task.CompletedTask;
         }
 

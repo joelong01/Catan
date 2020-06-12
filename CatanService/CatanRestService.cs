@@ -18,7 +18,6 @@ namespace Catan10
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
 
-        private GameInfo GameInfo { get; set; }
 
         private CatanProxy Proxy { get; } = new CatanProxy();
 
@@ -35,7 +34,7 @@ namespace Catan10
         ///     after the first time, we don't delete the game for obvious reasons...
         /// </summary>
         /// <param name="playerName"></param>
-        private async void Monitor(string playerName)
+        private async void Monitor(GameInfo gameInfo, string playerName)
         {
             bool delete = true;
             while (true)
@@ -43,7 +42,7 @@ namespace Catan10
                 List<CatanMessage> messages;
                 try
                 {
-                    messages = await Proxy.Monitor(GameInfo, playerName, delete);
+                    messages = await Proxy.Monitor(gameInfo, playerName, delete);
                     delete = false;
                 }
                 catch (Exception e)
@@ -113,44 +112,48 @@ namespace Catan10
 
         #endregion Delegates  + Events + Enums
 
-        public Task BroadcastMessage(CatanMessage message)
+        public Task BroadcastMessage(Guid gameId, CatanMessage message)
         {
-            return Proxy.BroadcastMessage(GameInfo.Id, message);
+            return Proxy.BroadcastMessage(gameId, message);
         }
 
-        public Task CreateGame()
+        public Task CreateGame(GameInfo gameInfo)
         {
-            return Proxy.CreateGame(GameInfo);
+            return Proxy.CreateGame(gameInfo);
         }
 
-        public Task DeleteGame(GameInfo gameInfo, string by)
+        public Task DeleteGame(Guid id, string by)
         {
-            return Proxy.DeleteGame(gameInfo.Id, by);
+            return Proxy.DeleteGame(id, by);
         }
 
-        public Task<List<GameInfo>> GetAllGames()
+        public async Task<List<GameInfo>> GetAllGames()
         {
-            return Proxy.GetGames();
+            var games = await Proxy.GetGames();
+            if (games == null)
+            {
+                games = new List<GameInfo>();
+            }
+            return games;
         }
 
-        public Task Initialize(string hostName, GameInfo gameInfo)
+        public Task Initialize(string hostName)
         {
             Proxy.HostName = "http://" + hostName;
-            GameInfo = gameInfo;
             return Task.CompletedTask;
         }
 
-        public Task JoinGame(string playerName)
+        public Task JoinGame(GameInfo gameInfo, string playerName)
         {
-            return Proxy.JoinGame(GameInfo, playerName);
+            return Proxy.JoinGame(gameInfo, playerName);
         }
 
-        public Task SendPrivateMessage(CatanMessage message)
+        public Task SendPrivateMessage(Guid id, CatanMessage message)
         {
-            return Proxy.BroadcastMessage(GameInfo.Id, message);
+            return Proxy.BroadcastMessage(id, message);
         }
 
-        public async Task StartConnection(string playerName)
+        public async Task StartConnection(GameInfo gameInfo, string playerName)
         {
             Contract.Assert(OnBroadcastMessageReceived != null);
             if (OnBroadcastMessageReceived != null)
@@ -159,7 +162,7 @@ namespace Catan10
                 {
                     await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        Monitor(playerName);
+                        Monitor(gameInfo, playerName);
                     });
                 }
                 catch (Exception e)

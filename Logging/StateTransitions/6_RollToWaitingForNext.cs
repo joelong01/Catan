@@ -102,11 +102,11 @@ namespace Catan10
 
                 if (gameController.TheHuman.GameData.Resources.Current.Count > 7)
                 {
-                    gameController.TheHuman.GameData.Resources.ResourcesThisTurn = new TradeResources();
+                    Contract.Assert(gameController.TheHuman.GameData.Resources.ResourcesThisTurn.Count == 0);
                     int loss = (int)gameController.TheHuman.GameData.Resources.Current.Count / 2;
                     TradeResources lost = new TradeResources();
                     ResourceCardCollection source = new ResourceCardCollection();
-                    source.InitalizeResources(gameController.TheHuman.GameData.Resources.Current);
+                    source.AddResources(gameController.TheHuman.GameData.Resources.Current);
                     TakeCardDlg dlg = new TakeCardDlg()
                     {
                         To = gameController.MainPageModel.Bank,

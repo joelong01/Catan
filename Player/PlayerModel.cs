@@ -76,7 +76,7 @@ namespace Catan10
         {
             //
             //  hide the rolls in the public data control
-            GameData.Resources.ResourcesThisTurn = new TradeResources(); // reset PublicDataCtrl resources
+            GameData.Resources.ResourcesThisTurn.Reset(); // reset PublicDataCtrl resources
             GameData.Resources.ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None };     // flips the "Dev Card Played this turn" in public data ctrl and in PrivateDataCtrl
             //
             //  the next player can always play a baron once

@@ -209,6 +209,7 @@ namespace Catan10
             var top = Done.Pop();
             Contract.Assert(top.PlayerName == rollState.PlayerName);
             Done.Push(rollState);
+            UpdatePlayerStats(RollAction.Do);
             return this.UpdateUi(RollAction.Do);
         }
 

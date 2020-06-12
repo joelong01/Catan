@@ -1,19 +1,17 @@
-﻿<ContentDialog
-    x:Class="Catan10.GameNameDlg"
+﻿<ContentDialog x:Class="Catan10.GameNameDlg"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Title="Cata Game"
-    PrimaryButtonText="Ok"
-    SecondaryButtonText="Cancel"
+    Title="Cata Game" PrimaryButtonText="Ok" SecondaryButtonText="Cancel"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick" mc:Ignorable="d">
 
-    <StackPanel Background="{x:Bind Player.BackgroundBrush, TargetNullValue=Blue, FallbackValue=Red}" Width="400" Height="110">        
-        <TextBlock Text="Game Name" Foreground="{x:Bind Player.ForegroundBrush, TargetNullValue=White, FallbackValue=White}" Margin="10,5,0,0" FontSize="22"/>
-        <TextBox HorizontalAlignment="Stretch" TextAlignment="Left" Text="{x:Bind MainPageModel.Settings.DefaultGameName, Mode=TwoWay}" Margin="10" FontSize="22" />
+    <StackPanel Width="400" Height="110" Background="{x:Bind Player.BackgroundBrush, TargetNullValue=Blue, FallbackValue=Red}">
+        <TextBlock Margin="10,5,0,0" Text="Game Name" Foreground="{x:Bind Player.ForegroundBrush, TargetNullValue=White, FallbackValue=White}" FontSize="22" />
+        <TextBox Margin="10" HorizontalAlignment="Stretch" TextAlignment="Left"
+            Text="{x:Bind MainPageModel.Settings.DefaultGameName, Mode=TwoWay}"
+            FontSize="22" />
     </StackPanel>
 </ContentDialog>
