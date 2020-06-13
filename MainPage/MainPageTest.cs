@@ -86,9 +86,13 @@ namespace Catan10
             };
             ResourceCardCollection col = new ResourceCardCollection();
             col.AddResources(tr);
+
+            var flat = ResourceCardCollection.Flatten(ResourceCardCollection.ToTradeResources(col));
+
             
             var json = Catan.Proxy.CatanProxy.Serialize(col, true);
-            await TestTargetPlayer();
+            await Task.CompletedTask;
+            //await TestTargetPlayer();
         }
 
         private async void OnTest2(object sdr, RoutedEventArgs rea)

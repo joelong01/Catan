@@ -131,9 +131,9 @@ namespace Catan10
             // await OnNewGame?.Invoke(this, EventArgs.Empty);
             await OnNewGame();
         }
-        private void Menu_OnEndGame(object sender, RoutedEventArgs e)
+        private async void Menu_OnEndGame(object sender, RoutedEventArgs e)
         {
-            InitializeMainPageModel();
+            await InitializeMainPageModel();
         }
 
         private async void Menu_SelectGame(object sender, RoutedEventArgs e)

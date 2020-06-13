@@ -18,12 +18,9 @@ namespace Catan10
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
 
-
         private CatanProxy Proxy { get; } = new CatanProxy();
 
         #endregion Properties + Fields
-
-
 
         #region Methods
 
@@ -148,6 +145,11 @@ namespace Catan10
             return Proxy.JoinGame(gameInfo, playerName);
         }
 
+        public Task<List<string>> LeavGame(GameInfo gameInfo, string playerName)
+        {
+            return Proxy.LeaveGame(gameInfo, playerName);
+        }
+
         public Task SendPrivateMessage(Guid id, CatanMessage message)
         {
             return Proxy.BroadcastMessage(id, message);
@@ -171,11 +173,6 @@ namespace Catan10
                     await StaticHelpers.ShowErrorText($"Error Monitoring Catan Rest Service.  Error:\n{e}", "Catan REST Service StartConnection");
                 }
             }
-        }
-
-        public Task<List<string>> LeavGame(GameInfo gameInfo, string playerName)
-        {
-            return Proxy.LeaveGame(gameInfo, playerName);
         }
     }
 }

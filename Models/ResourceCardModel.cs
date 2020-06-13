@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Windows.UI;
@@ -20,12 +21,66 @@ namespace Catan10
     /// </summary>
     public class ResourceCardCollection : ObservableCollection<ResourceCardModel>
     {
+        public int ResourceCount 
+        {
+            get {
+                int total = 0;
+                foreach (var model in this)
+                {
+                    total += model.Count;
+                }
+
+                return total;
+            }
+        }
+
+        new public int Count => base.Count;
+        public bool IsFlat
+        {
+            get
+            {
+                foreach (var model in this)
+                {
+                    if (model.Count > 1)
+                        return false;
+                }
+
+                return true;
+            }
+        }
+        public ResourceCardCollection Flatten()
+        {
+            ResourceCardCollection flat = new ResourceCardCollection();
+            foreach (var model in this)
+            {
+                for (int i=0; i<model.Count; i++)
+                {
+                    flat.Add(new ResourceCardModel() { Count = 1, ResourceType = model.ResourceType });
+                }
+            }
+            return flat;
+        }
+        public static ResourceCardCollection Flatten(TradeResources tradeResources)
+        {
+            ResourceCardCollection flat = new ResourceCardCollection();
+            flat.Clear();
+            foreach (var resType in tradeResources.NonZeroResources)
+            {              
+                for (int i = 0; i < tradeResources.CountForResource(resType); i++)
+                {
+                    flat.Add(new ResourceCardModel() { Count = 1, ResourceType = resType });
+                }
+                 
+            }
+            return flat;
+        }
+
         public static TradeResources ToTradeResources(IEnumerable<ResourceCardModel> resourceCards)
         {
             TradeResources tr = new TradeResources();
             foreach (var card in resourceCards)
             {
-                tr.Add(card.ResourceType, 1);
+                tr.Add(card.ResourceType, card.Count);
             }
             return tr;
         }
@@ -120,8 +175,12 @@ namespace Catan10
 
     
 
+        /// <summary>
+        ///     this should only be called on a flattened ResourceCollection - otherwise you are ranomized types, not cards
+        /// </summary>
         internal void Shuffle()
         {
+            Contract.Assert(this.IsFlat);
             Random rand = new Random((int)DateTime.Now.Ticks);
             for (int i = 0; i< this.Count; i++)
             {
@@ -158,7 +217,10 @@ namespace Catan10
         private bool _readOnly = false;
 
         private ResourceType _resourceType = ResourceType.Back;
-
+        public override string ToString()
+        {
+            return $"[Count={Count}][Resource={ResourceType}][DevCard={DevCardType}][Owner={Owner}][Orientation={Orientation}]";
+        }
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

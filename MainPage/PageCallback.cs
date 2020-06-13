@@ -555,11 +555,10 @@ namespace Catan10
                 ResourceType stolenResource = ResourceType.None;
                 if (victim != null) // targeted nobody
                 {
-                    var source = new ResourceCardCollection();
+                    var source = ResourceCardCollection.Flatten(victim.GameData.Resources.Current);
+                    Contract.Assert(source.ResourceCount == source.Count);
 
-                    source.AddResources(victim.GameData.Resources.Current);
-                    
-                    if (source.Count > 0) // it is ok to target a player with no cards
+                    if (source.ResourceCount > 0) // it is ok to target a player with no cards
                     {
                         source.Shuffle();
                         var destination = new ResourceCardCollection();
@@ -580,6 +579,7 @@ namespace Catan10
                         {
                             await StaticHelpers.ShowErrorText("You cancelled out of the dialog.  I'll pick a Random card for you.", "Catan");
                             Random rand = new Random((int)DateTime.Now.Ticks);
+                            
                             int index = rand.Next(source.Count);
                             destination.Add(source[index]);
                         }

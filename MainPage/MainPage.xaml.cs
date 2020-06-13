@@ -557,7 +557,7 @@ namespace Catan10
         {
             DateTime dt = DateTime.Now;
             TimeSpan diff = DateTime.Now - _dt;
-            if (diff.TotalSeconds < 0.1)
+            if (diff.TotalSeconds < 1.0)
             {
                 //  this.TraceMessage($"Rejecting mousewheel call.  diff: {diff.TotalSeconds}");
                 return;
