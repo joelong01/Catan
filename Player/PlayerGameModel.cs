@@ -808,6 +808,7 @@ namespace Catan10
                 if (rolls[i].Selected)
                 {
                     CurrentRoll = rolls[i];
+                    break;
                 }
             }
 

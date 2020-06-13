@@ -125,6 +125,8 @@ namespace Catan10
             MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
             MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
             MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
+            MainPageModel.IsServiceGame = true;
+
 
             if (MainPageModel.CatanService != null)
             {

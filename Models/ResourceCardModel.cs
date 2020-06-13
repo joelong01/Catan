@@ -123,7 +123,10 @@ namespace Catan10
                 if (model.ResourceType == resourceType) return model;
             }
 
-            throw new ArgumentException("bad resource type", nameof(resourceType));
+            this.TraceMessage($"Needed to add ResourceType={resourceType} to ResourceCollection");
+            var m = new ResourceCardModel() { ResourceType = resourceType, Count = 0 };
+            this.Add(m);
+            return m;
         }
 
         public void AddResources(TradeResources tr)
