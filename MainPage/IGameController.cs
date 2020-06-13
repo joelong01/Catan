@@ -345,6 +345,8 @@ namespace Catan10
                 if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) continue; //hasn't rolled yet
                 if (p.GameData.SyncronizedPlayerRolls.CompareTo(TheHuman.GameData.SyncronizedPlayerRolls) == 0)
                 {
+                    string s = "Tie Roll. Roll again!";
+                    await StaticHelpers.ShowErrorText(s, "Catan");
                     await _rollControl.Reset();
                 }
             }
