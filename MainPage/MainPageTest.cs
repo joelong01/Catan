@@ -87,10 +87,16 @@ namespace Catan10
             ResourceCardCollection col = new ResourceCardCollection();
             col.AddResources(tr);
 
+            CurrentPlayer.GameData.SyncronizedPlayerRolls.LatestRolls = _rollControl.Rolls;
+
             var flat = ResourceCardCollection.Flatten(ResourceCardCollection.ToTradeResources(col));
 
             
+
             var json = Catan.Proxy.CatanProxy.Serialize(col, true);
+
+            
+
             await Task.CompletedTask;
             //await TestTargetPlayer();
         }

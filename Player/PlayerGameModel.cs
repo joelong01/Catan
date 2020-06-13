@@ -801,17 +801,22 @@ namespace Catan10
             //
             //  5/26/2020:  Don't clear and add range -- XAML will barf because i'm accessing the indexers in PublicDataCtrl.xaml
 
+            
+
             Contract.Assert(rolls.Count == 4);
             for (int i = 0; i < rolls.Count; i++)
             {
-                LatestRolls[i] = rolls[i];
+                LatestRolls[i].Selected = rolls[i].Selected;
+                LatestRolls[i].DiceOne = rolls[i].DiceOne;
+                LatestRolls[i].DiceTwo = rolls[i].DiceTwo;
+                LatestRolls[i].Orientation = rolls[i].Orientation;
                 if (rolls[i].Selected)
                 {
-                    CurrentRoll = rolls[i];
-                    break;
+                    CurrentRoll = LatestRolls[i];                    
                 }
             }
-
+            NotifyPropertyChanged("LatestRolls");
+           
             RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);
             return CurrentRoll;
         }

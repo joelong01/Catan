@@ -14,9 +14,12 @@ namespace Catan10
 
     public sealed partial class PlayerRollCtrl : UserControl
     {
-        private ObservableCollection<RollModel> Rolls { get; } = new ObservableCollection<RollModel>();
+        public ObservableCollection<RollModel> Rolls { get; } = new ObservableCollection<RollModel>();
         private bool _rolled = false;
         private bool clicked = false;
+
+
+        
 
         private void OnFaceDown(object sender, RoutedEventArgs e)
         {
@@ -91,10 +94,9 @@ namespace Catan10
             Rolls.ForEach((roll) => roll.Randomize());
         }
 
-        public Task Reset()
+        public async Task Reset()
         {
             PopulateControlList();
-            var list = new List<Task>();
             Rolls.ForEach((roll) =>
                {
                    roll.Orientation = TileOrientation.FaceDown;
@@ -102,8 +104,9 @@ namespace Catan10
                });
 
             _rolled = false;
-
-            return Task.CompletedTask;
+            
+            await ShowAllRollsLog.Post(MainPage.Current, new List<RollModel>(Rolls));
+            
         }
     }
 }

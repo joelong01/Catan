@@ -481,6 +481,8 @@ namespace Catan10
         /// <returns>False if the IGameController.Do() should be executed locally </returns>
         public async Task<bool> PostMessage(LogHeader logHeader, ActionType msgType)
         {
+            if (MainPageModel.ServiceGameInfo == null) return false; // can be null druing testing scenarios
+
             CatanMessage message = new CatanMessage()
             {
                 Data = logHeader,
@@ -489,7 +491,10 @@ namespace Catan10
             };
             //  var tcs = new TaskCompletionSource<object>();
             //    MessageCompletionDictionary.Add(logHeader.LogId, tcs);
-            await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+            
+            
+                await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+            
             //if (MainPageModel.Settings.IsLocalGame)
             //{
             //    await ProcessMessage(message);
