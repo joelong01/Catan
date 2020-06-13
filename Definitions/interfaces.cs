@@ -87,7 +87,13 @@ namespace Catan10
         Task<GameInfo> JoinGame(GameInfo info, string playerName);
         Task SendPrivateMessage(Guid id, CatanMessage message);
         Task StartConnection(GameInfo info, string playerName);
-
+        /// <summary>
+        ///     leaves the game and returns the list of players that are still in it
+        /// </summary>
+        /// <param name="gameInfo"></param>
+        /// <param name="playerName"></param>
+        /// <returns></returns>
+        Task<List<string>> LeavGame(GameInfo gameInfo, string playerName);
         #endregion Methods
 
 

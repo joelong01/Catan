@@ -280,5 +280,10 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<string>> LeavGame(GameInfo gameInfo, string playerName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

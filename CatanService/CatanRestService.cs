@@ -172,5 +172,10 @@ namespace Catan10
                 }
             }
         }
+
+        public Task<List<string>> LeavGame(GameInfo gameInfo, string playerName)
+        {
+            return Proxy.LeaveGame(gameInfo, playerName);
+        }
     }
 }

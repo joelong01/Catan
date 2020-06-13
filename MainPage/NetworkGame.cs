@@ -191,6 +191,10 @@ namespace Catan10
             {
                 await gameService.CreateGame(gameInfo);
             }
+            else
+            {
+                await gameService.LeavGame(gameInfo, me);
+            }
             GameInfo serverGameInfo =  await gameService.JoinGame(gameInfo, me);
             gameInfo.Creator = serverGameInfo.Creator;
                 
