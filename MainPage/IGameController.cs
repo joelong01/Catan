@@ -192,7 +192,7 @@ namespace Catan10
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
-        public async Task AddPlayer(AddPlayerLog playerLogHeader)
+        public Task AddPlayer(AddPlayerLog playerLogHeader)
         {
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
@@ -237,14 +237,14 @@ namespace Catan10
                 {
                     CurrentPlayer = MainPageModel.GameStartedBy;
                 }
-
-                //
-                //  if we don't have them, they might not have us
-                if (playerLogHeader.SentBy != TheHuman.PlayerName)
-                {
-                    await AddPlayerLog.AddPlayer(this, TheHuman);
-                }
+                
             }
+            else
+            {
+                this.TraceMessage($"Recieved an AddPlayer call for {playerToAdd} when they are already in the game");
+            }
+
+            return Task.CompletedTask;
         }
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
