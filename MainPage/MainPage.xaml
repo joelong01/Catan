@@ -73,7 +73,10 @@
                             <ToggleMenuFlyoutItem Text="SignalR Game" IsChecked="{x:Bind MainPageModel.Settings.IsSignalRGame, Mode=TwoWay}" />
                             <ToggleMenuFlyoutItem Text="REST Game" IsChecked="{x:Bind MainPageModel.Settings.IsHomegrownGame, Mode=TwoWay}" />
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
+                        <MenuFlyoutSubItem Text="Game">
+                            <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
+                            <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
+                        </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Network Game">
                             <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}" />

@@ -119,7 +119,9 @@ namespace Catan10
             {
                 return;
             }
-            await EndGame();
+            await InitializeMainPageModel();
+
+            MainPageModel.IsGameStarted = false;
             MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
             MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
             MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
@@ -130,13 +132,13 @@ namespace Catan10
                 MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
                 MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
                 MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
-                
+
                 MainPageModel.CatanService = null;
             }
 
             if (MainPageModel.Settings.IsSignalRGame)
             {
-                MainPageModel.CatanService = new CatanSignalRClient();                                
+                MainPageModel.CatanService = new CatanSignalRClient();
             }
             else if (MainPageModel.Settings.IsHomegrownGame)
             {
@@ -150,8 +152,6 @@ namespace Catan10
             MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
 
 
-            MainPageModel.PlayingPlayers.Clear();
-            MainPageModel.Log = new Log(this);
 
             await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
             var action = await CreateOrJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);

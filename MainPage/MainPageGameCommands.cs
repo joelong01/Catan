@@ -131,6 +131,10 @@ namespace Catan10
             // await OnNewGame?.Invoke(this, EventArgs.Empty);
             await OnNewGame();
         }
+        private void Menu_OnEndGame(object sender, RoutedEventArgs e)
+        {
+            InitializeMainPageModel();
+        }
 
         private async void Menu_SelectGame(object sender, RoutedEventArgs e)
         {
@@ -647,7 +651,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task<bool> NextState()
         {
-            if (CurrentPlayer == null)
+            if (CurrentPlayer.PlayerIdentifier == Guid.Empty)
             {
                 await OnNewGame();
                 return false;

@@ -673,13 +673,22 @@ namespace Catan10
                 p.GameData.RollOrientation = TileOrientation.FaceUp;
             });
         }
-
-        public Task EndGame()
+        /// <summary>
+        ///     starting back as early as possible -- load MainPageModel from disk and recreate all the players.
+        /// </summary>
+        /// <returns></returns>
+        public async Task InitializeMainPageModel()
         {
-            ResetDataForNewGame();
-         
+            _gameView.Reset();
+            _gameView.SetCallbacks(this, this);
+            await LoadMainPageModel();
+            UpdateGridLocations();
+            _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            _progress.IsActive = false;
 
-            return Task.CompletedTask;
+            await _rollControl.Reset();
+            CurrentPlayer = TheHuman;
+
         }
 
         /// <summary>

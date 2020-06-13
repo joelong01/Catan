@@ -167,18 +167,15 @@ namespace Catan10
                 _gameView.Init(this, this);
                 CreateMenuItems();
 
-                await LoadMainPageModel();
-                UpdateGridLocations();
-                _progress.Visibility = Visibility.Collapsed;
-                _progress.IsActive = false;
+              
 
                 Ctrl_PlayerResourceCountCtrl.MainPage = this;
             }
 
             InitTest();
-            ResetDataForNewGame();
-            await InitMainPageModel();
-
+            
+            await InitializeMainPageModel();
+          
             SaveSettingsTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(5)
@@ -372,19 +369,7 @@ namespace Catan10
             }
         }
 
-        private Task InitMainPageModel()
-        {
-            return Task.CompletedTask;
-
-            //await MainPageModel.InitServiceHub();
-            //if (MainPageModel.Settings.IsSignalRGame)
-            //{
-            //    MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
-            //    MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
-            //    MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
-            //    MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
-            //}
-        }
+       
 
         private async Task LoadMainPageModel()
         {
@@ -810,26 +795,6 @@ namespace Catan10
             _raceTracking.Reset();
         }
 
-        private void ResetDataForNewGame()
-        {
-            _gameView.Reset();
-            _gameView.SetCallbacks(this, this);
-
-            foreach (PlayerModel p in MainPageModel.PlayingPlayers)
-            {
-                p.Reset();
-            }
-            MainPageModel.PlayingPlayers.Clear();
-            _rollControl.Reset();
-            if (TheHuman != null)
-            {
-                CurrentPlayer = TheHuman; // for color updates in UI
-            }
-
-            MainPageModel.PlayingPlayers.Clear();
-            MainPageModel.IsGameStarted = false;
-        }
-
         private async Task ResetTiles(bool bMakeFaceDown)
         {
             //
@@ -1027,5 +992,7 @@ namespace Catan10
             
 
         }
+
+        
     }
 }
