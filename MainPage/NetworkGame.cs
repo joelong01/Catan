@@ -161,6 +161,11 @@ namespace Catan10
             //
             //  start the game
             await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
+            //
+            //  add the human to the game
+            
+            await AddPlayerLog.AddPlayer(this, TheHuman);
+            
         }
 
         private void Service_OnGameJoined(GameInfo gameInfo, string playerName)

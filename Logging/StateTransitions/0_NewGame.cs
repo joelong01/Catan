@@ -46,8 +46,7 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            await gameController.StartGame(this);
-            await AddPlayerLog.AddPlayer(gameController, gameController.TheHuman);
+            await gameController.StartGame(this);            
         }
 
         public Task Redo(IGameController gameController)
