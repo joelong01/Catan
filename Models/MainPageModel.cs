@@ -496,6 +496,8 @@ namespace Catan10
             }
         }
 
+        public bool IsGameStarted { get; internal set; }
+
         public MainPageModel()
         {
             InitBank();

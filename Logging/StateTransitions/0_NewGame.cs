@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 using Catan.Proxy;
 
@@ -28,15 +29,17 @@ namespace Catan10
 
         #region Methods
 
-        public static async Task NewGame(IGameController gameController, string startingPlayer, int gameIndex)
+        public static async Task JoinOrCreateGame(IGameController gameController, string startingPlayer, int gameIndex, CatanAction action)
         {
+            Contract.Assert(action == CatanAction.GameCreated || action == CatanAction.GameJoined);
+
             NewGameLog logHeader = new NewGameLog
             {
                 CreatedBy = startingPlayer,
                 SentBy = gameController.TheHuman.PlayerName,
                 NewState = GameState.WaitingForPlayers,
                 OldState = (gameController.Log.PeekAction == null) ? GameState.Uninitialized : gameController.Log.PeekAction.NewState,
-                Action = CatanAction.GameCreated,
+                Action = action,
                 GameIndex = gameIndex,
                 CanUndo = false
             };
@@ -46,12 +49,12 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            await gameController.StartGame(this);            
+            await gameController.JoinOrCreateGame(this);            
         }
 
         public Task Redo(IGameController gameController)
         {
-            return gameController.StartGame(this);
+            return gameController.JoinOrCreateGame(this);
         }
 
         public override string ToString()

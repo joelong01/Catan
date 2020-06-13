@@ -119,7 +119,7 @@ namespace Catan10
             {
                 return;
             }
-
+            await EndGame();
             MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
             MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
             MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
@@ -154,13 +154,13 @@ namespace Catan10
             MainPageModel.Log = new Log(this);
 
             await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-            await CreateOrJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+            var action = await CreateOrJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
             await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
 
+           
+            await NewGameLog.JoinOrCreateGame(this, MainPageModel.ServiceGameInfo.Creator, 0, action);
+           
 
-            //
-            //  start the game
-            await NewGameLog.NewGame(this, TheHuman.PlayerName, 0);
             //
             //  add the human to the game
             
@@ -173,10 +173,11 @@ namespace Catan10
             this.TraceMessage($"{gameInfo}:{playerName}");
         }
 
-        private async Task CreateOrJoinGame(ICatanService gameService, GameInfo gameInfo, string me)
+        private async Task<CatanAction> CreateOrJoinGame(ICatanService gameService, GameInfo gameInfo, string me)
         {
             var games = await gameService.GetAllGames();            
             bool exists = false;
+            CatanAction action = CatanAction.GameJoined;
             
             foreach (var game in games)
             {
@@ -186,7 +187,7 @@ namespace Catan10
 
                     if (game.Creator == me)
                     {
-                        await gameService.DeleteGame(gameInfo.Id, me);
+                        await gameService.DeleteGame(gameInfo.Id, me);                        
                         exists = false;
                         break;
                     }
@@ -195,6 +196,7 @@ namespace Catan10
             if (!exists)
             {
                 await gameService.CreateGame(gameInfo);
+                action = CatanAction.GameCreated;
             }
             else
             {
@@ -202,6 +204,7 @@ namespace Catan10
             }
             GameInfo serverGameInfo =  await gameService.JoinGame(gameInfo, me);
             gameInfo.Creator = serverGameInfo.Creator;
+            return action;
                 
         }
 

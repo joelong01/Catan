@@ -221,7 +221,7 @@ namespace Catan10
         RandomBoardSettings GetRandomBoard();
 
         Task HideRollsInPublicUi();
-
+       
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection
         /// </summary>
@@ -257,7 +257,7 @@ namespace Catan10
 
         void ShowRollsInPublicUi();
 
-        Task StartGame(NewGameLog model);
+        Task JoinOrCreateGame(NewGameLog model);
 
         void StopHighlightingTiles();
 

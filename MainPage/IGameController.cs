@@ -674,6 +674,14 @@ namespace Catan10
             });
         }
 
+        public Task EndGame()
+        {
+            ResetDataForNewGame();
+         
+
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
         ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition
@@ -681,26 +689,17 @@ namespace Catan10
         /// </summary>
         /// <param name="logHeader"></param>
         /// <returns></returns>
-        public Task StartGame(NewGameLog logHeader)
+        public Task JoinOrCreateGame(NewGameLog logHeader)
         {
-            //
-            //  the issue here is that we Log StartGame, Add Player, then Monitor under normal circumstances
-            //  So when the second player does the same thing, they get all the log records for the game,
-            //  including the StartGame and AddPlayers.  so you need to be careful to start the game only once -- which often
-            //  isn't the locally started one.  if you don't, it will look like the players added before you connected aren't
-            //  in the game because this StartGame resets PlayingPlayers
-            //
-            if (logHeader.OldState != GameState.Uninitialized) return Task.CompletedTask;
+            if (MainPageModel.IsGameStarted) return Task.CompletedTask;
 
-            ResetDataForNewGame();
-            MainPageModel.PlayingPlayers.Clear();
-            MainPageModel.IsServiceGame = true;
-            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.SentBy);
-            Contract.Assert(MainPageModel.GameStartedBy != null);
+            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.CreatedBy);
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
-
+            MainPageModel.IsGameStarted = true;
             return Task.CompletedTask;
+                                 
         }
+       
 
         public void StopHighlightingTiles()
         {
@@ -945,5 +944,7 @@ namespace Catan10
 
             CalculateAndSetLongestRoad(raceTracking);
         }
+
+       
     }
 }

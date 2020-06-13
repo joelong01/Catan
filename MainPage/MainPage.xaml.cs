@@ -825,6 +825,9 @@ namespace Catan10
             {
                 CurrentPlayer = TheHuman; // for color updates in UI
             }
+
+            MainPageModel.PlayingPlayers.Clear();
+            MainPageModel.IsGameStarted = false;
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
