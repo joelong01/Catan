@@ -52,6 +52,7 @@ namespace Catan10
                     Source = source,
                     Instructions = $"Take {goldCards} {c} from the bank.",
                     Destination = destination,
+                    
                 };
 
                 var ret = await dlg.ShowAsync();
@@ -64,6 +65,7 @@ namespace Catan10
                 }
 
                 var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
+                picked.Add(ResourceType.GoldMine, -goldCards);
                 await TradeGold.PostTradeMessage(gameController, picked);
             }
         }
