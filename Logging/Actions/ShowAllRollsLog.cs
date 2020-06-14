@@ -29,15 +29,17 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
+        /// <summary>
+        ///     This just sets the orientation of all the rolls to faceup on all the machines
+        /// </summary>
+        /// <param name="gameController"></param>
+        /// <returns></returns>
         public Task Do(IGameController gameController)
         {
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(sentBy != null);
-            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(this.Rolls);
-            Contract.Assert(pickedRoll != null);
-            Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
-            Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
-
+            sentBy.GameData.SyncronizedPlayerRolls.LatestRolls.ForEach((r) => r.Orientation = TileOrientation.FaceUp);            
+            
             return Task.CompletedTask;
         }
 
