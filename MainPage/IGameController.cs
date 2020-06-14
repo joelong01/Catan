@@ -348,6 +348,7 @@ namespace Catan10
                     string s = "Tie Roll. Roll again!";
                     await StaticHelpers.ShowErrorText(s, "Catan");
                     await _rollControl.Reset();
+                    return false;
                 }
             }
 
