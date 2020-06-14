@@ -213,10 +213,7 @@ namespace Catan10
         private async Task ProcessMessage(CatanMessage message)
         {
             LogHeader logHeader = message.Data as LogHeader;
-
-            DateTime recievedTime = DateTime.Now;
-            TimeSpan roundTrip = recievedTime - logHeader.CreatedTime;
-            TheHuman.ServiceLatency = Math.Round(roundTrip.TotalMilliseconds);
+            NameToPlayer(logHeader.SentBy).ServiceLatency = (DateTime.Now - logHeader.CreatedTime).Milliseconds;
             
             ILogController logController = logHeader as ILogController;
             Contract.Assert(logController != null, "every LogEntry is a LogController!");
