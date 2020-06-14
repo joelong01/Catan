@@ -94,6 +94,7 @@ namespace Catan10
             //  moved your purchased dev cards into the available to play
             GameData.Resources.AvailableDevCards.AddRange(GameData.Resources.NewDevCards);
             GameData.Resources.NewDevCards.Clear();
+            GameData.Resources.StolenResource = ResourceType.None;
         }
 
         //

@@ -50,7 +50,7 @@ namespace Catan10
         }
         public ResourceCardCollection Flatten()
         {
-            ResourceCardCollection flat = new ResourceCardCollection();
+            ResourceCardCollection flat = new ResourceCardCollection(false);
             foreach (var model in this)
             {
                 for (int i=0; i<model.Count; i++)
@@ -62,7 +62,7 @@ namespace Catan10
         }
         public static ResourceCardCollection Flatten(TradeResources tradeResources)
         {
-            ResourceCardCollection flat = new ResourceCardCollection();
+            ResourceCardCollection flat = new ResourceCardCollection(false);
             flat.Clear();
             foreach (var resType in tradeResources.NonZeroResources)
             {              
@@ -85,11 +85,13 @@ namespace Catan10
             return tr;
         }
 
-        public ResourceCardCollection()
+
+        public ResourceCardCollection(bool initialize = true)
         {
             //
             //  put the right resources in the collection and set them to 0 count
             this.Reset();
+            if (!initialize) this.Clear();
         }
 
 

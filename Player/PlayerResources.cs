@@ -113,6 +113,23 @@ namespace Catan10
         private int _UnplayedYearOfPlenty = 0;
 
         private int _VictoryPoints = 0;
+        ResourceType _stolenResource = ResourceType.None;
+       
+        public ResourceType StolenResource
+        {
+            get
+            {
+                return _stolenResource;
+            }
+            set
+            {
+                if (_stolenResource != value)
+                {
+                    _stolenResource = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -296,7 +313,7 @@ namespace Catan10
         }
 
      
-        public ResourceCardCollection ResourcesThisTurn { get;  } = new ResourceCardCollection();
+        public ResourceCardCollection ResourcesThisTurn { get;  } = new ResourceCardCollection(true);
 
         public int Roads
         {
@@ -378,7 +395,7 @@ namespace Catan10
             }
         }
 
-        public ResourceCardCollection TotalResourcesCollection { get; set; } = new ResourceCardCollection();
+        public ResourceCardCollection TotalResourcesCollection { get; set; } = new ResourceCardCollection(true);
 
         public int UnplayedKnights
         {

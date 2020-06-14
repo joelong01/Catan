@@ -8,7 +8,15 @@ namespace Catan10
 {
     public sealed partial class ResourceCardSlimCtrl : UserControl
     {
-        #region Properties + Fields 
+        #region Properties + Fields
+
+        public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count", typeof(int), typeof(ResourceCardSlimCtrl), new PropertyMetadata(0));
+
+        public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(bool), typeof(ResourceCardSlimCtrl), new PropertyMetadata(true));
+
+        public static readonly DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof(Brush), typeof(ResourceCardSlimCtrl), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty ResourceTypeProperty = DependencyProperty.Register("ResourceType", typeof(ResourceType), typeof(ResourceCardSlimCtrl), new PropertyMetadata(ResourceType.None, ResourceTypeChanged));
 
         public int Count
         {
@@ -28,13 +36,31 @@ namespace Catan10
             set => SetValue(ImageProperty, value);
         }
 
-        public static readonly DependencyProperty CountProperty = DependencyProperty.Register("Count", typeof(int), typeof(ResourceCardSlimCtrl), new PropertyMetadata(0));
+        public ResourceType ResourceType
+        {
+            get => (ResourceType)GetValue(ResourceTypeProperty);
+            set => SetValue(ResourceTypeProperty, value);
+        }
 
-        public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(bool), typeof(ResourceCardSlimCtrl), new PropertyMetadata(true));
+        private static void ResourceTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as ResourceCardSlimCtrl;
+            var depPropValue = (ResourceType)e.NewValue;
+            depPropClass?.SetResourceType(depPropValue);
+        }
 
-        public static readonly DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof(Brush), typeof(ResourceCardSlimCtrl), new PropertyMetadata(null));
+        private void SetResourceType(ResourceType resourceType)
+        {
+            if (ResourceType != ResourceType.None)
+            {
+                string key = "ResourceType." + resourceType.ToString();
+                Image = (Brush)App.Current.Resources[key];
+            }
+        }
 
-        #endregion Properties + Fields 
+        #endregion Properties + Fields
+
+
 
         #region Constructors
 

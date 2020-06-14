@@ -28,7 +28,7 @@
         </Storyboard>
     </Control.Resources>
 
-    <Grid Name="LayoutRoot" Height="105" Width="75">
+    <Grid Name="LayoutRoot" Width="75" Height="105">
         <Grid Name="Grid_FaceDown" CornerRadius="10" BorderBrush="Black" BorderThickness="1"
             Background="{x:Bind ResourceCardModel.BackBrush, Mode=OneWay}">
             <Grid.Projection>

@@ -80,9 +80,9 @@ namespace Catan10
                     targetPlayer.GameData.Resources.GrantResources(tr.GetNegated());        // I Taketh
                     gameController.CurrentPlayer.GameData.Resources.GrantResources(tr);     // I Giveth
 
-                    //
-                    //  need a way to show the victim what card they lost...
-                    //
+                    targetPlayer.GameData.Resources.StolenResource = BaronModel.StolenResource;
+                    gameController.CurrentPlayer.GameData.Resources.StolenResource = BaronModel.StolenResource;
+
                 }
             }
 
@@ -106,6 +106,9 @@ namespace Catan10
             {
                 gameController.GameContainer.BaronTile = targetTile;
             }
+
+            //
+            //  Show the card taken in the UI - but only for the Victim and the player that took the card
 
             return Task.CompletedTask;
         }

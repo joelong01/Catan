@@ -30,8 +30,7 @@ namespace Catan10
             int goldCards = gameController.TheHuman.GameData.Resources.Current.GetCount(ResourceType.GoldMine);
             if (goldCards > 0)
             {
-                ResourceCardCollection destination = new ResourceCardCollection();
-                destination.Clear();
+                ResourceCardCollection destination = new ResourceCardCollection(false);
                 TradeResources tr = new TradeResources()
                 {
                     Wood = goldCards,

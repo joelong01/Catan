@@ -561,7 +561,7 @@ namespace Catan10
                     if (source.ResourceCount > 0) // it is ok to target a player with no cards
                     {
                         source.Shuffle();
-                        var destination = new ResourceCardCollection();
+                        var destination = new ResourceCardCollection(false);
 
                         TakeCardDlg dlg = new TakeCardDlg()
                         {
@@ -570,7 +570,7 @@ namespace Catan10
                             SourceOrientation = TileOrientation.FaceDown,
                             HowMany = 1,
                             Source = source,
-                            Destination = new ResourceCardCollection(),
+                            Destination = destination,                            
                             Instructions = $"Take a card from {victim.PlayerName}"
                         };
 

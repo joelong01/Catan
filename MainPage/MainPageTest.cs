@@ -33,7 +33,7 @@ namespace Catan10
             int loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
             if (loss >= 4)
             {
-                ResourceCardCollection rc = new ResourceCardCollection();
+                ResourceCardCollection rc = new ResourceCardCollection(false);
                 rc.AddResources(CurrentPlayer.GameData.Resources.Current);
                 TakeCardDlg dlg = new TakeCardDlg()
                 {
@@ -42,7 +42,7 @@ namespace Catan10
                     SourceOrientation = TileOrientation.FaceUp,
                     HowMany = loss,
                     Source = rc,
-                    Destination = new ResourceCardCollection(),
+                    Destination = new ResourceCardCollection(false),
                     Instructions = $"Give {loss} cards to the bank."
                 };
                 var ret = await dlg.ShowAsync();
@@ -118,8 +118,8 @@ namespace Catan10
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-
-            await TradeGoldTest();
+            CurrentPlayer.GameData.Resources.StolenResource = ResourceType.Wheat;
+           // await TradeGoldTest();
             //await TestTargetPlayer();
         }
 
@@ -230,8 +230,8 @@ namespace Catan10
 
         private async Task TestTargetPlayer()
         {
-            var source = new ResourceCardCollection();            
-            var destination = new ResourceCardCollection();
+            var source = new ResourceCardCollection(false);            
+            var destination = new ResourceCardCollection(false);
             source.ForEach((c) => c.Orientation = TileOrientation.FaceDown);
             TakeCardDlg dlg = new TakeCardDlg()
             {
@@ -240,7 +240,7 @@ namespace Catan10
                 SourceOrientation = TileOrientation.FaceDown,
                 HowMany = 1,
                 Source = source,
-                Destination = new ResourceCardCollection(),
+                Destination = new ResourceCardCollection(false),
                 Instructions = $"Take a card from {CurrentPlayer.PlayerName}"
             };
             var ret = await dlg.ShowAsync();
@@ -263,7 +263,7 @@ namespace Catan10
                 Sheep = 2
             };
 
-            ResourceCardCollection rc = new ResourceCardCollection();
+            ResourceCardCollection rc = new ResourceCardCollection(false);
             rc.AddResources(tr);
             TakeCardDlg dlg = new TakeCardDlg()
             {

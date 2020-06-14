@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
+using Windows.Devices.AllJoyn;
 using Windows.UI.Xaml.Controls;
 
 namespace Catan10
@@ -92,7 +92,11 @@ namespace Catan10
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
-
+            if (gameController.TheHuman.GameData.Resources.Current.GoldMine > 0)
+            {
+                await MustTradeGold.PostMessage(gameController);
+                return;
+            }
             if (rollLog.LastRoll == 7)
             {
                 //
@@ -105,7 +109,7 @@ namespace Catan10
                     Contract.Assert(gameController.TheHuman.GameData.Resources.ResourcesThisTurn.Count == 0);
                     int loss = (int)gameController.TheHuman.GameData.Resources.Current.Count / 2;
                     TradeResources lost = new TradeResources();
-                    ResourceCardCollection source = new ResourceCardCollection();
+                    ResourceCardCollection source = new ResourceCardCollection(false);
                     source.AddResources(gameController.TheHuman.GameData.Resources.Current);
                     TakeCardDlg dlg = new TakeCardDlg()
                     {

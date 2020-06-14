@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -18,11 +19,19 @@ namespace Catan10
             depPropClass?.SetHowMany(depPropValue);
         }
 
-        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private async void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             if (Destination.Count != HowMany)
             {
                 args.Cancel = true;
+            }
+            else
+            {
+                if (Destination.Count == 1 && Destination[0].Orientation == TileOrientation.FaceDown)
+                {
+                    Destination[0].Orientation = TileOrientation.FaceUp;
+                    await Task.Delay(1000); // give use 1 seconds to feel good about the card they got
+                }
             }
         }
 

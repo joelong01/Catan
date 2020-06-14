@@ -12,6 +12,122 @@ namespace Catan10
 {
     public sealed partial class PrivateDataCtrl : UserControl
     {
+        #region Delegates + Fields + Events + Enums
+
+        public static readonly DependencyProperty AvailableDevCardIndexProperty = DependencyProperty.Register("AvailableDevCardIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
+
+        public static readonly DependencyProperty NewDevCardsIndexProperty = DependencyProperty.Register("NewDevCardsIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
+
+        public static readonly DependencyProperty PlayedDevCardIndexProperty = DependencyProperty.Register("PlayedDevCardIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
+
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PrivateDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
+
+        public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty StolenResourceProperty = DependencyProperty.Register("StolenResource", typeof(ResourceType), typeof(PrivateDataCtrl), new PropertyMetadata(ResourceType.None, StolenResourceChanged));
+
+        public ResourceType StolenResource
+        {
+            get => (ResourceType)GetValue(StolenResourceProperty);
+            set => SetValue(StolenResourceProperty, value);
+        }
+
+        private static void StolenResourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as PrivateDataCtrl;
+            var depPropValue = (ResourceType)e.NewValue;
+            depPropClass?.SetStolenResource(depPropValue);
+        }
+        bool _showStolenResourcesUi = false;
+        public bool ShowStolenResourcesUi
+        {
+            get
+            {
+                return _showStolenResourcesUi;
+            }
+            set
+            {
+                if (_showStolenResourcesUi != value)
+                {
+                    _showStolenResourcesUi = value;
+                    if (_showStolenResourcesUi)
+                        ShowStolenResources.Begin();
+                    else
+                        HideStolenResources.Begin();
+                }
+            }
+        }
+        private void SetStolenResource(ResourceType resourceType)
+        {
+            if (resourceType == ResourceType.None)
+            {
+                ShowStolenResourcesUi = false;
+            }
+            else
+            {
+                ShowStolenResourcesUi = true;
+            }
+        }
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public int AvailableDevCardIndex
+        {
+            get => (int)GetValue(AvailableDevCardIndexProperty);
+            set => SetValue(AvailableDevCardIndexProperty, value);
+        }
+
+        public int NewDevCardsIndex
+        {
+            get => (int)GetValue(NewDevCardsIndexProperty);
+            set => SetValue(NewDevCardsIndexProperty, value);
+        }
+
+        public int PlayedDevCardIndex
+        {
+            get => (int)GetValue(PlayedDevCardIndexProperty);
+            set => SetValue(PlayedDevCardIndexProperty, value);
+        }
+
+        public PlayerModel Player
+        {
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
+        }
+
+        public DevCardModel SelectedAvailableDevCard
+        {
+            get => (DevCardModel)GetValue(SelectedAvailableDevCardProperty);
+            set => SetValue(SelectedAvailableDevCardProperty, value);
+        }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+        public PrivateDataCtrl()
+        {
+            this.DataContext = this;
+            this.InitializeComponent();
+        }
+
+        #endregion Constructors + Destructors
+
+        #region Methods
+
+        public static string MenuPlayString(DevCardType devCardType)
+        {
+            string description = devCardType.Description();
+            return $"Play {description}?";
+        }
+
+        public string XOfYText(int index, int count)
+        {
+            if (count == 0) return "";
+            return $"{index + 1} of {count}";
+        }
+
         private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as PrivateDataCtrl;
@@ -63,8 +179,7 @@ namespace Catan10
                 Sheep = 1
             };
 
-            ResourceCardCollection rc = new ResourceCardCollection();
-            rc.RemoveGold();
+            ResourceCardCollection rc = new ResourceCardCollection(false);
             rc.AddResources(tr);
             TakeCardDlg dlg = new TakeCardDlg()
             {
@@ -97,8 +212,7 @@ namespace Catan10
                 Sheep = 2
             };
 
-            ResourceCardCollection rc = new ResourceCardCollection();
-            rc.RemoveGold();
+            ResourceCardCollection rc = new ResourceCardCollection(false);
             rc.AddResources(tr);
             TakeCardDlg dlg = new TakeCardDlg()
             {
@@ -244,6 +358,13 @@ namespace Catan10
             }
         }
 
+
+
+        private void OnTargetResultClicked(object sender, RoutedEventArgs e)
+        {
+            ShowStolenResourcesUi = false;
+        }
+
         private void OnTrade(object sender, RoutedEventArgs e)
         {
         }
@@ -253,60 +374,11 @@ namespace Catan10
             if (value == null) return;
         }
 
-        public int AvailableDevCardIndex
+        #endregion Methods
+
+        private void OnOpenCloseStolenCard(object sender, RoutedEventArgs e)
         {
-            get => (int)GetValue(AvailableDevCardIndexProperty);
-            set => SetValue(AvailableDevCardIndexProperty, value);
-        }
-
-        public int NewDevCardsIndex
-        {
-            get => (int)GetValue(NewDevCardsIndexProperty);
-            set => SetValue(NewDevCardsIndexProperty, value);
-        }
-
-        public int PlayedDevCardIndex
-        {
-            get => (int)GetValue(PlayedDevCardIndexProperty);
-            set => SetValue(PlayedDevCardIndexProperty, value);
-        }
-
-        public PlayerModel Player
-        {
-            get => (PlayerModel)GetValue(PlayerProperty);
-            set => SetValue(PlayerProperty, value);
-        }
-
-        public DevCardModel SelectedAvailableDevCard
-        {
-            get => (DevCardModel)GetValue(SelectedAvailableDevCardProperty);
-            set => SetValue(SelectedAvailableDevCardProperty, value);
-        }
-
-        public static readonly DependencyProperty AvailableDevCardIndexProperty = DependencyProperty.Register("AvailableDevCardIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
-        public static readonly DependencyProperty NewDevCardsIndexProperty = DependencyProperty.Register("NewDevCardsIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
-
-        public static readonly DependencyProperty PlayedDevCardIndexProperty = DependencyProperty.Register("PlayedDevCardIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PrivateDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
-
-        public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
-
-        public PrivateDataCtrl()
-        {
-            this.DataContext = this;
-            this.InitializeComponent();
-        }
-
-        public static string MenuPlayString(DevCardType devCardType)
-        {
-            string description = devCardType.Description();
-            return $"Play {description}?";
-        }
-
-        public string XOfYText(int index, int count)
-        {
-            if (count == 0) return "";
-            return $"{index + 1} of {count}";
+            ShowStolenResourcesUi = !ShowStolenResourcesUi;
         }
     }
 }

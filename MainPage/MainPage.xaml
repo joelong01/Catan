@@ -161,7 +161,7 @@
                 BorderBrush="{StaticResource bmMaple}"
                 CornerRadius="10">
                 <local:DragableGridCtrl.Child>
-                    <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" />
+                    <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" StolenResource="{x:Bind TheHuman.GameData.Resources.StolenResource, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right"
