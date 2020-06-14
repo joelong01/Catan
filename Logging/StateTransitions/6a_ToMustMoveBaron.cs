@@ -35,7 +35,7 @@ namespace Catan10
             {
                 NewState = GameState.MustMoveBaron,
                 CanUndo = true,
-                Reason = reason,
+                Reason = reason,                
                 StartingState = gameController.CurrentGameState,
             };
 
