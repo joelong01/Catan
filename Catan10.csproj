@@ -185,6 +185,7 @@
     <Compile Include="Logging\VerifyMessages\VerifyPlayers.cs" />
     <Compile Include="Models\ResourceCardModel.cs" />
     <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\SyncronizedRoll.cs" />
     <Compile Include="Player\PlayerBindingFunctions.cs" />
     <Compile Include="Player\PlayerGameModel.cs" />
     <Compile Include="Logging\Actions\AddPlayer.cs" />
