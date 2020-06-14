@@ -479,11 +479,11 @@
                     </Viewbox>
                 </Grid>
                 <Grid Name="Grid_Roll" Width="100" Margin="0" HorizontalAlignment="Center"
-                    VerticalAlignment="Center" Background="Black">
+                    VerticalAlignment="Center" Background="Transparent">
                     <Grid.Projection>
                         <PlaneProjection RotationY="90" />
                     </Grid.Projection>
-                    <GridView Name="GridView_Rolls" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    <GridView Name="GridView_Rolls" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,8,0,0"
                         Background="Transparent"
                         ItemsSource="{x:Bind Player.GameData.SyncronizedPlayerRolls.LatestRolls, Mode=OneWay}"
                         SelectionMode="None">

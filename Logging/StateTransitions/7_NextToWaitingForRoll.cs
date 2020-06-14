@@ -14,7 +14,7 @@ namespace Catan10
     /// </summary>
     public class WaitingForNextToWaitingForRoll : LogHeader, ILogController
     {
-        public ResourceCardCollection ResourcesThisTurn { get; set; }
+        public TradeResources ResourcesThisTurn { get; set; }
         public RollState RollState { get; set; }
 
         public static async Task PostLog(IGameController gameController)
@@ -24,7 +24,7 @@ namespace Catan10
             {
                 CanUndo = true,
                 RollState = rollState,
-                ResourcesThisTurn = gameController.CurrentPlayer.GameData.Resources.ResourcesThisTurn,
+                ResourcesThisTurn = ResourceCardCollection.ToTradeResources(gameController.CurrentPlayer.GameData.Resources.ResourcesThisTurn),
                 Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForRoll,
             };
