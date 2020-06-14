@@ -55,6 +55,32 @@ namespace Catan10
         private Color _primaryBackgroundColor = Colors.SlateBlue;
 
         private Color _secondaryBackgroundColor = Colors.Black;
+        double _serviceLatency = 0;
+        public double ServiceLatency
+        {
+            get
+            {
+                return _serviceLatency;
+            }
+            set
+            {
+                if (_serviceLatency != value)
+                {
+                    _serviceLatency = value;
+                    NotifyPropertyChanged("LatencyString");
+                    NotifyPropertyChanged();
+
+                }
+            }
+        }
+
+        public string LatencyString
+        {
+            get
+            {
+                return $"Latency: {ServiceLatency} ms";
+            }
+        }
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {

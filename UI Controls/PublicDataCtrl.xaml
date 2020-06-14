@@ -58,6 +58,10 @@
                 <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="0" />
             </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,5"
+                       Text="{x:Bind Player.LatencyString, Mode=OneWay}" FontSize="14" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+            
             <!--  The button to flip between stats and rolls  -->
             <Button Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="60,0,0,0"
                 HorizontalAlignment="Left" VerticalAlignment="Top"

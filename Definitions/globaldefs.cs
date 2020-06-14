@@ -42,7 +42,8 @@ namespace Catan10
 
         public string SentBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
 
-        public DateTime Time { get; set; } = DateTime.Now;
+        public DateTime CreatedTime { get; set; } = DateTime.Now;
+        
 
         public string TypeName { get; set; }
 

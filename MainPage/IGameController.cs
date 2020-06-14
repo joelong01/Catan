@@ -209,7 +209,7 @@ namespace Catan10
                 playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
                 playerToAdd.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
                 playerToAdd.GameData.NotificationsEnabled = true;
-                playerToAdd.AddedTime = playerLogHeader.Time;
+                playerToAdd.AddedTime = playerLogHeader.CreatedTime;
                 int playerCount = MainPageModel.PlayingPlayers.Count;
 
                 //
