@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-
+using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -72,32 +72,54 @@ namespace Catan10
             await TestGrantEntitlements.Post(this, tr, new List<Entitlement>(), new List<DevCardType>());
         }
 
+        private async Task TradeGoldTest()
+        {
+
+            int goldCards = 2;
+            IGameController gameController = this;
+            ResourceCardCollection destination = new ResourceCardCollection();
+            destination.Clear();
+            TradeResources tr = new TradeResources()
+            {
+                Wood = goldCards,
+                Brick = goldCards,
+                Wheat = goldCards,
+                Ore = goldCards,
+                Sheep = goldCards
+            };
+            ResourceCardCollection source = ResourceCardCollection.Flatten(tr);
+
+            string c = goldCards > 1 ? "cards" : "card";
+
+            TakeCardDlg dlg = new TakeCardDlg()
+            {
+                To = gameController.TheHuman,
+                From = gameController.MainPageModel.Bank,
+                SourceOrientation = TileOrientation.FaceUp,
+                HowMany = goldCards,
+                Source = source,
+                Instructions = $"Take {goldCards} {c} from the bank.",
+                Destination = destination,
+            };
+
+            var ret = await dlg.ShowAsync();
+            if (ret != ContentDialogResult.Primary)
+            {
+                await StaticHelpers.ShowErrorText("Why did you click Cancel?  I'll pick a random resource for you.  No undo.", "Catan");
+                Random random = new Random((int)DateTime.Now.Ticks);
+                int idx = random.Next(source.Count);
+                destination.Add(source[idx]);
+            }
+
+            var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
+            this.TraceMessage(picked.ToString());
+        }
+
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
 
-            TradeResources tr = new TradeResources()
-            {
-                Sheep = 3,
-                Wheat = 3,
-                Ore = 3,
-                Brick = 3,
-                Wood = 3
-            };
-            ResourceCardCollection col = new ResourceCardCollection();
-            col.AddResources(tr);
-
-            CurrentPlayer.GameData.SyncronizedPlayerRolls.LatestRolls = _rollControl.Rolls;
-
-            var flat = ResourceCardCollection.Flatten(ResourceCardCollection.ToTradeResources(col));
-
-            
-
-            var json = Catan.Proxy.CatanProxy.Serialize(col, true);
-
-            
-
-            await Task.CompletedTask;
+            await TradeGoldTest();
             //await TestTargetPlayer();
         }
 

@@ -14,7 +14,7 @@ namespace Catan10
     ///
     ///     The RollState is *must be* the top of the RollLog stack
     /// </summary>
-    public class WaitingForRollToWaitingForNext : LogHeader, ILogController, IMessageDeserializer
+    public class WaitingForRollToWaitingForNext : LogHeader, ILogController
     {
         internal static async Task PostRollMessage(IGameController gameController, List<RollModel> rolls)
         {
