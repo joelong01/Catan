@@ -77,8 +77,8 @@ namespace Catan10
                     tr.Add(BaronModel.StolenResource, 1);
                     //
                     //  this needs to be face down and not show up in the Turn Resources, but it shoudl count towards Total Resource
-                    targetPlayer.GameData.Resources.GrantResources(tr.GetNegated());        // I Taketh
-                    gameController.CurrentPlayer.GameData.Resources.GrantResources(tr);     // I Giveth
+                    targetPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);        // I Taketh
+                    gameController.CurrentPlayer.GameData.Resources.GrantResources(tr, false);     // I Giveth
 
                     targetPlayer.GameData.Resources.StolenResource = BaronModel.StolenResource;
                     gameController.CurrentPlayer.GameData.Resources.StolenResource = BaronModel.StolenResource;
@@ -136,8 +136,8 @@ namespace Catan10
                 {
                     TradeResources tr = new TradeResources();
                     tr.Add(BaronModel.StolenResource, 1);
-                    targetPlayer.GameData.Resources.GrantResources(tr);                                  // I giveth back
-                    gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated());     // I taketh away
+                    targetPlayer.GameData.Resources.GrantResources(tr, false);                                  // I giveth back
+                    gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);     // I taketh away
                 }
             }
             else
@@ -147,8 +147,8 @@ namespace Catan10
                 {
                     TradeResources tr = new TradeResources();
                     tr.Add(BaronModel.StolenResource, 1);
-                    targetPlayer.GameData.Resources.GrantResources(tr);                                  // I giveth back
-                    gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated());     // I taketh away
+                    targetPlayer.GameData.Resources.GrantResources(tr, false);                                  // I giveth back
+                    gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);     // I taketh away
                 }
             }
 

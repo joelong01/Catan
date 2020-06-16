@@ -69,7 +69,7 @@ namespace Catan10
                 sentBy.GameData.Resources.GrantEntitlement(Entitlement.Road);
                 sentBy.GameData.Resources.GrantEntitlement(Entitlement.Road);
             }
-            else
+            else if (DevCardType == DevCardType.Monopoly)
             {
                 Contract.Assert(TradeResources.Count == 1);
                 ResourceType pickedResourceType = ResourceType.None;
@@ -102,6 +102,11 @@ namespace Catan10
                 TradeResources gained = new TradeResources();                
                 gained.Add(pickedResourceType, total);
                 sentBy.GameData.Resources.GrantResources(gained);
+            }
+            else
+            {
+                this.TraceMessage($"{DevCardType}");
+                Contract.Assert(false, "What kind of devcard is it?");
             }
 
             return Task.CompletedTask;

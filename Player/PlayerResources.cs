@@ -514,11 +514,15 @@ namespace Catan10
         //        case DevCardType.Monopoly:
         //            UnplayedMonopoly++;
         //            break;
-        public void GrantResources(TradeResources tr)
+        public void GrantResources(TradeResources tr, bool addToThisTurn= true)
         {
             Current += tr;
-            ResourcesThisTurn.AddResources(tr);
-            if (tr.Count > 0)
+
+            if (addToThisTurn)
+            {
+                ResourcesThisTurn.AddResources(tr);
+            }
+            if (tr.Count != 0)
             {
                 TotalResources += tr;
                 MainPage.Current.MainPageModel.GameResources += tr;

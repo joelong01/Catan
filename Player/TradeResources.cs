@@ -314,7 +314,7 @@ namespace Catan10
                 case ResourceType.Sea:
 
                 default:
-                    Contract.Assert(false, "Bad pass to Add!");
+                    this.TraceMessage($"{resourceType} passed to Add()");
                     break;
             }
         }

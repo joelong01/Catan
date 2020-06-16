@@ -50,7 +50,7 @@ namespace Catan10
                 var ret = await dlg.ShowAsync();
                 if (ret == ContentDialogResult.Primary)
                 {
-                    CurrentPlayer.GameData.Resources.GrantResources(ResourceCardCollection.ToTradeResources(dlg.Destination).GetNegated());
+                    CurrentPlayer.GameData.Resources.GrantResources(ResourceCardCollection.ToTradeResources(dlg.Destination).GetNegated(), false);
                 }
             }
         }
@@ -250,7 +250,7 @@ namespace Catan10
             var ret = await dlg.ShowAsync();
             if (ret == ContentDialogResult.Primary)
             {
-                CurrentPlayer.GameData.Resources.GrantResources(ResourceCardCollection.ToTradeResources(dlg.Destination).GetNegated());
+                CurrentPlayer.GameData.Resources.GrantResources(ResourceCardCollection.ToTradeResources(dlg.Destination).GetNegated(), false);
             }
 
             this.TraceMessage($"ret= {ret} Cards={ResourceCardCollection.ToTradeResources(dlg.Destination)}");
