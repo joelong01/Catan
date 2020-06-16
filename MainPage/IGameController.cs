@@ -494,7 +494,9 @@ namespace Catan10
             {
                 Data = logHeader,
                 From = TheHuman.PlayerName,
-                ActionType = msgType
+                ActionType = msgType,
+                DataTypeName = logHeader.GetType().FullName
+
             };
             //  var tcs = new TaskCompletionSource<object>();
             //    MessageCompletionDictionary.Add(logHeader.LogId, tcs);
@@ -540,7 +542,8 @@ namespace Catan10
             {
                 Data = logHeader,
                 From = TheHuman.PlayerName,
-                ActionType = ActionType.Redo
+                ActionType = ActionType.Redo,
+                DataTypeName = logHeader.GetType().FullName
             };
 
 
@@ -765,7 +768,8 @@ namespace Catan10
             {
                 Data = logHeader,
                 From = TheHuman.PlayerName,
-                ActionType = ActionType.Undo
+                ActionType = ActionType.Undo,
+                DataTypeName = logHeader.GetType().FullName
             };
 
             await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);

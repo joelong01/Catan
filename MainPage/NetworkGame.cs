@@ -160,12 +160,16 @@ namespace Catan10
             await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
 
            
+            //
+            //  note that we join or create the game and this returns when the message is sent, not when the message is processed
+            //
+
             await NewGameLog.JoinOrCreateGame(this, MainPageModel.ServiceGameInfo.Creator, 0, action);
            
 
             //
             //  add the human to the game
-            
+            //
             await AddPlayerLog.AddPlayer(this, TheHuman);
             
         }

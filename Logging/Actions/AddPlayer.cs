@@ -41,7 +41,10 @@ namespace Catan10
             //              so we have to hard code the new state because by the time we get to the log, the
             //              state will change
 
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForPlayers); // you can only add players in this state
+            // 6/15: pull the state from the interface as the debugger won't tell you what it is if the contract fails.
+            
+            GameState state = gameController.CurrentGameState;
+            Contract.Assert(state == GameState.WaitingForPlayers); // you can only add players in this state
             AddPlayerLog logHeader = new AddPlayerLog
             {
                 Action = CatanAction.AddPlayer,

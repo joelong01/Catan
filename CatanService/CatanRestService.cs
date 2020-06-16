@@ -110,7 +110,7 @@ namespace Catan10
         #endregion Delegates  + Events + Enums
 
         public Task BroadcastMessage(Guid gameId, CatanMessage message)
-        {
+        { 
             return Proxy.BroadcastMessage(gameId, message);
         }
 
