@@ -8,30 +8,14 @@ using Windows.UI.Xaml.Input;
 
 namespace Catan10
 {
-    //
-    //  this interface is implemented by the Controls that wrap the SimpleHexPanel
-    //  and exposes the data needed by the Views/Pages
-    internal interface ICatanGameData
-    {
-        #region Properties + Fields 
-
-        CatanGames CatanGame { get; }
-        string Description { get; }
-        List<TileCtrl> DesertTiles { get; }
-        CatanGameData GameData { get; }
-        GameType GameType { get; }
-        CatanHexPanel HexPanel { get; }
-        int Index { get; }
-
-        List<TileCtrl> Tiles { get; }
-
-        #endregion Properties + Fields 
-    }
-
     public delegate void BroadcastMessageReceivedHandler(CatanMessage message);
+
     public delegate void CreateGameHandler(GameInfo gameInfo, string playerName);
+
     public delegate void DeleteGameHandler(GameInfo gameInfo);
+
     public delegate void JoinedGameHandler(GameInfo gameInfo, string playerName);
+
     public delegate void PrivateMessageReceivedHandler(CatanMessage message);
 
     public interface ICatanService
@@ -42,6 +26,7 @@ namespace Catan10
         ///     a message is recieved that was sent to all clients
         /// </summary>
         event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
+
         /// <summary>
         ///    a game as created
         /// </summary>
@@ -51,14 +36,16 @@ namespace Catan10
         ///    a game was deleted
         /// </summary>
         event DeleteGameHandler OnGameDeleted;
+
+        /// <summary>
+        ///     a game was joined.  will be sent to the one that joined the game
+        /// </summary>
+        event JoinedGameHandler OnGameJoined;
+
         /// <summary>
         ///     a message was sent to only this client
         /// </summary>
         event PrivateMessageReceivedHandler OnPrivateMessage;
-        /// <summary>
-        ///     a game was joined.  will be sent to the one that joined the game     
-        /// </summary>
-        event JoinedGameHandler OnGameJoined;
 
         #endregion Delegates  + Events + Enums
 
@@ -84,9 +71,9 @@ namespace Catan10
         /// <param name="gameInfo"></param>
         /// <returns></returns>
         Task Initialize(string hostName);
+
         Task<GameInfo> JoinGame(GameInfo info, string playerName);
-        Task SendPrivateMessage(Guid id, CatanMessage message);
-        Task StartConnection(GameInfo info, string playerName);
+
         /// <summary>
         ///     leaves the game and returns the list of players that are still in it
         /// </summary>
@@ -94,14 +81,25 @@ namespace Catan10
         /// <param name="playerName"></param>
         /// <returns></returns>
         Task<List<string>> LeavGame(GameInfo gameInfo, string playerName);
+
+        Task SendPrivateMessage(Guid id, CatanMessage message);
+
+        Task StartConnection(GameInfo info, string playerName);
+
         #endregion Methods
 
+        #region Properties
 
+        int UnprocessedMessages { get; set; }
+
+        #endregion Properties
+
+        Task<bool> KeepAlive();
     }
 
     public interface ICatanSettings
     {
-        #region Properties + Fields 
+        #region Properties + Fields
 
         bool AnimateFade { get; set; }
         int AnimationSpeedBase { get; set; }
@@ -114,7 +112,9 @@ namespace Catan10
         bool ValidateBuilding { get; set; }
         double Zoom { get; set; }
 
-        #endregion Properties + Fields 
+        #endregion Properties + Fields
+
+
 
         #region Methods
 
@@ -164,7 +164,7 @@ namespace Catan10
 
     public interface IGameController
     {
-        #region Properties + Fields 
+        #region Properties + Fields
 
         bool AutoRespondAndTheHuman { get; }
         CatanGames CatanGame { get; set; }
@@ -195,7 +195,9 @@ namespace Catan10
         IRollLog RollLog { get; }
         PlayerModel TheHuman { get; }
 
-        #endregion Properties + Fields 
+        #endregion Properties + Fields
+
+
 
         #region Methods
 
@@ -221,7 +223,9 @@ namespace Catan10
         RandomBoardSettings GetRandomBoard();
 
         Task HideRollsInPublicUi();
-       
+
+        Task JoinOrCreateGame(NewGameLog model);
+
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection
         /// </summary>
@@ -253,11 +257,11 @@ namespace Catan10
 
         Task SetRoadState(UpdateRoadLog updateRoadModel);
 
+        void SetSpyInfo(string sentBy, bool spyOn);
+
         Task SetState(SetStateLog log);
 
         void ShowRollsInPublicUi();
-
-        Task JoinOrCreateGame(NewGameLog model);
 
         void StopHighlightingTiles();
 
@@ -280,7 +284,6 @@ namespace Catan10
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
-        void SetSpyInfo(string sentBy, bool spyOn);
 
         #endregion Methods
     }
@@ -329,5 +332,26 @@ namespace Catan10
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
 
         #endregion Methods
+    }
+
+    //
+    //  this interface is implemented by the Controls that wrap the SimpleHexPanel
+    //  and exposes the data needed by the Views/Pages
+    internal interface ICatanGameData
+    {
+        #region Properties + Fields
+
+        CatanGames CatanGame { get; }
+        string Description { get; }
+        List<TileCtrl> DesertTiles { get; }
+        CatanGameData GameData { get; }
+        GameType GameType { get; }
+        CatanHexPanel HexPanel { get; }
+        int Index { get; }
+
+        List<TileCtrl> Tiles { get; }
+
+        #endregion Properties + Fields
+
     }
 }

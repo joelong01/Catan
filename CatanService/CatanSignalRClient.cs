@@ -96,6 +96,8 @@ namespace Catan10
 
         public HubConnectionState ConnectionState => HubConnection.State;
 
+        public int UnprocessedMessages { get; set; }
+
         public CatanSignalRClient()
         {
         }
@@ -312,6 +314,11 @@ namespace Catan10
         }
 
         public Task<List<string>> LeavGame(GameInfo gameInfo, string playerName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> KeepAlive()
         {
             throw new NotImplementedException();
         }

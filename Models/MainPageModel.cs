@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -114,6 +115,27 @@ namespace Catan10
         [JsonIgnore] public GameInfo DefaultGame { get; } = new GameInfo() { Name = "DefaultGame", Started = false, Creator = "", Id = Guid.Parse("F070F8DA-A5FD-4957-A528-0B915930123F") };
         public string DefaultUser { get; set; } = "";
 
+        int _unprocessedMessages = 0;
+        [JsonIgnore]
+        public int UnprocessedMessages
+        {
+            get
+            {
+                return _unprocessedMessages;
+            }
+            set
+            {
+                Contract.Assert(value >= 0);
+                if (_unprocessedMessages != value)
+                {
+                    _unprocessedMessages = value;
+                    NotifyPropertyChanged();
+                    DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
+                  //  this.TraceMessage($"UnprocessedMessages: {CatanService.UnprocessedMessages} ");
+                }
+            }
+        }
+
         [JsonIgnore]
         public bool EnableNextButton
         {
@@ -126,6 +148,14 @@ namespace Catan10
                     if (!EnableUiInteraction) return ret;
 
                     if (Log == null) return true;
+
+                    //
+                    //  whevener this changes, the log changes...so you don't need to send a NotifyPropertyChanged() event...I hope...
+                    if (UnprocessedMessages > 0)
+                    {
+                       // this.TraceMessage($"Enable false because UnprocessedMessages: {CatanService.UnprocessedMessages} ");
+                        return false;
+                    }
 
                     if (MainPage.Current.CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;
 

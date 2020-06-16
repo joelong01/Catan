@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
+using System.Text.Json;
 using Catan.Proxy;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -59,6 +61,41 @@ namespace Catan10.Spy
             if (e.AddedItems.Count == 0) return;
             LogHeader logHeader = ((CatanMessage)e.AddedItems[0]).Data as LogHeader;
             LogHeaderJson = CatanProxy.Serialize<object>(logHeader, true);
+             // ParseTest(LogHeaderJson);
+        }
+        private void ParseTest(string json)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(json);
+            Utf8JsonReader reader = new Utf8JsonReader(data, isFinalBlock: true, state: default);
+
+            while (reader.Read())
+            {
+                System.Diagnostics.Debug.Write(reader.TokenType);
+
+                switch (reader.TokenType)
+                {
+                    case JsonTokenType.PropertyName:
+                    case JsonTokenType.String:
+                        {
+                            string text = reader.GetString();
+                            System.Diagnostics.Debug.Write(" ");
+                            System.Diagnostics.Debug.Write(text);
+                            break;
+                        }
+
+                    case JsonTokenType.Number:
+                        {
+                            int value = reader.GetInt32();
+                            System.Diagnostics.Debug.Write(" ");
+                            System.Diagnostics.Debug.Write(value);
+                            break;
+                        }
+
+                        // Other token types elided for brevity
+                }
+
+                System.Diagnostics.Debug.WriteLine(" ");
+            }
         }
     }
 }

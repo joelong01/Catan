@@ -224,7 +224,7 @@ namespace Catan10
                 //  this.TraceMessage("NextStep");
                 if (!MainPageModel.EnableUiInteraction)
                 {
-                    //   this.TraceMessage("CallRejected");
+                    this.TraceMessage("CallRejected");
                     return;
                 }
                 await NextState();
@@ -658,6 +658,15 @@ namespace Catan10
             }
             try
             {
+                //
+                //  6/16/2020: the UI binding can lag behing the flag being set.  checking it directly to make sure we don't reenter
+                //
+                if (!MainPageModel.EnableUiInteraction)
+                {
+                    this.TraceMessage("rejecting call to NextState");
+                    return false;
+                }
+
                 if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
 
                 if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;

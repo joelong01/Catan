@@ -19,6 +19,7 @@ namespace Catan10
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
 
         private CatanProxy Proxy { get; } = new CatanProxy();
+        public int UnprocessedMessages { get; set; }
 
         #endregion Properties + Fields
 
@@ -110,7 +111,8 @@ namespace Catan10
         #endregion Delegates  + Events + Enums
 
         public Task BroadcastMessage(Guid gameId, CatanMessage message)
-        { 
+        {
+            UnprocessedMessages++;
             return Proxy.BroadcastMessage(gameId, message);
         }
 
@@ -174,6 +176,11 @@ namespace Catan10
                     await StaticHelpers.ShowErrorText($"Error Monitoring Catan Rest Service.  Error:\n{e}", "Catan REST Service StartConnection");
                 }
             }
+        }
+
+        public Task<bool> KeepAlive()
+        {
+            return Proxy.KeepAlive();
         }
     }
 }

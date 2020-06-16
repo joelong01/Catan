@@ -44,6 +44,11 @@ namespace Catan10
             // 6/15: pull the state from the interface as the debugger won't tell you what it is if the contract fails.
             
             GameState state = gameController.CurrentGameState;
+
+            //
+            //  6/16/2020:  if the state !=  GameState.WaitingForPlayers then that means that the JoinOrCreateGame call hasn't completed.
+            //              which probably means there is an issue calling the service
+            //  
             Contract.Assert(state == GameState.WaitingForPlayers); // you can only add players in this state
             AddPlayerLog logHeader = new AddPlayerLog
             {

@@ -49,7 +49,13 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            await gameController.JoinOrCreateGame(this);            
+            await gameController.JoinOrCreateGame(this);
+
+            //
+            //  add the human to the game
+            //
+            
+            await AddPlayerLog.AddPlayer(gameController, gameController.TheHuman);
         }
 
         public Task Redo(IGameController gameController)

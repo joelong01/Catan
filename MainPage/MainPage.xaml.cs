@@ -183,7 +183,26 @@ namespace Catan10
                 Interval = TimeSpan.FromSeconds(5)
             };
             SaveSettingsTimer.Tick += SaveSettingsTimer_Tick;
+
+            KeepAliveTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(10) // will call service every 10 seconds to make sure it doesn't time out
+            };
+
+            KeepAliveTimer.Tick += KeepAliveTimer_Tick;
+            KeepAliveTimer.Start();
         }
+        
+        private void KeepAliveTimer_Tick(object sender, object e)
+        {
+            if (MainPageModel.CatanService != null)            
+            {
+                
+                MainPageModel.CatanService.KeepAlive();
+            }
+        }
+
+        private DispatcherTimer KeepAliveTimer { get; set; }
 
         private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -194,6 +213,7 @@ namespace Catan10
 
         private Task AddPlayer(PlayerModel pData, LogType logType)
         {
+
             MainPageModel.PlayingPlayers.Add(pData);
 
             AddPlayerMenu(pData);

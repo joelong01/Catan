@@ -27,7 +27,7 @@ namespace Catan10
         private GameInfo GameInfo { get; set; }
 
         public bool WebSocketConnected { get; set; } = false;
-
+        public int UnprocessedMessages { get; set; }
 
         public async Task BroadcastMessage(CatanMessage message)
         {
@@ -282,6 +282,11 @@ namespace Catan10
         }
 
         public Task<List<string>> LeavGame(GameInfo gameInfo, string playerName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> KeepAlive()
         {
             throw new NotImplementedException();
         }

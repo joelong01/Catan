@@ -194,57 +194,67 @@ namespace Catan10
         /// <returns></returns>
         public Task AddPlayer(AddPlayerLog playerLogHeader)
         {
-            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
-
-            var playerToAdd = NameToPlayer(playerLogHeader.PlayerToAdd);
-            Contract.Assert(playerToAdd != null);
-            if (MainPageModel.PlayingPlayers.Contains(playerToAdd) == false)
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            try
             {
-                AddPlayerMenu(playerToAdd);
+                Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
 
-                //
-                //  need to give the players some data about the game
-                playerToAdd.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
-                playerToAdd.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
-                playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
-                playerToAdd.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
-                playerToAdd.GameData.NotificationsEnabled = true;
-                playerToAdd.AddedTime = playerLogHeader.CreatedTime;
-                int playerCount = MainPageModel.PlayingPlayers.Count;
-
-                //
-                //  insert based on the time the message was sent
-                bool added = false;
-                for (int i = 0; i < MainPageModel.PlayingPlayers.Count; i++)
+                var playerToAdd = NameToPlayer(playerLogHeader.PlayerToAdd);
+                Contract.Assert(playerToAdd != null);
+                if (MainPageModel.PlayingPlayers.Contains(playerToAdd) == false)
                 {
-                    if (playerToAdd.AddedTime < MainPageModel.PlayingPlayers[i].AddedTime)
+                    AddPlayerMenu(playerToAdd);
+
+                    //
+                    //  need to give the players some data about the game
+                    playerToAdd.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
+                    playerToAdd.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
+                    playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
+                    playerToAdd.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
+                    playerToAdd.GameData.NotificationsEnabled = true;
+                    playerToAdd.AddedTime = playerLogHeader.CreatedTime;
+                    int playerCount = MainPageModel.PlayingPlayers.Count;
+
+                    //
+                    //  insert based on the time the message was sent
+                    bool added = false;
+                    for (int i = 0; i < MainPageModel.PlayingPlayers.Count; i++)
                     {
-                        MainPageModel.PlayingPlayers.Insert(i, playerToAdd);
-                        added = true;
-                        break;
+                        if (playerToAdd.AddedTime < MainPageModel.PlayingPlayers[i].AddedTime)
+                        {
+                            MainPageModel.PlayingPlayers.Insert(i, playerToAdd);
+                            added = true;
+                            break;
+                        }
                     }
-                }
-                if (!added) // put at end
-                {
-                    MainPageModel.PlayingPlayers.Add(playerToAdd);
-                }
-                //
-                //  Whoever starts the game controls the game until a first player is picked -- this doesn't have to happen
-                //  as a message because we assume the clocks are shared
-                //
-                MainPageModel.GameStartedBy = PlayingPlayers[0];
-                if (CurrentPlayer != MainPageModel.GameStartedBy)
-                {
-                    CurrentPlayer = MainPageModel.GameStartedBy;
-                }
-                
-            }
-            else
-            {
-                this.TraceMessage($"Recieved an AddPlayer call for {playerToAdd} when they are already in the game");
-            }
+                    if (!added) // put at end
+                    {
+                        MainPageModel.PlayingPlayers.Add(playerToAdd);
+                    }
+                    //
+                    //  Whoever starts the game controls the game until a first player is picked -- this doesn't have to happen
+                    //  as a message because we assume the clocks are shared
+                    //
+                    MainPageModel.GameStartedBy = PlayingPlayers[0];
+                    if (CurrentPlayer != MainPageModel.GameStartedBy)
+                    {
+                        CurrentPlayer = MainPageModel.GameStartedBy;
+                    }
 
-            return Task.CompletedTask;
+                }
+                else
+                {
+                    this.TraceMessage($"Recieved an AddPlayer call for {playerToAdd} when they are already in the game");
+                }
+
+                return Task.CompletedTask;
+            }
+            finally
+            {
+                watch.Stop();
+                var elapsedMs = watch.ElapsedMilliseconds;
+                this.TraceMessage($"Add player took {elapsedMs}ms");
+            }
         }
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
@@ -351,7 +361,7 @@ namespace Catan10
                         //  you are tied, but need to rollagain
                         string s = "Tie Roll. Roll again!";
                         await StaticHelpers.ShowErrorText(s, "Catan");
-                        await _rollControl.Reset();                     
+                        await _rollControl.Reset();
                     }
 
                     return false;
@@ -498,19 +508,11 @@ namespace Catan10
                 DataTypeName = logHeader.GetType().FullName
 
             };
-            //  var tcs = new TaskCompletionSource<object>();
-            //    MessageCompletionDictionary.Add(logHeader.LogId, tcs);
             
-            
-                await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
-            
-            //if (MainPageModel.Settings.IsLocalGame)
-            //{
-            //    await ProcessMessage(message);
-            //}
+            MainPageModel.UnprocessedMessages++;
+            await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
 
-            // await tcs.Task;
-
+            
             return (!MainPageModel.Settings.IsLocalGame);
         }
 
@@ -546,7 +548,7 @@ namespace Catan10
                 DataTypeName = logHeader.GetType().FullName
             };
 
-
+            MainPageModel.UnprocessedMessages++;
             await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
 
 
@@ -723,9 +725,9 @@ namespace Catan10
             _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
             MainPageModel.IsGameStarted = true;
             return Task.CompletedTask;
-                                 
+
         }
-       
+
 
         public void StopHighlightingTiles()
         {
@@ -771,7 +773,7 @@ namespace Catan10
                 ActionType = ActionType.Undo,
                 DataTypeName = logHeader.GetType().FullName
             };
-
+            MainPageModel.UnprocessedMessages++;
             await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
 
 
