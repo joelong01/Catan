@@ -139,14 +139,16 @@
     </Compile>
     <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
+    <Compile Include="Logging\Actions\SpyLog.cs" />
     <Compile Include="Logging\Actions\LoseCardsToSeven.cs" />
     <Compile Include="Logging\Actions\PlayDevCardLog.cs" />
     <Compile Include="Logging\Actions\TestGrantEntitlements.cs" />
     <Compile Include="Logging\Actions\TradedGold.cs" />
     <Compile Include="Logging\Actions\YearOfPlentyLog.cs" />
-    <Compile Include="Logging\StateTransitions\Helpers\AllocationPhaseHelper.cs" />
-    <Compile Include="Logging\StateTransitions\Helpers\BaronLogHelpers.cs" />
-    <Compile Include="Logging\StateTransitions\Helpers\ChangePlayerHelper.cs" />
+    <Compile Include="Logging\Helpers\AllocationPhaseHelper.cs" />
+    <Compile Include="Logging\Helpers\BaronLogHelpers.cs" />
+    <Compile Include="Logging\Helpers\ChangePlayerHelper.cs" />
+    <Compile Include="Logging\StateTransitions\6a_PlayerHasTooManyCards.cs" />
     <Compile Include="Logging\StateTransitions\6c_MustTradeGold.cs" />
     <Compile Include="Logging\StateTransitions\6d_TradeGoldToWaitingForNext.cs" />
     <Compile Include="Models\MainPageModel.cs" />
@@ -197,6 +199,9 @@
     <Compile Include="Player\TradeResources.cs" />
     <Compile Include="CatanService\CatanRestService.cs" />
     <Compile Include="CatanService\CatanSignalRClient.cs" />
+    <Compile Include="Spy\CatanSpyPage.xaml.cs">
+      <DependentUpon>CatanSpyPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="State\GridPosition.cs" />
     <Compile Include="State\TargetTracking.cs" />
     <Compile Include="Logging\StateTransitions\UpdateRoadState.cs" />
@@ -417,6 +422,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Spy\CatanSpyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\BoardMeasurementCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -559,7 +568,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.6.12.161850</Version>
+      <Version>2020.6.12.162342</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>
@@ -572,6 +581,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.10</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
+      <Version>7.0.0-preview1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.DataGrid">
+      <Version>7.0.0-preview1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.4.2</Version>

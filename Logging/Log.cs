@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -179,7 +180,7 @@ namespace Catan10
 
     public class Log : INotifyPropertyChanged, IDisposable
     {
-        private ConcurrentQueue<CatanMessage> MessageLog { get; } = new ConcurrentQueue<CatanMessage>();
+        public ObservableCollection<CatanMessage> MessageLog { get; } = new ObservableCollection<CatanMessage>();
         private string SaveFileName { get; set; }
         private Timer Timer { get; set; }
         private bool UpdateLogFlag { get; set; } = false;
@@ -270,7 +271,7 @@ namespace Catan10
 
         internal void RecordMessage(CatanMessage message)
         {
-            MessageLog.Enqueue(message);
+            MessageLog.Add(message);
         }
 
         public bool CanRedo => Stacks.CanRedo;

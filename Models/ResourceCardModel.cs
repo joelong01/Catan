@@ -21,6 +21,7 @@ namespace Catan10
     /// </summary>
     public class ResourceCardCollection : ObservableCollection<ResourceCardModel>
     {
+        
         public int ResourceCount 
         {
             get {
@@ -94,6 +95,10 @@ namespace Catan10
             if (!initialize) this.Clear();
         }
 
+        public ResourceCardCollection(TradeResources tr)
+        {
+            this.AddResources(tr);
+        }
 
         private void Add(ResourceType resource, bool countVisible = true)
         {

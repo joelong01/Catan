@@ -20,6 +20,7 @@ namespace Catan10
         {
             MustTradeGold logHeader = new MustTradeGold()
             {
+                CanUndo = false
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

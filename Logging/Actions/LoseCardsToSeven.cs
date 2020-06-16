@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 namespace Catan10
@@ -8,9 +9,37 @@ namespace Catan10
     /// </summary>
     public class LoseCardsToSeven : LogHeader, ILogController
     {
+        public TradeResources LostResources { get; set;  }
+        public static Task PostMessage(IGameController gameController, TradeResources lostCards)
+        {
+            Contract.Assert(lostCards.Count > 0); //don't negate them
+            Contract.Assert(lostCards.Count == gameController.CurrentPlayer.GameData.Resources.Current.Count / 2);
+            var logHeader = new LoseCardsToSeven()
+            {
+                LostResources = lostCards,
+                CanUndo = false
+            };
+            return gameController.PostMessage(logHeader, Catan.Proxy.ActionType.Normal);
+        }
         public Task Do(IGameController gameController)
         {
-            throw new NotImplementedException();
+            PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
+            sentBy.GameData.Resources.GrantResources(LostResources.GetNegated());
+            gameController.MainPageModel.Bank.GameData.Resources.GrantResources(LostResources);
+            if (gameController.CurrentPlayer == gameController.TheHuman)
+            {
+                foreach (var player in gameController.MainPageModel.PlayingPlayers)
+                {
+                    if (player.GameData.Resources.Current.Count > 7)
+                    {
+                        return Task.CompletedTask;
+                    }
+                }
+
+                return MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
+            }
+
+            return Task.CompletedTask;
         }
 
         public Task Redo(IGameController gameController)

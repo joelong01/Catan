@@ -53,24 +53,26 @@
             <Grid.RenderTransform>
                 <CompositeTransform TranslateX="335" TranslateY="20" />
             </Grid.RenderTransform>
-            <TextBlock Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" Text="Card Stolen" FontSize="22" 
-                    Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}" />
+            <TextBlock Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center"
+                Text="Card Stolen" FontSize="22"
+                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}" />
             <!--<TextBlock Text="&#xE8AB;" FontSize="22" FontFamily="Segoe MDL2 Assets" />-->
 
-            <Button Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Click="OnOpenCloseStolenCard" Foreground="White" Visibility="Visible">
-                    <Button.Content>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text=""
-                            FontFamily="Segoe MDL2 Assets" FontSize="12"
-                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}" />
-                    </Button.Content>
-                </Button>
-         
+            <Button Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                Click="OnOpenCloseStolenCard" Foreground="White" Visibility="Visible">
+                <Button.Content>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text=""
+                        FontFamily="Segoe MDL2 Assets" FontSize="12"
+                        Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}" />
+                </Button.Content>
+            </Button>
+
 
             <local:ResourceCardSlimCtrl Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 ResourceType="{x:Bind Player.GameData.Resources.StolenResource, Mode=OneWay}"
                 CountVisible="False" />
-            
+
 
         </Grid>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="5,5,0,0">

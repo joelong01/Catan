@@ -14,7 +14,8 @@ namespace Catan10
         {
             TradeGoldToWaitingForNext logHeader = new TradeGoldToWaitingForNext()
             {
-                NewState = GameState.WaitingForNext
+                NewState = GameState.WaitingForNext,
+                CanUndo = false
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

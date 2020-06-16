@@ -61,6 +61,14 @@
                     <MenuFlyout x:Name="_menuBaron" Placement="Right" />
                 </Button.Flyout>
             </Button>
+            <Viewbox Grid.Row="0" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="5"
+                Width="75" Margin="20,0,0,20" HorizontalAlignment="Left"
+                VerticalAlignment="Bottom">
+                <Grid Visibility="{x:Bind SpyVisible, Mode=OneWay}">
+                    <TextBlock Margin="5,14,5,-5" HorizontalAlignment="Center" FontSize="12" Text="{x:Bind TurnedSpyOn, Mode=OneWay}" />
+                    <TextBlock HorizontalAlignment="Center" FontSize="54" Text="" FontFamily="Segoe MDL2 Assets" />
+                </Grid>
+            </Viewbox>
             <Button Margin="29,20,0,0" VerticalAlignment="Top" FontSize="22"
                 Background="Transparent" Canvas.ZIndex="10">
                 <Button.Content>
@@ -94,6 +102,7 @@
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Development">
+                            <MenuFlyoutItem Text="Show Catan Spy" Click="OnShowCatanSpy" />
                             <ToggleMenuFlyoutItem Text="Auto Respond Mode" IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}" />
                             <MenuFlyoutItem Text="Save Settings" Click="OnSaveSettings" />
                             <MenuFlyoutSeparator />

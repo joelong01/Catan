@@ -968,6 +968,10 @@ namespace Catan10
             CalculateAndSetLongestRoad(raceTracking);
         }
 
-       
+        public void SetSpyInfo(string sentBy, bool spyOn)
+        {
+            this.SpyVisible = true;
+            this.TurnedSpyOn = sentBy;
+        }
     }
 }

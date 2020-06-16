@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
-
+using Windows.Devices.PointOfService;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -188,7 +188,8 @@ namespace Catan10
                 SourceOrientation = TileOrientation.FaceUp,
                 HowMany = 1,
                 Source = rc,
-                Instructions = "Take 2 cards from the bank.",
+                CountVisible = false,
+                Instructions = "Pick the resource for Monopoly",
                 Destination = new ObservableCollection<ResourceCardModel>(),
             };
 
@@ -203,14 +204,7 @@ namespace Catan10
 
         private async Task<TradeResources> DoYearOfPlenty()
         {
-            TradeResources tr = new TradeResources()
-            {
-                Wood = 2,
-                Wheat = 2,
-                Brick = 2,
-                Ore = 2,
-                Sheep = 2
-            };
+            TradeResources tr = MainPage.Current.MainPageModel.ResourcesLeftInBank;
 
             ResourceCardCollection rc = new ResourceCardCollection(false);
             rc.AddResources(tr);
@@ -221,6 +215,7 @@ namespace Catan10
                 SourceOrientation = TileOrientation.FaceUp,
                 HowMany = 2,
                 Source = rc,
+                CountVisible = true,
                 Instructions = "Take 2 cards from the bank.",
                 Destination = new ObservableCollection<ResourceCardModel>(),
             };
@@ -263,13 +258,17 @@ namespace Catan10
         /// <param name="e"></param>
         private async void OnAvailableCardPressed(object sender, RoutedEventArgs e)
         {
+            
             DevCardType devCardType = (DevCardType)((MenuFlyoutItem)sender).Tag;
             Contract.Assert(SelectedAvailableDevCard != null);
             Contract.Assert(SelectedAvailableDevCard.DevCardType == devCardType);
             Contract.Assert(SelectedAvailableDevCard.Played == false);
 
+            GameState state = MainPage.Current.MainPageModel.GameState;
+
             if (devCardType == DevCardType.YearOfPlenty)
             {
+                if (state != GameState.WaitingForNext) return;
                 TradeResources tr = await DoYearOfPlenty();
                 await PlayDevCardLog.PostLog(MainPage.Current, DevCardType.YearOfPlenty, tr);
                 return;
@@ -277,6 +276,7 @@ namespace Catan10
 
             if (devCardType == DevCardType.Monopoly)
             {
+                if (state != GameState.WaitingForNext) return;
                 TradeResources tr = await DoMonopoly();
                 await PlayDevCardLog.PostLog(MainPage.Current, DevCardType.Monopoly, tr);
                 return;
@@ -284,26 +284,20 @@ namespace Catan10
 
             if (devCardType == DevCardType.RoadBuilding)
             {
+                if (state != GameState.WaitingForNext) return;
                 await PlayDevCardLog.PostLog(MainPage.Current, DevCardType.RoadBuilding, null);
                 return;
             }
-            if (devCardType == DevCardType.Knight)
+            if (devCardType == DevCardType.Knight && (state == GameState.WaitingForNext || state == GameState.WaitingForRoll))
             {
-                /**
-                 *  1. send a message that a knight was played
-                 *  2. change the state so that the UI says "Much move baron"
-                 *  3. pick the target tile
-                 *  4. Send a message to move Baron to the target tile
-                 *  5. show the UI to pick one of the victim's cards
-                 *  6. Send a message to update the resources for each player
-                 */
-
-                await MustMoveBaronLog.PostLog(MainPage.Current, MoveBaronReason.PlayedDevCard);
+                await MustMoveBaronLog.PostLog(MainPage.Current, MoveBaronReason.PlayedDevCard);                
             }
         }
 
         private async void OnBuyCity(object sender, RoutedEventArgs e)
         {
+            GameState state = MainPage.Current.MainPageModel.GameState;
+            if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
             if (!Player.GameData.Resources.CanAfford(Entitlement.City)) return;
             if (AtMaxEntitlement(Player, Entitlement.City))
             {
@@ -314,12 +308,16 @@ namespace Catan10
 
         private async void OnBuyDevCard(object sender, RoutedEventArgs e)
         {
+            GameState state = MainPage.Current.MainPageModel.GameState;
+            if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
             if (!Player.GameData.Resources.CanAfford(Entitlement.DevCard)) return;
             await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.DevCard);
         }
 
         private async void OnBuyRoad(object sender, RoutedEventArgs e)
         {
+            GameState state = MainPage.Current.MainPageModel.GameState;
+            if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
             if (!Player.GameData.Resources.CanAfford(Entitlement.Road)) return;
             if (AtMaxEntitlement(Player, Entitlement.Road))
             {
@@ -330,6 +328,8 @@ namespace Catan10
 
         private async void OnBuySettlement(object sender, RoutedEventArgs e)
         {
+            GameState state = MainPage.Current.MainPageModel.GameState;
+            if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
             if (Player.GameData.Resources.CanAfford(Entitlement.Settlement))
             {
                 if (AtMaxEntitlement(Player, Entitlement.Settlement))

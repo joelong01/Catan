@@ -5,9 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="This_TakeCardDlg" Title="Catan Card Exchange" Width="820" Height="750"
-    Foreground="Black"
-    Background="{StaticResource bmMaple}"
-    CornerRadius="10" RequestedTheme="Light" PrimaryButtonText="Accept and Continue"
+    CornerRadius="10" RequestedTheme="Dark" PrimaryButtonText="Accept and Continue"
     SecondaryButtonText="Cancel"
     IsPrimaryButtonEnabled="{x:Bind EnableOkButton(Destination.Count), Mode=OneWay}"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick" Opened="OnOpened"
@@ -15,11 +13,11 @@
     <ContentDialog.Resources>
         <Style x:Key="OkButtonStyle" TargetType="Button">
             <Setter Property="IsEnabled" Value="{x:Bind EnableOkButton(Destination.Count), Mode=OneWay}" />
-            <Setter Property="Background" Value="{x:Bind To.BackgroundBrush, Mode=OneWay}" />
+            <Setter Property="Background" Value="Red" />
             <Setter Property="Foreground" Value="{x:Bind To.ForegroundBrush, Mode=OneWay}" />
         </Style>
     </ContentDialog.Resources>
-    <StackPanel Width="720" Height="640" CornerRadius="10">
+    <StackPanel Width="720" Height="640" CornerRadius="10" Background="{StaticResource ResourceType.GoldMine}">
         <GridView Name="GridView_Source" Grid.Row="2" Height="275" Margin="5"
             CornerRadius="5"
             Background="{x:Bind From.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Transparent}"

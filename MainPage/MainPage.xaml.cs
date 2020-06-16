@@ -7,14 +7,16 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
+using Catan10.Spy;
 using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.System;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
+using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
@@ -992,7 +994,40 @@ namespace Catan10
             
 
         }
+        public static readonly DependencyProperty SpyVisibleProperty = DependencyProperty.Register("SpyVisible", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
+        public bool SpyVisible
+        {
+            get => (bool)GetValue(SpyVisibleProperty);
+            set => SetValue(SpyVisibleProperty, value);
+        }
+        public static readonly DependencyProperty TurnedSpyOnProperty = DependencyProperty.Register("TurnedSpyOn", typeof(string), typeof(MainPage), new PropertyMetadata(""));
+        public string TurnedSpyOn
+        {
+            get => (string)GetValue(TurnedSpyOnProperty);
+            set => SetValue(TurnedSpyOnProperty, value);
+        }
 
-        
+        private bool _spyWindowOpen = false;
+
+        private async void OnShowCatanSpy(object sender, RoutedEventArgs e)
+        {
+            if (_spyWindowOpen) return;
+            _spyWindowOpen = true;
+            AppWindow appWindow = await AppWindow.TryCreateAsync();
+            Frame appWindowContentFrame = new Frame();
+            appWindowContentFrame.Navigate(typeof(CatanSpyPage));
+            await CatanSpyLog.SpyOnOff(this, true);
+            // Get a reference to the page instance and assign the
+            // newly created AppWindow to the MyAppWindow property.
+
+            ElementCompositionPreview.SetAppWindowContent(appWindow, appWindowContentFrame);
+            appWindow.Closed += delegate
+            {
+                _spyWindowOpen = false;
+                appWindowContentFrame.Content = null;
+                appWindow = null;
+            };
+            await appWindow.TryShowAsync();
+        }
     }
 }

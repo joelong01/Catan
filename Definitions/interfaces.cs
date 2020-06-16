@@ -280,6 +280,7 @@ namespace Catan10
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
+        void SetSpyInfo(string sentBy, bool spyOn);
 
         #endregion Methods
     }

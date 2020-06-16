@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
+using Windows.Services.Maps;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -40,6 +41,7 @@ namespace Catan10
                     To = MainPageModel.Bank,
                     From = CurrentPlayer,
                     SourceOrientation = TileOrientation.FaceUp,
+                    CountVisible = true,
                     HowMany = loss,
                     Source = rc,
                     Destination = new ResourceCardCollection(false),
@@ -87,7 +89,7 @@ namespace Catan10
                 Ore = goldCards,
                 Sheep = goldCards
             };
-            ResourceCardCollection source = ResourceCardCollection.Flatten(tr);
+            ResourceCardCollection source = new ResourceCardCollection(tr);
 
             string c = goldCards > 1 ? "cards" : "card";
 
@@ -97,6 +99,7 @@ namespace Catan10
                 From = gameController.MainPageModel.Bank,
                 SourceOrientation = TileOrientation.FaceUp,
                 HowMany = goldCards,
+                CountVisible = true,
                 Source = source,
                 Instructions = $"Take {goldCards} {c} from the bank.",
                 Destination = destination,
@@ -112,15 +115,16 @@ namespace Catan10
             }
 
             var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
-            this.TraceMessage(picked.ToString());
+            this.TraceMessage("trade gold: "  + picked.ToString());
         }
 
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            CurrentPlayer.GameData.Resources.StolenResource = ResourceType.Wheat;
-           // await TradeGoldTest();
-            //await TestTargetPlayer();
+            // await TestYearOfPlenty();
+            await TradeGoldTest();
+            await TestTargetPlayer();
+            await LoseHalfYourCards();
         }
 
         private async void OnTest2(object sdr, RoutedEventArgs rea)
@@ -230,7 +234,7 @@ namespace Catan10
 
         private async Task TestTargetPlayer()
         {
-            var source = new ResourceCardCollection(false);            
+            var source = new ResourceCardCollection(false);
             var destination = new ResourceCardCollection(false);
             source.ForEach((c) => c.Orientation = TileOrientation.FaceDown);
             TakeCardDlg dlg = new TakeCardDlg()
@@ -265,6 +269,7 @@ namespace Catan10
 
             ResourceCardCollection rc = new ResourceCardCollection(false);
             rc.AddResources(tr);
+            // rc = rc.Flatten();
             TakeCardDlg dlg = new TakeCardDlg()
             {
                 To = CurrentPlayer,
@@ -272,6 +277,7 @@ namespace Catan10
                 SourceOrientation = TileOrientation.FaceUp,
                 HowMany = 2,
                 Source = rc,
+                CountVisible = true,
                 Instructions = "Take 2 cards from the bank.",
                 Destination = new ObservableCollection<ResourceCardModel>(),
             };
@@ -281,6 +287,7 @@ namespace Catan10
             {
                 CurrentPlayer.GameData.Resources.GrantResources(ResourceCardCollection.ToTradeResources(dlg.Destination));
             }
+            this.TraceMessage($"{ResourceCardCollection.ToTradeResources(dlg.Destination)}");
         }
 
         private void VerifyRoundTrip<T>(T model)
