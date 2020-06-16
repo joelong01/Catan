@@ -446,7 +446,7 @@ namespace Catan10
 
         public TileOrientation CountToOrientation(int count)
         {
-            if (count > 0)
+            if (count != 0)
             {
                 return TileOrientation.FaceUp;
             }
