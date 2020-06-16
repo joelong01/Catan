@@ -137,6 +137,7 @@ namespace Catan10
         public Task Initialize(string hostName)
         {
             Proxy.HostName = "http://" + hostName;
+            Proxy.Timeout = TimeSpan.FromHours(12);
             return Task.CompletedTask;
         }
 
