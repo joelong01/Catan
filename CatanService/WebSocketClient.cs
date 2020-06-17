@@ -15,10 +15,15 @@ namespace Catan10
     class WebSocketClient : ICatanService
     {
         public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
-        public event CreateGameHandler OnGameCreated;
+
+        public event GameLifeTimeHandler OnGameCreated;
+
         public event DeleteGameHandler OnGameDeleted;
+
+        public event GameLifeTimeHandler OnGameJoined;
+        public event GameLifeTimeHandler OnGameLeft;
+
         public event PrivateMessageReceivedHandler OnPrivateMessage;
-        public event JoinedGameHandler OnGameJoined;
 
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
         private MessageWebSocket MessageWebSocket { get; set; }
@@ -28,6 +33,8 @@ namespace Catan10
 
         public bool WebSocketConnected { get; set; } = false;
         public int UnprocessedMessages { get; set; }
+
+      
 
         public async Task BroadcastMessage(CatanMessage message)
         {
@@ -225,7 +232,7 @@ namespace Catan10
                                 break;
 
                             case MessageType.DeleteGame:
-                                OnGameDeleted?.Invoke(serviceMessage.GameInfo);
+                                OnGameDeleted?.Invoke(serviceMessage.GameInfo.Id, message.From);
                                 break;
 
                             case MessageType.JoinGame:
@@ -246,7 +253,7 @@ namespace Catan10
 
         }
 
-        public Task BroadcastMessage(Guid id, CatanMessage message)
+        public Task SendBroadcastMessage(Guid id, CatanMessage message)
         {
             throw new NotImplementedException();
         }
@@ -281,7 +288,7 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        public Task<List<string>> LeavGame(GameInfo gameInfo, string playerName)
+        public Task<List<string>> LeaveGame(GameInfo gameInfo, string playerName)
         {
             throw new NotImplementedException();
         }

@@ -845,6 +845,7 @@ namespace Catan10
 
         private Task SaveGameState()
         {
+            if (SaveSettingsTimer == null) return Task.CompletedTask;
             if (SaveSettingsTimer.IsEnabled) return Task.CompletedTask;
             SaveSettingsTimer.Start();
             return Task.CompletedTask;

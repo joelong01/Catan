@@ -10,11 +10,11 @@ namespace Catan10
 {
     public delegate void BroadcastMessageReceivedHandler(CatanMessage message);
 
-    public delegate void CreateGameHandler(GameInfo gameInfo, string playerName);
+   
+    public delegate void DeleteGameHandler(Guid id, string by);
 
-    public delegate void DeleteGameHandler(GameInfo gameInfo);
-
-    public delegate void JoinedGameHandler(GameInfo gameInfo, string playerName);
+  
+    public delegate void GameLifeTimeHandler(GameInfo gameInfo, string playerName);
 
     public delegate void PrivateMessageReceivedHandler(CatanMessage message);
 
@@ -30,7 +30,7 @@ namespace Catan10
         /// <summary>
         ///    a game as created
         /// </summary>
-        event CreateGameHandler OnGameCreated;
+        event GameLifeTimeHandler OnGameCreated;
 
         /// <summary>
         ///    a game was deleted
@@ -40,7 +40,12 @@ namespace Catan10
         /// <summary>
         ///     a game was joined.  will be sent to the one that joined the game
         /// </summary>
-        event JoinedGameHandler OnGameJoined;
+        event GameLifeTimeHandler OnGameJoined;
+
+        /// <summary>
+        ///     a game was deleted.  will be sent to the one that joined the game
+        /// </summary>
+        event GameLifeTimeHandler OnGameLeft;
 
         /// <summary>
         ///     a message was sent to only this client
@@ -51,7 +56,7 @@ namespace Catan10
 
         #region Methods
 
-        Task BroadcastMessage(Guid id, CatanMessage message);
+        Task SendBroadcastMessage(Guid id, CatanMessage message);
 
         Task CreateGame(GameInfo gameInfo);
 
@@ -80,7 +85,7 @@ namespace Catan10
         /// <param name="gameInfo"></param>
         /// <param name="playerName"></param>
         /// <returns></returns>
-        Task<List<string>> LeavGame(GameInfo gameInfo, string playerName);
+        Task<List<string>> LeaveGame(GameInfo gameInfo, string playerName);
 
         Task SendPrivateMessage(Guid id, CatanMessage message);
 

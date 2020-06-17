@@ -80,7 +80,7 @@ namespace Catan10
                             break;
 
                         case MessageType.DeleteGame:
-                            OnGameDeleted?.Invoke(serviceMessage.GameInfo);
+                            OnGameDeleted?.Invoke(serviceMessage.GameInfo.Id, message.From);
                             break;
 
                         case MessageType.JoinGame:
@@ -100,17 +100,18 @@ namespace Catan10
 
         public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
 
-        public event CreateGameHandler OnGameCreated;
+        public event GameLifeTimeHandler OnGameCreated;
 
         public event DeleteGameHandler OnGameDeleted;
 
-        public event JoinedGameHandler OnGameJoined;
+        public event GameLifeTimeHandler OnGameJoined;
+        public event GameLifeTimeHandler OnGameLeft;
 
         public event PrivateMessageReceivedHandler OnPrivateMessage;
 
         #endregion Delegates  + Events + Enums
 
-        public Task BroadcastMessage(Guid gameId, CatanMessage message)
+        public Task SendBroadcastMessage(Guid gameId, CatanMessage message)
         {
             UnprocessedMessages++;
             return Proxy.BroadcastMessage(gameId, message);
@@ -148,7 +149,7 @@ namespace Catan10
             return Proxy.JoinGame(gameInfo, playerName);
         }
 
-        public Task<List<string>> LeavGame(GameInfo gameInfo, string playerName)
+        public Task<List<string>> LeaveGame(GameInfo gameInfo, string playerName)
         {
             return Proxy.LeaveGame(gameInfo, playerName);
         }

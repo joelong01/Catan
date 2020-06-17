@@ -510,7 +510,7 @@ namespace Catan10
             };
             
             MainPageModel.UnprocessedMessages++;
-            await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+            await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
 
             
             return (!MainPageModel.Settings.IsLocalGame);
@@ -549,7 +549,7 @@ namespace Catan10
             };
 
             MainPageModel.UnprocessedMessages++;
-            await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+            await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
 
 
             //if (MainPageModel.Settings.IsLocalGame)
@@ -774,7 +774,7 @@ namespace Catan10
                 DataTypeName = logHeader.GetType().FullName
             };
             MainPageModel.UnprocessedMessages++;
-            await MainPageModel.CatanService.BroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+            await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
 
 
             if (MainPageModel.Settings.IsLocalGame)

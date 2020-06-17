@@ -22,15 +22,20 @@ namespace Catan10
 
     public class FunctionTimer : IDisposable
     {
-        Stopwatch watch = new Stopwatch();
+        public bool Enabled { get; set; } = true;  // a global flag to turn off all timing
+
+        Stopwatch watch = null; 
         string message;
         public FunctionTimer(string msg)
         {
+            if (!Enabled) return;
+            watch = new Stopwatch();
             message = msg;
             watch.Start();
         }
         public void Dispose()
         {
+            if (!Enabled) return;
             watch.Stop();
             double elapsedMs = watch.ElapsedMilliseconds;
             this.TraceMessage($"{message}: {elapsedMs}ms");
@@ -38,6 +43,7 @@ namespace Catan10
     }
     public sealed partial class MainPage : Page
     {
+        
         #region Properties + Fields 
 
         private Dictionary<string, GameInfo> KnownGames = new Dictionary<string, GameInfo>();
@@ -125,88 +131,95 @@ namespace Catan10
 
         private async void OnStartDefaultNetworkGame(object sender, RoutedEventArgs e)
         {
-            using (new FunctionTimer("OnStartDefaultNetworkGame"))
+            try
             {
-                if (CurrentGameState != GameState.WaitingForNewGame)
+                using (new FunctionTimer("OnStartDefaultNetworkGame"))
                 {
-                    this.TraceMessage($"State={CurrentGameState} so rejecting call.  call EndGame() first.");
-                    return;
-                }
-
-                if (TheHuman == null)
-                {
-                    await PickDefaultUser();
-                }
-                if (TheHuman == null) return;
-
-                GameNameDlg dlg = new GameNameDlg() { MainPageModel = MainPageModel, Player = TheHuman };
-
-                var ret = await dlg.ShowAsync();
-                if (ret != ContentDialogResult.Primary || String.IsNullOrEmpty(MainPageModel.Settings.DefaultGameName))
-                {
-                    return;
-                }
-                using (new FunctionTimer("Initializing MainPageModel"))
-                {
-                    MainPageModel.IsGameStarted = false;
-                    MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
-                    MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
-                    MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
-                    MainPageModel.IsServiceGame = true;
-
-
-                    if (MainPageModel.CatanService != null)
+                    if (CurrentGameState != GameState.WaitingForNewGame)
                     {
-                        MainPageModel.CatanService.OnBroadcastMessageReceived -= Service_OnBroadcastMessageReceived;
-                        MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
-                        MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
-                        MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
-
-                        MainPageModel.CatanService = null;
+                        this.TraceMessage($"State={CurrentGameState} so rejecting call.  call EndGame() first.");
+                        return;
                     }
 
-                    if (MainPageModel.Settings.IsSignalRGame)
+                    if (TheHuman == null)
                     {
-                        MainPageModel.CatanService = new CatanSignalRClient();
+                        await PickDefaultUser();
                     }
-                    else if (MainPageModel.Settings.IsHomegrownGame)
+                    if (TheHuman == null) return;
+
+                    GameNameDlg dlg = new GameNameDlg() { MainPageModel = MainPageModel, Player = TheHuman };
+
+                    var ret = await dlg.ShowAsync();
+                    if (ret != ContentDialogResult.Primary || String.IsNullOrEmpty(MainPageModel.Settings.DefaultGameName))
                     {
-                        MainPageModel.CatanService = new CatanRestService();
+                        return;
+                    }
+                    using (new FunctionTimer("Initializing MainPageModel"))
+                    {
+                        MainPageModel.IsGameStarted = false;
+                        MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
+                        MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
+                        MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
+                        MainPageModel.IsServiceGame = true;
+
+
+                        if (MainPageModel.CatanService != null)
+                        {
+                            MainPageModel.CatanService.OnBroadcastMessageReceived -= Service_OnBroadcastMessageReceived;
+                            MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
+                            MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
+                            MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
+
+                            MainPageModel.CatanService = null;
+                        }
+
+                        if (MainPageModel.Settings.IsSignalRGame)
+                        {
+                            MainPageModel.CatanService = new CatanSignalRClient();
+                        }
+                        else if (MainPageModel.Settings.IsHomegrownGame)
+                        {
+                            MainPageModel.CatanService = new CatanRestService();
+                        }
+
+                        MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
+                        MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
+                        MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
+                        MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
+                        MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
                     }
 
-                    MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
-                    MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
-                    MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
-                    MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
-                    MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
+
+                    using (new FunctionTimer("MainPageModel.CatanService.Initialize"))
+                    {
+                        await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+                    }
+
+                    CatanAction action;
+                    using (new FunctionTimer("CreateOrJoinGame"))
+                    {
+                        action = await CreateOrJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+                    }
+                    using (new FunctionTimer("StartConnection"))
+                    {
+                        await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+                    }
+
+                    //
+                    //  note that we join or create the game and this returns when the message is sent, not when the message is processed
+                    //
+
+                    await NewGameLog.JoinOrCreateGame(this, MainPageModel.ServiceGameInfo.Creator, 0, action);
+
+                    //
+                    //  6/16/2020: If there is an issue connecting to the service we call AddPlayer() before creating the game
+                    //             moved to the JoinOrCreate.Do method
+
                 }
-
-
-                using (new FunctionTimer("MainPageModel.CatanService.Initialize"))
-                {
-                    await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-                }
-
-                CatanAction action;
-                using (new FunctionTimer("CreateOrJoinGame"))
-                {
-                    action = await CreateOrJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
-                }
-                using (new FunctionTimer("StartConnection"))
-                {
-                    await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
-                }
-
-                //
-                //  note that we join or create the game and this returns when the message is sent, not when the message is processed
-                //
-
-                await NewGameLog.JoinOrCreateGame(this, MainPageModel.ServiceGameInfo.Creator, 0, action);
-
-                //
-                //  6/16/2020: If there is an issue connecting to the service we call AddPlayer() before creating the game
-                //             moved to the JoinOrCreate.Do method
-
+            }
+            catch (Exception exception)
+            {
+                this.TraceMessage($"Exception starting game: {exception}");
             }
 
         }
@@ -248,7 +261,7 @@ namespace Catan10
             }
             else
             {
-                await gameService.LeavGame(gameInfo, me);
+                await gameService.LeaveGame(gameInfo, me);
             }
             GameInfo serverGameInfo = await gameService.JoinGame(gameInfo, me);
             gameInfo.Creator = serverGameInfo.Creator;
@@ -261,7 +274,7 @@ namespace Catan10
             LogHeader logHeader = message.Data as LogHeader;
             var latency = (DateTime.Now - logHeader.CreatedTime).Milliseconds;
             NameToPlayer(logHeader.SentBy).ServiceLatency = latency;
-            this.TraceMessage($"Latency: {latency}");
+            //this.TraceMessage($"Latency: {latency}");
             ILogController logController = logHeader as ILogController;
             Contract.Assert(logController != null, "every LogEntry is a LogController!");
             switch (message.ActionType)
@@ -274,7 +287,12 @@ namespace Catan10
                     {
                         await Log.PushAction(logHeader);
                     }
-                    await logController.Do(this);
+                    using (new FunctionTimer($"calling {message.DataTypeName}"))
+                    {
+                        await logController.Do(this);
+                    }
+
+
                     break;
 
                 case ActionType.Undo:
@@ -330,11 +348,15 @@ namespace Catan10
             }
         }
 
-        private async void Service_OnGameDeleted(GameInfo gameInfo)
+        private async void Service_OnGameDeleted(Guid id, string by)
         {
-            if (gameInfo.Creator == TheHuman.PlayerName) return; // don't reset games started by me!
+            if (by == TheHuman.PlayerName) return; // don't reset games started by me!
 
-            if (CurrentGameState != GameState.Uninitialized && CurrentGameState != GameState.WaitingForNewGame)
+            if (MainPageModel.ServiceGameInfo.Id != id) return;
+
+            // uh oh -- deleting my game
+
+            if (CurrentGameState != GameState.Uninitialized && CurrentGameState != GameState.WaitingForNewGame )
             {
                 await this.Reset();
             }

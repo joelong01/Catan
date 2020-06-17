@@ -89,9 +89,9 @@ namespace Catan10
             try
             {
                 MainPageModel.EnableUiInteraction = false;
-                this.TraceMessage("starting redo");
+             //   this.TraceMessage("starting redo");
                 bool ret = await RedoAsync();
-                this.TraceMessage("done redo");
+              //  this.TraceMessage("done redo");
             }
             finally
             {
