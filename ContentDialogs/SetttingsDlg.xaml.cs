@@ -45,7 +45,7 @@ namespace Catan10
             this.TheHuman = human;
             ValidServiceUris.Add("localhost:5000");
             ValidServiceUris.Add("192.168.1.128:5000");
-            ValidServiceUris.Add("jdlgameservice.azurewebsites.net");
+            ValidServiceUris.Add("catanservice.azurewebsites.net");
         }
 
         #endregion Constructors

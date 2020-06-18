@@ -74,7 +74,7 @@
             <ImageBrush x:Key="HarborType.Wheat" ImageSource="Assets/Harbors/2 for 1 wheat.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="HarborType.Wood" ImageSource="Assets/Harbors/2 for 1 wood.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="HarborType.ThreeForOne" ImageSource="Assets/Harbors/3 for 1.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="HarborType.Back" ImageSource="Assets/water.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="HarborType.None" ImageSource="Assets/water.png" Stretch="UniformToFill" />
             <!--  ResourceType Brushes - should be one per enum value  -->
             <ImageBrush x:Key="DevCardType.Back" ImageSource="Assets/DevCards/back.jpg" Stretch="UniformToFill" />
             <ImageBrush x:Key="DevCardType.Knight" ImageSource="Assets/DevCards/knight.jpg" Stretch="UniformToFill" />

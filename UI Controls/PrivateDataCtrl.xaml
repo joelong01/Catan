@@ -27,9 +27,10 @@
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Foreground" Value="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
             <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,5,0,0" />
         </Style>
     </Control.Resources>
-    <Grid Width="520" Height="400" Background="{StaticResource TransparentBrush}" CornerRadius="10">
+    <Grid Width="520" Height="415" Background="{StaticResource TransparentBrush}" CornerRadius="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />
@@ -214,42 +215,44 @@
                 <local:ResourceCardSlimCtrl Margin="109,0,0,0" Image="{StaticResource DevCardType.VictoryPoint}" Count="{x:Bind Player.GameData.Resources.VictoryPoints, Mode=OneWay}" />
             </StackPanel>
             <Rectangle Height="4" Margin="0,10,0,10" HorizontalAlignment="Stretch" Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
-            <StackPanel Margin="0,-4,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
+            <StackPanel Margin="0,0,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
                 Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
                 BorderBrush="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
                 BorderThickness="2" CornerRadius="10">
-                <Button Margin="5,0,5,0" Padding="0" Background="Transparent"
-                    ToolTipService.ToolTip="Buy Settlement" Click="OnBuySettlement"
+                <Button Margin="5" Padding="5" Background="Transparent"
+                    BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                    CornerRadius="5" ToolTipService.ToolTip="Buy Settlement" Click="OnBuySettlement"
                     IsEnabled="{x:Bind EnabledEntitlementPurchase('Settlement', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}">
                     <Button.Content>
-                        <StackPanel Padding="0" CornerRadius="10">
-                            <Viewbox Margin="0,0,0,0">
-                                <local:SettlementCtrl Width="50" Height="50" Margin="5,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
-                            </Viewbox>
-                            <TextBlock Text="Settlement" Style="{StaticResource ButtonTextStyle}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+                        <StackPanel Width="60" Height="65" Margin="0,0,0,0">
+                            <local:SettlementCtrl Width="50" Height="50" Owner="{x:Bind Player, Mode=OneWay}" />
+                            <TextBlock HorizontalAlignment="Center" Text="Settlement" Style="{StaticResource ButtonTextStyle}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" Margin="0, -2, 0,0" />
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button Margin="5,0,5,0" Padding="0" Background="Transparent"
+                <Button Margin="5" Padding="5" Background="Transparent"
+                    BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                    CornerRadius="5"
                     IsEnabled="{x:Bind EnabledEntitlementPurchase('City', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
                     ToolTipService.ToolTip="Buy City" Click="OnBuyCity">
                     <Button.Content>
-                        <StackPanel>
-                            <Viewbox Margin="0,0,0,0">
-                                <local:CityCtrl Width="50" Height="50" Margin="5,0,0,0" Owner="{x:Bind Player, Mode=OneWay}" />
-                            </Viewbox>
-                            <TextBlock Margin="5,0,0,0" HorizontalAlignment="Center" Text="City"
-                                Style="{StaticResource ButtonTextStyle}"
-                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+
+                        <StackPanel Width="50" Height="65">
+                            <local:CityCtrl Width="50" Height="50" Owner="{x:Bind Player, Mode=OneWay}" />
+                            <TextBlock HorizontalAlignment="Center" Text="City" Style="{StaticResource ButtonTextStyle}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" Margin="0, -2, 0,0"/>
                         </StackPanel>
+
                     </Button.Content>
                 </Button>
-                <Button Margin="5,0,5,0" Padding="0" Background="Transparent"
+                <Button Margin="5" Padding="5" Background="Transparent"
+                    BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                    CornerRadius="5"
                     IsEnabled="{x:Bind EnabledEntitlementPurchase('Road', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
                     ToolTipService.ToolTip="Buy Road" Click="OnBuyRoad">
                     <Button.Content>
-                        <StackPanel Width="50" Height="60" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
-                            <Grid Margin="0,0,0,0" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
+
+                        <StackPanel Width="50" Height="65">
+                            <Grid Width="50" Height="50">
                                 <Line X1="15" Y1="5" X2="15" Y2="45"
                                     Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
                                     StrokeThickness="2" />
@@ -260,37 +263,53 @@
                                     Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
                                     StrokeThickness="2" />
                             </Grid>
-                            <TextBlock Margin="0,0,0,0" Text="Road" Style="{StaticResource ButtonTextStyle}" />
+                            <TextBlock  Text="Road" Style="{StaticResource ButtonTextStyle}" Margin="0, 0, 0,0"/>
                         </StackPanel>
+
                     </Button.Content>
                 </Button>
-                <Button Margin="5,5,5,10" Padding="0" Background="Transparent" Click="OnBuyDevCard"
+                <Button Margin="5" Padding="5" Background="Transparent"
+                    BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                    CornerRadius="5"
                     IsEnabled="{x:Bind EnabledEntitlementPurchase('DevCard', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
                     ToolTipService.ToolTip="Buy Dev Card" ToolTipService.Placement="Left">
                     <Button.Content>
-                        <Viewbox Margin="0">
-                            <StackPanel Width="50">
-                                <Rectangle Width="35" Height="50" Margin="0,0,0,0" RadiusX="5"
-                                    RadiusY="5"
-                                    Fill="{StaticResource DevCardType.Back}" />
-                                <TextBlock Margin="0,2,0,0" Text="Dev Card" Style="{StaticResource ButtonTextStyle}" />
-                            </StackPanel>
-                        </Viewbox>
+                        <StackPanel  Width="50" Height="65">
+                            <Rectangle Width="35" Height="50" Margin="0" RadiusX="5" RadiusY="5" Fill="{StaticResource DevCardType.Back}" />
+                            <TextBlock HorizontalAlignment="Center" Text="Dev Card" Style="{StaticResource ButtonTextStyle}" Margin="0, 1, 0,0" FontSize="12"/>
+                        </StackPanel>
+
                     </Button.Content>
                 </Button>
-                <Button Margin="5,0,5,0" Padding="0" VerticalAlignment="Center"
-                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                    Click="OnTrade" ToolTipService.ToolTip="Trade" Background="Transparent">
+                <!--<Button Margin="5" Padding="5" HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center" Background="Transparent"
+                    BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                    CornerRadius="5" Click="OnTrade" ToolTipService.ToolTip="Trade">
                     <Button.Content>
-                        <StackPanel Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
-                            <TextBlock Grid.Column="0" Margin="0,0,0,0" HorizontalAlignment="Center"
+                        <StackPanel Width="50" Height="65">
+                            <TextBlock Grid.Column="0" Margin="0,-5,0,0" HorizontalAlignment="Center"
                                 VerticalAlignment="Top" Text="⇄" FontFamily="Segoe UI Symbol" FontSize="38"
-                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}">
-                                <TextBlock.RenderTransform>
-                                    <CompositeTransform TranslateY="-5" />
-                                </TextBlock.RenderTransform>
+                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}">                                
                             </TextBlock>
-                            <TextBlock HorizontalAlignment="Center" Text="Trade" Style="{StaticResource ButtonTextStyle}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+                            <TextBlock HorizontalAlignment="Center" Text="Trade" Style="{StaticResource ButtonTextStyle}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}"  />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>-->
+                <Button Margin="5" Padding="5" Background="Transparent"
+                    BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+                    CornerRadius="5" Click="OnTrade" ToolTipService.ToolTip="Trade">
+                    <Button.Content>
+                        <StackPanel Width="50" Height="65">
+                            <Viewbox Height="40" Margin="0,5, 0, 0">
+                            <local:Harbor SmallHarbor="True" HarborType="None" RenderTransformOrigin=".5 .5" HorizontalAlignment="Center" >
+                                <local:Harbor.RenderTransform>
+                                    <CompositeTransform Rotation="90" />
+                                </local:Harbor.RenderTransform>
+                            </local:Harbor>
+                            </Viewbox>
+                             <TextBlock Margin="0,5,0,0" HorizontalAlignment="Center" Text="Trade"
+                                Style="{StaticResource ButtonTextStyle}"
+                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
                         </StackPanel>
                     </Button.Content>
                 </Button>
