@@ -131,6 +131,9 @@
     <Compile Include="ContentDialogs\TakeCardDlg.xaml.cs">
       <DependentUpon>TakeCardDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ContentDialogs\TradeDlg.xaml.cs">
+      <DependentUpon>TradeDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Definitions\enums.cs" />
     <Compile Include="Definitions\interfaces.cs" />
     <Compile Include="Definitions\oldDefinitions.cs" />
@@ -415,6 +418,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ContentDialogs\TakeCardDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentDialogs\TradeDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

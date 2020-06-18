@@ -43,18 +43,12 @@ namespace Catan10
                     PointerPoint ptrPt = e.GetCurrentPoint(this);
                     if (ptrPt.Properties.IsRightButtonPressed)
                     {
-                        MainPage.Current.TheHuman = Player;
-                        MainPage.Current.CurrentPlayer = Player;
-                        return;
+                        PlayerModel player = ((Ellipse)sender).Tag as PlayerModel;
+                        TradeDlg dlg = new TradeDlg(MainPage.Current.CurrentPlayer, player);
+                        await dlg.ShowAsync();
                     }
                 }
 
-                PlayerModel player = ((Ellipse)sender).Tag as PlayerModel;
-
-                if (await StaticHelpers.AskUserYesNoQuestion($"Let {player.PlayerName} go first?", "Yes", "No"))
-                {
-                    //  await MainPage.Current.SetFirst(player); //manipulates the shared PlayingPlayers list, but also does logging and other book keeping.
-                }
             }
             finally
             {

@@ -1,0 +1,194 @@
+﻿<ContentDialog x:Class="Catan10.TradeDlg"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Catan Trade" RequestedTheme="Dark" PrimaryButtonText="Commit"
+    SecondaryButtonText="Cancel"
+               Width="695" Height="785"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick" mc:Ignorable="d">
+
+    <ContentDialog.Resources>
+        
+    </ContentDialog.Resources>
+    <Grid  CornerRadius="10" Background="Black" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="250" />
+            <RowDefinition Height="75" />
+            <RowDefinition Height="250" />
+            <RowDefinition Height="25" />            
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="25"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="75"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="75"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="45"/>
+        </Grid.ColumnDefinitions>
+         <TextBlock Grid.Column="2" Grid.Row="1"  Margin="0" HorizontalAlignment="Center"
+                                VerticalAlignment="Center" Text="⇄" FontFamily="Segoe UI Symbol" FontSize="58"
+                                Foreground="White">
+                            </TextBlock>
+         <TextBlock Grid.Column="4" Grid.Row="3"  Margin="0" HorizontalAlignment="Center"
+                                VerticalAlignment="Center" Text="⇄" FontFamily="Segoe UI Symbol" FontSize="58"
+                                Foreground="White">
+                            </TextBlock>
+        <TextBlock Grid.Column="3" Grid.Row="2"  Margin="0,0,0,0" HorizontalAlignment="Center"
+                                VerticalAlignment="Center" Text="" FontFamily="Segoe MDL2 Assets" FontSize="48"
+                                Foreground="White">
+                            </TextBlock>
+        
+        <GridView Name="GridView_Player" Grid.Row="1" Grid.Column="1" Grid.RowSpan="3"
+            CornerRadius="5"
+            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Blue}"
+            BorderBrush="White" 
+            BorderThickness="2" DragOver="OnDragOver" CanReorderItems="True"
+            DragEnter="OnDrageEnter" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            DragLeave="OnDragLeave" ScrollViewer.VerticalScrollBarVisibility="Auto"
+            Drop="OnDrop" CanDragItems="True" DragItemsStarting="GridView_DragItemsStarting"
+            IsSynchronizedWithCurrentItem="False" SelectionMode="Extended" AllowDrop="True"
+            IsHitTestVisible="True"
+            ItemsSource="{x:Bind PlayerResources, Mode=OneWay}">
+            <GridView.Header>
+                <Border Height="50" Margin="5,5,0,0" Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}">
+                    <Grid>
+                        <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind TradePartner.ImageBrush, Mode=OneWay}" />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Text="{x:Bind CurrentPlayer.PlayerName, Mode=OneWay}"
+                            Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
+                            FontSize="22" FontWeight="Bold" />
+                    </Grid>
+                </Border>
+            </GridView.Header>
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:ResourceCardModel">
+                    <Viewbox>
+                        <local:ResourceCardCtrl IsHitTestVisible="True" ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
+                    </Viewbox>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="5" />
+                    <Setter Property="Width" Value="140" />
+                </Style>
+            </GridView.ItemContainerStyle>
+        </GridView>
+        <GridView Name="GridView_PlayerTrade" Grid.Row="1" Grid.Column="3" Grid.RowSpan="1" 
+            CornerRadius="5"
+            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Blue}"
+            BorderBrush="White" 
+            BorderThickness="2" DragOver="OnDragOver" CanReorderItems="True"
+            DragEnter="OnDrageEnter" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            DragLeave="OnDragLeave" ScrollViewer.VerticalScrollBarVisibility="Auto"
+            Drop="OnDrop" CanDragItems="True" DragItemsStarting="GridView_DragItemsStarting"
+            IsSynchronizedWithCurrentItem="False" SelectionMode="Extended" AllowDrop="True"
+            IsHitTestVisible="True"
+            ItemsSource="{x:Bind PlayerTradeResources, Mode=OneWay}">
+            <GridView.Header>
+                <Border Height="50" Margin="5,5,0,0" Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}">
+                    <Grid>
+                        <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind TradePartner.ImageBrush, Mode=OneWay}" />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Text="{x:Bind TradePartner.PlayerName, Mode=OneWay}"
+                            Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
+                            FontSize="22" FontWeight="Bold" />
+                    </Grid>
+                </Border>
+            </GridView.Header>
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:ResourceCardModel">
+                    <Viewbox Width="67" Height="100">
+                        <local:ResourceCardCtrl IsHitTestVisible="True"  ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
+                    </Viewbox>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="2" />
+                    <Setter Property="Padding" Value="0" />                    
+                </Style>
+            </GridView.ItemContainerStyle>
+        </GridView>
+        <GridView Name="GridView_PartnerTrade" Grid.Row="3" Grid.Column="3" Grid.RowSpan="1"
+            CornerRadius="5"
+            Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Blue}"
+            BorderBrush="White" 
+            BorderThickness="2" DragOver="OnDragOver" CanReorderItems="True"
+            DragEnter="OnDrageEnter" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            DragLeave="OnDragLeave" ScrollViewer.VerticalScrollBarVisibility="Auto"
+            Drop="OnDrop" CanDragItems="True" DragItemsStarting="GridView_DragItemsStarting"
+            IsSynchronizedWithCurrentItem="False" SelectionMode="Extended" AllowDrop="True"
+            IsHitTestVisible="True"
+            ItemsSource="{x:Bind PartnerResources, Mode=OneWay}">
+            <GridView.Header>
+                <Border Height="50" Margin="5,5,0,0" Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}">
+                    <Grid>
+                        <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind TradePartner.ImageBrush, Mode=OneWay}" />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Text="{x:Bind TradePartner.PlayerName, Mode=OneWay}"
+                            Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
+                            FontSize="22" FontWeight="Bold" />
+                    </Grid>
+                </Border>
+            </GridView.Header>
+              <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:ResourceCardModel">
+                    <Viewbox Width="67" Height="100">
+                        <local:ResourceCardCtrl IsHitTestVisible="True"  ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
+                    </Viewbox>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="2" />
+                    <Setter Property="Padding" Value="0" />                    
+                </Style>
+            </GridView.ItemContainerStyle>
+        </GridView>
+        <GridView Name="GridView_PartnerResources" Grid.Row="1" Grid.ColumnSpan="1" Grid.Column="5" Grid.RowSpan="3"
+            HorizontalAlignment="Stretch" CornerRadius="10" IsHitTestVisible="True"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}"
+            DragOver="OnDragOver" CanReorderItems="True" DragEnter="OnDrageEnter"
+            DragLeave="OnDragLeave" Drop="OnDrop" CanDragItems="True"
+            DragItemsStarting="GridView_DragItemsStarting"
+            IsSynchronizedWithCurrentItem="False" SelectionMode="Extended" AllowDrop="True"
+            BorderBrush="Red"
+            BorderThickness="2"
+            ItemsSource="{x:Bind PartnerTradeResources, Mode=OneWay}">
+            <GridView.Header>
+                <Border Height="50" Margin="5,0,0,0" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
+                    <Grid>
+                        <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind CurrentPlayer.ImageBrush, Mode=OneWay}" />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Text="{x:Bind TradePartner.PlayerName, Mode=OneWay}"
+                            Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
+                            FontSize="22" FontWeight="Bold" />
+                    </Grid>
+                </Border>
+            </GridView.Header>
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:ResourceCardModel">
+                    <Viewbox>
+                        <local:ResourceCardCtrl ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
+                    </Viewbox>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="5" />
+                    <Setter Property="Width" Value="140" />
+                </Style>
+            </GridView.ItemContainerStyle>
+        </GridView>        
+    </Grid>
+</ContentDialog>
