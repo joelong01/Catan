@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Catan10.TradeResourcesCtrl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="205" d:DesignWidth="220" mc:Ignorable="d">
+    <RelativePanel Grid.Row="1" Width="220" Height="205" VerticalAlignment="Top">
+        <local:ResourceCardSlimCtrl x:Name="Brick" Width="70" Height="100" Margin="0,0,0,0"
+            OnResourceChanged="ResourceChanged"
+            Count="{x:Bind TradeResources.Brick, Mode=TwoWay}"
+            ShowButtons="True" ResourceType="Brick" />
+        <local:ResourceCardSlimCtrl x:Name="Wood" Width="70" Height="100" Margin="5,0,0,0"
+            OnResourceChanged="ResourceChanged"
+            Count="{x:Bind TradeResources.Wood, Mode=TwoWay}"
+            ShowButtons="True" ResourceType="Wood" RelativePanel.RightOf="Brick" />
+        <local:ResourceCardSlimCtrl x:Name="Sheep" Width="70" Height="100" Margin="5,0,0,0"
+            OnResourceChanged="ResourceChanged"
+            Count="{x:Bind TradeResources.Sheep, Mode=TwoWay}"
+            ShowButtons="True" ResourceType="Sheep" RelativePanel.RightOf="Wood" />
+        <local:ResourceCardSlimCtrl x:Name="Wheat" Width="70" Height="100" Margin="37,5,0,0"
+            OnResourceChanged="ResourceChanged"
+            Count="{x:Bind TradeResources.Wheat, Mode=TwoWay}"
+            ShowButtons="True" ResourceType="Wheat" RelativePanel.Below="Brick" />
+        <local:ResourceCardSlimCtrl x:Name="Ore" Width="70" Height="100" Margin="5,5,0,0"
+            OnResourceChanged="ResourceChanged"
+            Count="{x:Bind TradeResources.Ore, Mode=TwoWay}"
+            ShowButtons="True" ResourceType="Ore" RelativePanel.RightOf="Wheat"
+            RelativePanel.Below="Wood" />
+    </RelativePanel>
+</UserControl>

@@ -66,7 +66,7 @@ namespace Catan10
                 }
 
                 var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
-                picked.Add(ResourceType.GoldMine, -goldCards);
+                picked.AddResource(ResourceType.GoldMine, -goldCards);
                 await TradeGold.PostTradeMessage(gameController, picked);
             }
         }

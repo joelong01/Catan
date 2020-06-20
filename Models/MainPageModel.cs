@@ -109,6 +109,7 @@ namespace Catan10
         [JsonIgnore]
         public PlayerModel Bank { get; private set; }
 
+        
         [JsonIgnore]
         public ICatanService CatanService { get; set; }
 
@@ -365,25 +366,7 @@ namespace Catan10
         }
 
         
-        private bool GrantableResources(ResourceType resType)
-        {
-            switch (resType)
-            {
-                case ResourceType.Sheep:
-                case ResourceType.Wood:
-                case ResourceType.Ore:
-                case ResourceType.Wheat:
-                case ResourceType.Brick:
-                case ResourceType.GoldMine:
-                    return true;
-                case ResourceType.Desert:
-                case ResourceType.Back:
-                case ResourceType.None:
-                case ResourceType.Sea:
-                default:
-                    return false;
-            }
-        }
+        
 
         [JsonIgnore]
         public TradeResources ResourcesLeftInBank
@@ -394,12 +377,12 @@ namespace Catan10
 
                 foreach (ResourceType resType in Enum.GetValues(typeof(ResourceType)))
                 {
-                    if (!GrantableResources(resType)) continue;
+                    if (!TradeResources.GrantableResources(resType)) continue;
 
                     int total = 0;
                     PlayingPlayers.ForEach((p) => total += p.GameData.Resources.Current.CountForResource(resType));
                     total = MainPage.Current.GameContainer.CurrentGame.GameData.MaxResourceAllocated - total;
-                    tr.Add(resType, total);
+                    tr.AddResource(resType, total);
                 }
 
                 return tr;

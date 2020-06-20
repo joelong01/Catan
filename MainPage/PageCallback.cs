@@ -71,7 +71,7 @@ namespace Catan10
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
-                        tr.Add(kvp.Value.ResourceType, 1);
+                        tr.AddResource(kvp.Value.ResourceType, 1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
                 }
@@ -82,7 +82,7 @@ namespace Catan10
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
-                        tr.Add(kvp.Value.ResourceType, -1);
+                        tr.AddResource(kvp.Value.ResourceType, -1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
                 }

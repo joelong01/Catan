@@ -74,7 +74,7 @@ namespace Catan10
                 if (BaronModel.StolenResource != ResourceType.None)
                 {
                     TradeResources tr = new TradeResources();
-                    tr.Add(BaronModel.StolenResource, 1);
+                    tr.AddResource(BaronModel.StolenResource, 1);
                     //
                     //  this needs to be face down and not show up in the Turn Resources, but it shoudl count towards Total Resource
                     targetPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);        // I Taketh
@@ -135,7 +135,7 @@ namespace Catan10
                 if (BaronModel.StolenResource != ResourceType.None)
                 {
                     TradeResources tr = new TradeResources();
-                    tr.Add(BaronModel.StolenResource, 1);
+                    tr.AddResource(BaronModel.StolenResource, 1);
                     targetPlayer.GameData.Resources.GrantResources(tr, false);                                  // I giveth back
                     gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);     // I taketh away
                 }
@@ -146,7 +146,7 @@ namespace Catan10
                 if (BaronModel.StolenResource != ResourceType.None)
                 {
                     TradeResources tr = new TradeResources();
-                    tr.Add(BaronModel.StolenResource, 1);
+                    tr.AddResource(BaronModel.StolenResource, 1);
                     targetPlayer.GameData.Resources.GrantResources(tr, false);                                  // I giveth back
                     gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);     // I taketh away
                 }

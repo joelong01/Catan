@@ -61,7 +61,7 @@ namespace Catan10
         // this lets you double tap a map and then move it around
         // the index into PlayingPlayers that is the CurrentPlayer
         public static MainPage Current { get; private set; }
-
+        public static IGameController GameController { get; private set; }
         public GameType GameType
         {
             get => _gameView.CurrentGame.GameType;
@@ -95,6 +95,7 @@ namespace Catan10
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
             this.InitializeComponent();
             Current = this;
+            GameController = this;
             this.DataContext = this;
             _raceTracking = new RoadRaceTracking(this);
         }

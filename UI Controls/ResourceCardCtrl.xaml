@@ -50,28 +50,18 @@
             <Grid.Projection>
                 <PlaneProjection x:Name="_ppFront" RotationY="90" />
             </Grid.Projection>
-            <Grid Grid.RowSpan="3" Grid.ColumnSpan="3" Width="19" Height="33"
-                HorizontalAlignment="Right" VerticalAlignment="Bottom" CornerRadius="5"
-                Background="Black"
-                Visibility="{x:Bind ResourceCardModel.CountVisible, Mode=OneWay}">
+
+
+            <Border Width="30" Height="30" Margin="0" Padding="0" Grid.RowSpan="3" Grid.ColumnSpan="2"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Black"
+                CornerRadius="6">
                 <Viewbox>
-                    <TextBlock Margin="2,-4,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Text="{x:Bind ResourceCardModel.Count, Mode=OneWay, FallbackValue=0, Converter={StaticResource StringToIntConverter}}"
-                        FontSize="30"
-                        Foreground="{StaticResource YellowBrush}" />
+                    <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind ResourceCardModel.Count, Mode=OneWay, FallbackValue=0, Converter={StaticResource StringToIntConverter}}" />
                 </Viewbox>
-            </Grid>
-            <Viewbox Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Margin="0,0,0,0"
-                HorizontalAlignment="Left" VerticalAlignment="Top">
-                <TextBox x:Name="_txtCount" Margin="0,0,0,0" HorizontalAlignment="Left"
-                    VerticalAlignment="Center" VerticalContentAlignment="Center"
-                    Visibility="Collapsed" Foreground="Yellow" GotFocus="Text_GotFocus"
-                    RequestedTheme="Dark" TextAlignment="Center" CharacterSpacing="0" FontSize="40"
-                    IsReadOnly="{x:Bind ResourceCardModel.ReadOnly, Mode=OneWay}"
-                    Text="{x:Bind ResourceCardModel.Count, Mode=TwoWay}"
-                    BorderBrush="{StaticResource TransparentBrush}"
-                    Background="{StaticResource BlackBrush}" />
-            </Viewbox>
+            </Border>
+
+
+
             <Ellipse x:Name="HarborEllipse" Grid.ColumnSpan="2" Width="30" Height="30"
                 HorizontalAlignment="Center" VerticalAlignment="Top"
                 Fill="{x:Bind ResourceCardModel.HarborBrush, Mode=OneWay}"

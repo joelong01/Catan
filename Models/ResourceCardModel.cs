@@ -21,10 +21,11 @@ namespace Catan10
     /// </summary>
     public class ResourceCardCollection : ObservableCollection<ResourceCardModel>
     {
-        
-        public int ResourceCount 
+
+        public int ResourceCount
         {
-            get {
+            get
+            {
                 int total = 0;
                 foreach (var model in this)
                 {
@@ -54,7 +55,7 @@ namespace Catan10
             ResourceCardCollection flat = new ResourceCardCollection(false);
             foreach (var model in this)
             {
-                for (int i=0; i<model.Count; i++)
+                for (int i = 0; i < model.Count; i++)
                 {
                     flat.Add(new ResourceCardModel() { Count = 1, ResourceType = model.ResourceType });
                 }
@@ -66,12 +67,12 @@ namespace Catan10
             ResourceCardCollection flat = new ResourceCardCollection(false);
             flat.Clear();
             foreach (var resType in tradeResources.NonZeroResources)
-            {              
+            {
                 for (int i = 0; i < tradeResources.CountForResource(resType); i++)
                 {
                     flat.Add(new ResourceCardModel() { Count = 1, ResourceType = resType });
                 }
-                 
+
             }
             return flat;
         }
@@ -81,7 +82,7 @@ namespace Catan10
             TradeResources tr = new TradeResources();
             foreach (var card in resourceCards)
             {
-                tr.Add(card.ResourceType, card.Count);
+                tr.AddResource(card.ResourceType, card.Count);
             }
             return tr;
         }
@@ -130,7 +131,7 @@ namespace Catan10
                 if (model.ResourceType == resourceType) return model;
             }
 
-            this.TraceMessage($"Needed to add ResourceType={resourceType} to ResourceCollection");
+           // this.TraceMessage($"Needed to add ResourceType={resourceType} to ResourceCollection");
             var m = new ResourceCardModel() { ResourceType = resourceType, Count = 0 };
             this.Add(m);
             return m;
@@ -145,6 +146,37 @@ namespace Catan10
             }
         }
 
+        public static ResourceCardCollection FromTradeResources(TradeResources tr)
+        {
+            ResourceCardCollection rc = new ResourceCardCollection();
+            rc.AddResources(tr);
+            return rc;
+        }
+
+        public ObservableCollection<ResourceCardModel> ToObservableCollection(bool flat)
+        {
+            ResourceCardCollection resourceCards;
+            if (flat)
+            {
+                resourceCards = Flatten();
+            }
+            else
+            {
+                resourceCards = Consolidate();
+            }
+
+            var col = new ObservableCollection<ResourceCardModel>();
+            col.AddRange(this);
+            return col;
+        }
+
+        public   ResourceCardCollection Consolidate()
+        {
+
+            TradeResources tr = ToTradeResources(this);
+            return FromTradeResources(tr);
+        }
+
         public void AllDown()
         {
             this.ForEach((model) => model.Orientation = TileOrientation.FaceDown);
@@ -152,7 +184,7 @@ namespace Catan10
 
         internal void RemoveGold()
         {
-            for (int i = this.Count -1; i >= 0;  i--)
+            for (int i = this.Count - 1; i >= 0; i--)
             {
                 if (this[i].ResourceType == ResourceType.GoldMine)
                 {
@@ -168,7 +200,7 @@ namespace Catan10
             this.ForEach((model) => model.Orientation = TileOrientation.FaceUp);
         }
 
-       
+
 
         public void Reset()
         {
@@ -180,10 +212,10 @@ namespace Catan10
             this.Add(ResourceType.Ore);
 
 
-          
+
         }
 
-    
+
 
         /// <summary>
         ///     this should only be called on a flattened ResourceCollection - otherwise you are ranomized types, not cards
@@ -192,7 +224,7 @@ namespace Catan10
         {
             Contract.Assert(this.IsFlat);
             Random rand = new Random((int)DateTime.Now.Ticks);
-            for (int i = 0; i< this.Count; i++)
+            for (int i = 0; i < this.Count; i++)
             {
                 int index = rand.Next(this.Count);
                 this.Swap(i, index);

@@ -1,115 +1,142 @@
-﻿<ContentDialog x:Class="Catan10.TradeDlg"
+﻿<UserControl x:Class="Catan10.PlayerTradeCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Background="Transparent"
-    Style="{StaticResource CatanContentDialog}"
-    mc:Ignorable="d">
+    d:DesignWidth="675" d:DesignHeight="750" mc:Ignorable="d">
 
-    <ContentDialog.Resources />
-    <Viewbox Height="600" >
+    <Viewbox Width="835" Height="560">
         <Grid Background="Black" BorderBrush="Gold" BorderThickness="2" CornerRadius="10">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
-                <RowDefinition Height="175" />
-                <RowDefinition Height="125" />
-                <RowDefinition Height="20" />
-                <RowDefinition Height="175" />
-                <RowDefinition Height="125" />
-                <RowDefinition Height="50" />
+                <RowDefinition Height="60" />
+                <RowDefinition Height="150" />
+                <RowDefinition Height="150" />
+                <RowDefinition Height="100" />
+                <RowDefinition Height="80" />
                 <RowDefinition Height="20" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="25" />
+                <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="75" />
                 <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="75" />
                 <ColumnDefinition Width="150" />
-                <ColumnDefinition Width="25" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="5" />
             </Grid.ColumnDefinitions>
-            <!--  Dialog Title  -->
-            <TextBlock Grid.ColumnSpan="7" HorizontalAlignment="Center" Text="Catan Trade" FontSize="22" />
+            <!--  Players  -->
+            <GridView Grid.Row="0" Grid.ColumnSpan="9" HorizontalAlignment="Center"
+                Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                ItemsSource="{x:Bind ExceptMe(PlayingPlayers), Mode=OneWay}"
+                SelectionMode="None">
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="local:PlayerModel">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="50" Height="50" Margin="10,1,1,0" HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Fill="{x:Bind ImageBrush, Mode=OneWay}"
+                                PointerPressed="OnPlayerPressed"
+                                Tag="{x:Bind PlayerDataInstance, Mode=OneWay}" />
+
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
             <!--  Card direction hint  -->
             <TextBlock Grid.Row="1" Grid.Column="2" Margin="0" HorizontalAlignment="Center"
                 VerticalAlignment="Center" Text="⇄" FontFamily="Segoe UI Symbol" FontSize="58"
                 Foreground="White" />
             <!--  Card direction hint  -->
-            <TextBlock Grid.Row="3" Grid.Column="4" Margin="0" HorizontalAlignment="Center"
+            <TextBlock Grid.Row="1" Grid.Column="6" Margin="0" HorizontalAlignment="Center"
                 VerticalAlignment="Center" Text="⇄" FontFamily="Segoe UI Symbol" FontSize="58"
                 Foreground="White" />
 
             <!--  Player approval  -->
-            <StackPanel Grid.Row="2" Grid.Column="3" Margin="0,5,0,0" HorizontalAlignment="Center"
-                VerticalAlignment="Top" BorderBrush="White" BorderThickness="1"
-                CornerRadius="10">
+            <StackPanel Grid.Row="3" Grid.Column="3" Margin="0,5,0,0" HorizontalAlignment="Center"
+                VerticalAlignment="Stretch"
+                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                BorderThickness="1" CornerRadius="10">
                 <StackPanel Margin="5" Orientation="Horizontal">
                     <Ellipse Width="30" Height="30" Margin="0" HorizontalAlignment="Left"
                         VerticalAlignment="Top"
-                        Fill="{x:Bind TradePartner.ImageBrush, Mode=OneWay}" />
-                    <TextBlock Margin="10,0,0,0" Text="Approval" FontSize="18" />
+                        Fill="{x:Bind CurrentPlayer.ImageBrush, Mode=OneWay}" />
+                    <TextBlock Margin="10,0,0,0" Text="Approval" FontSize="18" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
                 </StackPanel>
+
                 <ToggleSwitch Grid.Row="2" Grid.Column="3" Margin="35,0,0,0" HorizontalAlignment="Center"
                     VerticalAlignment="Center">
                     <ToggleSwitch.OnContent>
                         <TextBlock Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" HorizontalAlignment="Center"
-                            VerticalAlignment="Center" Text="&#xE19F;"
-                            FontFamily="Segoe UI Symbol" FontSize="22" />
+                            VerticalAlignment="Center"
+                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                            Text="&#xE19F;" FontFamily="Segoe UI Symbol" FontSize="22" />
                     </ToggleSwitch.OnContent>
                     <ToggleSwitch.OffContent>
                         <TextBlock Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" HorizontalAlignment="Center"
-                            VerticalAlignment="Center" Text="&#xE19E;"
-                            FontFamily="Segoe UI Symbol" FontSize="22" />
+                            VerticalAlignment="Center"
+                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                            Text="&#xE19E;" FontFamily="Segoe UI Symbol" FontSize="22" />
                     </ToggleSwitch.OffContent>
                 </ToggleSwitch>
             </StackPanel>
 
             <!--  Partner approval  -->
-            <StackPanel Grid.Row="5" Grid.Column="3" Margin="0,5,0,0" HorizontalAlignment="Center"
-                VerticalAlignment="Bottom" BorderBrush="White" BorderThickness="1"
-                CornerRadius="10">
+            <StackPanel Grid.Row="3" Grid.Column="5" Margin="0,5,0,0" HorizontalAlignment="Center"
+                VerticalAlignment="Stretch"
+                Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}"
+                BorderBrush="White" BorderThickness="1" CornerRadius="10">
                 <StackPanel Margin="5" Orientation="Horizontal">
                     <Ellipse Width="30" Height="30" Margin="0" HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         Fill="{x:Bind TradePartner.ImageBrush, Mode=OneWay}" />
-                    <TextBlock Margin="10,0,0,0" Text="Approval" FontSize="18" />
+                    <TextBlock Margin="10,0,0,0" Text="Approval" FontSize="18" Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}" />
                 </StackPanel>
                 <ToggleSwitch Grid.Row="2" Grid.Column="3" Margin="35,0,0,0" HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+                    VerticalAlignment="Center" Foreground="Blue" IsHitTestVisible="False">
                     <ToggleSwitch.OnContent>
                         <TextBlock Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" HorizontalAlignment="Center"
                             VerticalAlignment="Center" Text="&#xE19F;"
+                            Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
                             FontFamily="Segoe UI Symbol" FontSize="22" />
                     </ToggleSwitch.OnContent>
                     <ToggleSwitch.OffContent>
                         <TextBlock Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" HorizontalAlignment="Center"
                             VerticalAlignment="Center" Text="&#xE19E;"
+                            Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
                             FontFamily="Segoe UI Symbol" FontSize="22" />
                     </ToggleSwitch.OffContent>
                 </ToggleSwitch>
             </StackPanel>
 
             <!--  Ok/Cancel buttons  -->
-            <StackPanel Grid.Row="6" Grid.RowSpan="2" Grid.ColumnSpan="6" Height="50"
-                Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
-                Orientation="Horizontal" Background="Transparent">
-                <Border Margin="0,-5,0,0" BorderBrush="Wheat" BorderThickness="1" CornerRadius="5">
-                    <AppBarButton Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Icon="Accept"
-                        Label="Ok" Background="Transparent" />
-                </Border>
-                <Border Margin="10,-5,0,0" BorderBrush="Wheat" BorderThickness="1" CornerRadius="5">
-                    <AppBarButton Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Icon="Cancel"
-                        Label="Cancel" Background="Transparent" />
-                </Border>
-            </StackPanel>
-            <!--  Consolidate Card  -->
-            <Viewbox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2">
-                <ToggleSwitch HorizontalAlignment="Center" IsOn="{x:Bind CountVisible, Mode=TwoWay}" OnContent="Consolidate Cards" OffContent="Flatten" />
+            <Viewbox Grid.Row="4" Grid.RowSpan="4" Grid.Column="7" Grid.ColumnSpan="4"
+                Margin="0,15,0,0">
+                <StackPanel Grid.Row="4" Grid.Column="7" Margin="0,0,0,0" HorizontalAlignment="Right"
+                    VerticalAlignment="Center" Orientation="Horizontal" Background="Transparent">
+                    <Border Margin="0" BorderBrush="Wheat" BorderThickness="1" CornerRadius="5">
+                        <AppBarButton Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Icon="Accept"
+                            Label="Ok" Background="Transparent" />
+                    </Border>
+                    <Border Margin="10,0,10,0" BorderBrush="Wheat" BorderThickness="1" CornerRadius="5">
+                        <AppBarButton Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Icon="Cancel"
+                            Label="Cancel" Background="Transparent" />
+                    </Border>
+                </StackPanel>
             </Viewbox>
+            <Border Grid.Row="4" Grid.RowSpan="2" Grid.ColumnSpan="8" Height="5"
+                Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                Background="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, TargetNullValue=white, FallbackValue=White}" />
+            <!--  Consolidate Card  -->
+            <!--<Viewbox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2">
+                <ToggleSwitch HorizontalAlignment="Center"
+                              IsOn="{x:Bind CountVisible, Mode=TwoWay}" OnContent="Consolidate Cards" OffContent="Flatten" />
+            </Viewbox>-->
             <!--  Player Cards  -->
-            <GridView Name="GridView_Player" Grid.Row="1" Grid.RowSpan="5" Grid.Column="1"
+            <GridView Name="GridView_Player" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"
                 CornerRadius="5"
                 Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Blue}"
                 BorderBrush="White" BorderThickness="2" DragOver="OnDragOver"
@@ -119,22 +146,22 @@
                 CanDragItems="True" DragItemsStarting="GridView_DragItemsStarting"
                 IsSynchronizedWithCurrentItem="False" SelectionMode="Extended" AllowDrop="True"
                 IsHitTestVisible="True"
-                ItemsSource="{x:Bind PlayerResources, Mode=OneWay}">
+                ItemsSource="{x:Bind PlayerResources, Mode=TwoWay}">
                 <GridView.Header>
-                    <Border Height="50" Margin="5,5,0,0" Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}">
+                    <Border Height="50" Margin="5,5,0,0" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
                         <Grid>
-                            <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind TradePartner.ImageBrush, Mode=OneWay}" />
+                            <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind CurrentPlayer.ImageBrush, Mode=OneWay}" />
                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
                                 Text="{x:Bind CurrentPlayer.PlayerName, Mode=OneWay}"
-                                Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
+                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                 FontSize="22" FontWeight="Bold" />
                         </Grid>
                     </Border>
                 </GridView.Header>
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="local:ResourceCardModel">
-                        <Viewbox>
-                            <local:ResourceCardCtrl IsHitTestVisible="True" ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
+                        <Viewbox Width="60">
+                            <local:ResourceCardCtrl HorizontalAlignment="Center" IsHitTestVisible="True" ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
                         </Viewbox>
                     </DataTemplate>
                 </GridView.ItemTemplate>
@@ -142,12 +169,12 @@
                     <Style TargetType="GridViewItem">
                         <Setter Property="Margin" Value="0" />
                         <Setter Property="Padding" Value="5" />
-                        <Setter Property="Width" Value="140" />
+
                     </Style>
                 </GridView.ItemContainerStyle>
             </GridView>
             <!--  Cards to trade  -->
-            <GridView Name="GridView_PlayerTrade" Grid.Row="1" Grid.RowSpan="1" Grid.Column="3"
+            <GridView Name="GridView_PlayerTrade" Grid.Row="1" Grid.RowSpan="2" Grid.Column="3"
                 CornerRadius="5"
                 Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Blue}"
                 BorderBrush="White" BorderThickness="2" DragOver="OnDragOver"
@@ -159,12 +186,12 @@
                 IsHitTestVisible="True"
                 ItemsSource="{x:Bind PlayerTradeResources, Mode=OneWay}">
                 <GridView.Header>
-                    <Border Height="50" Margin="5,5,0,0" Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}">
+                    <Border Height="50" Margin="5,5,0,0" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
                         <Grid>
-                            <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind TradePartner.ImageBrush, Mode=OneWay}" />
+                            <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind CurrentPlayer.ImageBrush, Mode=OneWay}" />
                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                                Text="{x:Bind TradePartner.PlayerName, Mode=OneWay}"
-                                Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
+                                Text="{x:Bind CurrentPlayer.PlayerName, Mode=OneWay}"
+                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                 FontSize="22" FontWeight="Bold" />
                         </Grid>
                     </Border>
@@ -183,15 +210,38 @@
                     </Style>
                 </GridView.ItemContainerStyle>
             </GridView>
+            <StackPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="5" Background="Blue">
+                <StackPanel Orientation="Horizontal">
+                    <Viewbox Height="80" Margin="10">
+                        <local:ResourceCardSlimCtrl Count="0" ShowButtons="True" ResourceType="Brick" />
+                    </Viewbox>
+                    <Viewbox Height="80">
+                        <local:ResourceCardSlimCtrl Count="0" ShowButtons="True" ResourceType="Sheep" />
+                    </Viewbox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Viewbox Height="80">
 
-            <!--  Cards the player is trading for -->
-            <GridView Grid.Row="4" Grid.RowSpan="1" Grid.Column="3" CornerRadius="5"  Margin="0,0,0,0"
+                        <local:ResourceCardSlimCtrl Count="0" ShowButtons="True" ResourceType="Wood" />
+                    </Viewbox>
+                    <Viewbox Height="80">
+                        <local:ResourceCardSlimCtrl Count="0" ShowButtons="True" ResourceType="Wheat" />
+                    </Viewbox>
+                </StackPanel>
+                <Viewbox Height="80">
+                    <local:ResourceCardSlimCtrl Count="0" ShowButtons="True" ResourceType="Ore" />
+                </Viewbox>
+
+            </StackPanel>
+            <!--  Cards the player is trading for  -->
+            <!--<GridView Grid.Row="1" Grid.RowSpan="2" Grid.Column="5" Margin="0,0,0,0"
+                CornerRadius="5"
                 Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Blue}"
                 BorderBrush="White" BorderThickness="2" CanReorderItems="True"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                CanDragItems="False" IsSynchronizedWithCurrentItem="False" SelectionMode="None"
-                AllowDrop="False" IsHitTestVisible="True"
+                ScrollViewer.VerticalScrollBarVisibility="Auto" CanDragItems="False"
+                IsSynchronizedWithCurrentItem="False" SelectionMode="None" AllowDrop="False"
+                IsHitTestVisible="True"
                 ItemsSource="{x:Bind PartnerTradeResources, Mode=OneWay}">
                 <GridView.Header>
                     <Border Height="50" Margin="5,5,0,0" Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}">
@@ -217,20 +267,20 @@
                         <Setter Property="Padding" Value="0" />
                     </Style>
                 </GridView.ItemContainerStyle>
-            </GridView>
+            </GridView>-->
             <!--  the Trading partner's card - need to be face down  -->
-            <GridView Grid.Row="1" Grid.RowSpan="4" Grid.Column="5" CornerRadius="5"
+            <GridView Grid.Row="1" Grid.RowSpan="3" Grid.Column="7" CornerRadius="5"
                 Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Blue}"
                 BorderBrush="White" BorderThickness="2" CanReorderItems="True"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                CanDragItems="False" IsSynchronizedWithCurrentItem="False" SelectionMode="None"
-                AllowDrop="False" IsHitTestVisible="True"
+                ScrollViewer.VerticalScrollBarVisibility="Auto" CanDragItems="False"
+                IsSynchronizedWithCurrentItem="False" SelectionMode="None" AllowDrop="False"
+                IsHitTestVisible="True"
                 ItemsSource="{x:Bind PartnerResources, Mode=OneWay}">
                 <GridView.Header>
-                    <Border Height="50" Margin="5,0,0,0" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
+                    <Border Height="50" Margin="5,0,0,0" Background="{x:Bind TradePartner.BackgroundBrush, Mode=OneWay}">
                         <Grid>
-                            <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind CurrentPlayer.ImageBrush, Mode=OneWay}" />
+                            <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind TradePartner.ImageBrush, Mode=OneWay}" />
                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
                                 Text="{x:Bind TradePartner.PlayerName, Mode=OneWay}"
                                 Foreground="{x:Bind TradePartner.ForegroundBrush, Mode=OneWay}"
@@ -247,12 +297,12 @@
                 </GridView.ItemTemplate>
                 <GridView.ItemContainerStyle>
                     <Style TargetType="GridViewItem">
-                        <Setter Property="Margin" Value="0" />
-                        <Setter Property="Padding" Value="5" />
-                        <Setter Property="Width" Value="140" />
+                        <Setter Property="Margin" Value="2" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Width" Value="67" />
                     </Style>
                 </GridView.ItemContainerStyle>
             </GridView>
         </Grid>
     </Viewbox>
-</ContentDialog>
+</UserControl>

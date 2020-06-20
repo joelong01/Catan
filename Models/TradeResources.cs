@@ -9,6 +9,10 @@ namespace Catan10
 {
     public class TradeResources : INotifyPropertyChanged
     {
+        #region Delegates + Fields + Events + Enums
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private int _brick = 0;
 
         private int _goldMine = 0;
@@ -21,66 +25,9 @@ namespace Catan10
 
         private int _wood = 0;
 
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-        }
+        #endregion Delegates + Fields + Events + Enums
 
-        [JsonIgnore]
-        public List<ResourceType> NonZeroResources
-        {
-            get
-            {
-                List<ResourceType> list = new List<ResourceType>();
-                if (Brick != 0) list.Add(ResourceType.Brick);
-                if (Wood != 0) list.Add(ResourceType.Wood);
-                if (Wheat != 0) list.Add(ResourceType.Wheat);
-                if (Sheep != 0) list.Add(ResourceType.Sheep);
-                if (Ore != 0) list.Add(ResourceType.Ore);
-                if (GoldMine != 0) list.Add(ResourceType.GoldMine);
-                return list;
-            }
-        }
-
-        internal int GetCount(ResourceType resourceType)
-        {
-            switch (resourceType)
-            {
-                case ResourceType.Sheep:
-                    return Sheep;
-
-                case ResourceType.Wood:
-                    return Wood;
-
-                case ResourceType.Ore:
-                    return Ore;
-
-                case ResourceType.Wheat:
-                    return Wheat;
-
-                case ResourceType.Brick:
-                    return Brick;
-
-                case ResourceType.GoldMine:
-                    return GoldMine;
-
-                case ResourceType.Desert:
-                    break;
-
-                case ResourceType.Back:
-                    break;
-
-                case ResourceType.None:
-                    break;
-
-                case ResourceType.Sea:
-                    break;
-
-                default:
-                    break;
-            }
-            return 0;
-        }
+        #region Properties
 
         public int Brick
         {
@@ -116,6 +63,22 @@ namespace Catan10
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Count");
                 }
+            }
+        }
+
+        [JsonIgnore]
+        public List<ResourceType> NonZeroResources
+        {
+            get
+            {
+                List<ResourceType> list = new List<ResourceType>();
+                if (Brick != 0) list.Add(ResourceType.Brick);
+                if (Wood != 0) list.Add(ResourceType.Wood);
+                if (Wheat != 0) list.Add(ResourceType.Wheat);
+                if (Sheep != 0) list.Add(ResourceType.Sheep);
+                if (Ore != 0) list.Add(ResourceType.Ore);
+                if (GoldMine != 0) list.Add(ResourceType.GoldMine);
+                return list;
             }
         }
 
@@ -187,6 +150,10 @@ namespace Catan10
             }
         }
 
+        #endregion Properties
+
+        #region Constructors + Destructors
+
         public TradeResources()
         {
         }
@@ -201,7 +168,9 @@ namespace Catan10
             GoldMine = this.GoldMine;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors + Destructors
+
+        #region Methods
 
         public static TradeResources GetEntitlementCost(Entitlement entitlement)
         {
@@ -261,6 +230,27 @@ namespace Catan10
             return cost;
         }
 
+        public static bool GrantableResources(ResourceType resType)
+        {
+            switch (resType)
+            {
+                case ResourceType.Sheep:
+                case ResourceType.Wood:
+                case ResourceType.Ore:
+                case ResourceType.Wheat:
+                case ResourceType.Brick:
+                case ResourceType.GoldMine:
+                    return true;
+
+                case ResourceType.Desert:
+                case ResourceType.Back:
+                case ResourceType.None:
+                case ResourceType.Sea:
+                default:
+                    return false;
+            }
+        }
+
         //
         //  useful for the Resource Tests
         public static TradeResources operator +(TradeResources a, TradeResources b)
@@ -276,7 +266,7 @@ namespace Catan10
             };
         }
 
-        public void Add(ResourceType resourceType, int toAdd)
+        public void AddResource(ResourceType resourceType, int toAdd)
         {
             switch (resourceType)
             {
@@ -387,6 +377,49 @@ namespace Catan10
             };
         }
 
+        public void SetResource(ResourceType resourceType, int value)
+        {
+            switch (resourceType)
+            {
+                case ResourceType.Sheep:
+                    Sheep = value;
+                    break;
+
+                case ResourceType.Wood:
+                    Wood = value;
+                    break;
+
+                case ResourceType.Ore:
+                    Ore = value;
+                    break;
+
+                case ResourceType.Wheat:
+                    Wheat = value;
+                    break;
+
+                case ResourceType.Brick:
+                    Brick = value;
+                    break;
+
+                case ResourceType.GoldMine:
+                    GoldMine = value;
+                    break;
+
+                case ResourceType.Desert:
+                    break;
+
+                case ResourceType.Back:
+
+                case ResourceType.None:
+
+                case ResourceType.Sea:
+
+                default:
+                    this.TraceMessage($"{resourceType} passed to SetResource");
+                    break;
+            }
+        }
+
         public List<ResourceType> ToList()
         {
             List<ResourceType> list = new List<ResourceType>();
@@ -413,9 +446,63 @@ namespace Catan10
             return list;
         }
 
+        public ResourceCardCollection ToResourceCardCollection()
+        {
+            ResourceCardCollection list = new ResourceCardCollection();
+            list.AddResources(this);
+            return list;
+        }
+
         public override string ToString()
         {
             return $"[Count={Count}][Ore={Ore}][Brick={Brick}][Wheat={Wheat}][Wood={Wood}][Sheep={Sheep}][Gold={GoldMine}]";
         }
+
+        internal int GetCount(ResourceType resourceType)
+        {
+            switch (resourceType)
+            {
+                case ResourceType.Sheep:
+                    return Sheep;
+
+                case ResourceType.Wood:
+                    return Wood;
+
+                case ResourceType.Ore:
+                    return Ore;
+
+                case ResourceType.Wheat:
+                    return Wheat;
+
+                case ResourceType.Brick:
+                    return Brick;
+
+                case ResourceType.GoldMine:
+                    return GoldMine;
+
+                case ResourceType.Desert:
+                    break;
+
+                case ResourceType.Back:
+                    break;
+
+                case ResourceType.None:
+                    break;
+
+                case ResourceType.Sea:
+                    break;
+
+                default:
+                    break;
+            }
+            return 0;
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion Methods
     }
 }

@@ -58,7 +58,7 @@ namespace Catan10
                     for (int i = 0; i < loss; i++)
                     {
                         int index = rand.Next(list.Count);
-                        lost.Add(list[index], 1);
+                        lost.AddResource(list[index], 1);
                         list.RemoveAt(index);
                     }
                 }

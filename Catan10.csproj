@@ -188,6 +188,7 @@
     <Compile Include="Logging\Actions\RollOrderLog.cs" />
     <Compile Include="Logging\StateTransitions\UpdateBuildingLog.cs" />
     <Compile Include="Logging\VerifyMessages\VerifyPlayers.cs" />
+    <Compile Include="Models\TradeModel.cs" />
     <Compile Include="Models\ResourceCardModel.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\SyncronizedRoll.cs" />
@@ -198,8 +199,8 @@
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\StateTransitions\Rolled.cs" />
     <Compile Include="Logging\StateTransitions\0_NewGame.cs" />
-    <Compile Include="Player\PlayerResources.cs" />
-    <Compile Include="Player\TradeResources.cs" />
+    <Compile Include="Models\PlayerResources.cs" />
+    <Compile Include="Models\TradeResources.cs" />
     <Compile Include="CatanService\CatanRestService.cs" />
     <Compile Include="CatanService\CatanSignalRClient.cs" />
     <Compile Include="Spy\CatanSpyPage.xaml.cs">
@@ -216,6 +217,12 @@
     </Compile>
     <Compile Include="UI Controls\DraggableGrid.xaml.cs">
       <DependentUpon>DraggableGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\OfferCtrl.xaml.cs">
+      <DependentUpon>OfferCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\PlayerTradeCtrl.xaml.cs">
+      <DependentUpon>PlayerTradeCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\PublicDataCtrl.xaml.cs">
       <DependentUpon>PublicDataCtrl.xaml</DependentUpon>
@@ -320,6 +327,12 @@
     </Compile>
     <Compile Include="UI Controls\TileCtrl.xaml.cs">
       <DependentUpon>TileCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\TradeCtrl.xaml.cs">
+      <DependentUpon>TradeCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\TradeResourcesCtrl.xaml.cs">
+      <DependentUpon>TradeResourcesCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValueConverter.cs" />
   </ItemGroup>
@@ -445,6 +458,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI Controls\OfferCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\PlayerTradeCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\PublicDataCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -566,6 +587,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\TileCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\TradeCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\TradeResourcesCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

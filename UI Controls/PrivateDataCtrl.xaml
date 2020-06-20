@@ -78,12 +78,12 @@
         </Grid>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wood}" Count="{x:Bind Player.GameData.Resources.Current.Wood, Mode=OneWay}" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Sheep}" Count="{x:Bind Player.GameData.Resources.Current.Sheep, Mode=OneWay}" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Brick}" Count="{x:Bind Player.GameData.Resources.Current.Brick, Mode=OneWay}" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wheat}" Count="{x:Bind Player.GameData.Resources.Current.Wheat, Mode=OneWay}" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Ore}" Count="{x:Bind Player.GameData.Resources.Current.Ore, Mode=OneWay}" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.GoldMine}" Count="{x:Bind Player.GameData.Resources.Current.GoldMine, Mode=OneWay}" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wood}" Count="{x:Bind Player.GameData.Resources.Current.Wood, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Sheep}" Count="{x:Bind Player.GameData.Resources.Current.Sheep, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Brick}" Count="{x:Bind Player.GameData.Resources.Current.Brick, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wheat}" Count="{x:Bind Player.GameData.Resources.Current.Wheat, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Ore}" Count="{x:Bind Player.GameData.Resources.Current.Ore, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.GoldMine}" Count="{x:Bind Player.GameData.Resources.Current.GoldMine, Mode=OneWay}" ShowButtons="False" />
             </StackPanel>
             <Rectangle Width="465" Height="4" Margin="0,5,0,5" Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
             <StackPanel Orientation="Horizontal">

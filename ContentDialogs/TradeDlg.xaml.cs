@@ -22,7 +22,7 @@ namespace Catan10
 {
     public sealed partial class TradeDlg : ContentDialog
     {
-     
+
 
         public TradeDlg(PlayerModel currentPlayer, PlayerModel tradePartner)
         {
@@ -33,6 +33,9 @@ namespace Catan10
             PlayerResources.AddRange(ResourceCardCollection.Flatten(currentPlayer.GameData.Resources.Current));
             PartnerResources.AddRange(ResourceCardCollection.Flatten(TradePartner.GameData.Resources.Current));
 
+            PlayerResources.ForEach((c) => c.Orientation = TileOrientation.FaceUp);
+            PartnerResources.ForEach((c) => c.Orientation = TileOrientation.FaceDown);
+
         }
 
         ObservableCollection<ResourceCardModel> PlayerResources { get; set; } = new ObservableCollection<ResourceCardModel>();
@@ -40,7 +43,7 @@ namespace Catan10
         ObservableCollection<ResourceCardModel> PartnerTradeResources { get; set; } = new ObservableCollection<ResourceCardModel>();
         ObservableCollection<ResourceCardModel> PlayerTradeResources { get; set; } = new ObservableCollection<ResourceCardModel>();
 
-        public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(bool), typeof(TradeDlg), new PropertyMetadata(true, CountVisibleChanged));        
+        public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(bool), typeof(TradeDlg), new PropertyMetadata(true, CountVisibleChanged));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TradeDlg), new PropertyMetadata(null));
         public static readonly DependencyProperty TradePartnerProperty = DependencyProperty.Register("TradePartner", typeof(PlayerModel), typeof(TradeDlg), new PropertyMetadata(null));
         public bool CountVisible
@@ -58,12 +61,17 @@ namespace Catan10
 
         private void SetCountVisible(bool value)
         {
-            
+            if (value)
+            {
+                PlayerResources.Clear();
+                PlayerResources.AddRange(CurrentPlayer.GameData.Resources.Current.ToResourceCardCollection());
+                PlayerResources.ForEach((c) => c.CountVisible = true);
+            }
         }
 
-       
 
-       
+
+
 
         public PlayerModel CurrentPlayer
         {
@@ -76,7 +84,7 @@ namespace Catan10
             get => (PlayerModel)GetValue(TradePartnerProperty);
             set => SetValue(TradePartnerProperty, value);
         }
-     
+
 
         private static void HowManyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -87,7 +95,7 @@ namespace Catan10
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-           
+
         }
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
@@ -112,9 +120,9 @@ namespace Catan10
             var source = PlayerResources;
             var gridView = sender as GridView;
 
-            if (gridView.Name == "GridView_PartnerResources")
+            if (gridView.Name == "GridView_PlayerTrade")
             {
-                source = PartnerResources;
+                source = PlayerTradeResources;
             }
             List<ResourceCardModel> movedCards = new List<ResourceCardModel>();
 
@@ -150,16 +158,16 @@ namespace Catan10
         {
             if (e.Data == null)
             {
-                this.TraceMessage("Drop will null data");
+                this.TraceMessage("Drop with null data");
                 return;
             }
 
-            var target = PlayerResources;
+            var target = PlayerTradeResources;
             var gridView = sender as GridView;
 
-            if (gridView.Name == "GridView_PartnerResources")
+            if (gridView.Name == "GridView_Player")
             {
-                target = PartnerResources;
+                target = PlayerResources;
             }
 
             var source = e.Data.Properties["source"];
@@ -199,14 +207,12 @@ namespace Catan10
 
                     target.Add(card);
                 }
-                //
-                //  if you pull down a card that is more than you deserve, put the first one back into the source              
             }
-           
+
             e.Handled = true;
         }
 
-      
+
 
         private int ResourceModelCollectionCount(ICollection<ResourceCardModel> list)
         {
@@ -231,6 +237,11 @@ namespace Catan10
             {
                 ((GridView)target).BorderThickness = new Thickness(thickness);
             }
+        }
+
+        private void OnApprove(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -593,11 +593,11 @@ namespace Catan10
                     {
                         if (kvp.Value.HasBaron == false)
                         {
-                            tr.Add(kvp.Value.ResourceType, building.ScoreValue);
+                            tr.AddResource(kvp.Value.ResourceType, building.ScoreValue);
                         }
                         else
                         {
-                            baron.Add(kvp.Value.ResourceType, building.ScoreValue);
+                            baron.AddResource(kvp.Value.ResourceType, building.ScoreValue);
                         }
                     }
                 }
@@ -865,7 +865,7 @@ namespace Catan10
                 TradeResources tr = new TradeResources();
                 foreach (var kvp in building.BuildingToTileDictionary)
                 {
-                    tr.Add(kvp.Value.ResourceType, -1);
+                    tr.AddResource(kvp.Value.ResourceType, -1);
                 }
                 CurrentPlayer.GameData.Resources.GrantResources(tr);
             }
@@ -896,7 +896,7 @@ namespace Catan10
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
-                        tr.Add(kvp.Value.ResourceType, 1);
+                        tr.AddResource(kvp.Value.ResourceType, 1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
                     // MainPageModel.GameResources += tr;
@@ -909,7 +909,7 @@ namespace Catan10
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
-                        tr.Add(kvp.Value.ResourceType, -1);
+                        tr.AddResource(kvp.Value.ResourceType, -1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
                     //  MainPageModel.GameResources += tr;

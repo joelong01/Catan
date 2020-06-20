@@ -360,6 +360,7 @@
                     </Viewbox>
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
+            
             <Grid Name="_savedGameGrid" Grid.Row="1" Width="383" Height="280"
                 Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                 x:Load="False" Canvas.ZIndex="10" PointerPressed="OnPointerPressed"
@@ -436,6 +437,21 @@
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
                     <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" OnShowAllRolls="OnShowAllRolls" />
+                </local:DragableGridCtrl.Child>
+            </local:DragableGridCtrl>
+            <local:DragableGridCtrl x:Name="PlayerTradeGrid" Width="775"  HorizontalAlignment="Center" 
+                VerticalAlignment="Center" Canvas.ZIndex="10"
+                PointerPressed="Draggable_PointerPressed"
+                OnGridPositionChanged="OnGridPositionChanged"
+                Background="{StaticResource bmMaple}"
+                Foreground="Black"
+                Visibility="{x:Bind MainPageModel.ShowRolls, Mode=OneWay}"
+                CornerRadius="10"
+                Player="{x:Bind TheHuman, Mode=OneWay}"
+                Caption="Resource Trades"
+                BorderBrush="{StaticResource WhiteBrush}">
+                <local:DragableGridCtrl.Child>
+                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"

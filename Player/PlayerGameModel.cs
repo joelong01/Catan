@@ -19,135 +19,48 @@ namespace Catan10
 {
     public class PlayerGameModel : INotifyPropertyChanged
     {
+        #region Delegates + Fields + Events + Enums
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public CardsLostUpdatedHandler OnCardsLost;
         private readonly bool[] _RoadTie = new bool[10];
 
         // does this instance win the ties for this count of roads?
         private int _CitiesPlayed = 0;
 
         private int _goldRolls = 0;
-
         private bool _goodRoll = false;
-
         private bool _HasLongestRoad = false;
-
         private bool _isCurrentPlayer = false;
-
         private Dictionary<Island, int> _islands = new Dictionary<Island, int>();
-
         private int _IslandsPlayed = 0;
-
         private bool _LargestArmy = false;
-
         private int _LongestRoad = 0;
-
         private int _MaxCities = 0;
-
         private int _maxNoResourceRolls = 0;
-
         private int _MaxRoads = 0;
-
         private int _MaxSettlements = 0;
-
         private int _MaxShips = 0;
-
         private bool? _MovedBaronAfterRollingSeven = null;
-
         private int _noResourceCount = 0;
-
         private int _pips = 0;
-
         private bool _PlayedKnightThisTurn = false;
-
         private PlayerModel _playerData = null;
-
         private PlayerResources _resources = new PlayerResources();
-
         private int _RoadsPlayed = 0;
-
         private TileOrientation _RollOrientation = TileOrientation.FaceDown;
-
         private int _rollsWithResource = 0;
-
         private int _score = 0;
-
         private int _SettlementsPlayed = 0;
-
         private int _ShipsPlayed = 0;
-
         private int _timesTargeted = 0;
-
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
+        Trades _trades = new Trades();
 
-        private void Cities_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            CitiesPlayed = Cities.Count;
-            UpdateScore();
-            Pips = CalculatePips(Settlements, Cities);
-        }
+        #endregion Delegates + Fields + Events + Enums
 
-        private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
-        {
-            //_playerData.Log?.PostLogEntry(_playerData, GameState.Unknown,
-            //                                                 CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
-            //                                                 new LogPropertyChanged(propertyName, oldVal, newVal));
-        }
-
-        private void LogPropertyChanged(int oldVal, int newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
-        {
-            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
-        }
-
-        private void LogPropertyChanged(bool oldVal, bool newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
-        {
-            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
-        }
-
-        private void LogPropertyChanged(bool? oldVal, bool? newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
-        {
-            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            // if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void OnGameModelResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
-        {
-            // _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
-        }
-
-        private void Roads_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RoadsPlayed = Roads.Count();
-        }
-
-        private void Settlements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            SettlementsPlayed = Settlements.Count;
-            UpdateScore();
-            Pips = CalculatePips(Settlements, Cities);
-        }
-
-        private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            ShipsPlayed = Ships.Count;
-        }
-
-        private void UpdateScore()
-        {
-            int score = CitiesPlayed * 2 + SettlementsPlayed;
-
-            score += HasLongestRoad ? 2 : 0;
-            score += LargestArmy ? 2 : 0;
-
-            IslandsPlayed = _islands.Count;
-
-            score += _islands.Count;
-
-            Score = score;
-        }
+        #region Properties
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -589,7 +502,25 @@ namespace Catan10
             }
         }
 
-        public CardsLostUpdatedHandler OnCardsLost;
+        public Trades Trades
+        {
+            get
+            {
+                return _trades;
+            }
+            set
+            {
+                if (_trades != value)
+                {
+                    _trades = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
 
         public PlayerGameModel()
         {
@@ -605,7 +536,9 @@ namespace Catan10
             PlayerModel = pData;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors + Destructors
+
+        #region Methods
 
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
         {
@@ -737,7 +670,142 @@ namespace Catan10
             Debug.Assert(roadCount >= 5 && roadCount <= 15, "bad roadcount");
             return _RoadTie[roadCount - 5];
         }
+
+        private void Cities_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            CitiesPlayed = Cities.Count;
+            UpdateScore();
+            Pips = CalculatePips(Settlements, Cities);
+        }
+
+        private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
+        {
+            //_playerData.Log?.PostLogEntry(_playerData, GameState.Unknown,
+            //                                                 CatanAction.ChangedPlayerProperty, stopUndo, LogType.Normal, -1,
+            //                                                 new LogPropertyChanged(propertyName, oldVal, newVal));
+        }
+
+        private void LogPropertyChanged(int oldVal, int newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+
+        private void LogPropertyChanged(bool oldVal, bool newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+
+        private void LogPropertyChanged(bool? oldVal, bool? newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")
+        {
+            LogPropertyChanged(oldVal.ToString(), newVal.ToString(), stopUndo, propertyName);
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            // if (!NotificationsEnabled) return; // this allows us to stop UI interactions during AddPlayer
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void OnGameModelResourceUpdate(PlayerModel player, ResourceType resource, int oldVal, int newVal)
+        {
+            // _playerData.Log.PostLogEntry(player, GameState.Unknown, CatanAction.AddResourceCount, false, LogType.Normal, newVal - oldVal, new LogResourceCount(oldVal, newVal, resource));
+        }
+
+        private void Roads_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RoadsPlayed = Roads.Count();
+        }
+
+        private void Settlements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            SettlementsPlayed = Settlements.Count;
+            UpdateScore();
+            Pips = CalculatePips(Settlements, Cities);
+        }
+
+        private void Ships_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ShipsPlayed = Ships.Count;
+        }
+
+        private void UpdateScore()
+        {
+            int score = CitiesPlayed * 2 + SettlementsPlayed;
+
+            score += HasLongestRoad ? 2 : 0;
+            score += LargestArmy ? 2 : 0;
+
+            IslandsPlayed = _islands.Count;
+
+            score += _islands.Count;
+
+            Score = score;
+        }
+
+        #endregion Methods
     }
 
-  
+    public class Trades : INotifyPropertyChanged
+    {
+        #region Delegates + Fields + Events + Enums
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        ObservableCollection<TradeOffer> _potentialTrades = new ObservableCollection<TradeOffer>();
+
+        TradeOffer _tradeRequest = new TradeOffer();
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public ObservableCollection<TradeOffer> PotentialTrades
+        {
+            get
+            {
+                return _potentialTrades;
+            }
+            set
+            {
+                if (_potentialTrades != value)
+                {
+                    _potentialTrades = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public TradeOffer TradeRequest
+        {
+            get
+            {
+                return _tradeRequest;
+            }
+            set
+            {
+                if (_tradeRequest != value)
+                {
+                    _tradeRequest = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        #endregion Properties
+
+        #region Methods
+
+        public void OfferAccepted()
+        {
+            TradeRequest.OwnerApproved = false;
+            PotentialTrades.ForEach((o) => o.OwnerApproved = false);
+        }
+    
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {            
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion Methods
+    }
 }

@@ -352,7 +352,8 @@ namespace Catan10
             }
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
-            if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
+            this.TraceMessage("removed MovedBaronAfterRollingSeven");
+            if (playerGameData.PlayedKnightThisTurn) // not eligible to move baron
             {
                 return;
             }

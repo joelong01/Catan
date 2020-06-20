@@ -93,14 +93,14 @@ namespace Catan10
 
                     int count = player.GameData.Resources.Current.CountForResource(pickedResourceType);
                     TradeResources lost = new TradeResources();
-                    lost.Add(pickedResourceType, -count);
+                    lost.AddResource(pickedResourceType, -count);
                     player.GameData.Resources.GrantResources(lost);
                     player.GameData.Resources.ResourcesLostToMonopoly += lost;
                     player.GameData.Resources.StolenResource = pickedResourceType;
                     total += count;
                 }
                 TradeResources gained = new TradeResources();                
-                gained.Add(pickedResourceType, total);
+                gained.AddResource(pickedResourceType, total);
                 sentBy.GameData.Resources.GrantResources(gained);
             }
             else

@@ -119,12 +119,47 @@ namespace Catan10
         }
 
         // int toggle = 0;
-        private async void OnTest1(object sdr, RoutedEventArgs rea)
+        private  void OnTest1(object sdr, RoutedEventArgs rea)
         {
             // await TestYearOfPlenty();
-            await TradeGoldTest();
-            await TestTargetPlayer();
-            await LoseHalfYourCards();
+            // await TradeGoldTest();
+            // await TestTargetPlayer();
+            // await LoseHalfYourCards();
+
+            TestTrade();
+        }
+
+        private void TestTrade()
+        {
+
+            TradeResources tr = new TradeResources()
+            {
+                Sheep = 3,
+                Wheat = 3,
+                Ore = 3,
+                Brick = 3,
+                Wood = 3
+            };
+
+
+            MainPageModel.PlayingPlayers.ForEach((p) => p.Reset());
+            MainPageModel.PlayingPlayers.Clear();
+
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[0]);
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
+
+            var player1 = MainPageModel.AllPlayers[1];
+            var player2 = MainPageModel.AllPlayers[0];
+
+            player1.GameData.Resources.GrantResources(tr);
+            player2.GameData.Resources.GrantResources(tr);
+
+            CurrentPlayer = MainPageModel.AllPlayers[2];
+            MyPlayerTraderCtrl.TradePartner = player2;
+            
+
+
         }
 
         private async void OnTest2(object sdr, RoutedEventArgs rea)
