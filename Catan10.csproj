@@ -221,9 +221,6 @@
     <Compile Include="UI Controls\OfferCtrl.xaml.cs">
       <DependentUpon>OfferCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\PlayerTradeCtrl.xaml.cs">
-      <DependentUpon>PlayerTradeCtrl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI Controls\PublicDataCtrl.xaml.cs">
       <DependentUpon>PublicDataCtrl.xaml</DependentUpon>
     </Compile>
@@ -459,10 +456,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\OfferCtrl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI Controls\PlayerTradeCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -149,15 +149,63 @@ namespace Catan10
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
 
+            string json = MainPageModel.PlayingPlayers[0].GameData.Trades.TradeRequest.Serialize();
+            var offer = TradeOffer.Deserialze(json);
+
             var player1 = MainPageModel.AllPlayers[1];
             var player2 = MainPageModel.AllPlayers[0];
 
             player1.GameData.Resources.GrantResources(tr);
             player2.GameData.Resources.GrantResources(tr);
 
-            CurrentPlayer = MainPageModel.AllPlayers[2];
-            MyPlayerTraderCtrl.TradePartner = player2;
-            
+            CurrentPlayer = MainPageModel.PlayingPlayers[2];
+            CurrentPlayer.GameData.Trades.TradeRequest.TradePartners = MainPageModel.PlayingPlayers;
+            TheHuman = CurrentPlayer;
+            CurrentPlayer.GameData.Trades.TradeRequest.Owner = TheHuman;
+            //foreach (var player in MainPageModel.PlayingPlayers)
+            //{
+            //    if (player == CurrentPlayer) continue;
+
+            //    CurrentPlayer.GameData.Trades.PotentialTrades.Add(new TradeOffer()
+            //    {
+            //        Desire = new TradeResources()
+            //        {
+            //            Wood = 1
+            //        },
+            //        Offer = new TradeResources()
+            //        {
+            //            Brick = 1
+            //        },
+            //        Owner = CurrentPlayer,
+            //        TradePartner = player,
+            //        OwnerApproved = true,
+            //        PartnerApproved = false,
+
+            //    });
+            //}
+
+            //
+            //  joe offer dodgy 2 brick for 1 wheat
+            CurrentPlayer.GameData.Trades.PotentialTrades.Add(new TradeOffer()
+            {
+                Desire = new TradeResources()
+                {
+                    Wheat = 1
+                },
+                Offer = new TradeResources()
+                {
+                    Brick = 2
+                },
+                Owner = MainPageModel.PlayingPlayers[0],
+                TradePartner = CurrentPlayer,
+                TradePartners = new ObservableCollection<PlayerModel>()
+                {
+                    CurrentPlayer
+                },
+                OwnerApproved = true,
+                PartnerApproved = false,
+
+            });
 
 
         }

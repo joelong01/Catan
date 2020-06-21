@@ -1,99 +1,125 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+﻿using System.Collections.ObjectModel;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Catan10
 {
+    public delegate void SendOfferHandler(TradeOffer offer);
+
     public sealed partial class OfferCtrl : UserControl
     {
+        #region Delegates + Fields + Events + Enums
+
         public OfferCtrl()
         {
             this.InitializeComponent();
-            MyOffer = new TradeResources();
-            MyDesire = new TradeResources();
-            PartnerDesire = new TradeResources();
-            PartnerOffer = new TradeResources();
         }
 
-        
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(OfferCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
-        public static readonly DependencyProperty TradePartnerProperty = DependencyProperty.Register("TradePartner", typeof(PlayerModel), typeof(OfferCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty MyOfferProperty = DependencyProperty.Register("MyOffer", typeof(TradeResources), typeof(OfferCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty MyDesireProperty = DependencyProperty.Register("MyDesire", typeof(TradeResources), typeof(OfferCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty PartnerOfferProperty = DependencyProperty.Register("PartnerOffer", typeof(TradeResources), typeof(OfferCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty PartnerDesireProperty = DependencyProperty.Register("PartnerDesire", typeof(TradeResources), typeof(OfferCtrl), new PropertyMetadata(null));
+        public SendOfferHandler OnSendOffer;
+
         public static readonly DependencyProperty ShowDeleteButtonProperty = DependencyProperty.Register("ShowDeleteButton", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(true));
+        public static readonly DependencyProperty ShowPartnerApprovalProperty = DependencyProperty.Register("ShowPartnerApproval", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(true));
+        public static readonly DependencyProperty TradeOfferProperty = DependencyProperty.Register("TradeOffer", typeof(TradeOffer), typeof(OfferCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty ShowSendButtonProperty = DependencyProperty.Register("ShowSendButton", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(true));
+        public static readonly DependencyProperty ShowResourceButtonsProperty = DependencyProperty.Register("ShowResourceButtons", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(true));
+        public static readonly DependencyProperty ShowAllButtonProperty = DependencyProperty.Register("ShowAllButton", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(true));
+        public static readonly DependencyProperty TradePartnersProperty = DependencyProperty.Register("TradePartners", typeof(ObservableCollection<PlayerModel>), typeof(OfferCtrl), new PropertyMetadata(null));
+
+        public ObservableCollection<PlayerModel> TradePartners
+        {
+            get => (ObservableCollection<PlayerModel>)GetValue(TradePartnersProperty);
+            set => SetValue(TradePartnersProperty, value);
+        }
+
+        public bool ShowAllButton
+        {
+            get => (bool)GetValue(ShowAllButtonProperty);
+            set => SetValue(ShowAllButtonProperty, value);
+        }
+
+        public bool ShowResourceButtons
+        {
+            get => (bool)GetValue(ShowResourceButtonsProperty);
+            set => SetValue(ShowResourceButtonsProperty, value);
+        }
+
+        public bool ShowSendButton
+        {
+            get => (bool)GetValue(ShowSendButtonProperty);
+            set => SetValue(ShowSendButtonProperty, value);
+        }
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
         public bool ShowDeleteButton
         {
             get => (bool)GetValue(ShowDeleteButtonProperty);
             set => SetValue(ShowDeleteButtonProperty, value);
         }
 
-        public TradeResources PartnerDesire
+        public bool ShowPartnerApproval
         {
-            get => (TradeResources)GetValue(PartnerDesireProperty);
-            set => SetValue(PartnerDesireProperty, value);
-        }
-        public TradeResources PartnerOffer
-        {
-            get => (TradeResources)GetValue(PartnerOfferProperty);
-            set => SetValue(PartnerOfferProperty, value);
-        }
-        public TradeResources MyDesire
-        {
-            get => (TradeResources)GetValue(MyDesireProperty);
-            set => SetValue(MyDesireProperty, value);
-        }
-        public TradeResources MyOffer
-        {
-            get => (TradeResources)GetValue(MyOfferProperty);
-            set => SetValue(MyOfferProperty, value);
-        }
-        public PlayerModel TradePartner
-        {
-            get => (PlayerModel)GetValue(TradePartnerProperty);
-            set => SetValue(TradePartnerProperty, value);
-        }
-        public PlayerModel CurrentPlayer
-        {
-            get => (PlayerModel)GetValue(CurrentPlayerProperty);
-            set => SetValue(CurrentPlayerProperty, value);
-        }
-        private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as OfferCtrl;
-            var depPropValue = (PlayerModel)e.NewValue;
-            depPropClass?.SetCurrentPlayer(depPropValue);
-        }
-        private void SetCurrentPlayer(PlayerModel value)
-        {
-
+            get => (bool)GetValue(ShowPartnerApprovalProperty);
+            set => SetValue(ShowPartnerApprovalProperty, value);
         }
 
-        
-        
-        private void OnCurrentPlayerPressed(object sender, PointerRoutedEventArgs e)
+        public TradeOffer TradeOffer
         {
-            MyOffer = new TradeResources();
-            MyDesire = new TradeResources();
-            PartnerDesire = new TradeResources();
-            PartnerOffer = new TradeResources();
+            get => (TradeOffer)GetValue(TradeOfferProperty);
+            set => SetValue(TradeOfferProperty, value);
         }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+       
+
+        #endregion Constructors + Destructors
+
+        #region Methods
+
+        private TradeOffer FindOffer(TradeOffer offer, ObservableCollection<TradeOffer> offers)
+        {
+            foreach (TradeOffer tradeOffer in offers)
+            {
+                if ((tradeOffer.TradePartner.PlayerIdentifier == offer.TradePartner.PlayerIdentifier) &&
+                    (tradeOffer.Owner.PlayerIdentifier == offer.Owner.PlayerIdentifier) &&
+                    (tradeOffer.Desire.EqualValue(offer.Desire)) &&
+                    (tradeOffer.Offer.EqualValue(offer.Offer)))
+                {
+                    return tradeOffer;
+                }
+            }
+            return null;
+        }
+
+        private bool OfferInCollection(TradeOffer offer, ObservableCollection<TradeOffer> offers)
+        {
+            return FindOffer(offer, offers) != null;
+        }
+
+        private void OnCreatedByPressed(object sender, PointerRoutedEventArgs e)
+        {
+            TradeOffer.Owner.GameData.Trades.TradeRequest = new TradeOffer();
+        }
+
+        private void OnDelete(object sender, RoutedEventArgs e)
+        {
+            TradeOffer offer = FindOffer(TradeOffer.Owner.GameData.Trades.TradeRequest, TradeOffer.Owner.GameData.Trades.PotentialTrades);
+            if (offer != null)
+            {
+                this.TraceMessage("this needs to be a message!!");
+                TradeOffer.Owner.GameData.Trades.PotentialTrades.Remove(offer);
+            }
+        }
+
         /// <summary>
         ///     if you change Desire, check to make sure that Offer and Desire don't share resources
         /// </summary>
@@ -104,9 +130,9 @@ namespace Catan10
         {
             if (count == 0) return;
 
-            if (MyOffer.GetCount(resourceType) > 0 && MyDesire.GetCount(resourceType) > 0)
+            if (TradeOffer.Offer.GetCount(resourceType) > 0 && TradeOffer.Desire.GetCount(resourceType) > 0)
             {
-                MyOffer.SetResource(resourceType, 0);
+                TradeOffer.Offer.SetResource(resourceType, 0);
             }
         }
 
@@ -114,15 +140,71 @@ namespace Catan10
         {
             if (count == 0) return;
 
-            if (MyOffer.GetCount(resourceType) > 0 && MyDesire.GetCount(resourceType) > 0)
+            if (TradeOffer.Offer.GetCount(resourceType) > 0 && TradeOffer.Desire.GetCount(resourceType) > 0)
             {
-                MyDesire.SetResource(resourceType, 0);
+                TradeOffer.Desire.SetResource(resourceType, 0);
             }
         }
 
-        private void OnDelete(object sender, RoutedEventArgs e)
+        #endregion Methods
+
+        /// <summary>
+        ///     if ownerTest is true, check for ownershipo
+        ///     if ownerTest is false, check for tradepartner
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="ownerTest"></param>
+        /// <returns></returns>
+        private bool OwnerHitTest(PlayerModel player, bool ownerTest)
+        {
+            //if (player == null) return false;
+            //if (ownerTest)
+            //{
+            //    if (MainPage.Current?.TheHuman == TradeOffer.Owner)
+            //        return true;
+
+            //    return false;
+            //}
+            //else
+            //{
+            //    if (MainPage.Current?.TheHuman == TradeOffer.TradePartner)
+            //        return true;
+
+            //    return false;
+            //}
+            return true;
+        }
+
+        private void OnSendClicked(object sender, RoutedEventArgs e)
+        {
+            OnSendOffer?.Invoke(this.TradeOffer);
+        }
+
+        private void OnClickAll(object sender, RoutedEventArgs e)
+        {
+            foreach (PlayerModel player in GridView_Players.Items)
+            {
+                player.GameData.InvitedToTrade = true;
+            }
+        }
+
+        public ObservableCollection<PlayerModel> ExceptMe(ObservableCollection<PlayerModel> list)
         {
 
+            var ret = new ObservableCollection<PlayerModel>();
+            if (list == null) return ret;
+            ret.AddRange(list);
+            if (list.Count > 1)
+            {
+                //
+                //  on a counter offer, there will only be one person and it will be the Human
+                ret.Remove(MainPage.Current.TheHuman);
+            }
+            return ret;
+        }
+
+        private void OnClickPlayer(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

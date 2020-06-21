@@ -81,6 +81,7 @@ namespace Catan10
 
                         case MessageType.DeleteGame:
                             OnGameDeleted?.Invoke(serviceMessage.GameInfo.Id, message.From);
+                            OnGameLeft?.Invoke(null, "");
                             break;
 
                         case MessageType.JoinGame:
@@ -113,6 +114,7 @@ namespace Catan10
 
         public Task SendBroadcastMessage(Guid gameId, CatanMessage message)
         {
+            
             UnprocessedMessages++;
             return Proxy.BroadcastMessage(gameId, message);
         }

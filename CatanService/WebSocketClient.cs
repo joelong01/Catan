@@ -228,10 +228,12 @@ namespace Catan10
                                 break;
 
                             case MessageType.CreateGame:
+                                OnGameJoined?.Invoke(null, "");
                                 OnGameCreated?.Invoke(serviceMessage.GameInfo, serviceMessage.PlayerName);
                                 break;
 
                             case MessageType.DeleteGame:
+                                OnGameLeft?.Invoke(null, "");
                                 OnGameDeleted?.Invoke(serviceMessage.GameInfo.Id, message.From);
                                 break;
 

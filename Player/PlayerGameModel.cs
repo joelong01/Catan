@@ -57,6 +57,22 @@ namespace Catan10
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         Trades _trades = new Trades();
+        bool _invitedToTrade = true;
+        public bool InvitedToTrade
+        {
+            get
+            {
+                return _invitedToTrade;
+            }
+            set
+            {
+                if (_invitedToTrade != value)
+                {
+                    _invitedToTrade = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         #endregion Delegates + Fields + Events + Enums
 

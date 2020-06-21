@@ -9,23 +9,32 @@
         <local:ResourceCardSlimCtrl x:Name="Brick" Width="70" Height="100" Margin="0,0,0,0"
             OnResourceChanged="ResourceChanged"
             Count="{x:Bind TradeResources.Brick, Mode=TwoWay}"
-            ShowButtons="True" ResourceType="Brick" />
+            Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Brick), Mode=OneWay}"
+            ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
+            ResourceType="Brick" />
         <local:ResourceCardSlimCtrl x:Name="Wood" Width="70" Height="100" Margin="5,0,0,0"
             OnResourceChanged="ResourceChanged"
             Count="{x:Bind TradeResources.Wood, Mode=TwoWay}"
-            ShowButtons="True" ResourceType="Wood" RelativePanel.RightOf="Brick" />
+            Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Wood), Mode=OneWay}"
+            ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
+            ResourceType="Wood" RelativePanel.RightOf="Brick" />
         <local:ResourceCardSlimCtrl x:Name="Sheep" Width="70" Height="100" Margin="5,0,0,0"
             OnResourceChanged="ResourceChanged"
             Count="{x:Bind TradeResources.Sheep, Mode=TwoWay}"
-            ShowButtons="True" ResourceType="Sheep" RelativePanel.RightOf="Wood" />
+            Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Sheep), Mode=OneWay}"
+            ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
+            ResourceType="Sheep" RelativePanel.RightOf="Wood" />
         <local:ResourceCardSlimCtrl x:Name="Wheat" Width="70" Height="100" Margin="37,5,0,0"
             OnResourceChanged="ResourceChanged"
             Count="{x:Bind TradeResources.Wheat, Mode=TwoWay}"
-            ShowButtons="True" ResourceType="Wheat" RelativePanel.Below="Brick" />
+            ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
+            Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Wheat), Mode=OneWay}"
+            ResourceType="Wheat" RelativePanel.Below="Brick" />
         <local:ResourceCardSlimCtrl x:Name="Ore" Width="70" Height="100" Margin="5,5,0,0"
             OnResourceChanged="ResourceChanged"
             Count="{x:Bind TradeResources.Ore, Mode=TwoWay}"
-            ShowButtons="True" ResourceType="Ore" RelativePanel.RightOf="Wheat"
-            RelativePanel.Below="Wood" />
+            ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
+            Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Ore), Mode=OneWay}"
+            ResourceType="Ore" RelativePanel.RightOf="Wheat" RelativePanel.Below="Wood" />
     </RelativePanel>
 </UserControl>

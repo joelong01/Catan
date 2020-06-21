@@ -266,6 +266,20 @@ namespace Catan10
             };
         }
 
+
+        public bool EqualValue(TradeResources b)
+        {
+            if (b == null) return false;
+            return (
+                (this.Wheat == b.Wheat) &&
+                (this.Wood == b.Wood) &&
+                (this.Ore == b.Ore) &&
+                (this.Sheep == b.Sheep) &&
+                (this.Brick == b.Brick) &&
+                (this.GoldMine == b.GoldMine));
+        }
+
+
         public void AddResource(ResourceType resourceType, int toAdd)
         {
             switch (resourceType)
