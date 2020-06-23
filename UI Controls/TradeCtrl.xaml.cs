@@ -11,10 +11,25 @@ namespace Catan10
     {
         #region Delegates + Fields + Events + Enums
 
+        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(TradeCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null));
-
-        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(TradeCtrl), new PropertyMetadata(null));
-        
+        private ObservableCollection<PlayerModel> PossibleTradePartners = new ObservableCollection<PlayerModel>();
+        public ObservableCollection<PlayerModel> PlayingPlayers
+        {
+            get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
+            set => SetValue(PlayingPlayersProperty, value);
+        }
+        private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as TradeCtrl;
+            var depPropValue = (ObservableCollection<PlayerModel>)e.NewValue;
+            depPropClass?.SetPlayingPlayers(depPropValue);
+        }
+        private void SetPlayingPlayers(ObservableCollection<PlayerModel> value)
+        {
+            PossibleTradePartners.Clear();
+            PossibleTradePartners.AddRange(value);
+        }
 
         #endregion Delegates + Fields + Events + Enums
 
@@ -26,13 +41,8 @@ namespace Catan10
             set => SetValue(TheHumanProperty, value);
         }
 
-        public ObservableCollection<PlayerModel> PlayingPlayers
-        {
-            get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
-            set => SetValue(PlayingPlayersProperty, value);
-        }
 
-       
+
 
         #endregion Properties
 
@@ -47,17 +57,23 @@ namespace Catan10
 
         #region Methods
 
-        public ObservableCollection<PlayerModel> ExceptMe(ObservableCollection<PlayerModel> list)
+        public ObservableCollection<PlayerTradeTracker> ExceptMe(ObservableCollection<PlayerTradeTracker> list)
         {
-            var ret = new ObservableCollection<PlayerModel>();
-            ret.AddRange(list);
-            ret.Remove(TheHuman);
+            var ret = new ObservableCollection<PlayerTradeTracker>();
+            foreach (var p in list)
+            {
+                if (p.PlayerId != TheHuman.PlayerIdentifier)
+                {
+                    ret.Add(p);
+                }
+            }
+
             return ret;
         }
 
-       
 
-       
+
+
 
         private void OnClickAll(object sender, RoutedEventArgs e)
         {
@@ -66,10 +82,55 @@ namespace Catan10
 
         #endregion Methods
 
+        public static double SmallOffers(bool smallOffers)
+        {
+            if (MainPage.Current == null) return 472;
+
+            if (smallOffers)
+                return 226;
+
+            return 472;
+        }
+
         private void OnClickPlayer(object sender, RoutedEventArgs e)
         {
-            var player = ((PlayerModel)((FrameworkElement)sender).Tag);
-            TheHuman.GameData.Trades.TradeRequest.TradePartner = player;
+            this.TraceMessage("What does this do?");
+        }
+
+        private void OnDeleteOffer(TradeOffer offer)
+        {
+            //
+            //  TODO: Send a message to delete the offer from the list
+            // if (offer.Owner) protected...
+            TheHuman.GameData.Trades.PotentialTrades.Remove(offer);
+        }
+        private void OnSendOffer(TradeOffer offer)
+        {
+            //
+            //  TODO: Send a message
+            foreach (var player in offer.TradePartners)
+            {
+                var o = new TradeOffer()
+                {
+                    Desire = new TradeResources(offer.Desire),
+                    Offer = new TradeResources(offer.Offer),
+                    Owner = MainPage.Current.NameToPlayer(offer.Owner.PlayerName),
+                    TradePartners = new ObservableCollection<PlayerTradeTracker>()
+                    {
+                        new PlayerTradeTracker()
+                        {
+                            PlayerId = player.PlayerId,
+                            PlayerName = player.PlayerName,
+                            InTrade = true
+                        }
+                    },
+                    OwnerApproved = offer.OwnerApproved,
+                    PartnerApproved = false
+                };
+
+                TheHuman.GameData.Trades.PotentialTrades.Add(o);
+            }
+
         }
     }
 }

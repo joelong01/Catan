@@ -160,12 +160,12 @@ namespace Catan10
 
         public TradeResources(TradeResources tradeResources)
         {
-            Wheat = this.Wheat;
-            Wood = this.Wood;
-            Brick = this.Brick;
-            Ore = this.Ore;
-            Sheep = this.Sheep;
-            GoldMine = this.GoldMine;
+            Wheat = tradeResources.Wheat;
+            Wood = tradeResources.Wood;
+            Brick = tradeResources.Brick;
+            Ore = tradeResources.Ore;
+            Sheep = tradeResources.Sheep;
+            GoldMine = tradeResources.GoldMine;
         }
 
         #endregion Constructors + Destructors

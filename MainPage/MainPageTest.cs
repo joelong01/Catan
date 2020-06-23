@@ -148,6 +148,7 @@ namespace Catan10
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[0]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
+            MainPageModel.PlayingPlayers.ForEach((player => player.GameData.Trades.TradeRequest.AddPotentialTradingPartners(MainPageModel.PlayingPlayers))); // then will set the potential trade partners 
 
             string json = MainPageModel.PlayingPlayers[0].GameData.Trades.TradeRequest.Serialize();
             var offer = TradeOffer.Deserialze(json);
@@ -159,7 +160,7 @@ namespace Catan10
             player2.GameData.Resources.GrantResources(tr);
 
             CurrentPlayer = MainPageModel.PlayingPlayers[2];
-            CurrentPlayer.GameData.Trades.TradeRequest.TradePartners = MainPageModel.PlayingPlayers;
+          //  CurrentPlayer.GameData.Trades.TradeRequest.AddPotentialTradingPartners(MainPageModel.PlayingPlayers);
             TheHuman = CurrentPlayer;
             CurrentPlayer.GameData.Trades.TradeRequest.Owner = TheHuman;
             //foreach (var player in MainPageModel.PlayingPlayers)
@@ -196,12 +197,7 @@ namespace Catan10
                 {
                     Brick = 2
                 },
-                Owner = MainPageModel.PlayingPlayers[0],
-                TradePartner = CurrentPlayer,
-                TradePartners = new ObservableCollection<PlayerModel>()
-                {
-                    CurrentPlayer
-                },
+                Owner = MainPageModel.PlayingPlayers[0],               
                 OwnerApproved = true,
                 PartnerApproved = false,
 

@@ -7,60 +7,54 @@
     d:DesignHeight="510" d:DesignWidth="1020" mc:Ignorable="d">
     <Grid Margin="0" BorderThickness="3" CornerRadius="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
+            <RowDefinition Height="0" />
             <RowDefinition Height="450" />
-            <RowDefinition Height="20" />
+            <RowDefinition Height="70" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="484" />
-            <ColumnDefinition Width="20" />
-            <ColumnDefinition Width="484" />
+            <ColumnDefinition Width="500" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="500" />
         </Grid.ColumnDefinitions>
-        <!--  Players  -->
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center"
-            Orientation="Horizontal">
-            <Button Width="50" Height="50" Padding="0"
-                Background="{StaticResource bmCherry}"
-                CornerRadius="50" Foreground="White" Click="OnClickAll">
+        <!--  left side:  Offer Creation  -->
+        <Viewbox Grid.Row="1" Grid.Column="0" Margin="0,0,0,40">
+            <local:OfferCtrl Grid.Row="1" Grid.Column="0" Margin="0,0,0,40" HorizontalAlignment="Stretch"
+                ShowAllButton="True" ShowPartnerApproval="False" ShowDeleteButton="False"
+                ShowResourceButtons="true" OnSendOffer="OnSendOffer" ShowResetButton="True"
+                TradePartners="{x:Bind ExceptMe(TheHuman.GameData.Trades.TradeRequest.TradePartners), Mode=OneWay}"
+                TradeOffer="{x:Bind TheHuman.GameData.Trades.TradeRequest, Mode=OneWay}" />
+        </Viewbox>
+
+
+        <Border Grid.Row="2" Margin="10,0,0,0" HorizontalAlignment="Left" Background="Black"
+            CornerRadius="5">
+            <Button Foreground="White">
                 <Button.Content>
-                    <TextBlock Text="All" />
+                    <StackPanel>
+                        <TextBlock HorizontalAlignment="Center" Text="⮽" FontSize="22" />
+                        <TextBlock HorizontalAlignment="Center" Text="Done" FontSize="22" />
+                    </StackPanel>
                 </Button.Content>
             </Button>
-            <GridView Margin="10,0,0,0" VerticalAlignment="Stretch"
-                ItemsSource="{x:Bind ExceptMe(PlayingPlayers), Mode=OneWay}"
-                ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionMode="None">
-                <GridView.ItemTemplate>
-                    <DataTemplate x:DataType="local:PlayerModel">
-                        <ToggleButton Width="50" Height="50" Padding="0" Click="OnClickPlayer"
-                            Tag="{x:Bind PlayerDataInstance, Mode=OneWay}">
-                            <ToggleButton.Content>
-                                <Ellipse Width="45" Height="45" Margin="0" HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Fill="{x:Bind ImageBrush, Mode=OneWay}"
-                                    Stroke="White"
-                                    Tag="{x:Bind PlayerDataInstance, Mode=OneWay}" />
-                            </ToggleButton.Content>
-                        </ToggleButton>
-                    </DataTemplate>
-                </GridView.ItemTemplate>
-            </GridView>
-        </StackPanel>
-        <local:OfferCtrl Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" HorizontalAlignment="Stretch"
-            ShowAllButton="True" ShowPartnerApproval="False" ShowDeleteButton="True"
-            ShowResourceButtons="true"
-            TradePartners="{x:Bind TheHuman.GameData.Trades.TradeRequest.TradePartners, Mode=OneWay}"
-            TradeOffer="{x:Bind TheHuman.GameData.Trades.TradeRequest, Mode=OneWay}" />
+        </Border>
+
+
+        <!--  Right side:  A list of outstanding offers  -->
+
         <GridView Grid.Row="1" Grid.Column="2" Margin="0" Padding="0"
             HorizontalAlignment="Stretch" CornerRadius="10" SelectionMode="None"
-            Background="Black"
+            Background="Transparent" BorderBrush="White" BorderThickness="1"
             ItemsSource="{x:Bind TheHuman.GameData.Trades.PotentialTrades, Mode=OneWay}">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:TradeOffer">
-                    <local:OfferCtrl Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" HorizontalAlignment="Stretch"
-                        ShowPartnerApproval="True" ShowDeleteButton="True" ShowSendButton="False"
-                        ShowAllButton="False" ShowResourceButtons="False"
-                        TradePartners="{x:Bind TradePartners, Mode=OneWay}"
-                        TradeOffer="{x:Bind Mode=OneWay}" />
+                    <Viewbox Width="{x:Bind local:TradeCtrl.SmallOffers(local:MainPage.Current.MainPageModel.Settings.SmallOffers), FallbackValue=472, Mode=OneWay}">
+                        <local:OfferCtrl Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" HorizontalAlignment="Stretch"
+                            ShowPartnerApproval="True" ShowDeleteButton="True" ShowSendButton="False"
+                            ShowResetButton="False" ShowAllButton="False" ShowResourceButtons="False"
+                            TradePartners="{x:Bind TradePartners, Mode=OneWay}"
+                            OnDeleteOffer="OnDeleteOffer"
+                            TradeOffer="{x:Bind Mode=OneWay}" />
+                    </Viewbox>
                 </DataTemplate>
             </GridView.ItemTemplate>
             <GridView.ItemContainerStyle>

@@ -51,7 +51,7 @@ namespace Catan10
         }
 
         public Visibility CountVisibility(TradeResources tr, ResourceType resourceType)
-        {
+        {            
             if (ShowButtons) return Visibility.Visible;
             if (tr == null) return Visibility.Collapsed;
             if (tr.GetCount(resourceType) > 0) return Visibility.Visible;

@@ -67,12 +67,12 @@
                     <Setter Property="Padding" Value="0,-15" />
                 </Style>
             </ListBox.ItemContainerStyle>
-            <ListBox.Items>
+            <!--<ListBox.Items>
                 <local:PublicDataCtrl />
-            </ListBox.Items>
+            </ListBox.Items>-->
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PublicDataCtrl Width="610" Player="{x:Bind Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay}" RenderTransformOrigin="0 0">
+                    <local:PublicDataCtrl Width="610" Player="{x:Bind Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}" RenderTransformOrigin="0 0">
                         <local:PublicDataCtrl.RenderTransform>
                             <CompositeTransform ScaleX=".88" ScaleY=".88" TranslateX="0" />
                         </local:PublicDataCtrl.RenderTransform>

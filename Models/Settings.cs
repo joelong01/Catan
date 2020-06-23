@@ -52,7 +52,22 @@ namespace Catan10
                 }
             }
         }
-
+        bool _smallOffers = false;
+        public bool SmallOffers
+        {
+            get
+            {
+                return _smallOffers;
+            }
+            set
+            {
+                if (_smallOffers != value)
+                {
+                    _smallOffers = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         public bool AnimateFadeTiles
         {
             get

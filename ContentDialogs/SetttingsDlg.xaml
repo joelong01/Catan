@@ -105,6 +105,13 @@
                         FontFamily="Segoe UI">
                         <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Animate Fade Tiles" />
                     </CheckBox>
+                    <CheckBox Margin="5" VerticalContentAlignment="Center"
+                        IsChecked="{x:Bind Settings.SmallOffers, Mode=TwoWay, FallbackValue=True}"
+                        Style="{StaticResource SettingCheckBoxStyle}"
+                        ToolTipService.ToolTip="Makes the offers in the available offers UI 50% of normal size"
+                        FontFamily="Segoe UI">
+                        <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Small Offers" />
+                    </CheckBox>
                 </StackPanel>
             </Border>
             <Border Style="{StaticResource SettingBorderStyle}">

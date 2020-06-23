@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -9,15 +10,16 @@ using Catan.Proxy;
 
 namespace Catan10
 {
-
     public class PlayerModelConverter : JsonConverter<PlayerModel>
     {
+        #region Methods
+
         public override PlayerModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (typeToConvert == typeof(string))
             {
                 string playerName = reader.GetString();
-                return MainPage.Current.NameToPlayer(playerName);                
+                return MainPage.Current.NameToPlayer(playerName);
             }
 
             return null;
@@ -27,15 +29,87 @@ namespace Catan10
         {
             writer.WriteStringValue(player.PlayerName);
         }
+
+        #endregion Methods
     }
 
+    public class PlayerTradeTracker : INotifyPropertyChanged
+    {
+        #region Delegates + Fields + Events + Enums
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        bool _inTrade = false;
+        private Guid _playerId;
+        private string playerName;
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public bool InTrade
+        {
+            get
+            {
+                return _inTrade;
+            }
+            set
+            {
+                if (_inTrade != value)
+                {
+                    _inTrade = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public Guid PlayerId
+        {
+            get
+            {
+                return _playerId;
+            }
+            set
+            {
+                if (value != _playerId)
+                {
+                    _playerId = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public string PlayerName
+        {
+            get => playerName;
+            set
+            {
+                if (playerName != value)
+                {
+                    playerName = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public override string ToString()
+        {
+            return $"[InTrade={InTrade}][Name={PlayerName}]";
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion Properties
+    }
     public class TradeOffer : INotifyPropertyChanged
     {
-        public TradeOffer() 
+        #region Constructors + Destructors
+
+        public TradeOffer()
         {
-           
         }
-        
+
+        #endregion Constructors + Destructors
+
         #region Delegates + Fields + Events + Enums
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -47,9 +121,9 @@ namespace Catan10
         private PlayerModel _owner = MainPage.Current?.TheHuman;
         private bool _ownerApproved = false;
         private bool _partnerApproved = false;
-        private PlayerModel _tradePartner = null;
-        ObservableCollection<PlayerModel> _tradePartners = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<PlayerModel> TradePartners
+        ObservableCollection<PlayerTradeTracker> _tradePartners = new ObservableCollection<PlayerTradeTracker>();
+
+        public ObservableCollection<PlayerTradeTracker> TradePartners
         {
             get
             {
@@ -65,6 +139,30 @@ namespace Catan10
             }
         }
 
+        /// <summary>
+        ///     This addes PlayingPlayers to the PotentialTradePartners along with a bool to indicate they are being offered the trade
+        /// </summary>
+        /// <param name="players"></param>
+        public void AddPotentialTradingPartners(ObservableCollection<PlayerModel> players)
+        {
+            TradePartners.Clear();
+            foreach (var player in players)
+            {
+                //
+                //  6/22 - while you can't trade with yourself, we need "self" in the 
+                //         list so that we can get the Owner picture
+                //  
+
+
+                PlayerTradeTracker tracker = new PlayerTradeTracker()
+                {
+                    PlayerName = player.PlayerName,
+                    InTrade = false,
+                    PlayerId = player.PlayerIdentifier
+                };
+                TradePartners.Add(tracker);
+            }
+        }
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties
@@ -149,32 +247,10 @@ namespace Catan10
             }
         }
 
-        public PlayerModel TradePartner
-        {
-            get
-            {
-                return _tradePartner;
-            }
-            set
-            {
-                if (_tradePartner != value)
-                {
-                    _tradePartner = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
 
         #endregion Properties
 
         #region Methods
-
-        public string Serialize()
-        {
-            var jsonOptions = CatanProxy.GetJsonOptions();
-            jsonOptions.Converters.Add(new PlayerModelConverter());
-            return JsonSerializer.Serialize(this, jsonOptions);
-        }
 
         public static TradeOffer Deserialze(string json)
         {
@@ -183,6 +259,12 @@ namespace Catan10
             return JsonSerializer.Deserialize<TradeOffer>(json, jsonOptions);
         }
 
+        public string Serialize()
+        {
+            var jsonOptions = CatanProxy.GetJsonOptions();
+            jsonOptions.Converters.Add(new PlayerModelConverter());
+            return JsonSerializer.Serialize(this, jsonOptions);
+        }
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

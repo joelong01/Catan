@@ -57,22 +57,7 @@ namespace Catan10
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         Trades _trades = new Trades();
-        bool _invitedToTrade = true;
-        public bool InvitedToTrade
-        {
-            get
-            {
-                return _invitedToTrade;
-            }
-            set
-            {
-                if (_invitedToTrade != value)
-                {
-                    _invitedToTrade = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        
 
         #endregion Delegates + Fields + Events + Enums
 
@@ -760,7 +745,10 @@ namespace Catan10
 
         #endregion Methods
     }
-
+    
+    /// <summary>
+    ///     The Data class that keeps track of trades.  the UI Lets you fill out a TradeOffer ("Request") and then you can add it to the PotentialTrades
+    /// </summary>
     public class Trades : INotifyPropertyChanged
     {
         #region Delegates + Fields + Events + Enums

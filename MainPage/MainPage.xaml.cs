@@ -160,6 +160,7 @@ namespace Catan10
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            Ctrl_PlayerResourceCountCtrl.MainPage = this;
             base.OnNavigatedTo(e);
 
             if (e.NavigationMode == NavigationMode.New)
@@ -172,12 +173,12 @@ namespace Catan10
 
               
 
-                Ctrl_PlayerResourceCountCtrl.MainPage = this;
+                
             }
 
             InitTest();
             
-            await InitializeMainPageModel();
+           await InitializeMainPageModel();
           
             SaveSettingsTimer = new DispatcherTimer
             {
@@ -191,7 +192,7 @@ namespace Catan10
             };
 
             KeepAliveTimer.Tick += KeepAliveTimer_Tick;
-            KeepAliveTimer.Start();
+           KeepAliveTimer.Start();
         }
         
         private void KeepAliveTimer_Tick(object sender, object e)
@@ -399,7 +400,7 @@ namespace Catan10
             try
             {
                 this.MainPageModel = await ReadMainPageModelOffDisk();
-                if (MainPageModel == null || MainPageModel.AllPlayers.Count == 0)
+                if (MainPageModel == null || MainPageModel.AllPlayers == null || MainPageModel.AllPlayers.Count == 0)
                 {
                     var list = await GetDefaultUsers();
 
