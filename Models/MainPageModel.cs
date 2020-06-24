@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -126,7 +127,7 @@ namespace Catan10
             }
             set
             {
-                Contract.Assert(value >= 0);
+                Debug.Assert(value >= 0);
                 if (_unprocessedMessages != value)
                 {
                     _unprocessedMessages = value;
@@ -154,7 +155,7 @@ namespace Catan10
                     //  whevener this changes, the log changes...so you don't need to send a NotifyPropertyChanged() event...I hope...
                     if (UnprocessedMessages > 0)
                     {
-                       // this.TraceMessage($"Enable false because UnprocessedMessages: {CatanService.UnprocessedMessages} ");
+                        this.TraceMessage($"Enable false because UnprocessedMessages: {CatanService.UnprocessedMessages} ");
                         return false;
                     }
 
