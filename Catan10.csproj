@@ -142,6 +142,7 @@
     </Compile>
     <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
+    <Compile Include="Logging\Actions\ResourceExchangeLog.cs" />
     <Compile Include="Logging\Actions\SpyLog.cs" />
     <Compile Include="Logging\Actions\LoseCardsToSeven.cs" />
     <Compile Include="Logging\Actions\PlayDevCardLog.cs" />

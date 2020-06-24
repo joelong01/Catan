@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Windows.Devices.PointOfService;
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -253,16 +254,7 @@ namespace Catan10
             return ret;
         }
 
-        private void Menu_DoTrade(object sender, RoutedEventArgs e)
-        {
-            MenuFlyoutItem item = sender as MenuFlyoutItem;
-            (ResourceType Get, ResourceType Give) = (ValueTuple<ResourceType, ResourceType>)item.Tag;
-            TradeResources tr = new TradeResources();
-            tr.AddResource(Give, -4);
-            tr.AddResource(Get, 1);
-            this.Player.GameData.Resources.GrantResources(tr);
-
-        }
+       
 
         /// <summary>
         ///         We added a menu to the "Available Dev Cads" collection, and the user picked one to play
@@ -381,42 +373,21 @@ namespace Catan10
         private void OnTrade4For1(object sender, RoutedEventArgs e)
         {
             TradeMenu.Items.Clear();
-            int count = 4;
             foreach (ResourceType resource in Enum.GetValues(typeof(ResourceType)))
             {
-                if (Player.GameData.Resources.Current.GetCount(resource) >= count)
+                var menu = Harbor.BuildResourceTradeMenu(this.Player, 4, resource);
+                if (menu != null)
                 {
-                    MenuFlyoutSubItem subItem = null;
-
-                    if (Player.GameData.Resources.Current.GetCount(resource) >= count)
-                    {
-                        subItem = new MenuFlyoutSubItem()
-                        {
-                            Text = $"{count} {resource} for 1 ..."
-                        };
-
-                        foreach (ResourceType rt in Enum.GetValues(typeof(ResourceType)))
-                        {
-                            if (TradeResources.GrantableResources(rt) && rt != ResourceType.GoldMine && rt != resource)
-                            {
-                                MenuFlyoutItem item = new MenuFlyoutItem()
-                                {
-                                    Text = $"{rt}",
-                                    Tag = (rt, resource)
-                                };
-                                subItem.Items.Add(item);
-                                item.Click += Menu_DoTrade;
-                            }
-
-                        }
-                    }
-                    if (subItem != null)
-                    {
-                        TradeMenu.Items.Add(subItem);
-                    }
+                    TradeMenu.Items.Add(menu);
                 }
             }
 
+            //
+            //  if they have a menu to display, show it
+            if (TradeMenu.Items.Count > 0)
+            {
+                TradeMenu.ShowAt(this, new Point(0, 0));                
+            }
         }
         private void SetPlayer(PlayerModel value)
         {

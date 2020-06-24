@@ -376,91 +376,98 @@ namespace Catan10
 
         private void OnHarborRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            if (Owner != null)
+            if (Owner == null) return;
+            
+
+
+            TradeMenu.Items.Clear();
+
+            if (this.HarborType == HarborType.ThreeForOne)
             {
-                TradeMenu.Items.Clear();
-                ResourceType myResourceType = StaticHelpers.HarborTypeToResourceType(this.HarborType);
-                if (this.HarborType == HarborType.ThreeForOne)
+                //
+                //  if it is 3:1, find all the resource types with more than 3 resources and add them to a trade menu
+                foreach (ResourceType resource in Enum.GetValues(typeof(ResourceType)))
                 {
-                    foreach (ResourceType resource in Enum.GetValues(typeof(ResourceType)))
+                    var menu = BuildResourceTradeMenu(this.Owner, 3, resource);
+                    if (menu != null)
                     {
-                        if (Owner.GameData.Resources.Current.GetCount(resource) >= 3)
-                        {
-                            var menu = BuildSubMenu(3, resource);
-                            if (menu != null)
-                            {
-                                TradeMenu.Items.Add(menu);
-                            }
-                        }
+                        TradeMenu.Items.Add(menu);
                     }
-                }
-                else // it is some kind of 2 for 1
-                {
-                    ResourceType resource = StaticHelpers.HarborTypeToResourceType(this.HarborType);
-                    if (Owner.GameData.Resources.Current.GetCount(resource) >= 2)
-                    {
-                        var menu = BuildSubMenu(2, resource);
-                        if (menu != null)
-                        {
-                            TradeMenu.Items.Add(menu);
-                        }
-                    }
-                }
-                if (TradeMenu.Items.Count > 0)
-                {
-                    TradeMenu.ShowAt(this, new Point(0, 0));
                 }
             }
+            else 
+            {
+                // if it is 2:1, add a menu only for the harbor resource type
+                ResourceType resource = StaticHelpers.HarborTypeToResourceType(this.HarborType);
+                var menu = BuildResourceTradeMenu(this.Owner, 2, resource);
+                if (menu != null)
+                {
+                    TradeMenu.Items.Add(menu);
+                }
+
+            }
+            //
+            //  if they have a menu to display, show it
+            if (TradeMenu.Items.Count > 0)
+            {
+                TradeMenu.ShowAt(this, new Point(0, 0));
+            }
+
         }
 
 
 
-        private MenuFlyoutSubItem BuildSubMenu(int count, ResourceType resourceType)
+        public static MenuFlyoutSubItem BuildResourceTradeMenu(PlayerModel owner, int cost, ResourceType give)
         {
+            //
+            // this is the only state you can do a meritime trade in
+            if (MainPage.GameController.CurrentGameState != GameState.WaitingForNext) return null;
 
+            //
+            //  can't trade if you don't have enough resources
+            if (owner.GameData.Resources.Current.GetCount(give) < cost) return null;
 
-            MenuFlyoutSubItem subItem = null;
-
-            if (Owner.GameData.Resources.Current.GetCount(resourceType) >= count)
+            //
+            //  local function to handle the menu click event we create below
+            //  
+            async void LocalHandleMenuClick(object sender, RoutedEventArgs e)
             {
-                subItem = new MenuFlyoutSubItem()
-                {
-                    Text = $"{count} {resourceType} for 1 ..."
-                };
+                MenuFlyoutItem item = sender as MenuFlyoutItem;
 
-                foreach (ResourceType rt in Enum.GetValues(typeof(ResourceType)))
-                {
-                    if (TradeResources.GrantableResources(rt) && rt != ResourceType.GoldMine && rt != resourceType)
-                    {
-                        MenuFlyoutItem item = new MenuFlyoutItem()
-                        {
-                            Text = $"{rt}",
-                            Tag = (rt, resourceType)
-                        };
-                        subItem.Items.Add(item);
-                        item.Click += Menu_DoTrade;
-                    }
+                (ResourceType Get, ResourceType Give) = (ValueTuple<ResourceType, ResourceType>)item.Tag;
 
-                }
+                TradeResources tr = new TradeResources();
+                tr.AddResource(Get, 1);
+                tr.AddResource(Give, -cost);
+
+                await ResourceExchangeLog.PostLog(MainPage.GameController, tr);
             }
 
+            
+            //
+            //  build the menu
+            MenuFlyoutSubItem subItem = subItem = new MenuFlyoutSubItem()
+            {
+                Text = $"{cost} {give} for 1 ..."
+            };
+            foreach (ResourceType get in Enum.GetValues(typeof(ResourceType)))
+            {
+                if (TradeResources.GrantableResources(get) && get != ResourceType.GoldMine && get != give)
+                {
+                    //
+                    //  use the tag to store the resources needed to build the TradeResources in the handler
+                    MenuFlyoutItem item = new MenuFlyoutItem()
+                    {
+                        Text = $"{get}",
+                        Tag = (get, give)
+                    };
+                    subItem.Items.Add(item);
+                    item.Click += LocalHandleMenuClick;
+                }
+            }
             return subItem;
         }
 
 
-        private void Menu_DoTrade(object sender, RoutedEventArgs e)
-        {
-            MenuFlyoutItem item = sender as MenuFlyoutItem;
-
-            (ResourceType Get, ResourceType Give) = (ValueTuple<ResourceType, ResourceType>)item.Tag;
-
-            int cost = 2;
-            if (this.HarborType == HarborType.ThreeForOne) cost = 3;
-            TradeResources tr = new TradeResources();
-            tr.AddResource(Give, -cost);
-            tr.AddResource(Get, 1);
-            this.Owner.GameData.Resources.GrantResources(tr);
-
-        }
     }
 }
