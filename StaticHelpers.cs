@@ -18,14 +18,35 @@ using Windows.System;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 
 namespace Catan10
 {
+
+    public static class BindingExtensions
+
+    {
+
+        #region Methods
+
+        public static void UpdateSource(this FrameworkElement element, DependencyProperty property)
+        {
+            BindingExpression expression = element.GetBindingExpression(property);
+            if (expression != null)
+            {
+                expression.UpdateSource();
+            }
+        }
+        #endregion Methods
+    }
+
     public static class EnumExtensions
     {
+        #region Methods
+
         public static string Description(this Enum instance)
         {
             string output = "";
@@ -38,10 +59,14 @@ namespace Catan10
             }
             return output;
         }
+
+        #endregion Methods
     }
 
     public static class ICollectionExtensions
     {
+        #region Methods
+
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> that)
         {
             if (that == null) return;
@@ -77,11 +102,19 @@ namespace Catan10
             list[firstIndex] = list[secondIndex];
             list[secondIndex] = temp;
         }
+
+        #endregion Methods
     }
 
     public static class StaticHelpers
     {
+        #region Properties
+
         public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
+
+        #endregion Properties
+
+        #region Methods
 
         public static void AddRange<T>(this ObservableCollection<T> oc, IEnumerable<T> collection)
         {
@@ -490,36 +523,66 @@ namespace Catan10
             return false;
         }
 
+        #endregion Methods
+
+        #region Interfaces
+
+        //
+        //  an interface called by the drag and drop code so we can simlulate the DragOver behavior
+        public interface IDragAndDropProgress
+        {
+            #region Methods
+
+            void PointerUp(Point value);
+
+            void Report(Point value);
+
+            #endregion Methods
+        }
+
+        #endregion Interfaces
+
+        #region Classes
+
         public class KeyValuePair
         {
+            #region Properties
+
             public string Key { get; set; }
 
             public string Value { get; set; }
+
+            #endregion Properties
+
+            #region Constructors + Destructors
 
             public KeyValuePair(string key, string value)
             {
                 Key = key;
                 Value = value;
             }
+
+            #endregion Constructors + Destructors
         }
 
-        //
-        //  an interface called by the drag and drop code so we can simlulate the DragOver behavior
-        public interface IDragAndDropProgress
-        {
-            void PointerUp(Point value);
-
-            void Report(Point value);
-        }
+        #endregion Classes
     }
 
     public class EnumDescription : Attribute
     {
+        #region Properties
+
         public string Description { get; }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
 
         public EnumDescription(string description)
         {
             Description = description;
         }
+
+        #endregion Constructors + Destructors
     }
 }

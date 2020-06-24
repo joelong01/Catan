@@ -84,12 +84,12 @@ namespace Catan10
 
         public static double SmallOffers(bool smallOffers)
         {
-            if (MainPage.Current == null) return 472;
+            if (MainPage.Current == null) return 400;
 
             if (smallOffers)
-                return 226;
+                return 188;
 
-            return 472;
+            return 400;
         }
 
         private void OnClickPlayer(object sender, RoutedEventArgs e)
@@ -110,6 +110,7 @@ namespace Catan10
             //  TODO: Send a message
             foreach (var player in offer.TradePartners)
             {
+                if (player.PlayerId == offer.Owner.PlayerIdentifier) continue;
                 var o = new TradeOffer()
                 {
                     Desire = new TradeResources(offer.Desire),

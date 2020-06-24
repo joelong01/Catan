@@ -10,10 +10,11 @@
         Background="{x:Bind Image, Mode=OneWay, TargetNullValue={StaticResource ResourceKey=ResourceType.Back}}"
         CornerRadius="10">
         <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0"
-            HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Black"
-            CornerRadius="6">
+            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            Visibility="{x:Bind CountVisible, Mode=OneWay}"
+            Background="Black" CornerRadius="6">
             <Viewbox>
-                <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind Count, Mode=OneWay}" Visibility="{x:Bind CountVisible, Mode=OneWay}" />
+                <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind Count, Mode=OneWay}" />
             </Viewbox>
         </Border>
 

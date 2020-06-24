@@ -259,9 +259,13 @@
                         StrokeThickness="1" />
                     <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"
                         FontWeight="ExtraBold" />
-                    <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind Player.GameData.Resources.TotalResources.Count, Mode=OneWay, FallbackValue=68}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                    <TextBlock Margin="0,0,10,0" FontSize="68" Text="{x:Bind Player.GameData.Resources.TotalResources.Count, Mode=OneWay, FallbackValue=68}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                     <!--  Gold Cards  -->
-                    <local:ResourceCardSlimCtrl Margin="30,0,0,0" Image="{StaticResource ResourceType.GoldMine}" CountVisible="False" />
+                    <Rectangle Width="70" Height="100" Margin="10,0,0,0"
+                        Fill="{StaticResource ResourceType.GoldMine}"
+                        RadiusX="10" RadiusY="10"
+                        Stroke="{x:Bind Player.ForegroundBrush}"
+                        StrokeThickness="1" ToolTipService.ToolTip="# Gold Cards Received" />
                     <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"
                         FontWeight="ExtraBold" />
                     <TextBlock Margin="10,0,0,0" FontSize="68" Text="{x:Bind Player.GameData.Resources.GoldTotal, Mode=OneWay, FallbackValue=0}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />

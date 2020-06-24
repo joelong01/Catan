@@ -26,6 +26,14 @@ namespace Catan10
             this.InitializeComponent();
         }
 
+        public Visibility Not(bool flag)
+        {
+            if (!flag)
+                return Visibility.Visible;
+
+            return Visibility.Collapsed;
+        }
+
         public event SendOfferHandler OnSendOffer;
         public event DeletedHandler OnDeleteOffer;
 
@@ -37,6 +45,18 @@ namespace Catan10
         public static readonly DependencyProperty ShowAllButtonProperty = DependencyProperty.Register("ShowAllButton", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(true));
         public static readonly DependencyProperty TradePartnersProperty = DependencyProperty.Register("TradePartners", typeof(ObservableCollection<PlayerTradeTracker>), typeof(OfferCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty ShowResetButtonProperty = DependencyProperty.Register("ShowResetButton", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty EnableSendProperty = DependencyProperty.Register("EnableSend", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty ListLayoutProperty = DependencyProperty.Register("ListLayout", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(false));
+        public bool ListLayout
+        {
+            get => (bool)GetValue(ListLayoutProperty);
+            set => SetValue(ListLayoutProperty, value);
+        }
+        public bool EnableSend
+        {
+            get => (bool)GetValue(EnableSendProperty);
+            set => SetValue(EnableSendProperty, value);
+        }
         public bool ShowResetButton
         {
             get => (bool)GetValue(ShowResetButtonProperty);
@@ -118,16 +138,23 @@ namespace Catan10
         /// <param name="count"></param>
         private void OnDesireChanged(TradeResources tradeResources, ResourceType resourceType, int count)
         {
-            if (count == 0) return;
+            EnableSend = CheckEnableSendButton();
+
+            if (count == 0)
+            {            
+                return;
+            }
 
             if (TradeOffer.Offer.GetCount(resourceType) > 0 && TradeOffer.Desire.GetCount(resourceType) > 0)
             {
                 TradeOffer.Offer.SetResource(resourceType, 0);
             }
+            
         }
 
         private void OnOfferChanged(TradeResources tradeResources, ResourceType resourceType, int count)
         {
+            EnableSend = CheckEnableSendButton();
             if (count == 0) return;
 
             if (TradeOffer.Offer.GetCount(resourceType) > 0 && TradeOffer.Desire.GetCount(resourceType) > 0)
@@ -204,7 +231,8 @@ namespace Catan10
 
         private void OnClickAll(object sender, RoutedEventArgs e)
         {
-            this.TraceMessage("this this");
+            TradeOffer.TradePartners.ForEach((p) => p.InTrade = true);
+            EnableSend = CheckEnableSendButton();
         }
 
         private void ResetTradeOffer()
@@ -213,11 +241,32 @@ namespace Catan10
             TradeOffer.Desire = new TradeResources();
             TradeOffer.OwnerApproved = false;
             TradeOffer.PartnerApproved = false;
-            TradeOffer.TradePartners.Clear();
+            TradeOffer.TradePartners.ForEach((p) => p.InTrade = false);
             
         }
 
-        
+        private bool CheckEnableSendButton()
+        {
+            
+            if (this.TradeOffer == null)
+            {
+                return false;
+            }
+                 
+            if (this.TradeOffer.Offer.Count == 0) return false;
+            if (this.TradeOffer.Desire.Count == 0) return false;
+
+            foreach (var partner in this.TradeOffer.TradePartners)
+            {
+                if (partner.PlayerId == this.TradeOffer.Owner.PlayerIdentifier) continue;
+                if (partner.InTrade)
+                {
+                    
+                    return true;
+                }
+            }
+            return false;
+        }
 
         private void OnReset(object sender, RoutedEventArgs e)
         {
@@ -231,6 +280,9 @@ namespace Catan10
             return tradePartners.Contains(player);
         }
 
-       
+        private void OnClickTradingPartner(object sender, RoutedEventArgs e)
+        {
+            EnableSend = CheckEnableSendButton();
+        }
     }
 }

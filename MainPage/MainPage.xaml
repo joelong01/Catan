@@ -439,7 +439,7 @@
                     <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" OnShowAllRolls="OnShowAllRolls" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:DragableGridCtrl x:Name="PlayerTradeGrid" Width="700" HorizontalAlignment="Center"
+            <local:DragableGridCtrl x:Name="PlayerTradeGrid" Width="500" HorizontalAlignment="Center"
                 VerticalAlignment="Center" Canvas.ZIndex="10"
                 PointerPressed="Draggable_PointerPressed"
                 OnGridPositionChanged="OnGridPositionChanged"
