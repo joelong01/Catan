@@ -47,7 +47,7 @@
         Width="{x:Bind _ctrl.Width, FallbackValue=50}"
         Height="{x:Bind _ctrl.Height, FallbackValue=50}"
         PointerPressed="HarborGrid_PointerPressed" RenderTransformOrigin=".5 .5"
-        Background="Transparent">
+        Background="Transparent" RightTapped="OnHarborRightTapped">
         <Canvas.RenderTransform>
             <CompositeTransform x:Name="_gridTransform" Rotation="0" />
         </Canvas.RenderTransform>
@@ -61,6 +61,11 @@
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="10" />
             </Grid.ColumnDefinitions>
+            <Button Visibility="Collapsed">
+                <Button.Flyout>
+                    <MenuFlyout x:Name="TradeMenu" Placement="Right" />
+                </Button.Flyout>
+            </Button>
             <Grid Name="_gridFront" Grid.Row="1" Grid.RowSpan="1" Grid.ColumnSpan="1"
                 Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 RenderTransformOrigin=".5 .5">

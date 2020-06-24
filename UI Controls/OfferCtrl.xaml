@@ -232,14 +232,14 @@
                 </StackPanel>
 
 
-                <StackPanel Margin="0,0,10,0" HorizontalAlignment="Right" Orientation="Horizontal" >
+                <StackPanel Margin="0,0,10,0" HorizontalAlignment="Right" Orientation="Horizontal">
                     <Ellipse Width="30" Height="30" Margin="0,0,10,0" HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Fill="{x:Bind PartnerImageBrush(TradeOffer.TradePartners), Mode=OneWay, TargetNullValue=Blue}"
                         Stroke="Black" />
 
-                    <ToggleSwitch Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Width="85"
-                        Background="Blue"
+                    <ToggleSwitch Width="85" Margin="0,0,0,0" HorizontalAlignment="Right"
+                        VerticalAlignment="Center" Background="Blue"
                         IsHitTestVisible="{x:Bind PartnerHitTest(TradeOffer.TradePartners), Mode=OneWay}"
                         Foreground="{x:Bind TradeOffer.Owner.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
                         Style="{StaticResource CatanToggleSwitch}"
@@ -286,26 +286,23 @@
                 FontSize="32" Text="Desire" />
 
             <Grid Margin="5,0,0,0">
-            <!--  My Desire  -->
-            <local:TradeResourcesCtrl HorizontalAlignment="Left"
-                TradeResources="{x:Bind TradeOffer.Desire, Mode=OneWay}"
-                ShowButtons="{x:Bind ShowResourceButtons, Mode=OneWay}"
-                OnResourceChanged="OnDesireChanged" />
+                <!--  My Desire  -->
+                <local:TradeResourcesCtrl HorizontalAlignment="Left" TradeResources="{x:Bind TradeOffer.Desire, Mode=OneWay}" ShowButtons="{x:Bind ShowResourceButtons, Mode=OneWay}" OnResourceChanged="OnDesireChanged" />
 
-            <!--  Delete Button  -->
-            <Button Grid.Row="3" Grid.Column="0" Margin="2,0,5,0" HorizontalAlignment="Right" 
-                VerticalAlignment="Center" CornerRadius="10" Click="OnDelete"
-                Visibility="{x:Bind ShowDeleteButton, Mode=OneWay}"
-                Foreground="{x:Bind TradeOffer.Owner.ForegroundBrush, Mode=OneWay}">
-                <Button.Content>
-                    <StackPanel>
-                        <TextBlock HorizontalAlignment="Center" Text="&#xE0D9;" FontFamily="Segoe UI Symbol" FontSize="18" />
-                        <TextBlock Text="Delete" FontSize="18" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-                </Grid>
-            
+                <!--  Delete Button  -->
+                <Button Grid.Row="3" Grid.Column="0" Margin="2,0,5,0" HorizontalAlignment="Right"
+                    VerticalAlignment="Center" CornerRadius="10" Click="OnDelete"
+                    Visibility="{x:Bind ShowDeleteButton, Mode=OneWay}"
+                    Foreground="{x:Bind TradeOffer.Owner.ForegroundBrush, Mode=OneWay}">
+                    <Button.Content>
+                        <StackPanel>
+                            <TextBlock HorizontalAlignment="Center" Text="&#xE0D9;" FontFamily="Segoe UI Symbol" FontSize="18" />
+                            <TextBlock Text="Delete" FontSize="18" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </Grid>
+
 
 
 

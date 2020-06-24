@@ -48,10 +48,9 @@
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:TradeOffer">
                     <Viewbox Width="{x:Bind local:TradeCtrl.SmallOffers(local:MainPage.Current.MainPageModel.Settings.SmallOffers), FallbackValue=472, Mode=OneWay}">
-                        <local:OfferCtrl Grid.Row="1" Grid.Column="0" Width="400" 
-                            Margin="0,0,0,0" ShowPartnerApproval="True" ShowDeleteButton="True"
-                            ShowSendButton="False" ShowResetButton="False" ShowAllButton="False"
-                            ShowResourceButtons="False"
+                        <local:OfferCtrl Grid.Row="1" Grid.Column="0" Width="400" Margin="0,0,0,0"
+                            ShowPartnerApproval="True" ShowDeleteButton="True" ShowSendButton="False"
+                            ShowResetButton="False" ShowAllButton="False" ShowResourceButtons="False"
                             TradePartners="{x:Bind TradePartners, Mode=OneWay}"
                             OnDeleteOffer="OnDeleteOffer" ListLayout="True"
                             TradeOffer="{x:Bind Mode=OneWay}" />

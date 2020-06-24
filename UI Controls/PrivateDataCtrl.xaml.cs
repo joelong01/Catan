@@ -25,19 +25,8 @@ namespace Catan10
         public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty StolenResourceProperty = DependencyProperty.Register("StolenResource", typeof(ResourceType), typeof(PrivateDataCtrl), new PropertyMetadata(ResourceType.None, StolenResourceChanged));
 
-        public ResourceType StolenResource
-        {
-            get => (ResourceType)GetValue(StolenResourceProperty);
-            set => SetValue(StolenResourceProperty, value);
-        }
-
-        private static void StolenResourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as PrivateDataCtrl;
-            var depPropValue = (ResourceType)e.NewValue;
-            depPropClass?.SetStolenResource(depPropValue);
-        }
         bool _showStolenResourcesUi = false;
+
         public bool ShowStolenResourcesUi
         {
             get
@@ -55,6 +44,19 @@ namespace Catan10
                         HideStolenResources.Begin();
                 }
             }
+        }
+
+        public ResourceType StolenResource
+        {
+            get => (ResourceType)GetValue(StolenResourceProperty);
+            set => SetValue(StolenResourceProperty, value);
+        }
+
+        private static void StolenResourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as PrivateDataCtrl;
+            var depPropValue = (ResourceType)e.NewValue;
+            depPropClass?.SetStolenResource(depPropValue);
         }
         private void SetStolenResource(ResourceType resourceType)
         {
@@ -251,6 +253,17 @@ namespace Catan10
             return ret;
         }
 
+        private void Menu_DoTrade(object sender, RoutedEventArgs e)
+        {
+            MenuFlyoutItem item = sender as MenuFlyoutItem;
+            (ResourceType Get, ResourceType Give) = (ValueTuple<ResourceType, ResourceType>)item.Tag;
+            TradeResources tr = new TradeResources();
+            tr.AddResource(Give, -4);
+            tr.AddResource(Get, 1);
+            this.Player.GameData.Resources.GrantResources(tr);
+
+        }
+
         /// <summary>
         ///         We added a menu to the "Available Dev Cads" collection, and the user picked one to play
         /// </summary>
@@ -258,7 +271,7 @@ namespace Catan10
         /// <param name="e"></param>
         private async void OnAvailableCardPressed(object sender, RoutedEventArgs e)
         {
-            
+
             DevCardType devCardType = (DevCardType)((MenuFlyoutItem)sender).Tag;
             Contract.Assert(SelectedAvailableDevCard != null);
             Contract.Assert(SelectedAvailableDevCard.DevCardType == devCardType);
@@ -290,7 +303,7 @@ namespace Catan10
             }
             if (devCardType == DevCardType.Knight && (state == GameState.WaitingForNext || state == GameState.WaitingForRoll))
             {
-                await MustMoveBaronLog.PostLog(MainPage.Current, MoveBaronReason.PlayedDevCard);                
+                await MustMoveBaronLog.PostLog(MainPage.Current, MoveBaronReason.PlayedDevCard);
             }
         }
 
@@ -365,10 +378,46 @@ namespace Catan10
             ShowStolenResourcesUi = false;
         }
 
-        private void OnTrade(object sender, RoutedEventArgs e)
+        private void OnTrade4For1(object sender, RoutedEventArgs e)
         {
-        }
+            TradeMenu.Items.Clear();
+            int count = 4;
+            foreach (ResourceType resource in Enum.GetValues(typeof(ResourceType)))
+            {
+                if (Player.GameData.Resources.Current.GetCount(resource) >= count)
+                {
+                    MenuFlyoutSubItem subItem = null;
 
+                    if (Player.GameData.Resources.Current.GetCount(resource) >= count)
+                    {
+                        subItem = new MenuFlyoutSubItem()
+                        {
+                            Text = $"{count} {resource} for 1 ..."
+                        };
+
+                        foreach (ResourceType rt in Enum.GetValues(typeof(ResourceType)))
+                        {
+                            if (TradeResources.GrantableResources(rt) && rt != ResourceType.GoldMine && rt != resource)
+                            {
+                                MenuFlyoutItem item = new MenuFlyoutItem()
+                                {
+                                    Text = $"{rt}",
+                                    Tag = (rt, resource)
+                                };
+                                subItem.Items.Add(item);
+                                item.Click += Menu_DoTrade;
+                            }
+
+                        }
+                    }
+                    if (subItem != null)
+                    {
+                        TradeMenu.Items.Add(subItem);
+                    }
+                }
+            }
+
+        }
         private void SetPlayer(PlayerModel value)
         {
             if (value == null) return;
@@ -380,5 +429,7 @@ namespace Catan10
         {
             ShowStolenResourcesUi = !ShowStolenResourcesUi;
         }
+
+
     }
 }

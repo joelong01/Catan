@@ -303,9 +303,13 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>-->
-                <Button Margin="5" Padding="5" Background="Transparent"
+                <Button Margin="5" Padding="5" Background="Transparent" 
                     BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
-                    CornerRadius="5" Click="OnTrade" ToolTipService.ToolTip="Trade">
+                        Click="OnTrade4For1"
+                    CornerRadius="5"  ToolTipService.ToolTip="Trade">
+                    <Button.Flyout>
+                        <MenuFlyout x:Name="TradeMenu" />
+                    </Button.Flyout>
                     <Button.Content>
                         <StackPanel Width="50" Height="65">
                             <Viewbox Height="40" Margin="0,5,0,0">

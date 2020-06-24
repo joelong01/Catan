@@ -7,6 +7,7 @@ using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -371,6 +372,95 @@ namespace Catan10
         public override string ToString()
         {
             return string.Format($"Index={Index} HarborLocation={_location} Type={HarborType}");
+        }
+
+        private void OnHarborRightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            if (Owner != null)
+            {
+                TradeMenu.Items.Clear();
+                ResourceType myResourceType = StaticHelpers.HarborTypeToResourceType(this.HarborType);
+                if (this.HarborType == HarborType.ThreeForOne)
+                {
+                    foreach (ResourceType resource in Enum.GetValues(typeof(ResourceType)))
+                    {
+                        if (Owner.GameData.Resources.Current.GetCount(resource) >= 3)
+                        {
+                            var menu = BuildSubMenu(3, resource);
+                            if (menu != null)
+                            {
+                                TradeMenu.Items.Add(menu);
+                            }
+                        }
+                    }
+                }
+                else // it is some kind of 2 for 1
+                {
+                    ResourceType resource = StaticHelpers.HarborTypeToResourceType(this.HarborType);
+                    if (Owner.GameData.Resources.Current.GetCount(resource) >= 2)
+                    {
+                        var menu = BuildSubMenu(2, resource);
+                        if (menu != null)
+                        {
+                            TradeMenu.Items.Add(menu);
+                        }
+                    }
+                }
+                if (TradeMenu.Items.Count > 0)
+                {
+                    TradeMenu.ShowAt(this, new Point(0, 0));
+                }
+            }
+        }
+
+
+
+        private MenuFlyoutSubItem BuildSubMenu(int count, ResourceType resourceType)
+        {
+
+
+            MenuFlyoutSubItem subItem = null;
+
+            if (Owner.GameData.Resources.Current.GetCount(resourceType) >= count)
+            {
+                subItem = new MenuFlyoutSubItem()
+                {
+                    Text = $"{count} {resourceType} for 1 ..."
+                };
+
+                foreach (ResourceType rt in Enum.GetValues(typeof(ResourceType)))
+                {
+                    if (TradeResources.GrantableResources(rt) && rt != ResourceType.GoldMine && rt != resourceType)
+                    {
+                        MenuFlyoutItem item = new MenuFlyoutItem()
+                        {
+                            Text = $"{rt}",
+                            Tag = (rt, resourceType)
+                        };
+                        subItem.Items.Add(item);
+                        item.Click += Menu_DoTrade;
+                    }
+
+                }
+            }
+
+            return subItem;
+        }
+
+
+        private void Menu_DoTrade(object sender, RoutedEventArgs e)
+        {
+            MenuFlyoutItem item = sender as MenuFlyoutItem;
+
+            (ResourceType Get, ResourceType Give) = (ValueTuple<ResourceType, ResourceType>)item.Tag;
+
+            int cost = 2;
+            if (this.HarborType == HarborType.ThreeForOne) cost = 3;
+            TradeResources tr = new TradeResources();
+            tr.AddResource(Give, -cost);
+            tr.AddResource(Get, 1);
+            this.Owner.GameData.Resources.GrantResources(tr);
+
         }
     }
 }

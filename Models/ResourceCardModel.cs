@@ -142,7 +142,7 @@ namespace Catan10
             foreach (var resType in tr.NonZeroResources)
             {
                 var model = ModelForResource(resType);
-                model.Count = tr.CountForResource(resType);
+                model.Count += tr.CountForResource(resType);
             }
         }
 
