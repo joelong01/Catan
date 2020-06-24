@@ -269,12 +269,14 @@ namespace Catan10
             {
                 TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
                 GameInfo serviceGameInfo = null;
-                HubConnection.On("JoinGame", (GameInfo info, string name) =>
+                void CatanSignalRClient_OnGameJoined(GameInfo info, string name)
                 {
+                    this.OnGameJoined -= CatanSignalRClient_OnGameJoined;
                     serviceGameInfo = info;
-                    tcs.SetResult(null);
+                    tcs.TrySetResult(null);                    
 
-                });
+                };
+                this.OnGameJoined += CatanSignalRClient_OnGameJoined;
                 await HubConnection.InvokeAsync("JoinGame", gameInfo, playerName);
                 await tcs.Task;
                 return serviceGameInfo;
@@ -286,6 +288,8 @@ namespace Catan10
             }
             return null;
         }
+
+      
 
         public async Task<bool> KeepAlive()
         {

@@ -192,7 +192,7 @@ namespace Catan10
             };
 
             KeepAliveTimer.Tick += KeepAliveTimer_Tick;
-           KeepAliveTimer.Start();
+            // KeepAliveTimer.Start();
         }
         
         private void KeepAliveTimer_Tick(object sender, object e)
