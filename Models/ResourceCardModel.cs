@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
@@ -13,14 +14,31 @@ namespace Catan10
 {
     /// <summary>
     ///     this class exists so that we can bind UI to a *list* of ResourceCards
-    ///     It is born with 
+    ///     It is born with
     ///         - 0 dev cards
     ///         - Brick, Wood, wheat, Shee, Ore => all 0 count and facedown
     ///         - note: NO GOLDMINE.
-    ///         
+    ///
     /// </summary>
     public class ResourceCardCollection : ObservableCollection<ResourceCardModel>
     {
+        #region Properties
+
+        new public int Count => base.Count;
+
+        public bool IsFlat
+        {
+            get
+            {
+                foreach (var model in this)
+                {
+                    if (model.Count > 1)
+                        return false;
+                }
+
+                return true;
+            }
+        }
 
         public int ResourceCount
         {
@@ -36,57 +54,9 @@ namespace Catan10
             }
         }
 
-        new public int Count => base.Count;
-        public bool IsFlat
-        {
-            get
-            {
-                foreach (var model in this)
-                {
-                    if (model.Count > 1)
-                        return false;
-                }
+        #endregion Properties
 
-                return true;
-            }
-        }
-        public ResourceCardCollection Flatten()
-        {
-            ResourceCardCollection flat = new ResourceCardCollection(false);
-            foreach (var model in this)
-            {
-                for (int i = 0; i < model.Count; i++)
-                {
-                    flat.Add(new ResourceCardModel() { Count = 1, ResourceType = model.ResourceType });
-                }
-            }
-            return flat;
-        }
-        public static ResourceCardCollection Flatten(TradeResources tradeResources)
-        {
-            ResourceCardCollection flat = new ResourceCardCollection(false);
-            flat.Clear();
-            foreach (var resType in tradeResources.NonZeroResources)
-            {
-                for (int i = 0; i < tradeResources.CountForResource(resType); i++)
-                {
-                    flat.Add(new ResourceCardModel() { Count = 1, ResourceType = resType });
-                }
-
-            }
-            return flat;
-        }
-
-        public static TradeResources ToTradeResources(IEnumerable<ResourceCardModel> resourceCards)
-        {
-            TradeResources tr = new TradeResources();
-            foreach (var card in resourceCards)
-            {
-                tr.AddResource(card.ResourceType, card.Count);
-            }
-            return tr;
-        }
-
+        #region Constructors + Destructors
 
         public ResourceCardCollection(bool initialize = true)
         {
@@ -101,16 +71,39 @@ namespace Catan10
             this.AddResources(tr);
         }
 
-        private void Add(ResourceType resource, bool countVisible = true)
-        {
-            ResourceCardModel model = new ResourceCardModel()
-            {
-                ResourceType = resource,
-                Orientation = TileOrientation.FaceDown,
-                CountVisible = countVisible
-            };
+        #endregion Constructors + Destructors
 
-            this.Add(model);
+        #region Methods
+
+        public static ResourceCardCollection Flatten(TradeResources tradeResources)
+        {
+            ResourceCardCollection flat = new ResourceCardCollection(false);
+            flat.Clear();
+            foreach (var resType in tradeResources.NonZeroResources)
+            {
+                for (int i = 0; i < tradeResources.CountForResource(resType); i++)
+                {
+                    flat.Add(new ResourceCardModel() { Count = 1, ResourceType = resType });
+                }
+            }
+            return flat;
+        }
+
+        public static ResourceCardCollection FromTradeResources(TradeResources tr)
+        {
+            ResourceCardCollection rc = new ResourceCardCollection();
+            rc.AddResources(tr);
+            return rc;
+        }
+
+        public static TradeResources ToTradeResources(IEnumerable<ResourceCardModel> resourceCards)
+        {
+            TradeResources tr = new TradeResources();
+            foreach (var card in resourceCards)
+            {
+                tr.AddResource(card.ResourceType, card.Count);
+            }
+            return tr;
         }
 
         public void Add(DevCardType resource, bool countVisible = false)
@@ -124,19 +117,6 @@ namespace Catan10
             this.Add(model);
         }
 
-        ResourceCardModel ModelForResource(ResourceType resourceType)
-        {
-            foreach (var model in this)
-            {
-                if (model.ResourceType == resourceType) return model;
-            }
-
-           // this.TraceMessage($"Needed to add ResourceType={resourceType} to ResourceCollection");
-            var m = new ResourceCardModel() { ResourceType = resourceType, Count = 0 };
-            this.Add(m);
-            return m;
-        }
-
         public void AddResources(TradeResources tr)
         {
             foreach (var resType in tr.NonZeroResources)
@@ -146,11 +126,43 @@ namespace Catan10
             }
         }
 
-        public static ResourceCardCollection FromTradeResources(TradeResources tr)
+        public void AllDown()
         {
-            ResourceCardCollection rc = new ResourceCardCollection();
-            rc.AddResources(tr);
-            return rc;
+            this.ForEach((model) => model.Orientation = TileOrientation.FaceDown);
+        }
+
+        public void AllUp()
+        {
+            this.ForEach((model) => model.Orientation = TileOrientation.FaceUp);
+        }
+
+        public ResourceCardCollection Consolidate()
+        {
+            TradeResources tr = ToTradeResources(this);
+            return FromTradeResources(tr);
+        }
+
+        public ResourceCardCollection Flatten()
+        {
+            ResourceCardCollection flat = new ResourceCardCollection(false);
+            foreach (var model in this)
+            {
+                for (int i = 0; i < model.Count; i++)
+                {
+                    flat.Add(new ResourceCardModel() { Count = 1, ResourceType = model.ResourceType });
+                }
+            }
+            return flat;
+        }
+
+        public void Reset()
+        {
+            this.Clear();
+            this.Add(ResourceType.Wood);
+            this.Add(ResourceType.Brick);
+            this.Add(ResourceType.Wheat);
+            this.Add(ResourceType.Sheep);
+            this.Add(ResourceType.Ore);
         }
 
         public ObservableCollection<ResourceCardModel> ToObservableCollection(bool flat)
@@ -170,16 +182,9 @@ namespace Catan10
             return col;
         }
 
-        public   ResourceCardCollection Consolidate()
+        internal void AddGoldMine()
         {
-
-            TradeResources tr = ToTradeResources(this);
-            return FromTradeResources(tr);
-        }
-
-        public void AllDown()
-        {
-            this.ForEach((model) => model.Orientation = TileOrientation.FaceDown);
+            this.Add(ResourceType.GoldMine);
         }
 
         internal void RemoveGold()
@@ -192,30 +197,7 @@ namespace Catan10
                     return;
                 }
             }
-
         }
-
-        public void AllUp()
-        {
-            this.ForEach((model) => model.Orientation = TileOrientation.FaceUp);
-        }
-
-
-
-        public void Reset()
-        {
-            this.Clear();
-            this.Add(ResourceType.Wood);
-            this.Add(ResourceType.Brick);
-            this.Add(ResourceType.Wheat);
-            this.Add(ResourceType.Sheep);
-            this.Add(ResourceType.Ore);
-
-
-
-        }
-
-
 
         /// <summary>
         ///     this should only be called on a flattened ResourceCollection - otherwise you are ranomized types, not cards
@@ -231,10 +213,32 @@ namespace Catan10
             }
         }
 
-        internal void AddGoldMine()
+        private void Add(ResourceType resource, bool countVisible = true)
         {
-            this.Add(ResourceType.GoldMine);
+            ResourceCardModel model = new ResourceCardModel()
+            {
+                ResourceType = resource,
+                Orientation = TileOrientation.FaceDown,
+                CountVisible = countVisible
+            };
+
+            this.Add(model);
         }
+
+        private ResourceCardModel ModelForResource(ResourceType resourceType)
+        {
+            foreach (var model in this)
+            {
+                if (model.ResourceType == resourceType) return model;
+            }
+
+            // this.TraceMessage($"Needed to add ResourceType={resourceType} to ResourceCollection");
+            var m = new ResourceCardModel() { ResourceType = resourceType, Count = 0 };
+            this.Add(m);
+            return m;
+        }
+
+        #endregion Methods
     }
 
     /// <summary>
@@ -242,6 +246,10 @@ namespace Catan10
     /// </summary>
     public class ResourceCardModel : INotifyPropertyChanged
     {
+        #region Delegates + Fields + Events + Enums
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private int _count = 0;
 
         private bool _countVisible = true;
@@ -259,23 +267,11 @@ namespace Catan10
         private bool _readOnly = false;
 
         private ResourceType _resourceType = ResourceType.Back;
-        public override string ToString()
-        {
-            return $"[Count={Count}][Resource={ResourceType}][DevCard={DevCardType}][Owner={Owner}][Orientation={Orientation}]";
-        }
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
-        [JsonIgnore]
-        public PlayerModel Owner
-        {
-            get
-            {
-                return MainPage.Current.NameToPlayer(_ownerName);
-            }
-        }
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
         [JsonIgnore]
         public Brush BackBrush
         {
@@ -339,6 +335,7 @@ namespace Catan10
                 }
             }
         }
+
         [JsonIgnore]
         public Brush FrontBrush
         {
@@ -357,6 +354,7 @@ namespace Catan10
                 return (Brush)App.Current.Resources["ResourceType." + ResourceType.ToString()];
             }
         }
+
         [JsonIgnore]
         public Brush HarborBrush
         {
@@ -419,6 +417,15 @@ namespace Catan10
             }
         }
 
+        [JsonIgnore]
+        public PlayerModel Owner
+        {
+            get
+            {
+                return MainPage.Current.NameToPlayer(_ownerName);
+            }
+        }
+
         public string OwnerName
         {
             get
@@ -469,12 +476,18 @@ namespace Catan10
             }
         }
 
+        #endregion Properties
+
+        #region Constructors + Destructors
+
         // ResourceType.None means it is a DevCard
         public ResourceCardModel()
         {
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors + Destructors
+
+        #region Methods
 
         public TileOrientation CountToOrientation(int count)
         {
@@ -485,5 +498,17 @@ namespace Catan10
 
             return TileOrientation.FaceDown;
         }
+
+        public override string ToString()
+        {
+            return $"[Count={Count}][Resource={ResourceType}][DevCard={DevCardType}][Owner={Owner}][Orientation={Orientation}]";
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion Methods
     }
 }

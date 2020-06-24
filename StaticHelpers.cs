@@ -25,11 +25,9 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace Catan10
 {
-
     public static class BindingExtensions
 
     {
-
         #region Methods
 
         public static void UpdateSource(this FrameworkElement element, DependencyProperty property)
@@ -40,6 +38,7 @@ namespace Catan10
                 expression.UpdateSource();
             }
         }
+
         #endregion Methods
     }
 

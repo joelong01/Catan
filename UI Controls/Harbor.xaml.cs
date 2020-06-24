@@ -7,7 +7,6 @@ using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -18,6 +17,13 @@ namespace Catan10
 {
     public sealed partial class Harbor : UserControl, INotifyPropertyChanged
     {
+        #region Delegates + Fields + Events + Enums
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
         private readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
 
         private readonly string[] _savePropName = new string[] { "HarborLocation" };
@@ -30,37 +36,9 @@ namespace Catan10
 
         private bool _useClassic = true;
 
-        private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var depPropClass = d as Harbor;
-            var newOwner = (PlayerModel)e.NewValue;
-            var oldOwner = (PlayerModel)e.OldValue;
-            depPropClass?.SetOwner(oldOwner, newOwner);
-        }
+        #endregion Delegates + Fields + Events + Enums
 
-        private void HarborGrid_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        //
-        //  update the Owner about who owns this harbor
-        private void SetOwner(PlayerModel oldOwner, PlayerModel newOwner)
-        {
-            if (oldOwner != null)
-            {
-                oldOwner.GameData.RemoveOwnedHarbor(this);
-            }
-
-            if (newOwner != null)
-            {
-                newOwner.GameData.AddOwnedHarbor(this);
-            }
-        }
+        #region Properties
 
         public FrameworkElement AnimationObject => _backGrid;
 
@@ -192,11 +170,9 @@ namespace Catan10
             set => _useClassic = value;
         }
 
-        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
+        #endregion Properties
 
-        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
-
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
+        #region Constructors + Destructors
 
         public Harbor()
         {
@@ -204,7 +180,59 @@ namespace Catan10
             this.DataContext = this;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors + Destructors
+
+        #region Methods
+
+        public static MenuFlyoutSubItem BuildResourceTradeMenu(PlayerModel owner, int cost, ResourceType give)
+        {
+            //
+            // this is the only state you can do a meritime trade in
+            if (MainPage.GameController.CurrentGameState != GameState.WaitingForNext) return null;
+
+            //
+            //  can't trade if you don't have enough resources
+            if (owner.GameData.Resources.Current.GetCount(give) < cost) return null;
+
+            //
+            //  local function to handle the menu click event we create below
+            //
+            async void LocalHandleMenuClick(object sender, RoutedEventArgs e)
+            {
+                MenuFlyoutItem item = sender as MenuFlyoutItem;
+
+                (ResourceType Get, ResourceType Give) = (ValueTuple<ResourceType, ResourceType>)item.Tag;
+
+                TradeResources tr = new TradeResources();
+                tr.AddResource(Get, 1);
+                tr.AddResource(Give, -cost);
+
+                await ResourceExchangeLog.PostLog(MainPage.GameController, tr);
+            }
+
+            //
+            //  build the menu
+            MenuFlyoutSubItem subItem = subItem = new MenuFlyoutSubItem()
+            {
+                Text = $"{cost} {give} for 1 ..."
+            };
+            foreach (ResourceType get in Enum.GetValues(typeof(ResourceType)))
+            {
+                if (TradeResources.GrantableResources(get) && get != ResourceType.GoldMine && get != give)
+                {
+                    //
+                    //  use the tag to store the resources needed to build the TradeResources in the handler
+                    MenuFlyoutItem item = new MenuFlyoutItem()
+                    {
+                        Text = $"{get}",
+                        Tag = (get, give)
+                    };
+                    subItem.Items.Add(item);
+                    item.Click += LocalHandleMenuClick;
+                }
+            }
+            return subItem;
+        }
 
         public Task AnimateMoveTask(Point to, double ms, double startAfter)
         {
@@ -374,11 +402,26 @@ namespace Catan10
             return string.Format($"Index={Index} HarborLocation={_location} Type={HarborType}");
         }
 
+        private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as Harbor;
+            var newOwner = (PlayerModel)e.NewValue;
+            var oldOwner = (PlayerModel)e.OldValue;
+            depPropClass?.SetOwner(oldOwner, newOwner);
+        }
+
+        private void HarborGrid_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         private void OnHarborRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             if (Owner == null) return;
-            
-
 
             TradeMenu.Items.Clear();
 
@@ -395,7 +438,7 @@ namespace Catan10
                     }
                 }
             }
-            else 
+            else
             {
                 // if it is 2:1, add a menu only for the harbor resource type
                 ResourceType resource = StaticHelpers.HarborTypeToResourceType(this.HarborType);
@@ -404,7 +447,6 @@ namespace Catan10
                 {
                     TradeMenu.Items.Add(menu);
                 }
-
             }
             //
             //  if they have a menu to display, show it
@@ -412,62 +454,23 @@ namespace Catan10
             {
                 TradeMenu.ShowAt(this, new Point(0, 0));
             }
-
         }
 
-
-
-        public static MenuFlyoutSubItem BuildResourceTradeMenu(PlayerModel owner, int cost, ResourceType give)
+        //
+        //  update the Owner about who owns this harbor
+        private void SetOwner(PlayerModel oldOwner, PlayerModel newOwner)
         {
-            //
-            // this is the only state you can do a meritime trade in
-            if (MainPage.GameController.CurrentGameState != GameState.WaitingForNext) return null;
-
-            //
-            //  can't trade if you don't have enough resources
-            if (owner.GameData.Resources.Current.GetCount(give) < cost) return null;
-
-            //
-            //  local function to handle the menu click event we create below
-            //  
-            async void LocalHandleMenuClick(object sender, RoutedEventArgs e)
+            if (oldOwner != null)
             {
-                MenuFlyoutItem item = sender as MenuFlyoutItem;
-
-                (ResourceType Get, ResourceType Give) = (ValueTuple<ResourceType, ResourceType>)item.Tag;
-
-                TradeResources tr = new TradeResources();
-                tr.AddResource(Get, 1);
-                tr.AddResource(Give, -cost);
-
-                await ResourceExchangeLog.PostLog(MainPage.GameController, tr);
+                oldOwner.GameData.RemoveOwnedHarbor(this);
             }
 
-            
-            //
-            //  build the menu
-            MenuFlyoutSubItem subItem = subItem = new MenuFlyoutSubItem()
+            if (newOwner != null)
             {
-                Text = $"{cost} {give} for 1 ..."
-            };
-            foreach (ResourceType get in Enum.GetValues(typeof(ResourceType)))
-            {
-                if (TradeResources.GrantableResources(get) && get != ResourceType.GoldMine && get != give)
-                {
-                    //
-                    //  use the tag to store the resources needed to build the TradeResources in the handler
-                    MenuFlyoutItem item = new MenuFlyoutItem()
-                    {
-                        Text = $"{get}",
-                        Tag = (get, give)
-                    };
-                    subItem.Items.Add(item);
-                    item.Click += LocalHandleMenuClick;
-                }
+                newOwner.GameData.AddOwnedHarbor(this);
             }
-            return subItem;
         }
 
-
+        #endregion Methods
     }
 }

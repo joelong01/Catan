@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
-using Windows.Devices.PointOfService;
+
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -26,7 +26,7 @@ namespace Catan10
         public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty StolenResourceProperty = DependencyProperty.Register("StolenResource", typeof(ResourceType), typeof(PrivateDataCtrl), new PropertyMetadata(ResourceType.None, StolenResourceChanged));
 
-        bool _showStolenResourcesUi = false;
+        private bool _showStolenResourcesUi = false;
 
         public bool ShowStolenResourcesUi
         {
@@ -59,6 +59,7 @@ namespace Catan10
             var depPropValue = (ResourceType)e.NewValue;
             depPropClass?.SetStolenResource(depPropValue);
         }
+
         private void SetStolenResource(ResourceType resourceType)
         {
             if (resourceType == ResourceType.None)
@@ -254,8 +255,6 @@ namespace Catan10
             return ret;
         }
 
-       
-
         /// <summary>
         ///         We added a menu to the "Available Dev Cads" collection, and the user picked one to play
         /// </summary>
@@ -263,7 +262,6 @@ namespace Catan10
         /// <param name="e"></param>
         private async void OnAvailableCardPressed(object sender, RoutedEventArgs e)
         {
-
             DevCardType devCardType = (DevCardType)((MenuFlyoutItem)sender).Tag;
             Contract.Assert(SelectedAvailableDevCard != null);
             Contract.Assert(SelectedAvailableDevCard.DevCardType == devCardType);
@@ -363,8 +361,6 @@ namespace Catan10
             }
         }
 
-
-
         private void OnTargetResultClicked(object sender, RoutedEventArgs e)
         {
             ShowStolenResourcesUi = false;
@@ -386,9 +382,10 @@ namespace Catan10
             //  if they have a menu to display, show it
             if (TradeMenu.Items.Count > 0)
             {
-                TradeMenu.ShowAt(this, new Point(0, 0));                
+                TradeMenu.ShowAt(this, new Point(0, 0));
             }
         }
+
         private void SetPlayer(PlayerModel value)
         {
             if (value == null) return;
@@ -400,7 +397,5 @@ namespace Catan10
         {
             ShowStolenResourcesUi = !ShowStolenResourcesUi;
         }
-
-
     }
 }

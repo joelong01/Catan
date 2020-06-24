@@ -1,17 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
+
 using Catan.Proxy;
 
 namespace Catan10
 {
     public class ResourceExchangeLog : LogHeader, ILogController
     {
+        #region Properties
+
         private TradeResources Traded { get; set; }
-        public static Task PostLog(IGameController gameController, TradeResources tr)        
+
+        #endregion Properties
+
+        #region Methods
+
+        public static Task PostLog(IGameController gameController, TradeResources tr)
         {
             Debug.Assert(gameController.CurrentGameState == GameState.WaitingForNext);
             var logHeader = new ResourceExchangeLog()
@@ -23,6 +27,7 @@ namespace Catan10
 
             return gameController.PostMessage(logHeader, ActionType.Normal);
         }
+
         public Task Do(IGameController gameController)
         {
             //
@@ -45,5 +50,7 @@ namespace Catan10
             owner.GameData.Resources.GrantResources(this.Traded.GetNegated());
             return Task.CompletedTask;
         }
+
+        #endregion Methods
     }
 }
