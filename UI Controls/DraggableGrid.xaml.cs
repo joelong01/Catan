@@ -152,6 +152,8 @@ namespace Catan10
 
             GridPosition.TranslateX = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateX;
             GridPosition.TranslateY = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateY;
+            GridPosition.ScaleX = (fullSize == 1.0) ? 1.0 : 0.5;
+            GridPosition.ScaleY = GridPosition.ScaleX;
 
             OnGridPositionChanged?.Invoke(userControl.Name, GridPosition);
         }
@@ -159,17 +161,17 @@ namespace Catan10
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
             fullSize = 1 - fullSize;
-            if (fullSize == 0)
-            {
-                this.Width = this.ActualWidth * 0.5;
-                this.Height = this.ActualHeight * 0.5;
+            //if (fullSize == 0)
+            //{
+            //    this.Width = this.ActualWidth * 0.5;
+            //    this.Height = this.ActualHeight * 0.5;
 
-            }
-            else
-            {
-                this.Width = this.ActualWidth * 2;
-                this.Height = this.ActualHeight * 2;
-            }
+            //}
+            //else
+            //{
+            //    this.Width = this.ActualWidth * 2;
+            //    this.Height = this.ActualHeight * 2;
+            //}
             //if (GridPosition.ScaleX != 1.0)
             //{
             //    GridPosition.ScaleX = 1.0;
