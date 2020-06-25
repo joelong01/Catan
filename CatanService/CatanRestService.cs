@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reflection;
+using System.ServiceModel.Channels;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -112,10 +113,23 @@ namespace Catan10
 
         #endregion Delegates  + Events + Enums
 
+        public void SendingMessage()
+        {
+            UnprocessedMessages++;
+        }
+
+        public void RecievedMessage(CatanMessage message)
+        {
+            if (message.From == MainPage.Current.TheHuman.PlayerName)
+            {
+                UnprocessedMessages--;
+            }
+        }
+        
         public Task SendBroadcastMessage(Guid gameId, CatanMessage message)
         {
             
-            UnprocessedMessages++;
+            SendingMessage();
             return Proxy.BroadcastMessage(gameId, message);
         }
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -19,20 +18,82 @@ namespace Catan10
 {
     public class CatanSignalRClient : IDisposable, ICatanService
     {
-        #region Properties + Fields 
+        public void SendingMessage()
+        {
+            UnprocessedMessages++;
+        }
+
+        public void RecievedMessage(string from)
+        {
+            if (from == MainPage.Current.TheHuman.PlayerName)
+            {
+                UnprocessedMessages--;
+            }
+            else
+            {
+                this.TraceMessage($"not decrementing UnprocessedMessages for message from {from}");
+            }
+        }
+
+
+
+        #region Delegates + Fields + Events + Enums
+
+        public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
+
+        public event GameLifeTimeHandler OnGameCreated;
+
+        public event DeleteGameHandler OnGameDeleted;
+
+        public event GameLifeTimeHandler OnGameJoined;
+
+        public event GameLifeTimeHandler OnGameLeft;
+
+        public event PrivateMessageReceivedHandler OnPrivateMessage;
+
+       
+
+
         private delegate void AllGamesReceivedHandler(List<GameInfo> games);
+
         private event AllGamesReceivedHandler OnAllGamesReceived;
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public HubConnectionState ConnectionState => HubConnection.State;
+        private int _unprocessedMessages = 0;
+        [JsonIgnore]
+        public int UnprocessedMessages
+        {
+            get
+            {
+                return _unprocessedMessages;
+            }
+            set
+            {
+                Debug.Assert(value >= 0);
+                if (_unprocessedMessages != value)
+                {
+                    _unprocessedMessages = value;                                        
+                 //   this.TraceMessage($"UnprocessedMessages: [Service={_unprocessedMessages}] ");
+                }
+            }
+        }
         private static Assembly CurrentAssembly { get; } = Assembly.GetExecutingAssembly();
-        
+
         private HubConnection HubConnection { get; set; }
 
         private string ServiceUrl { get; set; } = "";
 
-        #endregion Properties + Fields 
+        #endregion Properties
+
+
+
+
 
         #region Methods
-
-
 
         private async void OnToAllClients(string json)
         {
@@ -40,10 +101,13 @@ namespace Catan10
             {
                 try
                 {
+                    
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         CatanMessage message = ParseMessage(json);
+                        RecievedMessage(message.From);
                         OnBroadcastMessageReceived.Invoke(message);
+                        
                     });
                 }
                 catch (Exception e)
@@ -62,6 +126,7 @@ namespace Catan10
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         var message = ParseMessage(jsonMessage);
+                        RecievedMessage(message.From);
                         OnPrivateMessage.Invoke(message);
                     });
                 }
@@ -87,38 +152,14 @@ namespace Catan10
             message.Data = logHeader;
             return message;
         }
+
         #endregion Methods
 
-        #region Constructors
 
-        #endregion Constructors
 
-        #region Delegates  + Events + Enums
+        
 
-        #endregion Delegates  + Events + Enums
-
-        #region Delegates + Fields + Events + Enums
-
-        public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
-
-        public event GameLifeTimeHandler OnGameCreated;
-
-        public event DeleteGameHandler OnGameDeleted;
-
-        public event GameLifeTimeHandler OnGameJoined;
-        public event GameLifeTimeHandler OnGameLeft;
-
-        public event PrivateMessageReceivedHandler OnPrivateMessage;
-
-        #endregion Delegates + Fields + Events + Enums
-
-        #region Properties
-
-        public HubConnectionState ConnectionState => HubConnection.State;
-
-        public int UnprocessedMessages { get; set; }
-
-        #endregion Properties
+      
 
         #region Constructors + Destructors
 
@@ -144,7 +185,7 @@ namespace Catan10
             Contract.Assert(!String.IsNullOrEmpty(gameInfo.Name));
             try
             {
-               await HubConnection.InvokeAsync("CreateGame", gameInfo);
+                await HubConnection.InvokeAsync("CreateGame", gameInfo);
             }
             catch (Exception ex)
             {
@@ -177,16 +218,14 @@ namespace Catan10
             {
                 list = games;
                 this.OnAllGamesReceived -= CatanSignalRClient_OnAllGamesReceived;
+                // do not call UnprocessedMessages-- because the OnAllGamesRecieved does that for you
                 tcs.SetResult(null);
-
             }
             this.OnAllGamesReceived += CatanSignalRClient_OnAllGamesReceived;
 
             await HubConnection.InvokeAsync("GetAllGames");
             await tcs.Task;
             return list;
-
-
         }
 
         public async Task Initialize(string host)
@@ -194,7 +233,6 @@ namespace Catan10
             try
             {
                 ServiceUrl = "http://" + host + "/CatanHub";
-                
 
                 HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging((logging) =>
                 {
@@ -224,32 +262,30 @@ namespace Catan10
                 HubConnection.On("CreateGame", async (GameInfo gameInfo, string by) =>
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                        //this.TraceMessage($"CreateGame: {gameInfo}");
+                    {                        
                         OnGameCreated?.Invoke(gameInfo, by);
                     });
                 });
                 HubConnection.On("DeleteGame", async (Guid id, string by) =>
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                       // this.TraceMessage($"DeletedGame: [GameId={id}] [by={by}]");
+                    {                      
                         OnGameDeleted?.Invoke(id, by);
                     });
                 });
                 HubConnection.On("JoinGame", (GameInfo gameInfo, string playerName) =>
                 {
-                   // this.TraceMessage($"JoinGame: [Info={gameInfo}] [By={playerName}]");
+                    
                     OnGameJoined?.Invoke(gameInfo, playerName);
                 });
                 HubConnection.On("LeaveGame", (GameInfo gameInfo, string playerName) =>
                 {
-                    //this.TraceMessage($"Leave: [Info={gameInfo}] [By={playerName}]");
+                    
                     OnGameLeft?.Invoke(gameInfo, playerName);
                 });
 
                 HubConnection.On("AllGames", (List<GameInfo> games) =>
-                {
+                {                    
                     OnAllGamesReceived?.Invoke(games);
                 });
 
@@ -261,8 +297,6 @@ namespace Catan10
             }
         }
 
-
-
         public async Task<GameInfo> JoinGame(GameInfo gameInfo, string playerName)
         {
             try
@@ -272,9 +306,9 @@ namespace Catan10
                 void CatanSignalRClient_OnGameJoined(GameInfo info, string name)
                 {
                     this.OnGameJoined -= CatanSignalRClient_OnGameJoined;
+                    // do not decrement UnprocessedMessages -- the event firer (sp?) handler does that
                     serviceGameInfo = info;
-                    tcs.TrySetResult(null);                    
-
+                    tcs.TrySetResult(null);
                 };
                 this.OnGameJoined += CatanSignalRClient_OnGameJoined;
                 await HubConnection.InvokeAsync("JoinGame", gameInfo, playerName);
@@ -284,12 +318,9 @@ namespace Catan10
             catch (Exception ex)
             {
                 this.TraceMessage($"Exception! [Message={ex.Message}");
-
             }
             return null;
         }
-
-      
 
         public async Task<bool> KeepAlive()
         {
@@ -300,8 +331,8 @@ namespace Catan10
         public async Task<List<string>> LeaveGame(GameInfo gameInfo, string playerName)
         {
             try
-            {               
-                await HubConnection.InvokeAsync("LeaveGame", gameInfo, playerName);                
+            {
+                await HubConnection.InvokeAsync("LeaveGame", gameInfo, playerName);
             }
             catch (Exception ex)
             {
@@ -316,6 +347,7 @@ namespace Catan10
             try
             {
                 string json = JsonSerializer.Serialize<object>(message, GetJsonOptions());
+                SendingMessage();
                 await HubConnection.InvokeAsync("BroadcastMessage", gameId.ToString(), json);
             }
             catch (Exception ex)
@@ -334,6 +366,7 @@ namespace Catan10
             try
             {
                 string json = JsonSerializer.Serialize(message, GetJsonOptions());
+                SendingMessage();
                 await HubConnection.InvokeAsync("SendPrivateMessage", message.To, json);
             }
             catch (Exception ex)

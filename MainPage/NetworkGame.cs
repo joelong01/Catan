@@ -22,7 +22,7 @@ namespace Catan10
 
     public class FunctionTimer : IDisposable
     {
-        public bool Enabled { get; set; } = true;  // a global flag to turn off all timing
+        public bool Enabled { get; set; } = false;  // a global flag to turn off all timing
 
         Stopwatch watch = null; 
         string message;
@@ -312,8 +312,10 @@ namespace Catan10
                 default:
                     break;
             }
-            MainPageModel.UnprocessedMessages--;
-            MainPageModel.CatanService.UnprocessedMessages--;
+            if (message.From == TheHuman.PlayerName)
+            {
+                MainPageModel.UnprocessedMessages--;                
+            }
 
         }
 

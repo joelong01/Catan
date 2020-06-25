@@ -133,7 +133,7 @@ namespace Catan10
                     _unprocessedMessages = value;
                     NotifyPropertyChanged();
                     DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-                  //  this.TraceMessage($"UnprocessedMessages: {CatanService.UnprocessedMessages} ");
+                  //  this.TraceMessage($"UnprocessedMessages: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
                 }
             }
         }
@@ -151,11 +151,13 @@ namespace Catan10
 
                     if (Log == null) return true;
 
+                    Debug.Assert(UnprocessedMessages >= 0);
+
                     //
                     //  whevener this changes, the log changes...so you don't need to send a NotifyPropertyChanged() event...I hope...
                     if (UnprocessedMessages > 0)
-                    {
-                        this.TraceMessage($"Enable false because UnprocessedMessages: {CatanService.UnprocessedMessages} ");
+                    {                        
+                       // this.TraceMessage($"Enable false because UnprocessedMessages > 0: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
                         return false;
                     }
 

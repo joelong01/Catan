@@ -31,14 +31,14 @@ namespace Catan10
         }
 
         /// <summary>
-        ///    Resets ResourcesThis Turn for each players, pauses for UI continue
+        ///    pauses for UI continue.  leave the resources so people can remember what was picked
         /// </summary>
         /// <param name="gameController"></param>
         /// <returns></returns>
 
         public Task Do(IGameController gameController)
         {
-            gameController.MainPageModel.PlayingPlayers.ForEach((p) => p.GameData.Resources.ResourcesThisTurn.Reset());
+            
             return Task.CompletedTask;
         }
 

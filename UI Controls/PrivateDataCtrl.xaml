@@ -102,10 +102,16 @@
                                 <Grid>
                                     <Rectangle Width="70" Height="100" Margin="2" RadiusX="5"
                                         RadiusY="5"
-                                        Fill="{x:Bind local:DevCardModel.DevCardTypeToImage(DevCardType), Mode=OneWay}">
+                                        Fill="{x:Bind local:DevCardModel.DevCardTypeToImage(DevCardType), Mode=OneWay}"
+                                               ToolTipService.ToolTip="{x:Bind DevCardType}" >
+                                        
                                         <Rectangle.ContextFlyout>
                                             <MenuFlyout>
-                                                <MenuFlyoutItem Text="{x:Bind local:PrivateDataCtrl.MenuPlayString(DevCardType), Mode=OneWay}" Click="OnAvailableCardPressed" Tag="{x:Bind DevCardType, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind DevCardType}" />
+                                                <MenuFlyoutItem 
+                                                    IsEnabled="{x:Bind local:PrivateDataCtrl.EnableMenuForGameState(DevCardType, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}" 
+                                                    Text="{x:Bind local:PrivateDataCtrl.MenuPlayString(DevCardType), Mode=OneWay}" 
+                                                    Click="OnAvailableCardPressed" Tag="{x:Bind DevCardType, Mode=OneWay}" >                                                    
+                                                </MenuFlyoutItem>                                                    
                                             </MenuFlyout>
                                         </Rectangle.ContextFlyout>
                                     </Rectangle>
@@ -276,7 +282,7 @@
                     BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
                     CornerRadius="5"
                     IsEnabled="{x:Bind EnabledEntitlementPurchase('DevCard', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
-                    ToolTipService.ToolTip="Buy Dev Card" ToolTipService.Placement="Left">
+                    ToolTipService.ToolTip="Buy Dev Card" ToolTipService.Placement="Left" Click="OnBuyDevCard">
                     <Button.Content>
                         <StackPanel Width="50" Height="65">
                             <Rectangle Width="35" Height="50" Margin="0" RadiusX="5"

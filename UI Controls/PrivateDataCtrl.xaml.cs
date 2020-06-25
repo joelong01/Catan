@@ -255,6 +255,19 @@ namespace Catan10
             return ret;
         }
 
+        public static bool EnableMenuForGameState(DevCardType dcType, GameState state)
+        {
+            if (dcType == DevCardType.VictoryPoint) return false;
+
+            if (dcType == DevCardType.Knight && state == GameState.WaitingForRoll)
+            {                        
+               return true;            
+            }
+
+            return (state == GameState.WaitingForNext);
+                
+        }
+
         /// <summary>
         ///         We added a menu to the "Available Dev Cads" collection, and the user picked one to play
         /// </summary>

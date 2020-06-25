@@ -161,29 +161,7 @@ namespace Catan10
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
             fullSize = 1 - fullSize;
-            //if (fullSize == 0)
-            //{
-            //    this.Width = this.ActualWidth * 0.5;
-            //    this.Height = this.ActualHeight * 0.5;
-
-            //}
-            //else
-            //{
-            //    this.Width = this.ActualWidth * 2;
-            //    this.Height = this.ActualHeight * 2;
-            //}
-            //if (GridPosition.ScaleX != 1.0)
-            //{
-            //    GridPosition.ScaleX = 1.0;
-            //    GridPosition.ScaleY = 1.0;
-            //}
-            //else
-            //{
-            //    GridPosition.ScaleX = 0.5;
-            //    GridPosition.ScaleY = 0.5;
-            //}
-            //AnimateMove.Begin();
-
+           
             NotifyPositionChanged();
         }
 
