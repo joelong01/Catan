@@ -16,14 +16,76 @@ namespace Catan10
 {
     public sealed partial class ServiceGameDlg : ContentDialog
     {
-        #region Properties + Fields 
+
+
+        #region Delegates + Fields + Events + Enums
+
+        public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register("ErrorMessage", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", HostNameChanged));
+        public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
+        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(GameInfo), typeof(ServiceGameDlg), new PropertyMetadata(null, SelectedGameChanged));
+        public ObservableCollection<GameInfo> Games = new ObservableCollection<GameInfo>();
+        public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
+        public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
+        private TaskCompletionSource<bool> _tcs = null;
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public string ErrorMessage
+        {
+            get => (string)GetValue(ErrorMessageProperty);
+            set => SetValue(ErrorMessageProperty, value);
+        }
+
+        public CatanGameData GameInfo { get; set; }
+        public string HostName
+        {
+            get => (string)GetValue(HostNameProperty);
+            set => SetValue(HostNameProperty, value);
+        }
+
+        public bool IsCanceled { get; private set; } = false;
+        public bool JoinedExistingGame { get; private set; } = false;
+        public string NewGameName
+        {
+            get => (string)GetValue(NewGameNameProperty);
+            set => SetValue(NewGameNameProperty, value);
+        }
+
+        public GameInfo SelectedGame
+        {
+            get => (GameInfo)GetValue(SelectedGameProperty);
+            set => SetValue(SelectedGameProperty, value);
+        }
 
         private List<PlayerModel> AllPlayers { get; set; } = null;
         private PlayerModel CurrentPlayer { get; set; } = null;
-        private CatanProxy Proxy { get; }
-        private TaskCompletionSource<bool> _tcs = null;
+        private ICatanService Proxy { get; }
 
-        #endregion Properties + Fields 
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+        public ServiceGameDlg(PlayerModel currentPlayer, List<PlayerModel> players, List<GameInfo> games, ICatanService catanService)
+        {
+            this.InitializeComponent();
+            CurrentPlayer = currentPlayer;
+            AllPlayers = players;
+            Proxy = catanService;
+            Proxy.OnGameCreated += Proxy_OnGameCreated;
+            Proxy.OnGameDeleted += Proxy_OnGameDeleted;
+            Proxy.OnGameJoined += Proxy_OnGameJoined;
+            Proxy.OnGameLeft += Proxy_OnGameLeft;
+            if (games != null && games.Count > 0) Games.AddRange(games);
+            if (Games.Count > 0)
+            {
+                SelectedGame = Games[0];
+            }
+        }
+
+        #endregion Constructors + Destructors
 
         #region Methods
 
@@ -54,10 +116,9 @@ namespace Catan10
             ErrorMessage = "";
             try
             {
-                List<GameInfo> games = await Proxy.GetGames();
+                List<GameInfo> games = await Proxy.GetAllGames();
                 if (games == null)
                 {
-                    ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
                     return;
                 }
                 Games.Clear();
@@ -76,10 +137,10 @@ namespace Catan10
 
             try
             {
-                List<string> players = await Proxy.GetPlayers(SelectedGame.Id);
+                List<string> players = await Proxy.GetAllPlayerNames(SelectedGame.Id);
                 if (players == null)
                 {
-                    ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
+
                     return;
                 }
                 PlayersInGame.Clear();
@@ -130,15 +191,11 @@ namespace Catan10
                 bool ret = await AskUserQuestion($"Are you sure want to delete the game named \"{SelectedGame.Name}\"?");
                 if (ret)
                 {
-                    var games = await Proxy.DeleteGame(SelectedGame.Id, MainPage.Current.TheHuman.PlayerName);
-                    if (games == null)
-                    {
-                        ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-                        return;
-                    }
+                    await Proxy.DeleteGame(SelectedGame.Id, MainPage.Current.TheHuman.PlayerName);
+
                     PlayersInGame.Clear();
-                    Games.Clear();
-                    Games.AddRange(games);
+                    Games.Remove(SelectedGame);
+
                 }
             }
             catch (Exception e)
@@ -154,12 +211,8 @@ namespace Catan10
             {
                 Games.ForEach(async (game) =>
                 {
-                    var games = await Proxy.DeleteGame(game.Id, MainPage.Current.TheHuman.PlayerName);
-                    if (games == null)
-                    {
-                        ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-                        this.TraceMessage(ErrorMessage);
-                    }
+                    await Proxy.DeleteGame(game.Id, MainPage.Current.TheHuman.PlayerName);
+
                 });
 
                 PlayersInGame.Clear();
@@ -169,39 +222,34 @@ namespace Catan10
 
         private void OnJoin(object sender, RoutedEventArgs re)
         {
-            //ErrorMessage = "";
-            //try
-            //{
-            //    foreach (var player in PlayersInGame)
-            //    {
-            //        if (player.PlayerName == CurrentPlayer.PlayerName)
-            //        {
-            //            JoinedExistingGame = true;
-            //            this.Hide();
-            //            return;
-            //        }
-            //    }
+            ErrorMessage = "";
+            try
+            {
+                //foreach (var player in PlayersInGame)
+                //{
+                //    if (player.PlayerName == CurrentPlayer.PlayerName)
+                //    {
+                //        JoinedExistingGame = true;
+                //        this.Hide();
+                //        return;
+                //    }
+                //}
 
-            //    var gameInfo = await Proxy.JoinGame(SelectedGame.Id, CurrentPlayer.PlayerName);
-            //    if (gameInfo != null)
-            //    {
-            //        SelectedGame = gameInfo;
-            //        this.Hide();
-            //    }
+                //var gameInfo = await Proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
+                //if (gameInfo != null)
+                //{
+                //    SelectedGame = gameInfo;
+                //    this.Hide();
+                //}
 
-            //    if (Proxy.LastError != null)
-            //    {
-            //        ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-            //    }
-            //    else
-            //    {
-            //        ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    ErrorMessage = e.Message;
-            //}
+                this.Hide();
+
+                // ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
+            }
+            catch (Exception e)
+            {
+                ErrorMessage = e.Message;
+            }
         }
 
         private async void OnNew(object sender, RoutedEventArgs re)
@@ -211,19 +259,9 @@ namespace Catan10
             {
                 GameInfo gameInfo = new GameInfo() { Id = Guid.NewGuid(), Name = NewGameName, Creator = CurrentPlayer.PlayerName };
 
-                List<GameInfo> games = await Proxy.CreateGame(gameInfo);
-                if (games == null)
-                {
-                    ErrorMessage = CatanProxy.Serialize(Proxy.LastError, true);
-                    return;
-                }
-                if (games != null && games.Count > 0)
-                {
-                    Games.Clear();
-                    PlayersInGame.Clear();
-                    Games.AddRange(games);
-                    SelectedGame = Games[Games.Count - 1];
-                }
+                 await Proxy.CreateGame(gameInfo);
+                 // added to the UI in the event handler
+                
             }
             catch (Exception e)
             {
@@ -249,9 +287,32 @@ namespace Catan10
             await GetGames();
         }
 
+        private void Proxy_OnGameCreated(GameInfo gameInfo, string playerName)
+        {
+            this.TraceMessage($"{playerName} created {gameInfo.Name}");
+
+            Games.Add(gameInfo);
+
+        }
+
+        private void Proxy_OnGameDeleted(Guid id, string by)
+        {
+            this.TraceMessage($"{by} deleted {id}");
+        }
+
+        private void Proxy_OnGameJoined(GameInfo gameInfo, string playerName)
+        {
+            this.TraceMessage($"{playerName} joined {gameInfo.Name}");
+        }
+
+        private void Proxy_OnGameLeft(GameInfo gameInfo, string playerName)
+        {
+            this.TraceMessage($"{playerName} left {gameInfo.Name}");
+        }
+
         private void SetHostName(string value)
         {
-            Proxy.HostName = value;
+
         }
 
         private void SetSelectedGame(GameInfo value)
@@ -261,67 +322,23 @@ namespace Catan10
 
         #endregion Methods
 
+
+
         #region Constructors
 
         #endregion Constructors
-
-        public string ErrorMessage
-        {
-            get => (string)GetValue(ErrorMessageProperty);
-            set => SetValue(ErrorMessageProperty, value);
-        }
-
-        public CatanGameData GameInfo { get; set; }
-
-        public string HostName
-        {
-            get => (string)GetValue(HostNameProperty);
-            set => SetValue(HostNameProperty, value);
-        }
-
-        public bool IsCanceled { get; private set; } = false;
-        public bool JoinedExistingGame { get; private set; } = false;
-
-        public string NewGameName
-        {
-            get => (string)GetValue(NewGameNameProperty);
-            set => SetValue(NewGameNameProperty, value);
-        }
-
-        public GameInfo SelectedGame
-        {
-            get => (GameInfo)GetValue(SelectedGameProperty);
-            set => SetValue(SelectedGameProperty, value);
-        }
-
-        public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register("ErrorMessage", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
-        public static readonly DependencyProperty HostNameProperty = DependencyProperty.Register("HostName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata("", HostNameChanged));
-        public static readonly DependencyProperty NewGameNameProperty = DependencyProperty.Register("NewGameName", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
-        public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(GameInfo), typeof(ServiceGameDlg), new PropertyMetadata(null, SelectedGameChanged));
-        public ObservableCollection<GameInfo> Games = new ObservableCollection<GameInfo>();
-        public ObservableCollection<PlayerModel> Players = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<PlayerModel> PlayersInGame = new ObservableCollection<PlayerModel>();
-
-        public ServiceGameDlg()
-        {
-            this.InitializeComponent();
-        }
-
-        public ServiceGameDlg(PlayerModel currentPlayer, List<PlayerModel> players, List<GameInfo> games)
-        {
-            this.InitializeComponent();
-            CurrentPlayer = currentPlayer;
-            AllPlayers = players;
-            if (games != null && games.Count > 0) Games.AddRange(games);
-            if (Games.Count > 0)
-            {
-                SelectedGame = Games[0];
-            }
-        }
     }
 
     public class ServiceGameDlgModel : INotifyPropertyChanged
     {
+
+
+        #region Delegates + Fields + Events + Enums
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Delegates + Fields + Events + Enums
+
         #region Methods
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -330,11 +347,5 @@ namespace Catan10
         }
 
         #endregion Methods
-
-        #region Delegates  + Events + Enums
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Delegates  + Events + Enums
     }
 }

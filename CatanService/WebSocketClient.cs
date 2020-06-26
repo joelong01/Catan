@@ -299,5 +299,10 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<string>> GetAllPlayerNames(Guid gameId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -199,5 +199,10 @@ namespace Catan10
         {
             return Proxy.KeepAlive();
         }
+
+        public Task<List<string>> GetAllPlayerNames(Guid gameId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

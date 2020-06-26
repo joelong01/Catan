@@ -61,7 +61,7 @@ namespace Catan10
                 }
             }
         }
-        public Guid PlayerId
+        public Guid PlayerIdentifier
         {
             get
             {
@@ -158,7 +158,7 @@ namespace Catan10
                 {
                     PlayerName = player.PlayerName,
                     InTrade = false,
-                    PlayerId = player.PlayerIdentifier
+                    PlayerIdentifier = player.PlayerIdentifier
                 };
                 TradePartners.Add(tracker);
             }

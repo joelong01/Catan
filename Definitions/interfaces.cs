@@ -68,6 +68,7 @@ namespace Catan10
         Task DeleteGame(Guid id, string by);
 
         Task<List<GameInfo>> GetAllGames();
+        Task<List<string>> GetAllPlayerNames(Guid gameId);
 
         /// <summary>
         ///     Connect to the service and start listening for updates.  events will fire.

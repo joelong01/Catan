@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -11,20 +10,30 @@ namespace Catan10
     {
         #region Delegates + Fields + Events + Enums
 
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(TradeCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null));
         private ObservableCollection<PlayerModel> PossibleTradePartners = new ObservableCollection<PlayerModel>();
+
+        public PlayerModel CurrentPlayer
+        {
+            get => (PlayerModel)GetValue(CurrentPlayerProperty);
+            set => SetValue(CurrentPlayerProperty, value);
+        }
+
         public ObservableCollection<PlayerModel> PlayingPlayers
         {
             get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
             set => SetValue(PlayingPlayersProperty, value);
         }
+
         private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as TradeCtrl;
             var depPropValue = (ObservableCollection<PlayerModel>)e.NewValue;
             depPropClass?.SetPlayingPlayers(depPropValue);
         }
+
         private void SetPlayingPlayers(ObservableCollection<PlayerModel> value)
         {
             PossibleTradePartners.Clear();
@@ -40,9 +49,6 @@ namespace Catan10
             get => (PlayerModel)GetValue(TheHumanProperty);
             set => SetValue(TheHumanProperty, value);
         }
-
-
-
 
         #endregion Properties
 
@@ -62,7 +68,7 @@ namespace Catan10
             var ret = new ObservableCollection<PlayerTradeTracker>();
             foreach (var p in list)
             {
-                if (p.PlayerId != TheHuman.PlayerIdentifier)
+                if (p.PlayerIdentifier != TheHuman.PlayerIdentifier)
                 {
                     ret.Add(p);
                 }
@@ -71,14 +77,9 @@ namespace Catan10
             return ret;
         }
 
-
-
-
-
         private void OnClickAll(object sender, RoutedEventArgs e)
         {
         }
-
 
         #endregion Methods
 
@@ -104,13 +105,14 @@ namespace Catan10
             // if (offer.Owner) protected...
             TheHuman.GameData.Trades.PotentialTrades.Remove(offer);
         }
+
         private void OnSendOffer(TradeOffer offer)
         {
             //
             //  TODO: Send a message
             foreach (var player in offer.TradePartners)
             {
-                if (player.PlayerId == offer.Owner.PlayerIdentifier) continue;
+                if (player.PlayerIdentifier == offer.Owner.PlayerIdentifier) continue;
                 var o = new TradeOffer()
                 {
                     Desire = new TradeResources(offer.Desire),
@@ -120,7 +122,7 @@ namespace Catan10
                     {
                         new PlayerTradeTracker()
                         {
-                            PlayerId = player.PlayerId,
+                            PlayerIdentifier = player.PlayerIdentifier,
                             PlayerName = player.PlayerName,
                             InTrade = true
                         }
@@ -131,7 +133,6 @@ namespace Catan10
 
                 TheHuman.GameData.Trades.PotentialTrades.Add(o);
             }
-
         }
     }
 }

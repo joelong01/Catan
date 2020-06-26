@@ -565,6 +565,47 @@ namespace Catan10
         }
 
         #endregion Classes
+
+        public class FunctionTimer : IDisposable
+        {
+            #region Delegates + Fields + Events + Enums
+
+            private string message;
+            private Stopwatch watch = null;
+
+            #endregion Delegates + Fields + Events + Enums
+
+            #region Properties
+
+            public bool Enabled { get; set; } = false;
+
+            #endregion Properties
+
+            #region Constructors + Destructors
+
+            // a global flag to turn off all timing
+            public FunctionTimer(string msg)
+            {
+                if (!Enabled) return;
+                watch = new Stopwatch();
+                message = msg;
+                watch.Start();
+            }
+
+            #endregion Constructors + Destructors
+
+            #region Methods
+
+            public void Dispose()
+            {
+                if (!Enabled) return;
+                watch.Stop();
+                double elapsedMs = watch.ElapsedMilliseconds;
+                this.TraceMessage($"{message}: {elapsedMs}ms");
+            }
+
+            #endregion Methods
+        }
     }
 
     public class EnumDescription : Attribute
