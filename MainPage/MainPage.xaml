@@ -76,24 +76,11 @@
                 </Button.Content>
                 <Button.Flyout>
                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
-                        <MenuFlyoutSubItem Text="Game Type">
-                            <ToggleMenuFlyoutItem Text="Regular Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
-                            <ToggleMenuFlyoutItem Text="SignalR Game" IsChecked="{x:Bind MainPageModel.Settings.IsSignalRGame, Mode=TwoWay}" />
-                            <ToggleMenuFlyoutItem Text="REST Game" IsChecked="{x:Bind MainPageModel.Settings.IsHomegrownGame, Mode=TwoWay}" />
-                        </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Game">
-                            <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
-                            <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
-                        </MenuFlyoutSubItem>
-                        <MenuFlyoutSeparator />
-                        <MenuFlyoutSubItem Text="Network Game">
-                            <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}" />
-                            <ToggleMenuFlyoutItem Text="Connect to WebSocket" IsChecked="{x:Bind MainPageModel.WebSocketConnected, Mode=TwoWay}" Click="OnWebSocketConnect" />
-                            <MenuFlyoutItem Text="Start Default Network Game" Click="OnStartDefaultNetworkGame" />
                             <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
-                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
+                            <MenuFlyoutSeparator/>
                             <MenuFlyoutItem Text="Delete All Games" Click="OnDeleteAllGames" />
-                            <!--<MenuFlyoutItem Text="Join Game" Click="OnJoinGame" />-->
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Random Gold Tiles">
@@ -103,6 +90,11 @@
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Development">
                             <MenuFlyoutItem Text="Show Catan Spy" Click="OnShowCatanSpy" />
+                            <MenuFlyoutSubItem Text="Game Type">
+                                <ToggleMenuFlyoutItem Text="Regular Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
+                                <ToggleMenuFlyoutItem Text="SignalR Game" IsChecked="{x:Bind MainPageModel.Settings.IsSignalRGame, Mode=TwoWay}" />
+                                <ToggleMenuFlyoutItem Text="REST Game" IsChecked="{x:Bind MainPageModel.Settings.IsHomegrownGame, Mode=TwoWay}" />
+                            </MenuFlyoutSubItem>
                             <ToggleMenuFlyoutItem Text="Auto Respond Mode" IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}" />
                             <MenuFlyoutItem Text="Save Settings" Click="OnSaveSettings" />
                             <MenuFlyoutSeparator />
@@ -118,6 +110,9 @@
                             <MenuFlyoutItem Text="Pick Settlements and Road" Click="PickSettlementsAndRoads" />
                             <MenuFlyoutSeparator />
                             <ToggleMenuFlyoutItem Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
+                            <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
+                            <MenuFlyoutItem Text="Start Default Network Game" Click="OnStartDefaultNetworkGame" />
+                            <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Baron">
@@ -360,7 +355,6 @@
                     </Viewbox>
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-
             <Grid Name="_savedGameGrid" Grid.Row="1" Width="383" Height="280"
                 Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                 x:Load="False" Canvas.ZIndex="10" PointerPressed="OnPointerPressed"
