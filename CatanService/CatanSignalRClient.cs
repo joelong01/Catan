@@ -207,6 +207,11 @@ namespace Catan10
             return list;
         }
 
+        public async Task Reset()
+        {
+            await HubConnection.InvokeAsync("Reset");
+        }
+
         public async Task Initialize(string host)
         {
             try

@@ -56,8 +56,6 @@ namespace Catan10
 
         #region Methods
 
-        Task SendBroadcastMessage(Guid id, CatanMessage message);
-
         Task CreateGame(GameInfo gameInfo);
 
         /// <summary>
@@ -68,6 +66,7 @@ namespace Catan10
         Task DeleteGame(Guid id, string by);
 
         Task<List<GameInfo>> GetAllGames();
+
         Task<List<string>> GetAllPlayerNames(Guid gameId);
 
         /// <summary>
@@ -88,6 +87,9 @@ namespace Catan10
         /// <returns></returns>
         Task<List<string>> LeaveGame(GameInfo gameInfo, string playerName);
 
+        Task Reset();
+
+        Task SendBroadcastMessage(Guid id, CatanMessage message);
         Task SendPrivateMessage(Guid id, CatanMessage message);
 
         Task StartConnection(GameInfo info, string playerName);

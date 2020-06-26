@@ -9,7 +9,7 @@ namespace Catan10
     {
         #region Properties
 
-        private TradeResources Traded { get; set; }
+        public TradeResources Traded { get; set; }
 
         #endregion Properties
 

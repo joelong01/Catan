@@ -304,5 +304,10 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
+
+        public Task Reset()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

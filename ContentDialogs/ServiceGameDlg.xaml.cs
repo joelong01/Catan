@@ -220,31 +220,29 @@ namespace Catan10
             }
         }
 
-        private void OnJoin(object sender, RoutedEventArgs re)
+        private async void OnJoin(object sender, RoutedEventArgs re)
         {
             ErrorMessage = "";
             try
             {
-                //foreach (var player in PlayersInGame)
-                //{
-                //    if (player.PlayerName == CurrentPlayer.PlayerName)
-                //    {
-                //        JoinedExistingGame = true;
-                //        this.Hide();
-                //        return;
-                //    }
-                //}
+                foreach (var player in PlayersInGame)
+                {
+                    if (player.PlayerName == CurrentPlayer.PlayerName)
+                    {
+                        JoinedExistingGame = true;
+                        this.Hide();
+                        return;
+                    }
+                }
 
-                //var gameInfo = await Proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
-                //if (gameInfo != null)
-                //{
-                //    SelectedGame = gameInfo;
-                //    this.Hide();
-                //}
+                var gameInfo = await Proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
+                if (gameInfo != null)
+                {
+                    SelectedGame = gameInfo;
+                    this.Hide();
+                }
 
-                this.Hide();
-
-                // ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
+                ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
             }
             catch (Exception e)
             {

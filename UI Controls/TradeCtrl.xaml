@@ -23,7 +23,7 @@
             ListLayout="False" ShowResourceButtons="true" OnSendOffer="OnSendOffer"
             ShowResetButton="True"
             TheHuman="{x:Bind TheHuman, Mode=OneWay}"
-            CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"             
+            CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
             TradePartners="{x:Bind ExceptMe(TheHuman.GameData.Trades.TradeRequest.TradePartners), Mode=OneWay}"
             TradeOffer="{x:Bind TheHuman.GameData.Trades.TradeRequest, Mode=OneWay}" />
 

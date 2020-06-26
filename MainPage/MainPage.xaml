@@ -90,19 +90,22 @@
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Development">
                             <MenuFlyoutItem Text="Show Catan Spy" Click="OnShowCatanSpy" />
+                            <MenuFlyoutSeparator />
                             <MenuFlyoutSubItem Text="Game Type">
                                 <ToggleMenuFlyoutItem Text="Regular Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
                                 <ToggleMenuFlyoutItem Text="SignalR Game" IsChecked="{x:Bind MainPageModel.Settings.IsSignalRGame, Mode=TwoWay}" />
                                 <ToggleMenuFlyoutItem Text="REST Game" IsChecked="{x:Bind MainPageModel.Settings.IsHomegrownGame, Mode=TwoWay}" />
                             </MenuFlyoutSubItem>
-                            <ToggleMenuFlyoutItem Text="Auto Respond Mode" IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}" />
+                            <MenuFlyoutSeparator />                            
                             <MenuFlyoutItem Text="Save Settings" Click="OnSaveSettings" />
                             <MenuFlyoutSeparator />
+                            
                             <MenuFlyoutItem Text="Test 1" Click="OnTest1" />
                             <MenuFlyoutItem Text="Test 2" Click="OnTest2" />
                             <MenuFlyoutItem Text="Test 3" Click="OnTest3" />
                             <MenuFlyoutItem Text="Grant Resources" Click="OnGrantResources" />
                             <MenuFlyoutItem Text="Grant Entitlements" Click="OnGrantEntitlements" />
+                            <MenuFlyoutItem Text="Test Service" Click="OnTestService" />
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Test Game (Regular)" Click="OnTestRegularGame" />
                             <MenuFlyoutItem Text="Test Game (Expansion)" Click="OnTestExpansionGame" />
@@ -110,8 +113,11 @@
                             <MenuFlyoutItem Text="Pick Settlements and Road" Click="PickSettlementsAndRoads" />
                             <MenuFlyoutSeparator />
                             <ToggleMenuFlyoutItem Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
+                            <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
+                            <MenuFlyoutItem Text="Reset Service" Click="Menu_OnResetService" />
                             <MenuFlyoutItem Text="Start Default Network Game" Click="OnStartDefaultNetworkGame" />
+                            <ToggleMenuFlyoutItem Text="Auto Respond Mode" IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}" />
                             <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />

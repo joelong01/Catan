@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Catan.Proxy;
 using Windows.ApplicationModel.Activation;
 using Windows.Services.Maps;
 using Windows.UI.Xaml;
@@ -18,7 +19,15 @@ namespace Catan10
         private void InitTest()
         {
         }
+        private async void Menu_OnResetService(object sender, RoutedEventArgs e)
+        {
+            CreateAndConfigureProxy();
+            await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+            await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+            await MainPageModel.CatanService.Reset();
 
+
+        }
         private async Task LoseHalfYourCards()
         {
             TradeResources tr = new TradeResources()
@@ -115,11 +124,11 @@ namespace Catan10
             }
 
             var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
-            this.TraceMessage("trade gold: "  + picked.ToString());
+            this.TraceMessage("trade gold: " + picked.ToString());
         }
 
         // int toggle = 0;
-        private  void OnTest1(object sdr, RoutedEventArgs rea)
+        private void OnTest1(object sdr, RoutedEventArgs rea)
         {
             // await TestYearOfPlenty();
             // await TradeGoldTest();
@@ -128,6 +137,92 @@ namespace Catan10
 
             TestTrade();
         }
+
+        private async void OnTestService(object sender, RoutedEventArgs e)
+        {
+            CreateAndConfigureProxy();
+            await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+            await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+            Guid id = Guid.Parse("{A2D8D755-9015-41F3-9CF3-560B2BE758EF}");
+            string gameName = "Test_Game_{A2D8D755-9015-41F3-9CF3-560B2BE758EF}";
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
+            MainPageModel.CatanService.OnGameDeleted += CatanService_OnGameDeleted;
+            
+            void CatanService_OnGameDeleted(Guid gId, string by)
+            {
+                this.TraceMessage($"Deleted game id={gId} by {by}");
+                if (gId == id)
+                {
+                    MainPageModel.CatanService.OnGameDeleted -= CatanService_OnGameDeleted;
+                    tcs.TrySetResult(null);
+                }
+            }
+
+            
+
+            foreach (var game in games)
+            {
+                this.TraceMessage($"Found game={game.Name}");
+                if (game.Name == gameName)
+                {
+                    await MainPageModel.CatanService.DeleteGame(game.Id, TheHuman.PlayerName);
+                    await tcs.Task;
+                }
+            }
+
+            tcs = new TaskCompletionSource<object>();
+
+            MainPageModel.CatanService.OnGameCreated += CatanService_OnGameCreated;
+            void CatanService_OnGameCreated(GameInfo gameInfo, string playerName)
+            {
+                if (gameInfo.Id == id)
+                {                    
+                    MainPageModel.CatanService.OnGameCreated -= CatanService_OnGameCreated;
+                    tcs.TrySetResult(null);
+                }
+            }
+
+            GameInfo newGame = new GameInfo()
+            {
+                Id = id,
+                Name = gameName,
+                Creator = TheHuman.PlayerName,
+                RequestAutoJoin = false,
+                Started = false
+            };
+
+            await MainPageModel.CatanService.CreateGame(newGame);
+            await tcs.Task;
+
+            
+            tcs = new TaskCompletionSource<object>();
+            MainPageModel.CatanService.OnGameJoined += CatanService_OnGameJoined;
+            void CatanService_OnGameJoined(GameInfo gameInfo, string playerName)
+            {
+                if (playerName == TheHuman.PlayerName && gameInfo.Id == id)
+                {
+                    tcs.TrySetResult(null);
+                    MainPageModel.CatanService.OnGameJoined -= CatanService_OnGameJoined;
+                }
+            }
+            await MainPageModel.CatanService.JoinGame(newGame, TheHuman.PlayerName);
+
+            await tcs.Task;
+
+
+            var players = await MainPageModel.CatanService.GetAllPlayerNames(id);
+            foreach (var name in players)
+            {
+                if (name == TheHuman.PlayerName)
+                {
+                    this.TraceMessage("found player");
+                }
+            }
+
+        }
+
+        
 
         private void TestTrade()
         {
@@ -160,7 +255,7 @@ namespace Catan10
             player2.GameData.Resources.GrantResources(tr);
 
             CurrentPlayer = MainPageModel.PlayingPlayers[2];
-          //  CurrentPlayer.GameData.Trades.TradeRequest.AddPotentialTradingPartners(MainPageModel.PlayingPlayers);
+            //  CurrentPlayer.GameData.Trades.TradeRequest.AddPotentialTradingPartners(MainPageModel.PlayingPlayers);
             TheHuman = CurrentPlayer;
             CurrentPlayer.GameData.Trades.TradeRequest.Owner = TheHuman;
             //foreach (var player in MainPageModel.PlayingPlayers)
@@ -197,7 +292,7 @@ namespace Catan10
                 {
                     Brick = 2
                 },
-                Owner = MainPageModel.PlayingPlayers[0],               
+                Owner = MainPageModel.PlayingPlayers[0],
                 OwnerApproved = true,
                 PartnerApproved = false,
 
