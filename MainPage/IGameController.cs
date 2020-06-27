@@ -233,11 +233,8 @@ namespace Catan10
                 //  Whoever starts the game controls the game until a first player is picked -- this doesn't have to happen
                 //  as a message because we assume the clocks are shared
                 //
-                MainPageModel.GameStartedBy = PlayingPlayers[0];
-                if (CurrentPlayer != MainPageModel.GameStartedBy)
-                {
-                    CurrentPlayer = MainPageModel.GameStartedBy;
-                }
+                CurrentPlayer = MainPageModel.GameStartedBy;
+                
 
             }
             else
