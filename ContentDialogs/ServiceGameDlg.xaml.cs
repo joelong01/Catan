@@ -234,12 +234,12 @@ namespace Catan10
                         return;
                     }
                 }
-
+                this.Hide();
                 var gameInfo = await Proxy.JoinGame(SelectedGame, CurrentPlayer.PlayerName);
                 if (gameInfo != null)
                 {
                     SelectedGame = gameInfo;
-                    this.Hide();
+                    
                 }
 
                 ErrorMessage = "unexpected service error.  No Error message recieved.  Likely failed before getting to the service.";
