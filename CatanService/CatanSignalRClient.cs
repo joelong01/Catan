@@ -113,12 +113,13 @@ namespace Catan10
                 //
                 //  todo: what is the Ack call back fails?
                 this.TraceMessage($"Sending Ack for messageId: {message.MessageId}");
-                await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
+                
                 try
                 {
 
-                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                     {
+                        await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
                         message = ParseMessage(message);
                         OnBroadcastMessageReceived.Invoke(message);
 

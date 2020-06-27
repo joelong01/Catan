@@ -34,7 +34,7 @@ namespace Catan10
         /// <param name="gameController"></param>
         /// <param name="playerToAdd"></param>
         /// <returns></returns>
-        public static async Task AddPlayer(IGameController gameController, PlayerModel playerToAdd)
+        public static async Task AddPlayer(IGameController gameController, string playerToAdd)
         {
             //  5/20/2020:  The state *after* the CreateGame logEntry is pused is WaitingForPlayers.  But
             //              NewGameLog.Do() calls AddPlayerLog.PostLog *before* it gets pushed to the stack.
@@ -53,24 +53,24 @@ namespace Catan10
             AddPlayerLog logHeader = new AddPlayerLog
             {
                 Action = CatanAction.AddPlayer,
-                PlayerToAdd = playerToAdd.PlayerName,
+                PlayerToAdd = playerToAdd,
                 SentBy = gameController.TheHuman.PlayerName,
                 NewState = GameState.WaitingForPlayers,
                 OldState = gameController.CurrentGameState,
                 CanUndo = false
             };
 
-            await gameController.PostMessage(logHeader, ActionType.Normal);
+            await gameController.ExecuteSynchronously(logHeader, ActionType.Normal);
         }
 
         public async Task Do(IGameController gameController)
         {
-            await gameController.AddPlayer(this);
+            await gameController.AddPlayer(this.PlayerToAdd);
         }
 
         public Task Redo(IGameController gameController)
         {
-            return gameController.AddPlayer(this);
+            return gameController.AddPlayer(this.PlayerToAdd);
         }
 
         public override string ToString()

@@ -214,7 +214,7 @@ namespace Catan10
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        Task AddPlayer(AddPlayerLog playerLogHeader);
+        Task AddPlayer(string playerToAdd);
 
         Task ChangePlayer(ChangePlayerLog log);
 
@@ -225,7 +225,7 @@ namespace Catan10
         RandomBoardSettings CurrentRandomBoard();
 
         Task<bool> DetermineRollOrder(RollOrderLog log);
-
+        Task ExecuteSynchronously(LogHeader logHeader, ActionType normal);
         RollState GetNextRollState();
 
         RandomBoardSettings GetRandomBoard();

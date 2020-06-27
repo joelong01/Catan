@@ -192,25 +192,25 @@ namespace Catan10
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
-        public Task AddPlayer(AddPlayerLog playerLogHeader)
+        public Task AddPlayer(string playerToAdd)
         {
 
-            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers);
+            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.WaitingForNewGame);
 
-            var playerToAdd = NameToPlayer(playerLogHeader.PlayerToAdd);
-            Contract.Assert(playerToAdd != null);
-            if (MainPageModel.PlayingPlayers.Contains(playerToAdd) == false)
+            var newPlayer = NameToPlayer(playerToAdd);
+            Contract.Assert(newPlayer != null);
+            if (MainPageModel.PlayingPlayers.Contains(newPlayer) == false)
             {
-                AddPlayerMenu(playerToAdd);
+                AddPlayerMenu(newPlayer);
 
                 //
                 //  need to give the players some data about the game
-                playerToAdd.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
-                playerToAdd.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
-                playerToAdd.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
-                playerToAdd.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
-                playerToAdd.GameData.NotificationsEnabled = true;
-                playerToAdd.AddedTime = playerLogHeader.CreatedTime;
+                newPlayer.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
+                newPlayer.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
+                newPlayer.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
+                newPlayer.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
+                newPlayer.GameData.NotificationsEnabled = true;
+                newPlayer.AddedTime = DateTime.Now;
                 int playerCount = MainPageModel.PlayingPlayers.Count;
 
                 //
@@ -218,16 +218,16 @@ namespace Catan10
                 bool added = false;
                 for (int i = 0; i < MainPageModel.PlayingPlayers.Count; i++)
                 {
-                    if (playerToAdd.AddedTime < MainPageModel.PlayingPlayers[i].AddedTime)
+                    if (newPlayer.AddedTime < MainPageModel.PlayingPlayers[i].AddedTime)
                     {
-                        MainPageModel.PlayingPlayers.Insert(i, playerToAdd);
+                        MainPageModel.PlayingPlayers.Insert(i, newPlayer);
                         added = true;
                         break;
                     }
                 }
                 if (!added) // put at end
                 {
-                    MainPageModel.PlayingPlayers.Add(playerToAdd);
+                    MainPageModel.PlayingPlayers.Add(newPlayer);
                 }
                 //
                 //  Whoever starts the game controls the game until a first player is picked -- this doesn't have to happen
@@ -242,7 +242,7 @@ namespace Catan10
             }
             else
             {
-                this.TraceMessage($"Recieved an AddPlayer call for {playerToAdd} when they are already in the game");
+                this.TraceMessage($"Recieved an AddPlayer call for {newPlayer} when they are already in the game");
             }
 
             return Task.CompletedTask;
@@ -971,5 +971,25 @@ namespace Catan10
         this.SpyVisible = true;
         this.TurnedSpyOn = sentBy;
     }
-}
+
+        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)
+        {
+            if (MainPageModel.ServiceGameInfo == null) return Task.CompletedTask; 
+
+            CatanMessage message = new CatanMessage()
+            {
+                Data = logHeader,
+                From = TheHuman.PlayerName,
+                ActionType = msgType,
+                DataTypeName = logHeader.GetType().FullName
+
+            };
+
+            MainPageModel.UnprocessedMessages++;
+            return ProcessMessage(message);
+
+
+            
+        }
+    }
 }

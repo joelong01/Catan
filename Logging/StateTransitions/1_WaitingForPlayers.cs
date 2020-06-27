@@ -41,7 +41,7 @@ namespace Catan10
             MainPageModel mpm = gameController.MainPageModel;
             if (mpm.Settings.AutoRespond && mpm.GameStartedBy == gameController.TheHuman)
             {
-                await AddPlayerLog.AddPlayer(gameController, gameController.TheHuman);
+                await AddPlayerLog.AddPlayer(gameController, gameController.TheHuman.PlayerName);
                 //
                 //  AutoRespond doesn't chane the state because we need to give the other machines a chance to add their own humans
             }

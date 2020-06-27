@@ -26,7 +26,7 @@ namespace Catan10
 
         private void CreateAndConfigureProxy()
         {
-            using (new FunctionTimer("Initializing MainPageModel"))
+            using (new FunctionTimer("CreateAndConfigureProxy"))
             {
                 MainPageModel.IsGameStarted = false;
                 MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
@@ -44,14 +44,16 @@ namespace Catan10
                     MainPageModel.CatanService = null;
                 }
 
-                if (MainPageModel.Settings.IsSignalRGame)
-                {
-                    MainPageModel.CatanService = new CatanSignalRClient();
-                }
-                else if (MainPageModel.Settings.IsHomegrownGame)
-                {
-                    MainPageModel.CatanService = new CatanRestService();
-                }
+                MainPageModel.CatanService = new CatanSignalRClient();
+
+                //if (MainPageModel.Settings.IsSignalRGame)
+                //{
+                //    MainPageModel.CatanService = new CatanSignalRClient();
+                //}
+                //else if (MainPageModel.Settings.IsHomegrownGame)
+                //{
+                //    MainPageModel.CatanService = new CatanRestService();
+                //}
 
                 MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
                 MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
@@ -143,16 +145,11 @@ namespace Catan10
                 if (!ret) return;
             };
 
-            CreateAndConfigureProxy();
-            await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-            await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
-
             List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
             ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, MainPageModel.AllPlayers, games, MainPageModel.CatanService)
             {
                 HostName = MainPageModel.Settings.HostName
             };
-            // this.TraceMessage($"Human={TheHuman}");
             await dlg.ShowAsync();
             if (dlg.IsCanceled) return;
 
@@ -162,8 +159,8 @@ namespace Catan10
                 return;
             }
 
-            MainPageModel.ServiceGameInfo = dlg.SelectedGame;
-            await NewGameLog.JoinOrCreateGame(this, MainPageModel.ServiceGameInfo.Creator, 0, CatanAction.GameJoined);
+            //MainPageModel.ServiceGameInfo = dlg.SelectedGame;
+            //await NewGameLog.JoinOrCreateGame(this, MainPageModel.ServiceGameInfo.Creator, 0, CatanAction.GameJoined);
         }
 
         private async void OnStartDefaultNetworkGame(object sender, RoutedEventArgs e)
@@ -290,28 +287,23 @@ namespace Catan10
 
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
         {
+            //
+            //  todo: have some way to not auto-except someone else's game creation -- remember you can't have 2 dialogs open at the same time..
+            //
             this.TraceMessage($"{gameInfo} playerName={playerName}");
 
-            if (MainPageModel.Settings.AutoJoinGames)
-            {
-                if (TheHuman == null)
-                {
-                    bool ret = await PickDefaultUser();
-                    if (!ret) return;
-                }
-                if (playerName != TheHuman.PlayerName)
-                {
-                    await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);
-                    await AddPlayerLog.AddPlayer(this, TheHuman);
-                }
-            }
+            CatanAction action = CatanAction.GameCreated;
+            if (playerName != gameInfo.Creator) action = CatanAction.GameJoined;
+
+            await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, action);
+
         }
 
         private async void Service_OnGameDeleted(Guid id, string by)
         {
             this.TraceMessage($"{id} playerName={by}");
             if (MainPageModel == null || MainPageModel.ServiceGameInfo == null) return;
-            if (by == TheHuman.PlayerName) return; // don't reset games started by me!
+            
 
             if (MainPageModel.ServiceGameInfo.Id != id) return;
 
@@ -323,9 +315,41 @@ namespace Catan10
             }
         }
 
-        private void Service_OnGameJoined(GameInfo gameInfo, string playerName)
+        private async void Service_OnGameJoined(GameInfo gameInfo, string playerName)
         {
-            this.TraceMessage($"{gameInfo}:{playerName}");
+            //
+            // if I'm already joined, ignore
+            if (MainPageModel.ServiceGameInfo?.Id == gameInfo.Id) return;
+
+            //
+            //  set the ServiceInfo which means you (locally) have joined the game.
+            MainPageModel.ServiceGameInfo = gameInfo;
+
+
+            // ask user if they want to join
+            if (playerName != TheHuman.PlayerName)
+            {
+                bool yes = await StaticHelpers.AskUserYesNoQuestion($"{gameInfo.Creator} started a game named {gameInfo.Name}.\n\nWould you like to join it?", "Yes!", "No");
+                if (!yes) return;
+                //
+                //  tell the service you have joined -- will notify other clients
+                await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);
+            }
+
+            
+            //
+            //  ask the service for who has joined -- this will now include the current player because of the previous call
+            List<string> players = await MainPageModel.CatanService.GetAllPlayerNames(gameInfo.Id);
+
+            //
+            //  add the players locally to the game
+            foreach (var name in players)
+            {
+
+                await AddPlayerLog.AddPlayer(this, name);
+            }
+
+
         }
 
         private void Service_OnPrivateMessage(CatanMessage message)

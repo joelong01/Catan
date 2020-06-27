@@ -44,18 +44,13 @@ namespace Catan10
                 CanUndo = false
             };
 
-            await gameController.PostMessage(logHeader, ActionType.Normal);
+            await gameController.ExecuteSynchronously(logHeader, ActionType.Normal);
         }
 
         public async Task Do(IGameController gameController)
         {
             await gameController.JoinOrCreateGame(this);
-
-            //
-            //  add the human to the game
-            //
-            
-            await AddPlayerLog.AddPlayer(gameController, gameController.TheHuman);
+                        
         }
 
         public Task Redo(IGameController gameController)

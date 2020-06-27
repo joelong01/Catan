@@ -11,6 +11,7 @@ using Catan10.Spy;
 using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.WindowManagement;
@@ -158,48 +159,50 @@ namespace Catan10
             MainPageModel.SetPipCount(pipCount);
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             Ctrl_PlayerResourceCountCtrl.MainPage = this;
             base.OnNavigatedTo(e);
-
-            if (e.NavigationMode == NavigationMode.New)
+            var ignored = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                _progress.IsActive = true;
-                _progress.Visibility = Visibility.Visible;
+                if (e.NavigationMode == NavigationMode.New)
+                {
+                    _progress.IsActive = true;
+                    _progress.Visibility = Visibility.Visible;
 
-                _gameView.Init(this, this);
-                CreateMenuItems();
+                    _gameView.Init(this, this);
+                    CreateMenuItems();
 
-              
 
-                
-            }
 
-            InitTest();
-            
-           await InitializeMainPageModel();
-          
-            SaveSettingsTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(5)
-            };
-            SaveSettingsTimer.Tick += SaveSettingsTimer_Tick;
 
-            KeepAliveTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(10) // will call service every 10 seconds to make sure it doesn't time out
-            };
+                }
 
-            KeepAliveTimer.Tick += KeepAliveTimer_Tick;
-            // KeepAliveTimer.Start();
+                InitTest();
+
+                await InitializeMainPageModel();
+
+                SaveSettingsTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(5)
+                };
+                SaveSettingsTimer.Tick += SaveSettingsTimer_Tick;
+
+                //
+                //  start the connection to the SignalR service
+                //
+                CreateAndConfigureProxy();
+                await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+                await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+            });
+
         }
-        
+
         private void KeepAliveTimer_Tick(object sender, object e)
         {
-            if (MainPageModel.CatanService != null)            
+            if (MainPageModel.CatanService != null)
             {
-                
+
                 MainPageModel.CatanService.KeepAlive();
             }
         }
@@ -393,7 +396,7 @@ namespace Catan10
             }
         }
 
-       
+
 
         private async Task LoadMainPageModel()
         {
@@ -817,6 +820,8 @@ namespace Catan10
             }
 
             _raceTracking.Reset();
+
+
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
@@ -894,7 +899,7 @@ namespace Catan10
                     string verify = await FileIO.ReadTextAsync(file);
                     if (verify != content)
                     {
-                        await Task.Delay(100);                        
+                        await Task.Delay(100);
                         if (count == 1)
                         {
                             Debugger.Break();
@@ -1014,7 +1019,7 @@ namespace Catan10
             //
             //  boost the one clicked
             Canvas.SetZIndex(((FrameworkElement)sender), 11);
-            
+
 
         }
         public static readonly DependencyProperty SpyVisibleProperty = DependencyProperty.Register("SpyVisible", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
@@ -1053,7 +1058,7 @@ namespace Catan10
             await appWindow.TryShowAsync();
         }
 
-        
+
     }
-    
+
 }
