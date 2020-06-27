@@ -293,9 +293,16 @@ namespace Catan10
             this.TraceMessage($"{gameInfo} playerName={playerName}");
 
             CatanAction action = CatanAction.GameCreated;
-            if (playerName != gameInfo.Creator) action = CatanAction.GameJoined;
-
-            await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, action);
+            if (TheHuman.PlayerName != gameInfo.Creator) action = CatanAction.GameJoined;
+            if (TheHuman.PlayerName == gameInfo.Creator)
+            {
+                await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, action); // the local action to join as the service is already created
+            }
+            else if (action == CatanAction.GameJoined && MainPageModel.Settings.AutoJoinGames == true)
+            {
+                await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, action); // the local action to join as the service is already created
+                await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);   // join the service Hub fore this group -- will cause the client events to fire
+            }
 
         }
 

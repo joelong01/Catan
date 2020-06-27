@@ -188,12 +188,7 @@ namespace Catan10
                 };
                 SaveSettingsTimer.Tick += SaveSettingsTimer_Tick;
 
-                //
-                //  start the connection to the SignalR service
-                //
-                CreateAndConfigureProxy();
-                await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-                await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+             
             });
 
         }
