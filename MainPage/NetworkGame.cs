@@ -324,34 +324,32 @@ namespace Catan10
 
         private async void Service_OnGameJoined(GameInfo gameInfo, string playerName)
         {
-            //
-            // if I'm already joined, ignore
-            if (MainPageModel.ServiceGameInfo?.Id == gameInfo.Id) return;
 
-            //
-            //  set the ServiceInfo which means you (locally) have joined the game.
-            MainPageModel.ServiceGameInfo = gameInfo;
-            
-            
-            // ask user if they want to join
-            if (gameInfo.Creator != TheHuman.PlayerName)
+            if (MainPageModel.ServiceGameInfo?.Id != gameInfo.Id)
             {
-                if (!MainPageModel.Settings.AutoJoinGames)
-                {
-                    bool yes = await StaticHelpers.AskUserYesNoQuestion($"{gameInfo.Creator} started a game named {gameInfo.Name}.\n\nWould you like to join it?", "Yes!", "No");
-                    if (!yes) return;
-                }
-                if (!MainPageModel.IsGameStarted)
-                {
-                    await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, CatanAction.GameJoined);
-                }
 
                 //
-                //  tell the service you have joined -- will notify other clients
-                await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);
-            }
+                //  set the ServiceInfo which means you (locally) have joined the game.
+                MainPageModel.ServiceGameInfo = gameInfo;
 
-            
+
+                // ask user if they want to join
+                if (gameInfo.Creator != TheHuman.PlayerName)
+                {
+                    if (!MainPageModel.Settings.AutoJoinGames && !MainPageModel.IsGameStarted)
+                    {
+                        bool yes = await StaticHelpers.AskUserYesNoQuestion($"{gameInfo.Creator} started a game named {gameInfo.Name}.\n\nWould you like to join it?", "Yes!", "No");
+                        if (!yes) return;
+                    
+                        await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, CatanAction.GameJoined);
+                    }
+
+                    //
+                    //  tell the service you have joined -- will notify other clients
+                    await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);
+                }
+
+            } 
             //
             //  ask the service for who has joined -- this will now include the current player because of the previous call
             List<string> players = await MainPageModel.CatanService.GetAllPlayerNames(gameInfo.Id);
@@ -360,13 +358,24 @@ namespace Catan10
             //  add the players locally to the game
             foreach (var name in players)
             {
-
-                await AddPlayerLog.AddPlayer(this, name);
+                if (!IsInGame(name))
+                {
+                    await AddPlayerLog.AddPlayer(this, name);
+                }
             }
 
 
         }
 
+        private bool IsInGame(string name)
+        {
+            foreach (var player in MainPageModel.PlayingPlayers)
+            {
+                if (player.PlayerName == name)
+                    return true;
+            }
+            return false;
+        }
         private void Service_OnPrivateMessage(CatanMessage message)
         {
             this.TraceMessage($"{message}");
