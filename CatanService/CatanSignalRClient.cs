@@ -35,7 +35,7 @@ namespace Catan10
             {
                 return false;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -43,7 +43,7 @@ namespace Catan10
             {
                 client.OnAck -= Client_OnAck;
             }
-                        
+
         }
 
         private void Client_OnAck(string fromPlayer, Guid messageId)
@@ -63,7 +63,7 @@ namespace Catan10
 
     public class CatanSignalRClient : IDisposable, ICatanService
     {
-        
+
         #region Delegates + Fields + Events + Enums
 
         public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
@@ -79,7 +79,7 @@ namespace Catan10
         public event PrivateMessageReceivedHandler OnPrivateMessage;
         private delegate void AllGamesReceivedHandler(List<GameInfo> games);
         private delegate void AllPlayersReceivedHandler(List<string> playerNames);
-        public delegate void AckHandler (string fromPlayer, Guid messageId);
+        public delegate void AckHandler(string fromPlayer, Guid messageId);
         public event AckHandler OnAck;
 
         private event AllGamesReceivedHandler OnAllGamesReceived;
@@ -113,17 +113,13 @@ namespace Catan10
                 //
                 //  todo: what is the Ack call back fails?
                 this.TraceMessage($"Sending Ack for messageId: {message.MessageId}");
-                
+
                 try
                 {
+                    await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
+                    message = ParseMessage(message);
+                    OnBroadcastMessageReceived.Invoke(message);
 
-                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                    {
-                        await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
-                        message = ParseMessage(message);
-                        OnBroadcastMessageReceived.Invoke(message);
-
-                    });
                 }
                 catch (Exception e)
                 {
@@ -132,18 +128,16 @@ namespace Catan10
             }
         }
 
-        private async void OnToOneClient(string jsonMessage)
+        private void OnToOneClient(string jsonMessage)
         {
             if (OnPrivateMessage != null)
             {
                 try
                 {
-                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                        CatanMessage message = JsonSerializer.Deserialize<CatanMessage>(jsonMessage);
-                        message = ParseMessage(message);
-                        OnPrivateMessage.Invoke(message);
-                    });
+                    CatanMessage message = JsonSerializer.Deserialize<CatanMessage>(jsonMessage);
+                    message = ParseMessage(message);
+                    OnPrivateMessage.Invoke(message);
+
                 }
                 catch (Exception e)
                 {
@@ -154,10 +148,10 @@ namespace Catan10
 
         private CatanMessage ParseMessage(CatanMessage msg)
         {
-            
+
             Type type = CurrentAssembly.GetType(msg.DataTypeName);
             if (type == null) throw new ArgumentException("Unknown type!");
-            
+
             LogHeader logHeader = JsonSerializer.Deserialize(msg.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
             IMessageDeserializer deserializer = logHeader as IMessageDeserializer;
             if (deserializer != null)
@@ -299,9 +293,28 @@ namespace Catan10
                     await HubConnection.StartAsync();
                 };
 
-                HubConnection.On("ToAllClients", (CatanMessage message) => OnToAllClients(message));
-                HubConnection.On("ToOneClient", (string message) => OnToOneClient(message));
-                HubConnection.On("OnAck", (string fromPlayer, Guid messageId) => OnAck?.Invoke(fromPlayer, messageId));
+                HubConnection.On("ToAllClients", async (CatanMessage message) =>
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        OnToAllClients(message);
+                    });
+                });
+
+                HubConnection.On("ToOneClient", async (string message) =>
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        OnToOneClient(message);
+                    });
+                });
+                HubConnection.On("OnAck", async (string fromPlayer, Guid messageId) =>
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        OnAck?.Invoke(fromPlayer, messageId);
+                    });
+                });
 
                 HubConnection.On("CreateGame", async (GameInfo gameInfo, string by) =>
                 {
@@ -317,25 +330,35 @@ namespace Catan10
                         OnGameDeleted?.Invoke(id, by);
                     });
                 });
-                HubConnection.On("JoinGame", (GameInfo gameInfo, string playerName) =>
+                HubConnection.On("JoinGame", async (GameInfo gameInfo, string playerName) =>
                 {
-
-                    OnGameJoined?.Invoke(gameInfo, playerName);
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        OnGameJoined?.Invoke(gameInfo, playerName);
+                    });
                 });
-                HubConnection.On("LeaveGame", (GameInfo gameInfo, string playerName) =>
+                HubConnection.On("LeaveGame", async (GameInfo gameInfo, string playerName) =>
                 {
-
-                    OnGameLeft?.Invoke(gameInfo, playerName);
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        OnGameLeft?.Invoke(gameInfo, playerName);
+                    });
                 });
 
-                HubConnection.On("AllGames", (List<GameInfo> games) =>
+                HubConnection.On("AllGames", async (List<GameInfo> games) =>
                 {
-                    OnAllGamesReceived?.Invoke(games);
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        OnAllGamesReceived?.Invoke(games);
+                    });
                 });
 
-                HubConnection.On("AllPlayers", (ICollection<string> playerNames) =>
+                HubConnection.On("AllPlayers", async (ICollection<string> playerNames) =>
                 {
-                    OnAllPlayersReceived?.Invoke(new List<string>(playerNames));
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        OnAllPlayersReceived?.Invoke(new List<string>(playerNames));
+                    });
                 });
 
                 await HubConnection.StartAsync();
@@ -406,9 +429,9 @@ namespace Catan10
         {
             //
             //  the Task we will wait on
-                    
+
             List<string> targets = new List<string>();
-           
+
             MainPage.Current.MainPageModel.PlayingPlayers.ForEach((p) => targets.Add(p.PlayerName));
 
             if (targets.Count == 0)
@@ -439,7 +462,7 @@ namespace Catan10
                         await SendDirectAcknowledgedMessage(p, gameId, message);
                     }
                 }
-                
+
 
             }
             catch (Exception e)
@@ -447,11 +470,11 @@ namespace Catan10
                 this.TraceMessage($"You need to deal with this exception... {e}");
             }
 
-            
+
 
         }
 
-        private Task SendDirectAcknowledgedMessage(string p, Guid guid,  CatanMessage message)
+        private Task SendDirectAcknowledgedMessage(string p, Guid guid, CatanMessage message)
         {
             Debug.Assert(false);
             return Task.CompletedTask;
