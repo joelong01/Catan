@@ -310,7 +310,7 @@ namespace Catan10
         private async void Service_OnGameDeleted(Guid id, string by)
         {
             this.TraceMessage($"{id} playerName={by}");
-
+            if (MainPageModel == null || MainPageModel.ServiceGameInfo == null) return;
             if (by == TheHuman.PlayerName) return; // don't reset games started by me!
 
             if (MainPageModel.ServiceGameInfo.Id != id) return;
