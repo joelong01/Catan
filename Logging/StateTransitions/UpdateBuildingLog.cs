@@ -18,6 +18,13 @@ namespace Catan10
 
         public static async Task UpdateBuildingState(IGameController gameController, BuildingCtrl building, BuildingState newState)
         {
+            Entitlement entitlement = Entitlement.Undefined;
+            if (newState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
+            if (newState == BuildingState.City) entitlement = Entitlement.City;
+
+            if (gameController.CurrentPlayer.GameData.Resources.HasEntitlement(entitlement) == false)
+                return; // user double clicked
+
             UpdateBuildingLog logHeader = new UpdateBuildingLog()
             {
                 OldBuildingState = building.BuildingState,

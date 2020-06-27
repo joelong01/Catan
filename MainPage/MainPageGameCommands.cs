@@ -221,8 +221,8 @@ namespace Catan10
         {
             try
             {
-                //  this.TraceMessage("NextStep");
-                if (!MainPageModel.EnableUiInteraction)
+                
+                if (!MainPageModel.EnableNextButton)
                 {
                     this.TraceMessage("CallRejected");
                     return;

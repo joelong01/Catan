@@ -97,6 +97,7 @@ namespace Catan10
             }
             GameInfo serverGameInfo = await gameService.JoinGame(gameInfo, me);
             gameInfo.Creator = serverGameInfo.Creator;
+            this.TraceMessage($"Game {gameInfo.Name} created by {gameInfo.Creator} joined by {me}");
             return action;
         }
 
@@ -289,6 +290,8 @@ namespace Catan10
 
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
         {
+            this.TraceMessage($"{gameInfo} playerName={playerName}");
+
             if (MainPageModel.Settings.AutoJoinGames)
             {
                 if (TheHuman == null)
@@ -306,6 +309,8 @@ namespace Catan10
 
         private async void Service_OnGameDeleted(Guid id, string by)
         {
+            this.TraceMessage($"{id} playerName={by}");
+
             if (by == TheHuman.PlayerName) return; // don't reset games started by me!
 
             if (MainPageModel.ServiceGameInfo.Id != id) return;
@@ -325,7 +330,7 @@ namespace Catan10
 
         private void Service_OnPrivateMessage(CatanMessage message)
         {
-            throw new NotImplementedException();
+            this.TraceMessage($"{message}");
         }
 
         #endregion Methods

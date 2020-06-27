@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -11,11 +12,55 @@ using Catan.Proxy;
 
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
-
+using Windows.ApplicationModel.Activation;
 using Windows.UI.Core;
 
 namespace Catan10
 {
+    public class AckTracker
+    {
+        public Guid MessageId { get; set; }
+        public List<string> PlayerNames { get; set; }
+        private TaskCompletionSource<object> TCS = new TaskCompletionSource<object>();
+        public async Task<bool> WaitForAllAcks(CatanSignalRClient client, int timeoutMs)
+        {
+            client.OnAck += Client_OnAck;
+            try
+            {
+                this.TraceMessage($"Waiting for acks on message: {MessageId}");
+                await TCS.Task.TimeoutAfter(timeoutMs);
+                return true;
+            }
+            catch (TimeoutException)
+            {
+                return false;
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                client.OnAck -= Client_OnAck;
+            }
+                        
+        }
+
+        private void Client_OnAck(string fromPlayer, Guid messageId)
+        {
+            if (messageId == this.MessageId)
+            {
+                this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId}");
+                PlayerNames.Remove(fromPlayer);
+                if (PlayerNames.Count == 0)
+                {
+                    this.TraceMessage($"Received all acks for message {messageId}");
+                    TCS.TrySetResult(null);
+                }
+            }
+        }
+    }
+
     public class CatanSignalRClient : IDisposable, ICatanService
     {
         
@@ -34,6 +79,8 @@ namespace Catan10
         public event PrivateMessageReceivedHandler OnPrivateMessage;
         private delegate void AllGamesReceivedHandler(List<GameInfo> games);
         private delegate void AllPlayersReceivedHandler(List<string> playerNames);
+        public delegate void AckHandler (string fromPlayer, Guid messageId);
+        public event AckHandler OnAck;
 
         private event AllGamesReceivedHandler OnAllGamesReceived;
         private event AllPlayersReceivedHandler OnAllPlayersReceived;
@@ -63,6 +110,10 @@ namespace Catan10
         {
             if (OnBroadcastMessageReceived != null)
             {
+                //
+                //  todo: what is the Ack call back fails?
+                this.TraceMessage($"Sending Ack for messageId: {message.MessageId}");
+                await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
                 try
                 {
 
@@ -249,6 +300,7 @@ namespace Catan10
 
                 HubConnection.On("ToAllClients", (CatanMessage message) => OnToAllClients(message));
                 HubConnection.On("ToOneClient", (string message) => OnToOneClient(message));
+                HubConnection.On("OnAck", (string fromPlayer, Guid messageId) => OnAck?.Invoke(fromPlayer, messageId));
 
                 HubConnection.On("CreateGame", async (GameInfo gameInfo, string by) =>
                 {
@@ -336,12 +388,72 @@ namespace Catan10
 
             return null;
         }
-
+        /// <summary>
+        ///     Send a message to all the clients.
+        ///     
+        ///     1. create a list of Ack's you expect
+        ///     2. create a TCS to wait on with a timeout
+        ///     3. send the broadcast,
+        ///     5. wait for the Acks.
+        ///     6. if timeout, send a message to the one client and wait for acks
+        ///     
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public async Task SendBroadcastMessage(Guid gameId, CatanMessage message)
         {
-            message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());            
-            await HubConnection.InvokeAsync("BroadcastMessage", gameId, message);
+            //
+            //  the Task we will wait on
+                    
+            List<string> targets = new List<string>();
+           
+            MainPage.Current.MainPageModel.PlayingPlayers.ForEach((p) => targets.Add(p.PlayerName));
 
+            if (targets.Count == 0)
+            {
+                await HubConnection.InvokeAsync("BroadcastMessage", gameId, message);
+                return;
+            }
+            AckTracker ackTracker = new AckTracker()
+            {
+                PlayerNames = targets,
+                MessageId = message.MessageId
+            };
+
+            message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
+            await HubConnection.InvokeAsync("BroadcastMessage", gameId, message);
+            int timeout = 30000;
+            try
+            {
+                bool succeeded = await ackTracker.WaitForAllAcks(this, timeout);
+                if (!succeeded)
+                {
+                    string s = "";
+                    targets.ForEach((p) => s += p + ", ");
+                    s = s.Substring(0, s.Length - 1);
+                    await StaticHelpers.ShowErrorText($"Timed out waiting for an Ack from {s}.\n Message={CatanProxy.Serialize<CatanMessage>(message, true)}\n\nClick Ok to Retry.", "Catan");
+                    foreach (var p in targets)
+                    {
+                        await SendDirectAcknowledgedMessage(p, gameId, message);
+                    }
+                }
+                
+
+            }
+            catch (Exception e)
+            {
+                this.TraceMessage($"You need to deal with this exception... {e}");
+            }
+
+            
+
+        }
+
+        private Task SendDirectAcknowledgedMessage(string p, Guid guid,  CatanMessage message)
+        {
+            Debug.Assert(false);
+            return Task.CompletedTask;
         }
 
         public async Task SendPrivateMessage(Guid id, CatanMessage message)

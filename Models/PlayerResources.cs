@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 
@@ -135,11 +136,22 @@ namespace Catan10
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        internal void ConsumeEntitlement(Entitlement entitlement)
+        
+        public bool HasUnusedEntitlment(Entitlement entitlement)
         {
-            Contract.Assert(HasEntitlement(entitlement));
-            UnspentEntitlements.Remove(entitlement);
+            return HasEntitlement(entitlement);
+        }
+
+        internal bool ConsumeEntitlement(Entitlement entitlement)
+        {
+
+            Debug.Assert(HasEntitlement(entitlement));
+            if (HasEntitlement(entitlement))
+            {
+                UnspentEntitlements.Remove(entitlement);
+                return true;
+            }
+            return false;
         }
 
         internal void RevokeEntitlement(Entitlement entitlement)
