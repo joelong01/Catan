@@ -331,13 +331,21 @@ namespace Catan10
             //
             //  set the ServiceInfo which means you (locally) have joined the game.
             MainPageModel.ServiceGameInfo = gameInfo;
-
-
+            
+            
             // ask user if they want to join
-            if (playerName != TheHuman.PlayerName)
+            if (gameInfo.Creator != TheHuman.PlayerName)
             {
-                bool yes = await StaticHelpers.AskUserYesNoQuestion($"{gameInfo.Creator} started a game named {gameInfo.Name}.\n\nWould you like to join it?", "Yes!", "No");
-                if (!yes) return;
+                if (!MainPageModel.Settings.AutoJoinGames)
+                {
+                    bool yes = await StaticHelpers.AskUserYesNoQuestion($"{gameInfo.Creator} started a game named {gameInfo.Name}.\n\nWould you like to join it?", "Yes!", "No");
+                    if (!yes) return;
+                }
+                if (!MainPageModel.IsGameStarted)
+                {
+                    await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, CatanAction.GameJoined);
+                }
+
                 //
                 //  tell the service you have joined -- will notify other clients
                 await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);
