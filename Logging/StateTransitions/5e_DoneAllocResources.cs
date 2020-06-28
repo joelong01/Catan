@@ -38,7 +38,11 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            
+            gameController.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.Resources.ResourcesThisTurn.Reset();
+                p.GameData.Resources.ResourcesThisTurn.AddResources(p.GameData.Resources.Current);
+            });
             return Task.CompletedTask;
         }
 

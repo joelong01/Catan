@@ -25,7 +25,7 @@
                 <!--  Trading Partners  -->
                 <GridView Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
                     BorderBrush="White" BorderThickness="0"
-                    ItemsSource="{x:Bind TradeWith(TradePartners), Mode=OneWay}"
+                    ItemsSource="{x:Bind TradePartners, Mode=OneWay}"
                     ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionMode="None">
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="local:PlayerTradeTracker">
