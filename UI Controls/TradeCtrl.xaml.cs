@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -11,7 +12,7 @@ namespace Catan10
     {
         #region Delegates + Fields + Events + Enums
 
-        
+
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(TradeCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
@@ -33,7 +34,7 @@ namespace Catan10
 
         private ObservableCollection<PlayerModel> PossibleTradePartners = new ObservableCollection<PlayerModel>();
 
-        
+
         public ObservableCollection<PlayerModel> PlayingPlayers
         {
             get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
@@ -79,7 +80,7 @@ namespace Catan10
         public ObservableCollection<PlayerTradeTracker> GetTradePartners(PlayerModel theHuman, PlayerModel currentPlayer, ObservableCollection<PlayerModel> playingPlayers)
         {
             if (MainPage.Current == null) return null;
-            
+
             if (TheHuman == null) return null;
             if (currentPlayer == null) return null;
             if (playingPlayers == null) return null;
@@ -90,28 +91,35 @@ namespace Catan10
             {
                 theHuman.GameData.Trades.TradeRequest.Owner = theHuman;
             }
-            return theHuman.GameData.Trades.TradeRequest.TradePartners;
-            //var ret = new ObservableCollection<PlayerTradeTracker>();
-            //PlayerTradeTracker tracker;
-            //if (theHuman == currentPlayer)
-            //{
-            //    foreach (var p in playingPlayers)
-            //    {
-            //        if (p == TheHuman) continue; // can't trade with yourself
-            //        tracker = new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = p.PlayerIdentifier, PlayerName = p.PlayerName };
-            //        ret.Add(tracker);
-            //    }
 
-            //    return ret;
-            //}
+            //
+            // we don't want to display the current player
 
-            ////
-            ////  not the current player - can only trade with CurrentPlayer
+            var ret = new ObservableCollection<PlayerTradeTracker>();
+            if (CurrentPlayer == TheHuman)
+            {
+                ret.AddRange(theHuman.GameData.Trades.TradeRequest.TradePartners);
+                for (int i = ret.Count - 1; i >= 0; i--)
+                {
+                    if (ret[i].PlayerIdentifier == CurrentPlayer.PlayerIdentifier)
+                    {
+                        ret.RemoveAt(i);
+                        return ret;
+                    }
+                }
+            }
+            else
+            {
+                PlayerTradeTracker tracker = new PlayerTradeTracker()
+                {
+                    PlayerName = CurrentPlayer.PlayerName,
+                    InTrade = true,
+                    PlayerIdentifier = CurrentPlayer.PlayerIdentifier
+                };
+                ret.Add(tracker);
+            }
+            return ret;
 
-            //tracker = new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = currentPlayer.PlayerIdentifier, PlayerName = currentPlayer.PlayerName };
-            //ret.Add(tracker);
-
-            //return ret;
         }
 
         private void OnClickAll(object sender, RoutedEventArgs e)
@@ -141,11 +149,11 @@ namespace Catan10
 
             await DeleteTradeOfferLog.DeleteOffer(MainPage.Current, offer);
         }
-        
+
         private async void OnSendOffer(TradeOffer offer)
         {
             await PlayerTradesLog.DoTrade(MainPage.Current, offer);
-            
+
         }
 
         private void OnDone(object sender, RoutedEventArgs e)
