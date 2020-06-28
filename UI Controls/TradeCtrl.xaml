@@ -21,14 +21,14 @@
         <local:OfferCtrl Grid.Row="1" Grid.Column="0" Margin="0,0,0,40" HorizontalAlignment="Stretch"
             ShowAllButton="True" ShowPartnerApproval="False" ShowDeleteButton="False"
             ListLayout="False" ShowResourceButtons="true" OnSendOffer="OnSendOffer"
-            ShowResetButton="True"                         
+            ShowResetButton="True"
             TheHuman="{x:Bind TheHuman, Mode=OneWay}"
             CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
             TradePartners="{x:Bind GetTradePartners(TheHuman, CurrentPlayer, PlayingPlayers), Mode=OneWay}"
             TradeOffer="{x:Bind TheHuman.GameData.Trades.TradeRequest, Mode=OneWay}" />
 
 
-        <Border Grid.Row="2" Margin="10,0,0,0" HorizontalAlignment="Left" Background="Black" 
+        <Border Grid.Row="2" Margin="10,0,0,0" HorizontalAlignment="Left" Background="Black"
             CornerRadius="5">
             <Button Foreground="White" Click="OnDone">
                 <Button.Content>
@@ -54,6 +54,8 @@
                             ShowPartnerApproval="True" ShowDeleteButton="True" ShowSendButton="False"
                             ShowResetButton="False" ShowAllButton="False" ShowResourceButtons="False"
                             TradePartners="{x:Bind TradePartners, Mode=OneWay}"
+                            TheHuman="{x:Bind local:MainPage.Current.TheHuman, Mode=OneWay}"
+                            CurrentPlayer="{x:Bind local:MainPage.Current.CurrentPlayer, Mode=OneWay}"
                             OnDeleteOffer="OnDeleteOffer" ListLayout="True"
                             TradeOffer="{x:Bind Mode=OneWay}" />
                     </Viewbox>
