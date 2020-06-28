@@ -232,7 +232,7 @@ namespace Catan10
 
         Task HideRollsInPublicUi();
 
-        Task JoinOrCreateGame(NewGameLog model);
+        Task JoinOrCreateGame(GameInfo gameInfo);
 
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection

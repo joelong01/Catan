@@ -12,9 +12,7 @@ namespace Catan10
     {
         #region Properties
 
-        public string CreatedBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
-
-        public int GameIndex { get; set; }
+        public GameInfo GameInfo { get; set; }
 
         #endregion Properties
 
@@ -29,18 +27,17 @@ namespace Catan10
 
         #region Methods
 
-        public static async Task JoinOrCreateGame(IGameController gameController, string startingPlayer, int gameIndex, CatanAction action)
+        public static async Task JoinOrCreateGame(IGameController gameController, GameInfo gameInfo, CatanAction action)
         {
             Contract.Assert(action == CatanAction.GameCreated || action == CatanAction.GameJoined);
 
             NewGameLog logHeader = new NewGameLog
             {
-                CreatedBy = startingPlayer,
+                GameInfo = gameInfo,
                 SentBy = gameController.TheHuman.PlayerName,
                 NewState = GameState.WaitingForPlayers,
                 OldState = (gameController.Log.PeekAction == null) ? GameState.Uninitialized : gameController.Log.PeekAction.NewState,
-                Action = action,
-                GameIndex = gameIndex,
+                Action = action,                
                 CanUndo = false
             };
 
@@ -49,18 +46,18 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            await gameController.JoinOrCreateGame(this);
-                        
+            await gameController.JoinOrCreateGame(this.GameInfo);
+
         }
 
         public Task Redo(IGameController gameController)
         {
-            return gameController.JoinOrCreateGame(this);
+            return this.Do(gameController);
         }
 
         public override string ToString()
         {
-            return $"StartGame: [StartedBy={CreatedBy}][SendBy={SentBy}[id={LogId}]";
+            return $"StartGame: [StartedBy={GameInfo.Creator}][SendBy={SentBy}[id={LogId}]";
         }
 
         public Task Undo(IGameController gameController)

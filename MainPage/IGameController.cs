@@ -719,12 +719,13 @@ namespace Catan10
         /// </summary>
         /// <param name="logHeader"></param>
         /// <returns></returns>
-        public Task JoinOrCreateGame(NewGameLog logHeader)
+        public Task JoinOrCreateGame(GameInfo gameInfo)
         {
             if (MainPageModel.IsGameStarted) return Task.CompletedTask;
 
-            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, logHeader.CreatedBy);
-            _gameView.CurrentGame = _gameView.Games[logHeader.GameIndex];
+            MainPageModel.ServiceGameInfo = gameInfo;
+            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, gameInfo.Creator);
+            _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
             MainPageModel.IsGameStarted = true;
             return Task.CompletedTask;
 
