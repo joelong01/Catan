@@ -279,12 +279,7 @@ namespace Catan10
                     logging.SetMinimumLevel(LogLevel.Debug);
                 }).Build();
 
-                if (Debugger.IsAttached)
-                {
-                    HubConnection.ServerTimeout = TimeSpan.FromMinutes(60);
-                    HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(5);
-                }
-
+                
                 HubConnection.Reconnecting += error =>
                 {
                     this.TraceMessage("Hub reconnecting!!");

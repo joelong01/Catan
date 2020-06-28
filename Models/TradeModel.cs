@@ -130,6 +130,24 @@ namespace Catan10
         private bool _ownerApproved = false;
         private bool _partnerApproved = false;
         private ObservableCollection<PlayerTradeTracker> _tradePartners = new ObservableCollection<PlayerTradeTracker>();
+        string _ownerName = "";
+        public string OwnerName
+        {
+            get
+            {
+                return _ownerName;
+            }
+            set
+            {
+                if (_ownerName != value)
+                {
+                    _ownerName = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+
 
         public ObservableCollection<PlayerTradeTracker> TradePartners
         {
@@ -206,7 +224,7 @@ namespace Catan10
                 }
             }
         }
-
+        [JsonIgnore]
         public PlayerModel Owner
         {
             get
@@ -217,6 +235,7 @@ namespace Catan10
             {
                 if (_owner != value)
                 {
+                    OwnerName = value.PlayerName;
                     _owner = value;
                     NotifyPropertyChanged();
                 }

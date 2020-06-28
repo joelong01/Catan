@@ -24,14 +24,16 @@ namespace Catan10
         public Task Do(IGameController gameController)
         {
 
-            foreach (var player in TradeOffer.TradePartners)
+            foreach (var tracker in TradeOffer.TradePartners)
             {
+                TradeOffer.Owner = gameController.NameToPlayer(TradeOffer.OwnerName);
+                var player = gameController.NameToPlayer(tracker.PlayerName);
                 if (player.PlayerIdentifier == TradeOffer.Owner.PlayerIdentifier) continue;
                 var o = new TradeOffer()
                 {
                     Desire = new TradeResources(TradeOffer.Desire),
                     Offer = new TradeResources(this.TradeOffer.Offer),
-                    Owner = MainPage.Current.NameToPlayer(TradeOffer.Owner.PlayerName),
+                    Owner = TradeOffer.Owner, // set above
                     TradePartners = new ObservableCollection<PlayerTradeTracker>()
                     {
                         new PlayerTradeTracker()
