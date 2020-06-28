@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Catan.Proxy;
 
 namespace Catan10
@@ -39,9 +38,10 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        bool _inTrade = false;
+        private bool _inTrade = false;
         private Guid _playerId;
         private string playerName;
+
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties
@@ -61,6 +61,7 @@ namespace Catan10
                 }
             }
         }
+
         public Guid PlayerIdentifier
         {
             get
@@ -89,6 +90,7 @@ namespace Catan10
                 }
             }
         }
+
         public override string ToString()
         {
             return $"[InTrade={InTrade}][Name={PlayerName}]";
@@ -98,10 +100,14 @@ namespace Catan10
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
         #endregion Properties
     }
+
     public class TradeOffer : INotifyPropertyChanged
     {
+
+
         #region Constructors + Destructors
 
         public TradeOffer()
@@ -109,6 +115,8 @@ namespace Catan10
         }
 
         #endregion Constructors + Destructors
+
+
 
         #region Delegates + Fields + Events + Enums
 
@@ -121,7 +129,7 @@ namespace Catan10
         private PlayerModel _owner = MainPage.Current?.TheHuman;
         private bool _ownerApproved = false;
         private bool _partnerApproved = false;
-        ObservableCollection<PlayerTradeTracker> _tradePartners = new ObservableCollection<PlayerTradeTracker>();
+        private ObservableCollection<PlayerTradeTracker> _tradePartners = new ObservableCollection<PlayerTradeTracker>();
 
         public ObservableCollection<PlayerTradeTracker> TradePartners
         {
@@ -140,7 +148,7 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     This addes PlayingPlayers to the PotentialTradePartners along with a bool to indicate they are being offered the trade
+        ///     This adds PlayingPlayers to the PotentialTradePartners along with a bool to indicate they are being offered the trade
         /// </summary>
         /// <param name="players"></param>
         public void AddPotentialTradingPartners(ObservableCollection<PlayerModel> players)
@@ -149,10 +157,9 @@ namespace Catan10
             foreach (var player in players)
             {
                 //
-                //  6/22 - while you can't trade with yourself, we need "self" in the 
+                //  6/22 - while you can't trade with yourself, we need "self" in the
                 //         list so that we can get the Owner picture
-                //  
-
+                //
 
                 PlayerTradeTracker tracker = new PlayerTradeTracker()
                 {
@@ -163,6 +170,7 @@ namespace Catan10
                 TradePartners.Add(tracker);
             }
         }
+
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties
@@ -247,7 +255,6 @@ namespace Catan10
             }
         }
 
-
         #endregion Properties
 
         #region Methods
@@ -265,13 +272,12 @@ namespace Catan10
             jsonOptions.Converters.Add(new PlayerModelConverter());
             return JsonSerializer.Serialize(this, jsonOptions);
         }
+
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion Methods
-
-
     }
 }

@@ -21,7 +21,7 @@
         <local:OfferCtrl Grid.Row="1" Grid.Column="0" Margin="0,0,0,40" HorizontalAlignment="Stretch"
             ShowAllButton="True" ShowPartnerApproval="False" ShowDeleteButton="False"
             ListLayout="False" ShowResourceButtons="true" OnSendOffer="OnSendOffer"
-            ShowResetButton="True"
+            ShowResetButton="True"                         
             TheHuman="{x:Bind TheHuman, Mode=OneWay}"
             CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
             TradePartners="{x:Bind GetTradePartners(TheHuman, CurrentPlayer, PlayingPlayers), Mode=OneWay}"

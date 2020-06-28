@@ -85,27 +85,33 @@ namespace Catan10
             if (playingPlayers == null) return null;
             if (playingPlayers.Count == 0) return null;
 
-            var ret = new ObservableCollection<PlayerTradeTracker>();
-            PlayerTradeTracker tracker;
-            if (theHuman == currentPlayer)
+            theHuman.GameData.Trades.TradeRequest.AddPotentialTradingPartners(playingPlayers);
+            if (theHuman.GameData.Trades.TradeRequest.Owner == null)
             {
-                foreach (var p in playingPlayers)
-                {
-                    if (p == TheHuman) continue; // can't trade with yourself
-                    tracker = new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = p.PlayerIdentifier, PlayerName = p.PlayerName };
-                    ret.Add(tracker);
-                }
-
-                return ret;
+                theHuman.GameData.Trades.TradeRequest.Owner = theHuman;
             }
+            return theHuman.GameData.Trades.TradeRequest.TradePartners;
+            //var ret = new ObservableCollection<PlayerTradeTracker>();
+            //PlayerTradeTracker tracker;
+            //if (theHuman == currentPlayer)
+            //{
+            //    foreach (var p in playingPlayers)
+            //    {
+            //        if (p == TheHuman) continue; // can't trade with yourself
+            //        tracker = new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = p.PlayerIdentifier, PlayerName = p.PlayerName };
+            //        ret.Add(tracker);
+            //    }
 
-            //
-            //  not the current player - can only trade with CurrentPlayer
-            
-            tracker = new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = currentPlayer.PlayerIdentifier, PlayerName = currentPlayer.PlayerName };
-            ret.Add(tracker);
+            //    return ret;
+            //}
 
-            return ret;
+            ////
+            ////  not the current player - can only trade with CurrentPlayer
+
+            //tracker = new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = currentPlayer.PlayerIdentifier, PlayerName = currentPlayer.PlayerName };
+            //ret.Add(tracker);
+
+            //return ret;
         }
 
         private void OnClickAll(object sender, RoutedEventArgs e)
