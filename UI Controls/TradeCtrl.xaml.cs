@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -63,16 +64,27 @@ namespace Catan10
 
         #region Methods
 
-        public ObservableCollection<PlayerTradeTracker> ExceptMe(ObservableCollection<PlayerTradeTracker> list)
+        public ObservableCollection<PlayerTradeTracker> GetTradePartners(PlayerModel theHuman, PlayerModel currentPlayer, ObservableCollection<PlayerModel> playingPlayers)
         {
             var ret = new ObservableCollection<PlayerTradeTracker>();
-            foreach (var p in list)
+            PlayerTradeTracker tracker;
+            if (theHuman == currentPlayer)
             {
-                if (p.PlayerIdentifier != TheHuman.PlayerIdentifier)
+                foreach (var p in playingPlayers)
                 {
-                    ret.Add(p);
+                    if (p == TheHuman) continue; // can't trade with yourself
+                    tracker = new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = p.PlayerIdentifier, PlayerName = p.PlayerName };
+                    ret.Add(tracker);
                 }
+
+                return ret;
             }
+
+            //
+            //  not the current player - can only trade with CurrentPlayer
+            
+            tracker = new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = currentPlayer.PlayerIdentifier, PlayerName = currentPlayer.PlayerName };
+            ret.Add(tracker);
 
             return ret;
         }

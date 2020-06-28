@@ -24,7 +24,7 @@
             ShowResetButton="True"
             TheHuman="{x:Bind TheHuman, Mode=OneWay}"
             CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-            TradePartners="{x:Bind ExceptMe(TheHuman.GameData.Trades.TradeRequest.TradePartners), Mode=OneWay}"
+            TradePartners="{x:Bind GetTradePartners(TheHuman, CurrentPlayer, PlayingPlayers), Mode=OneWay}"
             TradeOffer="{x:Bind TheHuman.GameData.Trades.TradeRequest, Mode=OneWay}" />
 
 
