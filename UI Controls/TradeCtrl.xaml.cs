@@ -83,6 +83,7 @@ namespace Catan10
             if (TheHuman == null) return null;
             if (currentPlayer == null) return null;
             if (playingPlayers == null) return null;
+            if (playingPlayers.Count == 0) return null;
 
             var ret = new ObservableCollection<PlayerTradeTracker>();
             PlayerTradeTracker tracker;
