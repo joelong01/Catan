@@ -80,7 +80,7 @@
                             <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
                             <MenuFlyoutItem Text="Join Network Game" Click="OnJoinNetworkGame" />
                             <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
-                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Delete All Games" Click="OnDeleteAllGames" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
@@ -97,10 +97,10 @@
                                 <ToggleMenuFlyoutItem Text="SignalR Game" IsChecked="{x:Bind MainPageModel.Settings.IsSignalRGame, Mode=TwoWay}" />
                                 <ToggleMenuFlyoutItem Text="REST Game" IsChecked="{x:Bind MainPageModel.Settings.IsHomegrownGame, Mode=TwoWay}" />
                             </MenuFlyoutSubItem>
-                            <MenuFlyoutSeparator />                            
+                            <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Save Settings" Click="OnSaveSettings" />
                             <MenuFlyoutSeparator />
-                            
+
                             <MenuFlyoutItem Text="Test 1" Click="OnTest1" />
                             <MenuFlyoutItem Text="Test 2" Click="OnTest2" />
                             <MenuFlyoutItem Text="Test 3" Click="OnTest3" />
@@ -452,9 +452,7 @@
                 Caption="Resource Trades"
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
-                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" 
-                                     TheHuman="{x:Bind TheHuman, Mode=OneWay}" 
-                                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"/>
+                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" TheHuman="{x:Bind TheHuman, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"

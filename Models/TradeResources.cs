@@ -266,6 +266,8 @@ namespace Catan10
             };
         }
 
+       
+
         public void AddResource(ResourceType resourceType, int toAdd)
         {
             switch (resourceType)

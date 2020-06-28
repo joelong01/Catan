@@ -98,41 +98,17 @@ namespace Catan10
             this.TraceMessage("What does this do?");
         }
 
-        private void OnDeleteOffer(TradeOffer offer)
+        private async void OnDeleteOffer(TradeOffer offer)
         {
-            //
-            //  TODO: Send a message to delete the offer from the list
-            // if (offer.Owner) protected...
-            TheHuman.GameData.Trades.PotentialTrades.Remove(offer);
+            if (offer.Owner != TheHuman) return;
+
+            await DeleteTradeOfferLog.DeleteOffer(MainPage.Current, offer);
         }
-
-        private void OnSendOffer(TradeOffer offer)
+        
+        private async void OnSendOffer(TradeOffer offer)
         {
-            //
-            //  TODO: Send a message
-            foreach (var player in offer.TradePartners)
-            {
-                if (player.PlayerIdentifier == offer.Owner.PlayerIdentifier) continue;
-                var o = new TradeOffer()
-                {
-                    Desire = new TradeResources(offer.Desire),
-                    Offer = new TradeResources(offer.Offer),
-                    Owner = MainPage.Current.NameToPlayer(offer.Owner.PlayerName),
-                    TradePartners = new ObservableCollection<PlayerTradeTracker>()
-                    {
-                        new PlayerTradeTracker()
-                        {
-                            PlayerIdentifier = player.PlayerIdentifier,
-                            PlayerName = player.PlayerName,
-                            InTrade = true
-                        }
-                    },
-                    OwnerApproved = offer.OwnerApproved,
-                    PartnerApproved = false
-                };
-
-                TheHuman.GameData.Trades.PotentialTrades.Add(o);
-            }
+            await PlayerTradesLog.DoTrade(MainPage.Current, offer);
+            
         }
     }
 }

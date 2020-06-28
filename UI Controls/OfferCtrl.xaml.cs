@@ -320,5 +320,12 @@ namespace Catan10
 
             return ret;
         }
+
+        private async void ApprovalChanged(object sender, RoutedEventArgs e)
+        {
+            await TradeApprovalChangedLog.ToggleTrade(MainPage.Current, this.TradeOffer);
+        }
+
+        
     }
 }

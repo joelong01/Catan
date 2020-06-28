@@ -214,7 +214,8 @@
                         Style="{StaticResource CatanToggleSwitch}"
                         Foreground="{x:Bind TradeOffer.Owner.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
                         Background="Red"
-                        IsOn="{x:Bind TradeOffer.OwnerApproved, Mode=TwoWay}">
+                        IsOn="{x:Bind TradeOffer.OwnerApproved, Mode=TwoWay}"
+                        Toggled="ApprovalChanged">
                         <ToggleSwitch.OnContent>
                             <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                                 FontFamily="Segoe UI Symbol" FontSize="22"
@@ -242,7 +243,8 @@
                         IsHitTestVisible="{x:Bind PartnerHitTest(TradeOffer.TradePartners), Mode=OneWay}"
                         Foreground="{x:Bind TradeOffer.Owner.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
                         Style="{StaticResource CatanToggleSwitch}"
-                        IsOn="{x:Bind TradeOffer.PartnerApproved, Mode=TwoWay}">
+                        IsOn="{x:Bind TradeOffer.PartnerApproved, Mode=TwoWay}"
+                        Toggled="ApprovalChanged">
                         <ToggleSwitch.OnContent>
                             <TextBlock Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
                                 FontFamily="Segoe UI Symbol" FontSize="22"

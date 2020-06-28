@@ -142,11 +142,14 @@
     </Compile>
     <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
+    <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
+    <Compile Include="Logging\Actions\PlayerTradesLog.cs" />
     <Compile Include="Logging\Actions\ResourceExchangeLog.cs" />
     <Compile Include="Logging\Actions\SpyLog.cs" />
     <Compile Include="Logging\Actions\LoseCardsToSeven.cs" />
     <Compile Include="Logging\Actions\PlayDevCardLog.cs" />
     <Compile Include="Logging\Actions\TestGrantEntitlements.cs" />
+    <Compile Include="Logging\Actions\TradeApprovalLog.cs" />
     <Compile Include="Logging\Actions\TradedGold.cs" />
     <Compile Include="Logging\Actions\YearOfPlentyLog.cs" />
     <Compile Include="Logging\Helpers\AllocationPhaseHelper.cs" />

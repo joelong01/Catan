@@ -50,7 +50,7 @@ namespace Catan10
         {
             if (messageId == this.MessageId)
             {
-                this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId}");
+              //  this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId}");
                 PlayerNames.Remove(fromPlayer);
                 if (PlayerNames.Count == 0)
                 {

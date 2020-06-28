@@ -779,6 +779,25 @@ namespace Catan10
             }
         }
 
+        public TradeOffer FindTradeByValue(TradeOffer offer)
+        {
+
+            foreach (var o in PotentialTrades)
+            {
+                if (o.Offer.EqualValue(offer.Offer) == false) return null;
+                if (o.Desire.EqualValue(offer.Desire) == false) return null;
+                if (offer.TradePartners.Count != o.TradePartners.Count) return null; // this shoudl be 1
+                for (int i=0; i<offer.TradePartners.Count; i++)
+                {
+                    if (offer.TradePartners[i].PlayerIdentifier != o.TradePartners[i].PlayerIdentifier) return null;                    
+                }
+
+                return o;
+            }
+
+            return null;
+        }
+
         public TradeOffer TradeRequest
         {
             get
