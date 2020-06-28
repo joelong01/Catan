@@ -119,8 +119,8 @@
     <Compile Include="CatanColors.cs" />
     <Compile Include="CatanService\serviceHelpers.cs" />
     <Compile Include="CatanService\WebSocketClient.cs" />
-    <Compile Include="ContentDialogs\GameNameDlg.xaml.cs">
-      <DependentUpon>GameNameDlg.xaml</DependentUpon>
+    <Compile Include="ContentDialogs\JoinGameDlg.xaml.cs">
+      <DependentUpon>JoinGameDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="ContentDialogs\PlayerPickerDlg.xaml.cs">
       <DependentUpon>PlayerPickerDlg.xaml</DependentUpon>
@@ -416,7 +416,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="ContentDialogs\GameNameDlg.xaml">
+    <Page Include="ContentDialogs\JoinGameDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

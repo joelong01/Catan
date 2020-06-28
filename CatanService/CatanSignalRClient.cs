@@ -238,13 +238,22 @@ namespace Catan10
 
         public async Task<List<string>> GetAllPlayerNames(Guid gameId)
         {
+            if (HubConnection.State != HubConnectionState.Connected)
+            {
+                this.TraceMessage("Why isn't the hub Connected?");
+                await Task.Delay(2000);
+                this.TraceMessage($"Waited 2 seconds = state now {HubConnection.State}");
+
+            }
+
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+
             List<string> list = null;
             void OnPlayerNamesReceived(List<string> playerNames)
             {
                 list = playerNames;
                 this.OnAllPlayersReceived -= OnPlayerNamesReceived;
-                tcs.SetResult(null);
+                tcs.TrySetResult(null);
             }
             this.OnAllPlayersReceived += OnPlayerNamesReceived;
 

@@ -181,13 +181,13 @@ namespace Catan10
                     }
                     if (TheHuman == null) return;
 
-                    GameNameDlg dlg = new GameNameDlg() { MainPageModel = MainPageModel, Player = TheHuman };
+                    //JoinGameDlg dlg = new JoinGameDlg(new List<string>() { "DefaultNetworkGame" }) { MainPageModel = MainPageModel,  };
 
-                    var ret = await dlg.ShowAsync();
-                    if (ret != ContentDialogResult.Primary || String.IsNullOrEmpty(MainPageModel.Settings.DefaultGameName))
-                    {
-                        return;
-                    }
+                    //var ret = await dlg.ShowAsync();
+                    //if (ret != ContentDialogResult.Primary || String.IsNullOrEmpty(MainPageModel.Settings.DefaultGameName))
+                    //{
+                    //    return;
+                    //}
 
                     CreateAndConfigureProxy();
 
@@ -287,20 +287,22 @@ namespace Catan10
 
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
         {
-            //
-            //  todo: have some way to not auto-except someone else's game creation -- remember you can't have 2 dialogs open at the same time..
-            //
             this.TraceMessage($"{gameInfo} playerName={playerName}");
 
-            CatanAction action = CatanAction.GameCreated;
-            if (TheHuman.PlayerName != gameInfo.Creator) action = CatanAction.GameJoined;
             if (TheHuman.PlayerName == gameInfo.Creator)
             {
-                await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, action); // the local action to join as the service is already created
+                await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, CatanAction.GameCreated); // the local action to join as the service is already created
             }
-            else if (action == CatanAction.GameJoined && MainPageModel.Settings.AutoJoinGames == true)
+            else
             {
-                await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, action); // the local action to join as the service is already created
+                if (!MainPageModel.Settings.AutoJoinGames)
+                {
+                    bool yes = await StaticHelpers.AskUserYesNoQuestion($"{gameInfo.Creator} started a game named {gameInfo.Name}.\n\nWould you like to join it?", "Yes!", "No");
+                    if (!yes) return;
+                }
+                //
+                //  send a message to the service to Join the game
+                await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, CatanAction.GameJoined); // the local action to join as the service is already created
                 await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);   // join the service Hub fore this group -- will cause the client events to fire
             }
 
@@ -322,9 +324,24 @@ namespace Catan10
             }
         }
 
+        /// <summary>
+        ///     Message from the service saying somebody has join the game
+        /// </summary>
+        /// <param name="gameInfo"></param>
+        /// <param name="playerName"></param>
         private async void Service_OnGameJoined(GameInfo gameInfo, string playerName)
         {
+            //
+            //  am I already in a game?
+            if (CurrentGameState == GameState.WaitingForNewGame)
+            {
+                await NewGameLog.JoinOrCreateGame(this, gameInfo.Creator, gameInfo.GameIndex, CatanAction.GameJoined); // the local action to join as the service is already created
+            }
 
+            if (CurrentGameState != GameState.WaitingForPlayers) return;
+
+            //
+            //  client might have launched after the game was created ... 
             if (MainPageModel.ServiceGameInfo?.Id != gameInfo.Id)
             {
 

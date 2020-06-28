@@ -162,7 +162,7 @@ namespace Catan10
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             Ctrl_PlayerResourceCountCtrl.MainPage = this;
-            base.OnNavigatedTo(e);
+            
             var ignored = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
                 if (e.NavigationMode == NavigationMode.New)
@@ -188,7 +188,9 @@ namespace Catan10
                 };
                 SaveSettingsTimer.Tick += SaveSettingsTimer_Tick;
 
-             
+
+                base.OnNavigatedTo(e);
+
             });
 
         }
@@ -1053,7 +1055,18 @@ namespace Catan10
             await appWindow.TryShowAsync();
         }
 
-
+        private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
+        {
+            var games = await MainPageModel.CatanService.GetAllGames();
+            
+            var dlg = new JoinGameDlg(games) { MainPageModel = MainPageModel, Player = TheHuman };
+            var ret = await dlg.ShowAsync();
+            if (ret == ContentDialogResult.Primary)
+            {
+                GameInfo joinGame = dlg.GameSelected;
+                await MainPageModel.CatanService.JoinGame(joinGame, TheHuman.PlayerName);
+            }
+        }
     }
 
 }
