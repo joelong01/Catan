@@ -66,6 +66,12 @@ namespace Catan10
 
         public ObservableCollection<PlayerTradeTracker> GetTradePartners(PlayerModel theHuman, PlayerModel currentPlayer, ObservableCollection<PlayerModel> playingPlayers)
         {
+            if (MainPage.Current == null) return null;
+            
+            if (TheHuman == null) return null;
+            if (currentPlayer == null) return null;
+            if (playingPlayers == null) return null;
+
             var ret = new ObservableCollection<PlayerTradeTracker>();
             PlayerTradeTracker tracker;
             if (theHuman == currentPlayer)
