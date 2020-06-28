@@ -11,17 +11,29 @@ namespace Catan10
     {
         #region Delegates + Fields + Events + Enums
 
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null));
+        
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(TradeCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null));
-        private ObservableCollection<PlayerModel> PossibleTradePartners = new ObservableCollection<PlayerModel>();
-
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
         public PlayerModel CurrentPlayer
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
         }
+        private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as TradeCtrl;
+            var depPropValue = (PlayerModel)e.NewValue;
+            depPropClass?.SetCurrentPlayer(depPropValue);
+        }
+        private void SetCurrentPlayer(PlayerModel player)
+        {
+            this.TraceMessage($"CurrentPlayer = {player}");
+        }
 
+        private ObservableCollection<PlayerModel> PossibleTradePartners = new ObservableCollection<PlayerModel>();
+
+        
         public ObservableCollection<PlayerModel> PlayingPlayers
         {
             get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
@@ -127,6 +139,11 @@ namespace Catan10
         {
             await PlayerTradesLog.DoTrade(MainPage.Current, offer);
             
+        }
+
+        private void OnDone(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

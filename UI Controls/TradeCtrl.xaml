@@ -28,9 +28,9 @@
             TradeOffer="{x:Bind TheHuman.GameData.Trades.TradeRequest, Mode=OneWay}" />
 
 
-        <Border Grid.Row="2" Margin="10,0,0,0" HorizontalAlignment="Left" Background="Black"
+        <Border Grid.Row="2" Margin="10,0,0,0" HorizontalAlignment="Left" Background="Black" 
             CornerRadius="5">
-            <Button Foreground="White">
+            <Button Foreground="White" Click="OnDone">
                 <Button.Content>
                     <StackPanel>
                         <TextBlock HorizontalAlignment="Center" Text="⮽" FontSize="22" />
