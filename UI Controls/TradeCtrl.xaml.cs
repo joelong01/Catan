@@ -88,12 +88,12 @@ namespace Catan10
 
         public static double SmallOffers(bool smallOffers)
         {
-            if (MainPage.Current == null) return 400;
+            if (MainPage.Current == null) return 387;
 
             if (smallOffers)
                 return 188;
 
-            return 400;
+            return 387;
         }
 
         private void OnClickPlayer(object sender, RoutedEventArgs e)
