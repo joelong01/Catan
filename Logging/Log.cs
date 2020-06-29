@@ -385,7 +385,7 @@ namespace Catan10
             }
             finally
             {
-                GameController.CompleteRedo();
+               
                 //   PrintLog();
             }
         }

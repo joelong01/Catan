@@ -286,11 +286,24 @@ namespace Catan10
         {
             //  this.TraceMessage($"{TheHuman.PlayerName}: {message.From} - {message.MessageType} : {message.Data}");
 
-            if (!MainPageModel.Log.IsMessageRecorded(message))
+            if (message.ActionType == ActionType.Retry)
             {
-                MainPageModel.Log.RecordMessage(message);
-                await ProcessMessage(message);
+                for (int i=MainPageModel.Log.MessageLog.Count - 1; i>=0; i--)                
+                {
+                    var loggedMessage = MainPageModel.Log.MessageLog[i];
+                    if (loggedMessage.MessageId == message.MessageId)
+                    {
+                        this.TraceMessage($"Found the message in the message log.  {message}");
+                        this.TraceMessage($"IsRecordedMessage = {MainPageModel.Log.IsMessageRecorded(message)}");
+                        return;
+                    }
+                }
             }
+
+
+            MainPageModel.Log.RecordMessage(message);
+            await ProcessMessage(message);
+
         }
 
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
@@ -320,7 +333,7 @@ namespace Catan10
         {
             this.TraceMessage($"{id} playerName={by}");
             if (MainPageModel == null || MainPageModel.ServiceGameInfo == null) return;
-            
+
 
             if (MainPageModel.ServiceGameInfo.Id != id) return;
 
@@ -356,7 +369,7 @@ namespace Catan10
                 return;
             }
 
-                                    
+
             //
             //  ask the service for who has joined -- this will now include the current player because of the previous call
             List<string> players = await MainPageModel.CatanService.GetAllPlayerNames(gameInfo.Id);

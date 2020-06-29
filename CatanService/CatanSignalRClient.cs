@@ -532,6 +532,7 @@ namespace Catan10
                     targets.ForEach((p) => s += p + ", ");
                     s = s.Substring(0, s.Length - 1);
                     await StaticHelpers.ShowErrorText($"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nRetry after ok.", "Catan");
+                    message.ActionType = ActionType.Retry;
 
                 }
             }

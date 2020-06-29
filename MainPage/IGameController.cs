@@ -17,7 +17,7 @@ namespace Catan10
 
         #region Properties + Fields 
 
-        private TaskCompletionSource<bool> UndoRedoTcs { get; set; }
+        
 
         #endregion Properties + Fields 
 
@@ -281,21 +281,8 @@ namespace Catan10
             }
         }
 
-        public void CompleteRedo()
-        {
-            if (UndoRedoTcs != null)
-            {
-                UndoRedoTcs.SetResult(true);
-            }
-        }
+       
 
-        public void CompleteUndo()
-        {
-            if (UndoRedoTcs != null)
-            {
-                UndoRedoTcs.SetResult(true);
-            }
-        }
 
         public RandomBoardSettings CurrentRandomBoard()
         {
@@ -528,28 +515,10 @@ namespace Catan10
         {
             LogHeader logHeader = Log.PeekUndo;
             if (logHeader == null) return false;
-            UndoRedoTcs = new TaskCompletionSource<bool>();
+            
+            await MainPage.Current.PostMessage(logHeader, ActionType.Redo);
 
-            CatanMessage message = new CatanMessage()
-            {
-                Data = logHeader,
-                From = TheHuman.PlayerName,
-                ActionType = ActionType.Redo,
-                DataTypeName = logHeader.GetType().FullName
-            };
-
-            MainPageModel.UnprocessedMessages++;
-            await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
-
-
-            //if (MainPageModel.Settings.IsLocalGame)
-            //{
-            //    ILogController logController = logHeader as ILogController;
-            //    await logController.Redo(this);
-            //}
-
-
-            return await UndoRedoTcs.Task;
+            return true;
         }
 
         public void ResetAllBuildings()
@@ -775,26 +744,11 @@ namespace Catan10
         {
             LogHeader logHeader = Log.PeekAction;
             if (logHeader == null || logHeader.CanUndo == false) return false;
-            UndoRedoTcs = new TaskCompletionSource<bool>();
-            CatanMessage message = new CatanMessage()
-            {
-                Data = logHeader,
-                From = TheHuman.PlayerName,
-                ActionType = ActionType.Undo,
-                DataTypeName = logHeader.GetType().FullName
-            };
-            MainPageModel.UnprocessedMessages++;
-            await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+            
+            await MainPage.Current.PostMessage(logHeader, ActionType.Undo);
 
-
-            if (MainPageModel.Settings.IsLocalGame)
-            {
-                ILogController logController = logHeader as ILogController;
-                await logController.Undo(this);
-            }
-
-
-            return await UndoRedoTcs.Task;
+            return true;
+            
         }
 
         public async Task UndoChangePlayer(ChangePlayerLog logHeader)
@@ -1008,6 +962,16 @@ namespace Catan10
 
 
 
+        }
+
+        public void CompleteRedo()
+        {
+            this.TraceMessage("complete");
+        }
+
+        public void CompleteUndo()
+        {
+            this.TraceMessage("complete");
         }
     }
 }
