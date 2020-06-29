@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -23,8 +24,11 @@ namespace Catan10
 
         public static async Task PostLog(IGameController gameController, MoveBaronReason reason)
         {
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForNext ||
-                            gameController.CurrentGameState == GameState.WaitingForRoll);
+            if (gameController.CurrentGameState != GameState.WaitingForNext &&
+                            gameController.CurrentGameState != GameState.WaitingForRoll)
+            {
+                gameController.TraceMessage($"strange -- investigate.  currentstate is ${gameController.CurrentGameState}");
+            }
 
             if (reason == MoveBaronReason.Rolled7)
             {

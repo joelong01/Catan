@@ -21,10 +21,9 @@ namespace Catan10
         }
         private async void Menu_OnResetService(object sender, RoutedEventArgs e)
         {
-            CreateAndConfigureProxy();
-            await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-            await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
-            await MainPageModel.CatanService.Reset();
+           
+            await CreateAndConfigureProxy();
+            
 
 
         }
@@ -153,9 +152,8 @@ namespace Catan10
 
         private async void OnTestService(object sender, RoutedEventArgs e)
         {
-            CreateAndConfigureProxy();
-            await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-            await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+            await CreateAndConfigureProxy();
+            
             Guid id = Guid.Parse("{A2D8D755-9015-41F3-9CF3-560B2BE758EF}");
             string gameName = "Test_Game_{A2D8D755-9015-41F3-9CF3-560B2BE758EF}";
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();

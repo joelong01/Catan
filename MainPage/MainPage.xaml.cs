@@ -581,7 +581,7 @@ namespace Catan10
         {
             DateTime dt = DateTime.Now;
             TimeSpan diff = DateTime.Now - _dt;
-            if (diff.TotalSeconds < 1.0 || MainPageModel.EnableNextButton == false)
+            if (diff.TotalSeconds < 1.0)
             { 
                 ElementSoundPlayer.State = ElementSoundPlayerState.On;
                 ElementSoundPlayer.Play(ElementSoundKind.Show);

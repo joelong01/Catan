@@ -193,7 +193,7 @@ namespace Catan10
                     //    return;
                     //}
 
-                    CreateAndConfigureProxy();
+                    await CreateAndConfigureProxy();
 
                     using (new FunctionTimer("MainPageModel.CatanService.Initialize"))
                     {
