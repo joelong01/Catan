@@ -927,6 +927,8 @@ namespace Catan10
         /// <returns></returns>
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
+            
+
             if (TheHuman.PlayerName != CurrentPlayer.PlayerName) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
@@ -988,6 +990,10 @@ namespace Catan10
         private async void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             await SaveGameState();
+            if (e.PropertyName == "HostName")
+            {
+                await CreateAndConfigureProxy();
+            }
         }
 
         private async Task VisualShuffle(RandomBoardSettings rbs = null)
@@ -1056,9 +1062,10 @@ namespace Catan10
             };
             await appWindow.TryShowAsync();
         }
-
+        
         private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
         {
+            if (MainPageModel.EnableNextButton == false) return;
             var games = await MainPageModel.CatanService.GetAllGames();
             
             var dlg = new JoinGameDlg(games) { MainPageModel = MainPageModel, Player = TheHuman };

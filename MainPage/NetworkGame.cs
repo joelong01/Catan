@@ -25,7 +25,7 @@ namespace Catan10
 
         #region Methods
 
-        private void CreateAndConfigureProxy()
+        private async Task CreateAndConfigureProxy()
         {
             using (new FunctionTimer("CreateAndConfigureProxy"))
             {
@@ -41,7 +41,7 @@ namespace Catan10
                     MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
                     MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
                     MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
-
+                    await MainPageModel.CatanService.DisposeAsync();
                     MainPageModel.CatanService = null;
                 }
 
@@ -61,6 +61,9 @@ namespace Catan10
                 MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
                 MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
                 MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
+
+                await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+                await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
             }
         }
 

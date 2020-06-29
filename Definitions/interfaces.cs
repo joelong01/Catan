@@ -57,6 +57,7 @@ namespace Catan10
         #region Methods
 
         Task CreateGame(GameInfo gameInfo);
+        Task DisposeAsync();
 
         /// <summary>
         ///     Tell the service to delete the game with this ID

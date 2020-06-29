@@ -407,9 +407,17 @@ namespace Catan10
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                //
-                //  this has to be on the UI thread to access PlayerName
-                await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
+                try
+                {
+                    //
+                    //  this has to be on the UI thread to access PlayerName
+                    await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
+                }
+                catch (Microsoft.AspNetCore.SignalR.HubException he)
+                {
+                    await StaticHelpers.ShowErrorText($"Error calling Register.  Hub Error:\n\n{he}", "Catan");
+                    
+                }
 
             });
         }
@@ -624,6 +632,11 @@ namespace Catan10
         public async Task StartConnection(GameInfo info, string playerName)
         {
             await RegisterClient();
+        }
+
+        public Task DisposeAsync()
+        {
+            return HubConnection.DisposeAsync();
         }
     }
 }

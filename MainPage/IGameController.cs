@@ -699,13 +699,19 @@ namespace Catan10
             await _rollControl.Reset();
             CurrentPlayer = TheHuman;
             //
-            //  start the connection to the SignalR service
+            //  start the connection to the SignalR servi0ce
             //
             if (serviceReference == null)
             {
-                CreateAndConfigureProxy();
-                await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-                await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+                try
+                {
+                    await CreateAndConfigureProxy();
+                   
+                }
+                catch(Exception e)
+                {
+                    await StaticHelpers.ShowErrorText($"Error Connecting to the Catan Servvice.  Error Info:\n{e.ToString()}", "Catan");
+                }
             }
             else
             {
