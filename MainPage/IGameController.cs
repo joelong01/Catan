@@ -494,7 +494,8 @@ namespace Catan10
                 Data = logHeader,
                 From = TheHuman.PlayerName,
                 ActionType = msgType,
-                DataTypeName = logHeader.GetType().FullName
+                DataTypeName = logHeader.GetType().FullName,
+                To = "*"
 
             };
 

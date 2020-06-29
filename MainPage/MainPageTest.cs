@@ -128,14 +128,27 @@ namespace Catan10
         }
 
         // int toggle = 0;
-        private void OnTest1(object sdr, RoutedEventArgs rea)
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
             // await TestYearOfPlenty();
             // await TradeGoldTest();
             // await TestTargetPlayer();
             // await LoseHalfYourCards();
 
-            TestTrade();
+            // TestTrade();
+            LogHeader lh = new LogHeader();
+
+            CatanMessage message = new CatanMessage()
+            {
+                ActionType = ActionType.Normal,
+                MessageId = Guid.NewGuid(),
+                To = "Joe",
+                From = "Joe",
+                DataTypeName = typeof(LogHeader).FullName,
+                Data = lh
+
+            };
+            await MainPageModel.CatanService.SendPrivateMessage("Joe", message);
         }
 
         private async void OnTestService(object sender, RoutedEventArgs e)

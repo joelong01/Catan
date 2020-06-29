@@ -282,8 +282,12 @@ namespace Catan10
         private async void Service_OnBroadcastMessageReceived(CatanMessage message)
         {
             //  this.TraceMessage($"{TheHuman.PlayerName}: {message.From} - {message.MessageType} : {message.Data}");
-            MainPageModel.Log.RecordMessage(message);
-            await ProcessMessage(message);
+
+            if (!MainPageModel.Log.IsMessageRecorded(message))
+            {
+                MainPageModel.Log.RecordMessage(message);
+                await ProcessMessage(message);
+            }
         }
 
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
@@ -376,9 +380,10 @@ namespace Catan10
             }
             return false;
         }
-        private void Service_OnPrivateMessage(CatanMessage message)
+        private async void Service_OnPrivateMessage(CatanMessage message)
         {
-            this.TraceMessage($"{message}");
+            MainPageModel.Log.RecordMessage(message);
+            await ProcessMessage(message);
         }
 
         #endregion Methods

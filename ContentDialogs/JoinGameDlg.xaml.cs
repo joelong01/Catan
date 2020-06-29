@@ -51,6 +51,7 @@ namespace Catan10
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+            this.Hide();
         }
     }
 }

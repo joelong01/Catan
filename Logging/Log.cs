@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -187,6 +188,14 @@ namespace Catan10
         private readonly Stacks Stacks = new Stacks();
         private bool _writing = false;
 
+        public CatanMessage PeekMessageLog()
+        {
+            if (MessageLog.Count > 0)
+                return MessageLog.Last();
+            else
+                return null;
+        }
+
         private string GetJson()
         {
             // return CatanProxy.Serialize(MessageLog);
@@ -348,6 +357,15 @@ namespace Catan10
             {
                 // PrintLog();
             }
+        }
+
+        internal bool IsMessageRecorded(CatanMessage message)
+        {
+            if (MessageLog.Count == 0) return false;
+
+            if (MessageLog.Last().MessageId == message.MessageId) return true;
+
+            return false;
         }
 
         /// <summary>

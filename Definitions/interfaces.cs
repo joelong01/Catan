@@ -90,7 +90,7 @@ namespace Catan10
         Task Reset();
 
         Task SendBroadcastMessage(Guid id, CatanMessage message);
-        Task SendPrivateMessage(Guid id, CatanMessage message);
+        Task SendPrivateMessage(string to, CatanMessage message);
 
         Task StartConnection(GameInfo info, string playerName);
 

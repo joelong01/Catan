@@ -12,7 +12,7 @@ using System.Diagnostics.Contracts;
 
 namespace Catan10
 {
-    class WebSocketClient : ICatanService
+    class WebSocketClient 
     {
         public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
 
@@ -306,6 +306,11 @@ namespace Catan10
         }
 
         public Task Reset()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SendPrivateMessage(string to, CatanMessage message)
         {
             throw new NotImplementedException();
         }
