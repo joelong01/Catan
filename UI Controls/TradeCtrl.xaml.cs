@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -77,50 +78,7 @@ namespace Catan10
 
         #region Methods
 
-        public ObservableCollection<PlayerTradeTracker> GetTradePartners(PlayerModel theHuman, PlayerModel currentPlayer, ObservableCollection<PlayerModel> playingPlayers)
-        {
-            if (MainPage.Current == null) return null;
 
-            if (TheHuman == null) return null;
-            if (currentPlayer == null) return null;
-            if (playingPlayers == null) return null;
-            if (playingPlayers.Count == 0) return null;
-
-            theHuman.GameData.Trades.TradeRequest.AddPotentialTradingPartners(playingPlayers);
-            if (theHuman.GameData.Trades.TradeRequest.Owner == null)
-            {
-                theHuman.GameData.Trades.TradeRequest.Owner = theHuman;
-            }
-
-            //
-            // we don't want to display the current player
-
-            var ret = new ObservableCollection<PlayerTradeTracker>();
-            if (CurrentPlayer == TheHuman)
-            {
-                ret.AddRange(theHuman.GameData.Trades.TradeRequest.TradePartners);
-                for (int i = ret.Count - 1; i >= 0; i--)
-                {
-                    if (ret[i].PlayerIdentifier == CurrentPlayer.PlayerIdentifier)
-                    {
-                        ret.RemoveAt(i);
-                        return ret;
-                    }
-                }
-            }
-            else
-            {
-                PlayerTradeTracker tracker = new PlayerTradeTracker()
-                {
-                    PlayerName = CurrentPlayer.PlayerName,
-                    InTrade = true,
-                    PlayerIdentifier = CurrentPlayer.PlayerIdentifier
-                };
-                ret.Add(tracker);
-            }
-            return ret;
-
-        }
 
         private void OnClickAll(object sender, RoutedEventArgs e)
         {
@@ -143,13 +101,7 @@ namespace Catan10
             this.TraceMessage("What does this do?");
         }
 
-        private async void OnDeleteOffer(TradeOffer offer)
-        {
-            if (offer.Owner != TheHuman) return;
-
-            await DeleteTradeOfferLog.DeleteOffer(MainPage.Current, offer);
-        }
-
+        
         private async void OnSendOffer(TradeOffer offer)
         {
             await PlayerTradesLog.DoTrade(MainPage.Current, offer);
@@ -159,6 +111,44 @@ namespace Catan10
         private void OnDone(object sender, RoutedEventArgs e)
         {
 
+        }
+        private bool OwnerHitTest(PlayerModel player)
+        {
+            if (this.TheHuman.GameData.Trades.TradeRequest == null) return false;
+            return (this.TheHuman.GameData.Trades.TradeRequest.Owner == player);
+        }
+
+        public static bool PartnerHitTest(ObservableCollection<PlayerTradeTracker> players)
+        {
+            if (players == null || players.Count == 0) return false;
+
+
+            return (players[0].PlayerIdentifier == MainPage.Current?.TheHuman.PlayerIdentifier);
+        }
+
+        public static Brush PartnerImageBrush(ObservableCollection<PlayerTradeTracker> players)
+        {
+            if (players == null || players.Count == 0)
+            {
+                return (Brush)App.Current.Resources["ResourceType.Back"];
+            }
+
+            return OfferCtrl.PlayerIdToBrush(players[0].PlayerIdentifier);
+        }
+
+        private async void OnDelete(object sender, RoutedEventArgs e)
+        {
+
+
+            TradeOffer offer = sender as TradeOffer;
+            if (offer.Owner != TheHuman) return;
+
+            await DeleteTradeOfferLog.DeleteOffer(MainPage.Current, offer);
+        }
+
+        private void ApprovalChanged(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }
