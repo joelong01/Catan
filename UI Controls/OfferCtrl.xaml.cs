@@ -299,10 +299,7 @@ namespace Catan10
                 if (player == TheHuman) continue; //can't trade with yourself
                 partners.Add(player);
             }
-            if (theHuman.GameData.Trades.TradeRequest.Owner.Player == null)
-            {
-                theHuman.GameData.Trades.TradeRequest.Owner.Player = theHuman;
-            }
+           
 
             return partners;
         }

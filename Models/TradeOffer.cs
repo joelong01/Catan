@@ -5,12 +5,16 @@ namespace Catan10
 {
     public class TradeOffer : INotifyPropertyChanged
     {
+        public TradeOffer()
+        {
+            
+        }
         #region Delegates + Fields + Events + Enums
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private Offer _owner = null;
-        private Offer _partner = null;
+        private Offer _owner = new Offer();
+        private Offer _partner = new Offer();
 
         #endregion Delegates + Fields + Events + Enums
 
