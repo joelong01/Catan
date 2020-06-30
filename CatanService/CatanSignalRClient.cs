@@ -68,7 +68,7 @@ namespace Catan10
 
         public override PlayerModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (typeToConvert == typeof(string))
+            if (typeToConvert == typeof(PlayerModel))
             {
                 string playerName = reader.GetString();
                 return MainPage.Current.NameToPlayer(playerName);
