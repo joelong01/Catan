@@ -264,10 +264,6 @@ namespace Catan10
             return ret;
         }
 
-        private async void ApprovalChanged(object sender, RoutedEventArgs e)
-        {
-            await TradeApprovalChangedLog.ToggleTrade(MainPage.Current, this.TheHuman.GameData.Trades.TradeRequest);
-        }
 
         //
         //  this is Binding converter function for the OfferCtrl.xaml UI for showing whow we are going to trade with

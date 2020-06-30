@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,15 @@ namespace Catan10
     public class TradeApprovalChangedLog : LogHeader, ILogController
     {
         public TradeOffer TradeOffer { get; set; }
-        public  static Task ToggleTrade(IGameController gameController, TradeOffer offer)
+        public bool ApprovalValue { get; set; }
+        public PlayerModel Approver { get; set; }
+        public  static Task ToggleTrade(IGameController gameController, TradeOffer offer, bool approval, PlayerModel approver)
         {
             TradeApprovalChangedLog logHeader = new TradeApprovalChangedLog()
             {
                 TradeOffer = offer,
                 CanUndo = false,
+                ApprovalValue = approval,
                 Action = CatanAction.ChangedTradeApproval
             };
 
@@ -29,8 +33,16 @@ namespace Catan10
                 await StaticHelpers.ShowErrorText("Sorry, your offer no longer exists.\nLooks like somebody beat you to it.", "Catan Trades");
                 return;
             }
-            localOffer.Partner.Approved = this.TradeOffer.Partner.Approved;
-            localOffer.Owner.Approved= this.TradeOffer.Owner.Approved;
+            if (localOffer.Partner.Player == Approver)
+            {
+                localOffer.Partner.Approved = ApprovalValue;
+            }
+            else
+            {
+                Contract.Assert(localOffer.Owner.Player == Approver);
+                localOffer.Owner.Approved = ApprovalValue;
+            }
+            
             if (localOffer.Owner.Approved && localOffer.Partner.Approved)
             {
                 //
