@@ -19,6 +19,7 @@ namespace Catan10
             {
                 TradeOffer = offer,
                 CanUndo = false,
+                Approver = approver,
                 ApprovalValue = approval,
                 Action = CatanAction.ChangedTradeApproval
             };
