@@ -72,7 +72,7 @@ namespace Catan10
 
         private bool _approved = false;
         
-        private TradeResources _resources = null;
+        private TradeResources _resources = new TradeResources();
 
         #endregion Delegates + Fields + Events + Enums
 
