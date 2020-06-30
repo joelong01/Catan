@@ -36,12 +36,14 @@ namespace Catan10
                     Owner = new Offer()
                     {
                         Player = TradeOffer.Owner.Player,
-                        Approved = TradeOffer.Owner.Approved
+                        Approved = TradeOffer.Owner.Approved,
+                        Resources = new TradeResources(TradeOffer.Owner.Resources)
                     },
                     Partner = new Offer()
                     {
                         Player = player,
-                        Approved = false
+                        Approved = false,
+                        Resources = new TradeResources(TradeOffer.Partner.Resources)
                     }
                 };
 

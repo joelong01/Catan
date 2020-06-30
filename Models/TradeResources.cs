@@ -311,6 +311,18 @@ namespace Catan10
             }
         }
 
+        public bool CanAfford(TradeResources cost)
+        {
+            Contract.Assert(cost != null);
+            foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
+            {
+                if (cost.CountForResource(resourceType) > this.CountForResource(resourceType))
+                    return false;
+            }
+
+            return true;
+        }
+
         public bool CanAfford(Entitlement entitlement)
         {
             TradeResources cost = TradeResources.GetEntitlementCost(entitlement);

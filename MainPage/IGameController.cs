@@ -211,7 +211,7 @@ namespace Catan10
                 newPlayer.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
                 newPlayer.GameData.NotificationsEnabled = true;
                 newPlayer.AddedTime = DateTime.Now;
-                newPlayer.GameData.Trades.TradeRequest.Owner.Player = TheHuman;
+                newPlayer.GameData.Trades.TradeRequest.Owner.Player = newPlayer;
 
                 //
                 //  insert based on the time the message was sent

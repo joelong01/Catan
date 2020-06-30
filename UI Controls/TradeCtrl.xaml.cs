@@ -143,27 +143,28 @@ namespace Catan10
 
         private async void OnDelete(object sender, RoutedEventArgs e)
         {
+            if (!(((Button)sender).Tag is TradeOffer offer)) return;
 
-            if (SelectedOffer == null) return;
 
-            if (SelectedOffer.Owner.Player == TheHuman)
+            if (offer.Owner.Player == TheHuman)
             {
                 //
                 //  pull it from view everywhere
-                await DeleteTradeOfferLog.DeleteOffer(MainPage.Current, SelectedOffer);
+                await DeleteTradeOfferLog.DeleteOffer(MainPage.Current, offer);
             }
             else
             {
                 //
                 //  only remove it locally
-                TheHuman.GameData.Trades.PotentialTrades.Remove(SelectedOffer);
+                TheHuman.GameData.Trades.PotentialTrades.Remove(offer);
             }
         }
 
 
-        private void ApprovalChanged(object sender, RoutedEventArgs e)
+        private async void ApprovalChanged(object sender, RoutedEventArgs e)
         {
-            
+            if (!(((ToggleSwitch)sender).Tag is TradeOffer offer)) return;
+            await TradeApprovalChangedLog.ToggleTrade(MainPage.Current, offer);
         }
 
         

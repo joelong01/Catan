@@ -33,12 +33,34 @@ namespace Catan10
             localOffer.Owner.Approved= this.TradeOffer.Owner.Approved;
             if (localOffer.Owner.Approved && localOffer.Partner.Approved)
             {
-                Debug.Assert(false, "Need to implement moving the resources");
-                /*
-                 * 1. you can update the resources in here as everybody is getting this message
-                 * 2. you should send a message to remove this offer from the list
-                 * 
-                 */
+                //
+                //
+                if (!this.TradeOffer.Owner.Player.GameData.Resources.Current.CanAfford(this.TradeOffer.Owner.Resources))
+                {
+                    await StaticHelpers.ShowErrorText($"{this.TradeOffer.Owner.Player.PlayerName} is a bad person.\n\nThey approved a trade for resources they do not have.\n\nShame.", "Catan 10");
+                    return;
+                }
+                if (!this.TradeOffer.Partner.Player.GameData.Resources.Current.CanAfford(this.TradeOffer.Partner.Resources))
+                {
+                    await StaticHelpers.ShowErrorText($"{this.TradeOffer.Owner.Player.PlayerName} is a bad person.\n\nThey approved a trade for resources they do not have.\n\nShame.", "Catan 10");
+                    return;
+                }
+
+                //
+                //  clear the resources this turn
+                this.TradeOffer.Owner.Player.GameData.Resources.ResourcesThisTurn.Reset();
+                this.TradeOffer.Partner.Player.GameData.Resources.ResourcesThisTurn.Reset();
+
+                //
+                //  take away resources
+                this.TradeOffer.Partner.Player.GameData.Resources.GrantResources(this.TradeOffer.Partner.Resources.GetNegated());
+                this.TradeOffer.Owner.Player.GameData.Resources.GrantResources(this.TradeOffer.Owner.Resources.GetNegated());
+
+                //
+                //  grant the resources
+                this.TradeOffer.Owner.Player.GameData.Resources.GrantResources(this.TradeOffer.Partner.Resources);
+                this.TradeOffer.Partner.Player.GameData.Resources.GrantResources(this.TradeOffer.Owner.Resources);
+                
             }
             
         }
