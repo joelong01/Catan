@@ -192,6 +192,7 @@
     <Compile Include="Logging\Actions\RollOrderLog.cs" />
     <Compile Include="Logging\StateTransitions\UpdateBuildingLog.cs" />
     <Compile Include="Logging\VerifyMessages\VerifyPlayers.cs" />
+    <Compile Include="Models\TradeOffer.cs" />
     <Compile Include="Models\TradeModel.cs" />
     <Compile Include="Models\ResourceCardModel.cs" />
     <Compile Include="Models\Settings.cs" />

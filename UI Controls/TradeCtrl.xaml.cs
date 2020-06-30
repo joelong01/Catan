@@ -1,6 +1,8 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -17,6 +19,12 @@ namespace Catan10
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(TradeCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
+        public static readonly DependencyProperty SelectedTradeProperty = DependencyProperty.Register("SelectedOffer", typeof(TradeOffer), typeof(TradeCtrl), new PropertyMetadata(null));
+        public TradeOffer SelectedOffer
+        {
+            get => (TradeOffer)GetValue(SelectedTradeProperty);
+            set => SetValue(SelectedTradeProperty, value);
+        }
         public PlayerModel CurrentPlayer
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
@@ -101,10 +109,10 @@ namespace Catan10
             this.TraceMessage("What does this do?");
         }
 
-        
-        private async void OnSendOffer(TradeOffer offer)
+
+        private async void OnSendOffer(TradeOffer offer, List<PlayerModel> players)
         {
-            await PlayerTradesLog.DoTrade(MainPage.Current, offer);
+            await PlayerTradesLog.DoTrade(MainPage.Current, offer, players);
 
         }
 
@@ -112,43 +120,53 @@ namespace Catan10
         {
 
         }
-        private bool OwnerHitTest(PlayerModel player)
+        
+        //  returns true if the passed in player is TheHuman
+        //  this needs to be static because it is bound in a DataTemplate
+        public static bool IsHuman(PlayerModel player)
         {
-            if (this.TheHuman.GameData.Trades.TradeRequest == null) return false;
-            return (this.TheHuman.GameData.Trades.TradeRequest.Owner == player);
+            if (player == null) return false;
+            return (player == MainPage.Current?.TheHuman);
+            
         }
 
-        public static bool PartnerHitTest(ObservableCollection<PlayerTradeTracker> players)
+
+        //  returns true if the passed in player is the CurrentPlayer
+        //  this needs to be static because it is bound in a DataTemplate
+        public static bool IsCurrentPlayer(PlayerModel player)
         {
-            if (players == null || players.Count == 0) return false;
+            if (player == null) return false;
+            return (player == MainPage.Current?.CurrentPlayer);
 
-
-            return (players[0].PlayerIdentifier == MainPage.Current?.TheHuman.PlayerIdentifier);
         }
 
-        public static Brush PartnerImageBrush(ObservableCollection<PlayerTradeTracker> players)
-        {
-            if (players == null || players.Count == 0)
-            {
-                return (Brush)App.Current.Resources["ResourceType.Back"];
-            }
-
-            return OfferCtrl.PlayerIdToBrush(players[0].PlayerIdentifier);
-        }
 
         private async void OnDelete(object sender, RoutedEventArgs e)
         {
 
+            if (SelectedOffer == null) return;
 
-            TradeOffer offer = sender as TradeOffer;
-            if (offer.Owner != TheHuman) return;
-
-            await DeleteTradeOfferLog.DeleteOffer(MainPage.Current, offer);
+            if (SelectedOffer.Owner.Player == TheHuman)
+            {
+                //
+                //  pull it from view everywhere
+                await DeleteTradeOfferLog.DeleteOffer(MainPage.Current, SelectedOffer);
+            }
+            else
+            {
+                //
+                //  only remove it locally
+                TheHuman.GameData.Trades.PotentialTrades.Remove(SelectedOffer);
+            }
         }
+
 
         private void ApprovalChanged(object sender, RoutedEventArgs e)
         {
             
         }
+
+        
+        
     }
 }

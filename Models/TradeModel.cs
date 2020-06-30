@@ -9,29 +9,7 @@ using Catan.Proxy;
 
 namespace Catan10
 {
-    public class PlayerModelConverter : JsonConverter<PlayerModel>
-    {
-        #region Methods
-
-        public override PlayerModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            if (typeToConvert == typeof(string))
-            {
-                string playerName = reader.GetString();
-                return MainPage.Current.NameToPlayer(playerName);
-            }
-
-            return null;
-        }
-
-        public override void Write(Utf8JsonWriter writer, PlayerModel player, JsonSerializerOptions options)
-        {
-            writer.WriteStringValue(player.PlayerName);
-        }
-
-        #endregion Methods
-    }
-
+   
     public class PlayerTradeTracker : INotifyPropertyChanged
     {
         #region Delegates + Fields + Events + Enums
@@ -104,19 +82,58 @@ namespace Catan10
         #endregion Properties
     }
 
-    public class TradeOffer : INotifyPropertyChanged
+
+
+    public class OldTradeOffer : INotifyPropertyChanged
     {
 
 
         #region Constructors + Destructors
 
-        public TradeOffer()
+        public OldTradeOffer()
         {
         }
 
         #endregion Constructors + Destructors
 
+        PlayerModel _singlePartner = null;
+        
+        /// <summary>
+        ///     when a message is recieved we zero out the list of partners and add this for the one partner that owns/approves the trade
+        ///     used for databinding
+        /// </summary>
+        public PlayerModel SinglePartner
+        {
+            get
+            {
+                return _singlePartner;
+            }
+            set
+            {
+                if (_singlePartner != value)
+                {
+                    _singlePartner = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
+        string _singlePartnerName = "";
+        public string SinglePartnerName
+        {
+            get
+            {
+                return _singlePartnerName;
+            }
+            set
+            {
+                if (_singlePartnerName != value)
+                {
+                    _singlePartnerName = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         #region Delegates + Fields + Events + Enums
 
@@ -280,16 +297,13 @@ namespace Catan10
 
         public static TradeOffer Deserialze(string json)
         {
-            var jsonOptions = CatanProxy.GetJsonOptions();
-            jsonOptions.Converters.Add(new PlayerModelConverter());
-            return JsonSerializer.Deserialize<TradeOffer>(json, jsonOptions);
+            
+            return JsonSerializer.Deserialize<TradeOffer>(json, CatanSignalRClient.GetJsonOptions());
         }
 
         public string Serialize()
-        {
-            var jsonOptions = CatanProxy.GetJsonOptions();
-            jsonOptions.Converters.Add(new PlayerModelConverter());
-            return JsonSerializer.Serialize(this, jsonOptions);
+        {            
+            return JsonSerializer.Serialize(this, CatanSignalRClient.GetJsonOptions());
         }
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

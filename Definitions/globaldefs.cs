@@ -69,7 +69,7 @@ namespace Catan10
             var typeName = element.GetProperty("typeName").GetString();
             Contract.Assert(!String.IsNullOrEmpty(typeName));
             Type type = Type.GetType(typeName);
-            return JsonSerializer.Deserialize(element.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
+            return JsonSerializer.Deserialize(element.ToString(), type, CatanSignalRClient.GetJsonOptions()) as LogHeader;
         }
 
         /// <summary>

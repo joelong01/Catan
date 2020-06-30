@@ -254,10 +254,9 @@ namespace Catan10
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[0]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
-            MainPageModel.PlayingPlayers.ForEach((player => player.GameData.Trades.TradeRequest.AddPotentialTradingPartners(MainPageModel.PlayingPlayers))); // then will set the potential trade partners 
+            
 
-            string json = MainPageModel.PlayingPlayers[0].GameData.Trades.TradeRequest.Serialize();
-            var offer = TradeOffer.Deserialze(json);
+           
 
             var player1 = MainPageModel.AllPlayers[1];
             var player2 = MainPageModel.AllPlayers[0];
@@ -268,7 +267,7 @@ namespace Catan10
             CurrentPlayer = MainPageModel.PlayingPlayers[2];
             //  CurrentPlayer.GameData.Trades.TradeRequest.AddPotentialTradingPartners(MainPageModel.PlayingPlayers);
             TheHuman = CurrentPlayer;
-            CurrentPlayer.GameData.Trades.TradeRequest.Owner = TheHuman;
+            CurrentPlayer.GameData.Trades.TradeRequest.Owner.Player = TheHuman;
             //foreach (var player in MainPageModel.PlayingPlayers)
             //{
             //    if (player == CurrentPlayer) continue;
@@ -293,21 +292,21 @@ namespace Catan10
 
             //
             //  joe offer dodgy 2 brick for 1 wheat
-            CurrentPlayer.GameData.Trades.PotentialTrades.Add(new TradeOffer()
-            {
-                Desire = new TradeResources()
-                {
-                    Wheat = 1
-                },
-                Offer = new TradeResources()
-                {
-                    Brick = 2
-                },
-                Owner = MainPageModel.PlayingPlayers[0],
-                OwnerApproved = true,
-                PartnerApproved = false,
+            //CurrentPlayer.GameData.Trades.PotentialTrades.Add(new TradeOffer()
+            //{
+            //    Desire = new TradeResources()
+            //    {
+            //        Wheat = 1
+            //    },
+            //    Offer = new TradeResources()
+            //    {
+            //        Brick = 2
+            //    },
+            //    Owner = MainPageModel.PlayingPlayers[0],
+            //    OwnerApproved = true,
+            //    PartnerApproved = false,
 
-            });
+            //});
 
 
         }

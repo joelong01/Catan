@@ -784,13 +784,15 @@ namespace Catan10
 
             foreach (var o in PotentialTrades)
             {
-                if (o.Offer.EqualValue(offer.Offer) == false) return null;
-                if (o.Desire.EqualValue(offer.Desire) == false) return null;
-                if (offer.TradePartners.Count != o.TradePartners.Count) return null; // this shoudl be 1
-                for (int i=0; i<offer.TradePartners.Count; i++)
-                {
-                    if (offer.TradePartners[i].PlayerIdentifier != o.TradePartners[i].PlayerIdentifier) return null;                    
-                }
+                //
+                //  need to be same players
+                if (o.Owner.Player != offer.Owner.Player) return null;
+                if (o.Partner.Player != offer.Partner.Player) return null;
+
+                //  with same resources
+                if (o.Owner.Resources.EqualValue(offer.Owner.Resources) == false) return null;
+                if (o.Partner.Resources.EqualValue(offer.Partner.Resources) == false) return null;
+                
 
                 return o;
             }
@@ -818,11 +820,7 @@ namespace Catan10
 
         #region Methods
 
-        public void OfferAccepted()
-        {
-            TradeRequest.OwnerApproved = false;
-            PotentialTrades.ForEach((o) => o.OwnerApproved = false);
-        }
+      
     
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {            

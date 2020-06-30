@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 
@@ -13,13 +15,13 @@ namespace Catan10
 {
     public delegate void DeletedHandler(TradeOffer offer);
 
-    public delegate void SendOfferHandler(TradeOffer offer);
+    public delegate void SendOfferHandler(TradeOffer offer, List<PlayerModel> players);
 
     public sealed partial class OfferCtrl : UserControl
     {
         #region Delegates + Fields + Events + Enums
 
-
+       // private ObservableCollection<PlayerModel> TradingPartners { get; set; } = new ObservableCollection<PlayerModel>();
         public event SendOfferHandler OnSendOffer;
 
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(OfferCtrl), new PropertyMetadata(null));
@@ -147,9 +149,9 @@ namespace Catan10
                 return;
             }
 
-            if (this.TheHuman.GameData.Trades.TradeRequest.Offer.GetCount(resourceType) > 0 && this.TheHuman.GameData.Trades.TradeRequest.Desire.GetCount(resourceType) > 0)
+            if (this.TheHuman.GameData.Trades.TradeRequest.Owner.Resources.GetCount(resourceType) > 0 && this.TheHuman.GameData.Trades.TradeRequest.Partner.Resources.GetCount(resourceType) > 0)
             {
-                this.TheHuman.GameData.Trades.TradeRequest.Offer.SetResource(resourceType, 0);
+                this.TheHuman.GameData.Trades.TradeRequest.Owner.Resources.SetResource(resourceType, 0);
             }
         }
 
@@ -158,9 +160,9 @@ namespace Catan10
             EnableSend = CheckEnableSendButton();
             if (count == 0) return;
 
-            if (this.TheHuman.GameData.Trades.TradeRequest.Offer.GetCount(resourceType) > 0 && this.TheHuman.GameData.Trades.TradeRequest.Desire.GetCount(resourceType) > 0)
+            if (this.TheHuman.GameData.Trades.TradeRequest.Owner.Resources.GetCount(resourceType) > 0 && this.TheHuman.GameData.Trades.TradeRequest.Partner.Resources.GetCount(resourceType) > 0)
             {
-                this.TheHuman.GameData.Trades.TradeRequest.Desire.SetResource(resourceType, 0);
+                this.TheHuman.GameData.Trades.TradeRequest.Partner.Resources.SetResource(resourceType, 0);
             }
         }
 
@@ -188,28 +190,22 @@ namespace Catan10
 
         private bool CheckEnableSendButton()
         {
-            if (this.TheHuman.GameData.Trades.TradeRequest.Offer == null)
+            if (this.TheHuman.GameData.Trades.TradeRequest?.Owner?.Resources == null)
             {
                 return false;
             }
 
-            if (this.TheHuman.GameData.Trades.TradeRequest.Offer.Count == 0) return false;
-            if (this.TheHuman.GameData.Trades.TradeRequest.Desire.Count == 0) return false;
+            if (this.TheHuman.GameData.Trades.TradeRequest.Owner.Resources.Count == 0) return false;
+            if (this.TheHuman.GameData.Trades.TradeRequest.Partner.Resources.Count == 0) return false;
 
-            foreach (var partner in this.TheHuman.GameData.Trades.TradeRequest.TradePartners)
-            {
-                if (partner.PlayerIdentifier == this.TheHuman.GameData.Trades.TradeRequest.Owner.PlayerIdentifier) continue;
-                if (partner.InTrade)
-                {
-                    return true;
-                }
-            }
-            return false;
+            if (GridView_TradingPartners.SelectedItems.Count == 0) return false;
+
+            return true;
         }
 
         private void OnClickAll(object sender, RoutedEventArgs e)
         {
-            this.TheHuman.GameData.Trades.TradeRequest.TradePartners.ForEach((p) => p.InTrade = true);
+            GridView_TradingPartners.SelectAll();
             EnableSend = CheckEnableSendButton();
         }
 
@@ -226,26 +222,20 @@ namespace Catan10
         private void OnSendClicked(object sender, RoutedEventArgs e)
         {
             var offer = this.TheHuman.GameData.Trades.TradeRequest;
-            for (int i = offer.TradePartners.Count - 1; i >= 0; i--)
-            {
-                if (offer.TradePartners[i].InTrade == false)
-                {
-                    offer.TradePartners.RemoveAt(i);
-                }
-            }
 
-            OnSendOffer?.Invoke(offer);
+            List<PlayerModel> partners = new List<PlayerModel>();
+            GridView_TradingPartners.SelectedItems.ForEach((o) => partners.Add(o as PlayerModel));
+            OnSendOffer?.Invoke(offer, partners);
         }
 
       
 
         private void ResetTradeOffer()
         {
-            this.TheHuman.GameData.Trades.TradeRequest.Offer = new TradeResources();
-            this.TheHuman.GameData.Trades.TradeRequest.Desire = new TradeResources();
-            this.TheHuman.GameData.Trades.TradeRequest.OwnerApproved = false;
-            this.TheHuman.GameData.Trades.TradeRequest.PartnerApproved = false;
-            this.TheHuman.GameData.Trades.TradeRequest.TradePartners.ForEach((p) => p.InTrade = false);
+            this.TheHuman.GameData.Trades.TradeRequest.Owner.Resources = new TradeResources();
+            this.TheHuman.GameData.Trades.TradeRequest.Partner.Resources = new TradeResources();
+            this.TheHuman.GameData.Trades.TradeRequest.Owner.Approved = false;
+            this.TheHuman.GameData.Trades.TradeRequest.Partner.Approved = false;            
         }
 
         public ObservableCollection<PlayerTradeTracker> TradeWith(ObservableCollection<PlayerTradeTracker> list)
@@ -283,7 +273,7 @@ namespace Catan10
         //  this is Binding converter function for the OfferCtrl.xaml UI for showing whow we are going to trade with
         //  we need to make sure that the PlayerTradeTracker object this is updated with the two way binding is rooted in TheHuman object
         //  we need to take away anybody that the player can't trade with to display.
-        public ObservableCollection<PlayerTradeTracker> GetTradePartners(PlayerModel theHuman, PlayerModel currentPlayer, ObservableCollection<PlayerModel> playingPlayers)
+        public ObservableCollection<PlayerModel> GetTradePartners(PlayerModel theHuman, PlayerModel currentPlayer, ObservableCollection<PlayerModel> playingPlayers)
         {
             if (MainPage.Current == null) return null;
 
@@ -292,35 +282,29 @@ namespace Catan10
             if (playingPlayers == null) return null;
             if (playingPlayers.Count == 0) return null;
 
-            theHuman.GameData.Trades.TradeRequest.TradePartners.Clear(); // this should be called with currentPlayer changes
+            ObservableCollection<PlayerModel> partners = new ObservableCollection<PlayerModel>();
 
             if (currentPlayer != TheHuman)
             {
                 //
                 //  if it ain't your turn, you can only trade with the CurrentPlayer
-                theHuman.GameData.Trades.TradeRequest.TradePartners.Add(new PlayerTradeTracker() { InTrade = true, PlayerIdentifier = CurrentPlayer.PlayerIdentifier, PlayerName = CurrentPlayer.PlayerName });
-                return theHuman.GameData.Trades.TradeRequest.TradePartners;                
+                partners.Add(CurrentPlayer);
+                return partners;
+            
             }
             
 
             foreach (var player in playingPlayers)
             {
                 if (player == TheHuman) continue; //can't trade with yourself
-                PlayerTradeTracker tracker = new PlayerTradeTracker()
-                {
-                    PlayerName = player.PlayerName,
-                    InTrade = false,
-                    PlayerIdentifier = player.PlayerIdentifier
-                };
-
-                theHuman.GameData.Trades.TradeRequest.TradePartners.Add(tracker);
+                partners.Add(player);
             }
-            if (theHuman.GameData.Trades.TradeRequest.Owner == null)
+            if (theHuman.GameData.Trades.TradeRequest.Owner.Player == null)
             {
-                theHuman.GameData.Trades.TradeRequest.Owner = theHuman;
+                theHuman.GameData.Trades.TradeRequest.Owner.Player = theHuman;
             }
 
-            return theHuman.GameData.Trades.TradeRequest.TradePartners;
+            return partners;
         }
 
 

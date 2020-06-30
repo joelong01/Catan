@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,11 +29,16 @@ namespace Catan10
                 await StaticHelpers.ShowErrorText("Sorry, your offer no longer exists.\nLooks like somebody beat you to it.", "Catan Trades");
                 return;
             }
-            localOffer.PartnerApproved = this.TradeOffer.PartnerApproved;
-            localOffer.OwnerApproved = this.TradeOffer.OwnerApproved;
-            if (localOffer.PartnerApproved && localOffer.OwnerApproved)
+            localOffer.Partner.Approved = this.TradeOffer.Partner.Approved;
+            localOffer.Owner.Approved= this.TradeOffer.Owner.Approved;
+            if (localOffer.Owner.Approved && localOffer.Partner.Approved)
             {
-                
+                Debug.Assert(false, "Need to implement moving the resources");
+                /*
+                 * 1. you can update the resources in here as everybody is getting this message
+                 * 2. you should send a message to remove this offer from the list
+                 * 
+                 */
             }
             
         }

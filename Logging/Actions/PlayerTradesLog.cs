@@ -10,11 +10,13 @@ namespace Catan10
     class PlayerTradesLog : LogHeader, ILogController
     {
         public TradeOffer TradeOffer { get; set; }
-        public static Task DoTrade(IGameController gameController, TradeOffer offer)
+        public List<PlayerModel> TradePartners { get; set; }
+        public static Task DoTrade(IGameController gameController, TradeOffer offer, List<PlayerModel> partners)
         {
             PlayerTradesLog logHeader = new PlayerTradesLog()
             {
                 TradeOffer = offer,
+                TradePartners = partners,
                 CanUndo = false,
                 Action = CatanAction.PlayerTrade
             };
@@ -24,27 +26,23 @@ namespace Catan10
         public Task Do(IGameController gameController)
         {
 
-            foreach (var tracker in TradeOffer.TradePartners)
+            foreach (PlayerModel player in this.TradePartners)
             {
-                TradeOffer.Owner = gameController.NameToPlayer(TradeOffer.OwnerName);
-                var player = gameController.NameToPlayer(tracker.PlayerName);
-                if (player.PlayerIdentifier == TradeOffer.Owner.PlayerIdentifier) continue;
+                
+                if (player == TradeOffer.Owner.Player) continue;
+
                 var o = new TradeOffer()
                 {
-                    Desire = new TradeResources(TradeOffer.Desire),
-                    Offer = new TradeResources(this.TradeOffer.Offer),
-                    Owner = TradeOffer.Owner, // set above
-                    TradePartners = new ObservableCollection<PlayerTradeTracker>()
+                    Owner = new Offer()
                     {
-                        new PlayerTradeTracker()
-                        {
-                            PlayerIdentifier = player.PlayerIdentifier,
-                            PlayerName = player.PlayerName,
-                            InTrade = true
-                        }
+                        Player = TradeOffer.Owner.Player,
+                        Approved = TradeOffer.Owner.Approved
                     },
-                    OwnerApproved = TradeOffer.OwnerApproved,
-                    PartnerApproved = false
+                    Partner = new Offer()
+                    {
+                        Player = player,
+                        Approved = false
+                    }
                 };
 
                 gameController.TheHuman.GameData.Trades.PotentialTrades.Add(o);

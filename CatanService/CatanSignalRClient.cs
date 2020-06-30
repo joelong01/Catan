@@ -62,6 +62,29 @@ namespace Catan10
         }
     }
 
+    public class PlayerModelConverter : JsonConverter<PlayerModel>
+    {
+        #region Methods
+
+        public override PlayerModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (typeToConvert == typeof(string))
+            {
+                string playerName = reader.GetString();
+                return MainPage.Current.NameToPlayer(playerName);
+            }
+
+            return null;
+        }
+
+        public override void Write(Utf8JsonWriter writer, PlayerModel player, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(player.PlayerName);
+        }
+
+        #endregion Methods
+    }
+
     public class CatanSignalRClient : IDisposable, ICatanService
     {
 
@@ -168,7 +191,7 @@ namespace Catan10
             Type type = CurrentAssembly.GetType(msg.DataTypeName);
             if (type == null) throw new ArgumentException("Unknown type!");
 
-            LogHeader logHeader = JsonSerializer.Deserialize(msg.Data.ToString(), type, CatanProxy.GetJsonOptions()) as LogHeader;
+            LogHeader logHeader = JsonSerializer.Deserialize(msg.Data.ToString(), type, GetJsonOptions()) as LogHeader;
             IMessageDeserializer deserializer = logHeader as IMessageDeserializer;
             if (deserializer != null)
             {
@@ -194,6 +217,8 @@ namespace Catan10
 
         #endregion Constructors + Destructors
 
+
+
         public static JsonSerializerOptions GetJsonOptions(bool indented = false)
         {
             var options = new JsonSerializerOptions
@@ -202,6 +227,7 @@ namespace Catan10
                 WriteIndented = indented
             };
             options.Converters.Add(new JsonStringEnumConverter());
+            options.Converters.Add(new PlayerModelConverter());
             return options;
         }
 
