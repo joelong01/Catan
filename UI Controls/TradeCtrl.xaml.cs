@@ -164,6 +164,14 @@ namespace Catan10
         private async void ApprovalChanged(object sender, RoutedEventArgs e)
         {
             if (!(((ToggleSwitch)sender).Tag is TradeOffer offer)) return;
+            if (TheHuman == offer.Owner.Player)
+            {
+                offer.Owner.Approved = !offer.Owner.Approved;
+            }
+            else
+            {
+                offer.Partner.Approved = !offer.Partner.Approved;
+            }
             await TradeApprovalChangedLog.ToggleTrade(MainPage.Current, offer);
         }
 

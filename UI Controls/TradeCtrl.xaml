@@ -61,7 +61,7 @@
                                         Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
                                         Background="Red"
                                         IsEnabled="{x:Bind local:TradeCtrl.IsHuman(Owner.Player), Mode=OneWay}"
-                                        IsOn="{x:Bind Owner.Approved, Mode=TwoWay}"
+                                        IsOn="{x:Bind Owner.Approved, Mode=OneWay}"
                                         Toggled="ApprovalChanged">
                                         <ToggleSwitch.OnContent>
                                             <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"

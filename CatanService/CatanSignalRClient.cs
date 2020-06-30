@@ -450,8 +450,13 @@ namespace Catan10
 
         public async Task<GameInfo> JoinGame(GameInfo gameInfo, string playerName)
         {
+            if (gameInfo == null) throw new ArgumentException("GameInfo can't be null");
+            if (String.IsNullOrEmpty(playerName)) throw new ArgumentException("PlayerName can't be null");
+
             try
             {
+                
+
                 TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
                 GameInfo serviceGameInfo = null;
                 void CatanSignalRClient_OnGameJoined(GameInfo info, string name)
