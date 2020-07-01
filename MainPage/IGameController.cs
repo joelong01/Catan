@@ -138,7 +138,7 @@ namespace Catan10
             {
                 if (MainPageModel.Log == null) return GameState.WaitingForNewGame;
 
-                return MainPageModel.Log.GameState;
+                return MainPageModel.GameState;
             }
         }
 

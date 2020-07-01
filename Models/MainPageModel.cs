@@ -317,8 +317,16 @@ namespace Catan10
         [JsonIgnore]
         public PlayerModel GameStartedBy { get; internal set; }
 
-        public GameState GameState => Log.GameState;
+        [JsonIgnore]
+        public GameState GameState
+        {
+            get
+            {
+                if (Log == null) return GameState.WaitingForNewGame;
 
+                return Log.GameState;
+            }
+        }
         [JsonIgnore]
         public bool IsServiceGame
         {
