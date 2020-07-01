@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -68,9 +67,9 @@ namespace Catan10
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
-            
+
             //
-            //  does anybody have any gold? 
+            //  does anybody have any gold?
             //
             //
             if (gameController.TheHuman.GameData.Resources.Current.GoldMine > 0)
@@ -78,9 +77,10 @@ namespace Catan10
                 //
                 //  this message goes everywhere, so we only need one machien to send it. so even if 2 people need to trade gold, only one sends it
                 await MustTradeGold.PostMessage(gameController);
-                
             }
-            if (rollLog.LastRoll == 7)
+
+            // only the current player's machine should send this message.  everybody will get it
+            if (rollLog.LastRoll == 7 && gameController.CurrentPlayer == gameController.TheHuman) 
             {
                 await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
             }

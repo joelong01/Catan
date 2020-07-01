@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -11,6 +10,8 @@ namespace Catan10
 {
     public class PlayerHasTooManyCards : LogHeader, ILogController
     {
+        #region Methods
+
         public static Task PostMessage(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForNext);
@@ -20,14 +21,12 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            
             if (gameController.TheHuman.GameData.Resources.Current.Count > 7)
             {
                 //
                 //  we explicity discard before we target! -- this is *not* about the Baron, so don't move it.
                 //  this is about having too many cards
                 //
-
 
                 Contract.Assert(gameController.TheHuman.GameData.Resources.ResourcesThisTurn.Count == 0);
                 int loss = (int)gameController.TheHuman.GameData.Resources.Current.Count / 2;
@@ -65,9 +64,7 @@ namespace Catan10
 
                 Contract.Assert(lost.Count == loss);
                 await LoseCardsToSeven.PostMessage(gameController, lost);
-             
             }
-
         }
 
         public Task Redo(IGameController gameController)
@@ -79,5 +76,7 @@ namespace Catan10
         {
             throw new NotImplementedException();
         }
+
+        #endregion Methods
     }
 }
