@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.Threading.Tasks;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -161,22 +161,32 @@ namespace Catan10
         }
 
 
-        private async void ApprovalChanged(object sender, RoutedEventArgs e)
+        private async void OwnerApprovalChanged(object sender, RoutedEventArgs e)
         {
 
-            if (!(((ToggleSwitch)sender).Tag is TradeOffer offer)) return;
-            PlayerModel approver = offer.Partner.Player;
-            
-            if (TheHuman == offer.Owner.Player)
-            {
-                approver = offer.Owner.Player;
-            }
+            if (!(((ToggleSwitch)sender).Tag is TradeOffer offer)) return;      
             this.TraceMessage($"{offer}");
-
-            await TradeApprovalChangedLog.ToggleTrade(MainPage.Current, offer, ((ToggleSwitch)sender).IsOn, approver);
+            bool isOn = ((ToggleSwitch)sender).IsOn;
+            if (offer.Owner.Approved != isOn)
+            {
+                await TradeApprovalChangedLog.ToggleTrade(MainPage.Current, offer, isOn , offer.Owner.Player);
+            }
         }
 
-        
-        
+        private async void PartnerApprovalChanged(object sender, RoutedEventArgs e)
+        {
+            if (!(((ToggleSwitch)sender).Tag is TradeOffer offer)) return;
+            this.TraceMessage($"{offer}");
+            bool isOn = ((ToggleSwitch)sender).IsOn;
+            if (offer.Partner.Approved != isOn)
+            {
+                await TradeApprovalChangedLog.ToggleTrade(MainPage.Current, offer, isOn, offer.Partner.Player);
+            }
+        }
+
+      
+
+
+
     }
 }
