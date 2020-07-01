@@ -46,6 +46,8 @@ namespace Catan10
                     await PickingBoardToWaitingForRollOrder.PostLog(gameController);
                 }
             }
+
+            
         }
 
         public async Task Redo(IGameController gameController)

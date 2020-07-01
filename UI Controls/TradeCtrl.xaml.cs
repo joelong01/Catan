@@ -171,9 +171,7 @@ namespace Catan10
             {
                 approver = offer.Owner.Player;
             }
-
-            
-            
+            this.TraceMessage($"{offer}");
 
             await TradeApprovalChangedLog.ToggleTrade(MainPage.Current, offer, ((ToggleSwitch)sender).IsOn, approver);
         }

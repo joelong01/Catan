@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 namespace Catan10
 {
     public class TradeApprovalChangedLog : LogHeader, ILogController
     {
-        public TradeOffer TradeOffer { get; set; }
+        #region Properties
+
         public bool ApprovalValue { get; set; }
         public PlayerModel Approver { get; set; }
-        public  static Task ToggleTrade(IGameController gameController, TradeOffer offer, bool approval, PlayerModel approver)
+        public TradeOffer TradeOffer { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
+        public static Task ToggleTrade(IGameController gameController, TradeOffer offer, bool approval, PlayerModel approver)
         {
             TradeApprovalChangedLog logHeader = new TradeApprovalChangedLog()
             {
@@ -26,6 +28,7 @@ namespace Catan10
 
             return gameController.PostMessage(logHeader, Catan.Proxy.ActionType.Normal);
         }
+
         public async Task Do(IGameController gameController)
         {
             TradeOffer localOffer = gameController.TheHuman.GameData.Trades.FindTradeByValue(this.TradeOffer);
@@ -43,7 +46,7 @@ namespace Catan10
                 Contract.Assert(localOffer.Owner.Player == Approver);
                 localOffer.Owner.Approved = ApprovalValue;
             }
-            
+
             if (localOffer.Owner.Approved && localOffer.Partner.Approved)
             {
                 //
@@ -73,9 +76,7 @@ namespace Catan10
                 //  grant the resources
                 this.TradeOffer.Owner.Player.GameData.Resources.GrantResources(this.TradeOffer.Partner.Resources);
                 this.TradeOffer.Partner.Player.GameData.Resources.GrantResources(this.TradeOffer.Owner.Resources);
-                
             }
-            
         }
 
         public Task Redo(IGameController gameController)
@@ -87,5 +88,7 @@ namespace Catan10
         {
             return Task.CompletedTask;
         }
+
+        #endregion Methods
     }
 }

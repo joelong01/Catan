@@ -10,7 +10,10 @@ namespace Catan10
             
         }
         #region Delegates + Fields + Events + Enums
-
+        public override string ToString()
+        {
+            return $"[Onwer={Owner}][Partner={Partner}]";
+        }
         public event PropertyChangedEventHandler PropertyChanged;
 
         private Offer _owner = new Offer();
@@ -79,6 +82,10 @@ namespace Catan10
         #region Properties
 
         PlayerModel _player = null;
+        public override string ToString()
+        {
+            return $"Player={Player.PlayerName}|Approved={Approved}";
+        }
 
         public bool Approved
         {
