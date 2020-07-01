@@ -458,38 +458,28 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public Visibility ShowRolls
-        {
-            get
-            {
-                Visibility visibility = Visibility.Visible;
-                try
-                {
-                    if (Log == null) return visibility;
-                    if (Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForRollForOrder) return visibility;
-
-                    visibility = Visibility.Collapsed;
-                    return visibility;
-                }
-                finally
-                {
-                    // this.TraceMessage($"ShowRolls:[State={Log.GameState}] [Visibility={visibility}]");
-                }
-            }
-        }
-
-        public Visibility ShowRollUi(GameState state)
+        /// <summary>
+        ///     Binding function for setting the visibility of the RollUi
+        ///     Added WaitingForNewGame so that the setting of the grid positions works.
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <returns></returns>
+        public Visibility ShowRollUi(GameState gameState)
         {
 
             Visibility visibility = Visibility.Visible;
             if (Log == null) return visibility;
-            if (Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForRollForOrder) return visibility;
+            if (gameState == GameState.WaitingForRoll || gameState == GameState.WaitingForRollForOrder || gameState == GameState.WaitingForNewGame) return visibility;
 
             visibility = Visibility.Collapsed;
             return visibility;
         }
-
+        /// <summary>
+        /// When to show the TradeUi
+        /// Added WaitingForNewGame so that the setting of the grid positions works.
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <returns></returns>
         public Visibility ShowTradeUi(GameState gameState)
         {
             return gameState == GameState.WaitingForNext ? Visibility.Visible : Visibility.Collapsed;
