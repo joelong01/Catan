@@ -52,9 +52,11 @@
                                 BorderBrush="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}"
                                 BorderThickness="1" CornerRadius="10">
                                 <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+
                                     <Ellipse Width="30" Height="30" Margin="10,0,0,0" VerticalAlignment="Center"
                                         Fill="{x:Bind Owner.Player.ImageBrush, Mode=OneWay}"
                                         Stroke="Black" />
+
                                     <ToggleSwitch Margin="10,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                                         Style="{StaticResource CatanToggleSwitch}"
                                         Tag="{x:Bind}"

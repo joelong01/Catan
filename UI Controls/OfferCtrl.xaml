@@ -18,18 +18,34 @@
             <StackPanel Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                 Orientation="Horizontal" Background="Transparent">
                 <!--  Trading Partners  -->
-                <GridView Name="GridView_TradingPartners" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
-                    BorderBrush="White" BorderThickness="0" IsMultiSelectCheckBoxEnabled="True"
-                    ItemsSource="{x:Bind GetTradePartners(TheHuman, CurrentPlayer, PlayingPlayers), Mode=OneWay}"                     
+                <GridView Name="GridView_TradingPartners" Margin="0,0,0,0" HorizontalAlignment="Right"
+                    VerticalAlignment="Center" BorderBrush="White" BorderThickness="0"
+                    IsMultiSelectCheckBoxEnabled="True" IsItemClickEnabled="False"
+                    ItemsSource="{x:Bind GetTradePartners(TheHuman, CurrentPlayer, PlayingPlayers), Mode=OneWay}"
                     ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionMode="Extended">
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="local:PlayerModel">
-                            <Ellipse Width="45" Height="45" Margin="10" HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Fill="{x:Bind ImageBrush, Mode=OneWay}" />
-                                        
+                            <StackPanel Width="50" Height="50" Margin="0" Padding="0"
+                                BorderThickness="0"
+                                BorderBrush="{x:Bind ForegroundBrush}">
+                                <Ellipse Width="40" Height="40" Margin="3" HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Fill="{x:Bind ImageBrush, Mode=OneWay}" />
+                            </StackPanel>
                         </DataTemplate>
                     </GridView.ItemTemplate>
+                    <GridView.ItemContainerStyle>
+                        <Style TargetType="GridViewItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="GridViewItem">
+                                        <ListViewItemPresenter SelectedBorderThickness="2" CheckMode="Inline" SelectedForeground="White"
+                                            BorderBrush="White" BorderThickness="2" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GridView.ItemContainerStyle>
                 </GridView>
                 <Border Width="50" Height="50" Margin="10,0,0,15" HorizontalAlignment="Center"
                     VerticalAlignment="Center"

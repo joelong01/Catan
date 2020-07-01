@@ -26,7 +26,9 @@ namespace Catan10
             TradeOffer localOffer = gameController.TheHuman.GameData.Trades.FindTradeByValue(this.TradeOffer);
             if (localOffer == null)
             {
-                Debug.Assert(false);
+               //
+               //   this might happen if the user has deleted an offer locally (e.g. not the owner) and then 
+               //   the owner subsequently deletes it.  not a problem.                
                 return Task.CompletedTask;
             }
 

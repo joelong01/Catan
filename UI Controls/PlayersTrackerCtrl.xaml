@@ -6,22 +6,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="600" d:DesignWidth="615" Background="SlateBlue" mc:Ignorable="d">
     <Control.Resources />
-    <Grid Name="Grid_PlayerResourceCount" Width="550">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="110" />
-            <RowDefinition Height="2" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <local:CatanNumber x:Name="_lastRolled" Width="80" Height="80" NumberStyle="ResoureCount"
-            Number="{x:Bind MainPageModel.Log.RollLog.LastRoll, Mode=OneWay}"
-            Visibility="{x:Bind MainPageModel.Log.GameState, FallbackValue=Collapsed, ConverterParameter=WaitingForNext, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToVisibilityConverter}}" />
+    <StackPanel Name="Grid_PlayerResourceCount" HorizontalAlignment="Left"
+        VerticalAlignment="Top" Background="Transparent" CornerRadius="10">
+
+
+
         <StackPanel Name="StackPanel_TotalResourceCount" Grid.Row="0" Grid.RowSpan="1"
             Grid.Column="1" Margin="0,5,0,0" HorizontalAlignment="Center"
-            VerticalAlignment="Top" Orientation="Horizontal"
+            VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal"
             BorderBrush="{StaticResource bmMaple}"
             BorderThickness="1" CornerRadius="10">
             <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wood}" Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay}" />
@@ -31,40 +23,20 @@
             <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Ore}" Count="{x:Bind MainPageModel.GameResources.Ore, Mode=OneWay}" />
             <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.GoldMine}" Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}" />
         </StackPanel>
-        <!--<StackPanel Name="StackPanel_TotalResourceCount" Grid.Row="0" Grid.RowSpan="1"
-            Grid.Column="1" Margin="0,5,0,0" HorizontalAlignment="Center"
-            VerticalAlignment="Top" Orientation="Horizontal"
-            BorderBrush="{StaticResource bmMaple}"
-            BorderThickness="1" CornerRadius="10">
-            <local:ResourceCardCtrl x:Name="ResourceCardControl_Wood" ResourceType="Wood"
-                Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay, FallbackValue=0}"
-                ReadOnly="True" Orientation="FaceUp" />
-            <local:ResourceCardCtrl x:Name="ResourceCardControl_Brick" ResourceType="Brick"
-                Count="{x:Bind MainPageModel.GameResources.Brick, Mode=OneWay, FallbackValue=0}"
-                ReadOnly="True" Orientation="FaceUp" />
-            <local:ResourceCardCtrl x:Name="ResourceCardControl_Sheep" ResourceType="Sheep"
-                Count="{x:Bind MainPageModel.GameResources.Sheep, Mode=OneWay, FallbackValue=0}"
-                ReadOnly="True" Orientation="FaceUp" />
-            <local:ResourceCardCtrl x:Name="ResourceCardControl_Wheat" ResourceType="Wheat"
-                Count="{x:Bind MainPageModel.GameResources.Wheat, Mode=OneWay, FallbackValue=0}"
-                ReadOnly="True" Orientation="FaceUp" />
-            <local:ResourceCardCtrl x:Name="ResourceCardControl_Ore" ResourceType="Ore"
-                Count="{x:Bind GameResources.Ore, Mode=OneWay, FallbackValue=0}"
-                ReadOnly="True" Orientation="FaceUp" />
-            <local:ResourceCardCtrl x:Name="ResourceCardControl_GoldMine" ResourceType="GoldMine"
-                Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay, FallbackValue=0}"
-                ReadOnly="True" Orientation="FaceUp" />
-        </StackPanel>-->
-        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Margin="5,0,5,0" Fill="{StaticResource bmMaple}" />
+
+
+        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="2" Margin="0,5,0,0"
+            Fill="{StaticResource bmMaple}" />
         <ListBox x:Name="ListBox_PlayerResourceCountList" Grid.Row="2" Grid.ColumnSpan="2"
-            Width="610" Margin="0,5,0,0"
+            Height="922" Margin="0,5,0,0" HorizontalAlignment="Stretch"
             ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
-            Background="Transparent" UseSystemFocusVisuals="True"
-            ScrollViewer.VerticalScrollBarVisibility="Disabled">
+            Background="Transparent" UseSystemFocusVisuals="False"
+            ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
-                    <Setter Property="Margin" Value="0,15,0,-15" />
-                    <Setter Property="Padding" Value="0,-15" />
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="5" />
+                    <Setter Property="HorizontalAlignment" Value="Left" />
                 </Style>
             </ListBox.ItemContainerStyle>
             <!--<ListBox.Items>
@@ -72,13 +44,13 @@
             </ListBox.Items>-->
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PublicDataCtrl Width="610" Player="{x:Bind Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}" RenderTransformOrigin="0 0">
+                    <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}" RenderTransformOrigin="0 0">
                         <local:PublicDataCtrl.RenderTransform>
-                            <CompositeTransform ScaleX=".88" ScaleY=".88" TranslateX="0" />
+                            <CompositeTransform ScaleX="1" ScaleY="1" TranslateX="0" />
                         </local:PublicDataCtrl.RenderTransform>
                     </local:PublicDataCtrl>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-    </Grid>
+    </StackPanel>
 </UserControl>

@@ -114,6 +114,7 @@ namespace Catan10
         {
             GameContainerCtrl container = d as GameContainerCtrl;
             container.SetGame(e.NewValue as CatanGameCtrl);
+
         }
 
         private bool AboveTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)

@@ -4,7 +4,7 @@
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="383.092" mc:Ignorable="d" Width="408">
+    Width="408" d:DesignHeight="383.092" mc:Ignorable="d">
     <!--  the List of offers  -->
-    
+
 </UserControl>

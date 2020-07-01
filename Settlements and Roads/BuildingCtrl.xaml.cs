@@ -58,7 +58,7 @@ namespace Catan10
         /// <param name="e"></param>
         private void Building_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            if (this.BuildingState == BuildingState.None)
+            if (this.BuildingState == BuildingState.None && Callback != null)
             {
                 this.BuildingState = Callback.ValidateBuildingLocation(this);
             }
@@ -91,7 +91,7 @@ namespace Catan10
         {
             //
             //  need to validate that the GameState is a valid state to change the state of a building
-
+            if (Callback == null) return;
             bool valid = (bool)Callback?.BuildingStateChangeOk(this);
             if (!valid)
             {

@@ -300,6 +300,6 @@ namespace Catan10
             return partners;
         }
 
-
+       
     }
 }

@@ -445,16 +445,19 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public Visibility ShowBoardMeasurements
+        
+        public Visibility ShowBoardMeasurements(GameState gameState)
         {
-            get
+            
+            switch (gameState)
             {
-                if (Log == null) return Visibility.Visible;
-                if (Log.GameState == GameState.WaitingForNewGame) return Visibility.Visible;
-                if (Log.GameState == GameState.PickingBoard) return Visibility.Visible;
-                if (Log.GameState == GameState.AllocateResourceForward || Log.GameState == GameState.AllocateResourceReverse) return Visibility.Visible;
-                return Visibility.Collapsed;
+                case GameState.WaitingForNewGame:
+                case GameState.PickingBoard:
+                case GameState.AllocateResourceForward:
+                case GameState.AllocateResourceReverse:
+                    return Visibility.Visible;
+                default:
+                    return Visibility.Collapsed;
             }
         }
 
@@ -466,13 +469,16 @@ namespace Catan10
         /// <returns></returns>
         public Visibility ShowRollUi(GameState gameState)
         {
-
-            Visibility visibility = Visibility.Visible;
-            if (Log == null) return visibility;
-            if (gameState == GameState.WaitingForRoll || gameState == GameState.WaitingForRollForOrder || gameState == GameState.WaitingForNewGame) return visibility;
-
-            visibility = Visibility.Collapsed;
-            return visibility;
+            switch (gameState)
+            {
+                case GameState.WaitingForNewGame:
+                case GameState.WaitingForRoll:
+                case GameState.WaitingForRollForOrder:
+                    return Visibility.Visible;
+                default:
+                    return Visibility.Collapsed;
+            }
+           
         }
         /// <summary>
         /// When to show the TradeUi
@@ -482,7 +488,14 @@ namespace Catan10
         /// <returns></returns>
         public Visibility ShowTradeUi(GameState gameState)
         {
-            return gameState == GameState.WaitingForNext ? Visibility.Visible : Visibility.Collapsed;
+            switch (gameState)
+            {
+                case GameState.WaitingForNewGame:
+                case GameState.WaitingForNext:
+                    return Visibility.Visible;
+                default:
+                    return Visibility.Collapsed;
+            }
         }
 
         [JsonIgnore]

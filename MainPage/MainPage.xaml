@@ -151,8 +151,8 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-            <local:GameContainerCtrl x:Name="_gameView" DoubleTapped="GameViewControlDoubleTapped" Canvas.ZIndex="-1"
-                RenderTransformOrigin="0.5,0.5" IsEnabled="True"
+            <local:GameContainerCtrl x:Name="_gameView" DoubleTapped="GameViewControlDoubleTapped" Canvas.ZIndex="-1" 
+                RenderTransformOrigin="0.5,0.5" IsEnabled="True"                                     
                 PointerPressed="GameViewControlPointerPressed">
                 <local:GameContainerCtrl.RenderTransform>
                     <CompositeTransform x:Name="_transformGameView"
@@ -175,7 +175,7 @@
                     <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" StolenResource="{x:Bind TheHuman.GameData.Resources.StolenResource, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right"
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right" Width="500"
                 Canvas.ZIndex="5"
                 GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
                 PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
@@ -403,7 +403,7 @@
                 HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="10"
                 PointerPressed="Draggable_PointerPressed"
                 OnGridPositionChanged="OnGridPositionChanged" Caption="Board Measurements"
-                Visibility="{x:Bind MainPageModel.ShowBoardMeasurements, Mode=OneWay}"
+                Visibility="{x:Bind MainPageModel.ShowBoardMeasurements(MainPageModel.GameState), Mode=OneWay}"
                 BorderBrush="{StaticResource bmMaple}"
                 Background="{StaticResource DevCardType.Knight}"
                 Player="{x:Bind TheHuman, Mode=OneWay}"
@@ -452,9 +452,7 @@
                 Caption="Resource Trades"
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
-                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" TheHuman="{x:Bind TheHuman, Mode=OneWay}" 
-                                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" 
-                                     PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"/>
+                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" TheHuman="{x:Bind TheHuman, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"

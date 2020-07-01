@@ -96,8 +96,8 @@
                     <PlaneProjection x:Name="_ppHexBack" RotationY="0" />
                 </Grid.Projection>
                 <Polygon Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Stroke="BurlyWood" StrokeThickness="6"
-                    Points="29,3 81,3 106.5,48 81,93 29,93 3.5,48"
+                    Stroke="{StaticResource bmMaple}"
+                    StrokeThickness="6" Points="29,3 81,3 106.5,48 81,93 29,93 3.5,48"
                     Fill="{StaticResource TileType.Back}" />
             </Grid>
         </Grid>

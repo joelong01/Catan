@@ -135,19 +135,13 @@ namespace Catan10
             // await LoseHalfYourCards();
 
             // TestTrade();
-            LogHeader lh = new LogHeader();
-
-            CatanMessage message = new CatanMessage()
-            {
-                ActionType = ActionType.Normal,
-                MessageId = Guid.NewGuid(),
-                To = "Joe",
-                From = "Joe",
-                DataTypeName = typeof(LogHeader).FullName,
-                Data = lh
-
-            };
-            await MainPageModel.CatanService.SendPrivateMessage("Joe", message);
+            MainPageModel.PlayingPlayers.Clear();
+            
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[0]);
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[3]);
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[4]);
         }
 
         private async void OnTestService(object sender, RoutedEventArgs e)

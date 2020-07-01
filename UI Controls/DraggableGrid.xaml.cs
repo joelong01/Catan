@@ -16,6 +16,61 @@ namespace Catan10
     [ContentProperty(Name = "Child")]
     public sealed partial class DragableGridCtrl : UserControl
     {
+        #region Delegates + Fields + Events + Enums
+
+        public event GridPositionChangedHandler OnGridPositionChanged;
+
+        public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register("Caption", typeof(string), typeof(DragableGridCtrl), new PropertyMetadata("This is the Caption"));
+
+        public static readonly DependencyProperty ChildProperty = DependencyProperty.Register(nameof(Child), typeof(UIElement), typeof(DragableGridCtrl), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty GridPositionProperty = DependencyProperty.Register("GridPosition", typeof(GridPosition), typeof(DragableGridCtrl), new PropertyMetadata(new GridPosition(0, 0, 1.0, 1.0), GridPositionChanged));
+
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(DragableGridCtrl), new PropertyMetadata(new PlayerModel()));
+
+        private int fullSize = 1;
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public string Caption
+        {
+            get => (string)GetValue(CaptionProperty);
+            set => SetValue(CaptionProperty, value);
+        }
+
+        public UIElement Child
+        {
+            get { return (UIElement)GetValue(ChildProperty); }
+            set { SetValue(ChildProperty, value); }
+        }
+
+        public GridPosition GridPosition
+        {
+            get => (GridPosition)GetValue(GridPositionProperty);
+            set => SetValue(GridPositionProperty, value);
+        }
+
+        public PlayerModel Player
+        {
+            get => (PlayerModel)GetValue(PlayerProperty);
+            set => SetValue(PlayerProperty, value);
+        }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+        public DragableGridCtrl()
+        {
+            this.InitializeComponent();
+        }
+
+        #endregion Constructors + Destructors
+
+        #region Methods
+
         private static void GridPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as DragableGridCtrl;
@@ -157,7 +212,6 @@ namespace Catan10
 
             OnGridPositionChanged?.Invoke(userControl.Name, GridPosition);
         }
-        private int fullSize = 1;
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
             fullSize = 1 - fullSize;
@@ -192,43 +246,6 @@ namespace Catan10
             AnimateMove.Begin();
         }
 
-        public string Caption
-        {
-            get => (string)GetValue(CaptionProperty);
-            set => SetValue(CaptionProperty, value);
-        }
-
-        public UIElement Child
-        {
-            get { return (UIElement)GetValue(ChildProperty); }
-            set { SetValue(ChildProperty, value); }
-        }
-
-        public GridPosition GridPosition
-        {
-            get => (GridPosition)GetValue(GridPositionProperty);
-            set => SetValue(GridPositionProperty, value);
-        }
-
-        public PlayerModel Player
-        {
-            get => (PlayerModel)GetValue(PlayerProperty);
-            set => SetValue(PlayerProperty, value);
-        }
-
-        public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register("Caption", typeof(string), typeof(DragableGridCtrl), new PropertyMetadata("This is the Caption"));
-
-        public static readonly DependencyProperty ChildProperty = DependencyProperty.Register(nameof(Child), typeof(UIElement), typeof(DragableGridCtrl), new PropertyMetadata(null));
-
-        public static readonly DependencyProperty GridPositionProperty = DependencyProperty.Register("GridPosition", typeof(GridPosition), typeof(DragableGridCtrl), new PropertyMetadata(new GridPosition(0, 0, 1.0, 1.0), GridPositionChanged));
-
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(DragableGridCtrl), new PropertyMetadata(new PlayerModel()));
-
-        public DragableGridCtrl()
-        {
-            this.InitializeComponent();
-        }
-
-        public event GridPositionChangedHandler OnGridPositionChanged;
+        #endregion Methods
     }
 }

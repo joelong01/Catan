@@ -34,6 +34,8 @@ namespace Catan10
             TradeOffer localOffer = gameController.TheHuman.GameData.Trades.FindTradeByValue(this.TradeOffer);
             if (localOffer == null)
             {
+                this.TraceMessage($"Couldn't find LocalOffer: {TradeOffer}");
+
                 await StaticHelpers.ShowErrorText("Sorry, your offer no longer exists.\nLooks like somebody beat you to it.", "Catan Trades");
                 return;
             }
