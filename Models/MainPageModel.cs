@@ -110,7 +110,7 @@ namespace Catan10
         [JsonIgnore]
         public PlayerModel Bank { get; private set; }
 
-        
+
         [JsonIgnore]
         public ICatanService CatanService { get; set; }
 
@@ -133,7 +133,7 @@ namespace Catan10
                     _unprocessedMessages = value;
                     NotifyPropertyChanged();
                     DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-                  //  this.TraceMessage($"UnprocessedMessages: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
+                    //  this.TraceMessage($"UnprocessedMessages: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
                 }
             }
         }
@@ -156,8 +156,8 @@ namespace Catan10
                     //
                     //  whevener this changes, the log changes...so you don't need to send a NotifyPropertyChanged() event...I hope...
                     if (UnprocessedMessages > 0)
-                    {                        
-                       // this.TraceMessage($"Enable false because UnprocessedMessages > 0: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
+                    {
+                        // this.TraceMessage($"Enable false because UnprocessedMessages > 0: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
                         return false;
                     }
 
@@ -368,8 +368,8 @@ namespace Catan10
             }
         }
 
-        
-        
+
+
 
         [JsonIgnore]
         public TradeResources ResourcesLeftInBank
@@ -459,8 +459,7 @@ namespace Catan10
                 try
                 {
                     if (Log == null) return visibility;
-                    if (Log.GameState == GameState.WaitingForNewGame || Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.BeginResourceAllocation ||
-                        Log.GameState == GameState.WaitingForRollForOrder || Log.GameState == GameState.WaitingForNext) return visibility;
+                    if (Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForRollForOrder) return visibility;
 
                     visibility = Visibility.Collapsed;
                     return visibility;
@@ -470,6 +469,22 @@ namespace Catan10
                     // this.TraceMessage($"ShowRolls:[State={Log.GameState}] [Visibility={visibility}]");
                 }
             }
+        }
+
+        public Visibility ShowRollUi(GameState state)
+        {
+
+            Visibility visibility = Visibility.Visible;
+            if (Log == null) return visibility;
+            if (Log.GameState == GameState.WaitingForRoll || Log.GameState == GameState.WaitingForRollForOrder) return visibility;
+
+            visibility = Visibility.Collapsed;
+            return visibility;
+        }
+
+        public Visibility ShowTradeUi(GameState gameState)
+        {
+            return gameState == GameState.WaitingForNext ? Visibility.Visible : Visibility.Collapsed;
         }
 
         [JsonIgnore]

@@ -316,7 +316,7 @@ namespace Catan10
             }
             else
             {
-                if (!MainPageModel.Settings.AutoJoinGames)
+                if (!MainPageModel.Settings.AutoRespond)
                 {
                     bool yes = await StaticHelpers.AskUserYesNoQuestion($"{gameInfo.Creator} started a game named {gameInfo.Name}.\n\nWould you like to join it?", "Yes!", "No");
                     if (!yes) return;

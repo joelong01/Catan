@@ -29,7 +29,8 @@ namespace Catan10
             {
                 OldBuildingState = building.BuildingState,
                 NewBuildingState = newState,
-                BuildingIndex = building.Index
+                BuildingIndex = building.Index,
+                Action=CatanAction.UpdateBuildingState
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace Catan10
 
             if (reason == MoveBaronReason.Rolled7)
             {
-                Contract.Assert(gameController.CurrentGameState == GameState.WaitingForNext);
+                Debug.Assert(gameController.CurrentGameState == GameState.WaitingForNext);
             }
 
             MustMoveBaronLog logHeader = new MustMoveBaronLog()
