@@ -42,8 +42,9 @@
         <GridView Grid.Row="2" Grid.Column="1" Margin="0" Padding="0"
             HorizontalAlignment="Stretch" CornerRadius="10" Background="Transparent"
             BorderBrush="White" BorderThickness="2"
+                  SelectionMode="None"
             SelectedItem="{x:Bind SelectedOffer, Mode=TwoWay}"
-            IsItemClickEnabled="True" SelectionMode="Single"
+            IsItemClickEnabled="False" 
             ItemsSource="{x:Bind FilteredOffers(TheHuman.GameData.Trades.PotentialTrades, MyOffersOnly), Mode=OneWay}">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:TradeOffer">
