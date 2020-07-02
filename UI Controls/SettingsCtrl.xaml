@@ -4,7 +4,7 @@
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="userControl" Width="366" Height="1080" d:DesignHeight="1080"
+    x:Name="userControl" Width="700" Height="1080" d:DesignHeight="1080"
     d:DesignWidth="346" RequestedTheme="Dark" IsTabStop="False"
     RenderTransformOrigin="0.5,0.5" mc:Ignorable="d">
     <UserControl.Resources>
@@ -38,7 +38,7 @@
                 VerticalAlignment="Top" FontFamily="Segoe MDL2 Assets"
                 Content="&#xE700;" Click="HamburgerButton_Click" Foreground="White"
                 IsTabStop="False"
-                Background="{StaticResource bmBack}" />
+                Background="{StaticResource BlackBrush}" />
 
             <Rectangle Grid.RowSpan="2" Grid.Column="1" Stroke="White" StrokeThickness="2" />
 

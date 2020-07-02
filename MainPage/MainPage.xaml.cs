@@ -546,7 +546,7 @@ namespace Catan10
                     {
                         DiceOne = number.Number / 2,
                         Selected = false
-                    }; 
+                    };
                     rollModel.DiceTwo = number.Number - rollModel.DiceOne;
                     rolls.Add(rollModel);
                 }
@@ -1094,6 +1094,70 @@ namespace Catan10
                 appWindow = null;
             };
             await appWindow.TryShowAsync();
+        }
+
+        private async void OnNewLocalGame(object sender, RoutedEventArgs e)
+        {
+            MainPageModel.Settings.IsLocalGame = true;
+
+
+            if (MainPageModel.GameState != GameState.WaitingForNewGame)
+            {
+                if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
+                {
+                    return;
+                }
+            }
+
+
+
+            NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
+
+            ContentDialogResult result = await dlg.ShowAsync();
+            if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
+            {
+                string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
+                MessageDialog msgDlg = new MessageDialog(content);
+                await msgDlg.ShowAsync();
+                return;
+            }
+
+            if (dlg.SelectedGame == null)
+            {
+                string content = String.Format($"Pick a game!!");
+                MessageDialog msgDlg = new MessageDialog(content);
+                await msgDlg.ShowAsync();
+                return;
+            }
+
+            if (result != ContentDialogResult.Secondary)
+            {
+                _gameView.Reset();
+                await this.Reset();
+
+
+                _gameView.CurrentGame = dlg.SelectedGame;
+                MainPageModel.PlayingPlayers.Clear();
+                GameInfo info = new GameInfo()
+                {
+                    Creator = "Joe",
+                    Id = Guid.NewGuid(),
+                    Started = false
+                };
+                await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
+
+                MainPageModel.PlayingPlayers.Clear();
+
+                dlg.PlayingPlayers.ForEach(async (p) =>
+              {
+                  await AddPlayerLog.AddPlayer(this, p.PlayerName);
+              });
+
+
+
+            }
+
+
         }
     }
 }

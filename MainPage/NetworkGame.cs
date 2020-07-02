@@ -186,7 +186,7 @@ namespace Catan10
                 bool ret = await PickDefaultUser();
                 if (!ret) return;
             };
-
+            MainPageModel.Settings.IsLocalGame = false;
             List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
             ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, MainPageModel.AllPlayers, games, MainPageModel.CatanService)
             {

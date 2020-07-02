@@ -78,6 +78,7 @@
                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
                         <MenuFlyoutSubItem Text="Game">
                             <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
+                            <MenuFlyoutItem Text="New Shared Game" Click="OnNewLocalGame" />
                             <MenuFlyoutItem Text="Join Network Game" Click="OnJoinNetworkGame" />
                             <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
                             <MenuFlyoutSeparator />
