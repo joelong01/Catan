@@ -6,48 +6,49 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="100" d:DesignWidth="70" mc:Ignorable="d">
     <Control.Resources />
-    <Grid Width="67" Height="100" Margin="1"
-        Background="{x:Bind Image, Mode=OneWay, TargetNullValue={StaticResource ResourceKey=ResourceType.Back}}"
-        CornerRadius="10">
-        <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0"
-            HorizontalAlignment="Right" VerticalAlignment="Bottom"
-            Visibility="{x:Bind ShowCount(Count), Mode=OneWay}"
-            Background="Black" CornerRadius="6">
-            <Viewbox>
-                <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind Count, Mode=OneWay}" />
-            </Viewbox>
-        </Border>
+    <Viewbox>
+        <Grid Width="67" Height="100" Margin="1"
+            Background="{x:Bind Image, Mode=OneWay, TargetNullValue={StaticResource ResourceKey=ResourceType.Back}}"
+            CornerRadius="10">
+            <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Visibility="{x:Bind ShowCount(Count), Mode=OneWay}"
+                Background="Black" CornerRadius="6">
+                <Viewbox>
+                    <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind Count, Mode=OneWay}" />
+                </Viewbox>
+            </Border>
 
-        <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0"
-            HorizontalAlignment="Right" VerticalAlignment="Top"
-            Visibility="{x:Bind ShowTopCount, Mode=OneWay}"
-            Background="Black" CornerRadius="6">
-            <Viewbox>
-                <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind TopCount, Mode=OneWay}" 
-                           Foreground="{x:Bind TopCountColor(Count, TopCount), Mode=OneWay}" />
-            </Viewbox>
-        </Border>
+            <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                Visibility="{x:Bind ShowTopCount, Mode=OneWay}"
+                Background="Black" CornerRadius="6">
+                <Viewbox>
+                    <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind TopCount, Mode=OneWay}" Foreground="{x:Bind TopCountColor(Count, TopCount), Mode=OneWay}" />
+                </Viewbox>
+            </Border>
 
-        <Button Margin="0" Padding="2" HorizontalAlignment="Left" VerticalAlignment="Top"
-            Click="OnIncrement"
-            Visibility="{x:Bind ShowButtons, Mode=OneWay}">
-            <Button.Content>
-                <TextBlock Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                    FontFamily="Segoe UI Symbol" FontSize="12" Foreground="Black"
-                    Text="&#xE0C8;" />
-            </Button.Content>
-        </Button>
+            <Button Margin="0" Padding="2" HorizontalAlignment="Left" VerticalAlignment="Top"
+                Click="OnIncrement"
+                Visibility="{x:Bind ShowButtons, Mode=OneWay}">
+                <Button.Content>
+                    <TextBlock Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        FontFamily="Segoe UI Symbol" FontSize="12" Foreground="Black"
+                        Text="&#xE0C8;" />
+                </Button.Content>
+            </Button>
 
-        <Button Margin="0" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-            Click="OnDecrement"
-            Visibility="{x:Bind ShowButtons, Mode=OneWay}">
-            <Button.Content>
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                    FontFamily="Segoe UI Symbol" FontSize="12" FontStretch="Expanded"
-                    Foreground="Black" Text="&#xE0C9;" />
-            </Button.Content>
-        </Button>
+            <Button Margin="0" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                Click="OnDecrement"
+                Visibility="{x:Bind ShowButtons, Mode=OneWay}">
+                <Button.Content>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                        FontFamily="Segoe UI Symbol" FontSize="12" FontStretch="Expanded"
+                        Foreground="Black" Text="&#xE0C9;" />
+                </Button.Content>
+            </Button>
 
 
-    </Grid>
+        </Grid>
+    </Viewbox>
 </UserControl>

@@ -144,14 +144,90 @@ namespace Catan10
                 Id = Guid.NewGuid(),
                 Started = false
             };
-            await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
+         
 
             MainPageModel.PlayingPlayers.Clear();
             
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[0]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
- 
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[3]);
+            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[4]);
+            CurrentPlayer.GameData.Trades.PotentialTrades.Clear();
+
+            CurrentPlayer.GameData.Trades.PotentialTrades.Add(new TradeOffer()
+            {
+                Owner = new Offer()
+                {
+                    Approved = false,
+                    Player = CurrentPlayer,
+                    Resources = new TradeResources()
+                    {
+                        Brick = 1, Wood=1, Wheat=1, Ore = 1
+                    }
+                },
+                Partner = new Offer()
+                {
+                    Approved = false,
+                    Player = MainPageModel.AllPlayers[1],
+                    Resources = new TradeResources()
+                    {
+                        Sheep = 1
+                    }
+                }
+
+            });
+
+            CurrentPlayer.GameData.Trades.PotentialTrades.Add(new TradeOffer()
+            {
+                Owner = new Offer()
+                {
+                    Approved = false,
+                    Player = MainPageModel.AllPlayers[1],
+                    Resources = new TradeResources()
+                    {
+                        Sheep = 1
+                    }
+                },
+                Partner = new Offer()
+                {
+                    Approved = false,
+                    Player = MainPageModel.AllPlayers[2],
+                    Resources = new TradeResources()
+                    {
+                        Brick = 1,
+                        Wood = 1,
+                        Wheat = 1,
+                        Ore = 1
+                    }
+                }
+
+            });
+
+            CurrentPlayer.GameData.Trades.PotentialTrades.Add(new TradeOffer()
+            {
+                Owner = new Offer()
+                {
+                    Approved = false,
+                    Player = MainPageModel.AllPlayers[2],
+                    Resources = new TradeResources()
+                    {
+                        Brick = 1
+                    }
+                },
+                Partner = new Offer()
+                {
+                    Approved = false,
+                    Player = MainPageModel.AllPlayers[3],
+                    Resources = new TradeResources()
+                    {
+                        Wood = 1
+                    }
+                }
+
+            });
+
+
         }
 
         private async void OnTestService(object sender, RoutedEventArgs e)

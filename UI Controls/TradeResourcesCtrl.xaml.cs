@@ -23,6 +23,12 @@ namespace Catan10
         public static readonly DependencyProperty HorizontalSpacingProperty = DependencyProperty.Register("HorizontalSpacing", typeof(int), typeof(TradeResourcesCtrl), new PropertyMetadata(5));
         public static readonly DependencyProperty AvailableResourcesProperty = DependencyProperty.Register("AvailableResources", typeof(TradeResources), typeof(TradeResourcesCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty ShowAvailableResourcesProperty = DependencyProperty.Register("ShowAvailableResources", typeof(bool), typeof(TradeResourcesCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty CardWidthProperty = DependencyProperty.Register("CardWidth", typeof(double), typeof(TradeResourcesCtrl), new PropertyMetadata(35.0));
+        public double CardWidth
+        {
+            get => (double)GetValue(CardWidthProperty);
+            set => SetValue(CardWidthProperty, value);
+        }
         public bool ShowAvailableResources
         {
             get => (bool)GetValue(ShowAvailableResourcesProperty);

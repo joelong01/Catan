@@ -14,12 +14,14 @@ using Windows.UI.Xaml.Media;
 namespace Catan10
 {
     public delegate void DeletedHandler(TradeOffer offer);
+    public delegate void FilterOfferHandler(bool onlyOffersForMe);
 
     public delegate void SendOfferHandler(TradeOffer offer, List<PlayerModel> players);
 
     public sealed partial class OfferCtrl : UserControl
     {
         #region Delegates + Fields + Events + Enums
+        public event FilterOfferHandler OnFilter;
 
        // private ObservableCollection<PlayerModel> TradingPartners { get; set; } = new ObservableCollection<PlayerModel>();
         public event SendOfferHandler OnSendOffer;
@@ -142,7 +144,7 @@ namespace Catan10
         /// <param name="count"></param>
         private void OnDesireChanged(TradeResources tradeResources, ResourceType resourceType, int count)
         {
-        
+            EnableSend = CheckEnableSendButton();
             if (count == 0)
             {
                 return;
@@ -153,7 +155,7 @@ namespace Catan10
                 this.TheHuman.GameData.Trades.TradeRequest.Owner.Resources.SetResource(resourceType, 0);
             }
 
-            EnableSend = CheckEnableSendButton();
+            
         }
 
         private void OnOfferChanged(TradeResources tradeResources, ResourceType resourceType, int count)
@@ -217,11 +219,7 @@ namespace Catan10
             EnableSend = CheckEnableSendButton();
         }
 
-        private void OnClickTradingPartner(object sender, RoutedEventArgs e)
-        {
-            EnableSend = CheckEnableSendButton();
-        }
-
+        
         private void OnReset(object sender, RoutedEventArgs e)
         {
             ResetTradeOffer();
@@ -308,6 +306,19 @@ namespace Catan10
             return partners;
         }
 
-       
+        private void OnClickNone(object sender, RoutedEventArgs e)
+        {
+            GridView_TradingPartners.SelectedItems.Clear();
+        }
+
+        private void OnTradingPartnerSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            EnableSend = CheckEnableSendButton();
+        }
+
+        private void OnFilterToggled(object sender, RoutedEventArgs e)
+        {
+            OnFilter?.Invoke(((ToggleSwitch)sender).IsOn);
+        }
     }
 }

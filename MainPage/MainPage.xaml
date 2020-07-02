@@ -442,7 +442,7 @@
                     <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" OnShowAllRolls="OnShowAllRolls" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:DragableGridCtrl x:Name="PlayerTradeGrid" Width="500" HorizontalAlignment="Center"
+            <local:DragableGridCtrl x:Name="PlayerTradeGrid" Width="450" HorizontalAlignment="Center"
                 VerticalAlignment="Center" Canvas.ZIndex="10"
                 PointerPressed="Draggable_PointerPressed"
                 OnGridPositionChanged="OnGridPositionChanged"
@@ -454,7 +454,8 @@
                 Caption="Resource Trades"
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
-                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" TheHuman="{x:Bind TheHuman, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
+                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" TheHuman="{x:Bind TheHuman, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" 
+                                     PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"
