@@ -149,7 +149,7 @@ namespace Catan10
         {
             if (MainPageModel.CatanService == null) return;
 
-            if (MainPageModel.Settings.IsHomegrownGame)
+            if (MainPageModel.Settings.IsServiceGame)
             {
                 List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
                 if (games != null)

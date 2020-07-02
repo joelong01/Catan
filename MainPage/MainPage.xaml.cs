@@ -890,6 +890,7 @@ namespace Catan10
             SaveSettingsTimer.Stop();
             try
             {
+
                 //
                 //  on occasion, i've had to rename grids in mainpage -- but their position might be in the saved file.
                 //  this will remove the ones that don't exist anymore
@@ -1008,6 +1009,26 @@ namespace Catan10
         private async void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             await SaveGameState();
+
+            if (e.PropertyName == "IsLocalGame")
+            {
+
+                if (MainPageModel.Settings.IsLocalGame && MainPageModel.CatanService != null)
+                {
+                    await MainPageModel.CatanService.DisposeAsync();
+                    MainPageModel.CatanService = null;
+                }
+            }
+
+            if (e.PropertyName == "IsServiceGame")
+            {
+
+                if (MainPageModel.Settings.IsServiceGame && MainPageModel.CatanService == null)
+                {
+                    await CreateAndConfigureProxy();
+                }
+            }
+
             if (e.PropertyName == "HostName")
             {
                 await CreateAndConfigureProxy();

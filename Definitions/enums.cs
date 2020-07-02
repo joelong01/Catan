@@ -100,7 +100,7 @@ namespace Catan10
         Knight
     }
 
-    public enum GameCommunicationStrategy { Local, SignalR, Homegrown };
+    
 
     public enum GameState
     {

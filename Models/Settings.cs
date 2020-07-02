@@ -17,7 +17,6 @@ namespace Catan10
         private int _animationSpeed = 3;
         private bool _AutoJoinGames = false;
         private bool _AutoRespond = false;
-        private GameCommunicationStrategy _comStrat = GameCommunicationStrategy.Homegrown;
         string _defaultGameName = "DefaultGame";
         private int _fadeSeconds = 3;
         private int _FadeTime = 0;
@@ -228,61 +227,42 @@ namespace Catan10
             }
         }
 
-        public bool IsHomegrownGame
-        {
-            get
-            {
-                return _comStrat == GameCommunicationStrategy.Homegrown;
-            }
-
-            set
-            {
-                {
-                    if (_comStrat != GameCommunicationStrategy.Homegrown && value)
-                    {
-                        _comStrat = GameCommunicationStrategy.Homegrown;
-                        IsLocalGame = false;
-                        IsSignalRGame = false;
-                    }
-
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        bool _isServiceGame = true;
+        bool _isLocalGame = false;
 
         public bool IsLocalGame
         {
             get
             {
-                return _comStrat == GameCommunicationStrategy.Local;
+                return _isLocalGame;
             }
             set
             {
-                if (_comStrat != GameCommunicationStrategy.Local && value)
+                if (_isLocalGame != value)
                 {
-                    _comStrat = GameCommunicationStrategy.Local;
-                    IsHomegrownGame = false;
-                    IsSignalRGame = false;
+                    _isLocalGame = value;
+                    IsServiceGame = !value;
+                    NotifyPropertyChanged();
                 }
-                NotifyPropertyChanged();
+                
             }
         }
 
-        public bool IsSignalRGame
+        public bool IsServiceGame
         {
             get
             {
-                return _comStrat == GameCommunicationStrategy.SignalR;
+                return _isServiceGame;
             }
             set
             {
-                if (_comStrat != GameCommunicationStrategy.SignalR && value)
+                if (_isServiceGame != value)
                 {
-                    _comStrat = GameCommunicationStrategy.SignalR;
-                    IsHomegrownGame = false;
-                    IsLocalGame = false;
+                    _isServiceGame = value;
+                    IsLocalGame = !value;
+                    NotifyPropertyChanged();
                 }
-                NotifyPropertyChanged();
+                
             }
         }
 

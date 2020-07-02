@@ -78,11 +78,13 @@
                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
                         <MenuFlyoutSubItem Text="Game">
                             <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
-                            <MenuFlyoutItem Text="New Shared Game" Click="OnNewLocalGame" />
+                            <MenuFlyoutItem Text="New Local Game" Click="OnNewLocalGame" />
                             <MenuFlyoutItem Text="Join Network Game" Click="OnJoinNetworkGame" />
-                            <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
                             <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />                            
                             <MenuFlyoutItem Text="Delete All Games" Click="OnDeleteAllGames" />
+                            <MenuFlyoutSeparator />
+                            <ToggleMenuFlyoutItem Text="Local Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Random Gold Tiles">
@@ -94,9 +96,8 @@
                             <MenuFlyoutItem Text="Show Catan Spy" Click="OnShowCatanSpy" />
                             <MenuFlyoutSeparator />
                             <MenuFlyoutSubItem Text="Game Type">
-                                <ToggleMenuFlyoutItem Text="Regular Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
-                                <ToggleMenuFlyoutItem Text="SignalR Game" IsChecked="{x:Bind MainPageModel.Settings.IsSignalRGame, Mode=TwoWay}" />
-                                <ToggleMenuFlyoutItem Text="REST Game" IsChecked="{x:Bind MainPageModel.Settings.IsHomegrownGame, Mode=TwoWay}" />
+                                <ToggleMenuFlyoutItem Text="Local Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
+                                <ToggleMenuFlyoutItem Text="Service Game" IsChecked="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=TwoWay}" />                                
                             </MenuFlyoutSubItem>
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Save Settings" Click="OnSaveSettings" />
