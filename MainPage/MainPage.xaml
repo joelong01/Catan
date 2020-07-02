@@ -45,7 +45,7 @@
         </Style>
         <Style x:Key="NumberButtonKey" TargetType="Button">
             <Setter Property="Background" Value="Black" />
-            <Setter Property="IsEnabled" Value="False" />
+            <Setter Property="IsEnabled" Value="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}" />
         </Style>
     </Page.Resources>
     <Viewbox Stretch="Uniform">
@@ -151,8 +151,8 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-            <local:GameContainerCtrl x:Name="_gameView" DoubleTapped="GameViewControlDoubleTapped" Canvas.ZIndex="-1" 
-                RenderTransformOrigin="0.5,0.5" IsEnabled="True"                                     
+            <local:GameContainerCtrl x:Name="_gameView" DoubleTapped="GameViewControlDoubleTapped" Canvas.ZIndex="-1"
+                RenderTransformOrigin="0.5,0.5" IsEnabled="True"
                 PointerPressed="GameViewControlPointerPressed">
                 <local:GameContainerCtrl.RenderTransform>
                     <CompositeTransform x:Name="_transformGameView"
@@ -175,8 +175,8 @@
                     <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" StolenResource="{x:Bind TheHuman.GameData.Resources.StolenResource, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="10" HorizontalAlignment="Right" Width="500"
-                Canvas.ZIndex="5"
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Width="500" Margin="10"
+                HorizontalAlignment="Right" Canvas.ZIndex="5"
                 GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
                 PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
                 MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"

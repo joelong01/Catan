@@ -577,7 +577,7 @@ namespace Catan10
                         var ret = await dlg.ShowAsync();
                         if (ret != ContentDialogResult.Primary)
                         {
-                            await StaticHelpers.ShowErrorText("You cancelled out of the dialog.  I'll pick a Random card for you.", "Catan");
+                            await ShowErrorMessage("You cancelled out of the dialog.  I'll pick a Random card for you.\n\n", "Catan", "");
                             Random rand = new Random((int)DateTime.Now.Ticks);
                             
                             int index = rand.Next(source.Count);

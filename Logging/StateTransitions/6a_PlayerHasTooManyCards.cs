@@ -50,7 +50,7 @@ namespace Catan10
                 }
                 else
                 {
-                    await StaticHelpers.ShowErrorText($"Since you cancelled out of the dialog (I assume it was you Dodgy) the game will now pick {loss} random cards.\nNo Undo. Live and learn.", "Catan");
+                    await MainPage.Current.ShowErrorMessage($"Since you cancelled out of the dialog (I assume it was you Dodgy) the game will now pick {loss} random cards.\nNo Undo. Live and learn.\n", "Catan", "");
                     var list = gameController.TheHuman.GameData.Resources.Current.ToList();
                     Random rand = new Random((int)DateTime.Now.Ticks);
 

@@ -36,7 +36,7 @@ namespace Catan10
             {
                 this.TraceMessage($"Couldn't find LocalOffer: {TradeOffer}");
 
-                await StaticHelpers.ShowErrorText("Sorry, your offer no longer exists.\nLooks like somebody beat you to it.", "Catan Trades");
+                await MainPage.Current.ShowErrorMessage("Sorry, your offer no longer exists.\nLooks like somebody beat you to it.", "Catan Trades", "");
                 return;
             }
             if (localOffer.Partner.Player == Approver)
@@ -55,12 +55,12 @@ namespace Catan10
                 //
                 if (!this.TradeOffer.Owner.Player.GameData.Resources.Current.CanAfford(this.TradeOffer.Owner.Resources))
                 {
-                    await StaticHelpers.ShowErrorText($"{this.TradeOffer.Owner.Player.PlayerName} is a bad person.\n\nThey approved a trade for resources they do not have.\n\nShame.", "Catan 10");
+                    await MainPage.Current.ShowErrorMessage($"{this.TradeOffer.Owner.Player.PlayerName} is a bad person.\n\nThey approved a trade for resources they do not have.\n\nShame.\n\n", "Catan 10", "");
                     return;
                 }
                 if (!this.TradeOffer.Partner.Player.GameData.Resources.Current.CanAfford(this.TradeOffer.Partner.Resources))
                 {
-                    await StaticHelpers.ShowErrorText($"{this.TradeOffer.Owner.Player.PlayerName} is a bad person.\n\nThey approved a trade for resources they do not have.\n\nShame.", "Catan 10");
+                    await MainPage.Current.ShowErrorMessage($"{this.TradeOffer.Owner.Player.PlayerName} is a bad person.\n\nThey approved a trade for resources they do not have.\n\nShame.\n\n", "Catan 10", "");
                     return;
                 }
 

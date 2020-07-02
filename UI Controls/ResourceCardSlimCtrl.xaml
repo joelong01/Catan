@@ -11,14 +11,24 @@
         CornerRadius="10">
         <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0"
             HorizontalAlignment="Right" VerticalAlignment="Bottom"
-            Visibility="{x:Bind CountVisible, Mode=OneWay}"
+            Visibility="{x:Bind ShowCount(Count), Mode=OneWay}"
             Background="Black" CornerRadius="6">
             <Viewbox>
                 <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind Count, Mode=OneWay}" />
             </Viewbox>
         </Border>
 
-        <Button Margin="5" Padding="0" HorizontalAlignment="Left" VerticalAlignment="Top"
+        <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            Visibility="{x:Bind ShowTopCount, Mode=OneWay}"
+            Background="Black" CornerRadius="6">
+            <Viewbox>
+                <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Text="{x:Bind TopCount, Mode=OneWay}" 
+                           Foreground="{x:Bind TopCountColor(Count, TopCount), Mode=OneWay}" />
+            </Viewbox>
+        </Border>
+
+        <Button Margin="0" Padding="2" HorizontalAlignment="Left" VerticalAlignment="Top"
             Click="OnIncrement"
             Visibility="{x:Bind ShowButtons, Mode=OneWay}">
             <Button.Content>
@@ -28,7 +38,7 @@
             </Button.Content>
         </Button>
 
-        <Button Margin="5" Padding="0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+        <Button Margin="0" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Bottom"
             Click="OnDecrement"
             Visibility="{x:Bind ShowButtons, Mode=OneWay}">
             <Button.Content>

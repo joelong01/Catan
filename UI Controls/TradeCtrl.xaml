@@ -8,7 +8,7 @@
     <Grid Margin="0" BorderThickness="3" CornerRadius="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="0" />
-            <RowDefinition Height="670" />
+            <RowDefinition Height="1010" />
             <RowDefinition Height="70" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -336,7 +337,7 @@ namespace Catan10
                         //
                         //  you are tied, but need to rollagain
                         string s = "Tie Roll. Roll again!";
-                        await StaticHelpers.ShowErrorText(s, "Catan");
+                        await MainPage.Current.ShowErrorMessage(s, "Catan", "");
                         await _rollControl.Reset();
                     }
 
@@ -487,7 +488,14 @@ namespace Catan10
             };
 
             MainPageModel.UnprocessedMessages++;
-            await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+            if (MainPageModel.Settings.IsLocalGame)
+            {
+                await ProcessMessage(message);
+            }
+            else
+            {
+                await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+            }
 
 
             return (!MainPageModel.Settings.IsLocalGame);
@@ -679,7 +687,7 @@ namespace Catan10
                 }
                 catch(Exception e)
                 {
-                    await StaticHelpers.ShowErrorText($"Error Connecting to the Catan Servvice.  Error Info:\n{e.ToString()}", "Catan");
+                    await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
                 }
             }
             else

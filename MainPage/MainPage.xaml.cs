@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
+
 using Catan10.Spy;
+
 using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.System;
@@ -62,7 +65,9 @@ namespace Catan10
         // this lets you double tap a map and then move it around
         // the index into PlayingPlayers that is the CurrentPlayer
         public static MainPage Current { get; private set; }
+
         public static IGameController GameController { get; private set; }
+
         public GameType GameType
         {
             get => _gameView.CurrentGame.GameType;
@@ -72,6 +77,7 @@ namespace Catan10
         }
 
         public bool HasSupplementalBuild => GameType == GameType.SupplementalBuildPhase;
+
         public MainPageModel MainPageModel
         {
             get => (MainPageModel)GetValue(MainPageModelProperty);
@@ -79,6 +85,7 @@ namespace Catan10
         }
 
         public StorageFolder SaveFolder { get; set; } = null;
+
         // a global for the game
         public PlayerModel TheHuman
         {
@@ -87,6 +94,7 @@ namespace Catan10
         }
 
         private DispatcherTimer SaveSettingsTimer { get; set; }
+
         #endregion Properties
 
         #region Constructors + Destructors
@@ -104,6 +112,8 @@ namespace Catan10
         #endregion Constructors + Destructors
 
         #region Methods
+
+        private DispatcherTimer KeepAliveTimer { get; set; }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
         {
@@ -162,7 +172,7 @@ namespace Catan10
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             Ctrl_PlayerResourceCountCtrl.MainPage = this;
-            
+
             var ignored = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
                 if (e.NavigationMode == NavigationMode.New)
@@ -172,10 +182,6 @@ namespace Catan10
 
                     _gameView.Init(this, this);
                     CreateMenuItems();
-
-
-
-
                 }
 
                 InitTest();
@@ -188,23 +194,9 @@ namespace Catan10
                 };
                 SaveSettingsTimer.Tick += SaveSettingsTimer_Tick;
 
-
                 base.OnNavigatedTo(e);
-
             });
-
         }
-
-        private void KeepAliveTimer_Tick(object sender, object e)
-        {
-            if (MainPageModel.CatanService != null)
-            {
-
-                MainPageModel.CatanService.KeepAlive();
-            }
-        }
-
-        private DispatcherTimer KeepAliveTimer { get; set; }
 
         private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -215,7 +207,6 @@ namespace Catan10
 
         private Task AddPlayer(PlayerModel pData, LogType logType)
         {
-
             MainPageModel.PlayingPlayers.Add(pData);
 
             AddPlayerMenu(pData);
@@ -393,7 +384,13 @@ namespace Catan10
             }
         }
 
-
+        private void KeepAliveTimer_Tick(object sender, object e)
+        {
+            if (MainPageModel.CatanService != null)
+            {
+                MainPageModel.CatanService.KeepAlive();
+            }
+        }
 
         private async Task LoadMainPageModel()
         {
@@ -437,6 +434,14 @@ namespace Catan10
                     await PickDefaultUser();
                     CurrentPlayer = TheHuman; // this means each client will start with CurrentPlayer being themselves so that all UI binding to current player will give decent colors
                 }
+            }
+            catch (FileLoadException fle)
+            {
+                this.TraceMessage($"FileLoadMessage exception: {fle}");
+            }
+            catch (Exception e)
+            {
+                this.TraceMessage($"Generic Excpetion: {e}");
             }
             finally
             {
@@ -532,6 +537,22 @@ namespace Catan10
 
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
+            if (((Button)sender).Content is CatanNumber number)
+            {
+                List<RollModel> rolls = new List<RollModel>();
+                for (int i = 0; i < 4; i++)
+                {
+                    var rollModel = new RollModel
+                    {
+                        DiceOne = number.Number / 2,
+                        Selected = false
+                    }; 
+                    rollModel.DiceTwo = number.Number - rollModel.DiceOne;
+                    rolls.Add(rollModel);
+                }
+                rolls[0].Selected = true;
+                OnRolled(rolls);
+            }
         }
 
         private async Task OnOpenSavedGame()
@@ -582,7 +603,7 @@ namespace Catan10
             DateTime dt = DateTime.Now;
             TimeSpan diff = DateTime.Now - _dt;
             if (diff.TotalSeconds < 1.0)
-            { 
+            {
                 ElementSoundPlayer.State = ElementSoundPlayerState.On;
                 ElementSoundPlayer.Play(ElementSoundKind.Show);
                 ElementSoundPlayer.State = ElementSoundPlayerState.Off;
@@ -819,8 +840,6 @@ namespace Catan10
             }
 
             _raceTracking.Reset();
-
-
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
@@ -920,6 +939,7 @@ namespace Catan10
                 this.TraceMessage($"Saved Settings file. saved {count} times");
             }
         }
+
         /// <summary>
         ///     Unlike previsous implementations, the use the Action/Undo stacks in the log to store the random boards.
         /// </summary>
@@ -927,8 +947,6 @@ namespace Catan10
         /// <returns></returns>
         private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
         {
-            
-
             if (TheHuman.PlayerName != CurrentPlayer.PlayerName) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
@@ -1006,6 +1024,23 @@ namespace Catan10
 
         #endregion Methods
 
+        public static readonly DependencyProperty SpyVisibleProperty = DependencyProperty.Register("SpyVisible", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
+
+        public static readonly DependencyProperty TurnedSpyOnProperty = DependencyProperty.Register("TurnedSpyOn", typeof(string), typeof(MainPage), new PropertyMetadata(""));
+
+        private bool _spyWindowOpen = false;
+
+        public bool SpyVisible
+        {
+            get => (bool)GetValue(SpyVisibleProperty);
+            set => SetValue(SpyVisibleProperty, value);
+        }
+
+        public string TurnedSpyOn
+        {
+            get => (string)GetValue(TurnedSpyOnProperty);
+            set => SetValue(TurnedSpyOnProperty, value);
+        }
 
         private void Draggable_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
@@ -1024,23 +1059,21 @@ namespace Catan10
             //
             //  boost the one clicked
             Canvas.SetZIndex(((FrameworkElement)sender), 11);
-
-
         }
-        public static readonly DependencyProperty SpyVisibleProperty = DependencyProperty.Register("SpyVisible", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
-        public bool SpyVisible
+
+        private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
         {
-            get => (bool)GetValue(SpyVisibleProperty);
-            set => SetValue(SpyVisibleProperty, value);
-        }
-        public static readonly DependencyProperty TurnedSpyOnProperty = DependencyProperty.Register("TurnedSpyOn", typeof(string), typeof(MainPage), new PropertyMetadata(""));
-        public string TurnedSpyOn
-        {
-            get => (string)GetValue(TurnedSpyOnProperty);
-            set => SetValue(TurnedSpyOnProperty, value);
-        }
+            if (MainPageModel.EnableNextButton == false) return;
+            var games = await MainPageModel.CatanService.GetAllGames();
 
-        private bool _spyWindowOpen = false;
+            var dlg = new JoinGameDlg(games) { MainPageModel = MainPageModel, Player = TheHuman };
+            var ret = await dlg.ShowAsync();
+            if (ret == ContentDialogResult.Primary)
+            {
+                GameInfo joinGame = dlg.GameSelected;
+                await MainPageModel.CatanService.JoinGame(joinGame, TheHuman.PlayerName);
+            }
+        }
 
         private async void OnShowCatanSpy(object sender, RoutedEventArgs e)
         {
@@ -1062,20 +1095,5 @@ namespace Catan10
             };
             await appWindow.TryShowAsync();
         }
-        
-        private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
-        {
-            if (MainPageModel.EnableNextButton == false) return;
-            var games = await MainPageModel.CatanService.GetAllGames();
-            
-            var dlg = new JoinGameDlg(games) { MainPageModel = MainPageModel, Player = TheHuman };
-            var ret = await dlg.ShowAsync();
-            if (ret == ContentDialogResult.Primary)
-            {
-                GameInfo joinGame = dlg.GameSelected;
-                await MainPageModel.CatanService.JoinGame(joinGame, TheHuman.PlayerName);
-            }
-        }
     }
-
 }

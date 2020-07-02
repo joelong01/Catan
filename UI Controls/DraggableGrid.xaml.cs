@@ -207,15 +207,27 @@ namespace Catan10
 
             GridPosition.TranslateX = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateX;
             GridPosition.TranslateY = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateY;
-            GridPosition.ScaleX = (fullSize == 1.0) ? 1.0 : 0.5;
-            GridPosition.ScaleY = GridPosition.ScaleX;
+            //GridPosition.ScaleX = (fullSize == 1.0) ? 1.0 : 0.5;
+            //GridPosition.ScaleY = GridPosition.ScaleX;
 
             OnGridPositionChanged?.Invoke(userControl.Name, GridPosition);
         }
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
             fullSize = 1 - fullSize;
-           
+
+            if (GridPosition.ScaleX == 1.0)
+            {
+                GridPosition.ScaleX = 0.5;
+            }
+            else
+            {
+                GridPosition.ScaleX = 1.0;
+            }
+
+            GridPosition.ScaleY = GridPosition.ScaleX;
+
+
             NotifyPositionChanged();
         }
 

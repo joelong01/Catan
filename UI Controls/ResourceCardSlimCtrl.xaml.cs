@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml;
+﻿using Windows.Media.Streaming.Adaptive;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
@@ -23,6 +24,42 @@ namespace Catan10
 
         public static readonly DependencyProperty ResourceTypeProperty = DependencyProperty.Register("ResourceType", typeof(ResourceType), typeof(ResourceCardSlimCtrl), new PropertyMetadata(ResourceType.None, ResourceTypeChanged));
         public static readonly DependencyProperty ShowButtonsProperty = DependencyProperty.Register("ShowButtons", typeof(bool), typeof(ResourceCardSlimCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty TopCountProperty = DependencyProperty.Register("TopCount", typeof(int), typeof(ResourceCardSlimCtrl), new PropertyMetadata(0));
+        public static readonly DependencyProperty ShowTopCountProperty = DependencyProperty.Register("ShowTopCount", typeof(bool), typeof(ResourceCardSlimCtrl), new PropertyMetadata(false));
+        public bool ShowTopCount
+        {
+            get => (bool)GetValue(ShowTopCountProperty);
+            set => SetValue(ShowTopCountProperty, value);
+        }
+        public int TopCount
+        {
+            get => (int)GetValue(TopCountProperty);
+            set => SetValue(TopCountProperty, value);
+        }
+
+        private Brush TopCountColor(int count, int available)
+        {
+            if (count < available)
+            {
+                return (Brush)App.Current.Resources["GreenBrush"];
+            }
+            if (count == available)
+            {
+                return (Brush)App.Current.Resources["YellowBrush"];
+            }
+            if (count > available)
+            {
+                return (Brush)App.Current.Resources["RedBrush"];
+            }
+            
+            return (Brush)App.Current.Resources["WhiteBrush"];
+            
+        }
+
+        private Visibility ShowCount(int count)
+        {
+            return (count > 0) ? Visibility.Visible : Visibility.Collapsed;
+        }
         public bool ShowButtons
         {
             get => (bool)GetValue(ShowButtonsProperty);

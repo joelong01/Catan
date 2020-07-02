@@ -317,7 +317,7 @@ namespace Catan10
             if (!Player.GameData.Resources.CanAfford(Entitlement.City)) return;
             if (AtMaxEntitlement(Player, Entitlement.City))
             {
-                await StaticHelpers.ShowErrorText($"You have purchased all available cities.", "Catan");
+                await MainPage.Current.ShowErrorMessage($"You have purchased all available cities.\n\n", "Catan", "");
             }
             await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.City);
         }
@@ -337,7 +337,7 @@ namespace Catan10
             if (!Player.GameData.Resources.CanAfford(Entitlement.Road)) return;
             if (AtMaxEntitlement(Player, Entitlement.Road))
             {
-                await StaticHelpers.ShowErrorText($"You have purchased all available roads.", "Catan");
+                await MainPage.Current.ShowErrorMessage($"You have purchased all available roads.", "Catan", "");
             }
             await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Road);
         }
@@ -350,7 +350,7 @@ namespace Catan10
             {
                 if (AtMaxEntitlement(Player, Entitlement.Settlement))
                 {
-                    await StaticHelpers.ShowErrorText($"You have purchased all available Settlements.", "Catan");
+                    await MainPage.Current.ShowErrorMessage($"You have purchased all available Settlements.", "Catan","");
                 }
                 await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement);
             }

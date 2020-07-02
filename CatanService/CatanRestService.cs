@@ -190,7 +190,7 @@ namespace Catan10
                 catch (Exception e)
                 {
                     this.TraceMessage(e.ToString());
-                    await StaticHelpers.ShowErrorText($"Error Monitoring Catan Rest Service.  Error:\n{e}", "Catan REST Service StartConnection");
+                    await MainPage.Current.ShowErrorMessage($"Error Monitoring Catan Rest Service.", "Catan REST Service StartConnection", e.ToString());
                 }
             }
         }

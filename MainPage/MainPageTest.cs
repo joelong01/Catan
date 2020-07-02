@@ -116,7 +116,7 @@ namespace Catan10
             var ret = await dlg.ShowAsync();
             if (ret != ContentDialogResult.Primary)
             {
-                await StaticHelpers.ShowErrorText("Why did you click Cancel?  I'll pick a random resource for you.  No undo.", "Catan");
+                await ShowErrorMessage("Why did you click Cancel?  I'll pick a random resource for you.  No undo.", "Catan", "");
                 Random random = new Random((int)DateTime.Now.Ticks);
                 int idx = random.Next(source.Count);
                 destination.Add(source[idx]);
@@ -129,19 +129,29 @@ namespace Catan10
         // int toggle = 0;
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
+
+            
             // await TestYearOfPlenty();
             // await TradeGoldTest();
             // await TestTargetPlayer();
             // await LoseHalfYourCards();
 
             // TestTrade();
+            MainPageModel.Settings.IsLocalGame = true;
+            GameInfo info = new GameInfo()
+            {
+                Creator = "Joe",
+                Id = Guid.NewGuid(),
+                Started = false
+            };
+            await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
+
             MainPageModel.PlayingPlayers.Clear();
             
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[0]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
-            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[3]);
-            MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[4]);
+ 
         }
 
         private async void OnTestService(object sender, RoutedEventArgs e)

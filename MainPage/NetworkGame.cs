@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
 
+using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -27,44 +29,80 @@ namespace Catan10
 
         private async Task CreateAndConfigureProxy()
         {
-            using (new FunctionTimer("CreateAndConfigureProxy"))
+            try
             {
-                MainPageModel.IsGameStarted = false;
-                MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
-                MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
-                MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
-                MainPageModel.IsServiceGame = true;
-
-                if (MainPageModel.CatanService != null)
+                using (new FunctionTimer("CreateAndConfigureProxy"))
                 {
-                    MainPageModel.CatanService.OnBroadcastMessageReceived -= Service_OnBroadcastMessageReceived;
-                    MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
-                    MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
-                    MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
-                    await MainPageModel.CatanService.DisposeAsync();
-                    MainPageModel.CatanService = null;
+                    MainPageModel.IsGameStarted = false;
+                    MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
+                    MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
+                    MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
+                    MainPageModel.IsServiceGame = true;
+
+                    if (MainPageModel.CatanService != null)
+                    {
+                        MainPageModel.CatanService.OnBroadcastMessageReceived -= Service_OnBroadcastMessageReceived;
+                        MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
+                        MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
+                        MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
+                        await MainPageModel.CatanService.DisposeAsync();
+                        MainPageModel.CatanService = null;
+                    }
+
+                    MainPageModel.CatanService = new CatanSignalRClient();
+
+                    //if (MainPageModel.Settings.IsSignalRGame)
+                    //{
+                    //    MainPageModel.CatanService = new CatanSignalRClient();
+                    //}
+                    //else if (MainPageModel.Settings.IsHomegrownGame)
+                    //{
+                    //    MainPageModel.CatanService = new CatanRestService();
+                    //}
+
+                    MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
+                    MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
+                    MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
+                    MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
+                    MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
+
+                    await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+                    await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
                 }
-
-                MainPageModel.CatanService = new CatanSignalRClient();
-
-                //if (MainPageModel.Settings.IsSignalRGame)
-                //{
-                //    MainPageModel.CatanService = new CatanSignalRClient();
-                //}
-                //else if (MainPageModel.Settings.IsHomegrownGame)
-                //{
-                //    MainPageModel.CatanService = new CatanRestService();
-                //}
-
-                MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
-                MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
-                MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
-                MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
-                MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
-
-                await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-                await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
             }
+            catch (Exception e)
+            {
+
+                string Title = "Catan Connnection Error";
+                string Message = $"Error connecting to the Catan Service.\n\nOnly Local Games allowed.\n";
+                string ExtendedMessage = e.ToString();
+                await this.ShowErrorMessage(Message, Title, ExtendedMessage);
+                this.MainPageModel.Settings.IsLocalGame = true;
+            }
+
+            // await StaticHelpers.ShowErrorText($"Error connecting to the Catan Service.\nOnly Local Games allowed.", "Connection Error");
+            
+            
+        }
+
+        public async Task ShowErrorMessage(string message, string caption, string extended)
+        {
+            if (TheHuman == null)
+            {
+                bool ret = await PickDefaultUser();
+                if (!ret) return;
+                    
+            }
+
+            var dlg = new ErrorDlg()
+            {
+                Title = caption,
+                Background = TheHuman.BackgroundBrush,
+                Foreground = TheHuman.ForegroundBrush,
+                Message = message,
+                ExtendedMessage = extended
+            };
+            await dlg.ShowAsync();
         }
 
         private async Task<CatanAction> CreateOrJoinGame(ICatanService gameService, GameInfo gameInfo, string me)

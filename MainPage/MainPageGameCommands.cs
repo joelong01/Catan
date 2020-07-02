@@ -508,7 +508,7 @@ namespace Catan10
             var ret = await picker.ShowAsync();
             if (picker.Player == null)
             {
-                await StaticHelpers.ShowErrorText("You have to pick a player!  Stop messing around Dodgy!", "Catan");
+                await ShowErrorMessage("You have to pick a player!  Stop messing around Dodgy!", "Catan", "");
                 return false;
             }
 
@@ -685,7 +685,20 @@ namespace Catan10
                         break;
 
                     case GameState.PickingBoard:  // you get here by clicking the "=>" button
-                        await PickingBoardToWaitingForRollOrder.PostLog(this);
+                        if (MainPageModel.Settings.IsLocalGame)
+                        {
+                            LogHeader logHeader = new LogHeader()
+                            {
+                                NewState = GameState.WaitingForRollForOrder,                                
+                                
+                            };
+                            await MainPageModel.Log.PushAction(logHeader);
+                            await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
+                        }
+                        else
+                        {
+                            await PickingBoardToWaitingForRollOrder.PostLog(this);
+                        }
                         break;
 
                     case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button

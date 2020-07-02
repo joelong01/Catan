@@ -155,7 +155,7 @@ namespace Catan10
 
                     //
                     //  whevener this changes, the log changes...so you don't need to send a NotifyPropertyChanged() event...I hope...
-                    if (UnprocessedMessages > 0)
+                    if (UnprocessedMessages > 0  && !Settings.IsLocalGame)
                     {
                         // this.TraceMessage($"Enable false because UnprocessedMessages > 0: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
                         return false;

@@ -48,7 +48,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message, "Catan");
+                await MainPage.Current.ShowErrorMessage($"Unable to make WebSocketConnection.{Environment.NewLine}" , "Catan", e.ToString());
             }
 
 
@@ -117,7 +117,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message, "Catan");
+                await MainPage.Current.ShowErrorMessage($"Unable to make WebSocketConnection.{Environment.NewLine}", "Catan", e.ToString());
             }
         }
 
@@ -162,7 +162,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                await StaticHelpers.ShowErrorText($"Unable to make WebSocketConnection.{Environment.NewLine}" + e.Message, "Catan");
+                await MainPage.Current.ShowErrorMessage($"Unable to make WebSocketConnection.{Environment.NewLine}", "Catan", e.ToString());
             }
         }
 

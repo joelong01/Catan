@@ -142,8 +142,7 @@ namespace Catan10
         /// <param name="count"></param>
         private void OnDesireChanged(TradeResources tradeResources, ResourceType resourceType, int count)
         {
-            EnableSend = CheckEnableSendButton();
-
+        
             if (count == 0)
             {
                 return;
@@ -153,17 +152,26 @@ namespace Catan10
             {
                 this.TheHuman.GameData.Trades.TradeRequest.Owner.Resources.SetResource(resourceType, 0);
             }
+
+            EnableSend = CheckEnableSendButton();
         }
 
         private void OnOfferChanged(TradeResources tradeResources, ResourceType resourceType, int count)
         {
-            EnableSend = CheckEnableSendButton();
+            
             if (count == 0) return;
 
             if (this.TheHuman.GameData.Trades.TradeRequest.Owner.Resources.GetCount(resourceType) > 0 && this.TheHuman.GameData.Trades.TradeRequest.Partner.Resources.GetCount(resourceType) > 0)
             {
                 this.TheHuman.GameData.Trades.TradeRequest.Partner.Resources.SetResource(resourceType, 0);
             }
+
+            if (this.TheHuman.GameData.Trades.TradeRequest.Owner.Player == null)
+            {
+                this.TheHuman.GameData.Trades.TradeRequest.Owner.Player = this.TheHuman;
+            }
+
+            EnableSend = CheckEnableSendButton();
         }
 
         #endregion Methods

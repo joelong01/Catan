@@ -1,4 +1,6 @@
-﻿using Windows.UI.Xaml;
+﻿using Microsoft.Toolkit.Uwp.UI.Controls;
+
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -16,7 +18,37 @@ namespace Catan10
 
         public static readonly DependencyProperty ShowButtonsProperty = DependencyProperty.Register("ShowButtons", typeof(bool), typeof(TradeResourcesCtrl), new PropertyMetadata(true));
         public static readonly DependencyProperty TradeResourcesProperty = DependencyProperty.Register("TradeResources", typeof(TradeResources), typeof(TradeResourcesCtrl), new PropertyMetadata(null));
-        
+        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(Orientation), typeof(TradeResourcesCtrl), new PropertyMetadata(Orientation.Horizontal));
+        public static readonly DependencyProperty VerticalSpacingProperty = DependencyProperty.Register("VerticalSpacing", typeof(int), typeof(TradeResourcesCtrl), new PropertyMetadata(2));
+        public static readonly DependencyProperty HorizontalSpacingProperty = DependencyProperty.Register("HorizontalSpacing", typeof(int), typeof(TradeResourcesCtrl), new PropertyMetadata(5));
+        public static readonly DependencyProperty AvailableResourcesProperty = DependencyProperty.Register("AvailableResources", typeof(TradeResources), typeof(TradeResourcesCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty ShowAvailableResourcesProperty = DependencyProperty.Register("ShowAvailableResources", typeof(bool), typeof(TradeResourcesCtrl), new PropertyMetadata(false));
+        public bool ShowAvailableResources
+        {
+            get => (bool)GetValue(ShowAvailableResourcesProperty);
+            set => SetValue(ShowAvailableResourcesProperty, value);
+        }
+        public TradeResources AvailableResources
+        {
+            get => (TradeResources)GetValue(AvailableResourcesProperty);
+            set => SetValue(AvailableResourcesProperty, value);
+        }
+        public int HorizontalSpacing
+        {
+            get => (int)GetValue(HorizontalSpacingProperty);
+            set => SetValue(HorizontalSpacingProperty, value);
+        }
+        public int VerticalSpacing
+        {
+            get => (int)GetValue(VerticalSpacingProperty);
+            set => SetValue(VerticalSpacingProperty, value);
+        }
+        public Orientation Orientation
+        {
+            get => (Orientation)GetValue(OrientationProperty);
+            set => SetValue(OrientationProperty, value);
+        }
+
 
         #endregion Delegates + Fields + Events + Enums
 

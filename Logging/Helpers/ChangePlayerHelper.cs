@@ -39,6 +39,11 @@ namespace Catan10
             //
             //  tell current player that turn started
             gameController.CurrentPlayer.TurnStarted();
+
+            if (gameController.MainPageModel.Settings.IsLocalGame)
+            {
+                MainPage.Current.TheHuman = gameController.CurrentPlayer;
+            }
         }
     }
 }

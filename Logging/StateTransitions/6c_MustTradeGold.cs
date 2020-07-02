@@ -59,7 +59,7 @@ namespace Catan10
                 var ret = await dlg.ShowAsync();
                 if (ret != ContentDialogResult.Primary)
                 {
-                    await StaticHelpers.ShowErrorText("Why did you click Cancel?  I'll pick a random resource for you.  No undo.", "Catan");
+                    await MainPage.Current.ShowErrorMessage("Why did you click Cancel?  I'll pick a random resource for you.  No undo.\n\n", "Catan", "");
                     Random random = new Random((int)DateTime.Now.Ticks);
                     int idx = random.Next(source.Count);
                     destination.Add(source[idx]);

@@ -140,7 +140,7 @@ namespace Catan10
                 {
                     if (message.To == "*" || message.To == MainPage.Current.TheHuman.PlayerName)
                     {
-                        int msDelay =0;
+                        int msDelay = 0;
                         await Task.Delay(msDelay); // force a timout
                         await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
                         message = ParseMessage(message);
@@ -425,7 +425,9 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                await StaticHelpers.ShowErrorText($"Error connection to SignalR.  ServiceUrl: {ServiceUrl}\nException:{e}", "Catan");
+                this.TraceMessage($"Error connection to SignalR.  ServiceUrl: {ServiceUrl}\nException:{e}");
+                // await StaticHelpers.ShowErrorText($"Error connection to SignalR.  ServiceUrl: {ServiceUrl}\nException:{e}", "Catan");
+                throw;
             }
         }
 
@@ -433,18 +435,12 @@ namespace Catan10
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                try
-                {
-                    //
-                    //  this has to be on the UI thread to access PlayerName
-                    await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
-                }
-                catch (Microsoft.AspNetCore.SignalR.HubException he)
-                {
-                    await StaticHelpers.ShowErrorText($"Error calling Register.  Hub Error:\n\n{he}", "Catan");
-                    
-                }
 
+                // this will happily throw..
+
+                //
+                //  this has to be on the UI thread to access PlayerName
+                await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
             });
         }
 
@@ -455,7 +451,7 @@ namespace Catan10
 
             try
             {
-                
+
 
                 TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
                 GameInfo serviceGameInfo = null;
@@ -562,7 +558,7 @@ namespace Catan10
                     string s = "";
                     targets.ForEach((p) => s += p + ", ");
                     s = s.Substring(0, s.Length - 1);
-                    await StaticHelpers.ShowErrorText($"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nRetry after ok.", "Catan");
+                    await MainPage.Current.ShowErrorMessage($"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nRetry after ok.", "Catan", "");
                     message.ActionType = ActionType.Retry;
 
                 }
@@ -591,7 +587,7 @@ namespace Catan10
             while (HubConnection.State != HubConnectionState.Connected)
             {
                 n++;
-                await StaticHelpers.ShowErrorText("Lost Connection to the Catan Service.  Click Ok and I'll try to connect.", "Catan");
+                await MainPage.Current.ShowErrorMessage("Lost Connection to the Catan Service.  Click Ok and I'll try to connect.", "Catan", "");
                 await connectionTCS.Task.TimeoutAfter(5000);
                 connectionTCS = new TaskCompletionSource<object>();
             }
