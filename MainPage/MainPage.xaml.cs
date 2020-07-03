@@ -282,7 +282,8 @@ namespace Catan10
                     {
                         if (b.BuildingState != BuildingState.Settlement && b.BuildingState != BuildingState.City)
                         {
-                            if (ValidateBuildingLocation(b) == BuildingState.Pips)
+                            var buildingState = ValidateBuildingLocation(b);
+                            if ( buildingState == BuildingState.Pips || buildingState == BuildingState.Build)
                                 return b;
                         }
                     }
@@ -757,7 +758,7 @@ namespace Catan10
         {
             while (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
-                await SetBuildingAndRoad();
+                await AutoSetBuildingAndRoad();
                 await NextState();
                
             }
@@ -966,19 +967,21 @@ namespace Catan10
             }
         }
 
-        private async Task SetBuildingAndRoad()
+        /// <summary>
+        ///     Used for debugging/testing -- automatically pick a settlement and road
+        /// </summary>
+        /// <returns></returns>        
+        private async Task AutoSetBuildingAndRoad()
         {
             // pick a tile with the highest pips and put a settlement on it
             var building = GetHighestPipsBuilding();
-            await building.UpdateBuildingState(CurrentPlayer, building.BuildingState, BuildingState.Settlement);
+            await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
 
             // pick a Random Road
             var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
-            //
-            //  5/15/2020: moved to passying CurrentPlayer pointer around and binding to its colors
-            road.CurrentPlayer = CurrentPlayer;
 
-            await UpdateRoadState(road, road.RoadState, RoadState.Road, LogType.Normal);
+            await UpdateRoadLog.SetRoadState(this, road, RoadState.Road, _raceTracking);
+
         }
 
         private void SetMainPageModel(MainPageModel oldModel, MainPageModel newModel)
