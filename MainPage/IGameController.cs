@@ -129,7 +129,7 @@ namespace Catan10
 
         #endregion Methods
 
-        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman);
+        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && CurrentPlayer == TheHuman);
 
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 

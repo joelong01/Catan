@@ -756,7 +756,7 @@ namespace Catan10
 
         public async Task PickSettlementsAndRoads()
         {
-            while (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
                 await AutoSetBuildingAndRoad();
                 await NextState();

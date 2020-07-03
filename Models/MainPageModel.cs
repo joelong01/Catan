@@ -175,6 +175,11 @@ namespace Catan10
                         return ret;
                     }
 
+                    if (MainPage.Current.TheHuman != MainPage.Current.CurrentPlayer)
+                    {
+                        return false;
+                    }
+
                     ret = (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.BeginResourceAllocation || state == GameState.PickingBoard ||
                             state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
                             state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers);
