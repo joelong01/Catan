@@ -753,21 +753,13 @@ namespace Catan10
             await _gameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
         }
 
-        private async Task PickSettlementsAndRoads()
+        public async Task PickSettlementsAndRoads()
         {
             while (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
                 await SetBuildingAndRoad();
-                // move to next
-                GameState oldState = CurrentGameState;
                 await NextState();
-                //
-                //  we do it this way because the last player goes twice in the same state
-                //
-                if (oldState == GameState.AllocateResourceForward && CurrentGameState == GameState.AllocateResourceReverse)
-                {
-                    await SetBuildingAndRoad();
-                }
+               
             }
         }
 

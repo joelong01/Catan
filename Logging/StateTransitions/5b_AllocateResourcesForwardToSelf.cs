@@ -26,11 +26,15 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             ChangePlayerHelper.ChangePlayer(gameController, 1);
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
-            return Task.CompletedTask;
+            if (gameController.CurrentPlayer == gameController.TheHuman && gameController.MainPageModel.Settings.AutoRespond)
+            {
+                await gameController.PickSettlementsAndRoads();
+            }
+           
         }
 
         public Task Redo(IGameController gameController)
