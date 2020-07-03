@@ -405,7 +405,7 @@ namespace Catan10
             {
                 if (player.PlayerName == playerName)
                 {
-                    await ShowErrorMessage("You have two people named {playerName} trying to play at the same time.\nThat is bad joojoo.", "Uh oh", "");
+                    await ShowErrorMessage($"You have two people named {playerName} trying to play at the same time.\nThat is bad joojoo.", "Uh oh", "");
                     return;
                 }
             }

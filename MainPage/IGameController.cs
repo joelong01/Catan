@@ -952,9 +952,13 @@ namespace Catan10
             this.TurnedSpyOn = sentBy;
         }
 
-        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)
+        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)        
         {
-            if (MainPageModel.ServiceGameInfo == null) return Task.CompletedTask;
+            if (MainPageModel.GameState != GameState.WaitingForNewGame && MainPageModel.ServiceGameInfo == null)
+            {
+                Debugger.Break();
+            }
+            
 
             CatanMessage message = new CatanMessage()
             {

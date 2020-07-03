@@ -15,6 +15,8 @@ using Microsoft.Extensions.Logging;
 
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Core;
+using Windows.UI.Popups;
+using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
@@ -558,7 +560,20 @@ namespace Catan10
                     string s = "";
                     targets.ForEach((p) => s += p + ", ");
                     s = s.Substring(0, s.Length - 1);
-                    await MainPage.Current.ShowErrorMessage($"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nRetry after ok.", "Catan", "");
+                    ContentDialog dlg = new ContentDialog()
+                    {
+                        Title = "Catan Networking Error",
+                        Content = $"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nHit Cancel to end the game.  For everybody.",
+                        CloseButtonText = "Retry",
+                        SecondaryButtonText = "Cancel"
+
+                    };
+                    // await MainPage.Current.ShowErrorMessage($"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nRetry after ok.", "Catan", "");
+                    var ret = await dlg.ShowAsync();
+                    if (ret == ContentDialogResult.Secondary)
+                    {
+                        break;
+                    }
                     message.ActionType = ActionType.Retry;
 
                 }
