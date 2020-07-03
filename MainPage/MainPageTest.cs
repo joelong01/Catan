@@ -127,7 +127,7 @@ namespace Catan10
         }
 
         // int toggle = 0;
-        private async void OnTest1(object sdr, RoutedEventArgs rea)
+        private  void OnTest1(object sdr, RoutedEventArgs rea)
         {
 
             

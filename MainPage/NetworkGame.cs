@@ -10,7 +10,7 @@ using Catan.Proxy;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-
+using Windows.UI.Xaml.Media;
 using static Catan10.StaticHelpers;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -80,7 +80,6 @@ namespace Catan10
                 this.MainPageModel.Settings.IsLocalGame = true;
             }
 
-            // await StaticHelpers.ShowErrorText($"Error connecting to the Catan Service.\nOnly Local Games allowed.", "Connection Error");
             
             
         }
@@ -93,7 +92,10 @@ namespace Catan10
                 if (!ret) return;
                     
             }
-
+            while (IsAnyContentDialogOpen())
+            {
+                await Task.Delay(1000);
+            }
             var dlg = new ErrorDlg()
             {
                 Title = caption,
@@ -102,9 +104,16 @@ namespace Catan10
                 Message = message,
                 ExtendedMessage = extended
             };
+            if (String.IsNullOrEmpty(dlg.ExtendedMessage))
+            {
+                dlg.Height = 300;
+            }
             await dlg.ShowAsync();
         }
-
+        private bool IsAnyContentDialogOpen()
+        {
+            return VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0;
+        }
         private async Task<CatanAction> CreateOrJoinGame(ICatanService gameService, GameInfo gameInfo, string me)
         {
             List<GameInfo> games;
@@ -392,6 +401,14 @@ namespace Catan10
         /// <param name="playerName"></param>
         private async void Service_OnGameJoined(GameInfo gameInfo, string playerName)
         {
+            foreach (var player in MainPageModel.PlayingPlayers)
+            {
+                if (player.PlayerName == playerName)
+                {
+                    await ShowErrorMessage("You have two people named {playerName} trying to play at the same time.\nThat is bad joojoo.", "Uh oh", "");
+                    return;
+                }
+            }
             //
             //  am I already in a game?
             if (CurrentGameState == GameState.WaitingForNewGame)

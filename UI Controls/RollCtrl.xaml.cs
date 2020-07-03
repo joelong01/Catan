@@ -13,6 +13,54 @@ namespace Catan10
 {
     public sealed partial class RollCtrl : UserControl
     {
+        #region Delegates + Fields + Events + Enums
+
+        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(RollCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
+
+        public static readonly DependencyProperty RollProperty = DependencyProperty.Register("Roll", typeof(RollModel), typeof(RollCtrl), new PropertyMetadata(new RollModel()));
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public TileOrientation Orientation
+        {
+            get => (TileOrientation)GetValue(OrientationProperty);
+            set => SetValue(OrientationProperty, value);
+        }
+
+        public RollModel Roll
+        {
+            get => (RollModel)GetValue(RollProperty);
+            set => SetValue(RollProperty, value);
+        }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+        public RollCtrl()
+        {
+            this.InitializeComponent();
+            FlipClose.Begin();
+        }
+
+        #endregion Constructors + Destructors
+
+        #region Methods
+
+        public Task GetFlipTask(TileOrientation orientation)
+        {
+            if (orientation == TileOrientation.FaceDown) return FlipClose.ToTask();
+            if (orientation == TileOrientation.FaceUp) return FlipOpen.ToTask();
+            throw new InvalidEnumArgumentException();
+        }
+
+        public void Randomize()
+        {
+            Roll.Randomize();
+        }
+
         private static void OrientationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as RollCtrl;
@@ -32,55 +80,23 @@ namespace Catan10
             }
         }
 
-        public TileOrientation Orientation
-        {
-            get => (TileOrientation)GetValue(OrientationProperty);
-            set => SetValue(OrientationProperty, value);
-        }
-
-        public RollModel Roll
-        {
-            get => (RollModel)GetValue(RollProperty);
-            set => SetValue(RollProperty, value);
-        }
-
-        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(RollCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
-        public static readonly DependencyProperty RollProperty = DependencyProperty.Register("Roll", typeof(RollModel), typeof(RollCtrl), new PropertyMetadata(new RollModel()));
-
-        public RollCtrl()
-        {
-            this.InitializeComponent();
-            FlipClose.Begin();
-        }
-
-        public Task GetFlipTask(TileOrientation orientation)
-        {
-            if (orientation == TileOrientation.FaceDown) return FlipClose.ToTask();
-            if (orientation == TileOrientation.FaceUp) return FlipOpen.ToTask();
-            throw new InvalidEnumArgumentException();
-        }
-
-        public void Randomize()
-        {
-            Roll.Randomize();
-        }
+        #endregion Methods
     }
 
     public class RollModel : INotifyPropertyChanged
     {
-        static private MersenneTwister Twist { get; } = new MersenneTwister((int)DateTime.Now.Ticks);
-        private int _diceOne = 2;
+        #region Delegates + Fields + Events + Enums
 
-        private int _diceTwo = 5;
+        public event PropertyChangedEventHandler PropertyChanged;
 
+        private int _diceOne = -1;
+        private int _diceTwo = -1;
         private TileOrientation _Orientation = TileOrientation.FaceDown;
-
         private bool _selected = false;
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
 
         public int DiceOne
         {
@@ -155,11 +171,19 @@ namespace Catan10
             }
         }
 
+        static private MersenneTwister Twist { get; } = new MersenneTwister((int)DateTime.Now.Ticks);
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
         public RollModel()
         {
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors + Destructors
+
+        #region Methods
 
         public void Randomize()
         {
@@ -172,5 +196,12 @@ namespace Catan10
         {
             return $"[Selected={Selected}][Roll={Roll}][One={DiceOne}][Two={DiceTwo}][Orientation={Orientation}]";
         }
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion Methods
     }
 }
