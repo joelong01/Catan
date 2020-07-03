@@ -179,11 +179,24 @@ namespace Catan10
                     {
                         return false;
                     }
-
-                    ret = (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.BeginResourceAllocation || state == GameState.PickingBoard ||
-                            state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
-                            state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers);
-                    return ret;
+                    switch (state)
+                    {
+                        
+                        case GameState.WaitingForNewGame:
+                        case GameState.FinishedRollOrder:
+                        case GameState.BeginResourceAllocation:
+                        case GameState.WaitingForPlayers:
+                        case GameState.PickingBoard:
+                        case GameState.AllocateResourceForward:
+                        case GameState.AllocateResourceReverse:
+                        case GameState.DoneResourceAllocation:
+                        case GameState.WaitingForNext:
+                        case GameState.Supplemental:
+                            return true;
+                         
+                        default:
+                            return false;
+                    }                    
                 }
                 finally
                 {
@@ -479,6 +492,7 @@ namespace Catan10
                 case GameState.WaitingForNewGame:
                 case GameState.WaitingForRoll:
                 case GameState.WaitingForRollForOrder:
+                case GameState.FinishedRollOrder:
                     return Visibility.Visible;
                 default:
                     return Visibility.Collapsed;

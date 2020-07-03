@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -13,18 +12,30 @@ using Catan.Proxy;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 
-using Windows.ApplicationModel.Activation;
 using Windows.UI.Core;
-using Windows.UI.Popups;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
     public class AckTracker
     {
+        #region Delegates + Fields + Events + Enums
+
+        private TaskCompletionSource<object> TCS = new TaskCompletionSource<object>();
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
         public Guid MessageId { get; set; }
         public List<string> PlayerNames { get; set; }
-        private TaskCompletionSource<object> TCS = new TaskCompletionSource<object>();
+
+        #endregion Properties
+
+        #region Methods
+
         public async Task<bool> WaitForAllAcks(CatanSignalRClient client, int timeoutMs)
         {
             client.OnAck += Client_OnAck;
@@ -46,7 +57,6 @@ namespace Catan10
             {
                 client.OnAck -= Client_OnAck;
             }
-
         }
 
         private void Client_OnAck(string fromPlayer, Guid messageId)
@@ -62,35 +72,17 @@ namespace Catan10
                 }
             }
         }
-    }
-
-    public class PlayerModelConverter : JsonConverter<PlayerModel>
-    {
-        #region Methods
-
-        public override PlayerModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            if (typeToConvert == typeof(PlayerModel))
-            {
-                string playerName = reader.GetString();
-                return MainPage.Current.NameToPlayer(playerName);
-            }
-
-            return null;
-        }
-
-        public override void Write(Utf8JsonWriter writer, PlayerModel player, JsonSerializerOptions options)
-        {
-            writer.WriteStringValue(player.PlayerName);
-        }
 
         #endregion Methods
     }
 
     public class CatanSignalRClient : IDisposable, ICatanService
     {
-
         #region Delegates + Fields + Events + Enums
+
+        public delegate void AckHandler(string fromPlayer, Guid messageId);
+
+        public event AckHandler OnAck;
 
         public event BroadcastMessageReceivedHandler OnBroadcastMessageReceived;
 
@@ -103,14 +95,14 @@ namespace Catan10
         public event GameLifeTimeHandler OnGameLeft;
 
         public event PrivateMessageReceivedHandler OnPrivateMessage;
+
         private delegate void AllGamesReceivedHandler(List<GameInfo> games);
+
         private delegate void AllPlayersReceivedHandler(List<string> playerNames);
-        public delegate void AckHandler(string fromPlayer, Guid messageId);
-        public event AckHandler OnAck;
 
         private event AllGamesReceivedHandler OnAllGamesReceived;
-        private event AllPlayersReceivedHandler OnAllPlayersReceived;
 
+        private event AllPlayersReceivedHandler OnAllPlayersReceived;
 
         #endregion Delegates + Fields + Events + Enums
 
@@ -124,11 +116,8 @@ namespace Catan10
         private HubConnection HubConnection { get; set; }
 
         private string ServiceUrl { get; set; } = "";
+
         #endregion Properties
-
-
-
-
 
         #region Methods
 
@@ -136,8 +125,6 @@ namespace Catan10
         {
             if (OnBroadcastMessageReceived != null)
             {
-
-
                 try
                 {
                     if (message.To == "*" || message.To == MainPage.Current.TheHuman.PlayerName)
@@ -148,7 +135,6 @@ namespace Catan10
                         message = ParseMessage(message);
                         OnBroadcastMessageReceived.Invoke(message);
                     }
-
                 }
                 catch (Exception e)
                 {
@@ -163,7 +149,6 @@ namespace Catan10
             {
                 try
                 {
-
                     await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
 
                     //
@@ -172,13 +157,11 @@ namespace Catan10
                     CatanMessage lastMessage = MainPage.Current.MainPageModel.Log.PeekMessageLog();
                     if (lastMessage == null || lastMessage.MessageId != message.MessageId)
                     {
-
                         //
                         //  not the last message.
                         message = ParseMessage(message);
                         OnPrivateMessage.Invoke(message);
                     }
-
                 }
                 catch (Exception e)
                 {
@@ -189,7 +172,6 @@ namespace Catan10
 
         private CatanMessage ParseMessage(CatanMessage msg)
         {
-
             Type type = CurrentAssembly.GetType(msg.DataTypeName);
             if (type == null) throw new ArgumentException("Unknown type!");
 
@@ -205,12 +187,6 @@ namespace Catan10
 
         #endregion Methods
 
-
-
-
-
-
-
         #region Constructors + Destructors
 
         public CatanSignalRClient()
@@ -218,8 +194,6 @@ namespace Catan10
         }
 
         #endregion Constructors + Destructors
-
-
 
         public static JsonSerializerOptions GetJsonOptions(bool indented = false)
         {
@@ -263,6 +237,11 @@ namespace Catan10
             HubConnection.DisposeAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
+        public Task DisposeAsync()
+        {
+            return HubConnection.DisposeAsync();
+        }
+
         public async Task<List<GameInfo>> GetAllGames()
         {
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
@@ -287,7 +266,6 @@ namespace Catan10
                 this.TraceMessage("Why isn't the hub Connected?");
                 await Task.Delay(2000);
                 this.TraceMessage($"Waited 2 seconds = state now {HubConnection.State}");
-
             }
 
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
@@ -304,11 +282,6 @@ namespace Catan10
             await HubConnection.InvokeAsync("GetPlayersInGame", gameId);
             await tcs.Task;
             return list;
-        }
-
-        public async Task Reset()
-        {
-            await HubConnection.InvokeAsync("Reset");
         }
 
         public async Task Initialize(string host)
@@ -329,8 +302,6 @@ namespace Catan10
                     HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(30);
                     HubConnection.KeepAliveInterval = TimeSpan.FromMinutes(15);
                 }
-
-
 
                 HubConnection.Reconnecting += error =>
                 {
@@ -433,19 +404,6 @@ namespace Catan10
             }
         }
 
-        private async Task RegisterClient()
-        {
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-            {
-
-                // this will happily throw..
-
-                //
-                //  this has to be on the UI thread to access PlayerName
-                await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
-            });
-        }
-
         public async Task<GameInfo> JoinGame(GameInfo gameInfo, string playerName)
         {
             if (gameInfo == null) throw new ArgumentException("GameInfo can't be null");
@@ -453,8 +411,6 @@ namespace Catan10
 
             try
             {
-
-
                 TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
                 GameInfo serviceGameInfo = null;
                 void CatanSignalRClient_OnGameJoined(GameInfo info, string name)
@@ -494,15 +450,21 @@ namespace Catan10
 
             return null;
         }
+
+        public async Task Reset()
+        {
+            await HubConnection.InvokeAsync("Reset");
+        }
+
         /// <summary>
         ///     Send a message to all the clients.
-        ///     
+        ///
         ///     1. create a list of Ack's you expect
         ///     2. create a TCS to wait on with a timeout
         ///     3. send the broadcast,
         ///     5. wait for the Acks.
         ///     6. if timeout, send a message to the one client and wait for acks
-        ///     
+        ///
         /// </summary>
         /// <param name="gameId"></param>
         /// <param name="message"></param>
@@ -522,13 +484,9 @@ namespace Catan10
                 return;
             }
 
-
-
             //
             //  make it an object so we can get the whole message
             message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
-
-
 
             //
             //  the app tracker is not getting Acks called on it
@@ -536,7 +494,6 @@ namespace Catan10
             int timeout = 3 * 1000; // for debuggin...one second timeout
             while (true)
             {
-
                 await EnsureConnection();
 
                 AckTracker ackTracker = new AckTracker()
@@ -566,94 +523,34 @@ namespace Catan10
                         Content = $"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nHit Cancel to end the game.  For everybody.",
                         CloseButtonText = "Retry",
                         SecondaryButtonText = "Cancel"
-
                     };
-                    // await MainPage.Current.ShowErrorMessage($"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nRetry after ok.", "Catan", "");
-                    var ret = await dlg.ShowAsync();
-                    if (ret == ContentDialogResult.Secondary)
+                    try
                     {
-                        break;
+                        // await MainPage.Current.ShowErrorMessage($"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nRetry after ok.", "Catan", "");
+                        while (VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0)
+                        {
+                            this.TraceMessage("Wating for Dialogbox to close");
+                            await Task.Delay(1000);
+                        }
+                        this.TraceMessage($"calling retry dialog for id={message.MessageId}");
+                        var ret = await dlg.ShowAsync();
+                        this.TraceMessage($"return from retry dialog for id={message.MessageId}");
+                        if (ret == ContentDialogResult.Secondary)
+                        {
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        //
+                        //  we have cases where we notifiy the user twice that we are waiting for a Retry .. this will retry w/o telling the user
+                        this.TraceMessage($"exception thrown for rety notification for id ={message.MessageId}");
+                        await Task.Delay(1000);
                     }
                     message.ActionType = ActionType.Retry;
-
                 }
             }
-
         }
-
-        private async Task EnsureConnection()
-        {
-
-            if (HubConnection.State == HubConnectionState.Connected) return;
-
-
-            TaskCompletionSource<object> connectionTCS = new TaskCompletionSource<object>(); ;
-            HubConnection.Reconnected += Reconnected;
-            Task Reconnected(string arg)
-            {
-                connectionTCS.TrySetResult(null);
-                HubConnection.Reconnected -= Reconnected;
-                return Task.CompletedTask;
-            }
-
-            int n = 0;
-            //
-            //  make sure we are connected to the service
-            while (HubConnection.State != HubConnectionState.Connected)
-            {
-                n++;
-                await MainPage.Current.ShowErrorMessage("Lost Connection to the Catan Service.  Click Ok and I'll try to connect.", "Catan", "");
-                await connectionTCS.Task.TimeoutAfter(5000);
-                connectionTCS = new TaskCompletionSource<object>();
-            }
-
-        }
-
-        private async Task SendDirectAcknowledgedMessage(string player, Guid gameId, CatanMessage message)
-        {
-            TaskCompletionSource<object> connectionTCS = null;
-            HubConnection.Reconnected += Reconnected;
-            Task Reconnected(string arg)
-            {
-                connectionTCS.TrySetResult(null);
-                HubConnection.Reconnected -= Reconnected;
-                return Task.CompletedTask;
-            }
-
-
-            int n = 0;
-            //
-            //  make sure we are connected to the service
-            while (HubConnection.State != HubConnectionState.Connected)
-            {
-                n++;
-                this.TraceMessage("Waiting to reconnect to hub...");
-                connectionTCS = new TaskCompletionSource<object>();
-                await connectionTCS.Task.TimeoutAfter(5000);
-
-            }
-
-            //
-            //  now we should be connected again
-
-
-
-            AckTracker ackTracker = new AckTracker()
-            {
-                PlayerNames = new List<string>() { player },
-                MessageId = message.MessageId
-            };
-            bool ret = false;
-            n = 0;
-            do
-            {
-                this.TraceMessage($"count = {n++} player={player} message={message.DataTypeName} id={gameId}");
-                await SendPrivateMessage(player, message);
-                ret = await ackTracker.WaitForAllAcks(this, 1000);
-            } while (ret == false);
-
-        }
-
 
         public async Task SendPrivateMessage(string playerName, CatanMessage message)
         {
@@ -677,9 +574,104 @@ namespace Catan10
             await RegisterClient();
         }
 
-        public Task DisposeAsync()
+        private async Task EnsureConnection()
         {
-            return HubConnection.DisposeAsync();
+            if (HubConnection.State == HubConnectionState.Connected) return;
+
+            TaskCompletionSource<object> connectionTCS = new TaskCompletionSource<object>(); ;
+            HubConnection.Reconnected += Reconnected;
+            Task Reconnected(string arg)
+            {
+                connectionTCS.TrySetResult(null);
+                HubConnection.Reconnected -= Reconnected;
+                return Task.CompletedTask;
+            }
+
+            int n = 0;
+            //
+            //  make sure we are connected to the service
+            while (HubConnection.State != HubConnectionState.Connected)
+            {
+                n++;
+                await MainPage.Current.ShowErrorMessage("Lost Connection to the Catan Service.  Click Ok and I'll try to connect.", "Catan", "");
+                await connectionTCS.Task.TimeoutAfter(5000);
+                connectionTCS = new TaskCompletionSource<object>();
+            }
         }
+
+        private async Task RegisterClient()
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                // this will happily throw..
+
+                //
+                //  this has to be on the UI thread to access PlayerName
+                await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
+            });
+        }
+
+        private async Task SendDirectAcknowledgedMessage(string player, Guid gameId, CatanMessage message)
+        {
+            TaskCompletionSource<object> connectionTCS = null;
+            HubConnection.Reconnected += Reconnected;
+            Task Reconnected(string arg)
+            {
+                connectionTCS.TrySetResult(null);
+                HubConnection.Reconnected -= Reconnected;
+                return Task.CompletedTask;
+            }
+
+            int n = 0;
+            //
+            //  make sure we are connected to the service
+            while (HubConnection.State != HubConnectionState.Connected)
+            {
+                n++;
+                this.TraceMessage("Waiting to reconnect to hub...");
+                connectionTCS = new TaskCompletionSource<object>();
+                await connectionTCS.Task.TimeoutAfter(5000);
+            }
+
+            //
+            //  now we should be connected again
+
+            AckTracker ackTracker = new AckTracker()
+            {
+                PlayerNames = new List<string>() { player },
+                MessageId = message.MessageId
+            };
+            bool ret = false;
+            n = 0;
+            do
+            {
+                this.TraceMessage($"count = {n++} player={player} message={message.DataTypeName} id={gameId}");
+                await SendPrivateMessage(player, message);
+                ret = await ackTracker.WaitForAllAcks(this, 1000);
+            } while (ret == false);
+        }
+    }
+
+    public class PlayerModelConverter : JsonConverter<PlayerModel>
+    {
+        #region Methods
+
+        public override PlayerModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (typeToConvert == typeof(PlayerModel))
+            {
+                string playerName = reader.GetString();
+                return MainPage.Current.NameToPlayer(playerName);
+            }
+
+            return null;
+        }
+
+        public override void Write(Utf8JsonWriter writer, PlayerModel player, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(player.PlayerName);
+        }
+
+        #endregion Methods
     }
 }

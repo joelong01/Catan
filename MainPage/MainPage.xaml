@@ -204,7 +204,7 @@
                                 Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                                 Style="{StaticResource GameControllerStyle}"
                                 Click="OnNextStep"
-                                IsEnabled="{x:Bind MainPageModel.EnableNextButton, Mode=OneWay}" />
+                                IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}" />
                             <TextBlock Margin="5,0,5,0" Style="{StaticResource ControlGridTextStyle}" Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Center" Style="{StaticResource GameControllerStackPanelCommand}">

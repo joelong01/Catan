@@ -706,9 +706,11 @@ namespace Catan10
                         break;
 
                     case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
+                        
+                        break;
+                    case GameState.FinishedRollOrder:
                         await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
                         break;
-
                     case GameState.BeginResourceAllocation:
                         await BeginAllocationToAllocateResourcesForward.PostLog(this);
                         break;

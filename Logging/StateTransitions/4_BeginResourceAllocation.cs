@@ -16,7 +16,7 @@ namespace Catan10
 
         public static async Task PostLog(IGameController gameController)
         {
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRollForOrder);
+            Contract.Assert(gameController.CurrentGameState == GameState.FinishedRollOrder);
 
             WaitingForRollOrderToBeginResourceAllocation logHeader = new WaitingForRollOrderToBeginResourceAllocation()
             {
@@ -25,7 +25,7 @@ namespace Catan10
                 NewState = GameState.BeginResourceAllocation,
             };
 
-            Contract.Assert(logHeader.OldState == GameState.WaitingForRollForOrder);
+            Contract.Assert(logHeader.OldState == GameState.FinishedRollOrder);
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }

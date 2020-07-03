@@ -155,9 +155,11 @@
     <Compile Include="Logging\Actions\TradeApprovalLog.cs" />
     <Compile Include="Logging\Actions\TradedGold.cs" />
     <Compile Include="Logging\Actions\YearOfPlentyLog.cs" />
+    <Compile Include="Logging\GameLog.cs" />
     <Compile Include="Logging\Helpers\AllocationPhaseHelper.cs" />
     <Compile Include="Logging\Helpers\BaronLogHelpers.cs" />
     <Compile Include="Logging\Helpers\ChangePlayerHelper.cs" />
+    <Compile Include="Logging\StateTransitions\3b_RollOrderFinalized.cs" />
     <Compile Include="Logging\StateTransitions\6a_PlayerHasTooManyCards.cs" />
     <Compile Include="Logging\StateTransitions\6c_MustTradeGold.cs" />
     <Compile Include="Logging\StateTransitions\6d_TradeGoldToWaitingForNext.cs" />

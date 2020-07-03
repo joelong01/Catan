@@ -53,7 +53,7 @@ namespace Catan10
             if (mainPageModel.Settings.AutoRespond)
             {
                 //
-                //  step 5 is to roll -- simulate it
+                // simulate a roll
                 await RollOrderLog.PostMessage(gameController, GetRollModelList());
             }
         }

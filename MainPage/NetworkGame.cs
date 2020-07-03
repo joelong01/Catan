@@ -352,11 +352,31 @@ namespace Catan10
             await ProcessMessage(message);
 
         }
+        private void RecordGameMessage(CatanAction action, GameInfo info, string by)
+        {
+            GameLog logHeader = new GameLog()
+            {
+                CanUndo = false,
+                Action = action,
+                GameInfo = info,
+                Name = by
+            };
+            CatanMessage message = new CatanMessage()
+            {
+                Data = logHeader,
+                From = TheHuman.PlayerName,
+                ActionType = ActionType.Normal,
+                DataTypeName = logHeader.GetType().FullName,
+                To = "*"
 
+            };
+            MainPageModel.Log.RecordMessage(message);
+        }
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
         {
             this.TraceMessage($"{gameInfo} playerName={playerName}");
-
+            RecordGameMessage(CatanAction.GameCreated, gameInfo, playerName);
+            
             if (TheHuman.PlayerName == gameInfo.Creator)
             {
                 await NewGameLog.JoinOrCreateGame(this, gameInfo, CatanAction.GameCreated); // the local action to join as the service is already created
@@ -381,6 +401,7 @@ namespace Catan10
             this.TraceMessage($"{id} playerName={by}");
             if (MainPageModel == null || MainPageModel.ServiceGameInfo == null) return;
 
+            RecordGameMessage(CatanAction.GameDeleted, MainPageModel.ServiceGameInfo, by);
 
             if (MainPageModel.ServiceGameInfo.Id != id) return;
 
@@ -401,6 +422,7 @@ namespace Catan10
         /// <param name="playerName"></param>
         private async void Service_OnGameJoined(GameInfo gameInfo, string playerName)
         {
+            RecordGameMessage(CatanAction.GameJoined, gameInfo, playerName);
             foreach (var player in MainPageModel.PlayingPlayers)
             {
                 if (player.PlayerName == playerName)

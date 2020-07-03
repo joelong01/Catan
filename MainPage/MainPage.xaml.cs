@@ -1112,6 +1112,21 @@ namespace Catan10
             await appWindow.TryShowAsync();
         }
 
+        private bool EnableNextButton(bool enableNextButton, GameState gameState, int unprocessedMessages)
+        {
+            this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
+            if (unprocessedMessages != 0)
+            {
+                this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
+                return false;
+            }
+
+            bool enable = MainPageModel.EnableNextButton;
+            Debug.Assert(enable == enableNextButton);
+            return enable;
+
+        }
+
         private async void OnNewLocalGame(object sender, RoutedEventArgs e)
         {
             MainPageModel.Settings.IsLocalGame = true;

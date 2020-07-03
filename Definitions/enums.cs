@@ -100,8 +100,6 @@ namespace Catan10
         Knight
     }
 
-    
-
     public enum GameState
     {
         [Description("Uninitialized")]
@@ -110,7 +108,7 @@ namespace Catan10
         [Description("New Game")]
         WaitingForNewGame,
 
-        [Description("Pick Resources")]
+        [Description("Start Pick Resources")]
         BeginResourceAllocation,
 
         [Description("Done With Players.  Pick Board...")]
@@ -122,10 +120,13 @@ namespace Catan10
         [Description("Select Roll...")]
         WaitingForRollForOrder,
 
-        [Description("Next (Forward)...")]
+        [Description("Order Done")]
+        FinishedRollOrder,
+
+        [Description("Finished Building...")]
         AllocateResourceForward,
 
-        [Description("Next (Back)...")]
+        [Description("Finished Building...")]
         AllocateResourceReverse,
 
         [Description("Start Game...")]
@@ -141,7 +142,9 @@ namespace Catan10
         Supplemental,
 
         [Description("Move Baron")]
-        MustMoveBaron
+        MustMoveBaron,
+
+       
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

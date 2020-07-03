@@ -36,7 +36,7 @@ namespace Catan10
             bool finished = await gameController.DetermineRollOrder(this);
             if (finished)
             {
-                await WaitingForRollOrderToBeginResourceAllocation.PostLog(gameController);
+                await RollOrderFinalizedLog.PostLog(gameController);
             }
         }
 
