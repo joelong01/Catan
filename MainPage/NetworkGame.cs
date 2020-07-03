@@ -106,7 +106,7 @@ namespace Catan10
             };
             if (String.IsNullOrEmpty(dlg.ExtendedMessage))
             {
-                dlg.Height = 300;
+                
             }
             await dlg.ShowAsync();
         }

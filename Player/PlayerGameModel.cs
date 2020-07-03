@@ -786,12 +786,12 @@ namespace Catan10
             {
                 //
                 //  need to be same players
-                if (o.Owner.Player != offer.Owner.Player) return null;
-                if (o.Partner.Player != offer.Partner.Player) return null;
+                if (o.Owner.Player != offer.Owner.Player) continue;
+                if (o.Partner.Player != offer.Partner.Player) continue;
 
                 //  with same resources
-                if (o.Owner.Resources.EqualValue(offer.Owner.Resources) == false) return null;
-                if (o.Partner.Resources.EqualValue(offer.Partner.Resources) == false) return null;
+                if (o.Owner.Resources.EqualValue(offer.Owner.Resources) == false) continue;
+                if (o.Partner.Resources.EqualValue(offer.Partner.Resources) == false) continue;
                 
 
                 return o;
