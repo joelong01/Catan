@@ -25,6 +25,8 @@ namespace Catan10
 
         private RollModel _rollModel = new RollModel();
 
+        public bool Finished { get; set; } = false;
+
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties

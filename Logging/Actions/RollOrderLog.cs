@@ -34,7 +34,8 @@ namespace Catan10
         {
             gameController.ShowRollsInPublicUi();
             bool finished = await gameController.DetermineRollOrder(this);
-            if (finished)
+
+            if (finished && gameController.TheHuman == gameController.CurrentPlayer) // whoever wins sends the message saying we have finished rolling for order
             {
                 await RollOrderFinalizedLog.PostLog(gameController);
             }

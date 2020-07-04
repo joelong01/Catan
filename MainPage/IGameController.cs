@@ -332,87 +332,114 @@ namespace Catan10
                 if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) return false;
             }
 
-            bool somebodyTied = false;
 
-            
+            //
+            //  look at all the rolls and see if the current player needs to roll again
+            //
+            var tiedPlayers = PlayerInTie(TheHuman);
+            if (tiedPlayers.Count > 0)
+            {
+                ContentDialog dlg = new ContentDialog()
+                {
+                    Title = "Catan - Roll For Order",
+                    Content = $"You are tied with {ListToCsv(tiedPlayers)}.\n\nRollAgain.",
+                    CloseButtonText = "Ok",
+                };
+
+                await dlg.ShowAsync();
+
+                return false;
+            }
+
+            //
+            //  I have rolled.  I'm not in a tie.  no more rolls for me!
+            //
+            TheHuman.GameData.SyncronizedPlayerRolls.Finished = true;
+
+
+            //
+            //  if I get here, TheHuman is *not* tied - others might be
+            foreach (var p in PlayingPlayers)
+            {
+                tiedPlayers = PlayerInTie(p); // yes this is n!.  for 5 max...
+                if (tiedPlayers.Count > 0)
+                {
+                    // we checked above that TheHuman isn't tied with anybody
+                    Debug.Assert(tiedPlayers.Contains(TheHuman) == false);
+                    return false; // wait until everybody else has resolved their ties.
+                }
+            }
+
+            //
+            // set the order locally
+
+            var newList = new List<PlayerModel>(MainPageModel.PlayingPlayers);
+            newList.Sort((x, y) => x.GameData.SyncronizedPlayerRolls.CompareTo(y.GameData.SyncronizedPlayerRolls));
+            for (int i = 0; i < newList.Count; i++)
+            {
+                MainPageModel.PlayingPlayers[i] = newList[i];
+            }
+
+            //
+            //  because all players are sharing the rolls, we can implicitly set the CurrentPlayer w/o sharing that we have done so.
+            CurrentPlayer = MainPageModel.PlayingPlayers[0];
+            return true;
+
+        }
+
+        /// <summary>
+        ///     return 
+        ///         name1
+        ///             or
+        ///        name1 and name2
+        ///             or
+        ///        name1, name2, name3, and name4
+        /// </summary>
+        /// <param name="players"></param>
+        /// <returns></returns>
+        private string ListToCsv(List<PlayerModel> players)
+        {
+
+            int count = players.Count;
+            if (count == 0) return "";
+            if (count == 1) return players[0].PlayerName;
+            if (count == 2) return $"{players[0].PlayerName} and {players[1].PlayerName}";
+
+            string s = $"{players[0].PlayerName}, ";
+            for (int i = 1; i < count - 2; i++)
+            {
+                s += $"{players[i + 1].PlayerName}, ";
+            }
+            s += $"and {players[count - 1].PlayerName}";
+            return s;
+        }
+
+        /// <summary>
+        ///     checks to see if the player is in a tie roll with any other players        
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns>The list of players in the tie</returns>
+        private List<PlayerModel> PlayerInTie(PlayerModel player)
+        {
+            List<PlayerModel> list = new List<PlayerModel>();
 
             //
             //  look at all the rolls and see if the current player needs to roll again
             foreach (var p in MainPageModel.PlayingPlayers)
             {
-                if (p == TheHuman) continue; // don't compare yourself to yourself
+                if (p == player) continue; // don't compare yourself to yourself
                 if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) continue; //hasn't rolled yet
-                if (p.GameData.SyncronizedPlayerRolls.CompareTo(TheHuman.GameData.SyncronizedPlayerRolls) == 0)
+                if (p.GameData.SyncronizedPlayerRolls.CompareTo(player.GameData.SyncronizedPlayerRolls) == 0)
                 {
-                    if (p.GameData.SyncronizedPlayerRolls.RollValues.Count == TheHuman.GameData.SyncronizedPlayerRolls.RollValues.Count)
+                    if (p.GameData.SyncronizedPlayerRolls.RollValues.Count == player.GameData.SyncronizedPlayerRolls.RollValues.Count)
                     {
-                        //
-                        //  you are tied, but need to rollagain
-                        string s = "Tie Roll. Roll again!";
-                        await MainPage.Current.ShowErrorMessage(s, "Catan", "");
-                        await _rollControl.Reset();
-                        somebodyTied = true;
+                        list.Add(p);
                     }
 
-                    return false;
                 }
             }
 
-            if (somebodyTied) return false;
-
-            //
-            //  go through PlayingPlayers and ask if any are tied and if any need to roll
-            //
-
-            int count = MainPageModel.PlayingPlayers.Count;
-            bool tie = false;
-            for (int i = 0; i < count; i++)
-            {
-                var p1 = MainPageModel.PlayingPlayers[i];
-                for (int j = i; j < count; j++)
-                {
-                    var p2 = MainPageModel.PlayingPlayers[j];
-                    if (p2 == p1) continue;
-                    if (p2.GameData.SyncronizedPlayerRolls.CompareTo(p1.GameData.SyncronizedPlayerRolls) == 0)
-                    {
-                        //
-                        //  there is a tie.  keep going
-                        tie = true;
-                        break;
-                    }
-                }
-                i++;
-            }
-
-            
-
-            if (!tie)
-            {
-                var newList = new List<PlayerModel>(MainPageModel.PlayingPlayers);
-                newList.Sort((x, y) => x.GameData.SyncronizedPlayerRolls.CompareTo(y.GameData.SyncronizedPlayerRolls));
-                for (int i = 0; i < newList.Count; i++)
-                {
-                    MainPageModel.PlayingPlayers[i] = newList[i];
-                }
-
-                //
-                //  because all players are sharing the rolls, we can implicitly set the CurrentPlayer w/o sharing that we have done so.
-                CurrentPlayer = MainPageModel.PlayingPlayers[0];
-
-                //
-                //
-                if (CurrentGameState == GameState.WaitingForRollForOrder)
-                {
-                    return true;
-                }
-                else
-                {
-                    this.TraceMessage($"didn't call WaitingForRollOrderToWaitingForStart for {logEntry}");
-                }
-                // else eat it...only need one of these
-            }
-
-            return false;
+            return list;
         }
 
         /// <summary>
