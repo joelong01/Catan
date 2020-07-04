@@ -493,6 +493,7 @@ namespace Catan10
                 case GameState.WaitingForRoll:
                 case GameState.WaitingForRollForOrder:
                 case GameState.FinishedRollOrder:
+                case GameState.WaitingForNext:
                     return Visibility.Visible;
                 default:
                     return Visibility.Collapsed;

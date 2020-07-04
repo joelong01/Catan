@@ -108,14 +108,7 @@ namespace Catan10
 
             if (roll == 7)
             {
-                if (action == RollAction.Undo)
-                {
-                    sentBy.GameData.MovedBaronAfterRollingSeven = false;
-                }
-                else
-                {
-                    sentBy.GameData.MovedBaronAfterRollingSeven = false;
-                }
+               
 
                 foreach (PlayerModel player in GameController.PlayingPlayers)
                 {
@@ -127,8 +120,7 @@ namespace Catan10
             }
             else
             {
-                sentBy.GameData.MovedBaronAfterRollingSeven = null;
-
+             
                 //
                 //  get the resources for the roll
                 foreach (var player in GameController.PlayingPlayers)

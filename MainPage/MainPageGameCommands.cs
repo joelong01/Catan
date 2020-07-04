@@ -248,10 +248,7 @@ namespace Catan10
             }
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
-            if (playerGameData.MovedBaronAfterRollingSeven != false && playerGameData.PlayedKnightThisTurn) // not eligible to move baron
-            {
-                return;
-            }
+            
 
             List<Target> targetList = PickBaronVictim(true);
             if (targetList.Count == 0)
@@ -357,10 +354,7 @@ namespace Catan10
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
             this.TraceMessage("removed MovedBaronAfterRollingSeven");
-            if (playerGameData.PlayedKnightThisTurn) // not eligible to move baron
-            {
-                return;
-            }
+           
 
             List<Target> targetList = PickBaronVictim(true);
             if (targetList.Count == 0)

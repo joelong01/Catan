@@ -338,11 +338,7 @@ namespace Catan10
 
         public async Task CurrentPlayerChanged()
         {
-            //
-            //  the next player can always play a baron once
-            CurrentPlayer.GameData.PlayedKnightThisTurn = false;
-            CurrentPlayer.GameData.MovedBaronAfterRollingSeven = null;
-
+           
             UpdateTurnFlag();
 
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
@@ -889,13 +885,11 @@ namespace Catan10
         //      6. check to see if we should update the Largest Army
         private Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
         {
-            bool flagState = true;
             int inc = 1;
             if (logType == LogType.Undo)
             {
                 //
                 //   if this is an undo action, decrement the counter and set the flag to false so the player can do it again
-                flagState = false;
                 inc = -1;
             }
 
@@ -919,15 +913,11 @@ namespace Catan10
 
             if (action == CatanAction.PlayedKnight)
             {
-                CurrentPlayer.GameData.PlayedKnightThisTurn = flagState;
+               
                 CurrentPlayer.GameData.Resources.KnightsPlayed += inc;
                 AssignLargestArmy();
             }
-            else
-            {
-                CurrentPlayer.GameData.MovedBaronAfterRollingSeven = flagState;
-            }
-
+            
             //  await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
 
             if (CurrentGameState == GameState.MustMoveBaron && logType != LogType.Undo)

@@ -104,11 +104,10 @@ namespace Catan10
             //  hide the rolls in the public data control
             GameData.Resources.ResourcesThisTurn.Reset(); // reset PublicDataCtrl resources
             GameData.Resources.ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None };     // flips the "Dev Card Played this turn" in public data ctrl and in PrivateDataCtrl
-            //
-            //  the next player can always play a baron once
-            //  TODO: these should probably be deleted and we control if a Knight is played via knowing a dev card is played
-            GameData.PlayedKnightThisTurn = false;
-            GameData.MovedBaronAfterRollingSeven = null;
+
+            GameData.Trades = new Trades();
+            GameData.Trades.TradeRequest.Owner.Player = MainPage.Current.TheHuman;
+            
         }
 
         /// <summary>

@@ -161,7 +161,7 @@ namespace Catan10
 
             }
 
-            gameController.CurrentPlayer.GameData.MovedBaronAfterRollingSeven = false;
+           
 
             return Task.CompletedTask;
         }

@@ -42,10 +42,8 @@ namespace Catan10
         private int _MaxRoads = 0;
         private int _MaxSettlements = 0;
         private int _MaxShips = 0;
-        private bool? _MovedBaronAfterRollingSeven = null;
         private int _noResourceCount = 0;
         private int _pips = 0;
-        private bool _PlayedKnightThisTurn = false;
         private PlayerModel _playerData = null;
         private PlayerResources _resources = new PlayerResources();
         private int _RoadsPlayed = 0;
@@ -261,19 +259,7 @@ namespace Catan10
             }
         }
 
-        public bool? MovedBaronAfterRollingSeven
-        {
-            get => _MovedBaronAfterRollingSeven;
-            set
-            {
-                if (_MovedBaronAfterRollingSeven != value)
-                {
-                    LogPropertyChanged(_MovedBaronAfterRollingSeven, value);
-                    _MovedBaronAfterRollingSeven = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+       
 
         public int NoResourceCount
         {
@@ -313,18 +299,6 @@ namespace Catan10
             }
         }
 
-        public bool PlayedKnightThisTurn
-        {
-            get => _PlayedKnightThisTurn;
-            set
-            {
-                if (_PlayedKnightThisTurn != value)
-                {
-                    _PlayedKnightThisTurn = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
 
         public PlayerModel PlayerModel
         {
@@ -628,8 +602,6 @@ namespace Catan10
             SettlementsPlayed = 0;
             IslandsPlayed = 0;
             TotalTime = TimeSpan.FromSeconds(0);
-            MovedBaronAfterRollingSeven = null;
-            PlayedKnightThisTurn = false;
             Roads.Clear();
             Settlements.Clear();
             Cities.Clear();

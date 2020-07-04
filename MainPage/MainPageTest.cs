@@ -100,7 +100,7 @@ namespace Catan10
             ResourceCardCollection source = new ResourceCardCollection(tr);
 
             string c = goldCards > 1 ? "cards" : "card";
-
+           
             TakeCardDlg dlg = new TakeCardDlg()
             {
                 To = gameController.TheHuman,
@@ -127,16 +127,22 @@ namespace Catan10
         }
 
         // int toggle = 0;
-        private  void OnTest1(object sdr, RoutedEventArgs rea)
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
 
             
             // await TestYearOfPlenty();
-            // await TradeGoldTest();
+             await TradeGoldTest();
             // await TestTargetPlayer();
             // await LoseHalfYourCards();
 
             // TestTrade();
+           
+
+        }
+
+        private void TestTrades2()
+        {
             MainPageModel.Settings.IsLocalGame = true;
             GameInfo info = new GameInfo()
             {
@@ -144,10 +150,10 @@ namespace Catan10
                 Id = Guid.NewGuid(),
                 Started = false
             };
-         
+
 
             MainPageModel.PlayingPlayers.Clear();
-            
+
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[0]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
@@ -163,7 +169,10 @@ namespace Catan10
                     Player = CurrentPlayer,
                     Resources = new TradeResources()
                     {
-                        Brick = 1, Wood=1, Wheat=1, Ore = 1
+                        Brick = 1,
+                        Wood = 1,
+                        Wheat = 1,
+                        Ore = 1
                     }
                 },
                 Partner = new Offer()
@@ -226,7 +235,6 @@ namespace Catan10
                 }
 
             });
-
 
         }
 
