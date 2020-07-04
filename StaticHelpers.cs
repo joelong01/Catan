@@ -634,7 +634,7 @@ namespace Catan10
 
         public void Dispose()
         {
-            if (!Enabled) return;
+            if (watch == null) return;
             watch.Stop();
             double elapsedMs = watch.ElapsedMilliseconds;
             this.TraceMessage($"{message}: {elapsedMs}ms");

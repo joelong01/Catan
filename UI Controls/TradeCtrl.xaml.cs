@@ -59,7 +59,7 @@ namespace Catan10
 
         private void SetCurrentPlayer(PlayerModel player)
         {
-            this.TraceMessage($"CurrentPlayer = {player}");
+//            this.TraceMessage($"CurrentPlayer = {player}");
         }
 
         private void SetPlayingPlayers(ObservableCollection<PlayerModel> value)

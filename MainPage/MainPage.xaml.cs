@@ -1114,7 +1114,7 @@ namespace Catan10
 
         private bool EnableNextButton(bool enableNextButton, GameState gameState, int unprocessedMessages)
         {
-            this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
+         //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
             if (unprocessedMessages != 0)
             {
                 this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
