@@ -1015,13 +1015,10 @@ namespace Catan10
             foreach (var p in MainPageModel.PlayingPlayers)
             {
                 if (p == player) continue; // don't compare yourself to yourself
-                if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) continue; //hasn't rolled yet
+                if (p.GameData.SyncronizedPlayerRolls.RollValues.Count == 0) continue;                 
                 if (p.GameData.SyncronizedPlayerRolls.CompareTo(player.GameData.SyncronizedPlayerRolls) == 0)
-                {
-                    if (p.GameData.SyncronizedPlayerRolls.RollValues.Count == player.GameData.SyncronizedPlayerRolls.RollValues.Count)
-                    {
-                        list.Add(p);
-                    }
+                {                   
+                    list.Add(p);                   
                 }
             }
 
