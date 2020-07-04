@@ -56,7 +56,7 @@ namespace Catan10
             //
             //  what roll did the user pick?
             //  make sure it is valid, otherwise there is a bug
-            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddOrReplaceRolls(this.RollState.Rolls);
+            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRoll(this.RollState.Rolls);
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
@@ -104,7 +104,7 @@ namespace Catan10
             //
             //  what roll did the user pick?
             //  make sure it is valid, otherwise there is a bug
-            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddOrReplaceRolls(this.RollState.Rolls);
+            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRoll(this.RollState.Rolls);
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);

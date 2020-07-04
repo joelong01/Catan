@@ -75,7 +75,7 @@ namespace Catan10
 
         #region Methods
 
-        public RollModel AddOrReplaceRolls(List<RollModel> rolls)
+        public RollModel AddRoll(List<RollModel> rolls)
         {
             //
             //  5/26/2020:  Don't clear and add range -- XAML will barf because i'm accessing the indexers in PublicDataCtrl.xaml
@@ -93,13 +93,6 @@ namespace Catan10
                 }
             }
             NotifyPropertyChanged("LatestRolls");
-
-            if (RollValues.Count != 0)
-            {
-                var last = RollValues.Last();
-                Debug.Assert(last == -2); // -1 for each dice
-                RollValues.RemoveAt(RollValues.Count - 1);
-            }
 
             RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);            
             return CurrentRoll;

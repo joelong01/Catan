@@ -15,13 +15,6 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
-
-        #region Properties + Fields 
-
-
-
-        #endregion Properties + Fields 
-
         #region Methods
 
         private async Task UpdateUiForState(GameState currentState)
@@ -129,6 +122,8 @@ namespace Catan10
 
         #endregion Methods
 
+        #region Properties
+
         public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && CurrentPlayer == TheHuman);
 
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
@@ -171,9 +166,9 @@ namespace Catan10
 
         public List<PlayerModel> PlayingPlayers => new List<PlayerModel>(MainPageModel.PlayingPlayers);
 
-
-
         public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
+
+        #endregion Properties
 
         /// <summary>
         ///     Called when a Player is added to a Service game
@@ -195,7 +190,6 @@ namespace Catan10
         /// <returns></returns>
         public Task AddPlayer(string playerToAdd)
         {
-
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.WaitingForNewGame);
 
             var newPlayer = NameToPlayer(playerToAdd);
@@ -235,8 +229,6 @@ namespace Catan10
                 //  as a message because we assume the clocks are shared
                 //
                 CurrentPlayer = MainPageModel.GameStartedBy;
-
-
             }
             else
             {
@@ -245,7 +237,6 @@ namespace Catan10
 
             return Task.CompletedTask;
         }
-
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
         {
@@ -282,25 +273,19 @@ namespace Catan10
             }
         }
 
+        public void CompleteRedo()
+        {
+            this.TraceMessage("complete");
+        }
 
-
+        public void CompleteUndo()
+        {
+            this.TraceMessage("complete");
+        }
 
         public RandomBoardSettings CurrentRandomBoard()
         {
             return _gameView.RandomBoardSettings;
-        }
-
-        private void DumpAllRolls()
-        {
-            string s = "\n";
-            foreach (var player in PlayingPlayers)
-            {
-                s += $"{player.PlayerName}: ";
-                player.GameData.SyncronizedPlayerRolls.RollValues.ForEach((p) => s += $"{p},");
-                s += "\n";
-
-            }
-            this.TraceMessage(s);
         }
 
         /// <summary>
@@ -333,59 +318,53 @@ namespace Catan10
             //  when this is called we either have no current rolls, or we hit a tie.
             //  if we hit a tie, then the current roll == -1
 
-
-            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddOrReplaceRolls(logEntry.Rolls);
+            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.Rolls);
 
             Contract.Assert(pickedRoll != null);
-         
 
             DumpAllRolls();
 
             //
             //  7/4/2020: has everybody rolled? -- don't make any decisions until the rolls are in
+            //            we check to see if we are waiting for a roll by looking for a negative 
+            //            value in CurrentRoll.Roll
             //
             foreach (var p in MainPageModel.PlayingPlayers)
             {
                 if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.Roll < 0) return false;
             }
 
-            //
-            //  look at all the rolls and see if the current player needs to roll again
-            //
-            var tiedPlayers = PlayerInTie(TheHuman);
-            if (tiedPlayers.Count > 0)
-            {
-                ContentDialog dlg = new ContentDialog()
-                {
-                    Title = "Catan - Roll For Order",
-                    Content = $"You are tied with {ListToCsv(tiedPlayers)}.\n\nRollAgain.",
-                    CloseButtonText = "Ok",
-                };
+            bool somebodyIsTied = false;
 
-                await dlg.ShowAsync();
-                //
-                //  add a -1 roll showing that they need to roll
-                foreach (var tiedPlayer in tiedPlayers)
-                {
-                    AddRollPlaceHolder(tiedPlayer);
-                }
-                return false;
-            }
-
-            
             //
-            //  if I get here, TheHuman is *not* tied - others might be.
             //  they will be notified by the check above, but we need to bail out of the function
+            //  give everybody who is tied a 
             foreach (var p in PlayingPlayers)
             {
-                tiedPlayers = PlayerInTie(p); // yes this is n!.  for 5 max...
+                var tiedPlayers = PlayerInTie(p); // yes this is n!.  for 5 max...
                 if (tiedPlayers.Count > 0)
                 {
-                    // we checked above that TheHuman isn't tied with anybody
-                    Debug.Assert(tiedPlayers.Contains(TheHuman) == false);
-                    return false; // wait until everybody else has resolved their ties.
+                    if (p == TheHuman)
+                    {
+                        ContentDialog dlg = new ContentDialog()
+                        {
+                            Title = "Catan - Roll For Order",
+                            Content = $"You are tied with {ListToCsv(tiedPlayers)}.\n\nRollAgain.",
+                            CloseButtonText = "Ok",
+                        };
+
+                        await dlg.ShowAsync();
+                    }
+
+                    //
+                    //  waiting for a roll from p...
+                    p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = -1;
+                    p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = -1;                    
+                    somebodyIsTied = true;
                 }
             }
+
+            if (somebodyIsTied) return false;
 
             //
             //  we got here because nobody is tied and all rolls have come in
@@ -404,77 +383,25 @@ namespace Catan10
             //  because all players are sharing the rolls, we can implicitly set the CurrentPlayer w/o sharing that we have done so.
             CurrentPlayer = MainPageModel.PlayingPlayers[0];
             return true;
-
         }
 
-        private static void AddRollPlaceHolder(PlayerModel tiedPlayer)
+        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)
         {
-            List<RollModel> rolls = new List<RollModel>();
-            for (int i = 0; i < 4; i++)
+            if (MainPageModel.GameState != GameState.WaitingForNewGame && MainPageModel.ServiceGameInfo == null)
             {
-                rolls.Add(new RollModel()
-                {
-                    DiceOne = -1,
-                    DiceTwo = -1
-                });
-            }
-            rolls[0].Selected = true;
-            tiedPlayer.GameData.SyncronizedPlayerRolls.AddOrReplaceRolls(rolls);
-        }
-
-        /// <summary>
-        ///     return 
-        ///         name1
-        ///             or
-        ///        name1 and name2
-        ///             or
-        ///        name1, name2, name3, and name4
-        /// </summary>
-        /// <param name="players"></param>
-        /// <returns></returns>
-        private string ListToCsv(List<PlayerModel> players)
-        {
-
-            int count = players.Count;
-            if (count == 0) return "";
-            if (count == 1) return players[0].PlayerName;
-            if (count == 2) return $"{players[0].PlayerName} and {players[1].PlayerName}";
-
-            string s = $"{players[0].PlayerName}, ";
-            for (int i = 1; i < count - 2; i++)
-            {
-                s += $"{players[i + 1].PlayerName}, ";
-            }
-            s += $"and {players[count - 1].PlayerName}";
-            return s;
-        }
-
-        /// <summary>
-        ///     checks to see if the player is in a tie roll with any other players        
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns>The list of players in the tie</returns>
-        private List<PlayerModel> PlayerInTie(PlayerModel player)
-        {
-            List<PlayerModel> list = new List<PlayerModel>();
-
-            //
-            //  look at all the rolls and see if the current player needs to roll again
-            foreach (var p in MainPageModel.PlayingPlayers)
-            {
-                if (p == player) continue; // don't compare yourself to yourself
-                if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) continue; //hasn't rolled yet
-                if (p.GameData.SyncronizedPlayerRolls.CompareTo(player.GameData.SyncronizedPlayerRolls) == 0)
-                {
-                    if (p.GameData.SyncronizedPlayerRolls.RollValues.Count == player.GameData.SyncronizedPlayerRolls.RollValues.Count)
-                    {
-                        list.Add(p);
-                    }
-
-                }
+                Debugger.Break();
             }
 
-            return list;
+            CatanMessage message = new CatanMessage()
+            {
+                Data = logHeader,
+                From = TheHuman.PlayerName,
+                ActionType = msgType,
+                DataTypeName = logHeader.GetType().FullName
+            };
+
+            MainPageModel.UnprocessedMessages++;
+            return ProcessMessage(message);
         }
 
         /// <summary>
@@ -522,6 +449,60 @@ namespace Catan10
             }); // I hate this hack but I couldn't figure out how to do it with DataBinding
         }
 
+        /// <summary>
+        ///     starting back as early as possible -- load MainPageModel from disk and recreate all the players.
+        /// </summary>
+        /// <returns></returns>
+        public async Task InitializeMainPageModel()
+        {
+            var serviceReference = MainPageModel?.CatanService;
+            _gameView.Reset();
+            _gameView.SetCallbacks(this, this);
+            await LoadMainPageModel();
+            UpdateGridLocations();
+            _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            _progress.IsActive = false;
+
+            await _rollControl.Reset();
+            CurrentPlayer = TheHuman;
+            //
+            //  start the connection to the SignalR servi0ce
+            //
+            if (serviceReference == null)
+            {
+                try
+                {
+                    await CreateAndConfigureProxy();
+                }
+                catch (Exception e)
+                {
+                    await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
+                }
+            }
+            else
+            {
+                MainPageModel.CatanService = serviceReference;
+            }
+        }
+
+        /// <summary>
+        ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
+        ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition
+        ///     of new players.
+        /// </summary>
+        /// <param name="logHeader"></param>
+        /// <returns></returns>
+        public Task JoinOrCreateGame(GameInfo gameInfo)
+        {
+            if (MainPageModel.IsGameStarted) return Task.CompletedTask;
+
+            MainPageModel.ServiceGameInfo = gameInfo;
+            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, gameInfo.Creator);
+            _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
+            MainPageModel.IsGameStarted = true;
+            return Task.CompletedTask;
+        }
+
         public PlayerModel NameToPlayer(string playerName)
         {
             Contract.Assert(MainPageModel.AllPlayers.Count > 0);
@@ -533,6 +514,11 @@ namespace Catan10
                 }
             }
             return null;
+        }
+
+        public PlayerModel NameToPlayer(PlayerModel player)
+        {
+            return player;
         }
 
         /// <summary>
@@ -553,7 +539,6 @@ namespace Catan10
                 ActionType = msgType,
                 DataTypeName = logHeader.GetType().FullName,
                 To = "*"
-
             };
 
             MainPageModel.UnprocessedMessages++;
@@ -565,7 +550,6 @@ namespace Catan10
             {
                 await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
             }
-
 
             return (!MainPageModel.Settings.IsLocalGame);
         }
@@ -709,6 +693,12 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
+        public void SetSpyInfo(string sentBy, bool spyOn)
+        {
+            this.SpyVisible = true;
+            this.TurnedSpyOn = sentBy;
+        }
+
         /// <summary>
         ///     Need to clean up any UI actions  -- e.g. if the GameStarter clicks on "Roll to See who goes first", then that will cause
         ///     messages to be Posted to the other clients.  They end up calling this function.  it needs to be exactly the same as if the
@@ -728,62 +718,6 @@ namespace Catan10
                 p.GameData.RollOrientation = TileOrientation.FaceUp;
             });
         }
-        /// <summary>
-        ///     starting back as early as possible -- load MainPageModel from disk and recreate all the players.
-        /// </summary>
-        /// <returns></returns>
-        public async Task InitializeMainPageModel()
-        {
-            var serviceReference = MainPageModel?.CatanService;
-            _gameView.Reset();
-            _gameView.SetCallbacks(this, this);
-            await LoadMainPageModel();
-            UpdateGridLocations();
-            _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            _progress.IsActive = false;
-
-            await _rollControl.Reset();
-            CurrentPlayer = TheHuman;
-            //
-            //  start the connection to the SignalR servi0ce
-            //
-            if (serviceReference == null)
-            {
-                try
-                {
-                    await CreateAndConfigureProxy();
-
-                }
-                catch (Exception e)
-                {
-                    await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
-                }
-            }
-            else
-            {
-                MainPageModel.CatanService = serviceReference;
-            }
-        }
-
-        /// <summary>
-        ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
-        ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition
-        ///     of new players.
-        /// </summary>
-        /// <param name="logHeader"></param>
-        /// <returns></returns>
-        public Task JoinOrCreateGame(GameInfo gameInfo)
-        {
-            if (MainPageModel.IsGameStarted) return Task.CompletedTask;
-
-            MainPageModel.ServiceGameInfo = gameInfo;
-            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, gameInfo.Creator);
-            _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
-            MainPageModel.IsGameStarted = true;
-            return Task.CompletedTask;
-
-        }
-
 
         public void StopHighlightingTiles()
         {
@@ -825,7 +759,6 @@ namespace Catan10
             await MainPage.Current.PostMessage(logHeader, ActionType.Undo);
 
             return true;
-
         }
 
         public async Task UndoChangePlayer(ChangePlayerLog logHeader)
@@ -1015,49 +948,84 @@ namespace Catan10
             CalculateAndSetLongestRoad(raceTracking);
         }
 
-        public void SetSpyInfo(string sentBy, bool spyOn)
+        private static void AddRollPlaceHolder(PlayerModel tiedPlayer)
         {
-            this.SpyVisible = true;
-            this.TurnedSpyOn = sentBy;
+            List<RollModel> rolls = new List<RollModel>();
+            for (int i = 0; i < 4; i++)
+            {
+                rolls.Add(new RollModel()
+                {
+                    DiceOne = -1,
+                    DiceTwo = -1
+                });
+            }
+            rolls[0].Selected = true;
+            tiedPlayer.GameData.SyncronizedPlayerRolls.AddRoll(rolls);
         }
 
-        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)
+        private void DumpAllRolls()
         {
-            if (MainPageModel.GameState != GameState.WaitingForNewGame && MainPageModel.ServiceGameInfo == null)
+            string s = "\n";
+            foreach (var player in PlayingPlayers)
             {
-                Debugger.Break();
+                s += $"{player.PlayerName}: ";
+                player.GameData.SyncronizedPlayerRolls.RollValues.ForEach((p) => s += $"{p},");
+                s += "\n";
+            }
+            this.TraceMessage(s);
+        }
+
+        /// <summary>
+        ///     return
+        ///         name1
+        ///             or
+        ///        name1 and name2
+        ///             or
+        ///        name1, name2, name3, and name4
+        /// </summary>
+        /// <param name="players"></param>
+        /// <returns></returns>
+        private string ListToCsv(List<PlayerModel> players)
+        {
+            int count = players.Count;
+            if (count == 0) return "";
+            if (count == 1) return players[0].PlayerName;
+            if (count == 2) return $"{players[0].PlayerName} and {players[1].PlayerName}";
+
+            string s = $"{players[0].PlayerName}, ";
+            for (int i = 1; i < count - 2; i++)
+            {
+                s += $"{players[i + 1].PlayerName}, ";
+            }
+            s += $"and {players[count - 1].PlayerName}";
+            return s;
+        }
+
+        /// <summary>
+        ///     checks to see if the player is in a tie roll with any other players
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns>The list of players in the tie</returns>
+        private List<PlayerModel> PlayerInTie(PlayerModel player)
+        {
+            List<PlayerModel> list = new List<PlayerModel>();
+
+            //
+            //  look at all the rolls and see if the current player needs to roll again
+            foreach (var p in MainPageModel.PlayingPlayers)
+            {
+                if (p == player) continue; // don't compare yourself to yourself
+                if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) continue; //hasn't rolled yet
+                if (p.GameData.SyncronizedPlayerRolls.CompareTo(player.GameData.SyncronizedPlayerRolls) == 0)
+                {
+                    if (p.GameData.SyncronizedPlayerRolls.RollValues.Count == player.GameData.SyncronizedPlayerRolls.RollValues.Count)
+                    {
+                        list.Add(p);
+                    }
+                }
             }
 
-
-            CatanMessage message = new CatanMessage()
-            {
-                Data = logHeader,
-                From = TheHuman.PlayerName,
-                ActionType = msgType,
-                DataTypeName = logHeader.GetType().FullName
-
-            };
-
-            MainPageModel.UnprocessedMessages++;
-            return ProcessMessage(message);
-
-
-
-        }
-
-        public void CompleteRedo()
-        {
-            this.TraceMessage("complete");
-        }
-
-        public void CompleteUndo()
-        {
-            this.TraceMessage("complete");
-        }
-
-        public PlayerModel NameToPlayer(PlayerModel player)
-        {
-            return player;
+            return list;
         }
     }
 }
