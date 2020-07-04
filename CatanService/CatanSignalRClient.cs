@@ -31,13 +31,14 @@ namespace Catan10
 
         public Guid MessageId { get; set; }
         public List<string> PlayerNames { get; set; }
-
+        public CatanSignalRClient Client { get; set; }
         #endregion Properties
 
         #region Methods
 
         public async Task<bool> WaitForAllAcks(CatanSignalRClient client, int timeoutMs)
         {
+            Client = client;
             client.OnAck += Client_OnAck;
             try
             {
@@ -73,6 +74,12 @@ namespace Catan10
             }
         }
 
+        public void Cancel()
+        {
+            Client.OnAck -= Client_OnAck;
+
+
+        }
         #endregion Methods
     }
 
@@ -308,10 +315,10 @@ namespace Catan10
                     this.TraceMessage("Hub reconnecting!!");
                     Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
 
-                    // Notify users the connection was lost and the client is reconnecting.
-                    // Start queuing or dropping messages.
+                        // Notify users the connection was lost and the client is reconnecting.
+                        // Start queuing or dropping messages.
 
-                    return Task.CompletedTask;
+                        return Task.CompletedTask;
                 };
                 HubConnection.Reconnected += async (connectionId) =>
                 {
@@ -491,7 +498,7 @@ namespace Catan10
             //
             //  the app tracker is not getting Acks called on it
 
-            int timeout = 3 * 1000; // for debuggin...one second timeout
+            int timeout = 5 * 1000; // for debuggin...one second timeout
             while (true)
             {
                 await EnsureConnection();
@@ -499,7 +506,8 @@ namespace Catan10
                 AckTracker ackTracker = new AckTracker()
                 {
                     PlayerNames = targets,
-                    MessageId = message.MessageId
+                    MessageId = message.MessageId,
+                    Client = this,
                 };
 
                 //
@@ -520,7 +528,7 @@ namespace Catan10
                     ContentDialog dlg = new ContentDialog()
                     {
                         Title = "Catan Networking Error",
-                        Content = $"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nHit Cancel to end the game.  For everybody.",
+                        Content = $"Timed out waiting for an Ack from {s}.\nTimeout={timeout}ms\nMessage={message.DataTypeName}\n\nHit Cancel to end the game.  For everybody.",
                         CloseButtonText = "Retry",
                         SecondaryButtonText = "Cancel"
                     };
@@ -544,10 +552,12 @@ namespace Catan10
                     {
                         //
                         //  we have cases where we notifiy the user twice that we are waiting for a Retry .. this will retry w/o telling the user
-                        this.TraceMessage($"exception thrown for rety notification for id ={message.MessageId}");
-                        await Task.Delay(1000);
+                        this.TraceMessage($"exception thrown for rety notification for id ={message.MessageId}\nWaiting 3 seconds");
+                        await Task.Delay(3000);
                     }
                     message.ActionType = ActionType.Retry;
+                    ackTracker.Cancel();
+                    ackTracker = null;
                 }
             }
         }
@@ -603,11 +613,11 @@ namespace Catan10
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                // this will happily throw..
+                    // this will happily throw..
 
-                //
-                //  this has to be on the UI thread to access PlayerName
-                await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
+                    //
+                    //  this has to be on the UI thread to access PlayerName
+                    await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
             });
         }
 
