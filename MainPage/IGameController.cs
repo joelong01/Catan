@@ -308,15 +308,11 @@ namespace Catan10
         ///
         ///     General Algorythm:
         ///
-        ///     1. Store the rolls in PlayerData.GameData (they are rolls for the game)
-        ///     2. When called, see if we've hit the terminating conditions
-        ///         a) everybody has rolled
-        ///         b) there are no ties
-        ///     3. if we need more rolls
-        ///         a) check to see if TheHuman (e.g. player on this machine) needs to roll
-        ///         b) if so, wait for a roll
-        ///         c) update GameData
-        ///         d) log results
+        ///     we start with the CurrentRoll < 0
+        ///     if anybody has a CurrentRoll < 0, wait for all the rolls to come in
+        ///     When all rolls have come in, look for ties.
+        ///     if anybody has a tie, make a CurrentRoll < 0 and add it to their Rolls
+        ///     repeat until there are no ties and there are no CurrentRolls < 0
         ///
         /// </summary>
         /// <param name="logEntry"></param>
@@ -338,7 +334,8 @@ namespace Catan10
             //  if we hit a tie, then the current roll == -1
 
 
-            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(logEntry.Rolls);
+            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddOrReplaceRolls(logEntry.Rolls);
+
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
@@ -351,10 +348,8 @@ namespace Catan10
             //
             foreach (var p in MainPageModel.PlayingPlayers)
             {
-                if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) return false;
+                if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.Roll < 0) return false;
             }
-
-            
 
             //
             //  look at all the rolls and see if the current player needs to roll again
@@ -372,30 +367,17 @@ namespace Catan10
                 await dlg.ShowAsync();
                 //
                 //  add a -1 roll showing that they need to roll
-
-                List<RollModel> rolls = new List<RollModel>();
-                for (int i=0; i<4; i++)
+                foreach (var tiedPlayer in tiedPlayers)
                 {
-                    rolls.Add(new RollModel()
-                    {
-                        DiceOne = -1,
-                        DiceTwo = -1
-                    });
+                    AddRollPlaceHolder(tiedPlayer);
                 }
-                rolls[0].Selected = true;
-                sentBy.GameData.SyncronizedPlayerRolls.AddRolls(rolls);
-
                 return false;
             }
 
+            
             //
-            //  I have rolled.  I'm not in a tie.  no more rolls for me!
-            //
-            TheHuman.GameData.SyncronizedPlayerRolls.Finished = true;
-
-
-            //
-            //  if I get here, TheHuman is *not* tied - others might be
+            //  if I get here, TheHuman is *not* tied - others might be.
+            //  they will be notified by the check above, but we need to bail out of the function
             foreach (var p in PlayingPlayers)
             {
                 tiedPlayers = PlayerInTie(p); // yes this is n!.  for 5 max...
@@ -408,7 +390,10 @@ namespace Catan10
             }
 
             //
-            // set the order locally
+            //  we got here because nobody is tied and all rolls have come in
+
+            //
+            // set the order locally on each machine
 
             var newList = new List<PlayerModel>(MainPageModel.PlayingPlayers);
             newList.Sort((x, y) => x.GameData.SyncronizedPlayerRolls.CompareTo(y.GameData.SyncronizedPlayerRolls));
@@ -422,6 +407,21 @@ namespace Catan10
             CurrentPlayer = MainPageModel.PlayingPlayers[0];
             return true;
 
+        }
+
+        private static void AddRollPlaceHolder(PlayerModel tiedPlayer)
+        {
+            List<RollModel> rolls = new List<RollModel>();
+            for (int i = 0; i < 4; i++)
+            {
+                rolls.Add(new RollModel()
+                {
+                    DiceOne = -1,
+                    DiceTwo = -1
+                });
+            }
+            rolls[0].Selected = true;
+            tiedPlayer.GameData.SyncronizedPlayerRolls.AddOrReplaceRolls(rolls);
         }
 
         /// <summary>

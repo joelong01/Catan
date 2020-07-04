@@ -27,7 +27,6 @@ namespace Catan10
 
         private RollModel _rollModel = new RollModel();
 
-        public bool Finished { get; set; } = false;
 
         #endregion Delegates + Fields + Events + Enums
 
@@ -76,7 +75,7 @@ namespace Catan10
 
         #region Methods
 
-        public RollModel AddRolls(List<RollModel> rolls)
+        public RollModel AddOrReplaceRolls(List<RollModel> rolls)
         {
             //
             //  5/26/2020:  Don't clear and add range -- XAML will barf because i'm accessing the indexers in PublicDataCtrl.xaml
