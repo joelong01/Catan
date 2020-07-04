@@ -296,8 +296,9 @@ namespace Catan10
             foreach (var player in PlayingPlayers)
             {
                 s += $"{player.PlayerName}: ";
-                player.GameData.SyncronizedPlayerRolls.RollValues.ForEach((p) => s += $"{p}, \n");
-                                
+                player.GameData.SyncronizedPlayerRolls.RollValues.ForEach((p) => s += $"{p},");
+                s += "\n";
+
             }
             this.TraceMessage(s);
         }
@@ -347,6 +348,31 @@ namespace Catan10
                 if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) return false;
             }
 
+            //
+            //  are we waiting for a tie to resolve? - we know because if you aren't finished, you need to have the same number of rolls
+
+            var notFinishedList = new List<PlayerModel>();
+
+            foreach (var player in PlayingPlayers)
+            {
+                if (player.GameData.SyncronizedPlayerRolls.Finished) continue;
+                notFinishedList.Add(player);
+            }
+
+            if (notFinishedList.Count > 0)
+            {
+                int maxRolls = 0;
+                notFinishedList.ForEach((p) =>
+                  {
+                      if (p.GameData.SyncronizedPlayerRolls.RollValues.Count > maxRolls)
+                          maxRolls = p.GameData.SyncronizedPlayerRolls.RollValues.Count;
+                  });
+
+                //
+                //  I expect everybody who isn't finished to either wait or to roll
+                //  here I could say "if you aren't at maxRolls, then i'm waiting o a roll from you...
+                return false; 
+            }
 
             //
             //  look at all the rolls and see if the current player needs to roll again
