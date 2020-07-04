@@ -30,14 +30,14 @@ namespace Catan10
         {
             string s = "";
             PlayerNames.ForEach((p) => s +=p  + ",") ;
-            this.TraceMessage($"Waiting for Acks from {s}");
+        //    this.TraceMessage($"Waiting for Acks from {s}");
             
             Client.OnAck += Client_OnAck;
             try
             {
-                using (new FunctionTimer("Task.TimeoutAfter", true))
+                using (new FunctionTimer("WaitForAllAcks", true))
                 {
-                    this.TraceMessage($"Waiting for acks on message: {MessageId}");
+                  //  this.TraceMessage($"Waiting for acks on message: {MessageId}");
                     await TCS.Task.TimeoutAfter(timeoutMs);
                 }
                 return true;
@@ -58,13 +58,13 @@ namespace Catan10
 
         private void Client_OnAck(string fromPlayer, Guid messageId)
         {
-            this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId} IsMyMessage={messageId == this.MessageId}");
+          //  this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId} IsMyMessage={messageId == this.MessageId}");
             if (messageId == this.MessageId)
             {                
                 PlayerNames.Remove(fromPlayer);
                 if (PlayerNames.Count == 0)
                 {
-                    this.TraceMessage($"Received all acks for message {messageId}");
+             //       this.TraceMessage($"Received all acks for message {messageId}");
                     TCS.TrySetResult(null);
                 }
             }

@@ -18,7 +18,7 @@ namespace Catan10
 
         #region Properties + Fields 
 
-        
+
 
         #endregion Properties + Fields 
 
@@ -235,7 +235,7 @@ namespace Catan10
                 //  as a message because we assume the clocks are shared
                 //
                 CurrentPlayer = MainPageModel.GameStartedBy;
-                
+
 
             }
             else
@@ -282,7 +282,7 @@ namespace Catan10
             }
         }
 
-       
+
 
 
         public RandomBoardSettings CurrentRandomBoard()
@@ -323,6 +323,15 @@ namespace Catan10
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
+
+            //
+            //  7/4/2020: has everybody rolled?
+            //
+            foreach (var p in MainPageModel.PlayingPlayers)
+            {
+                if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) return false;
+            }
+
 
             //
             //  look at all the rolls and see if the current player needs to roll again
@@ -523,7 +532,7 @@ namespace Catan10
         {
             LogHeader logHeader = Log.PeekUndo;
             if (logHeader == null) return false;
-            
+
             await MainPage.Current.PostMessage(logHeader, ActionType.Redo);
 
             return true;
@@ -683,9 +692,9 @@ namespace Catan10
                 try
                 {
                     await CreateAndConfigureProxy();
-                   
+
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
                 }
@@ -752,11 +761,11 @@ namespace Catan10
         {
             LogHeader logHeader = Log.PeekAction;
             if (logHeader == null || logHeader.CanUndo == false) return false;
-            
+
             await MainPage.Current.PostMessage(logHeader, ActionType.Undo);
 
             return true;
-            
+
         }
 
         public async Task UndoChangePlayer(ChangePlayerLog logHeader)
@@ -952,13 +961,13 @@ namespace Catan10
             this.TurnedSpyOn = sentBy;
         }
 
-        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)        
+        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)
         {
             if (MainPageModel.GameState != GameState.WaitingForNewGame && MainPageModel.ServiceGameInfo == null)
             {
                 Debugger.Break();
             }
-            
+
 
             CatanMessage message = new CatanMessage()
             {

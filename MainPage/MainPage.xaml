@@ -44,7 +44,7 @@
             <Setter Property="CharacterSpacing" Value="0" />
         </Style>
         <Style x:Key="NumberButtonKey" TargetType="Button">
-            <Setter Property="Background" Value="Black" />
+            <Setter Property="Background" Value="{StaticResource bmMaple}" />
             <!--<Setter Property="IsEnabled" Value="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}" />-->
             <Setter Property="IsEnabled" Value="True" />
         </Style>
