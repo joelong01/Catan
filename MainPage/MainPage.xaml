@@ -45,7 +45,8 @@
         </Style>
         <Style x:Key="NumberButtonKey" TargetType="Button">
             <Setter Property="Background" Value="Black" />
-            <Setter Property="IsEnabled" Value="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}" />
+            <!--<Setter Property="IsEnabled" Value="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}" />-->
+            <Setter Property="IsEnabled" Value="True" />
         </Style>
     </Page.Resources>
     <Viewbox Stretch="Uniform">
@@ -81,7 +82,7 @@
                             <MenuFlyoutItem Text="New Local Game" Click="OnNewLocalGame" />
                             <MenuFlyoutItem Text="Join Network Game" Click="OnJoinNetworkGame" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />                            
+                            <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
                             <MenuFlyoutItem Text="Delete All Games" Click="OnDeleteAllGames" />
                             <MenuFlyoutSeparator />
                             <ToggleMenuFlyoutItem Text="Local Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
@@ -97,7 +98,7 @@
                             <MenuFlyoutSeparator />
                             <MenuFlyoutSubItem Text="Game Type">
                                 <ToggleMenuFlyoutItem Text="Local Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
-                                <ToggleMenuFlyoutItem Text="Service Game" IsChecked="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=TwoWay}" />                                
+                                <ToggleMenuFlyoutItem Text="Service Game" IsChecked="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=TwoWay}" />
                             </MenuFlyoutSubItem>
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="Save Settings" Click="OnSaveSettings" />
@@ -454,8 +455,7 @@
                 Caption="Resource Trades"
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
-                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" TheHuman="{x:Bind TheHuman, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" 
-                                     PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
+                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" TheHuman="{x:Bind TheHuman, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
             <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"

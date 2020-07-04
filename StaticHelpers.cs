@@ -25,16 +25,6 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace Catan10
 {
-    public static class TaskExtensions
-    {
-        public static async Task TimeoutAfter(this Task task, int millisecondsTimeout)
-        {
-            if (task == await Task.WhenAny(task, Task.Delay(millisecondsTimeout)))
-                await task;
-            else
-                throw new TimeoutException();
-        }       
-    }
     public static class BindingExtensions
 
     {
@@ -576,46 +566,22 @@ namespace Catan10
 
         #endregion Classes
 
-        public class FunctionTimer : IDisposable
+
+    }
+
+    public static class TaskExtensions
+    {
+        #region Methods
+
+        public static async Task TimeoutAfter(this Task task, int millisecondsTimeout)
         {
-            #region Delegates + Fields + Events + Enums
-
-            private string message;
-            private Stopwatch watch = null;
-
-            #endregion Delegates + Fields + Events + Enums
-
-            #region Properties
-
-            public bool Enabled { get; set; } = false;
-
-            #endregion Properties
-
-            #region Constructors + Destructors
-
-            // a global flag to turn off all timing
-            public FunctionTimer(string msg)
-            {
-                if (!Enabled) return;
-                watch = new Stopwatch();
-                message = msg;
-                watch.Start();
-            }
-
-            #endregion Constructors + Destructors
-
-            #region Methods
-
-            public void Dispose()
-            {
-                if (!Enabled) return;
-                watch.Stop();
-                double elapsedMs = watch.ElapsedMilliseconds;
-                this.TraceMessage($"{message}: {elapsedMs}ms");
-            }
-
-            #endregion Methods
+            if (task == await Task.WhenAny(task, Task.Delay(millisecondsTimeout)))
+                await task;
+            else
+                throw new TimeoutException();
         }
+
+        #endregion Methods       
     }
 
     public class EnumDescription : Attribute
@@ -634,5 +600,46 @@ namespace Catan10
         }
 
         #endregion Constructors + Destructors
+    }
+
+    public class FunctionTimer : IDisposable
+    {
+        #region Delegates + Fields + Events + Enums
+
+        private string message;
+        private Stopwatch watch = null;
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
+
+        public bool Enabled { get; set; } = false;
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+        // a global flag to turn off all timing
+        public FunctionTimer(string msg, bool enableOverride = false)
+        {
+            if (!Enabled && !enableOverride) return;
+            watch = new Stopwatch();
+            message = msg;
+            watch.Start();
+        }
+
+        #endregion Constructors + Destructors
+
+        #region Methods
+
+        public void Dispose()
+        {
+            if (!Enabled) return;
+            watch.Stop();
+            double elapsedMs = watch.ElapsedMilliseconds;
+            this.TraceMessage($"{message}: {elapsedMs}ms");
+        }
+
+        #endregion Methods
     }
 }

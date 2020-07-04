@@ -74,11 +74,12 @@ namespace Catan10
                 {
                     if (message.To == "*" || message.To == MainPage.Current.TheHuman.PlayerName)
                     {
-                        int msDelay = 0;
-                        await Task.Delay(msDelay); // force a timout
-                        await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
-                        message = ParseMessage(message);
-                        OnBroadcastMessageReceived.Invoke(message);
+                        using (new FunctionTimer($"Ack + Process.  Id={message.MessageId} Type={message.DataTypeName}", true))
+                        {
+                            await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
+                            message = ParseMessage(message);
+                            OnBroadcastMessageReceived.Invoke(message);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -434,9 +435,9 @@ namespace Catan10
             message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
 
             //
-            //  the app tracker is not getting Acks called on it
-
-            int timeout = 5 * 1000; // for debuggin...one second timeout
+            //  Ack timeout
+            // 
+            int timeout = 5 * 1000; 
             while (true)
             {
                 await EnsureConnection();
@@ -495,7 +496,9 @@ namespace Catan10
                     message.ActionType = ActionType.Retry;
                     targets.Clear();
                     targets.AddRange(ackTracker.PlayerNames);
-                    
+                    targets.ForEach((p) => s += p + ", ");
+                    s = s.Substring(0, s.Length - 1);
+                    this.TraceMessage($"need acks from {targets}");
                     ackTracker.Cancel();
                     ackTracker = null;
                     if (targets.Count == 0)

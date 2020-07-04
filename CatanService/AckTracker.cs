@@ -35,8 +35,11 @@ namespace Catan10
             Client.OnAck += Client_OnAck;
             try
             {
-                this.TraceMessage($"Waiting for acks on message: {MessageId}");
-                await TCS.Task.TimeoutAfter(timeoutMs);
+                using (new FunctionTimer("Task.TimeoutAfter", true))
+                {
+                    this.TraceMessage($"Waiting for acks on message: {MessageId}");
+                    await TCS.Task.TimeoutAfter(timeoutMs);
+                }
                 return true;
             }
             catch (TimeoutException)
@@ -55,9 +58,9 @@ namespace Catan10
 
         private void Client_OnAck(string fromPlayer, Guid messageId)
         {
+            this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId} IsMyMessage={messageId == this.MessageId}");
             if (messageId == this.MessageId)
-            {
-                this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId}");
+            {                
                 PlayerNames.Remove(fromPlayer);
                 if (PlayerNames.Count == 0)
                 {
