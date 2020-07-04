@@ -290,6 +290,18 @@ namespace Catan10
             return _gameView.RandomBoardSettings;
         }
 
+        private void DumpAllRolls()
+        {
+            string s = "\n";
+            foreach (var player in PlayingPlayers)
+            {
+                s += $"{player.PlayerName}: ";
+                player.GameData.SyncronizedPlayerRolls.RollValues.ForEach((p) => s += $"{p}, \n");
+                                
+            }
+            this.TraceMessage(s);
+        }
+
         /// <summary>
         ///     this is where we do the work to synchronize a roll across devices.
         ///
@@ -323,6 +335,9 @@ namespace Catan10
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
+
+
+            DumpAllRolls();
 
             //
             //  7/4/2020: has everybody rolled? -- don't make any decisions until the rolls are in
