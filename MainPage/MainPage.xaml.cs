@@ -1129,6 +1129,18 @@ namespace Catan10
 
         }
 
+        private string BuildCaption(string begin, string end)
+        {
+            if (String.IsNullOrEmpty(end)) return begin;
+
+            return $"{begin} -  {end}";
+        }
+
+        private string BuildTurnCaption(string name)
+        {
+            return $"{name}'s Turn";
+        }
+
         private async void OnNewLocalGame(object sender, RoutedEventArgs e)
         {
             MainPageModel.Settings.IsLocalGame = true;

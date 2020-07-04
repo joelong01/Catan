@@ -171,7 +171,7 @@
                 OnGridPositionChanged="OnGridPositionChanged"
                 Player="{x:Bind TheHuman, Mode=OneWay}"
                 Background="{StaticResource DevCardType.Knight}"
-                Caption="Private Data" BorderThickness="2"
+                Caption="{x:Bind BuildCaption('Private Data', TheHuman.PlayerName), Mode=OneWay}" BorderThickness="2"
                 BorderBrush="{StaticResource bmMaple}"
                 CornerRadius="10">
                 <local:DragableGridCtrl.Child>
@@ -191,7 +191,8 @@
                 Background="{StaticResource bmMaple}"
                 Foreground="Black" Visibility="Visible" CornerRadius="10"
                 Player="{x:Bind CurrentPlayer, Mode=OneWay}"
-                Caption="{x:Bind CurrentPlayer.PlayerName, Mode=OneWay}"
+                Caption="{x:Bind BuildTurnCaption(TheHuman.PlayerName), Mode=OneWay}"
+                
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
                     <StackPanel Width="350" Height="425" Margin="5" HorizontalAlignment="Center"

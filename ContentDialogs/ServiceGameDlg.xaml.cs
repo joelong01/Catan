@@ -290,6 +290,7 @@ namespace Catan10
             this.TraceMessage($"{playerName} created {gameInfo.Name}");
 
             Games.Add(gameInfo);
+            SelectedGame = gameInfo;
 
         }
 

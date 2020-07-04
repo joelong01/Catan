@@ -325,13 +325,16 @@ namespace Catan10
             Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
 
             //
-            //  7/4/2020: has everybody rolled?
+            //  7/4/2020: has everybody rolled? -- don't make any decisions until the rolls are in
             //
             foreach (var p in MainPageModel.PlayingPlayers)
             {
                 if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) return false;
             }
 
+            bool somebodyTied = false;
+
+            
 
             //
             //  look at all the rolls and see if the current player needs to roll again
@@ -348,11 +351,14 @@ namespace Catan10
                         string s = "Tie Roll. Roll again!";
                         await MainPage.Current.ShowErrorMessage(s, "Catan", "");
                         await _rollControl.Reset();
+                        somebodyTied = true;
                     }
 
                     return false;
                 }
             }
+
+            if (somebodyTied) return false;
 
             //
             //  go through PlayingPlayers and ask if any are tied and if any need to roll
@@ -378,17 +384,9 @@ namespace Catan10
                 i++;
             }
 
-            bool allPlayersRolled = true;
-            foreach (var p in MainPageModel.PlayingPlayers)
-            {
-                if (p.GameData.SyncronizedPlayerRolls.RollValues.Count == 0)
-                {
-                    allPlayersRolled = false;
-                    break;
-                }
-            }
+            
 
-            if (allPlayersRolled && !tie)
+            if (!tie)
             {
                 var newList = new List<PlayerModel>(MainPageModel.PlayingPlayers);
                 newList.Sort((x, y) => x.GameData.SyncronizedPlayerRolls.CompareTo(y.GameData.SyncronizedPlayerRolls));
