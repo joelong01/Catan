@@ -94,7 +94,7 @@ namespace Catan10
             }
             NotifyPropertyChanged("LatestRolls");
 
-            if (RollValues.Count >= 0)
+            if (RollValues.Count != 0)
             {
                 var last = RollValues.Last();
                 Debug.Assert(last == -2); // -1 for each dice

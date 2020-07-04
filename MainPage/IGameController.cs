@@ -337,9 +337,7 @@ namespace Catan10
             RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddOrReplaceRolls(logEntry.Rolls);
 
             Contract.Assert(pickedRoll != null);
-            Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
-            Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
-
+         
 
             DumpAllRolls();
 
