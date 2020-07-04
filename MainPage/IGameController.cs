@@ -494,8 +494,6 @@ namespace Catan10
         /// <returns></returns>
         public Task JoinOrCreateGame(GameInfo gameInfo)
         {
-            if (MainPageModel.IsGameStarted) return Task.CompletedTask;
-
             MainPageModel.ServiceGameInfo = gameInfo;
             MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, gameInfo.Creator);
             _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
