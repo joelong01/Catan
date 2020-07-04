@@ -191,7 +191,7 @@
                 Background="{StaticResource bmMaple}"
                 Foreground="Black" Visibility="Visible" CornerRadius="10"
                 Player="{x:Bind CurrentPlayer, Mode=OneWay}"
-                Caption="{x:Bind BuildTurnCaption(TheHuman.PlayerName), Mode=OneWay}"
+                Caption="{x:Bind BuildTurnCaption(CurrentPlayer.PlayerName), Mode=OneWay}"
                 
                 BorderBrush="{StaticResource WhiteBrush}">
                 <local:DragableGridCtrl.Child>
