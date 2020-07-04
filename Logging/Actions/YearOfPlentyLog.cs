@@ -14,7 +14,7 @@ namespace Catan10
             {
                 Action = CatanAction.PlayedDevCard,
                 TradeResources = tr,
-                SentBy = gameController.CurrentPlayer.PlayerName
+                SentBy = gameController.CurrentPlayer
             };
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }

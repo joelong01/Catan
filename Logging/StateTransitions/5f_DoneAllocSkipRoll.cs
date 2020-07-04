@@ -8,7 +8,7 @@ namespace Catan10
     /// <summary>
     ///     Need to get the random gold tiles for this turn
     /// </summary>
-    public class DoneAllocResourcesToWaitingForRoll : LogHeader, ILogController, IMessageDeserializer
+    public class DoneAllocResourcesToWaitingForRoll : LogHeader, ILogController
     {
         internal static async Task PostLog(IGameController gameController)
         {
@@ -27,13 +27,7 @@ namespace Catan10
 
         public RollState RollState { get; set; } = null;
 
-        // this is what the JSON gets Deserialized to
-
-        public LogHeader Deserialize(string json)
-        {
-            DoneAllocResourcesToWaitingForRoll logHeader = CatanProxy.Deserialize<DoneAllocResourcesToWaitingForRoll>(json);
-            return logHeader;
-        }
+       
 
         public async Task Do(IGameController gameController)
         {

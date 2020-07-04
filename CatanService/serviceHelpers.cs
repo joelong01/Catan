@@ -6,7 +6,7 @@ namespace Catan10
     {
         static public LogHeader DeserializeLogHeader(string json)
         {
-            LogHeader logHeader = CatanProxy.Deserialize<LogHeader>(json);
+            LogHeader logHeader = CatanSignalRClient.Deserialize<LogHeader>(json);
             if (logHeader == null) return null;
             switch (logHeader.Action)
             {
@@ -53,7 +53,7 @@ namespace Catan10
                     break;
 
                 case CatanAction.AddPlayer:
-                    return CatanProxy.Deserialize<AddPlayerLog>(json);
+                    return CatanSignalRClient.Deserialize<AddPlayerLog>(json);
 
                 case CatanAction.SelectGame:
                     break;

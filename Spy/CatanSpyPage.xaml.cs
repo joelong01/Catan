@@ -47,7 +47,7 @@ namespace Catan10.Spy
         private void SetSelectedMessage(CatanMessage message)
         {
             LogHeader logHeader = message.Data as LogHeader;
-            string json = CatanProxy.Serialize<LogHeader>(logHeader, true);
+            string json = CatanSignalRClient.Serialize<LogHeader>(logHeader, true);
         }
 
         public CatanSpyPage()
@@ -60,7 +60,7 @@ namespace Catan10.Spy
             if (e == null) return;
             if (e.AddedItems.Count == 0) return;
             LogHeader logHeader = ((CatanMessage)e.AddedItems[0]).Data as LogHeader;
-            LogHeaderJson = CatanProxy.Serialize<object>(logHeader, true);
+            LogHeaderJson = CatanSignalRClient.Serialize<object>(logHeader, true);
              // ParseTest(LogHeaderJson);
         }
         private void ParseTest(string json)

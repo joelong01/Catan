@@ -38,7 +38,7 @@ namespace Catan10
 
             foreach (var message in stack)
             {
-                string json = CatanProxy.Serialize(message);
+                string json = CatanSignalRClient.Serialize(message);
                 sb.Append(json);
                 sb.Append(",");
                 sb.Append(Environment.NewLine);
@@ -198,14 +198,14 @@ namespace Catan10
 
         private string GetJson()
         {
-            // return CatanProxy.Serialize(MessageLog);
+            // return CatanSignalRClient.Serialize(MessageLog);
             StringBuilder sb = new StringBuilder();
             sb.Append("[");
             sb.Append(Environment.NewLine);
 
             foreach (var message in MessageLog)
             {
-                string json = CatanProxy.Serialize(message);
+                string json = CatanSignalRClient.Serialize(message);
                 sb.Append(json);
                 sb.Append(",");
                 sb.Append(Environment.NewLine);

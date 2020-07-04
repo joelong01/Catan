@@ -326,7 +326,7 @@ namespace Catan10
                 valid = IsValidNumberLayout();
             }
 
-            //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanProxy.Serialize(randomNumberSequence)}");
+            //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanSignalRClient.Serialize(randomNumberSequence)}");
             return randomNumberSequence;
         }
 
@@ -820,7 +820,7 @@ namespace Catan10
             }
 
             rbs.RandomHarborTypeList = GetRandomList(_currentHexPanel.Harbors.Count - 1);
-            //this.TraceMessage($"Tiles: {CatanProxy.Serialize(rbs.TileGroupToRandomListsDictionary["0"].TileList)} Numbers: {CatanProxy.Serialize(rbs.TileGroupToRandomListsDictionary["0"].NumberList)}");
+            //this.TraceMessage($"Tiles: {CatanSignalRClient.Serialize(rbs.TileGroupToRandomListsDictionary["0"].TileList)} Numbers: {CatanSignalRClient.Serialize(rbs.TileGroupToRandomListsDictionary["0"].NumberList)}");
             return rbs;
         }
 

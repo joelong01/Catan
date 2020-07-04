@@ -341,7 +341,7 @@ namespace Catan10
 
         public static PlayerModel Deserialize(string json)
         {
-            return CatanProxy.Deserialize<PlayerModel>(json);
+            return CatanSignalRClient.Deserialize<PlayerModel>(json);
         }
 
         public async Task<StorageFile> CopyImage(StorageFile file)
@@ -412,7 +412,7 @@ namespace Catan10
 
         public string Serialize(bool indented)
         {
-            return CatanProxy.Serialize<PlayerModel>(this, indented);
+            return CatanSignalRClient.Serialize<PlayerModel>(this, indented);
         }
 
         public override string ToString()

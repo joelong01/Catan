@@ -316,7 +316,7 @@ namespace Catan10
 
             Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
 
-            PlayerModel sentBy = PlayerNameToPlayer(logEntry.SentBy, MainPageModel.AllPlayers);
+            PlayerModel sentBy = logEntry.SentBy;
 
             Contract.Assert(sentBy != null);
             RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(logEntry.Rolls);
@@ -991,6 +991,11 @@ namespace Catan10
         public void CompleteUndo()
         {
             this.TraceMessage("complete");
+        }
+
+        public PlayerModel NameToPlayer(PlayerModel player)
+        {
+            return player;
         }
     }
 }

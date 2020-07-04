@@ -20,7 +20,7 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            gameController.SetSpyInfo(this.SentBy, this.SpyOn);
+            gameController.SetSpyInfo(this.SentBy.PlayerName, this.SpyOn);
             return Task.CompletedTask;
         }
 

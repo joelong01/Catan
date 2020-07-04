@@ -623,7 +623,7 @@ namespace Catan10
 
         public string Serialize(bool indented)
         {
-            return CatanProxy.Serialize(this, indented);
+            return CatanSignalRClient.Serialize(this, indented);
         }
 
         /// <summary>

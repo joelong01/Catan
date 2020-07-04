@@ -54,7 +54,7 @@ namespace Catan10
             {
                 Action = CatanAction.AddPlayer,
                 PlayerToAdd = playerToAdd,
-                SentBy = gameController.TheHuman.PlayerName,
+                SentBy = gameController.TheHuman,
                 NewState = GameState.WaitingForPlayers,
                 OldState = gameController.CurrentGameState,
                 CanUndo = false

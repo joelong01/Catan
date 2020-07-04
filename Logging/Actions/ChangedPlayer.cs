@@ -59,7 +59,7 @@ namespace Catan10
             ChangePlayerLog logHeader = new ChangePlayerLog
             {
                 Action = CatanAction.ChangedPlayer,
-                SentBy = gameController.CurrentPlayer.PlayerName,
+                SentBy = gameController.CurrentPlayer,
                 PreviousPlayer = gameController.CurrentPlayer.PlayerName,
                 OldState = gameController.CurrentGameState,
                 NewState = gameController.CurrentGameState,

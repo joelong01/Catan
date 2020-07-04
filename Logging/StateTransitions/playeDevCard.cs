@@ -52,18 +52,18 @@ namespace Catan10
             switch (devCard)
             {
                 case DevCardType.Knight:
-                    KnightPlayedLog pk = CatanProxy.Deserialize<KnightPlayedLog>(json);
+                    KnightPlayedLog pk = CatanSignalRClient.Deserialize<KnightPlayedLog>(json);
                     return pk as PlayedDevCardModel;
 
                 case DevCardType.YearOfPlenty:
-                    PlayedPlayedYearOfPlentyLog yop = CatanProxy.Deserialize<PlayedPlayedYearOfPlentyLog>(json);
+                    PlayedPlayedYearOfPlentyLog yop = CatanSignalRClient.Deserialize<PlayedPlayedYearOfPlentyLog>(json);
                     return yop as PlayedDevCardModel;
 
                 case DevCardType.RoadBuilding:
-                    return CatanProxy.Deserialize<PlayedDevCardModel>(json);
+                    return CatanSignalRClient.Deserialize<PlayedDevCardModel>(json);
 
                 case DevCardType.Monopoly:
-                    PlayedMonopoly mono = CatanProxy.Deserialize<PlayedMonopoly>(json);
+                    PlayedMonopoly mono = CatanSignalRClient.Deserialize<PlayedMonopoly>(json);
                     return mono as PlayedMonopoly;
 
                 case DevCardType.Back:

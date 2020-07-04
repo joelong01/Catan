@@ -48,7 +48,7 @@ namespace Catan10
 
         public static RoadRaceTracking Deserialize(string json)
         {
-            return CatanProxy.Deserialize<RoadRaceTracking>(json);
+            return CatanSignalRClient.Deserialize<RoadRaceTracking>(json);
         }
 
         public void AddPlayer(PlayerModel player, int roadCount)
@@ -111,7 +111,7 @@ namespace Catan10
         //
         public string Serialize(bool indent = false)
         {
-            return CatanProxy.Serialize(this, indent);
+            return CatanSignalRClient.Serialize(this, indent);
         }
 
         public override string ToString()

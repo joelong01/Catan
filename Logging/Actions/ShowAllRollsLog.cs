@@ -24,7 +24,7 @@ namespace Catan10
                 LogType = LogType.DoNotLog,
                 Action = CatanAction.ShowAllRolls,
                 Rolls = rolls,
-                SentBy = gameController.TheHuman.PlayerName
+                SentBy = gameController.TheHuman
             };
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }

@@ -24,7 +24,7 @@ namespace Catan10
                 CanUndo = false,
                 Action = CatanAction.Rolled,
                 Rolls = rolls,
-                SentBy = gameController.TheHuman.PlayerName
+                SentBy = gameController.TheHuman
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

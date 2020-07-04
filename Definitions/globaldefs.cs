@@ -23,9 +23,9 @@ namespace Catan10
         {
             get
             {
-                Contract.Assert(String.IsNullOrEmpty(SentBy) == false);
+                Contract.Assert(SentBy != null);
                 Contract.Assert(MainPage.Current.TheHuman != null);
-                return (MainPage.Current.TheHuman.PlayerName == SentBy);
+                return (MainPage.Current.TheHuman == SentBy);
             }
         }
 
@@ -40,7 +40,7 @@ namespace Catan10
         [JsonIgnore]
         public LogHeader Previous { get; set; } = MainPage.Current.MainPageModel.Log.PeekAction;
 
-        public string SentBy { get; set; } = MainPage.Current.TheHuman?.PlayerName;
+        public PlayerModel SentBy { get; set; } = MainPage.Current.TheHuman;
 
         public DateTime CreatedTime { get; set; } = DateTime.Now;
         
@@ -83,7 +83,7 @@ namespace Catan10
 
         public string Serialize()
         {
-            return CatanProxy.Serialize<object>(this);
+            return CatanSignalRClient.Serialize<object>(this);
         }
 
         public override string ToString()
@@ -132,12 +132,12 @@ namespace Catan10
 
         public static RandomBoardSettings Deserialize(string saved)
         {
-            return CatanProxy.Deserialize<RandomBoardSettings>(saved);
+            return CatanSignalRClient.Deserialize<RandomBoardSettings>(saved);
         }
 
         public string Serialize()
         {
-            return CatanProxy.Serialize<RandomBoardSettings>(this);
+            return CatanSignalRClient.Serialize<RandomBoardSettings>(this);
         }
 
         public override string ToString()
@@ -183,12 +183,12 @@ namespace Catan10
 
         public static RandomLists Deserialize(string saved)
         {
-            return CatanProxy.Deserialize<RandomLists>(saved);
+            return CatanSignalRClient.Deserialize<RandomLists>(saved);
         }
 
         public string Serialize()
         {
-            return CatanProxy.Serialize<RandomLists>(this);
+            return CatanSignalRClient.Serialize<RandomLists>(this);
         }
 
         #endregion Methods

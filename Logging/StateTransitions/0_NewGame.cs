@@ -34,7 +34,7 @@ namespace Catan10
             NewGameLog logHeader = new NewGameLog
             {
                 GameInfo = gameInfo,
-                SentBy = gameController.TheHuman.PlayerName,
+                SentBy = gameController.TheHuman,
                 NewState = GameState.WaitingForPlayers,
                 OldState = (gameController.Log.PeekAction == null) ? GameState.Uninitialized : gameController.Log.PeekAction.NewState,
                 Action = action,                

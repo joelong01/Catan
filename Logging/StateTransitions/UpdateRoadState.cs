@@ -41,7 +41,7 @@ namespace Catan10
                 OldRoadState = road.RoadState,
                 NewRoadState = newRoadState,
                 OldRaceTracking = raceTracker,
-                SentBy = gameController.CurrentPlayer.PlayerName
+                SentBy = gameController.CurrentPlayer
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

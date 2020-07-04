@@ -863,12 +863,12 @@ namespace Catan10
 
         public static TileData Deserialize(string json)
         {
-            return CatanProxy.Deserialize<TileData>(json);
+            return CatanSignalRClient.Deserialize<TileData>(json);
         }
 
         public string Serialize(bool oneLine)
         {
-            return CatanProxy.Serialize(this, !oneLine);
+            return CatanSignalRClient.Serialize(this, !oneLine);
         }
     }
 }

@@ -241,6 +241,7 @@ namespace Catan10
         /// <param name="playerName"></param>
         /// <returns></returns>
         PlayerModel NameToPlayer(string playerName);
+        PlayerModel NameToPlayer(PlayerModel player);
         Task PickSettlementsAndRoads();
         Task<bool> PostMessage(LogHeader logHeader, ActionType actionType);
 

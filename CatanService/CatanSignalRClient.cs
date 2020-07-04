@@ -140,7 +140,15 @@ namespace Catan10
         }
 
         #endregion Constructors + Destructors
-
+        static public T Deserialize<T>(string json)
+        {         
+            return JsonSerializer.Deserialize<T>(json, GetJsonOptions());
+        }
+        static public string Serialize<T>(T obj, bool indented = false)
+        {
+            if (obj == null) return null;
+            return JsonSerializer.Serialize<T>(obj, GetJsonOptions(indented));
+        }
         public static JsonSerializerOptions GetJsonOptions(bool indented = false)
         {
             var options = new JsonSerializerOptions
@@ -640,6 +648,19 @@ namespace Catan10
             if (typeToConvert == typeof(PlayerModel))
             {
                 string playerName = reader.GetString();
+                if (MainPage.Current.MainPageModel.AllPlayers.Count > 0)
+                {
+                    var player = MainPage.Current.NameToPlayer(playerName);
+                    if (player != null)
+                    {
+                        return player;
+                    }
+                }
+                //
+                //  we are probably loading MainPage Model from disk
+
+                
+
                 return MainPage.Current.NameToPlayer(playerName);
             }
 

@@ -19,7 +19,7 @@ namespace Catan10
     //    }
     //    public override string ToString()
     //    {
-    //        return CatanProxy.Serialize(this);
+    //        return CatanSignalRClient.Serialize(this);
     //    }
     //}
 

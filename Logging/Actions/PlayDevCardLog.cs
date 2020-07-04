@@ -30,7 +30,7 @@ namespace Catan10
                 CanUndo = false, // BIG DEAL:  stops the undo tree..
                 DevCardType = devCardType,
                 Action = CatanAction.PlayedDevCard,
-                SentBy = gameController.CurrentPlayer.PlayerName,
+                SentBy = gameController.CurrentPlayer,
                 TradeResources = resources
             };
 

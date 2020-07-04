@@ -58,12 +58,12 @@ namespace Catan10
                     {
                         Type type = CurrentAssembly.GetType(message.DataTypeName);
                         if (type == null) throw new ArgumentException("Unknown type!");
-                        logHeader = JsonSerializer.Deserialize(json, type, CatanProxy.GetJsonOptions()) as LogHeader;
+                        logHeader = JsonSerializer.Deserialize(json, type, CatanSignalRClient.GetJsonOptions()) as LogHeader;
                         message.Data = logHeader;
                     }
                     else
                     {
-                        serviceMessage = CatanProxy.Deserialize<CatanServiceMessage>(json);
+                        serviceMessage = CatanSignalRClient.Deserialize<CatanServiceMessage>(json);
                     }
 
                     switch (message.MessageType)

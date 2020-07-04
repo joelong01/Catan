@@ -125,7 +125,7 @@ namespace Catan10
 
         public string Serialize()
         {
-            return CatanProxy.Serialize(this);
+            return CatanSignalRClient.Serialize(this);
         }
 
         public override string ToString()

@@ -408,12 +408,12 @@ namespace Catan10
 
         public static Settings Deserialize(string s)
         {
-            return CatanProxy.Deserialize<Settings>(s);
+            return CatanSignalRClient.Deserialize<Settings>(s);
         }
 
         public string Serialize()
         {
-            return CatanProxy.Serialize(this);
+            return CatanSignalRClient.Serialize(this);
         }
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

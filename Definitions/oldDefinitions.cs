@@ -43,12 +43,12 @@ namespace Catan10
 
         public static LogStateTranstion Deserialize(string json)
         {
-            return CatanProxy.Deserialize<LogStateTranstion>(json);
+            return CatanSignalRClient.Deserialize<LogStateTranstion>(json);
         }
 
         public override string ToString()
         {
-            return CatanProxy.Serialize(this);
+            return CatanSignalRClient.Serialize(this);
         }
     }
 

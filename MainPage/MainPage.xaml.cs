@@ -444,7 +444,7 @@ namespace Catan10
             }
             catch (Exception e)
             {
-                this.TraceMessage($"Generic Excpetion: {e}");
+                this.TraceMessage($"Generic Exception: {e}");
             }
             finally
             {
@@ -574,7 +574,7 @@ namespace Catan10
 
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+           // ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
 
         /// <summary>
@@ -787,7 +787,7 @@ namespace Catan10
             }
             try
             {
-                mainPageModel = CatanProxy.Deserialize<MainPageModel>(content);
+                mainPageModel = JsonSerializer.Deserialize<MainPageModel>(content);
                 if (mainPageModel == null) mainPageModel = new MainPageModel();
                 mainPageModel.GameController = this;
                 mainPageModel.Log = new Log(this);
@@ -901,7 +901,7 @@ namespace Catan10
                 badGridNames.ForEach((name) => MainPageModel.Settings.GridPositions.Remove(name));
 
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
-                var content = CatanProxy.Serialize<MainPageModel>(MainPageModel, true);
+                var content = CatanSignalRClient.Serialize<MainPageModel>(MainPageModel, true);
                 StorageFile file = await folder.CreateFileAsync(PlayerDataFile, CreationCollisionOption.ReplaceExisting);
                 Debug.Assert(content.Length > 100);
 

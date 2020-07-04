@@ -17,7 +17,7 @@ namespace Catan10
             PurchaseLog logHeader = new PurchaseLog()
             {
                 CanUndo = entitlement != Entitlement.DevCard,
-                SentBy = player.PlayerName,
+                SentBy = player,
                 Action = CatanAction.Purchased,
                 PurchasedEntitlement = entitlement
             };

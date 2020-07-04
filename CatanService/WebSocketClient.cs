@@ -42,7 +42,7 @@ namespace Catan10
             {
                 message.MessageType = MessageType.BroadcastMessage;
                 MessageWriter = new DataWriter(MessageWebSocket.OutputStream);
-                var json = CatanProxy.Serialize<CatanMessage>(message);
+                var json = CatanSignalRClient.Serialize<CatanMessage>(message);
                 MessageWriter.WriteString(json);
                 await MessageWriter.StoreAsync();
             }
@@ -132,7 +132,7 @@ namespace Catan10
             Contract.Assert(!String.IsNullOrEmpty(GameInfo.Name));
             try
             {
-                var json = CatanProxy.Serialize(GameInfo);
+                var json = CatanSignalRClient.Serialize(GameInfo);
                 CatanMessage message = new CatanMessage()
                 {
                     ActionType = ActionType.Normal,
@@ -156,7 +156,7 @@ namespace Catan10
             {
                 message.MessageType = MessageType.PrivateMessage;                
                 MessageWriter = new DataWriter(MessageWebSocket.OutputStream);
-                var json = CatanProxy.Serialize<CatanMessage>(message);
+                var json = CatanSignalRClient.Serialize<CatanMessage>(message);
                 MessageWriter.WriteString(json);
                 await MessageWriter.StoreAsync();
             }
@@ -172,7 +172,7 @@ namespace Catan10
             MessageWriter = new DataWriter(MessageWebSocket.OutputStream);
 
             WsMessage message = new WsMessage() { MessageType = CatanWsMessageType.RegisterForGameNotifications };
-            var json = CatanProxy.Serialize<WsMessage>(message);
+            var json = CatanSignalRClient.Serialize<WsMessage>(message);
             MessageWriter.WriteString(json);
             await MessageWriter.StoreAsync();
             WebSocketConnected = true;
@@ -181,7 +181,7 @@ namespace Catan10
         private async Task Ack(CatanMessage message)
         {
             message.MessageType = MessageType.Ack;
-            var json = CatanProxy.Serialize(message);
+            var json = CatanSignalRClient.Serialize(message);
             MessageWriter.WriteString(json);
             await MessageWriter.StoreAsync();
         }
@@ -199,7 +199,7 @@ namespace Catan10
                     try
                     {
                         string messageJson = reader.ReadString(reader.UnconsumedBufferLength);
-                        message = CatanProxy.Deserialize<CatanMessage>(messageJson);
+                        message = CatanSignalRClient.Deserialize<CatanMessage>(messageJson);
                         await Ack(message);
 
                         LogHeader logHeader;
@@ -209,12 +209,12 @@ namespace Catan10
                         {
                             Type type = CurrentAssembly.GetType(message.DataTypeName);
                             if (type == null) throw new ArgumentException("Unknown type!");
-                            logHeader = JsonSerializer.Deserialize(json, type, CatanProxy.GetJsonOptions()) as LogHeader;
+                            logHeader = JsonSerializer.Deserialize(json, type, CatanSignalRClient.GetJsonOptions()) as LogHeader;
                             message.Data = logHeader;
                         }
                         else
                         {
-                            serviceMessage = CatanProxy.Deserialize<CatanServiceMessage>(json);
+                            serviceMessage = CatanSignalRClient.Deserialize<CatanServiceMessage>(json);
                         }
 
                         switch (message.MessageType)
