@@ -493,9 +493,10 @@ namespace Catan10
                         this.TraceMessage($"exception thrown for rety notification for id ={message.MessageId}\nWaiting 3 seconds");
                         await Task.Delay(3000);
                     }
-                    message.ActionType = ActionType.Retry;
-                    targets.Clear();
-                    targets.AddRange(ackTracker.PlayerNames);
+                    //
+                    //  note: Targets gets modified by the AckTracker so it will only have the list of Players that need to send us an acc
+                    //  
+                    message.ActionType = ActionType.Retry;                    
                     targets.ForEach((p) => s += p + ", ");
                     s = s.Substring(0, s.Length - 1);
                     this.TraceMessage($"need acks from {targets}");

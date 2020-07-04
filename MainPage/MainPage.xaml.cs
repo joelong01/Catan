@@ -101,7 +101,9 @@ namespace Catan10
 
         public MainPage()
         {
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+          //
+          //  ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+          //
             this.InitializeComponent();
             Current = this;
             GameController = this;
@@ -1117,7 +1119,7 @@ namespace Catan10
          //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
             if (unprocessedMessages != 0)
             {
-                this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
+             //   this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
                 return false;
             }
 
