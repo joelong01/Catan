@@ -130,9 +130,10 @@ namespace Catan10
         private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
 
+            await ShowErrorMessage("This is the error message!\n\nThis is the error message This is the error message\n\nThis is the error message This is the error message", "Test error", "");
             
             // await TestYearOfPlenty();
-             await TradeGoldTest();
+            // await TradeGoldTest();
             // await TestTargetPlayer();
             // await LoseHalfYourCards();
 
