@@ -494,9 +494,19 @@ namespace Catan10
             return tcs.Task;
         }
 
-        public static void TraceMessage(this object o, string toWrite, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
+        public static void TraceMessage(this object o, string toWrite, int indentLevel=0, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
-            System.Diagnostics.Debug.WriteLine($"{cfp}({cln}):{toWrite}\t\t[Caller={cmb}]");
+            for(int i=0; i<indentLevel; i++)
+            {
+                Debug.Indent();
+            }
+
+            Debug.WriteLine($"{cfp}({cln}):{toWrite}\t\t[Caller={cmb}]");
+
+            for (int i = 0; i < indentLevel; i++)
+            {
+                Debug.Unindent();
+            }
         }
 
         /// <summary>

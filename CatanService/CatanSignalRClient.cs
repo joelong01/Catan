@@ -421,9 +421,9 @@ namespace Catan10
         {
             if (BroadcastTcs != null && !BroadcastTcs.Task.IsCompleted)
             {
-                this.TraceMessage("started waiting for BroadcastTcs");
+                this.TraceMessage($"STARTED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
                 await BroadcastTcs.Task;
-                this.TraceMessage("Finished Waiting for BroadcastTcs");
+                this.TraceMessage($"FINISHED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
             }
 
             BroadcastTcs = new TaskCompletionSource<object>();
@@ -510,9 +510,10 @@ namespace Catan10
                         //  note: Targets gets modified by the AckTracker so it will only have the list of Players that need to send us an acc
                         //  
                         message.ActionType = ActionType.Retry;
+                        s = "";
                         targets.ForEach((p) => s += p + ", ");
                         s = s.Substring(0, s.Length - 1);
-                        this.TraceMessage($"need acks from {targets}");
+                        this.TraceMessage($"need acks from {s}");
                         ackTracker.Cancel();
                         ackTracker = null;
                         if (targets.Count == 0)
