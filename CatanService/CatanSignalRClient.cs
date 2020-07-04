@@ -19,69 +19,7 @@ using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
-    public class AckTracker
-    {
-        #region Delegates + Fields + Events + Enums
-
-        private TaskCompletionSource<object> TCS = new TaskCompletionSource<object>();
-
-        #endregion Delegates + Fields + Events + Enums
-
-        #region Properties
-
-        public Guid MessageId { get; set; }
-        public List<string> PlayerNames { get; set; }
-        public CatanSignalRClient Client { get; set; }
-        #endregion Properties
-
-        #region Methods
-
-        public async Task<bool> WaitForAllAcks(CatanSignalRClient client, int timeoutMs)
-        {
-            Client = client;
-            client.OnAck += Client_OnAck;
-            try
-            {
-                this.TraceMessage($"Waiting for acks on message: {MessageId}");
-                await TCS.Task.TimeoutAfter(timeoutMs);
-                return true;
-            }
-            catch (TimeoutException)
-            {
-                return false;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                client.OnAck -= Client_OnAck;
-            }
-        }
-
-        private void Client_OnAck(string fromPlayer, Guid messageId)
-        {
-            if (messageId == this.MessageId)
-            {
-                //  this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId}");
-                PlayerNames.Remove(fromPlayer);
-                if (PlayerNames.Count == 0)
-                {
-                    this.TraceMessage($"Received all acks for message {messageId}");
-                    TCS.TrySetResult(null);
-                }
-            }
-        }
-
-        public void Cancel()
-        {
-            Client.OnAck -= Client_OnAck;
-
-
-        }
-        #endregion Methods
-    }
+  
 
     public class CatanSignalRClient : IDisposable, ICatanService
     {
@@ -157,7 +95,7 @@ namespace Catan10
                 try
                 {
                     await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
-
+                    this.TraceMessage($"{MainPage.Current.TheHuman.PlayerName} Sent Ack for {message}");
                     //
                     //  make sure we didn't process it - maybe the ACK was lost.
 
@@ -516,7 +454,7 @@ namespace Catan10
 
                 //
                 //  this will return after timeout, or after we get acks from everything
-                bool succeeded = await ackTracker.WaitForAllAcks(this, timeout);
+                bool succeeded = await ackTracker.WaitForAllAcks(timeout);
                 if (succeeded) break;
                 if (!succeeded)
                 {
@@ -533,19 +471,18 @@ namespace Catan10
                         SecondaryButtonText = "Cancel"
                     };
                     try
-                    {
-                        // await MainPage.Current.ShowErrorMessage($"Timed out waiting for an Ack from {s}.\n Message={message.DataTypeName}\n\nRetry after ok.", "Catan", "");
+                    {                        
                         while (VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0)
                         {
                             this.TraceMessage("Wating for Dialogbox to close");
-                            await Task.Delay(1000);
+                            await Task.Delay(5000);
                         }
                         this.TraceMessage($"calling retry dialog for id={message.MessageId}");
                         var ret = await dlg.ShowAsync();
                         this.TraceMessage($"return from retry dialog for id={message.MessageId}");
                         if (ret == ContentDialogResult.Secondary)
                         {
-                            break;
+                            await DeleteGame(gameId, "system");
                         }
                     }
                     catch
@@ -556,8 +493,13 @@ namespace Catan10
                         await Task.Delay(3000);
                     }
                     message.ActionType = ActionType.Retry;
+                    targets.Clear();
+                    targets.AddRange(ackTracker.PlayerNames);
+                    
                     ackTracker.Cancel();
                     ackTracker = null;
+                    if (targets.Count == 0)
+                        break; // don't have anybody more to Ack, but for some reason the system didn't fire
                 }
             }
         }
@@ -657,7 +599,7 @@ namespace Catan10
             {
                 this.TraceMessage($"count = {n++} player={player} message={message.DataTypeName} id={gameId}");
                 await SendPrivateMessage(player, message);
-                ret = await ackTracker.WaitForAllAcks(this, 1000);
+                ret = await ackTracker.WaitForAllAcks(3000);
             } while (ret == false);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -34,7 +35,7 @@ namespace Catan10
             Contract.Assert(this.PlayingPlayers.Count == gameController.PlayingPlayers.Count);
             for (int i = 0; i < PlayingPlayers.Count; i++)
             {
-                Contract.Assert(this.PlayingPlayers[i].PlayerName == gameController.PlayingPlayers[i].PlayerName);
+                Debug.Assert(this.PlayingPlayers[i].PlayerName == gameController.PlayingPlayers[i].PlayerName);
             }
             Contract.Assert(this.CurrentPlayer.PlayerName == gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;

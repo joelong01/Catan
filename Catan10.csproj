@@ -117,6 +117,7 @@
     </Compile>
     <Compile Include="attachedProperties.cs" />
     <Compile Include="CatanColors.cs" />
+    <Compile Include="CatanService\AckTracker.cs" />
     <Compile Include="CatanService\serviceHelpers.cs" />
     <Compile Include="CatanService\WebSocketClient.cs" />
     <Compile Include="ContentDialogs\ErrorDlg.xaml.cs">
