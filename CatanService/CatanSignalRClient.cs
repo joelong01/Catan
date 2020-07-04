@@ -19,7 +19,7 @@ using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
-  
+
 
     public class CatanSignalRClient : IDisposable, ICatanService
     {
@@ -254,10 +254,10 @@ namespace Catan10
                     this.TraceMessage("Hub reconnecting!!");
                     Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
 
-                        // Notify users the connection was lost and the client is reconnecting.
-                        // Start queuing or dropping messages.
+                    // Notify users the connection was lost and the client is reconnecting.
+                    // Start queuing or dropping messages.
 
-                        return Task.CompletedTask;
+                    return Task.CompletedTask;
                 };
                 HubConnection.Reconnected += async (connectionId) =>
                 {
@@ -402,6 +402,8 @@ namespace Catan10
             await HubConnection.InvokeAsync("Reset");
         }
 
+        private TaskCompletionSource<object> BroadcastTcs = null;
+
         /// <summary>
         ///     Send a message to all the clients.
         ///
@@ -417,96 +419,116 @@ namespace Catan10
         /// <returns></returns>
         public async Task SendBroadcastMessage(Guid gameId, CatanMessage message)
         {
-            //
-            //  this are the players the messag is going to -- we will wait for acks from all these
-            List<string> targets = new List<string>();
-            MainPage.Current.MainPageModel.PlayingPlayers.ForEach((p) => targets.Add(p.PlayerName));
-
-            //
-            //  No playing players...broadcast
-            if (targets.Count == 0)
+            if (BroadcastTcs != null && !BroadcastTcs.Task.IsCompleted)
             {
-                this.TraceMessage("No playing players.  not sending message");
-                return;
+                this.TraceMessage("started waiting for BroadcastTcs");
+                await BroadcastTcs.Task;
+                this.TraceMessage("Finished Waiting for BroadcastTcs");
             }
 
-            //
-            //  make it an object so we can get the whole message
-            message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
-
-            //
-            //  Ack timeout
-            // 
-            int timeout = 5 * 1000; 
-            while (true)
+            BroadcastTcs = new TaskCompletionSource<object>();
+            try
             {
-                await EnsureConnection();
-
-                AckTracker ackTracker = new AckTracker()
-                {
-                    PlayerNames = targets,
-                    MessageId = message.MessageId,
-                    Client = this,
-                };
 
                 //
-                //  call the hub
-                await HubConnection.InvokeAsync("BroadcastMessage", gameId, message);
+                //  this are the players the messag is going to -- we will wait for acks from all these
+                List<string> targets = new List<string>();
+                MainPage.Current.MainPageModel.PlayingPlayers.ForEach((p) => targets.Add(p.PlayerName));
 
                 //
-                //  this will return after timeout, or after we get acks from everything
-                bool succeeded = await ackTracker.WaitForAllAcks(timeout);
-                if (succeeded) break;
-                if (!succeeded)
+                //  No playing players...broadcast
+                if (targets.Count == 0)
                 {
-                    //
-                    //  got a timeout
-                    string s = "";
-                    targets.ForEach((p) => s += p + ", ");
-                    s = s.Substring(0, s.Length - 1);
-                    ContentDialog dlg = new ContentDialog()
+                    this.TraceMessage("No playing players.  not sending message");
+                    return;
+                }
+
+                //
+                //  make it an object so we can get the whole message
+                message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
+
+                //
+                //  Ack timeout
+                // 
+                int timeout = 5 * 1000;
+                while (true)
+                {
+                    await EnsureConnection();
+
+                    AckTracker ackTracker = new AckTracker()
                     {
-                        Title = "Catan Networking Error",
-                        Content = $"Timed out waiting for an Ack from {s}.\nTimeout={timeout}ms\nMessage={message.DataTypeName}\n\nHit Cancel to end the game.  For everybody.",
-                        CloseButtonText = "Retry",
-                        SecondaryButtonText = "Cancel"
+                        PlayerNames = targets,
+                        MessageId = message.MessageId,
+                        Client = this,
                     };
-                    try
-                    {                        
-                        while (VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0)
-                        {
-                            this.TraceMessage("Wating for Dialogbox to close");
-                            await Task.Delay(5000);
-                        }
-                        this.TraceMessage($"calling retry dialog for id={message.MessageId}");
-                        var ret = await dlg.ShowAsync();
-                        this.TraceMessage($"return from retry dialog for id={message.MessageId}");
-                        if (ret == ContentDialogResult.Secondary)
-                        {
-                            await DeleteGame(gameId, "system");
-                        }
-                    }
-                    catch
+
+                    //
+                    //  call the hub
+                    await HubConnection.InvokeAsync("BroadcastMessage", gameId, message);
+
+                    //
+                    //  this will return after timeout, or after we get acks from everything
+                    bool succeeded = await ackTracker.WaitForAllAcks(timeout);
+                    if (succeeded) break;
+                    if (!succeeded)
                     {
                         //
-                        //  we have cases where we notifiy the user twice that we are waiting for a Retry .. this will retry w/o telling the user
-                        this.TraceMessage($"exception thrown for rety notification for id ={message.MessageId}\nWaiting 3 seconds");
-                        await Task.Delay(3000);
+                        //  got a timeout
+                        string s = "";
+                        targets.ForEach((p) => s += p + ", ");
+                        s = s.Substring(0, s.Length - 1);
+                        ContentDialog dlg = new ContentDialog()
+                        {
+                            Title = "Catan Networking Error",
+                            Content = $"Timed out waiting for an Ack from {s}.\nTimeout={timeout}ms\nMessage={message.DataTypeName}\n\nHit Cancel to end the game.  For everybody.",
+                            CloseButtonText = "Retry",
+                            SecondaryButtonText = "Cancel"
+                        };
+                        try
+                        {
+                            while (VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0)
+                            {
+                                this.TraceMessage("Wating for Dialogbox to close");
+                                await Task.Delay(5000);
+                            }
+                            this.TraceMessage($"calling retry dialog for id={message.MessageId}");
+                            var ret = await dlg.ShowAsync();
+                            this.TraceMessage($"return from retry dialog for id={message.MessageId}");
+                            if (ret == ContentDialogResult.Secondary)
+                            {
+                                await DeleteGame(gameId, "system");
+                            }
+                        }
+                        catch
+                        {
+                            //
+                            //  we have cases where we notifiy the user twice that we are waiting for a Retry .. this will retry w/o telling the user
+                            this.TraceMessage($"exception thrown for rety notification for id ={message.MessageId}\nWaiting 3 seconds");
+                            await Task.Delay(3000);
+                        }
+                        //
+                        //  note: Targets gets modified by the AckTracker so it will only have the list of Players that need to send us an acc
+                        //  
+                        message.ActionType = ActionType.Retry;
+                        targets.ForEach((p) => s += p + ", ");
+                        s = s.Substring(0, s.Length - 1);
+                        this.TraceMessage($"need acks from {targets}");
+                        ackTracker.Cancel();
+                        ackTracker = null;
+                        if (targets.Count == 0)
+                            break; // don't have anybody more to Ack, but for some reason the system didn't fire
                     }
-                    //
-                    //  note: Targets gets modified by the AckTracker so it will only have the list of Players that need to send us an acc
-                    //  
-                    message.ActionType = ActionType.Retry;                    
-                    targets.ForEach((p) => s += p + ", ");
-                    s = s.Substring(0, s.Length - 1);
-                    this.TraceMessage($"need acks from {targets}");
-                    ackTracker.Cancel();
-                    ackTracker = null;
-                    if (targets.Count == 0)
-                        break; // don't have anybody more to Ack, but for some reason the system didn't fire
                 }
             }
+            finally
+            {
+                BroadcastTcs.TrySetResult(null);
+
+            }
         }
+
+       
+
 
         public async Task SendPrivateMessage(string playerName, CatanMessage message)
         {
@@ -559,11 +581,11 @@ namespace Catan10
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                    // this will happily throw..
+                // this will happily throw..
 
-                    //
-                    //  this has to be on the UI thread to access PlayerName
-                    await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
+                //
+                //  this has to be on the UI thread to access PlayerName
+                await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
             });
         }
 
