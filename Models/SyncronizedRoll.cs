@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Catan10
@@ -93,7 +95,14 @@ namespace Catan10
             }
             NotifyPropertyChanged("LatestRolls");
 
-            RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);
+            if (RollValues.Count >= 0)
+            {
+                var last = RollValues.Last();
+                Debug.Assert(last == -2); // -1 for each dice
+                RollValues.RemoveAt(RollValues.Count - 1);
+            }
+
+            RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);            
             return CurrentRoll;
         }
 

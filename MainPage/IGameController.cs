@@ -332,6 +332,12 @@ namespace Catan10
             PlayerModel sentBy = logEntry.SentBy;
 
             Contract.Assert(sentBy != null);
+
+            //
+            //  when this is called we either have no current rolls, or we hit a tie.
+            //  if we hit a tie, then the current roll == -1
+
+
             RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRolls(logEntry.Rolls);
             Contract.Assert(pickedRoll != null);
             Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
@@ -348,31 +354,7 @@ namespace Catan10
                 if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne == -1) return false;
             }
 
-            //
-            //  are we waiting for a tie to resolve? - we know because if you aren't finished, you need to have the same number of rolls
-
-            var notFinishedList = new List<PlayerModel>();
-
-            foreach (var player in PlayingPlayers)
-            {
-                if (player.GameData.SyncronizedPlayerRolls.Finished) continue;
-                notFinishedList.Add(player);
-            }
-
-            if (notFinishedList.Count > 0)
-            {
-                int maxRolls = 0;
-                notFinishedList.ForEach((p) =>
-                  {
-                      if (p.GameData.SyncronizedPlayerRolls.RollValues.Count > maxRolls)
-                          maxRolls = p.GameData.SyncronizedPlayerRolls.RollValues.Count;
-                  });
-
-                //
-                //  I expect everybody who isn't finished to either wait or to roll
-                //  here I could say "if you aren't at maxRolls, then i'm waiting o a roll from you...
-                return false; 
-            }
+            
 
             //
             //  look at all the rolls and see if the current player needs to roll again
@@ -388,6 +370,20 @@ namespace Catan10
                 };
 
                 await dlg.ShowAsync();
+                //
+                //  add a -1 roll showing that they need to roll
+
+                List<RollModel> rolls = new List<RollModel>();
+                for (int i=0; i<4; i++)
+                {
+                    rolls.Add(new RollModel()
+                    {
+                        DiceOne = -1,
+                        DiceTwo = -1
+                    });
+                }
+                rolls[0].Selected = true;
+                sentBy.GameData.SyncronizedPlayerRolls.AddRolls(rolls);
 
                 return false;
             }
