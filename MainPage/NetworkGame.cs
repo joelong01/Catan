@@ -196,14 +196,7 @@ namespace Catan10
                 if (!ret) return;
             };
             MainPageModel.Settings.IsLocalGame = false;
-            try
-            {
-                await CreateAndConfigureProxy();
-            }
-            catch (Exception e)
-            {
-                await ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
-            }
+            
 
             List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
             ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, MainPageModel.AllPlayers, games, MainPageModel.CatanService)
