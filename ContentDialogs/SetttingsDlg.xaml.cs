@@ -35,7 +35,7 @@ namespace Catan10
             this.InitializeComponent();
             ValidServiceUris.Add("localhost:5000");
             ValidServiceUris.Add("192.168.1.128:5000");
-            ValidServiceUris.Add("jdlgameservice.azurewebsites.net");
+            ValidServiceUris.Add("catanhub.azurewebsites.net");
         }
 
         public SettingsDlg(Settings settings, PlayerModel human)
@@ -45,7 +45,7 @@ namespace Catan10
             this.TheHuman = human;
             ValidServiceUris.Add("localhost:5000");
             ValidServiceUris.Add("192.168.1.128:5000");
-            ValidServiceUris.Add("catanservice.azurewebsites.net");
+            ValidServiceUris.Add("catanhub.azurewebsites.net");
         }
 
         #endregion Constructors

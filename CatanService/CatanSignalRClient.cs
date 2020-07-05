@@ -242,7 +242,7 @@ namespace Catan10
         {
             try
             {
-                ServiceUrl = "http://" + host + "/CatanHub";
+                ServiceUrl = "https://" + host + "/CatanHub";
 
                 HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging((logging) =>
                 {
@@ -250,12 +250,12 @@ namespace Catan10
                     logging.SetMinimumLevel(LogLevel.Debug);
                 }).Build();
 
-                if (Debugger.IsAttached)
-                {
-                    HubConnection.ServerTimeout = TimeSpan.FromMinutes(30);
-                    HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(30);
-                    HubConnection.KeepAliveInterval = TimeSpan.FromMinutes(15);
-                }
+                //if (Debugger.IsAttached)
+                //{
+                //    HubConnection.ServerTimeout = TimeSpan.FromMinutes(30);
+                //    HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(30);
+                //    HubConnection.KeepAliveInterval = TimeSpan.FromMinutes(15);
+                //}
 
                 HubConnection.Reconnecting += error =>
                 {

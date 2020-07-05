@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -101,9 +102,9 @@ namespace Catan10
 
         public MainPage()
         {
-          //
-          //  ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-          //
+            //
+            //  ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            //
             this.InitializeComponent();
             Current = this;
             GameController = this;
@@ -285,7 +286,7 @@ namespace Catan10
                         if (b.BuildingState != BuildingState.Settlement && b.BuildingState != BuildingState.City)
                         {
                             var buildingState = ValidateBuildingLocation(b);
-                            if ( buildingState == BuildingState.Pips || buildingState == BuildingState.Build)
+                            if (buildingState == BuildingState.Pips || buildingState == BuildingState.Build)
                                 return b;
                         }
                     }
@@ -574,7 +575,7 @@ namespace Catan10
 
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-           // ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            // ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
 
         /// <summary>
@@ -762,7 +763,7 @@ namespace Catan10
             {
                 await AutoSetBuildingAndRoad();
                 await NextState();
-               
+
             }
         }
 
@@ -899,9 +900,20 @@ namespace Catan10
                     }
                 }
                 badGridNames.ForEach((name) => MainPageModel.Settings.GridPositions.Remove(name));
-
+                //
+                //  you cannot use the SignalR Json options here because you need to store more than just names
+                //  to serialize the players.
+                // 
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
-                var content = CatanSignalRClient.Serialize<MainPageModel>(MainPageModel, true);
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    WriteIndented = true
+                };
+                options.Converters.Add(new JsonStringEnumConverter());
+
+                var content = JsonSerializer.Serialize<MainPageModel>(MainPageModel, options);
+
                 StorageFile file = await folder.CreateFileAsync(PlayerDataFile, CreationCollisionOption.ReplaceExisting);
                 Debug.Assert(content.Length > 100);
 
@@ -1116,10 +1128,10 @@ namespace Catan10
 
         private bool EnableNextButton(bool enableNextButton, GameState gameState, int unprocessedMessages)
         {
-         //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
+            //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
             if (unprocessedMessages != 0)
             {
-             //   this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
+                //   this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
                 return false;
             }
 
@@ -1202,6 +1214,23 @@ namespace Catan10
 
             }
 
+
+        }
+
+        private async void OnNetworkConnect(object _, RoutedEventArgs rea)
+        {
+            //
+            //  start the connection to the SignalR servi0ce
+            //
+
+            try
+            {
+                await CreateAndConfigureProxy();
+            }
+            catch (Exception e)
+            {
+                await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
+            }
 
         }
     }

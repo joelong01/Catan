@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Windows.ApplicationModel.DataTransfer;
@@ -147,14 +149,16 @@ namespace Catan10
 
         public async Task ResetGridLayout()
         {
-            foreach (var kvp in MainPageModel.Settings.GridPositions)
-            {
-                GridPosition pos = kvp.Value;
-                pos.TranslateX = 0;
-                pos.TranslateY = 0;
-                pos.ScaleX = 1.0;
-                pos.ScaleY = 1.0;
-            }
+            string json = @"{""PlayerTradeGrid"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-635,""TranslateY"":-199},""SynchronizedRolls"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":4,""TranslateY"":427},""Grid_BoardMeasurement"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":389,""TranslateY"":391},""Grid_RollStats"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-850,""TranslateY"":248},""ControlGrid"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-270,""TranslateY"":330},""Draggable_PrivateData"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-568,""TranslateY"":248},""_gameView"":{""ScaleX"":0.60000002384185791,""ScaleY"":0.60000002384185791,""TranslateX"":138,""TranslateY"":-215}}";
+            MainPageModel.Settings.GridPositions = JsonSerializer.Deserialize<Dictionary<string, GridPosition>>(json);
+            //foreach (var kvp in MainPageModel.Settings.GridPositions)
+            //{
+            //    GridPosition pos = kvp.Value;
+            //    pos.TranslateX = 0;
+            //    pos.TranslateY = 0;
+            //    pos.ScaleX = 1.0;
+            //    pos.ScaleY = 1.0;
+            //}
 
             UpdateGridLocations();
             await SaveGridLocations();

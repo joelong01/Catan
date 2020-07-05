@@ -210,8 +210,6 @@ namespace Catan10
                 return;
             }
 
-            //MainPageModel.ServiceGameInfo = dlg.SelectedGame;
-            //await NewGameLog.JoinOrCreateGame(this, MainPageModel.ServiceGameInfo.Creator, 0, CatanAction.GameJoined);
         }
 
         private async void OnStartDefaultNetworkGame(object sender, RoutedEventArgs e)

@@ -455,7 +455,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task InitializeMainPageModel()
         {
-            var serviceReference = MainPageModel?.CatanService;
+           // var serviceReference = MainPageModel?.CatanService;
             _gameView.Reset();
             _gameView.SetCallbacks(this, this);
             await LoadMainPageModel();
@@ -465,24 +465,24 @@ namespace Catan10
 
             await _rollControl.Reset();
             CurrentPlayer = TheHuman;
-            //
-            //  start the connection to the SignalR servi0ce
-            //
-            if (serviceReference == null)
-            {
-                try
-                {
-                    await CreateAndConfigureProxy();
-                }
-                catch (Exception e)
-                {
-                    await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
-                }
-            }
-            else
-            {
-                MainPageModel.CatanService = serviceReference;
-            }
+            ////
+            ////  start the connection to the SignalR servi0ce
+            ////
+            //if (serviceReference == null)
+            //{
+            //    try
+            //    {
+            //        await CreateAndConfigureProxy();
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
+            //    }
+            //}
+            //else
+            //{
+            //    MainPageModel.CatanService = serviceReference;
+            //}
         }
 
         /// <summary>
