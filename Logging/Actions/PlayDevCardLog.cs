@@ -52,7 +52,19 @@ namespace Catan10
             Contract.Assert(sentBy.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None);
             Contract.Assert(sentBy == gameController.CurrentPlayer); // only current players can play dev cards
 
-            DevCardModel localDevCard = ((ICollection<DevCardModel>)sentBy.GameData.Resources.AvailableDevCards).First((dcm) => dcm.DevCardType == this.DevCardType);
+
+            DevCardModel localDevCard = null;
+            //
+            //  find the first one and make sure we have it locally
+            foreach (var card in sentBy.GameData.Resources.AvailableDevCards)
+            {
+                if (card.DevCardType == this.DevCardType)
+                {
+                    localDevCard = card;
+                    break;
+                }
+            }
+
             Contract.Assert(localDevCard != null);
 
             sentBy.GameData.Resources.AvailableDevCards.Remove(localDevCard);
