@@ -1,0 +1,48 @@
+﻿<UserControl
+    x:Class="Catan10.Sliders.SliderCtrl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Catan10.Sliders"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Name="userControl" d:DesignHeight="300" d:DesignWidth="400" 
+   >
+    <UserControl.Resources>
+         <Storyboard x:Name="ShowStolenResources">
+            <DoubleAnimation d:IsOptimized="True"
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
+                Storyboard.TargetName="LayoutRoot" To="0" Duration="0:0:0.250" />
+        </Storyboard>
+        <Storyboard x:Name="HideStolenResources">
+            <DoubleAnimation d:IsOptimized="True"
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
+                Storyboard.TargetName="LayoutRoot" To="{x:Bind userControl.Width, Mode=OneWay}" Duration="0:0:0.250" />
+        </Storyboard>
+    </UserControl.Resources>
+    <Grid Name="LayoutRoot"  Width="{Binding Width, ElementName=userControl, FallbackValue=400, TargetNullValue=400, Mode=OneWay}"
+        Height="{Binding Height, ElementName=userControl, FallbackValue=300, TargetNullValue=300, Mode=OneWay}"
+        Background="{Binding Background, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
+        BorderBrush="{Binding BorderBrush, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
+        BorderThickness="{Binding BorderThickness, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
+        CornerRadius="{Binding CornerRadius, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RenderTransform>
+            <CompositeTransform/>
+        </Grid.RenderTransform>
+        <Rectangle Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                   Fill="{Binding Background, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}" />
+        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Width="20" Height="40" Click="OnOpenClose">
+            <Button.Content>
+                <Grid Background="Black" VerticalAlignment="Center" Height="40" Margin="-10,0,-10,0">
+                    <Rectangle Width="2" Height="10" Fill="White" Margin="-10, 0, 0,0" HorizontalAlignment="Center"/>
+                    <Rectangle Width="2" Height="15" Fill="White" HorizontalAlignment="Center"/>
+                    <Rectangle Width="2" Height="20" Fill="White" Margin="10, 0 ,0 ,0"/>
+                </Grid>
+            </Button.Content>
+        </Button>
+    </Grid>
+</UserControl>

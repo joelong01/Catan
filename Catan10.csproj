@@ -214,6 +214,9 @@
     <Compile Include="Models\TradeResources.cs" />
     <Compile Include="CatanService\CatanRestService.cs" />
     <Compile Include="CatanService\CatanSignalRClient.cs" />
+    <Compile Include="Sliders\SliderCtrl.xaml.cs">
+      <DependentUpon>SliderCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Spy\CatanSpyPage.xaml.cs">
       <DependentUpon>CatanSpyPage.xaml</DependentUpon>
     </Compile>
@@ -456,6 +459,10 @@
     <Page Include="Games\ExpansionCtrl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sliders\SliderCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Spy\CatanSpyPage.xaml">
       <SubType>Designer</SubType>

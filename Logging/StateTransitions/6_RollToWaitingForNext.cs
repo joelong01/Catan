@@ -70,17 +70,24 @@ namespace Catan10
 
             //
             //  does anybody have any gold?
+            //  this message goes everywhere, so we only need one machien to send it. so even if 2 people need to trade gold, only one sends it
             //
-            //
-            if (gameController.TheHuman.GameData.Resources.Current.GoldMine > 0)
+            if (gameController.TheHuman == gameController.CurrentPlayer)
             {
-                //
-                //  this message goes everywhere, so we only need one machien to send it. so even if 2 people need to trade gold, only one sends it
-                await MustTradeGold.PostMessage(gameController);
+                // current player checks each player to see if anybody has gold
+                foreach (var player in gameController.PlayingPlayers)
+                {
+                    if (player.GameData.Resources.Current.GoldMine > 0)
+                    {
+                        // at least one person has gold
+                        await MustTradeGold.PostMessage(gameController);
+                        break;
+                    }
+                }
             }
 
             // only the current player's machine should send this message.  everybody will get it
-            if (rollLog.LastRoll == 7 && gameController.CurrentPlayer == gameController.TheHuman) 
+            if (rollLog.LastRoll == 7 && gameController.CurrentPlayer == gameController.TheHuman)
             {
                 await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
             }

@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
-
-
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace Catan10
 {
@@ -31,6 +31,7 @@ namespace Catan10
             int goldCards = gameController.TheHuman.GameData.Resources.Current.GetCount(ResourceType.GoldMine);
             if (goldCards > 0)
             {
+                Debug.Assert(VisualTreeHelper.GetOpenPopups(Window.Current).Count == 0); // we shouldn't have any popups at this time.
                 ResourceCardCollection destination = new ResourceCardCollection(false);
                 TradeResources tr = new TradeResources()
                 {
