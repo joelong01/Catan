@@ -250,22 +250,21 @@ namespace Catan10
                     logging.SetMinimumLevel(LogLevel.Debug);
                 }).Build();
 
-                //if (Debugger.IsAttached)
-                //{
-                //    HubConnection.ServerTimeout = TimeSpan.FromMinutes(30);
-                //    HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(30);
-                //    HubConnection.KeepAliveInterval = TimeSpan.FromMinutes(15);
-                //}
+                if (Debugger.IsAttached)
+                {
+                    HubConnection.ServerTimeout = TimeSpan.FromMinutes(30);
+                    HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(30);
+                    HubConnection.KeepAliveInterval = TimeSpan.FromMinutes(15);
+                }
 
-                HubConnection.Reconnecting += error =>
+                HubConnection.Reconnecting += async error =>
                 {
                     this.TraceMessage("Hub reconnecting!!");
                     Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
-
-                    // Notify users the connection was lost and the client is reconnecting.
-                    // Start queuing or dropping messages.
-
-                    return Task.CompletedTask;
+                    if (GameInfo != null) // this puts us back into the channel with the other players.
+                    {
+                        await HubConnection.InvokeAsync("JoinGame", this.GameInfo, this.PlayerName);
+                    }                   
                 };
                 HubConnection.Reconnected += async (connectionId) =>
                 {
@@ -358,10 +357,18 @@ namespace Catan10
             }
         }
 
+        
+
+        private GameInfo GameInfo { get; set; }
+        private string PlayerName { get; set; }
+
         public async Task<GameInfo> JoinGame(GameInfo gameInfo, string playerName)
         {
             if (gameInfo == null) throw new ArgumentException("GameInfo can't be null");
             if (String.IsNullOrEmpty(playerName)) throw new ArgumentException("PlayerName can't be null");
+
+            this.GameInfo = gameInfo;
+            this.PlayerName = playerName;
 
             try
             {
