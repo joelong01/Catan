@@ -78,8 +78,6 @@
                 <Button.Flyout>
                     <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
                         <MenuFlyoutSubItem Text="Game">
-                            <MenuFlyoutItem Text="Connect To Catan Service Hub" Click="OnNetworkConnect" />
-                            <MenuFlyoutSeparator />
                             <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
                             <MenuFlyoutItem Text="New Local Game" Click="OnNewLocalGame" />
                             <MenuFlyoutItem Text="Join Network Game" Click="OnJoinNetworkGame" />
@@ -87,6 +85,7 @@
                             <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
                             <MenuFlyoutItem Text="Delete All Games" Click="OnDeleteAllGames" />
                             <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Connect To Catan Service Hub" Click="OnNetworkConnect" />
                             <ToggleMenuFlyoutItem Text="Local Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
