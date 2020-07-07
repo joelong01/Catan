@@ -135,9 +135,9 @@ namespace Catan10
         {
             if (MainPageModel.IsServiceGame)
             {
-                await MainPageModel.CatanService.DeleteGame(MainPageModel.ServiceGameInfo.Id, TheHuman.PlayerName);
-                await this.Reset();
+                await MainPageModel.CatanService.DeleteGame(MainPageModel.ServiceGameInfo.Id, TheHuman.PlayerName);                
             }
+            await this.Reset();
             await InitializeMainPageModel();
         }
 

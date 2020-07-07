@@ -22,11 +22,12 @@
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
             ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-        <TextBox Grid.Column="1" Margin="16,0,0,0" AcceptsReturn="True"
+        <TextBox Grid.Column="1" Margin="16,0,0,0" AcceptsReturn="True" Visibility="Visible"
             FontFamily="Lucida Sans Typewriter" FontSize="16"
             Text="{x:Bind LogHeaderJson, Mode=OneWay}"
             IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto"
             ScrollViewer.VerticalScrollBarVisibility="Auto" />
+        <!--<TreeView x:Name="MyTreeView" Grid.Column="1" Margin="16,0,0,0" />-->
         <controls:GridSplitter Grid.Column="1" Width="16" HorizontalAlignment="Left" GripperCursor="Default"
             ResizeDirection="Auto" ResizeBehavior="BasedOnAlignment"
             CursorBehavior="ChangeOnSplitterHover">

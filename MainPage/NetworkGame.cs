@@ -422,7 +422,7 @@ namespace Catan10
         /// <param name="playerName"></param>
         private async void Service_OnGameJoined(GameInfo gameInfo, string playerName)
         {
-            if (CurrentGameState != GameState.WaitingForNewGame || CurrentGameState != GameState.WaitingForPlayers) return;
+            if (CurrentGameState != GameState.WaitingForNewGame && CurrentGameState != GameState.WaitingForPlayers) return;
 
             RecordGameMessage(CatanAction.GameJoined, gameInfo, playerName);
             foreach (var player in MainPageModel.PlayingPlayers)

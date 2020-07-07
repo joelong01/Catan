@@ -6,7 +6,9 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.Json;
+
 using Catan.Proxy;
+
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -60,42 +62,37 @@ namespace Catan10.Spy
             if (e == null) return;
             if (e.AddedItems.Count == 0) return;
             LogHeader logHeader = ((CatanMessage)e.AddedItems[0]).Data as LogHeader;
-            LogHeaderJson = CatanSignalRClient.Serialize<object>(logHeader, true);
-             // ParseTest(LogHeaderJson);
+            string json = CatanSignalRClient.Serialize<object>(logHeader, true);
+            LogHeaderJson = Format(logHeader.TypeName, json);
         }
-        private void ParseTest(string json)
+        private string Format(string dataType, string json)
         {
-            byte[] data = Encoding.UTF8.GetBytes(json);
-            Utf8JsonReader reader = new Utf8JsonReader(data, isFinalBlock: true, state: default);
-
-            while (reader.Read())
+            if (dataType.Contains("RandomBoardLog"))
             {
-                System.Diagnostics.Debug.Write(reader.TokenType);
-
-                switch (reader.TokenType)
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < json.Length; i++)
                 {
-                    case JsonTokenType.PropertyName:
-                    case JsonTokenType.String:
-                        {
-                            string text = reader.GetString();
-                            System.Diagnostics.Debug.Write(" ");
-                            System.Diagnostics.Debug.Write(text);
-                            break;
-                        }
+                    sb.Append(json[i]);
+                    if (json[i] == '[')
+                    {
 
-                    case JsonTokenType.Number:
+                        while (json[i] != ']')
                         {
-                            int value = reader.GetInt32();
-                            System.Diagnostics.Debug.Write(" ");
-                            System.Diagnostics.Debug.Write(value);
-                            break;
+                            i++;
+                            if (json[i] == '\n' || json[i] == '\r' || json[i] == ' ' || json[i] == '\t') continue;
+                            sb.Append(json[i]);
                         }
+                    }
 
-                        // Other token types elided for brevity
+
                 }
 
-                System.Diagnostics.Debug.WriteLine(" ");
+                return sb.ToString();
             }
+
+
+            return json;
         }
+
     }
 }
