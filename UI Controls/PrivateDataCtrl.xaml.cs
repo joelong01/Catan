@@ -72,6 +72,13 @@ namespace Catan10
             }
         }
 
+        private bool StolenResourceEmpty(ResourceType resourceType)
+        {
+            if (resourceType == ResourceType.None) return false;
+
+            return true;
+        }
+
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties
@@ -119,6 +126,18 @@ namespace Catan10
         #endregion Constructors + Destructors
 
         #region Methods
+
+        public static bool EnableMenuForGameState(DevCardType dcType, GameState state)
+        {
+            if (dcType == DevCardType.VictoryPoint) return false;
+
+            if (dcType == DevCardType.Knight && state == GameState.WaitingForRoll)
+            {
+                return true;
+            }
+
+            return (state == GameState.WaitingForNext);
+        }
 
         public static string MenuPlayString(DevCardType devCardType)
         {
@@ -255,19 +274,6 @@ namespace Catan10
             return ret;
         }
 
-        public static bool EnableMenuForGameState(DevCardType dcType, GameState state)
-        {
-            if (dcType == DevCardType.VictoryPoint) return false;
-
-            if (dcType == DevCardType.Knight && state == GameState.WaitingForRoll)
-            {                        
-               return true;            
-            }
-
-            return (state == GameState.WaitingForNext);
-                
-        }
-
         /// <summary>
         ///         We added a menu to the "Available Dev Cads" collection, and the user picked one to play
         /// </summary>
@@ -350,7 +356,7 @@ namespace Catan10
             {
                 if (AtMaxEntitlement(Player, Entitlement.Settlement))
                 {
-                    await MainPage.Current.ShowErrorMessage($"You have purchased all available Settlements.", "Catan","");
+                    await MainPage.Current.ShowErrorMessage($"You have purchased all available Settlements.", "Catan", "");
                 }
                 await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement);
             }

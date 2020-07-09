@@ -16,22 +16,7 @@ namespace Catan10
 {
     public class CatanGameCtrl : ICatanGameData
     {
-        private ICatanGameData ChildControl
-        {
-            get
-            {
-                if (Control != null)
-                {
-                    return Control as ICatanGameData;
-                }
-                return null;
-            }
-        }
-
-        internal DevCardType GetNextDevCard()
-        {
-            return ChildControl.GameData.GetNextDevCard();
-        }
+        #region Properties
 
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
@@ -63,6 +48,22 @@ namespace Catan10
 
         public List<TileCtrl> Tiles => ChildControl.Tiles;
 
+        private ICatanGameData ChildControl
+        {
+            get
+            {
+                if (Control != null)
+                {
+                    return Control as ICatanGameData;
+                }
+                return null;
+            }
+        }
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
         public CatanGameCtrl(Type type, CatanGames gameType, string s, int idx)
         {
             ControlType = type;
@@ -71,10 +72,21 @@ namespace Catan10
             CatanGame = gameType;
         }
 
+        #endregion Constructors + Destructors
+
+        #region Methods
+
         public override string ToString()
         {
             return String.Format($"{Description}.{ControlType.Name}");
         }
+
+        internal DevCardType GetNextDevCard()
+        {
+            return ChildControl.GameData.GetNextDevCard();
+        }
+
+        #endregion Methods
     }
 
     /// <summary>
@@ -85,6 +97,12 @@ namespace Catan10
 
     public sealed partial class GameContainerCtrl : UserControl
     {
+        #region Delegates + Fields + Events + Enums
+
+        public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGameCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
+
+        public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGameCtrl>), typeof(CatanHexPanel), new PropertyMetadata(""));
+
         //
         //  when you build a new Game control, add it to this list
         //
@@ -110,293 +128,14 @@ namespace Catan10
         private Dictionary<ResourceType, double> _probabilities = new Dictionary<ResourceType, double>();
         private ITileControlCallback _tileCallback = null;
 
-        private static void OnCurrentGameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            GameContainerCtrl container = d as GameContainerCtrl;
-            container.SetGame(e.NewValue as CatanGameCtrl);
+        #endregion Delegates + Fields + Events + Enums
 
-        }
-
-        private bool AboveTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
-        {
-            if (row == 0)
-            {
-                return false;
-            }
-
-            int number = visualTiles.ElementAt(col).ElementAt(row - 1).Number;
-            return IsRed(number);
-        }
-
-        private bool BelowTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
-        {
-            if (row == visualTiles.ElementAt(col).Count - 1)
-            {
-                return false;
-            }
-
-            int number = visualTiles.ElementAt(col).ElementAt(row + 1).Number;
-            return IsRed(number);
-        }
-
-        private string DumpTileList(List<TileCtrl> list)
-        {
-            string s = "";
-            foreach (var t in list)
-            {
-                s += $"{t},";
-            }
-            return s;
-        }
-
-        private bool IsRed(int i)
-        {
-            if (i == 6 || i == 8)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool IsValidNumberLayout()
-        {
-            List<List<TileCtrl>> visualTiles = _currentHexPanel.VisualTiles;
-
-            //
-            //  Need to check the last column to see if one red tile is below another
-            for (int col = 0; col < visualTiles.Count; col++)
-            {
-                for (int row = 0; row < visualTiles.ElementAt(col).Count; row++)
-                {
-                    TileCtrl tile = visualTiles.ElementAt(col).ElementAt(row);
-                    int number = tile.Number;
-                    if (tile.ResourceType == ResourceType.GoldMine)
-                    {
-                        if (number == 8 || number == 6)
-                        {
-                            // this.TraceMessage($"Rejected layout because Gold had a {number}");
-                            return false;
-                        }
-                    }
-                    if (IsRed(number))
-                    {
-                        if (NextLowerRightIsRed(row, col, visualTiles))
-                        {
-                            return false;
-                        }
-
-                        if (NextUpperRightIsRed(row, col, visualTiles))
-                        {
-                            return false;
-                        }
-
-                        if (BelowTileIsRed(row, col, visualTiles))
-                        {
-                            return false;
-                        }
-
-                        // shouldn't need the below, as they are next to a tile that is above
-                        //if (AboveTileIsRed(row, col, visualTiles))
-                        //    return false;
-                        //if (PreviousLowerLeftIsRed(row, col, visualTiles))
-                        //    return false;
-                        //if (PreviousUpperLeftIsRed(row, col, visualTiles))
-                        //    return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private bool NextLowerRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
-        {
-            if (col == visualTiles.Count - 1)
-            {
-                return false; // last column has no Next column
-            }
-
-            bool ret = false;
-
-            bool beforeMiddle = (col < visualTiles.Count / 2);
-
-            int number;
-            if (beforeMiddle)
-            {
-                number = visualTiles.ElementAt(col + 1).ElementAt(row + 1).Number;
-                ret = IsRed(number);
-                return ret;
-            }
-
-            if (row > visualTiles.ElementAt(col + 1).Count - 1)
-            {
-                return false;
-            }
-            // we are at or past the middle
-            number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;   // row + 1 is always valid after the middle
-            ret = IsRed(number);
-            return ret;
-        }
-
-        private bool NextUpperRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
-        {
-            if (col == visualTiles.Count - 1)
-            {
-                return false; // last column has no Next column
-            }
-
-            bool ret = false;
-
-            bool beforeMiddle = (col < visualTiles.Count / 2);
-
-            int number;
-            if (beforeMiddle)
-            {
-                number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;
-                ret = IsRed(number);
-                return ret;
-            }
-
-            if (row == 0)
-            {
-                return false;
-            }
-
-            // we are at or past the middle
-            number = visualTiles.ElementAt(col + 1).ElementAt(row - 1).Number;   // row + 1 is always valid after the middle
-            ret = IsRed(number);
-            return ret;
-        }
-
-        /// <summary>
-        ///     Given a tileGroup (e.g. a set of Tiles completely surrounded by water (or a continuguous set of tiles like the standard board)
-        ///     return a list of numbers that represent the random numbers for that TileGroup
-        /// </summary>
-        /// <param name="tileGroup"></param>
-        /// <returns></returns>
-        private List<int> RandomAndValidNumberList(TileGroup tileGroup)
-        {
-            bool valid = false;
-            int iterations = 0;
-            List<int> randomNumberSequence = new List<int>();
-
-            while (!valid)
-            {
-                randomNumberSequence = GetRandomList(tileGroup.StartingTileNumbers.Count - 1); // this is the index *into* TileGroup.StartingTileNumbers
-                _currentHexPanel.DesertTiles.Clear();
-                _currentHexPanel.DesertTiles.AddRange(tileGroup.TilesToRandomize.FindAll(t => t.ResourceType == ResourceType.Desert));
-                int startingDesertIndex = 0;
-                int randomDesertIndex = 0;
-                for (int i = 0; i < _currentHexPanel.DesertTiles.Count; i++)
-                {
-                    //
-                    //  the index into the TileGroup.StartingTileNumbers that has the desert number (7)
-                    startingDesertIndex = tileGroup.StartingTileNumbers.IndexOf(7, startingDesertIndex);
-
-                    //
-                    //  find the index in the random array that has that index
-                    randomDesertIndex = randomNumberSequence.IndexOf(startingDesertIndex, randomDesertIndex);
-
-                    // where is the Desert in the Randomtiles?
-
-                    TileCtrl desertTile = _currentHexPanel.DesertTiles[i];
-                    int desertTileIndex = tileGroup.TilesToRandomize.IndexOf(desertTile);
-
-                    randomNumberSequence.Swap(desertTileIndex, randomDesertIndex);
-                }
-
-                for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
-                {
-                    TileCtrl t = tileGroup.TilesToRandomize[i];
-                    t.HasBaron = false;
-                    int number = tileGroup.StartingTileNumbers[randomNumberSequence[i]];
-                    if (number == 7)
-                    {
-                        Debug.Assert(t.ResourceType == ResourceType.Desert);
-                    }
-                    else
-                    {
-                        Debug.Assert(t.ResourceType != ResourceType.Desert);
-                    }
-
-                    t.Number = number;
-                }
-                iterations++;
-                valid = IsValidNumberLayout();
-            }
-
-            //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanSignalRClient.Serialize(randomNumberSequence)}");
-            return randomNumberSequence;
-        }
-
-        //
-        // 1. the dependency property SetGame gets called
-        // 2. the change notification function OnCurrentGameChanged gets called
-        // 3. that calls this function
-        //
-        //  please don't call this directly, as it will bypass any UI that has bound to the DP
-        //
-        private void SetGame(CatanGameCtrl newGame)
-        {
-            if (newGame.Control == null)
-            {
-                newGame.Control = (UserControl)Activator.CreateInstance(newGame.ControlType);
-            }
-
-            PanelGrid.Children.Clear();
-            PanelGrid.Children.Add(newGame.Control);
-            PanelGrid.UpdateLayout();
-            _currentHexPanel = newGame.HexPanel;
-            _currentHexPanel.GameCallback = _gameCallback;
-            _currentHexPanel.TileCallback = _tileCallback;
-
-            FlipAllAsync(TileOrientation.FaceDown);
-        }
-
-        internal void CalculateAdjacentBuildings()
-        {
-            _currentHexPanel.FindAdjacentRoads();
-        }
-
-        internal bool GetBuilding(TileCtrl tile, BuildingLocation location, out BuildingCtrl control)
-        {
-            BuildingKey key = new BuildingKey(tile, location);
-            return _currentHexPanel.BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out control);
-        }
-
-        internal IReadOnlyCollection<TileCtrl> GetTilesWithNumber(int val)
-        {
-            if (_TilesWithNumbers[val] == null)
-            {
-                _TilesWithNumbers[val] = new List<TileCtrl>();
-                foreach (TileCtrl t in CurrentGame.Tiles)
-                {
-                    if (t.Number == val)
-
-                    {
-                        _TilesWithNumbers[val].Add(t);
-                    }
-                }
-            }
-            return _TilesWithNumbers[val];
-        }
-
-        internal void Reset()
-        {
-            _currentHexPanel.Reset();
-            _probabilities.Clear();
-            RandomBoardSettings = new RandomBoardSettings();
-            _ = ResetRandomGoldTiles();
-        }
-
-        internal Task RotateTiles()
-        {
-            throw new NotImplementedException();
-        }
+        #region Properties
 
         public List<BuildingCtrl> AllBuildings => _currentHexPanel.Buildings;
+
         public List<RoadCtrl> AllRoads => _currentHexPanel.Roads;
+
         public List<TileCtrl> AllTiles => _currentHexPanel.Tiles;
 
         public TileCtrl BaronTile
@@ -490,15 +229,22 @@ namespace Catan10
         }
 
         public RandomBoardSettings RandomBoardSettings { get; private set; } = null;
+
         public TileCtrl[] TilesInIndexOrder => _currentHexPanel.TilesInIndexOrder;
-        public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGameCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
-        public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGameCtrl>), typeof(CatanHexPanel), new PropertyMetadata(""));
+
+        #endregion Properties
+
+        #region Constructors + Destructors
 
         public GameContainerCtrl()
         {
             this.InitializeComponent();
             Games = _games;
         }
+
+        #endregion Constructors + Destructors
+
+        #region Methods
 
         public static List<int> GetRandomList(int max)
         {
@@ -1107,6 +853,292 @@ namespace Catan10
             await FancyHarborDistribution();
             await InitialPlaceBaron();
         }
+
+        internal void CalculateAdjacentBuildings()
+        {
+            _currentHexPanel.FindAdjacentRoads();
+        }
+
+        internal bool GetBuilding(TileCtrl tile, BuildingLocation location, out BuildingCtrl control)
+        {
+            BuildingKey key = new BuildingKey(tile, location);
+            return _currentHexPanel.BuildingKeyToBuildingCtrlDictionary.TryGetValue(key, out control);
+        }
+
+        internal IReadOnlyCollection<TileCtrl> GetTilesWithNumber(int val)
+        {
+            if (_TilesWithNumbers[val] == null)
+            {
+                _TilesWithNumbers[val] = new List<TileCtrl>();
+                foreach (TileCtrl t in CurrentGame.Tiles)
+                {
+                    if (t.Number == val)
+
+                    {
+                        _TilesWithNumbers[val].Add(t);
+                    }
+                }
+            }
+            return _TilesWithNumbers[val];
+        }
+
+        internal void Reset()
+        {
+            _currentHexPanel.Reset();
+            _probabilities.Clear();
+            RandomBoardSettings = new RandomBoardSettings();
+            _ = ResetRandomGoldTiles();
+        }
+
+        internal Task RotateTiles()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void OnCurrentGameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            GameContainerCtrl container = d as GameContainerCtrl;
+            container.SetGame(e.NewValue as CatanGameCtrl);
+        }
+
+        private bool AboveTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
+        {
+            if (row == 0)
+            {
+                return false;
+            }
+
+            int number = visualTiles.ElementAt(col).ElementAt(row - 1).Number;
+            return IsRed(number);
+        }
+
+        private bool BelowTileIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
+        {
+            if (row == visualTiles.ElementAt(col).Count - 1)
+            {
+                return false;
+            }
+
+            int number = visualTiles.ElementAt(col).ElementAt(row + 1).Number;
+            return IsRed(number);
+        }
+
+        private string DumpTileList(List<TileCtrl> list)
+        {
+            string s = "";
+            foreach (var t in list)
+            {
+                s += $"{t},";
+            }
+            return s;
+        }
+
+        private bool IsRed(int i)
+        {
+            if (i == 6 || i == 8)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsValidNumberLayout()
+        {
+            List<List<TileCtrl>> visualTiles = _currentHexPanel.VisualTiles;
+
+            //
+            //  Need to check the last column to see if one red tile is below another
+            for (int col = 0; col < visualTiles.Count; col++)
+            {
+                for (int row = 0; row < visualTiles.ElementAt(col).Count; row++)
+                {
+                    TileCtrl tile = visualTiles.ElementAt(col).ElementAt(row);
+                    int number = tile.Number;
+                    if (tile.ResourceType == ResourceType.GoldMine)
+                    {
+                        if (number == 8 || number == 6)
+                        {
+                            // this.TraceMessage($"Rejected layout because Gold had a {number}");
+                            return false;
+                        }
+                    }
+                    if (IsRed(number))
+                    {
+                        if (NextLowerRightIsRed(row, col, visualTiles))
+                        {
+                            return false;
+                        }
+
+                        if (NextUpperRightIsRed(row, col, visualTiles))
+                        {
+                            return false;
+                        }
+
+                        if (BelowTileIsRed(row, col, visualTiles))
+                        {
+                            return false;
+                        }
+
+                        // shouldn't need the below, as they are next to a tile that is above
+                        //if (AboveTileIsRed(row, col, visualTiles))
+                        //    return false;
+                        //if (PreviousLowerLeftIsRed(row, col, visualTiles))
+                        //    return false;
+                        //if (PreviousUpperLeftIsRed(row, col, visualTiles))
+                        //    return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool NextLowerRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
+        {
+            if (col == visualTiles.Count - 1)
+            {
+                return false; // last column has no Next column
+            }
+
+            bool ret = false;
+
+            bool beforeMiddle = (col < visualTiles.Count / 2);
+
+            int number;
+            if (beforeMiddle)
+            {
+                number = visualTiles.ElementAt(col + 1).ElementAt(row + 1).Number;
+                ret = IsRed(number);
+                return ret;
+            }
+
+            if (row > visualTiles.ElementAt(col + 1).Count - 1)
+            {
+                return false;
+            }
+            // we are at or past the middle
+            number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;   // row + 1 is always valid after the middle
+            ret = IsRed(number);
+            return ret;
+        }
+
+        private bool NextUpperRightIsRed(int row, int col, List<List<TileCtrl>> visualTiles)
+        {
+            if (col == visualTiles.Count - 1)
+            {
+                return false; // last column has no Next column
+            }
+
+            bool ret = false;
+
+            bool beforeMiddle = (col < visualTiles.Count / 2);
+
+            int number;
+            if (beforeMiddle)
+            {
+                number = visualTiles.ElementAt(col + 1).ElementAt(row).Number;
+                ret = IsRed(number);
+                return ret;
+            }
+
+            if (row == 0)
+            {
+                return false;
+            }
+
+            // we are at or past the middle
+            number = visualTiles.ElementAt(col + 1).ElementAt(row - 1).Number;   // row + 1 is always valid after the middle
+            ret = IsRed(number);
+            return ret;
+        }
+
+        /// <summary>
+        ///     Given a tileGroup (e.g. a set of Tiles completely surrounded by water (or a continuguous set of tiles like the standard board)
+        ///     return a list of numbers that represent the random numbers for that TileGroup
+        /// </summary>
+        /// <param name="tileGroup"></param>
+        /// <returns></returns>
+        private List<int> RandomAndValidNumberList(TileGroup tileGroup)
+        {
+            bool valid = false;
+            int iterations = 0;
+            List<int> randomNumberSequence = new List<int>();
+
+            while (!valid)
+            {
+                randomNumberSequence = GetRandomList(tileGroup.StartingTileNumbers.Count - 1); // this is the index *into* TileGroup.StartingTileNumbers
+                _currentHexPanel.DesertTiles.Clear();
+                _currentHexPanel.DesertTiles.AddRange(tileGroup.TilesToRandomize.FindAll(t => t.ResourceType == ResourceType.Desert));
+                int startingDesertIndex = 0;
+                int randomDesertIndex = 0;
+                for (int i = 0; i < _currentHexPanel.DesertTiles.Count; i++)
+                {
+                    //
+                    //  the index into the TileGroup.StartingTileNumbers that has the desert number (7)
+                    startingDesertIndex = tileGroup.StartingTileNumbers.IndexOf(7, startingDesertIndex);
+
+                    //
+                    //  find the index in the random array that has that index
+                    randomDesertIndex = randomNumberSequence.IndexOf(startingDesertIndex, randomDesertIndex);
+
+                    // where is the Desert in the Randomtiles?
+
+                    TileCtrl desertTile = _currentHexPanel.DesertTiles[i];
+                    int desertTileIndex = tileGroup.TilesToRandomize.IndexOf(desertTile);
+
+                    randomNumberSequence.Swap(desertTileIndex, randomDesertIndex);
+                }
+
+                for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
+                {
+                    TileCtrl t = tileGroup.TilesToRandomize[i];
+                    t.HasBaron = false;
+                    int number = tileGroup.StartingTileNumbers[randomNumberSequence[i]];
+                    if (number == 7)
+                    {
+                        Debug.Assert(t.ResourceType == ResourceType.Desert);
+                    }
+                    else
+                    {
+                        Debug.Assert(t.ResourceType != ResourceType.Desert);
+                    }
+
+                    t.Number = number;
+                }
+                iterations++;
+                valid = IsValidNumberLayout();
+            }
+
+            //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanSignalRClient.Serialize(randomNumberSequence)}");
+            return randomNumberSequence;
+        }
+
+        //
+        // 1. the dependency property SetGame gets called
+        // 2. the change notification function OnCurrentGameChanged gets called
+        // 3. that calls this function
+        //
+        //  please don't call this directly, as it will bypass any UI that has bound to the DP
+        //
+        private void SetGame(CatanGameCtrl newGame)
+        {
+            if (newGame.Control == null)
+            {
+                newGame.Control = (UserControl)Activator.CreateInstance(newGame.ControlType);
+            }
+
+            PanelGrid.Children.Clear();
+            PanelGrid.Children.Add(newGame.Control);
+            PanelGrid.UpdateLayout();
+            _currentHexPanel = newGame.HexPanel;
+            _currentHexPanel.GameCallback = _gameCallback;
+            _currentHexPanel.TileCallback = _tileCallback;
+
+            FlipAllAsync(TileOrientation.FaceDown);
+        }
+
+        #endregion Methods
 
         /**
         *  flip tiles to facedown, change them to temp gold, and then flip them back up

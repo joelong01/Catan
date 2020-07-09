@@ -17,7 +17,6 @@ using Windows.Storage.Search;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Popups;
-using Windows.UI.ViewManagement;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -155,6 +154,22 @@ namespace Catan10
             return files;
         }
 
+        public string MainPageTitle(GameInfo gameInfo, PlayerModel player, GameState state)
+        {
+            if (gameInfo == null) return "Catan";
+
+            return $"{_gameView.Games[gameInfo.GameIndex].CatanGame} in channel {gameInfo.Name}.  {player.PlayerName}'s Turn.  Click Next for: {state.Description()}";
+        }
+
+        public async Task PickSettlementsAndRoads()
+        {
+            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
+            {
+                await AutoSetBuildingAndRoad();
+                await NextState();
+            }
+        }
+
         public void UpdateBoardMeasurements()
         {
             PipCount = GetPipCount();
@@ -224,16 +239,25 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        ///     Used for debugging/testing -- automatically pick a settlement and road
+        /// </summary>
+        /// <returns></returns>
+        private async Task AutoSetBuildingAndRoad()
+        {
+            // pick a tile with the highest pips and put a settlement on it
+            var building = GetHighestPipsBuilding();
+            await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
+
+            // pick a Random Road
+            var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
+
+            await UpdateRoadLog.SetRoadState(this, road, RoadState.Road, _raceTracking);
+        }
+
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             _doDragDrop = _doDragDrop ? false : true;
-        }
-
-        public string MainPageTitle(GameInfo gameInfo, PlayerModel player, GameState state)
-        {
-            if (gameInfo == null) return "Catan";
-            
-            return $"{_gameView.Games[gameInfo.GameIndex].CatanGame} in channel {gameInfo.Name}.  {player.PlayerName}'s Turn.  Click Next for: {state.Description()}";
         }
 
         private void GameViewControlPointerPressed(object sender, PointerRoutedEventArgs pRoutedEvents)
@@ -530,11 +554,6 @@ namespace Catan10
             await SaveGameState();
         }
 
-        private bool OpenControlGrid(PlayerModel current, PlayerModel human)
-        {
-            return current == human;
-        }
-
         private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
             await GrowOrShrink(ControlGrid);
@@ -739,6 +758,11 @@ namespace Catan10
             }
         }
 
+        private bool OpenControlGrid(PlayerModel current, PlayerModel human)
+        {
+            return current == human;
+        }
+
         private async void PickAGoodBoard(PointerRoutedEventArgs e)
         {
             if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
@@ -767,16 +791,6 @@ namespace Catan10
             }
 
             await _gameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
-        }
-
-        public async Task PickSettlementsAndRoads()
-        {
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
-            {
-                await AutoSetBuildingAndRoad();
-                await NextState();
-
-            }
         }
 
         private async void PickSettlementsAndRoads(object sender, RoutedEventArgs e)
@@ -898,7 +912,6 @@ namespace Catan10
             SaveSettingsTimer.Stop();
             try
             {
-
                 //
                 //  on occasion, i've had to rename grids in mainpage -- but their position might be in the saved file.
                 //  this will remove the ones that don't exist anymore
@@ -915,7 +928,7 @@ namespace Catan10
                 //
                 //  you cannot use the SignalR Json options here because you need to store more than just names
                 //  to serialize the players.
-                // 
+                //
                 StorageFolder folder = await StaticHelpers.GetSaveFolder();
                 var options = new JsonSerializerOptions
                 {
@@ -993,23 +1006,6 @@ namespace Catan10
             }
         }
 
-        /// <summary>
-        ///     Used for debugging/testing -- automatically pick a settlement and road
-        /// </summary>
-        /// <returns></returns>        
-        private async Task AutoSetBuildingAndRoad()
-        {
-            // pick a tile with the highest pips and put a settlement on it
-            var building = GetHighestPipsBuilding();
-            await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
-
-            // pick a Random Road
-            var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
-
-            await UpdateRoadLog.SetRoadState(this, road, RoadState.Road, _raceTracking);
-
-        }
-
         private void SetMainPageModel(MainPageModel oldModel, MainPageModel newModel)
         {
             if (oldModel != null)
@@ -1033,7 +1029,6 @@ namespace Catan10
 
             if (e.PropertyName == "IsLocalGame")
             {
-
                 if (MainPageModel.Settings.IsLocalGame && MainPageModel.CatanService != null)
                 {
                     await MainPageModel.CatanService.DisposeAsync();
@@ -1043,7 +1038,6 @@ namespace Catan10
 
             if (e.PropertyName == "IsServiceGame")
             {
-
                 if (MainPageModel.Settings.IsServiceGame && MainPageModel.CatanService == null)
                 {
                     await CreateAndConfigureProxy();
@@ -1084,6 +1078,18 @@ namespace Catan10
             set => SetValue(TurnedSpyOnProperty, value);
         }
 
+        private string BuildCaption(string begin, string end)
+        {
+            if (String.IsNullOrEmpty(end)) return begin;
+
+            return $"{begin} -  {end}";
+        }
+
+        private string BuildTurnCaption(string name)
+        {
+            return $"{name}'s Turn";
+        }
+
         private void Draggable_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             e.Handled = false; // bubble up
@@ -1103,6 +1109,20 @@ namespace Catan10
             Canvas.SetZIndex(((FrameworkElement)sender), 11);
         }
 
+        private bool EnableNextButton(bool enableNextButton, GameState gameState, int unprocessedMessages)
+        {
+            //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
+            if (unprocessedMessages != 0)
+            {
+                //   this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
+                return false;
+            }
+
+            bool enable = MainPageModel.EnableNextButton;
+            Debug.Assert(enable == enableNextButton);
+            return enable;
+        }
+
         private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
         {
             if (MainPageModel.EnableNextButton == false) return;
@@ -1117,58 +1137,25 @@ namespace Catan10
             }
         }
 
-        private async void OnShowCatanSpy(object sender, RoutedEventArgs e)
+        private async void OnNetworkConnect(object _, RoutedEventArgs rea)
         {
-            if (_spyWindowOpen) return;
-            _spyWindowOpen = true;
-            AppWindow appWindow = await AppWindow.TryCreateAsync();
-            Frame appWindowContentFrame = new Frame();
-            appWindowContentFrame.Navigate(typeof(CatanSpyPage));
-            await CatanSpyLog.SpyOnOff(this, true);
-            // Get a reference to the page instance and assign the
-            // newly created AppWindow to the MyAppWindow property.
+            //
+            //  start the connection to the SignalR servi0ce
+            //
 
-            ElementCompositionPreview.SetAppWindowContent(appWindow, appWindowContentFrame);
-            appWindow.Closed += delegate
+            try
             {
-                _spyWindowOpen = false;
-                appWindowContentFrame.Content = null;
-                appWindow = null;
-            };
-            await appWindow.TryShowAsync();
-        }
-
-        private bool EnableNextButton(bool enableNextButton, GameState gameState, int unprocessedMessages)
-        {
-            //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
-            if (unprocessedMessages != 0)
-            {
-                //   this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
-                return false;
+                await CreateAndConfigureProxy();
             }
-
-            bool enable = MainPageModel.EnableNextButton;
-            Debug.Assert(enable == enableNextButton);
-            return enable;
-
-        }
-
-        private string BuildCaption(string begin, string end)
-        {
-            if (String.IsNullOrEmpty(end)) return begin;
-
-            return $"{begin} -  {end}";
-        }
-
-        private string BuildTurnCaption(string name)
-        {
-            return $"{name}'s Turn";
+            catch (Exception e)
+            {
+                await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
+            }
         }
 
         private async void OnNewLocalGame(object sender, RoutedEventArgs e)
         {
             MainPageModel.Settings.IsLocalGame = true;
-
 
             if (MainPageModel.GameState != GameState.WaitingForNewGame)
             {
@@ -1177,8 +1164,6 @@ namespace Catan10
                     return;
                 }
             }
-
-
 
             NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
 
@@ -1204,7 +1189,6 @@ namespace Catan10
                 _gameView.Reset();
                 await this.Reset();
 
-
                 _gameView.CurrentGame = dlg.SelectedGame;
                 MainPageModel.PlayingPlayers.Clear();
                 GameInfo info = new GameInfo()
@@ -1221,29 +1205,28 @@ namespace Catan10
               {
                   await AddPlayerLog.AddPlayer(this, p.PlayerName);
               });
-
-
-
             }
-
-
         }
 
-        private async void OnNetworkConnect(object _, RoutedEventArgs rea)
+        private async void OnShowCatanSpy(object sender, RoutedEventArgs e)
         {
-            //
-            //  start the connection to the SignalR servi0ce
-            //
+            if (_spyWindowOpen) return;
+            _spyWindowOpen = true;
+            AppWindow appWindow = await AppWindow.TryCreateAsync();
+            Frame appWindowContentFrame = new Frame();
+            appWindowContentFrame.Navigate(typeof(CatanSpyPage));
+            await CatanSpyLog.SpyOnOff(this, true);
+            // Get a reference to the page instance and assign the
+            // newly created AppWindow to the MyAppWindow property.
 
-            try
+            ElementCompositionPreview.SetAppWindowContent(appWindow, appWindowContentFrame);
+            appWindow.Closed += delegate
             {
-                await CreateAndConfigureProxy();
-            }
-            catch (Exception e)
-            {
-                await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
-            }
-
+                _spyWindowOpen = false;
+                appWindowContentFrame.Content = null;
+                appWindow = null;
+            };
+            await appWindow.TryShowAsync();
         }
     }
 }

@@ -44,7 +44,7 @@
             HorizontalAlignment="Right" VerticalAlignment="Center" Canvas.ZIndex="99"
             Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
             Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
-            Open="True" SlideDirection="Left">
+            Open="{x:Bind StolenResourceEmpty(Player.GameData.Resources.StolenResource), Mode=OneWay}" SlideDirection="Left">
             <s:SliderCtrl.Child>
                 <StackPanel>
                     <TextBlock Margin="5" HorizontalAlignment="Center" Text="Stolen Resource" />

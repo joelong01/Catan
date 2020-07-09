@@ -16,6 +16,8 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        #region Delegates + Fields + Events + Enums
+
         private readonly List<PlayerModel> defaultPlayers = new List<PlayerModel>()
         {
             new PlayerModel() {PlayerName = "Joe", ImageFileName = "ms-appx:Assets/DefaultPlayers/joe.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.SlateBlue, SecondaryBackgroundColor = Colors.Black,PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3AC5}")},
@@ -26,6 +28,171 @@ namespace Catan10
             new PlayerModel() {PlayerName = "Cort", ImageFileName = "ms-appx:Assets/DefaultPlayers/cort.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Green, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACA}") },
             new PlayerModel() {PlayerName = "Adrian", ImageFileName = "ms-appx:Assets/DefaultPlayers/adrian.jpg", ForegroundColor=Colors.White, PrimaryBackgroundColor=Colors.Purple, SecondaryBackgroundColor = Colors.Black, PlayerIdentifier = Guid.Parse("{2B685447-31D9-4DCA-B29F-6FEC870E3ACB}") },
         };
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Methods
+
+        public async Task DoUndo()
+        {
+            if ((CurrentGameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction) && ValidateBuilding)
+            {
+                return;
+            }
+            try
+            {
+                MainPageModel.EnableUiInteraction = false;
+                bool ret = await UndoAsync();
+            }
+            finally
+            {
+                MainPageModel.EnableUiInteraction = true;
+            }
+        }
+
+        /// <summary>
+        ///     This is called when the user clicks on the "Next" button.
+        ///     its job is to do all of the updates nesessary to move to the next state
+        ///
+        ///     We need to be identical here and in the IGameController::SetState(SetStateLog log) function in that hitting "next" on this machine
+        ///     does the exact same thing to all the other machines in the game.
+        ///
+        ///     intuition says that this switch should just call a LogHeader static to initiate the action.
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> NextState()
+        {
+            if (CurrentPlayer.PlayerIdentifier == Guid.Empty)
+            {
+                await OnNewGame();
+                return false;
+            }
+            try
+            {
+                //
+                //  6/16/2020: the UI binding can lag behing the flag being set.  checking it directly to make sure we don't reenter
+                //
+                if (!MainPageModel.EnableUiInteraction)
+                {
+                    this.TraceMessage("rejecting call to NextState");
+                    return false;
+                }
+
+                if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
+
+                if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;
+
+                // this.TraceMessage("starting NextStep");
+                MainPageModel.EnableUiInteraction = false;
+                switch (CurrentGameState)
+                {
+                    case GameState.WaitingForNewGame:
+                        OnStartDefaultNetworkGame(null, null);
+                        break;
+
+                    case GameState.WaitingForPlayers:
+                        await WaitingForPlayersToPickingBoard.PostLog(this);
+                        break;
+
+                    case GameState.PickingBoard:  // you get here by clicking the "=>" button
+                        if (MainPageModel.Settings.IsLocalGame)
+                        {
+                            LogHeader logHeader = new LogHeader()
+                            {
+                                NewState = GameState.WaitingForRollForOrder,
+                            };
+                            await MainPageModel.Log.PushAction(logHeader);
+                            await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
+                        }
+                        else
+                        {
+                            await PickingBoardToWaitingForRollOrder.PostLog(this);
+                        }
+                        break;
+
+                    case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
+
+                        break;
+
+                    case GameState.FinishedRollOrder:
+                        await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
+                        break;
+
+                    case GameState.BeginResourceAllocation:
+                        await BeginAllocationToAllocateResourcesForward.PostLog(this);
+                        break;
+
+                    case GameState.AllocateResourceForward:
+                        if (MainPageModel.PlayingPlayers.Last().GameData.Score == 1)
+                        {
+                            await AllocateResourcesForwardToAllocateResourcesReverse.PostLog(this);
+                        }
+                        else
+                        {
+                            await AllocateResourcesForwardToAllocateResourcesForward.PostLog(this);
+                        }
+                        break;
+
+                    case GameState.AllocateResourceReverse:
+
+                        int players = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1;
+
+                        if (MainPageModel.PlayingPlayers[0].GameData.Score == 2)
+                        {
+                            await AllocateResourcesReverseToDoneAllocResources.PostLog(this);
+                        }
+                        else
+                        {
+                            await AllocateResourcesReverseToAllocateResourcesReverse.PostLog(this);
+                        }
+
+                        break;
+
+                    case GameState.DoneResourceAllocation:
+                        if (Log.RollLog.CanRedo)
+                        {
+                            await DoneAllocResourcesToWaitingForNext.PostLog(this); // skip the roll and use the one that is there....
+                        }
+                        else
+                        {
+                            await DoneAllocResourcesToWaitingForRoll.PostLog(this);
+                        }
+                        break;
+
+                    case GameState.WaitingForRoll:
+                        Contract.Assert(false, "should be done in MainPage.OnRolled");
+                        //
+                        //  this is called in MainPage.OnRolled
+                        break;
+
+                    case GameState.MustMoveBaron:
+                        Contract.Assert(false, "this is done in pagecallback");
+                        break;
+
+                    case GameState.WaitingForNext:
+                        await WaitingForNextToWaitingForRoll.PostLog(this);
+                        break;
+
+                    //
+                    //  these don't ever get called when Next is hit
+                    case GameState.Uninitialized:
+                    default:
+                        Contract.Assert(false, "Next should not have been anabled for this state!");
+                        break;
+                }
+
+                return true;
+            }
+            finally
+            {
+                MainPageModel.EnableUiInteraction = true;
+            }
+        }
+
+        internal void AddPlayerMenu(PlayerModel player)
+        {
+        }
 
         private void CreateMenuItems()
         {
@@ -89,9 +256,9 @@ namespace Catan10
             try
             {
                 MainPageModel.EnableUiInteraction = false;
-             //   this.TraceMessage("starting redo");
+                //   this.TraceMessage("starting redo");
                 bool ret = await RedoAsync();
-              //  this.TraceMessage("done redo");
+                //  this.TraceMessage("done redo");
             }
             finally
             {
@@ -126,19 +293,20 @@ namespace Catan10
             return defaultPlayers;
         }
 
-        private async void Menu_OnNewGame(object sender, RoutedEventArgs e)
-        {
-            // await OnNewGame?.Invoke(this, EventArgs.Empty);
-            await OnNewGame();
-        }
         private async void Menu_OnEndGame(object sender, RoutedEventArgs e)
         {
             if (MainPageModel.IsServiceGame)
             {
-                await MainPageModel.CatanService.DeleteGame(MainPageModel.GameInfo.Id, TheHuman.PlayerName);                
+                await MainPageModel.CatanService.DeleteGame(MainPageModel.GameInfo.Id, TheHuman.PlayerName);
             }
             await this.Reset();
             await InitializeMainPageModel();
+        }
+
+        private async void Menu_OnNewGame(object sender, RoutedEventArgs e)
+        {
+            // await OnNewGame?.Invoke(this, EventArgs.Empty);
+            await OnNewGame();
         }
 
         private async void Menu_SelectGame(object sender, RoutedEventArgs e)
@@ -226,7 +394,6 @@ namespace Catan10
         {
             try
             {
-                
                 if (!MainPageModel.EnableNextButton)
                 {
                     this.TraceMessage("CallRejected");
@@ -249,7 +416,6 @@ namespace Catan10
             }
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
-            
 
             List<Target> targetList = PickBaronVictim(true);
             if (targetList.Count == 0)
@@ -355,7 +521,6 @@ namespace Catan10
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
             this.TraceMessage("removed MovedBaronAfterRollingSeven");
-           
 
             List<Target> targetList = PickBaronVictim(true);
             if (targetList.Count == 0)
@@ -615,164 +780,6 @@ namespace Catan10
             }
         }
 
-        internal void AddPlayerMenu(PlayerModel player)
-        {
-        }
-
-        public async Task DoUndo()
-        {
-            if ((CurrentGameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction) && ValidateBuilding)
-            {
-                return;
-            }
-            try
-            {
-                MainPageModel.EnableUiInteraction = false;
-                bool ret = await UndoAsync();
-            }
-            finally
-            {
-                MainPageModel.EnableUiInteraction = true;
-            }
-        }
-
-        /// <summary>
-        ///     This is called when the user clicks on the "Next" button.
-        ///     its job is to do all of the updates nesessary to move to the next state
-        ///
-        ///     We need to be identical here and in the IGameController::SetState(SetStateLog log) function in that hitting "next" on this machine
-        ///     does the exact same thing to all the other machines in the game.
-        ///
-        ///     intuition says that this switch should just call a LogHeader static to initiate the action.
-        ///
-        /// </summary>
-        /// <returns></returns>
-        public async Task<bool> NextState()
-        {
-            if (CurrentPlayer.PlayerIdentifier == Guid.Empty)
-            {
-                await OnNewGame();
-                return false;
-            }
-            try
-            {
-                //
-                //  6/16/2020: the UI binding can lag behing the flag being set.  checking it directly to make sure we don't reenter
-                //
-                if (!MainPageModel.EnableUiInteraction)
-                {
-                    this.TraceMessage("rejecting call to NextState");
-                    return false;
-                }
-
-                if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
-
-                if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;
-
-                // this.TraceMessage("starting NextStep");
-                MainPageModel.EnableUiInteraction = false;
-                switch (CurrentGameState)
-                {
-                    case GameState.WaitingForNewGame:
-                        OnStartDefaultNetworkGame(null, null);
-                        break;
-
-                    case GameState.WaitingForPlayers:
-                        await WaitingForPlayersToPickingBoard.PostLog(this);
-                        break;
-
-                    case GameState.PickingBoard:  // you get here by clicking the "=>" button
-                        if (MainPageModel.Settings.IsLocalGame)
-                        {
-                            LogHeader logHeader = new LogHeader()
-                            {
-                                NewState = GameState.WaitingForRollForOrder,                                
-                                
-                            };
-                            await MainPageModel.Log.PushAction(logHeader);
-                            await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
-                        }
-                        else
-                        {
-                            await PickingBoardToWaitingForRollOrder.PostLog(this);
-                        }
-                        break;
-
-                    case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
-                        
-                        break;
-                    case GameState.FinishedRollOrder:
-                        await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
-                        break;
-                    case GameState.BeginResourceAllocation:
-                        await BeginAllocationToAllocateResourcesForward.PostLog(this);
-                        break;
-
-                    case GameState.AllocateResourceForward:
-                        if (MainPageModel.PlayingPlayers.Last().GameData.Score == 1)
-                        {
-                            await AllocateResourcesForwardToAllocateResourcesReverse.PostLog(this);
-                        }
-                        else
-                        {
-                            await AllocateResourcesForwardToAllocateResourcesForward.PostLog(this);
-                        }
-                        break;
-
-                    case GameState.AllocateResourceReverse:
-
-                        int players = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1;
-
-                        if (MainPageModel.PlayingPlayers[0].GameData.Score == 2)
-                        {
-                            await AllocateResourcesReverseToDoneAllocResources.PostLog(this);
-                        }
-                        else
-                        {
-                            await AllocateResourcesReverseToAllocateResourcesReverse.PostLog(this);
-                        }
-
-                        break;
-
-                    case GameState.DoneResourceAllocation:
-                        if (Log.RollLog.CanRedo)
-                        {
-                            await DoneAllocResourcesToWaitingForNext.PostLog(this); // skip the roll and use the one that is there....
-                        }
-                        else
-                        {
-                            await DoneAllocResourcesToWaitingForRoll.PostLog(this);
-                        }
-                        break;
-
-                    case GameState.WaitingForRoll:
-                        Contract.Assert(false, "should be done in MainPage.OnRolled");
-                        //
-                        //  this is called in MainPage.OnRolled
-                        break;
-
-                    case GameState.MustMoveBaron:
-                        Contract.Assert(false, "this is done in pagecallback");
-                        break;
-
-                    case GameState.WaitingForNext:
-                        await WaitingForNextToWaitingForRoll.PostLog(this);
-                        break;
-
-                    //
-                    //  these don't ever get called when Next is hit
-                    case GameState.Uninitialized:
-                    default:
-                        Contract.Assert(false, "Next should not have been anabled for this state!");
-                        break;
-                }
-
-                return true;
-            }
-            finally
-            {
-                MainPageModel.EnableUiInteraction = true;
-            }
-        }
+        #endregion Methods
     }
 }

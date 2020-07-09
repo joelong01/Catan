@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 using Catan.Proxy;
 
@@ -17,35 +15,39 @@ namespace Catan10
 {
     public class MainPageModel : INotifyPropertyChanged
     {
-        #region Properties + Fields 
-
-        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
+        #region Properties + Fields
 
         private bool _EnableUiInteraction = true;
-
         private int _FiveStarPositions = 0;
-
         private int _FourStarPosition = 0;
-
         private TradeResources _gameResources = new TradeResources();
-
         private bool _isServiceGame = false;
-
         private Log _newLog = null;
-
         private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
-
         private Settings _Settings = new Settings();
-
         private int _ThreeStarPosition = 0;
-
         private int _TwoStarPosition = 0;
-
         private bool _WebSocketConnected = false;
+        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
+        #endregion Properties + Fields
 
-        #endregion Properties + Fields 
+
 
         #region Methods
+
+        internal void FinishedAddingPlayers()
+        {
+            //
+            //   turn on NotifyPropertyChanged() events for the model and subscribe to the entitlements changed event so that
+            //   we can enabled/disable the next button
+
+            PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.NotificationsEnabled = true;
+                p.GameData.Resources.UnspentEntitlements.CollectionChanged += UnspentEntitlements_CollectionChanged;
+            }
+            );
+        }
 
         private void InitBank()
         {
@@ -80,64 +82,29 @@ namespace Catan10
             NotifyPropertyChanged("EnableNextButton");
             NotifyPropertyChanged("StateMessage");
         }
-
-        internal void FinishedAddingPlayers()
-        {
-            //
-            //   turn on NotifyPropertyChanged() events for the model and subscribe to the entitlements changed event so that
-            //   we can enabled/disable the next button
-
-            PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.NotificationsEnabled = true;
-                p.GameData.Resources.UnspentEntitlements.CollectionChanged += UnspentEntitlements_CollectionChanged;
-            }
-            );
-        }
-
         #endregion Methods
 
-        #region Constructors
+        #region Delegates + Fields + Events + Enums
 
-        #endregion Constructors
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        #region Delegates  + Events + Enums
+        private GameInfo _gameInfo = null;
+        private int _unprocessedMessages = 0;
 
-        #endregion Delegates  + Events + Enums
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
 
         public List<PlayerModel> AllPlayers { get; set; } = new List<PlayerModel>();
 
         [JsonIgnore]
         public PlayerModel Bank { get; private set; }
 
-
         [JsonIgnore]
         public ICatanService CatanService { get; set; }
 
         [JsonIgnore] public GameInfo DefaultGame { get; } = new GameInfo() { Name = "DefaultGame", Started = false, Creator = "", Id = Guid.Parse("F070F8DA-A5FD-4957-A528-0B915930123F") };
         public string DefaultUser { get; set; } = "";
-
-        int _unprocessedMessages = 0;
-        [JsonIgnore]
-        public int UnprocessedMessages
-        {
-            get
-            {
-                return _unprocessedMessages;
-            }
-            set
-            {
-                Debug.Assert(value >= 0);
-                if (_unprocessedMessages != value)
-                {
-                    _unprocessedMessages = value;
-                    NotifyPropertyChanged();
-                    DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-                    this.TraceMessage($"UnprocessedMessages: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
-                }
-            }
-        }
-
         [JsonIgnore]
         public bool EnableNextButton
         {
@@ -155,7 +122,7 @@ namespace Catan10
 
                     //
                     //  whevener this changes, the log changes...so you don't need to send a NotifyPropertyChanged() event...I hope...
-                    if (UnprocessedMessages > 0  && !Settings.IsLocalGame)
+                    if (UnprocessedMessages > 0 && !Settings.IsLocalGame)
                     {
                         // this.TraceMessage($"Enable false because UnprocessedMessages > 0: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
                         return false;
@@ -181,7 +148,6 @@ namespace Catan10
                     }
                     switch (state)
                     {
-                        
                         case GameState.WaitingForNewGame:
                         case GameState.FinishedRollOrder:
                         case GameState.BeginResourceAllocation:
@@ -193,10 +159,10 @@ namespace Catan10
                         case GameState.WaitingForNext:
                         case GameState.Supplemental:
                             return true;
-                         
+
                         default:
                             return false;
-                    }                    
+                    }
                 }
                 finally
                 {
@@ -316,6 +282,23 @@ namespace Catan10
         public IGameController GameController { get; set; }
 
         [JsonIgnore]
+        public GameInfo GameInfo
+        {
+            get
+            {
+                return _gameInfo;
+            }
+            set
+            {
+                if (_gameInfo != value)
+                {
+                    _gameInfo = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        [JsonIgnore]
         public TradeResources GameResources
         {
             get
@@ -345,6 +328,9 @@ namespace Catan10
                 return Log.GameState;
             }
         }
+
+        public bool IsGameStarted { get; internal set; }
+
         [JsonIgnore]
         public bool IsServiceGame
         {
@@ -394,9 +380,6 @@ namespace Catan10
             }
         }
 
-
-
-
         [JsonIgnore]
         public TradeResources ResourcesLeftInBank
         {
@@ -444,24 +427,6 @@ namespace Catan10
             }
         }
 
-        GameInfo _gameInfo = null;
-        [JsonIgnore]
-        public GameInfo GameInfo
-        {
-            get
-            {
-                return _gameInfo;
-            }
-            set
-            {
-                if (_gameInfo != value)
-                {
-                    _gameInfo = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
         public Settings Settings
         {
             get
@@ -475,61 +440,6 @@ namespace Catan10
                     _Settings = value;
                     NotifyPropertyChanged();
                 }
-            }
-        }
-
-        
-        public bool ShowBoardMeasurements(GameState gameState)
-        {
-            
-            switch (gameState)
-            {
-                case GameState.WaitingForNewGame:
-                case GameState.PickingBoard:
-                case GameState.AllocateResourceForward:
-                case GameState.AllocateResourceReverse:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        /// <summary>
-        ///     Binding function for setting the visibility of the RollUi
-        ///     Added WaitingForNewGame so that the setting of the grid positions works.
-        /// </summary>
-        /// <param name="gameState"></param>
-        /// <returns></returns>
-        public bool ShowRollUi(GameState gameState)
-        {
-            switch (gameState)
-            {
-                case GameState.WaitingForNewGame:
-                case GameState.WaitingForRoll:
-                case GameState.WaitingForRollForOrder:
-                case GameState.FinishedRollOrder:
-                case GameState.WaitingForNext:
-                    return true;
-                default:
-                    return false;
-            }
-           
-        }
-        /// <summary>
-        /// When to show the TradeUi
-        /// Added WaitingForNewGame so that the setting of the grid positions works.
-        /// </summary>
-        /// <param name="gameState"></param>
-        /// <returns></returns>
-        public Visibility ShowTradeUi(GameState gameState)
-        {
-            switch (gameState)
-            {
-                case GameState.WaitingForNewGame:
-                case GameState.WaitingForNext:
-                    return Visibility.Visible;
-                default:
-                    return Visibility.Collapsed;
             }
         }
 
@@ -580,6 +490,25 @@ namespace Catan10
         }
 
         [JsonIgnore]
+        public int UnprocessedMessages
+        {
+            get
+            {
+                return _unprocessedMessages;
+            }
+            set
+            {
+                Debug.Assert(value >= 0);
+                if (_unprocessedMessages != value)
+                {
+                    _unprocessedMessages = value;
+                    NotifyPropertyChanged();
+                    DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
+                    this.TraceMessage($"UnprocessedMessages: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
+                }
+            }
+        }
+        [JsonIgnore]
         public bool WebSocketConnected
         {
             get
@@ -596,7 +525,9 @@ namespace Catan10
             }
         }
 
-        public bool IsGameStarted { get; internal set; }
+        #endregion Properties
+
+        #region Constructors + Destructors
 
         public MainPageModel()
         {
@@ -605,8 +536,7 @@ namespace Catan10
             GameController = MainPage.Current;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        #endregion Constructors + Destructors
 
         public void SetPipCount(int[] value)
         {
@@ -614,6 +544,61 @@ namespace Catan10
             FourStarPositions = value[1];
             ThreeStarPositions = value[2];
             TwoStarPositions = value[3];
+        }
+
+        public bool ShowBoardMeasurements(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.PickingBoard:
+                case GameState.AllocateResourceForward:
+                case GameState.AllocateResourceReverse:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        ///     Binding function for setting the visibility of the RollUi
+        ///     Added WaitingForNewGame so that the setting of the grid positions works.
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <returns></returns>
+        public bool ShowRollUi(GameState gameState)
+        {
+            switch (gameState)
+            {
+                
+                case GameState.WaitingForRoll:
+                case GameState.WaitingForRollForOrder:
+                case GameState.FinishedRollOrder:
+                case GameState.WaitingForNext:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// When to show the TradeUi
+        /// Added WaitingForNewGame so that the setting of the grid positions works.
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <returns></returns>
+        public Visibility ShowTradeUi(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.WaitingForNewGame:
+                case GameState.WaitingForNext:
+                    return Visibility.Visible;
+
+                default:
+                    return Visibility.Collapsed;
+            }
         }
     }
 }

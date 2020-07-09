@@ -107,6 +107,7 @@ namespace Catan10
 
             GameData.Trades = new Trades();
             GameData.Trades.TradeRequest.Owner.Player = MainPage.Current.TheHuman;
+            GameData.Resources.StolenResource = ResourceType.None;
             
         }
 
