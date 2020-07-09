@@ -156,9 +156,11 @@ namespace Catan10
 
         public string MainPageTitle(GameInfo gameInfo, PlayerModel player, GameState state)
         {
-            if (gameInfo == null) return "Catan";
+            if (gameInfo == null || state == GameState.WaitingForNewGame) return "Catan";
 
-            return $"{_gameView.Games[gameInfo.GameIndex].CatanGame} in channel {gameInfo.Name}.  {player.PlayerName}'s Turn.  Click Next for: {state.Description()}";
+            
+
+            return $"Playing {_gameView.Games[gameInfo.GameIndex].CatanGame} in channel \"{gameInfo.Name}\".  {player.PlayerName}'s Turn.";
         }
 
         public async Task PickSettlementsAndRoads()
@@ -572,21 +574,33 @@ namespace Catan10
 
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
+            if (!MainPageModel.IsServiceGame) return; // todo: make work for local game
+
             if (((Button)sender).Content is CatanNumber number)
             {
                 List<RollModel> rolls = new List<RollModel>();
-                for (int i = 0; i < 4; i++)
+                var rollModel = new RollModel
                 {
-                    var rollModel = new RollModel
+                    DiceOne = number.Number / 2,
+                    Selected = true
+                };
+                rollModel.DiceTwo = number.Number - rollModel.DiceOne;
+                rolls.Add(rollModel);
+                Random rand = new Random((int)DateTime.Now.Ticks);
+                for (int i = 0; i < 3; i++)
+                {
+
+                    rollModel = new RollModel
                     {
-                        DiceOne = number.Number / 2,
+                        DiceOne = rand.Next(1, 6),
+                        DiceTwo = rand.Next(1, 6),
                         Selected = false
-                    };
-                    rollModel.DiceTwo = number.Number - rollModel.DiceOne;
+                    };                    
                     rolls.Add(rollModel);
                 }
-                rolls[0].Selected = true;
-                OnRolled(rolls);
+                //
+                //  set them in the roll UI
+                _rollControl.TestSetRolls(rolls);
             }
         }
 
@@ -616,7 +630,14 @@ namespace Catan10
         /// <param name="rolls"></param>
         private async void OnRolled(List<RollModel> rolls)
         {
-            if (!MainPageModel.EnableRolls) return;
+            if (!MainPageModel.EnableRolls)
+            {
+                this.TraceMessage("Warning: OnRolled called but EnableRolls is false!");
+                return;
+            }
+
+            Debug.Assert(rolls.Count == 4);
+           
 
             switch (CurrentGameState)
             {
@@ -1133,6 +1154,7 @@ namespace Catan10
             if (ret == ContentDialogResult.Primary)
             {
                 GameInfo joinGame = dlg.GameSelected;
+                if (dlg.GameSelected == null) return;
                 await MainPageModel.CatanService.JoinGame(joinGame, TheHuman.PlayerName);
             }
         }

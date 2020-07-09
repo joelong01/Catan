@@ -31,29 +31,10 @@ namespace Catan10
             Player.GameData.RollOrientation = (Player.GameData.RollOrientation == TileOrientation.FaceDown) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
         }
 
-        private async void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
+        private void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            Ellipse ellipse = sender as Ellipse;
-            ellipse.IsTapEnabled = false;
-            try
-            {
-                Pointer ptr = e.Pointer;
-                if (ptr.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
-                {
-                    PointerPoint ptrPt = e.GetCurrentPoint(this);
-                    if (ptrPt.Properties.IsRightButtonPressed)
-                    {
-                        PlayerModel player = ((Ellipse)sender).Tag as PlayerModel;
-                        TradeDlg dlg = new TradeDlg(MainPage.Current.CurrentPlayer, player);
-                        await dlg.ShowAsync();
-                    }
-                }
-
-            }
-            finally
-            {
-                ellipse.IsTapEnabled = true;
-            }
+            //
+            //  7/9/2020:  this used to open Trade in multiplayer.  leave it here in case we need a real time debug entry point
         }
 
         private void SetPlayer(PlayerModel value)

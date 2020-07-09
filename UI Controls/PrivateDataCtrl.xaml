@@ -73,7 +73,10 @@
                                         ToolTipService.ToolTip="{x:Bind DevCardType}">
                                         <Rectangle.ContextFlyout>
                                             <MenuFlyout>
-                                                <MenuFlyoutItem IsEnabled="{x:Bind local:PrivateDataCtrl.EnableMenuForGameState(DevCardType, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}" Text="{x:Bind local:PrivateDataCtrl.MenuPlayString(DevCardType), Mode=OneWay}" Click="OnAvailableCardPressed" Tag="{x:Bind DevCardType, Mode=OneWay}" />
+                                                <MenuFlyoutItem IsEnabled="{x:Bind local:PrivateDataCtrl.EnableMenuForGameState(DevCardType, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}" 
+                                                                Text="{x:Bind local:PrivateDataCtrl.MenuPlayString(DevCardType), Mode=OneWay}" 
+                                                                Click="OnAvailableCardPressed" 
+                                                                Tag="{x:Bind DevCardType, Mode=OneWay}" />
                                             </MenuFlyout>
                                         </Rectangle.ContextFlyout>
                                     </Rectangle>

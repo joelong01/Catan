@@ -172,6 +172,16 @@ namespace Catan10
         private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             IsCanceled = true;
+            UnscribeFromGameEvents();
+
+
+        }
+        private void UnscribeFromGameEvents()
+        {
+            Proxy.OnGameCreated -= Proxy_OnGameCreated;
+            Proxy.OnGameDeleted -= Proxy_OnGameDeleted;
+            Proxy.OnGameJoined -= Proxy_OnGameJoined;
+            Proxy.OnGameLeft -= Proxy_OnGameLeft;
         }
 
         private void OnCancelError(object sender, RoutedEventArgs e)
@@ -271,6 +281,7 @@ namespace Catan10
         private void OnOk(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             IsCanceled = false;
+            UnscribeFromGameEvents();
         }
 
         private void OnOkError(object sender, RoutedEventArgs e)

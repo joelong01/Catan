@@ -213,7 +213,7 @@ namespace Catan10
                 Source = rc,
                 CountVisible = true,
                 Instructions = "Take 2 cards from the bank.",
-                Destination = new ObservableCollection<ResourceCardModel>(),
+                Destination = new ObservableCollection<ResourceCardModel>(),                
             };
 
             var ret = await dlg.ShowAsync();
@@ -254,6 +254,18 @@ namespace Catan10
         /// <param name="e"></param>
         private async void OnAvailableCardPressed(object sender, RoutedEventArgs e)
         {
+            if (Player.GameData.Resources.ThisTurnsDevCard.DevCardType != DevCardType.None)
+            {
+                ContentDialog dlg = new ContentDialog()
+                {
+                    Title = "Play Dev Card",
+                    Content = $"You can only play one dev card per turn and you've already played a {Player.GameData.Resources.ThisTurnsDevCard.DevCardType}.",
+                    CloseButtonText = "Ok",                    
+                };
+                await dlg.ShowAsync();
+                return; // you can only play one dev card per turn
+            }
+
             DevCardType devCardType = (DevCardType)((MenuFlyoutItem)sender).Tag;
             Contract.Assert(SelectedAvailableDevCard != null);
             Contract.Assert(SelectedAvailableDevCard.DevCardType == devCardType);

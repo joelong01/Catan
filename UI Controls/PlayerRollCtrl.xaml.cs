@@ -73,6 +73,35 @@ namespace Catan10
             }
         }
 
+        public void TestSetRolls(List<RollModel> rolls)
+        {
+            Rolls.Clear();
+            Rolls.AddRange(rolls);
+            if (_rolled) return;
+            try
+            {
+                _rolled = true;
+                //
+                //  which roll was selected?
+                int rollValue = 0;
+                foreach (var r in rolls)
+                {
+                    if (r.Selected)
+                    {
+                        rollValue = r.Roll;
+                        r.Orientation = TileOrientation.FaceUp;
+                        break;
+                    }
+                }
+
+                OnRolled?.Invoke(new List<RollModel>(Rolls));
+            }
+            finally
+            {
+            }
+
+        }
+
         public PlayerRollCtrl()
         {
             this.InitializeComponent();

@@ -95,8 +95,6 @@ namespace Catan10
 
         private TradeResources _resourcesLostToMonopoly = new TradeResources();
 
-        private TradeResources _resourcesThisTurn = new TradeResources();
-
         private int _Roads = 0;
 
         private int _Settlements = 0;

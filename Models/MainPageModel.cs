@@ -390,6 +390,7 @@ namespace Catan10
                 foreach (ResourceType resType in Enum.GetValues(typeof(ResourceType)))
                 {
                     if (!TradeResources.GrantableResources(resType)) continue;
+                    if (resType == ResourceType.GoldMine) continue;
 
                     int total = 0;
                     PlayingPlayers.ForEach((p) => total += p.GameData.Resources.Current.CountForResource(resType));
