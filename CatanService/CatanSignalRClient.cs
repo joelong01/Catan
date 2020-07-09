@@ -141,7 +141,7 @@ namespace Catan10
 
         #endregion Constructors + Destructors
         static public T Deserialize<T>(string json)
-        {         
+        {
             return JsonSerializer.Deserialize<T>(json, GetJsonOptions());
         }
         static public string Serialize<T>(T obj, bool indented = false)
@@ -250,12 +250,11 @@ namespace Catan10
                     logging.SetMinimumLevel(LogLevel.Debug);
                 }).Build();
 
-                if (Debugger.IsAttached)
-                {
-                    HubConnection.ServerTimeout = TimeSpan.FromMinutes(30);
-                    HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(30);
-                    HubConnection.KeepAliveInterval = TimeSpan.FromMinutes(15);
-                }
+
+                HubConnection.ServerTimeout = TimeSpan.FromMinutes(30);
+                HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(30);
+                HubConnection.KeepAliveInterval = TimeSpan.FromMinutes(15);
+
 
                 HubConnection.Reconnecting += async error =>
                 {
@@ -264,7 +263,7 @@ namespace Catan10
                     if (GameInfo != null) // this puts us back into the channel with the other players.
                     {
                         await HubConnection.InvokeAsync("JoinGame", this.GameInfo, this.PlayerName);
-                    }                   
+                    }
                 };
                 HubConnection.Reconnected += async (connectionId) =>
                 {
@@ -357,7 +356,7 @@ namespace Catan10
             }
         }
 
-        
+
 
         private GameInfo GameInfo { get; set; }
         private string PlayerName { get; set; }
@@ -543,7 +542,7 @@ namespace Catan10
             }
         }
 
-       
+
 
 
         public async Task SendPrivateMessage(string playerName, CatanMessage message)
@@ -666,7 +665,7 @@ namespace Catan10
                 //
                 //  we are probably loading MainPage Model from disk
 
-                
+
 
                 return MainPage.Current.NameToPlayer(playerName);
             }
