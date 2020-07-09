@@ -26,26 +26,7 @@ namespace Catan10
         public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty StolenResourceProperty = DependencyProperty.Register("StolenResource", typeof(ResourceType), typeof(PrivateDataCtrl), new PropertyMetadata(ResourceType.None, StolenResourceChanged));
 
-        private bool _showStolenResourcesUi = false;
-
-        public bool ShowStolenResourcesUi
-        {
-            get
-            {
-                return _showStolenResourcesUi;
-            }
-            set
-            {
-                if (_showStolenResourcesUi != value)
-                {
-                    _showStolenResourcesUi = value;
-                    if (_showStolenResourcesUi)
-                        ShowStolenResources.Begin();
-                    else
-                        HideStolenResources.Begin();
-                }
-            }
-        }
+        
 
         public ResourceType StolenResource
         {
@@ -62,14 +43,6 @@ namespace Catan10
 
         private void SetStolenResource(ResourceType resourceType)
         {
-            if (resourceType == ResourceType.None)
-            {
-                ShowStolenResourcesUi = false;
-            }
-            else
-            {
-                ShowStolenResourcesUi = true;
-            }
         }
 
         private bool StolenResourceEmpty(ResourceType resourceType)
@@ -380,10 +353,6 @@ namespace Catan10
             }
         }
 
-        private void OnTargetResultClicked(object sender, RoutedEventArgs e)
-        {
-            ShowStolenResourcesUi = false;
-        }
 
         private void OnTrade4For1(object sender, RoutedEventArgs e)
         {
@@ -412,9 +381,5 @@ namespace Catan10
 
         #endregion Methods
 
-        private void OnOpenCloseStolenCard(object sender, RoutedEventArgs e)
-        {
-            ShowStolenResourcesUi = !ShowStolenResourcesUi;
-        }
     }
 }
