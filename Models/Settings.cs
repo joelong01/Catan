@@ -179,23 +179,7 @@ namespace Catan10
             }
         }
 
-        public GridPosition GameViewPosition
-        {
-            get
-            {
-                return _GameViewPosition;
-            }
-            set
-            {
-                if (_GameViewPosition != value)
-                {
-                    _GameViewPosition = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public Dictionary<string, GridPosition> GridPositions
+       public Dictionary<string, GridPosition> GridPositions
         {
             get
             {

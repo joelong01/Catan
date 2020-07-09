@@ -124,8 +124,8 @@
                 VerticalAlignment="Center"
                 BorderBrush="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
                 BorderThickness="0" CornerRadius="10">
-                
-                <StackPanel Orientation="Horizontal" >
+
+                <StackPanel Orientation="Horizontal">
                     <Ellipse Width="70" Height="70" Margin="5,0,5,0" HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Fill="{x:Bind TheHuman.ImageBrush, Mode=OneWay}"
@@ -133,8 +133,7 @@
                     <ToggleSwitch Width="170" Margin="10,0,0,0" VerticalAlignment="Top"
                         Style="{StaticResource CatanToggleSwitch}"
                         Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
-                        Background="Red"
-                                  Header="Approve"
+                        Background="Red" Header="Approve"
                         IsOn="{x:Bind TheHuman.GameData.Trades.TradeRequest.Owner.Approved, Mode=OneWay, FallbackValue=False}">
                         <ToggleSwitch.OnContent>
                             <Border BorderBrush="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay, TargetNullValue=White}" BorderThickness="0">
@@ -208,13 +207,14 @@
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
                     <!--  Filter  -->
-                    <StackPanel Orientation="Horizontal"  Margin="0,0,30,0" Padding="5" HorizontalAlignment="Left" 
-                            VerticalAlignment="Center" CornerRadius="10"
-                            BorderBrush="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
-                            BorderThickness="1">
-                        <TextBlock Text="&#xE16E;" FontFamily="SEgoe MDL2 Assets" Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}" FontSize="32" 
-                                   Margin="10,10,20,10"
-                                   VerticalAlignment="Center" HorizontalAlignment="Left" />
+                    <StackPanel Margin="0,0,30,0" Padding="5" HorizontalAlignment="Left"
+                        VerticalAlignment="Center" Orientation="Horizontal" CornerRadius="10"
+                        BorderBrush="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
+                        BorderThickness="1">
+                        <TextBlock Margin="10,10,20,10" HorizontalAlignment="Left" VerticalAlignment="Center"
+                            Text="&#xE16E;" FontFamily="SEgoe MDL2 Assets"
+                            Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
+                            FontSize="32" />
                         <ToggleSwitch Toggled="OnFilterToggled">
                             <ToggleSwitch.OffContent>
                                 <TextBlock Text="All" FontSize="22" />

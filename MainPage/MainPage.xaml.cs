@@ -229,13 +229,20 @@ namespace Catan10
             _doDragDrop = _doDragDrop ? false : true;
         }
 
-        private async void GameViewControlPointerPressed(object sender, PointerRoutedEventArgs pRoutedEvents)
+        public string MainPageTitle(GameInfo gameInfo, PlayerModel player, GameState state)
         {
-            if (_doDragDrop)
-            {
-                await StaticHelpers.DragAsync((UIElement)sender, pRoutedEvents);
-                OnGridPositionChanged("_gameView", new GridPosition(_transformGameView));
-            }
+            if (gameInfo == null) return "Catan";
+            
+            return $"{_gameView.Games[gameInfo.GameIndex].CatanGame} in channel {gameInfo.Name}.  {player.PlayerName}'s Turn.  Click Next for: {state.Description()}";
+        }
+
+        private void GameViewControlPointerPressed(object sender, PointerRoutedEventArgs pRoutedEvents)
+        {
+            //if (_doDragDrop)
+            //{
+            //    await StaticHelpers.DragAsync((UIElement)sender, pRoutedEvents);
+            //    OnGridPositionChanged("_gameView", new GridPosition(_transformGameView));
+            //}
         }
 
         /// <summary>
@@ -521,6 +528,11 @@ namespace Catan10
                 MainPageModel.Settings.GridPositions[name] = gridPosition;
             }
             await SaveGameState();
+        }
+
+        private bool OpenControlGrid(PlayerModel current, PlayerModel human)
+        {
+            return current == human;
         }
 
         private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)

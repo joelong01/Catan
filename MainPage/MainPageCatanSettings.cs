@@ -115,13 +115,13 @@ namespace Catan10
 
         public double Zoom
         {
-            get => _transformGameView.ScaleX;
+            get => 1.0; // _transformGameView.ScaleX;
 
             set
             {
-                MainPageModel.Settings.Zoom = value;
-                _transformGameView.ScaleX = value;
-                _transformGameView.ScaleY = value;
+                //MainPageModel.Settings.Zoom = value;
+                //_transformGameView.ScaleX = value;
+                //_transformGameView.ScaleY = value;
             }
         }
 

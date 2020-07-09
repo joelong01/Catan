@@ -1,48 +1,143 @@
-﻿<UserControl
-    x:Class="Catan10.Sliders.SliderCtrl"
+﻿<UserControl x:Class="Catan10.Sliders.SliderCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Catan10.Sliders"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    x:Name="userControl" d:DesignHeight="300" d:DesignWidth="400" 
-   >
+    x:Name="userControl" d:DesignHeight="300" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
-         <Storyboard x:Name="ShowStolenResources">
+        <Storyboard x:Name="SbOpenRightLeft">
             <DoubleAnimation d:IsOptimized="True"
                 Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
                 Storyboard.TargetName="LayoutRoot" To="0" Duration="0:0:0.250" />
         </Storyboard>
-        <Storyboard x:Name="HideStolenResources">
+        <Storyboard x:Name="SbCloseRightLeft">
             <DoubleAnimation d:IsOptimized="True"
                 Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
-                Storyboard.TargetName="LayoutRoot" To="{x:Bind userControl.Width, Mode=OneWay}" Duration="0:0:0.250" />
+                Storyboard.TargetName="LayoutRoot"
+                To="{x:Bind ClosedPosition(userControl.Width), Mode=OneWay}"
+                Duration="0:0:0.250" />
+        </Storyboard>
+        <Storyboard x:Name="SbOpenUpDown">
+            <DoubleAnimation d:IsOptimized="True"
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
+                Storyboard.TargetName="LayoutRoot" To="0" Duration="0:0:0.250" />
+        </Storyboard>
+        <Storyboard x:Name="SbCloseUpDown">
+            <DoubleAnimation d:IsOptimized="True"
+                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
+                Storyboard.TargetName="LayoutRoot"
+                To="{x:Bind ClosedPosition(userControl.Height), Mode=OneWay}"
+                Duration="0:0:0.250" />
         </Storyboard>
     </UserControl.Resources>
-    <Grid Name="LayoutRoot"  Width="{Binding Width, ElementName=userControl, FallbackValue=400, TargetNullValue=400, Mode=OneWay}"
-        Height="{Binding Height, ElementName=userControl, FallbackValue=300, TargetNullValue=300, Mode=OneWay}"
-        Background="{Binding Background, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
-        BorderBrush="{Binding BorderBrush, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
-        BorderThickness="{Binding BorderThickness, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
-        CornerRadius="{Binding CornerRadius, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}">
+    <Grid Name="LayoutRoot"
+        Background="{x:Bind userControl.Background, Mode=OneWay}"
+        BorderBrush="{x:Bind userControl.BorderBrush, Mode=OneWay}"
+        BorderThickness="{x:Bind userControl.BorderThickness, Mode=OneWay}"
+        CornerRadius="{x:Bind userControl.CornerRadius, Mode=OneWay}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="25" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="25" />
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="25" />
+        </Grid.RowDefinitions>
         <Grid.RenderTransform>
-            <CompositeTransform/>
+            <CompositeTransform />
         </Grid.RenderTransform>
-        <Rectangle Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                   Fill="{Binding Background, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}" />
-        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Width="20" Height="40" Click="OnOpenClose">
+        <Viewbox Name="ViewBox_Parent" Grid.Row="1" Grid.Column="1">
+            <ContentPresenter Content="{x:Bind Child}" />
+        </Viewbox>
+
+        <Rectangle Name="RectTop" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            Fill="{x:Bind userControl.Background, Mode=OneWay}"
+            Visibility="{x:Bind MatchesSlideDirection(SlideDirection, local:SlideDirection.Up), Mode=OneWay}" />
+        <Rectangle Name="RectRight" Grid.RowSpan="3" Grid.Column="2" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Fill="{x:Bind userControl.Background, Mode=OneWay}"
+            Visibility="{x:Bind MatchesSlideDirection(SlideDirection, local:SlideDirection.Right), Mode=OneWay}" />
+        <Rectangle Name="RectBottom" Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Fill="{x:Bind userControl.Background, Mode=OneWay}"
+            Visibility="{x:Bind MatchesSlideDirection(SlideDirection, local:SlideDirection.Down), Mode=OneWay}" />
+        <Rectangle Name="RectLeft" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Fill="{x:Bind userControl.Background, Mode=OneWay}"
+            Visibility="{x:Bind MatchesSlideDirection(SlideDirection, local:SlideDirection.Left), Mode=OneWay}" />
+
+        <Button Name="BtnOpenRight" Grid.RowSpan="3" Grid.Column="3" Width="20"
+            Height="40" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Background="{x:Bind userControl.Background, Mode=OneWay}"
+            Visibility="{x:Bind MatchesSlideDirection(SlideDirection, local:SlideDirection.Right), Mode=OneWay}"
+            Click="OnOpenClose">
             <Button.Content>
-                <Grid Background="Black" VerticalAlignment="Center" Height="40" Margin="-10,0,-10,0">
-                    <Rectangle Width="2" Height="10" Fill="White" Margin="-10, 0, 0,0" HorizontalAlignment="Center"/>
-                    <Rectangle Width="2" Height="15" Fill="White" HorizontalAlignment="Center"/>
-                    <Rectangle Width="2" Height="20" Fill="White" Margin="10, 0 ,0 ,0"/>
+                <Grid Margin="-10,0,-10,0" VerticalAlignment="Center">
+                    <Rectangle Width="2" Height="10" Margin="-10,0,0,0" HorizontalAlignment="Center"
+                        Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                    <Rectangle Width="2" Height="15" HorizontalAlignment="Center" Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                    <Rectangle Width="2" Height="20" Margin="10,0,0,0" Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
                 </Grid>
             </Button.Content>
         </Button>
+        <Button Name="BtnOpenLeft" Grid.RowSpan="3" Grid.Column="0" Width="20"
+            Height="40" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Background="{x:Bind userControl.Background, Mode=OneWay}"
+            Visibility="{x:Bind MatchesSlideDirection(SlideDirection, local:SlideDirection.Left), Mode=OneWay}"
+            Click="OnOpenClose">
+            <Button.Content>
+                <Grid Margin="-10,0,-10,0" VerticalAlignment="Center">
+                    <Rectangle Width="2" Height="10" Margin="-10,0,0,0" HorizontalAlignment="Center"
+                        Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                    <Rectangle Width="2" Height="15" HorizontalAlignment="Center" Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                    <Rectangle Width="2" Height="20" Margin="10,0,0,0" Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                </Grid>
+            </Button.Content>
+        </Button>
+        <Button Name="BtnOpenUp" Grid.Column="0" Grid.ColumnSpan="3" Height="25"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            Background="{x:Bind userControl.Background, Mode=OneWay}"
+            Visibility="{x:Bind MatchesSlideDirection(SlideDirection, local:SlideDirection.Up), Mode=OneWay}"
+            Click="OnOpenClose">
+            <Button.Content>
+
+                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Rectangle Width="20" Height="2" Margin="0" HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                    <Rectangle Width="15" Height="2" Margin="0,2,0,0" HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                    <Rectangle Width="11" Height="2" Margin="0,2,0,0" HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                </StackPanel>
+
+            </Button.Content>
+        </Button>
+        <Button Name="BtnOpenDown" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+            Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Background="{x:Bind userControl.Background, Mode=OneWay}"
+            Visibility="{x:Bind MatchesSlideDirection(SlideDirection, local:SlideDirection.Down), Mode=OneWay}"
+            Click="OnOpenClose">
+            <Button.Content>
+                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Rectangle Width="20" Height="2" Margin="0" HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                    <Rectangle Width="15" Height="2" Margin="0,2,0,0" HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                    <Rectangle Width="10" Height="2" Margin="0,2,0,0" HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Fill="{x:Bind userControl.Foreground, Mode=OneWay}" />
+                </StackPanel>
+            </Button.Content>
+        </Button>
     </Grid>
+
 </UserControl>

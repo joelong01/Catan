@@ -142,7 +142,7 @@ namespace Catan10
 
         public CatanGameData GameData => this.GameContainer.CurrentGame.GameData;
 
-        public GameInfo GameInfo => MainPageModel.ServiceGameInfo;
+        public GameInfo GameInfo => MainPageModel.GameInfo;
 
         public List<int> HighlightedTiles
         {
@@ -387,7 +387,7 @@ namespace Catan10
 
         public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)
         {
-            if (MainPageModel.GameState != GameState.WaitingForNewGame && MainPageModel.ServiceGameInfo == null)
+            if (MainPageModel.GameState != GameState.WaitingForNewGame && MainPageModel.GameInfo == null)
             {
                 Debugger.Break();
             }
@@ -494,7 +494,7 @@ namespace Catan10
         /// <returns></returns>
         public Task JoinOrCreateGame(GameInfo gameInfo)
         {
-            MainPageModel.ServiceGameInfo = gameInfo;
+            MainPageModel.GameInfo = gameInfo;
             MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, gameInfo.Creator);
             _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
             MainPageModel.IsGameStarted = true;
@@ -528,7 +528,7 @@ namespace Catan10
         /// <returns>False if the IGameController.Do() should be executed locally </returns>
         public async Task<bool> PostMessage(LogHeader logHeader, ActionType msgType)
         {
-            if (MainPageModel.ServiceGameInfo == null) return false; // can be null druing testing scenarios
+            if (MainPageModel.GameInfo == null) return false; // can be null druing testing scenarios
 
             CatanMessage message = new CatanMessage()
             {
@@ -546,7 +546,7 @@ namespace Catan10
             }
             else
             {
-                await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.ServiceGameInfo.Id, message);
+                await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.GameInfo.Id, message);
             }
 
             return (!MainPageModel.Settings.IsLocalGame);
@@ -726,7 +726,7 @@ namespace Catan10
         {
             if (MainPageModel.CatanService == null) return Task.CompletedTask;
             this.TraceMessage("you took this out.  put it back or delete it.");
-            // await MainPageModel.CatanService.StartGame(MainPageModel.ServiceGameInfo);
+            // await MainPageModel.CatanService.StartGame(MainPageModel.GameInfo);
             return Task.CompletedTask;
         }
 

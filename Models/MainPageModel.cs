@@ -444,8 +444,23 @@ namespace Catan10
             }
         }
 
+        GameInfo _gameInfo = null;
         [JsonIgnore]
-        public GameInfo ServiceGameInfo { get; set; }
+        public GameInfo GameInfo
+        {
+            get
+            {
+                return _gameInfo;
+            }
+            set
+            {
+                if (_gameInfo != value)
+                {
+                    _gameInfo = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         public Settings Settings
         {
@@ -464,7 +479,7 @@ namespace Catan10
         }
 
         
-        public Visibility ShowBoardMeasurements(GameState gameState)
+        public bool ShowBoardMeasurements(GameState gameState)
         {
             
             switch (gameState)
@@ -473,9 +488,9 @@ namespace Catan10
                 case GameState.PickingBoard:
                 case GameState.AllocateResourceForward:
                 case GameState.AllocateResourceReverse:
-                    return Visibility.Visible;
+                    return true;
                 default:
-                    return Visibility.Collapsed;
+                    return false;
             }
         }
 
@@ -485,7 +500,7 @@ namespace Catan10
         /// </summary>
         /// <param name="gameState"></param>
         /// <returns></returns>
-        public Visibility ShowRollUi(GameState gameState)
+        public bool ShowRollUi(GameState gameState)
         {
             switch (gameState)
             {
@@ -494,9 +509,9 @@ namespace Catan10
                 case GameState.WaitingForRollForOrder:
                 case GameState.FinishedRollOrder:
                 case GameState.WaitingForNext:
-                    return Visibility.Visible;
+                    return true;
                 default:
-                    return Visibility.Collapsed;
+                    return false;
             }
            
         }

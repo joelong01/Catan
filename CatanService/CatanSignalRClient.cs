@@ -76,7 +76,7 @@ namespace Catan10
                     {
                         using (new FunctionTimer($"Ack + Process.  Id={message.MessageId} Type={message.DataTypeName}", true))
                         {
-                            await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
+                            await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.GameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
                             message = ParseMessage(message);
                             OnBroadcastMessageReceived.Invoke(message);
                         }
@@ -95,7 +95,7 @@ namespace Catan10
             {
                 try
                 {
-                    await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.ServiceGameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
+                    await HubConnection.SendAsync("Ack", MainPage.Current.MainPageModel.GameInfo.Id, MainPage.Current.TheHuman.PlayerName, message.From, message.MessageId);
                     this.TraceMessage($"{MainPage.Current.TheHuman.PlayerName} Sent Ack for {message}");
                     //
                     //  make sure we didn't process it - maybe the ACK was lost.

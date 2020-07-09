@@ -135,7 +135,7 @@ namespace Catan10
         {
             if (MainPageModel.IsServiceGame)
             {
-                await MainPageModel.CatanService.DeleteGame(MainPageModel.ServiceGameInfo.Id, TheHuman.PlayerName);                
+                await MainPageModel.CatanService.DeleteGame(MainPageModel.GameInfo.Id, TheHuman.PlayerName);                
             }
             await this.Reset();
             await InitializeMainPageModel();
@@ -605,10 +605,8 @@ namespace Catan10
                     string name = kvp.Key;
                     var ctrl = this.FindName(name);
                     if (ctrl == null) continue; // the dev renamed the control!!
-                    if (ctrl.GetType().FullName == "Catan10.GameContainerCtrl") continue;
 
-                    DragableGridCtrl dGrid = ctrl as DragableGridCtrl;
-                    if (dGrid != null) dGrid.GridPosition = pos;
+                    if (ctrl is DragableGridCtrl dGrid) dGrid.GridPosition = pos;
                 }
             }
             catch (Exception e)

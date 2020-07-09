@@ -34,9 +34,9 @@ namespace Catan10
                 using (new FunctionTimer("CreateAndConfigureProxy"))
                 {
                     MainPageModel.IsGameStarted = false;
-                    MainPageModel.ServiceGameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
-                    MainPageModel.ServiceGameInfo.Name = MainPageModel.Settings.DefaultGameName;
-                    MainPageModel.ServiceGameInfo.Creator = TheHuman.PlayerName;
+                    MainPageModel.GameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
+                    MainPageModel.GameInfo.Name = MainPageModel.Settings.DefaultGameName;
+                    MainPageModel.GameInfo.Creator = TheHuman.PlayerName;
                     MainPageModel.IsServiceGame = true;
 
                     if (MainPageModel.CatanService != null)
@@ -67,7 +67,7 @@ namespace Catan10
                     MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
 
                     await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
-                    await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+                    await MainPageModel.CatanService.StartConnection(MainPageModel.GameInfo, TheHuman.PlayerName);
                 }
             }
             catch (Exception e)
@@ -250,18 +250,18 @@ namespace Catan10
                     CatanAction action;
                     using (new FunctionTimer("CreateOrJoinGame"))
                     {
-                        action = await CreateOrJoinGame(MainPageModel.CatanService, MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+                        action = await CreateOrJoinGame(MainPageModel.CatanService, MainPageModel.GameInfo, TheHuman.PlayerName);
                     }
                     using (new FunctionTimer("StartConnection"))
                     {
-                        await MainPageModel.CatanService.StartConnection(MainPageModel.ServiceGameInfo, TheHuman.PlayerName);
+                        await MainPageModel.CatanService.StartConnection(MainPageModel.GameInfo, TheHuman.PlayerName);
                     }
 
                     //
                     //  note that we join or create the game and this returns when the message is sent, not when the message is processed
                     //
 
-                    await NewGameLog.JoinOrCreateGame(this, MainPageModel.ServiceGameInfo, action);
+                    await NewGameLog.JoinOrCreateGame(this, MainPageModel.GameInfo, action);
 
                     //
                     //  6/16/2020: If there is an issue connecting to the service we call AddPlayer() before creating the game
@@ -399,11 +399,11 @@ namespace Catan10
         private async void Service_OnGameDeleted(Guid id, string by)
         {
             this.TraceMessage($"{id} playerName={by}");
-            if (MainPageModel == null || MainPageModel.ServiceGameInfo == null) return;
+            if (MainPageModel == null || MainPageModel.GameInfo == null) return;
 
-            RecordGameMessage(CatanAction.GameDeleted, MainPageModel.ServiceGameInfo, by);
+            RecordGameMessage(CatanAction.GameDeleted, MainPageModel.GameInfo, by);
 
-            if (MainPageModel.ServiceGameInfo.Id != id) return;
+            if (MainPageModel.GameInfo.Id != id) return;
 
             // uh oh -- deleting my game
 
@@ -424,15 +424,22 @@ namespace Catan10
         {
             if (CurrentGameState != GameState.WaitingForNewGame && CurrentGameState != GameState.WaitingForPlayers) return;
 
-            RecordGameMessage(CatanAction.GameJoined, gameInfo, playerName);
+            
             foreach (var player in MainPageModel.PlayingPlayers)
             {
                 if (player.PlayerName == playerName)
                 {
+                    //
+                    // 7/8/2020: if you are debugging when waiting for players, we will reconnect to SignalR and this function will be called.
+                    //           so just return if the player has already joined the game
+                    if (CurrentGameState == GameState.WaitingForPlayers) return;
+
                     await ShowErrorMessage($"You have two people named {playerName} trying to play at the same time.\nThat is bad joojoo.", "Uh oh", "");
                     return;
                 }
             }
+
+            RecordGameMessage(CatanAction.GameJoined, gameInfo, playerName);
             //
             //  am I already in a game?
             if (CurrentGameState == GameState.WaitingForNewGame)

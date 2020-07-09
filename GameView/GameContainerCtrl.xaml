@@ -7,7 +7,7 @@
     d:DesignHeight="1080" mc:Ignorable="d">
 
     <Viewbox Grid.Column="1" StretchDirection="Both" Stretch="Uniform">
-        <Grid x:Name="PanelGrid" CornerRadius="10" Background="{x:Bind local:MainPage.Current.CurrentPlayer.BackgroundBrush, Mode=OneWay}">
+        <Grid x:Name="PanelGrid"  Background="{x:Bind local:MainPage.Current.CurrentPlayer.BackgroundBrush, Mode=OneWay}">
 
             <Grid.CacheMode>
                 <BitmapCache />
