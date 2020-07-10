@@ -237,28 +237,28 @@ namespace Catan10
             await tcs.Task;
             return list;
         }
-
+        DateTime _lastReconnected = new DateTime();
         public async Task Initialize(string host)
         {
             try
             {
                 ServiceUrl = "https://" + host + "/CatanHub";
-
+                _lastReconnected = DateTime.Now;
                 HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging((logging) =>
                 {
                     logging.AddConsole();
-                    logging.SetMinimumLevel(LogLevel.Debug);
+                    logging.SetMinimumLevel(LogLevel.Trace);
                 }).Build();
 
 
-                HubConnection.ServerTimeout = TimeSpan.FromMinutes(30);
-                HubConnection.HandshakeTimeout = TimeSpan.FromMinutes(30);
-                HubConnection.KeepAliveInterval = TimeSpan.FromMinutes(15);
-
+                HubConnection.ServerTimeout = TimeSpan.FromMinutes(5);
+                HubConnection.HandshakeTimeout = TimeSpan.FromSeconds(10);
+                HubConnection.KeepAliveInterval = TimeSpan.FromSeconds(19);
+                
 
                 HubConnection.Reconnecting += async error =>
                 {
-                    this.TraceMessage("Hub reconnecting!!");
+                 //   this.TraceMessage("Hub reconnecting!!");
                     Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
                     if (GameInfo != null) // this puts us back into the channel with the other players.
                     {
@@ -267,8 +267,10 @@ namespace Catan10
                 };
                 HubConnection.Reconnected += async (connectionId) =>
                 {
-                    this.TraceMessage($"Reconnected.  new id: {connectionId}");
+                    TimeSpan delta = DateTime.Now - _lastReconnected;                    
+                    this.TraceMessage($"Reconnected.  new id: {connectionId}.  It has been {delta.TotalSeconds} seconds ");
                     await RegisterClient();
+                    _lastReconnected = DateTime.Now;
                 };
 
                 HubConnection.Closed += async (error) =>
