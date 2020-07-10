@@ -61,6 +61,7 @@ namespace Catan10
         private HubConnection HubConnection { get; set; }
 
         private string ServiceUrl { get; set; } = "";
+        private ICollection<CatanMessage> MessageLog = null;
 
         #endregion Properties
 
@@ -238,11 +239,20 @@ namespace Catan10
             return list;
         }
         DateTime _lastReconnected = new DateTime();
-        public async Task Initialize(string host)
+        public async Task Initialize(string host, ICollection<CatanMessage> messageLog)
         {
+            MessageLog = messageLog;
             try
             {
-                ServiceUrl = "https://" + host + "/CatanHub";
+                if (host.Contains("192"))
+                {
+                    ServiceUrl = "http://" + host + "/CatanHub";
+                }
+                else
+                {
+                    ServiceUrl = "https://" + host + "/CatanHub";
+                }
+
                 _lastReconnected = DateTime.Now;
                 HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging((logging) =>
                 {
@@ -254,11 +264,11 @@ namespace Catan10
                 HubConnection.ServerTimeout = TimeSpan.FromMinutes(5);
                 HubConnection.HandshakeTimeout = TimeSpan.FromSeconds(10);
                 HubConnection.KeepAliveInterval = TimeSpan.FromSeconds(19);
-                
+
 
                 HubConnection.Reconnecting += async error =>
                 {
-                 //   this.TraceMessage("Hub reconnecting!!");
+                    //   this.TraceMessage("Hub reconnecting!!");
                     Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
                     if (GameInfo != null) // this puts us back into the channel with the other players.
                     {
@@ -267,7 +277,7 @@ namespace Catan10
                 };
                 HubConnection.Reconnected += async (connectionId) =>
                 {
-                    TimeSpan delta = DateTime.Now - _lastReconnected;                    
+                    TimeSpan delta = DateTime.Now - _lastReconnected;
                     this.TraceMessage($"Reconnected.  new id: {connectionId}.  It has been {delta.TotalSeconds} seconds ");
                     await RegisterClient();
                     _lastReconnected = DateTime.Now;
@@ -284,6 +294,7 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
+                        MessageLog.Add(message);
                         OnToAllClients(message);
                     });
                 });
@@ -292,6 +303,7 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
+                        MessageLog.Add(message);
                         OnToOneClient(message);
                     });
                 });
@@ -299,6 +311,11 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
+
+                        RecordGameMessage(MessageType.Ack, CatanAction.Ack, new GameInfo() { Id = messageId }, fromPlayer);
+
+
+
                         OnAck?.Invoke(fromPlayer, messageId);
                     });
                 });
@@ -307,6 +324,8 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
+                        RecordGameMessage(MessageType.CreateGame, CatanAction.GameCreated, gameInfo, by);
+
                         OnGameCreated?.Invoke(gameInfo, by);
                     });
                 });
@@ -314,6 +333,7 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
+                        RecordGameMessage(MessageType.DeleteGame, CatanAction.GameDeleted, new GameInfo() { Id = id }, by);
                         OnGameDeleted?.Invoke(id, by);
                     });
                 });
@@ -321,6 +341,8 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
+                        RecordGameMessage(MessageType.JoinGame, CatanAction.GameJoined, gameInfo, playerName);
+
                         OnGameJoined?.Invoke(gameInfo, playerName);
                     });
                 });
@@ -328,6 +350,7 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
+                        RecordGameMessage(MessageType.LeaveGame, CatanAction.None, gameInfo, playerName);
                         OnGameLeft?.Invoke(gameInfo, playerName);
                     });
                 });
@@ -358,6 +381,28 @@ namespace Catan10
             }
         }
 
+        private void RecordGameMessage(MessageType messageType, CatanAction action, GameInfo info, string by)
+        {
+            GameLog logHeader = new GameLog()
+            {
+                CanUndo = false,
+                Action = action,
+                GameInfo = info,
+                Name = by
+            };
+            CatanMessage message = new CatanMessage()
+            {
+                Data = logHeader,
+                From = info.Name,
+                ActionType = ActionType.Normal,
+                DataTypeName = logHeader.GetType().FullName,
+                To = "*",
+                MessageType = messageType
+
+
+            };
+            this.MessageLog.Add(message);
+        }
 
 
         private GameInfo GameInfo { get; set; }
@@ -417,6 +462,8 @@ namespace Catan10
         {
             await HubConnection.InvokeAsync("Reset");
         }
+
+
 
         private TaskCompletionSource<object> BroadcastTcs = null;
 

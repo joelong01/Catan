@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
 
-using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-using static Catan10.StaticHelpers;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
+using CatanMessage = Catan.Proxy.CatanMessage;
+
 
 namespace Catan10
 {
@@ -66,7 +64,7 @@ namespace Catan10
                     MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
                     MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
 
-                    await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+                    await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.Log.MessageLog as ICollection<CatanMessage>);
                     await MainPageModel.CatanService.StartConnection(MainPageModel.GameInfo, TheHuman.PlayerName);
                 }
             }
@@ -244,7 +242,7 @@ namespace Catan10
 
                     using (new FunctionTimer("MainPageModel.CatanService.Initialize"))
                     {
-                        await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName);
+                        await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.Log.MessageLog);
                     }
 
                     CatanAction action;
@@ -346,36 +344,14 @@ namespace Catan10
                     }
                 }
             }
-
-
-            MainPageModel.Log.RecordMessage(message);
+          //  MainPageModel.Log.RecordMessage(message);
             await ProcessMessage(message);
 
         }
-        private void RecordGameMessage(CatanAction action, GameInfo info, string by)
-        {
-            GameLog logHeader = new GameLog()
-            {
-                CanUndo = false,
-                Action = action,
-                GameInfo = info,
-                Name = by
-            };
-            CatanMessage message = new CatanMessage()
-            {
-                Data = logHeader,
-                From = TheHuman.PlayerName,
-                ActionType = ActionType.Normal,
-                DataTypeName = logHeader.GetType().FullName,
-                To = "*"
-
-            };
-            MainPageModel.Log.RecordMessage(message);
-        }
+       
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
         {
             this.TraceMessage($"{gameInfo} playerName={playerName}");
-            RecordGameMessage(CatanAction.GameCreated, gameInfo, playerName);
             
             if (TheHuman.PlayerName == gameInfo.Creator)
             {
@@ -401,7 +377,6 @@ namespace Catan10
             this.TraceMessage($"{id} playerName={by}");
             if (MainPageModel == null || MainPageModel.GameInfo == null) return;
 
-            RecordGameMessage(CatanAction.GameDeleted, MainPageModel.GameInfo, by);
 
             if (MainPageModel.GameInfo.Id != id) return;
 
@@ -427,19 +402,16 @@ namespace Catan10
             
             foreach (var player in MainPageModel.PlayingPlayers)
             {
-                if (player.PlayerName == playerName)
-                {
-                    //
-                    // 7/8/2020: if you are debugging when waiting for players, we will reconnect to SignalR and this function will be called.
-                    //           so just return if the player has already joined the game
-                    if (CurrentGameState == GameState.WaitingForPlayers) return;
+                if (player.PlayerName != playerName) continue;
+                //
+                // 7/8/2020: if you are debugging when waiting for players, we will reconnect to SignalR and this function will be called.
+                //           so just return if the player has already joined the game
+                if (CurrentGameState == GameState.WaitingForPlayers) return;
 
-                    await ShowErrorMessage($"You have two people named {playerName} trying to play at the same time.\nThat is bad joojoo.", "Uh oh", "");
-                    return;
-                }
+                await ShowErrorMessage($"You have two people named {playerName} trying to play at the same time.\nThat is bad joojoo.", "Uh oh", "");
+                return;
             }
 
-            RecordGameMessage(CatanAction.GameJoined, gameInfo, playerName);
             //
             //  am I already in a game?
             if (CurrentGameState == GameState.WaitingForNewGame)
@@ -484,7 +456,7 @@ namespace Catan10
         }
         private async void Service_OnPrivateMessage(CatanMessage message)
         {
-            MainPageModel.Log.RecordMessage(message);
+          //  MainPageModel.Log.RecordMessage(message);
             await ProcessMessage(message);
         }
 

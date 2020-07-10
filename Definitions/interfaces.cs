@@ -14,7 +14,7 @@ namespace Catan10
     public delegate void DeleteGameHandler(Guid id, string by);
 
   
-    public delegate void GameLifeTimeHandler(GameInfo gameInfo, string playerName);
+    public delegate void GameLifeTimeHandler(GameInfo gameInfo, string gameName);
 
     public delegate void PrivateMessageReceivedHandler(CatanMessage message);
 
@@ -76,7 +76,7 @@ namespace Catan10
         /// <param name="hostName"></param>
         /// <param name="gameInfo"></param>
         /// <returns></returns>
-        Task Initialize(string hostName);
+        Task Initialize(string hostName, ICollection<CatanMessage> messageLog);
 
         Task<GameInfo> JoinGame(GameInfo info, string playerName);
 

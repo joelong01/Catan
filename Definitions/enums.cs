@@ -62,7 +62,8 @@ namespace Catan10
         ShowAllRolls,
         GameJoined,
         DeleteOffer,
-        ChangedTradeApproval
+        ChangedTradeApproval,
+        Ack
     };
 
     public enum CatanGames { Regular, Expansion, Seafarers, Seafarers4Player };

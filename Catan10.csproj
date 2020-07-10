@@ -118,8 +118,6 @@
     <Compile Include="attachedProperties.cs" />
     <Compile Include="CatanColors.cs" />
     <Compile Include="CatanService\AckTracker.cs" />
-    <Compile Include="CatanService\serviceHelpers.cs" />
-    <Compile Include="CatanService\WebSocketClient.cs" />
     <Compile Include="ContentDialogs\ErrorDlg.xaml.cs">
       <DependentUpon>ErrorDlg.xaml</DependentUpon>
     </Compile>
@@ -209,7 +207,6 @@
     <Compile Include="Logging\StateTransitions\0_NewGame.cs" />
     <Compile Include="Models\PlayerResources.cs" />
     <Compile Include="Models\TradeResources.cs" />
-    <Compile Include="CatanService\CatanRestService.cs" />
     <Compile Include="CatanService\CatanSignalRClient.cs" />
     <Compile Include="Sliders\SliderCtrl.xaml.cs">
       <DependentUpon>SliderCtrl.xaml</DependentUpon>
