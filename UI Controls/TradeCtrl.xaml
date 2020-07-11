@@ -10,7 +10,7 @@
             <RowDefinition Height="0" />
             <RowDefinition Height="530" />
             <RowDefinition Height="470" />
-            <RowDefinition Height="75" />
+            <RowDefinition Height="0" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0" />
@@ -28,7 +28,7 @@
             PlayingPlayers="{x:Bind PlayingPlayers, Mode=OneWay}" />
 
         <Border Grid.Row="3" Grid.ColumnSpan="3" Margin="10,0,0,0" HorizontalAlignment="Left"
-            Background="Black" CornerRadius="5">
+            Visibility="Collapsed" Background="Black" CornerRadius="5">
             <Button Foreground="White" Click="OnDone">
                 <Button.Content>
                     <StackPanel>

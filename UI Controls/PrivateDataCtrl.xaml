@@ -30,6 +30,7 @@
             <ColumnDefinition Width="115" />
             <ColumnDefinition Width="0" />
         </Grid.ColumnDefinitions>
+        
         <s:SliderCtrl Grid.RowSpan="2" Grid.ColumnSpan="3" Width="200" Height="415"
             HorizontalAlignment="Right" VerticalAlignment="Center" Canvas.ZIndex="99"
             Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
@@ -53,6 +54,7 @@
                 <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.GoldMine}" Count="{x:Bind Player.GameData.Resources.Current.GoldMine, Mode=OneWay}" ShowButtons="False" />
             </StackPanel>
             <Rectangle Width="465" Height="4" Margin="0,5,0,5" Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
+
             <StackPanel Orientation="Horizontal">
                 <StackPanel Height="170">
                     <Border Margin="-10,0,0,0" HorizontalAlignment="Center" Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}" CornerRadius="2">
@@ -185,7 +187,12 @@
                 <local:ResourceCardSlimCtrl Margin="1,0,0,0" Image="{StaticResource DevCardType.RoadBuilding}" Count="{x:Bind Player.GameData.Resources.UnplayedRoadBuilding, Mode=OneWay}" />
                 <local:ResourceCardSlimCtrl Margin="109,0,0,0" Image="{StaticResource DevCardType.VictoryPoint}" Count="{x:Bind Player.GameData.Resources.VictoryPoints, Mode=OneWay}" />
             </StackPanel>
-            <Rectangle Height="4" Margin="0,10,0,10" HorizontalAlignment="Stretch" Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,-20,0,10"
+                        Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}" >
+                <TextBlock Text="✨" FontSize="32" />
+                <TextBlock Text="{x:Bind ActualScore(Player.GameData.Score, Player.GameData.Resources.NewDevCards, Player.GameData.Resources.AvailableDevCards), Mode=OneWay}" 
+                           VerticalAlignment="Center" FontSize="30"/>
+            </StackPanel>
             <StackPanel Margin="0,0,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
                 Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
                 BorderBrush="{x:Bind Player.BackgroundBrush, Mode=OneWay}"

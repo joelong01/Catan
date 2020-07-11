@@ -21,10 +21,10 @@
     <Grid Name="LayoutRoot"
         Width="{Binding Width, ElementName=userControl, FallbackValue=400, TargetNullValue=400, Mode=OneWay}"
         Height="{Binding Height, ElementName=userControl, FallbackValue=300, TargetNullValue=300, Mode=OneWay}"
-        Background="{Binding Background, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
-        BorderBrush="{Binding BorderBrush, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
-        BorderThickness="{Binding BorderThickness, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
-        CornerRadius="{Binding CornerRadius, ElementName=userControl, FallbackValue=Colors.Red, TargetNullValue=Colors.Blue, Mode=OneWay}"
+        Background="{x:Bind userControl.Background, Mode=OneWay}"
+        BorderBrush="{x:Bind userControl.BorderBrush, Mode=OneWay}"
+        BorderThickness="{x:Bind userControl.BorderThickness, Mode=OneWay}"
+        CornerRadius="{x:Bind userControl.CornerRadius, Mode=OneWay}"
         PointerPressed="OnPointerPressed">
         <Grid.RenderTransform>
             <CompositeTransform />

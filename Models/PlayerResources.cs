@@ -75,19 +75,19 @@ namespace Catan10
 
     public class PlayerResources : INotifyPropertyChanged
     {
-        private int _Cities = 0;
+        private int _cities = 0;
 
         private TradeResources _currentResources = new TradeResources();
 
-        private int _GoldTotal = 0;
+        private int _goldTotal = 0;
 
         private int _knightsPlayed = 0;
 
-        private int _PlayedMonopoly = 0;
+        private int _playedMonopoly = 0;
 
-        private int _PlayedRoadBuilding = 0;
+        private int _playedRoadBuilding = 0;
 
-        private int _PlayedYearOfPlenty = 0;
+        private int _playedYearOfPlenty = 0;
 
         private TradeResources _resourcesLostSeven = new TradeResources();
 
@@ -95,23 +95,23 @@ namespace Catan10
 
         private TradeResources _resourcesLostToMonopoly = new TradeResources();
 
-        private int _Roads = 0;
+        private int _roads = 0;
 
-        private int _Settlements = 0;
+        private int _settlements = 0;
 
         private DevCardModel _thisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None };
 
-        private int _TotalDevCards = 0;
+        private int _totalDevCards = 0;
 
         private TradeResources _totalResources = new TradeResources();
 
-        private int _UnplayedKnights = 0;
+        private int _unplayedKnights = 0;
 
-        private int _UnplayedMonopoly = 0;
+        private int _unplayedMonopoly = 0;
 
-        private int _UnplayedYearOfPlenty = 0;
+        private int _unplayedYearOfPlenty = 0;
 
-        private int _VictoryPoints = 0;
+        private int _victoryPoints = 0;
         ResourceType _stolenResource = ResourceType.None;
        
         public ResourceType StolenResource
@@ -163,13 +163,13 @@ namespace Catan10
         {
             get
             {
-                return _Cities;
+                return _cities;
             }
             set
             {
-                if (_Cities != value)
+                if (_cities != value)
                 {
-                    _Cities = value;
+                    _cities = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -195,13 +195,13 @@ namespace Catan10
         {
             get
             {
-                return _GoldTotal;
+                return _goldTotal;
             }
             set
             {
-                if (_GoldTotal != value)
+                if (_goldTotal != value)
                 {
-                    _GoldTotal = value;
+                    _goldTotal = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -230,13 +230,13 @@ namespace Catan10
         {
             get
             {
-                return _PlayedMonopoly;
+                return _playedMonopoly;
             }
             set
             {
-                if (_PlayedMonopoly != value)
+                if (_playedMonopoly != value)
                 {
-                    _PlayedMonopoly = value;
+                    _playedMonopoly = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -246,13 +246,13 @@ namespace Catan10
         {
             get
             {
-                return _PlayedRoadBuilding;
+                return _playedRoadBuilding;
             }
             set
             {
-                if (_PlayedRoadBuilding != value)
+                if (_playedRoadBuilding != value)
                 {
-                    _PlayedRoadBuilding = value;
+                    _playedRoadBuilding = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -262,13 +262,13 @@ namespace Catan10
         {
             get
             {
-                return _PlayedYearOfPlenty;
+                return _playedYearOfPlenty;
             }
             set
             {
-                if (_PlayedYearOfPlenty != value)
+                if (_playedYearOfPlenty != value)
                 {
-                    _PlayedYearOfPlenty = value;
+                    _playedYearOfPlenty = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -329,13 +329,13 @@ namespace Catan10
         {
             get
             {
-                return _Roads;
+                return _roads;
             }
             set
             {
-                if (_Roads != value)
+                if (_roads != value)
                 {
-                    _Roads = value;
+                    _roads = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -345,13 +345,13 @@ namespace Catan10
         {
             get
             {
-                return _Settlements;
+                return _settlements;
             }
             set
             {
-                if (_Settlements != value)
+                if (_settlements != value)
                 {
-                    _Settlements = value;
+                    _settlements = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -377,13 +377,13 @@ namespace Catan10
         {
             get
             {
-                return _TotalDevCards;
+                return _totalDevCards;
             }
             set
             {
-                if (_TotalDevCards != value)
+                if (_totalDevCards != value)
                 {
-                    _TotalDevCards = value;
+                    _totalDevCards = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -411,13 +411,13 @@ namespace Catan10
         {
             get
             {
-                return _UnplayedKnights;
+                return _unplayedKnights;
             }
             set
             {
-                if (_UnplayedKnights != value)
+                if (_unplayedKnights != value)
                 {
-                    _UnplayedKnights = value;
+                    _unplayedKnights = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -427,13 +427,13 @@ namespace Catan10
         {
             get
             {
-                return _UnplayedMonopoly;
+                return _unplayedMonopoly;
             }
             set
             {
-                if (_UnplayedMonopoly != value)
+                if (_unplayedMonopoly != value)
                 {
-                    _UnplayedMonopoly = value;
+                    _unplayedMonopoly = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -445,13 +445,13 @@ namespace Catan10
         {
             get
             {
-                return _UnplayedYearOfPlenty;
+                return _unplayedYearOfPlenty;
             }
             set
             {
-                if (_UnplayedYearOfPlenty != value)
+                if (_unplayedYearOfPlenty != value)
                 {
-                    _UnplayedYearOfPlenty = value;
+                    _unplayedYearOfPlenty = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -463,13 +463,13 @@ namespace Catan10
         {
             get
             {
-                return _VictoryPoints;
+                return _victoryPoints;
             }
             set
             {
-                if (_VictoryPoints != value)
+                if (_victoryPoints != value)
                 {
-                    _VictoryPoints = value;
+                    _victoryPoints = value;
                     NotifyPropertyChanged();
                 }
             }

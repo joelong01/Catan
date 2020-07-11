@@ -2,13 +2,14 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Catan10"
+    x:Name="UserControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <Grid Width="470" Margin="0"
         Background="{StaticResource DevCardType.VictoryPoint}"
         BorderBrush="{StaticResource bmMaple}"
-        CornerRadius="10">
+        CornerRadius="{x:Bind UserControl.CornerRadius, Mode=OneWay}">
         <Grid.RowDefinitions>
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />

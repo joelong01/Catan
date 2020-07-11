@@ -26,7 +26,14 @@ namespace Catan10
         public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty StolenResourceProperty = DependencyProperty.Register("StolenResource", typeof(ResourceType), typeof(PrivateDataCtrl), new PropertyMetadata(ResourceType.None, StolenResourceChanged));
 
-        
+        private string ActualScore(int publicScore, ObservableCollection<DevCardModel> newDevCards, ObservableCollection<DevCardModel> available)
+        {
+            int victoryPoints = 0;
+            newDevCards.ForEach((c) => { if (c.DevCardType == DevCardType.VictoryPoint) victoryPoints++; });
+            available.ForEach((c) => { if (c.DevCardType == DevCardType.VictoryPoint) victoryPoints++; });
+
+            return $"{publicScore + victoryPoints }";
+        }
 
         public ResourceType StolenResource
         {
