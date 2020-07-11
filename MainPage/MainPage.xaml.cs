@@ -572,35 +572,40 @@ namespace Catan10
             }
         }
 
+        public void SimulateRoll(int roll)
+        {
+            List<RollModel> rolls = new List<RollModel>();
+            var rollModel = new RollModel
+            {
+                DiceOne = roll / 2,
+                Selected = true
+            };
+            rollModel.DiceTwo = roll - rollModel.DiceOne;
+            rolls.Add(rollModel);
+            var rand = new Random((int)DateTime.Now.Ticks);
+            for (int i = 0; i < 3; i++)
+            {
+
+                rollModel = new RollModel
+                {
+                    DiceOne = rand.Next(1, 6),
+                    DiceTwo = rand.Next(1, 6),
+                    Selected = false
+                };
+                rolls.Add(rollModel);
+            }
+            //
+            //  set them in the roll UI
+            _rollControl.TestSetRolls(rolls);
+        }
+
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
             if (!MainPageModel.IsServiceGame) return; // todo: make work for local game
 
             if (((Button)sender).Content is CatanNumber number)
             {
-                List<RollModel> rolls = new List<RollModel>();
-                var rollModel = new RollModel
-                {
-                    DiceOne = number.Number / 2,
-                    Selected = true
-                };
-                rollModel.DiceTwo = number.Number - rollModel.DiceOne;
-                rolls.Add(rollModel);
-                Random rand = new Random((int)DateTime.Now.Ticks);
-                for (int i = 0; i < 3; i++)
-                {
-
-                    rollModel = new RollModel
-                    {
-                        DiceOne = rand.Next(1, 6),
-                        DiceTwo = rand.Next(1, 6),
-                        Selected = false
-                    };                    
-                    rolls.Add(rollModel);
-                }
-                //
-                //  set them in the roll UI
-                _rollControl.TestSetRolls(rolls);
+                SimulateRoll(number.Number);
             }
         }
 
