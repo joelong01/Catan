@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Catan.Proxy;
 
 using Windows.UI.Xaml.Media;
+using Catan10.CatanService;
 
 namespace Catan10
 {

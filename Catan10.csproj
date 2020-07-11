@@ -118,6 +118,7 @@
     <Compile Include="attachedProperties.cs" />
     <Compile Include="CatanColors.cs" />
     <Compile Include="CatanService\AckTracker.cs" />
+    <Compile Include="CatanService\GameMessageModels.cs" />
     <Compile Include="ContentDialogs\ErrorDlg.xaml.cs">
       <DependentUpon>ErrorDlg.xaml</DependentUpon>
     </Compile>

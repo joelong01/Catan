@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using Catan.Proxy;
+using Catan10.CatanService;
 
 namespace Catan10
 {

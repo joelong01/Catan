@@ -6,18 +6,15 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-
-using Catan.Proxy;
-
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
-
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Catan.Proxy;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
-namespace Catan10
+namespace Catan10.CatanService
 {
 
 
@@ -164,7 +161,7 @@ namespace Catan10
 
         public async Task CreateGame(GameInfo gameInfo)
         {
-            Contract.Assert(!String.IsNullOrEmpty(gameInfo.Name));
+            Contract.Assert(!string.IsNullOrEmpty(gameInfo.Name));
             try
             {
                 await HubConnection.InvokeAsync("CreateGame", gameInfo);
@@ -311,11 +308,8 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-
-                        RecordGameMessage(MessageType.Ack, CatanAction.Ack, new GameInfo() { Id = messageId }, fromPlayer);
-
-
-
+                        var message = AckModel.CreateMessage(fromPlayer, messageId);
+                        MessageLog.Add(message);
                         OnAck?.Invoke(fromPlayer, messageId);
                     });
                 });
@@ -324,8 +318,8 @@ namespace Catan10
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        RecordGameMessage(MessageType.CreateGame, CatanAction.GameCreated, gameInfo, by);
-
+                        var message = CreateGameModel.CreateMessage(gameInfo);
+                        MessageLog.Add(message);
                         OnGameCreated?.Invoke(gameInfo, by);
                     });
                 });

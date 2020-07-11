@@ -36,7 +36,7 @@ namespace Catan10
                 GameInfo = gameInfo,
                 SentBy = gameController.TheHuman,
                 NewState = GameState.WaitingForPlayers,
-                OldState = (gameController.Log.PeekAction == null) ? GameState.Uninitialized : gameController.Log.PeekAction.NewState,
+                OldState = gameController.Log.PeekAction?.NewState ?? GameState.Uninitialized,
                 Action = action,                
                 CanUndo = false
             };

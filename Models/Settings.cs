@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 using Catan.Proxy;
+using Catan10.CatanService;
 
 namespace Catan10
 {

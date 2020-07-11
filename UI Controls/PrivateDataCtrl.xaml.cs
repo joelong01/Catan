@@ -44,12 +44,10 @@ namespace Catan10
         private void SetStolenResource(ResourceType resourceType)
         {
         }
-
+        
         private bool StolenResourceEmpty(ResourceType resourceType)
         {
-            if (resourceType == ResourceType.None) return false;
-
-            return true;
+            return resourceType != ResourceType.None;
         }
 
         #endregion Delegates + Fields + Events + Enums

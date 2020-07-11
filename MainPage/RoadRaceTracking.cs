@@ -2,6 +2,7 @@
 using System.Diagnostics;
 
 using Catan.Proxy;
+using Catan10.CatanService;
 
 namespace Catan10
 {

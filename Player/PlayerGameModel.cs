@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using Catan.Proxy;
 
 using Windows.UI.Xaml;
+using Catan10.CatanService;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 

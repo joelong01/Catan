@@ -3,6 +3,7 @@
 using Catan.Proxy;
 
 using Windows.Storage;
+using Catan10.CatanService;
 
 namespace Catan10
 {
