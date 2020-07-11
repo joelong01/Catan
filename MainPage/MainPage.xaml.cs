@@ -574,6 +574,8 @@ namespace Catan10
 
         public void SimulateRoll(int roll)
         {
+            var rand = new Random((int)DateTime.Now.Ticks);
+            if (roll < 2) roll = rand.Next(2, 12);
             List<RollModel> rolls = new List<RollModel>();
             var rollModel = new RollModel
             {
@@ -582,7 +584,7 @@ namespace Catan10
             };
             rollModel.DiceTwo = roll - rollModel.DiceOne;
             rolls.Add(rollModel);
-            var rand = new Random((int)DateTime.Now.Ticks);
+            
             for (int i = 0; i < 3; i++)
             {
 

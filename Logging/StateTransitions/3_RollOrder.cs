@@ -54,7 +54,7 @@ namespace Catan10
             {
                 //
                 // simulate a roll
-                await RollOrderLog.PostMessage(gameController, GetRollModelList());
+                gameController.SimulateRoll(-1);
             }
         }
 

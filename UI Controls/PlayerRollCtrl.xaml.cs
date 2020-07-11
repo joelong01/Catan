@@ -83,12 +83,10 @@ namespace Catan10
                 _rolled = true;
                 //
                 //  which roll was selected?
-                int rollValue = 0;
                 foreach (var r in rolls)
                 {
                     if (r.Selected)
                     {
-                        rollValue = r.Roll;
                         r.Orientation = TileOrientation.FaceUp;
                         break;
                     }
