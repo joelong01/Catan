@@ -86,7 +86,7 @@ namespace Catan10
 
             for (int i = 0; i < 11; i++)
             {
-                percents[i] = counts[i] / (double)counts.Length;
+                percents[i] = counts[i] / (double)total;
             }
 
             return (counts, percents);

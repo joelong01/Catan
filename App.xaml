@@ -367,6 +367,7 @@
             <ImageBrush x:Key="DevCardType.YearOfPlenty" ImageSource="Assets/DevCards/YearOfPlenty.jpg" Stretch="UniformToFill" />
             <SolidColorBrush x:Key="DevCardType.None" Color="Transparent" />
             <!--  ResourceType Brushes - should be one per enum value  -->
+            <ImageBrush x:Key="ResourceType.None" ImageSource="Assets/ResourceCards/back.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="ResourceType.Back" ImageSource="Assets/ResourceCards/back.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="ResourceType.Brick" ImageSource="Assets/ResourceCards/brick.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="ResourceType.GoldMine" ImageSource="Assets/ResourceCards/goldMine.png" Stretch="UniformToFill" />
@@ -376,7 +377,7 @@
             <ImageBrush x:Key="ResourceType.Wood" ImageSource="Assets/ResourceCards/wood.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="ResourceType.Desert" ImageSource="Assets/Tiles/desert.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="ResourceType.Sea" ImageSource="Assets/water.png" Stretch="UniformToFill" />
-            <SolidColorBrush x:Key="ResourceType.None" Color="Transparent" />
+            <!--<SolidColorBrush x:Key="ResourceType.None" Color="Transparent" />-->
             <Style x:Key="GameControllerStyle" TargetType="Button">
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />

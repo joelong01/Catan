@@ -20,7 +20,7 @@
             <Setter Property="Margin" Value="0,5,0,0" />
         </Style>
     </Control.Resources>
-    <Grid Width="520" Height="415" Background="{StaticResource TransparentBrush}" CornerRadius="10">
+    <Grid Width="520" Height="415" Background="{StaticResource TransparentBrush}" CornerRadius="10,0,10,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />
@@ -31,15 +31,17 @@
             <ColumnDefinition Width="0" />
         </Grid.ColumnDefinitions>
         
-        <s:SliderCtrl Grid.RowSpan="2" Grid.ColumnSpan="3" Width="200" Height="415"
-            HorizontalAlignment="Right" VerticalAlignment="Center" Canvas.ZIndex="99"
+        <s:SliderCtrl Grid.RowSpan="2" Grid.ColumnSpan="3" Width="200" Height="420"
+            HorizontalAlignment="Right" VerticalAlignment="Center" Canvas.ZIndex="99"                      
             Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
             Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
+            Caption="Stolen Resource"
+            CornerRadius="0"
+                      FontSize="22"
             Open="{x:Bind StolenResourceEmpty(Player.GameData.Resources.StolenResource), Mode=OneWay}"
             SlideDirection="Left">
             <s:SliderCtrl.Child>
-                <StackPanel>
-                    <TextBlock Margin="5" HorizontalAlignment="Center" Text="Stolen Resource" />
+                <StackPanel>                    
                     <local:ResourceCardSlimCtrl ResourceType="{x:Bind Player.GameData.Resources.StolenResource, Mode=OneWay}" CountVisible="False" />
                 </StackPanel>
             </s:SliderCtrl.Child>

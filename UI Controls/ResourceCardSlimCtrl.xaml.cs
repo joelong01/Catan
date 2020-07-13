@@ -99,7 +99,7 @@ namespace Catan10
 
         private void SetResourceType(ResourceType resourceType)
         {
-            if (ResourceType != ResourceType.None)
+           // if (ResourceType != ResourceType.None)
             {
                 string key = "ResourceType." + resourceType.ToString();
                 Image = (Brush)App.Current.Resources[key];

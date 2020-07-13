@@ -6,18 +6,19 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
+using Catan.Proxy;
+
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
+
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-using Catan.Proxy;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
 
 namespace Catan10.CatanService
 {
-
-
     public class CatanSignalRClient : IDisposable, ICatanService
     {
         #region Delegates + Fields + Events + Enums
@@ -50,6 +51,7 @@ namespace Catan10.CatanService
 
         #region Properties
 
+        private ICollection<CatanMessage> MessageLog = null;
         public HubConnectionState ConnectionState => HubConnection.State;
 
         public int UnprocessedMessages { get; set; }
@@ -58,7 +60,6 @@ namespace Catan10.CatanService
         private HubConnection HubConnection { get; set; }
 
         private string ServiceUrl { get; set; } = "";
-        private ICollection<CatanMessage> MessageLog = null;
 
         #endregion Properties
 
@@ -138,15 +139,20 @@ namespace Catan10.CatanService
         }
 
         #endregion Constructors + Destructors
+
+        private DateTime _lastReconnected = new DateTime();
+
+        private TaskCompletionSource<object> BroadcastTcs = null;
+
+        private GameInfo GameInfo { get; set; }
+
+        private string PlayerName { get; set; }
+
         static public T Deserialize<T>(string json)
         {
             return JsonSerializer.Deserialize<T>(json, GetJsonOptions());
         }
-        static public string Serialize<T>(T obj, bool indented = false)
-        {
-            if (obj == null) return null;
-            return JsonSerializer.Serialize<T>(obj, GetJsonOptions(indented));
-        }
+
         public static JsonSerializerOptions GetJsonOptions(bool indented = false)
         {
             var options = new JsonSerializerOptions
@@ -157,6 +163,12 @@ namespace Catan10.CatanService
             options.Converters.Add(new JsonStringEnumConverter());
             options.Converters.Add(new PlayerModelConverter());
             return options;
+        }
+
+        static public string Serialize<T>(T obj, bool indented = false)
+        {
+            if (obj == null) return null;
+            return JsonSerializer.Serialize<T>(obj, GetJsonOptions(indented));
         }
 
         public async Task CreateGame(GameInfo gameInfo)
@@ -235,7 +247,7 @@ namespace Catan10.CatanService
             await tcs.Task;
             return list;
         }
-        DateTime _lastReconnected = new DateTime();
+
         public async Task Initialize(string host, ICollection<CatanMessage> messageLog)
         {
             MessageLog = messageLog;
@@ -257,11 +269,9 @@ namespace Catan10.CatanService
                     logging.SetMinimumLevel(LogLevel.Trace);
                 }).Build();
 
-
                 HubConnection.ServerTimeout = TimeSpan.FromMinutes(5);
                 HubConnection.HandshakeTimeout = TimeSpan.FromSeconds(10);
                 HubConnection.KeepAliveInterval = TimeSpan.FromSeconds(19);
-
 
                 HubConnection.Reconnecting += async error =>
                 {
@@ -289,6 +299,7 @@ namespace Catan10.CatanService
 
                 HubConnection.On("ToAllClients", async (CatanMessage message) =>
                 {
+                    //  Debug.WriteLine($"message received: {message}");
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         MessageLog.Add(message);
@@ -304,14 +315,14 @@ namespace Catan10.CatanService
                         OnToOneClient(message);
                     });
                 });
-                HubConnection.On("OnAck", async (string fromPlayer, Guid messageId) =>
+                HubConnection.On("OnAck", (string fromPlayer, Guid messageId) =>
                 {
-                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                        var message = AckModel.CreateMessage(fromPlayer, messageId);
-                        MessageLog.Add(message);
-                        OnAck?.Invoke(fromPlayer, messageId);
-                    });
+                    OnAck?.Invoke(fromPlayer, messageId);
+
+                    //
+                    //  this does not give me an RPC_E_WRONG_THREAD...much be because all it does is add it to a collection.
+                    var message = AckModel.CreateMessage(fromPlayer, messageId);
+                    MessageLog.Add(message);
                 });
 
                 HubConnection.On("CreateGame", async (GameInfo gameInfo, string by) =>
@@ -375,33 +386,6 @@ namespace Catan10.CatanService
             }
         }
 
-        private void RecordGameMessage(MessageType messageType, CatanAction action, GameInfo info, string by)
-        {
-            GameLog logHeader = new GameLog()
-            {
-                CanUndo = false,
-                Action = action,
-                GameInfo = info,
-                Name = by
-            };
-            CatanMessage message = new CatanMessage()
-            {
-                Data = logHeader,
-                From = info.Name,
-                ActionType = ActionType.Normal,
-                DataTypeName = logHeader.GetType().FullName,
-                To = "*",
-                MessageType = messageType
-
-
-            };
-            this.MessageLog.Add(message);
-        }
-
-
-        private GameInfo GameInfo { get; set; }
-        private string PlayerName { get; set; }
-
         public async Task<GameInfo> JoinGame(GameInfo gameInfo, string playerName)
         {
             if (gameInfo == null) throw new ArgumentException("GameInfo can't be null");
@@ -457,10 +441,6 @@ namespace Catan10.CatanService
             await HubConnection.InvokeAsync("Reset");
         }
 
-
-
-        private TaskCompletionSource<object> BroadcastTcs = null;
-
         /// <summary>
         ///     Send a message to all the clients.
         ///
@@ -486,7 +466,6 @@ namespace Catan10.CatanService
             BroadcastTcs = new TaskCompletionSource<object>();
             try
             {
-
                 //
                 //  this are the players the messag is going to -- we will wait for acks from all these
                 List<string> targets = new List<string>();
@@ -506,7 +485,7 @@ namespace Catan10.CatanService
 
                 //
                 //  Ack timeout
-                // 
+                //
                 int timeout = 5 * 1000;
                 while (true)
                 {
@@ -565,7 +544,7 @@ namespace Catan10.CatanService
                         }
                         //
                         //  note: Targets gets modified by the AckTracker so it will only have the list of Players that need to send us an acc
-                        //  
+                        //
                         message.ActionType = ActionType.Retry;
                         s = "";
                         targets.ForEach((p) => s += p + ", ");
@@ -581,12 +560,8 @@ namespace Catan10.CatanService
             finally
             {
                 BroadcastTcs.TrySetResult(null);
-
             }
         }
-
-
-
 
         public async Task SendPrivateMessage(string playerName, CatanMessage message)
         {
@@ -633,6 +608,27 @@ namespace Catan10.CatanService
                 await connectionTCS.Task.TimeoutAfter(5000);
                 connectionTCS = new TaskCompletionSource<object>();
             }
+        }
+
+        private void RecordGameMessage(MessageType messageType, CatanAction action, GameInfo info, string by)
+        {
+            GameLog logHeader = new GameLog()
+            {
+                CanUndo = false,
+                Action = action,
+                GameInfo = info,
+                Name = by
+            };
+            CatanMessage message = new CatanMessage()
+            {
+                Data = logHeader,
+                From = info.Name,
+                ActionType = ActionType.Normal,
+                DataTypeName = logHeader.GetType().FullName,
+                To = "*",
+                MessageType = messageType
+            };
+            this.MessageLog.Add(message);
         }
 
         private async Task RegisterClient()
@@ -707,8 +703,6 @@ namespace Catan10.CatanService
                 }
                 //
                 //  we are probably loading MainPage Model from disk
-
-
 
                 return MainPage.Current.NameToPlayer(playerName);
             }
