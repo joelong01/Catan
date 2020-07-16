@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -108,12 +109,14 @@ namespace Catan10.Spy
                     Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
                     if (SelectedGame != null) // this puts us back into the channel with the other players.
                     {
-                        await HubConnection.InvokeAsync("JoinGame", SelectedGame, "Catan Spy");
+                        await JoinGame(SelectedGame);
                     }
                 };
-                HubConnection.Reconnected += async (connectionId) =>
-                {
-                };
+                //HubConnection.Reconnected += (connectionId) =>
+                //{
+                //    this.TraceMessage($"Reconnected.  new id: {connectionId}.");
+
+                //};
 
                 HubConnection.Closed += async (error) =>
                 {
@@ -138,14 +141,9 @@ namespace Catan10.Spy
                         Messages.Add(message);
                     });
                 });
-                HubConnection.On("OnAck", (string fromPlayer, Guid messageId) =>
+                HubConnection.On("OnAck", (CatanMessage message) =>
                 {
-                    Messages.Add(new CatanMessage()
-                    {
-                        MessageType = MessageType.Ack,
-                        MessageId = messageId,
-                        From = fromPlayer
-                    });
+                    Messages.Add(message);
                 });
 
                 HubConnection.On("CreateGame", async (GameInfo gameInfo, string by) =>
@@ -190,7 +188,7 @@ namespace Catan10.Spy
                     });
                 });
 
-                HubConnection.On("AllMessagages", async (List<CatanMessage> messages) =>
+                HubConnection.On("AllMessages", async (List<CatanMessage> messages) =>
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
@@ -218,6 +216,31 @@ namespace Catan10.Spy
             var depPropClass = d as CatanSpyPage;
             var depPropValue = (CatanMessage)e.NewValue;
             depPropClass?.SetSelectedMessage(depPropValue);
+        }
+
+        private async Task EnsureConnection ()
+        {
+            if (HubConnection.State == HubConnectionState.Connected) return;
+
+            TaskCompletionSource<object> connectionTCS = new TaskCompletionSource<object>(); ;
+            HubConnection.Reconnected += Reconnected;
+            Task Reconnected (string arg)
+            {
+                connectionTCS.TrySetResult(null);
+                HubConnection.Reconnected -= Reconnected;
+                return Task.CompletedTask;
+            }
+
+            int n = 0;
+            //
+            //  make sure we are connected to the service
+            while (HubConnection.State != HubConnectionState.Connected)
+            {
+                n++;
+                await MainPage.Current.ShowErrorMessage("Lost Connection to the Catan Service.  Click Ok and I'll try to connect.", "Catan", "");
+                await connectionTCS.Task.TimeoutAfter(5000);
+                connectionTCS = new TaskCompletionSource<object>();
+            }
         }
 
         private string Format (string dataType, string json)
@@ -324,6 +347,16 @@ namespace Catan10.Spy
             LogHeaderJson = FormatJson(json);
         }
 
+        private async Task PostHubMessage (CatanMessage message)
+        {
+            await EnsureConnection();
+            //
+            //  make it an object so we can get the whole message
+            message.Data = JsonSerializer.Serialize<object>(message.Data, CatanSignalRClient.GetJsonOptions());
+
+            await HubConnection.SendAsync("PostMessage", message);
+        }
+
         private async Task RefreshGames ()
         {
             var games = await MainPage.Current.Proxy.GetAllGames();
@@ -335,7 +368,23 @@ namespace Catan10.Spy
         {
             this.TraceMessage($"Selected Game: {game}");
             await HubConnection.InvokeAsync("GetAllMessage", game);
-            await HubConnection.InvokeAsync("JoinGame", game, "Catan Spy");
+            await JoinGame(game);
+        }
+
+        private async Task JoinGame(GameInfo gameInfo)
+        {
+            CatanMessage message = new CatanMessage()
+            {
+                MessageType = MessageType.JoinGame,
+                ActionType = ActionType.Normal,
+                Data = null,
+                DataTypeName="",
+                From = "Catan Spy",
+                To="*",
+                GameInfo = gameInfo,
+
+            };
+            await PostHubMessage(message);
         }
 
         private void SetSelectedMessage (CatanMessage message)

@@ -131,7 +131,7 @@ namespace Catan10
 
                     if (game.Creator == me)
                     {
-                        await gameService.DeleteGame(gameInfo.Id, me);
+                        await gameService.DeleteGame(gameInfo, me);
                         exists = false;
                         break;
                     }
@@ -163,7 +163,7 @@ namespace Catan10
                 {
                     games.ForEach(async (game) =>
                     {
-                        await MainPageModel.CatanService.DeleteGame(game.Id, TheHuman.PlayerName);
+                        await MainPageModel.CatanService.DeleteGame(game, TheHuman.PlayerName);
                     });
                 }
             }
@@ -372,13 +372,13 @@ namespace Catan10
 
         }
 
-        private async void Service_OnGameDeleted(Guid id, string by)
+        private async void Service_OnGameDeleted(GameInfo gameInfo, string by)
         {
-            this.TraceMessage($"{id} playerName={by}");
+            this.TraceMessage($"{gameInfo.Id} playerName={by}");
             if (MainPageModel == null || MainPageModel.GameInfo == null) return;
 
 
-            if (MainPageModel.GameInfo.Id != id) return;
+            if (MainPageModel.GameInfo.Id != gameInfo.Id) return;
 
             // uh oh -- deleting my game
 

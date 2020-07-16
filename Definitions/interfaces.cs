@@ -11,7 +11,7 @@ namespace Catan10
     public delegate void BroadcastMessageReceivedHandler(CatanMessage message);
 
    
-    public delegate void DeleteGameHandler(Guid id, string by);
+    public delegate void DeleteGameHandler(GameInfo gameInfo, string by);
 
   
     public delegate void GameLifeTimeHandler(GameInfo gameInfo, string gameName);
@@ -64,7 +64,7 @@ namespace Catan10
         /// </summary>
         /// <param name="gameName"></param>
         /// <returns></returns>
-        Task DeleteGame(Guid id, string by);
+        Task DeleteGame(GameInfo gameInfo, string by);
 
         Task<List<GameInfo>> GetAllGames();
 
@@ -90,7 +90,7 @@ namespace Catan10
 
         Task Reset();
 
-        Task SendBroadcastMessage(Guid id, CatanMessage message);
+        Task SendBroadcastMessage(CatanMessage message);
         Task SendPrivateMessage(string to, CatanMessage message);
 
         Task StartConnection(GameInfo info, string playerName);

@@ -389,17 +389,13 @@ namespace Catan10
 
         public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)
         {
-            if (MainPageModel.GameState != GameState.WaitingForNewGame && MainPageModel.GameInfo == null)
-            {
-                Debugger.Break();
-            }
-
             CatanMessage message = new CatanMessage()
             {
                 Data = logHeader,
                 From = TheHuman.PlayerName,
                 ActionType = msgType,
-                DataTypeName = logHeader.GetType().FullName
+                DataTypeName = logHeader.GetType().FullName,
+                GameInfo = MainPageModel.GameInfo
             };
 
             MainPageModel.UnprocessedMessages++;
@@ -464,7 +460,7 @@ namespace Catan10
             UpdateGridLocations();
             _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             _progress.IsActive = false;
-
+           
             await _rollControl.Reset();
             CurrentPlayer = TheHuman;
             //
@@ -531,9 +527,12 @@ namespace Catan10
         public async Task<bool> PostMessage(LogHeader logHeader, ActionType msgType)
         {
             if (MainPageModel.GameInfo == null) return false; // can be null druing testing scenarios
+            
+            
 
             CatanMessage message = new CatanMessage()
             {
+                GameInfo = this.MainPageModel.GameInfo,
                 Data = logHeader,
                 From = TheHuman.PlayerName,
                 ActionType = msgType,
@@ -542,13 +541,23 @@ namespace Catan10
             };
 
             MainPageModel.UnprocessedMessages++;
+
+            //
+            //  if you start spy before a game starts, nobody is there to recieve the message and decrement the message counter...
+            //  so will will call it directly to make the UI update correctly. 
+            if (MainPageModel.GameState == GameState.WaitingForNewGame && logHeader.TypeName == typeof(CatanSpyLog).FullName)
+            {
+                await ProcessMessage(message);
+                return true;
+            }
+
             if (MainPageModel.Settings.IsLocalGame)
             {
                 await ProcessMessage(message);
             }
             else
             {
-                await MainPageModel.CatanService.SendBroadcastMessage(MainPageModel.GameInfo.Id, message);
+                await MainPageModel.CatanService.SendBroadcastMessage(message);
             }
 
             return (!MainPageModel.Settings.IsLocalGame);

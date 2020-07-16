@@ -4,14 +4,57 @@ using Catan.Proxy;
 
 namespace Catan10.CatanService
 {
+    public class AckModel
+    {
+        #region Properties
+
+        public Guid AckedMessageId { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
+        public static CatanMessage CreateMessage (CatanMessage msgToAck)
+        {
+            var model = new AckModel()
+            {
+                AckedMessageId = msgToAck.MessageId
+            };
+
+            var message = new CatanMessage
+            {
+                ActionType = ActionType.Normal,
+                Data = (object)model,
+                DataTypeName = typeof(AckModel).FullName,
+                From = msgToAck.From,
+                MessageType = MessageType.Ack,
+                Sequence = 0,
+                GameInfo = msgToAck.GameInfo,
+                To = "*"
+            };
+            return message;
+        }
+
+        public override string ToString ()
+        {
+            return $"Ack={AckedMessageId}";
+        }
+
+        #endregion Methods
+    }
+
     public class CreateGameModel : LogHeader
     {
+        #region Properties
 
         public GameInfo GameInfo { get; set; }
 
-        public static CatanMessage CreateMessage(GameInfo gameInfo)
-        {
+        #endregion Properties
 
+        #region Methods
+
+        public static CatanMessage CreateMessage (GameInfo gameInfo)
+        {
             var model = new CreateGameModel
             {
                 Action = CatanAction.GameCreated,
@@ -27,8 +70,6 @@ namespace Catan10.CatanService
                 TypeName = typeof(CreateGameModel).FullName,
                 GameInfo = gameInfo
             };
-            
-            
 
             var message = new CatanMessage
             {
@@ -44,50 +85,6 @@ namespace Catan10.CatanService
             return message;
         }
 
-
-    }
-
-
-    public class AckModel: LogHeader
-    {
-        public string Player { get; set; }
-        public Guid MessageId { get; set; }
-
-        public static CatanMessage CreateMessage(string player, Guid ackdMessageId)
-        {
-
-            var model = new AckModel
-            {
-                Action = CatanAction.Ack,
-                CanUndo = false,
-                CatanGame = CatanGames.Regular,
-                LogId = default,
-                LogType = LogType.Normal,
-                NewState = MainPage.Current.CurrentGameState,
-                OldState = MainPage.Current.CurrentGameState,
-                Previous = null,
-                SentBy = MainPage.Current.TheHuman,
-                CreatedTime = DateTime.Now,
-                TypeName = typeof(AckModel).FullName,
-                Player = player,
-                MessageId = ackdMessageId
-
-            };
-
-
-
-            var message = new CatanMessage
-            {
-                ActionType = ActionType.Normal,
-                Data = (object)model,
-                DataTypeName = typeof(AckModel).FullName,
-                From = player,
-                MessageId = Guid.Empty,
-                MessageType = MessageType.Ack,
-                Sequence = 0,
-                To = ""
-            };
-            return message;
-        }
+        #endregion Methods
     }
 }

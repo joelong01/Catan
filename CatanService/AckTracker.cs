@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Catan.Proxy;
 using Catan10.CatanService;
 
 namespace Catan10
@@ -57,12 +58,13 @@ namespace Catan10
             }
         }
 
-        private void Client_OnAck(string fromPlayer, Guid messageId)
+        private void Client_OnAck(CatanMessage message)
         {
-          //  this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId} IsMyMessage={messageId == this.MessageId}");
-            if (messageId == this.MessageId)
+            //  this.TraceMessage($"Received Ack from {fromPlayer} for message {messageId} IsMyMessage={messageId == this.MessageId}");
+            AckModel ackModel = (AckModel)message.Data;
+            if (ackModel.AckedMessageId == this.MessageId)
             {                
-                PlayerNames.Remove(fromPlayer);
+                PlayerNames.Remove(message.From);
                 if (PlayerNames.Count == 0)
                 {
              //       this.TraceMessage($"Received all acks for message {messageId}");

@@ -186,10 +186,10 @@ namespace Catan10
             List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
             MainPageModel.CatanService.OnGameDeleted += CatanService_OnGameDeleted;
 
-            void CatanService_OnGameDeleted(Guid gId, string by)
+            void CatanService_OnGameDeleted(GameInfo gameInfo, string by)
             {
-                this.TraceMessage($"Deleted game id={gId} by {by}");
-                if (gId == id)
+                this.TraceMessage($"Deleted game={gameInfo} by {by}");
+                if (gameInfo.Id == id)
                 {
                     MainPageModel.CatanService.OnGameDeleted -= CatanService_OnGameDeleted;
                     tcs.TrySetResult(null);
@@ -203,7 +203,7 @@ namespace Catan10
                 this.TraceMessage($"Found game={game.Name}");
                 if (game.Name == gameName)
                 {
-                    await MainPageModel.CatanService.DeleteGame(game.Id, TheHuman.PlayerName);
+                    await MainPageModel.CatanService.DeleteGame(game, TheHuman.PlayerName);
                     await tcs.Task;
                 }
             }

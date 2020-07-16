@@ -201,7 +201,7 @@ namespace Catan10
                 bool ret = await AskUserQuestion($"Are you sure want to delete the game named \"{SelectedGame.Name}\"?");
                 if (ret)
                 {
-                    await Proxy.DeleteGame(SelectedGame.Id, MainPage.Current.TheHuman.PlayerName);
+                    await Proxy.DeleteGame(SelectedGame, MainPage.Current.TheHuman.PlayerName);
 
                     PlayersInGame.Clear();
                     Games.Remove(SelectedGame);
@@ -221,7 +221,7 @@ namespace Catan10
             {
                 Games.ForEach(async (game) =>
                 {
-                    await Proxy.DeleteGame(game.Id, MainPage.Current.TheHuman.PlayerName);
+                    await Proxy.DeleteGame(game, MainPage.Current.TheHuman.PlayerName);
 
                 });
 
@@ -309,9 +309,9 @@ namespace Catan10
 
         }
 
-        private void Proxy_OnGameDeleted(Guid id, string by)
+        private void Proxy_OnGameDeleted(GameInfo gameInfo, string by)
         {
-            this.TraceMessage($"{by} deleted {id}");
+            this.TraceMessage($"{by} deleted {gameInfo}");
         }
 
         private void Proxy_OnGameJoined(GameInfo gameInfo, string playerName)
