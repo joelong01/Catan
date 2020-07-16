@@ -12,20 +12,18 @@ namespace Catan10
 {
     public sealed partial class JoinGameDlg : ContentDialog
     {
-        public JoinGameDlg(List<GameInfo> games)
-        {
-            this.InitializeComponent();
-            GameNames.AddRange(games);
-            if (games.Count > 0)
-            {
-                GameSelected = games[0];
-            }
-        }
 
-        private ObservableCollection<GameInfo> GameNames { get; } = new ObservableCollection<GameInfo>();
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(JoinGameDlg), new PropertyMetadata(null));
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(JoinGameDlg), new PropertyMetadata(null));
+        #region Delegates + Fields + Events + Enums
+
         public static readonly DependencyProperty GameSelectedProperty = DependencyProperty.Register("GameSelected", typeof(GameInfo), typeof(JoinGameDlg), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(JoinGameDlg), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(JoinGameDlg), new PropertyMetadata(null));
+
+        #endregion Delegates + Fields + Events + Enums
+
+        #region Properties
 
         public GameInfo GameSelected
         {
@@ -45,6 +43,26 @@ namespace Catan10
             set => SetValue(PlayerProperty, value);
         }
 
+        private ObservableCollection<GameInfo> GameNames { get; } = new ObservableCollection<GameInfo>();
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+        public JoinGameDlg(List<GameInfo> games)
+        {
+            this.InitializeComponent();
+            GameNames.AddRange(games);
+            if (games.Count > 0)
+            {
+                GameSelected = games[0];
+            }
+        }
+
+        #endregion Constructors + Destructors
+
+        #region Methods
+
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
         }
@@ -53,5 +71,7 @@ namespace Catan10
         {
             this.Hide();
         }
+
+        #endregion Methods
     }
 }

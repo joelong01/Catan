@@ -203,7 +203,7 @@ namespace Catan10
 
         IRollLog RollLog { get; }
         PlayerModel TheHuman { get; }
-
+        ICatanService Proxy { get; }
         #endregion Properties + Fields
 
 

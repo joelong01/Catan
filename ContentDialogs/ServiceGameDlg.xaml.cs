@@ -266,8 +266,12 @@ namespace Catan10
             try
             {
                 GameInfo gameInfo = new GameInfo() { Id = Guid.NewGuid(), Name = NewGameName, Creator = CurrentPlayer.PlayerName };
+                //
+                //  
+                // await Proxy.CreateGame(gameInfo);
 
-                 await Proxy.CreateGame(gameInfo);
+                await CreateNewGame.CreateGame(MainPage.Current, gameInfo);
+
                  // added to the UI in the event handler
                 
             }

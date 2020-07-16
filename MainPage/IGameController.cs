@@ -168,6 +168,8 @@ namespace Catan10
 
         public IRollLog RollLog => MainPageModel.Log.RollLog as IRollLog;
 
+        public ICatanService Proxy => MainPageModel?.CatanService;
+
         #endregion Properties
 
         /// <summary>
