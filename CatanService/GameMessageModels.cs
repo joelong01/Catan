@@ -26,7 +26,7 @@ namespace Catan10.CatanService
                 ActionType = ActionType.Normal,
                 Data = (object)model,
                 DataTypeName = typeof(AckModel).FullName,
-                From = msgToAck.From,
+                From = MainPage.Current.TheHuman.PlayerName,
                 MessageType = MessageType.Ack,
                 Sequence = 0,
                 GameInfo = msgToAck.GameInfo,

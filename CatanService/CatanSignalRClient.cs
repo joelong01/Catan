@@ -88,10 +88,17 @@ namespace Catan10.CatanService
         private async Task PostHubMessage (CatanMessage message)
         {
             await EnsureConnection();
-            //
-            //  make it an object so we can get the whole message
-            message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
-            
+            if (message.Data != null && message.Data.GetType() != typeof(string))
+            {
+                //
+                //  make it an object so we can get the whole message
+                message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
+            }
+            else
+            {
+                this.TraceMessage($"message.Data is a string for {message}");
+            }
+
             await HubConnection.SendAsync("PostMessage", message);
         }
 
@@ -116,7 +123,13 @@ namespace Catan10.CatanService
             Type type = CurrentAssembly.GetType(msg.DataTypeName);
             if (type == null) throw new ArgumentException("Unknown type!");
 
-            object logHeader = JsonSerializer.Deserialize(msg.Data.ToString(), type, GetJsonOptions()) as object;
+            if (type == typeof(AckModel))
+            {
+                msg.Data = JsonSerializer.Deserialize(msg.Data.ToString(), typeof(AckModel), GetJsonOptions());
+                return msg;
+            }
+
+            LogHeader logHeader = JsonSerializer.Deserialize(msg.Data.ToString(), type, GetJsonOptions()) as LogHeader;
             msg.Data = logHeader;
             return msg;
         }
@@ -326,7 +339,9 @@ namespace Catan10.CatanService
                 {
                     //
                     //  when we get the message, immediately send the ack -- don't switch threads to do so.
+                    this.TraceMessage($"recieved id {message.MessageId}");
                     var ack = AckModel.CreateMessage(message);
+                    this.TraceMessage($"sent Ack: {((AckModel)ack.Data).AckedMessageId}");
                     await PostHubMessage(ack);
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {

@@ -338,8 +338,8 @@ namespace Catan10
                     var loggedMessage = MainPageModel.Log.MessageLog[i];
                     if (loggedMessage.MessageId == message.MessageId)
                     {
-                        this.TraceMessage($"Found the message in the message log.  {message}");
-                        this.TraceMessage($"IsRecordedMessage = {MainPageModel.Log.IsMessageRecorded(message)}");
+                        // this.TraceMessage($"Found the message in the message log.  {message}");
+                        // this.TraceMessage($"IsRecordedMessage = {MainPageModel.Log.IsMessageRecorded(message)}");
                         return;
                     }
                 }
