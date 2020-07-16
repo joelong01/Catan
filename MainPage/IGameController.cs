@@ -192,6 +192,7 @@ namespace Catan10
         /// <returns></returns>
         public Task AddPlayer(string playerToAdd)
         {
+            if (playerToAdd == "Catan Spy") return Task.CompletedTask;
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.WaitingForNewGame);
 
             var newPlayer = NameToPlayer(playerToAdd);
