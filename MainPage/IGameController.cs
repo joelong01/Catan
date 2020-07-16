@@ -364,6 +364,7 @@ namespace Catan10
                     p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = -1;
                     p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = -1;                    
                     somebodyIsTied = true;
+                    await ResetRollControl();
                 }
             }
 
