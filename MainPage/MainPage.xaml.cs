@@ -661,6 +661,14 @@ namespace Catan10
             }
         }
 
+        public static bool MyTurn
+        {
+            get
+            {
+                return MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer;
+            }
+        }
+
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {
             DateTime dt = DateTime.Now;

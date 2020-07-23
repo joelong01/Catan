@@ -190,7 +190,8 @@ namespace Catan10
             get
             {
                 if (Log == null) return false;
-                if ((Log.GameState == GameState.WaitingForRoll) || (Log.GameState == GameState.WaitingForRollForOrder)) return true;
+                if (Log.GameState == GameState.WaitingForRollForOrder) return true; // anybody can submit a roll
+                if (Log.GameState == GameState.WaitingForRoll && MainPage.MyTurn) return true;
                 return false;
             }
         }
