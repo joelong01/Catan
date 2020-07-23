@@ -351,7 +351,7 @@ namespace Catan10
        
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
         {
-            this.TraceMessage($"{gameInfo} playerName={playerName}");
+         //   this.TraceMessage($"{gameInfo} playerName={playerName}");
             
             if (TheHuman.PlayerName == gameInfo.Creator)
             {

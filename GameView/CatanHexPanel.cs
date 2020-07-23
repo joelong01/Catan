@@ -844,7 +844,14 @@ namespace Catan10
         public Visibility BaronVisibility
         {
             get => (Visibility)GetValue(BaronVisibilityProperty);
-            set => SetValue(BaronVisibilityProperty, value);
+            set
+            {   //
+                // 7/23/202: the changed property handler isn't being called...don't know why.
+                //           instead of debugging it, will set it directly here.
+                
+                SetValue(BaronVisibilityProperty, value);
+                _baron.Visibility = value;
+            }
         }
 
         public string BuildingIndexToHarborIndex
@@ -1291,7 +1298,7 @@ namespace Catan10
             this.Children.Add(TopLayer);
         }
 
-        public void ArrangeRoads()
+       public void ArrangeRoads()
         {
             if (RoadKeyToRoadDictionary.Count != 0)
             {

@@ -302,7 +302,7 @@ namespace Catan10
 
         private void Proxy_OnGameCreated(GameInfo gameInfo, string playerName)
         {
-            this.TraceMessage($"{playerName} created {gameInfo.Name}");
+          //  this.TraceMessage($"{playerName} created {gameInfo.Name}");
 
             Games.Add(gameInfo);
             SelectedGame = gameInfo;

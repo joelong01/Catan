@@ -503,7 +503,7 @@ namespace Catan10
                     _unprocessedMessages = value;
                     NotifyPropertyChanged();
                     DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-                    this.TraceMessage($"UnprocessedMessages: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
+                 //   this.TraceMessage($"UnprocessedMessages: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
                 }
             }
         }
