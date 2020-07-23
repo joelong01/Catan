@@ -897,8 +897,11 @@ namespace Catan10
                 player.Reset();
             }
 
+            _gameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
+
             _raceTracking.Reset();
             await _rollControl.Reset();
+            
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
