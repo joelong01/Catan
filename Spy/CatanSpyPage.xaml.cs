@@ -389,8 +389,8 @@ namespace Catan10.Spy
 
         private void SetSelectedMessage (CatanMessage message)
         {
-            LogHeader logHeader = message.Data as LogHeader;
-            string json = CatanSignalRClient.Serialize<LogHeader>(logHeader, true);
+            //LogHeader logHeader = message.Data as LogHeader;
+            //string json = CatanSignalRClient.Serialize<LogHeader>(logHeader, true);
         }
 
         #endregion Methods

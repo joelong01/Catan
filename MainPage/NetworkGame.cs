@@ -397,6 +397,12 @@ namespace Catan10
         /// <param name="playerName"></param>
         private async void Service_OnGameJoined(GameInfo gameInfo, string playerName)
         {
+            if (playerName == "Catan Spy")
+            {
+                SetSpyInfo("", true);
+                return;
+            }
+
             if (CurrentGameState != GameState.WaitingForNewGame && CurrentGameState != GameState.WaitingForPlayers) return;
 
             
