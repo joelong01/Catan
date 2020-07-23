@@ -898,6 +898,7 @@ namespace Catan10
             }
 
             _raceTracking.Reset();
+            await _rollControl.Reset();
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
