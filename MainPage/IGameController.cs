@@ -6,8 +6,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -307,6 +308,13 @@ namespace Catan10
         /// <returns>true if everybody has rolled and their are no ties</returns>
         public async Task<bool> DetermineRollOrder(RollOrderLog logEntry)
         {
+
+            if (VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0)
+            {
+                this.TraceMessage("a dialog is open...returning");
+                return false;
+            }
+
             //
             // need to update the state first because data binding is used to show/hide roll UI and it is driven off of
             // GameState.  the end of this function changes the state to GameState.WaitingForRollForOrder as well
