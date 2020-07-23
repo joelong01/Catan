@@ -21,7 +21,6 @@ namespace Catan10
         private int _FiveStarPositions = 0;
         private int _FourStarPosition = 0;
         private TradeResources _gameResources = new TradeResources();
-        private bool _isServiceGame = false;
         private Log _newLog = null;
         private ObservableCollection<PlayerModel> _PlayingPlayers = new ObservableCollection<PlayerModel>();
         private Settings _Settings = new Settings();
@@ -335,16 +334,14 @@ namespace Catan10
         [JsonIgnore]
         public bool IsServiceGame
         {
-            get => _isServiceGame;
+            get => !Settings.IsLocalGame;
             set
             {
-                if (value != _isServiceGame)
-                {
-                    _isServiceGame = value;
-                    NotifyPropertyChanged();
-                }
+                Settings.IsLocalGame = !value;
             }
         }
+
+
 
         [JsonIgnore]
         public Log Log
