@@ -58,6 +58,9 @@ namespace Catan10
 
         private void Roll_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+
+            if (MainPage.Current.MainPageModel.EnableRolls == false) return;
+
             if (_rolled) return;
             try
             {

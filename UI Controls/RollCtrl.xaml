@@ -34,7 +34,7 @@
         </Style>
     </Control.Resources>
     <Viewbox Stretch="Uniform">
-        <Grid Width="120" Height="170">
+        <Grid Width="120" Height="170" >
             <Grid Name="Grid_FaceDown" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource ResourceType.Back}">
                 <Grid.Projection>
                     <PlaneProjection x:Name="PlaneProjection_FaceDown" RotationY="0" />
@@ -45,7 +45,7 @@
                 <Grid.Projection>
                     <PlaneProjection x:Name="PlaneProjection_FaceUp" RotationY="-90" />
                 </Grid.Projection>
-                <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Left"
+                <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Left"                    
                     VerticalAlignment="Top"
                     FillColor="{StaticResource WhiteBrush}"
                     Thickness="15"
