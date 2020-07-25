@@ -282,6 +282,13 @@ namespace Catan10
             Contract.Assert(logController != null, "every LogEntry is a LogController!");
             switch (message.ActionType)
             {
+                case ActionType.Replay:
+                    if (logHeader.LogType != LogType.DoNotLog)
+                    {
+                        await Log.PushAction(logHeader);
+                    }
+                    await logController.Replay(this);
+                    break;
                 case ActionType.Normal:
                     //
                     //  5/20/2020: we are logging first so that the Do() method has the correct current state of the system
@@ -294,23 +301,17 @@ namespace Catan10
                     {
                         await logController.Do(this);
                     }
-
                     break;
-
                 case ActionType.Undo:
                     await logController.Undo(this);
                     await Log.Undo(logHeader);
                     break;
 
+                
                 case ActionType.Redo:
                     await logController.Redo(this);
                     await Log.Redo(logHeader);
-                    break;
-
-                case ActionType.Replay:
-                    Contract.Assert(false, "You haven't implemented this yet!");
-                    break;
-
+                    break;               
                 default:
                     break;
             }

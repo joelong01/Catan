@@ -58,6 +58,12 @@ namespace Catan10
             }
         }
 
+        public Task Replay (IGameController gameController)
+        {
+            gameController.ResetAllBuildings();
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         ///     Redo the action from the log
         ///     Don't call Do as we don't want to do the AutoRespond actions
@@ -67,7 +73,6 @@ namespace Catan10
         public Task Redo(IGameController gameController)
         {
             gameController.ResetAllBuildings();
-            MainPageModel mainPageModel = gameController.MainPageModel;
             return Task.CompletedTask;
         }
 

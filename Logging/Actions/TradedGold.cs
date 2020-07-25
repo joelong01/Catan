@@ -52,6 +52,13 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
+        public Task Replay (IGameController gameController)
+        {
+            var player = gameController.NameToPlayer(this.SentBy);            
+            player.GameData.Resources.GrantResources(this.GoldTrade);           
+            return Task.CompletedTask;
+        }
+
         public Task Redo(IGameController gameController)
         {
             throw new NotImplementedException();

@@ -41,9 +41,14 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
+        public Task Replay (IGameController gameController)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+            return Do(gameController);
         }
     }
 }

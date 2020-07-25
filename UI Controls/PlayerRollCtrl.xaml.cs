@@ -10,73 +10,65 @@ using Windows.UI.Xaml.Input;
 
 namespace Catan10
 {
-    public delegate void OnRolledHandler(List<RollModel> rolls);
+    public delegate void OnRolledHandler (List<RollModel> rolls);
 
     public sealed partial class PlayerRollCtrl : UserControl
     {
-        public ObservableCollection<RollModel> Rolls { get; } = new ObservableCollection<RollModel>();
+        #region Delegates + Fields + Events + Enums
+
+        public event OnRolledHandler OnRolled;
+
+        public event OnRolledHandler OnShowAllRolls;
+
         private bool _rolled = false;
         private bool clicked = false;
 
+        #endregion Delegates + Fields + Events + Enums
 
-        
+        #region Properties
 
-        private void OnFaceDown(object sender, RoutedEventArgs e)
+        public ObservableCollection<RollModel> Rolls { get; } = new ObservableCollection<RollModel>();
+
+        #endregion Properties
+
+        #region Constructors + Destructors
+
+        public PlayerRollCtrl ()
         {
-            var list = new List<Task>();
-            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceDown);
-        }
+            this.InitializeComponent();
 
-        private void OnFaceUp(object sender, RoutedEventArgs e)
-        {
-            var list = new List<Task>();
-            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceUp);
-        }
+            for (int i = 0; i < 4; i++)
+            {
+                Rolls.Add(new RollModel());
+            }
 
-        private async void OnReset(object sender, RoutedEventArgs e)
-        {
-            await Reset();
             Randomize();
         }
 
-        private void OnShowAll(object sender, RoutedEventArgs e)
+        #endregion Constructors + Destructors
+
+        #region Methods
+
+        public void Randomize ()
         {
-            if (!_rolled) return;
-
-            if (clicked) return;
-            clicked = true;
-
-            var list = new List<Task>();
-            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceUp);
-            OnShowAllRolls?.Invoke(new List<RollModel>(Rolls));
-            clicked = false;
+            Rolls.ForEach((roll) => roll.Randomize());
         }
 
-        private void PopulateControlList()
+        public Task Reset ()
         {
+            PopulateControlList();
+            Rolls.ForEach((roll) =>
+               {
+                   roll.Orientation = TileOrientation.FaceDown;
+                   roll.Randomize();
+               });
+
+            _rolled = false;
+
+            return Task.CompletedTask;
         }
 
-        private void Roll_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-
-            if (MainPage.Current.MainPageModel.EnableRolls == false) return;
-
-            if (_rolled) return;
-            try
-            {
-                _rolled = true;
-                RollModel roll = ((RollCtrl)sender).Roll;
-                roll.Selected = true;
-                roll.Orientation = TileOrientation.FaceUp;
-
-                OnRolled?.Invoke(new List<RollModel>(Rolls));
-            }
-            finally
-            {
-            }
-        }
-
-        public void TestSetRolls(List<RollModel> rolls)
+        public void TestSetRolls (List<RollModel> rolls)
         {
             Rolls.Clear();
             Rolls.AddRange(rolls);
@@ -100,43 +92,62 @@ namespace Catan10
             finally
             {
             }
-
         }
 
-        public PlayerRollCtrl()
+        private void OnFaceDown (object sender, RoutedEventArgs e)
         {
-            this.InitializeComponent();
+            var list = new List<Task>();
+            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceDown);
+        }
 
-            for (int i = 0; i < 4; i++)
-            {
-                Rolls.Add(new RollModel());
-            }
+        private void OnFaceUp (object sender, RoutedEventArgs e)
+        {
+            var list = new List<Task>();
+            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceUp);
+        }
 
+        private async void OnReset (object sender, RoutedEventArgs e)
+        {
+            await Reset();
             Randomize();
         }
 
-        public event OnRolledHandler OnRolled;
-
-        public event OnRolledHandler OnShowAllRolls;
-
-        public void Randomize()
+        private void OnShowAll (object sender, RoutedEventArgs e)
         {
-            Rolls.ForEach((roll) => roll.Randomize());
+            if (!_rolled) return;
+
+            if (clicked) return;
+            clicked = true;
+
+            var list = new List<Task>();
+            Rolls.ForEach((ctrl) => ctrl.Orientation = TileOrientation.FaceUp);
+            OnShowAllRolls?.Invoke(new List<RollModel>(Rolls));
+            clicked = false;
         }
 
-        public async Task Reset()
+        private void PopulateControlList ()
         {
-            PopulateControlList();
-            Rolls.ForEach((roll) =>
-               {
-                   roll.Orientation = TileOrientation.FaceDown;
-                   roll.Randomize();
-               });
-
-            _rolled = false;
-            
-            await ShowAllRollsLog.Post(MainPage.Current, new List<RollModel>(Rolls));
-            
         }
+
+        private void Roll_PointerPressed (object sender, PointerRoutedEventArgs e)
+        {
+            if (MainPage.Current.MainPageModel.EnableRolls == false) return;
+
+            if (_rolled) return;
+            try
+            {
+                _rolled = true;
+                RollModel roll = ((RollCtrl)sender).Roll;
+                roll.Selected = true;
+                roll.Orientation = TileOrientation.FaceUp;
+
+                OnRolled?.Invoke(new List<RollModel>(Rolls));
+            }
+            finally
+            {
+            }
+        }
+
+        #endregion Methods
     }
 }

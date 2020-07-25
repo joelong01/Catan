@@ -15,6 +15,7 @@ using Catan.Proxy;
 
 using Windows.Storage;
 using Catan10.CatanService;
+using System.Text.Json;
 
 namespace Catan10
 {
@@ -252,13 +253,15 @@ namespace Catan10
                 if (_writing) return;
                 _writing = true;
 
-                string json = Stacks.Serialize();
+                //string json = ""; // Stacks.Serialize();
 
-                json = "{" + Environment.NewLine + json;
-                json += "," + Environment.NewLine;
-                json += "\"MessageLog\":";
-                json += GetJson();
-                json += "}" + Environment.NewLine;
+                //json = "{" + Environment.NewLine + json;
+                //json += "," + Environment.NewLine;
+                //json += "\"MessageLog\":";
+                //json += GetJson();
+                //json += "}" + Environment.NewLine;
+
+                string json = JsonSerializer.Serialize<ObservableCollection<CatanMessage>>(MessageLog, CatanSignalRClient.GetJsonOptions());
 
                 var folder = MainPage.Current.SaveFolder;
                 var file = await folder.CreateFileAsync(SaveFileName, CreationCollisionOption.ReplaceExisting);

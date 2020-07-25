@@ -131,7 +131,7 @@ namespace Catan10
 
                     if (state == GameState.PickingBoard || state == GameState.WaitingForPlayers)
                     {
-                        ret = (MainPage.Current.TheHuman == this.GameStartedBy);
+                        ret = (MainPage.Current.TheHuman.PlayerName == this.GameInfo.Creator);
                         return ret;
                     }
 
@@ -190,14 +190,12 @@ namespace Catan10
             {
                 if (Log == null) return false;
                 if (Log.GameState == GameState.WaitingForRollForOrder) return true; // anybody can submit a roll
-                if (Log.GameState == GameState.WaitingForRoll && MainPage.MyTurn) return true;
+                if (Log.GameState == GameState.WaitingForRoll && MainPage.Current.MyTurn) return true;
                 return false;
             }
         }
 
-        //        return (EnableUiInteraction && (state == GameState.WaitingForNewGame || state == GameState.WaitingForNext || state == GameState.WaitingForStart || state == GameState.PickingBoard ||
-        //                state == GameState.DoneSupplemental || state == GameState.Supplemental || state == GameState.AllocateResourceForward || state == GameState.AllocateResourceReverse ||
-        //                state == GameState.DoneResourceAllocation || state == GameState.WaitingForPlayers));
+     
         [JsonIgnore]
         public bool EnableUiInteraction
         {
@@ -315,9 +313,7 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public PlayerModel GameStartedBy { get; internal set; }
-
+        
         [JsonIgnore]
         public GameState GameState
         {

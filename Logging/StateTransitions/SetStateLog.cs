@@ -37,6 +37,10 @@ namespace Catan10
         {
             return gameController.SetState(this);
         }
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
+        }
 
         public Task Redo(IGameController gameController)
         {

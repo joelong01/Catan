@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
+using Catan10.CatanService;
 using Windows.UI.Xaml.Input;
 
 namespace Catan10
@@ -200,6 +200,7 @@ namespace Catan10
         MainPageModel MainPageModel { get; }
 
         List<PlayerModel> PlayingPlayers { get; }
+        bool MyTurn { get; }
 
         IRollLog RollLog { get; }
         PlayerModel TheHuman { get; }
@@ -226,7 +227,7 @@ namespace Catan10
         RandomBoardSettings CurrentRandomBoard();
 
         Task<bool> DetermineRollOrder(RollOrderLog log);
-        Task ExecuteSynchronously(LogHeader logHeader, ActionType normal);
+        Task ExecuteSynchronously(LogHeader logHeader, ActionType normal, MessageType messageType);
         RollState GetNextRollState();
 
         RandomBoardSettings GetRandomBoard();
@@ -298,6 +299,7 @@ namespace Catan10
         #endregion Methods
 
         void SimulateRoll(int roll);
+        string PlayerListToCsv (List<PlayerModel> playersWithTooManyCards);
     }
 
     public interface IGameViewCallback
@@ -324,6 +326,8 @@ namespace Catan10
         Task Redo(IGameController gameController);
 
         Task Undo(IGameController gameController);
+
+        Task Replay (IGameController gameController);
 
         #endregion Methods
     }

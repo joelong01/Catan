@@ -147,7 +147,7 @@
     </Compile>
     <Compile Include="GameView\CatanGameData.cs" />
     <Compile Include="GameView\TileGroup.cs" />
-    <Compile Include="Logging\Actions\CreateNewGame.cs" />
+    <Compile Include="Logging\Actions\CreateGameModel.cs" />
     <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
     <Compile Include="Logging\Actions\PlayerTradesLog.cs" />
     <Compile Include="Logging\Actions\ResourceExchangeLog.cs" />

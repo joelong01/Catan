@@ -270,7 +270,7 @@ namespace Catan10
                 //  
                 // await Proxy.CreateGame(gameInfo);
 
-                await CreateNewGame.CreateGame(MainPage.Current, gameInfo);
+                await CreateGameModel.CreateGame(MainPage.Current, gameInfo);
 
                  // added to the UI in the event handler
                 

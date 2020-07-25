@@ -38,6 +38,10 @@ namespace Catan10
             }
             
         }
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
+        }
 
         public Task Redo(IGameController gameController)
         {

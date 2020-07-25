@@ -114,6 +114,11 @@ namespace Catan10
             return true;
         }
 
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
+        }
+
         #endregion Methods
     }
 }

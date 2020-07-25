@@ -15,7 +15,11 @@ namespace Catan10
         public static Task PostMessage(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForNext);
-            var logHeader = new PlayerHasTooManyCards() { CanUndo = false };
+            var logHeader = new PlayerHasTooManyCards() 
+            { 
+                CanUndo = false, 
+                NewState = GameState.TooManyCards,
+            };
             return gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
@@ -70,6 +74,11 @@ namespace Catan10
         public Task Redo(IGameController gameController)
         {
             throw new NotImplementedException();
+        }
+
+        public Task Replay (IGameController gameController)
+        {
+            return Task.CompletedTask; // TODO: what if this is the last message?
         }
 
         public Task Undo(IGameController gameController)

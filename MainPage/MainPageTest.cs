@@ -9,6 +9,10 @@ using System.Text.Json;
 using Windows.Services.Maps;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.Storage;
+using Catan10.CatanService;
+using System.Diagnostics.Contracts;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -24,10 +28,10 @@ namespace Catan10
 
         #region Methods
 
-        private void InitTest()
+        private void InitTest ()
         {
         }
-        private async Task LoseHalfYourCards()
+        private async Task LoseHalfYourCards ()
         {
             TradeResources tr = new TradeResources()
             {
@@ -63,7 +67,7 @@ namespace Catan10
             }
         }
 
-        private async void Menu_OnResetService(object sender, RoutedEventArgs e)
+        private async void Menu_OnResetService (object sender, RoutedEventArgs e)
         {
 
             await CreateAndConfigureProxy();
@@ -71,62 +75,130 @@ namespace Catan10
 
 
         }
-        private async void OnGrantEntitlements(object sender, RoutedEventArgs e)
+        private async void OnGrantEntitlements (object sender, RoutedEventArgs e)
         {
             await TestGrantEntitlementMessage();
         }
 
-        private async void OnGrantResources(object sender, RoutedEventArgs e)
+        private async void OnGrantResources (object sender, RoutedEventArgs e)
         {
             TradeResources tr = new TradeResources()
             {
-                Sheep = 3,
-                Wheat = 3,
-                Ore = 3,
-                Brick = 3,
-                Wood = 3
+                Sheep = 0,
+                Wheat = 0,
+                Ore = 2,
+                Brick = 1,
+                Wood = 1
             };
 
             await TestGrantEntitlements.Post(this, tr, new List<Entitlement>(), new List<DevCardType>());
         }
 
         // int toggle = 0;
-        private void OnTest1(object sdr, RoutedEventArgs rea)
+        private async void OnTest1 (object sdr, RoutedEventArgs rea)
         {
-            string json = @"{""PlayerTradeGrid"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-495,""TranslateY"":205},""SynchronizedRolls"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-495,""TranslateY"":205},""Grid_BoardMeasurement"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-495,""TranslateY"":205},""Grid_RollStats"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-495,""TranslateY"":205},""ControlGrid"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-495,""TranslateY"":205},""Draggable_PrivateData"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-495,""TranslateY"":205},""_gameView"":{""ScaleX"":0.60000002384185791,""ScaleY"":0.60000002384185791,""TranslateX"":138,""TranslateY"":-215}}";
+
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".json");
 
 
+            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            if (file == null)
+            {
+                return;
+            }
 
-            Dictionary<string, GridPosition> dict = JsonSerializer.Deserialize<Dictionary<string, GridPosition>>(json);
-            string rt = JsonSerializer.Serialize(dict);
 
+            string json =await FileIO.ReadTextAsync(file);
 
-            this.TraceMessage(rt);
+            List<CatanMessage> messages = CatanSignalRClient.Deserialize<List<CatanMessage>>(json);
+            await DoReplay(messages);
+        }
 
-            //await ShowErrorMessage("This is the error message!\n\nThis is the error message This is the error message\n\nThis is the error message This is the error message", "Test error", "");
+        /// <summary>
+        ///     the game goes through these basic steps
+        ///     1. Create the "game" ... this is the communication channel the game uses to send messages to all the players
+        ///     2. Join the "game"
+        ///     3. Send Broadcast Messages to the clients 
+        ///         => each of these are processed via ProcessMessage()
+        /// </summary>
+        /// <param name="messages"></param>
+        /// <returns></returns>
+        private async Task DoReplay (List<CatanMessage> messages)
+        {
+            if (messages == null) return;
+            if (messages.Count == 0) return;
+            await EndGame();
+            GameInfo gameInfo;
+            for (int i=0; i<messages.Count; i++)
+            {
 
-            // await TestYearOfPlenty();
-            // await TradeGoldTest();
-            // await TestTargetPlayer();
-            // await LoseHalfYourCards();
+                if (messages[i].MessageType == MessageType.Ack) continue;
 
-            // TestTrade();
+                CatanMessage parsedMessage = null;
+                try
+                {
+                     parsedMessage =  CatanSignalRClient.ParseMessage(messages[i]);
+                }
+                catch(Exception e)
+                {
+                    this.TraceMessage($"{e}");
+                    Debugger.Break();
+                    continue;
+                }
+                
+                 switch (parsedMessage.MessageType)
+                {
+                    case MessageType.PrivateMessage:
+                    case MessageType.BroadcastMessage:
+                        if (messages[i + 1].MessageType == MessageType.Ack)
+                        {
+                            var ack = CatanSignalRClient.ParseMessage(messages[i+1]);
+                            Debug.Assert(((AckModel)ack.Data).AckedMessageId == parsedMessage.MessageId);
+                            if (parsedMessage.ActionType == ActionType.Normal)
+                            {
+                                parsedMessage.ActionType = ActionType.Replay;
+                            }
+                            MainPageModel.UnprocessedMessages++;
+                            await ProcessMessage(parsedMessage);
+                        }
+                        break;
+                    case MessageType.CreateGame:
+                        //  parsedMessage.ActionType = ActionType.Retry;
+                        //  await this.Proxy.CreateGame(parsedMessage.GameInfo);
+                        gameInfo = parsedMessage.GameInfo;
+                        break;
+                    case MessageType.DeleteGame:
+                        break;
+                    case MessageType.JoinGame:
+                        await JoinOrCreateGame(parsedMessage.GameInfo);
+                        break;
+                    case MessageType.LeaveGame:
+                        break;
+                    case MessageType.Ack:
+                        break;
+                    default:
+                        break;
+                }
 
+            }
 
         }
 
-        private async void OnTest2(object sdr, RoutedEventArgs rea)
+        private async void OnTest2 (object sdr, RoutedEventArgs rea)
         {
             await LoseHalfYourCards();
         }
 
         // Undo
-        private async void OnTest3(object sdr, RoutedEventArgs rea)
+        private async void OnTest3 (object sdr, RoutedEventArgs rea)
         {
             await TestGrantEntitlementMessage();
         }
 
-        private void OnTestExpansionGame(object sender, RoutedEventArgs e)
+        private void OnTestExpansionGame (object sender, RoutedEventArgs e)
         {
             //AnimationSpeedBase = 10; // speed up the animations
             //RandomGoldTileCount = 3;
@@ -151,7 +223,7 @@ namespace Catan10
             //await PickSettlementsAndRoads();
         }
 
-        private void OnTestRegularGame(object sender, RoutedEventArgs e)
+        private void OnTestRegularGame (object sender, RoutedEventArgs e)
         {
             //AnimationSpeedBase = 10; // speed up the animations
 
@@ -176,7 +248,7 @@ namespace Catan10
             //await PickSettlementsAndRoads();
         }
 
-        private async void OnTestService(object sender, RoutedEventArgs e)
+        private async void OnTestService (object sender, RoutedEventArgs e)
         {
             await CreateAndConfigureProxy();
 
@@ -186,7 +258,7 @@ namespace Catan10
             List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
             MainPageModel.CatanService.OnGameDeleted += CatanService_OnGameDeleted;
 
-            void CatanService_OnGameDeleted(GameInfo gameInfo, string by)
+            void CatanService_OnGameDeleted (GameInfo gameInfo, string by)
             {
                 this.TraceMessage($"Deleted game={gameInfo} by {by}");
                 if (gameInfo.Id == id)
@@ -211,7 +283,7 @@ namespace Catan10
             tcs = new TaskCompletionSource<object>();
 
             MainPageModel.CatanService.OnGameCreated += CatanService_OnGameCreated;
-            void CatanService_OnGameCreated(GameInfo gameInfo, string playerName)
+            void CatanService_OnGameCreated (GameInfo gameInfo, string playerName)
             {
                 if (gameInfo.Id == id)
                 {
@@ -235,7 +307,7 @@ namespace Catan10
 
             tcs = new TaskCompletionSource<object>();
             MainPageModel.CatanService.OnGameJoined += CatanService_OnGameJoined;
-            void CatanService_OnGameJoined(GameInfo gameInfo, string playerName)
+            void CatanService_OnGameJoined (GameInfo gameInfo, string playerName)
             {
                 if (playerName == TheHuman.PlayerName && gameInfo.Id == id)
                 {
@@ -259,7 +331,7 @@ namespace Catan10
 
         }
 
-        private async Task TestGrantEntitlementMessage()
+        private async Task TestGrantEntitlementMessage ()
         {
             TradeResources tr = new TradeResources()
             {
@@ -286,7 +358,7 @@ namespace Catan10
             await TestGrantEntitlements.Post(this, tr, entitlements, devCards);
         }
 
-        private void TestStats()
+        private void TestStats ()
         {
             CurrentPlayer.GameData.Score++;
 
@@ -303,7 +375,7 @@ namespace Catan10
             CurrentPlayer.GameData.Resources.TotalResources = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5, Brick = 10 };
         }
 
-        private async Task TestTargetPlayer()
+        private async Task TestTargetPlayer ()
         {
             var source = new ResourceCardCollection(false);
             var destination = new ResourceCardCollection(false);
@@ -327,7 +399,7 @@ namespace Catan10
             this.TraceMessage($"ret= {ret} Cards={ResourceCardCollection.ToTradeResources(dlg.Destination)}");
         }
 
-        private void TestTrade()
+        private void TestTrade ()
         {
 
             TradeResources tr = new TradeResources()
@@ -403,7 +475,7 @@ namespace Catan10
 
         }
 
-        private void TestTrades2()
+        private void TestTrades2 ()
         {
             MainPageModel.Settings.IsLocalGame = true;
             GameInfo info = new GameInfo()
@@ -500,7 +572,7 @@ namespace Catan10
 
         }
 
-        private async Task TestYearOfPlenty()
+        private async Task TestYearOfPlenty ()
         {
             TradeResources tr = new TradeResources()
             {
@@ -534,7 +606,7 @@ namespace Catan10
             this.TraceMessage($"{ResourceCardCollection.ToTradeResources(dlg.Destination)}");
         }
 
-        private async Task TradeGoldTest()
+        private async Task TradeGoldTest ()
         {
 
             int goldCards = 2;
@@ -577,7 +649,7 @@ namespace Catan10
             var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
             this.TraceMessage("trade gold: " + picked.ToString());
         }
-        private void VerifyRoundTrip<T>(T model)
+        private void VerifyRoundTrip<T> (T model)
         {
             //var options = new JsonSerializerOptions() { WriteIndented = true };
             //options.Converters.Add(new JsonStringEnumConverter());
@@ -591,13 +663,5 @@ namespace Catan10
         #endregion Methods
     }
 
-    public class WSConnectInfo
-    {
-        #region Properties
 
-        public string GameId { get; set; }
-        public string PlayerName { get; set; }
-
-        #endregion Properties
-    }
 }

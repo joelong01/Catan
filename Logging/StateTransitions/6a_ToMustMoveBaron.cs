@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -8,22 +6,28 @@ using Catan.Proxy;
 namespace Catan10
 {
     /// <summary>
-    /// 
-    /// the general flow is 
-    /// 
+    ///
+    /// the general flow is
+    ///
     ///     WaitingForRoll => Rolled 7 => MustMoveBaronLog => MoveBaronLog => WaitingForNext
     ///                             or
     ///     WaitingForRoll => PlayedKnight => MustMoveBaronLog => MoveBaronLog => WaitingForRoll
     ///                             or
     ///     WaitingForRoll => WaitingForNext => PlayedKnight => MustMoveBaronLog => MoveBaronLog => WaitingForRoll
-    ///     
+    ///
     /// </summary>
     public class MustMoveBaronLog : LogHeader, ILogController
     {
+        #region Properties
+
         public MoveBaronReason Reason { get; set; }
         public GameState StartingState { get; set; }
 
-        public static async Task PostLog(IGameController gameController, MoveBaronReason reason)
+        #endregion Properties
+
+        #region Methods
+
+        public static async Task PostLog (IGameController gameController, MoveBaronReason reason)
         {
             if (gameController.CurrentGameState != GameState.WaitingForNext &&
                             gameController.CurrentGameState != GameState.WaitingForRoll)
@@ -40,31 +44,38 @@ namespace Catan10
             {
                 NewState = GameState.MustMoveBaron,
                 CanUndo = true,
-                Reason = reason,                
+                Reason = reason,
                 StartingState = gameController.CurrentGameState,
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public Task Do (IGameController gameController)
         {
             //
             //   nothing to do -- we just want the state and state message set
-            //   the code to move the Baron isin PageCallback.cs in the TileRightTapped method 
+            //   the code to move the Baron isin PageCallback.cs in the TileRightTapped method
             //
 
             return Task.CompletedTask;
         }
 
-        public Task Redo(IGameController gameController)
+        public Task Redo (IGameController gameController)
         {
             return Task.CompletedTask;
         }
 
-        public Task Undo(IGameController gameController)
+        public Task Replay (IGameController gameController)
         {
             return Task.CompletedTask;
         }
+
+        public Task Undo (IGameController gameController)
+        {
+            return Task.CompletedTask;
+        }
+
+        #endregion Methods
     }
 }

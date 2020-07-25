@@ -129,6 +129,11 @@ namespace Catan10
             throw new System.NotImplementedException();
         }
 
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
+        }
+
         public Task Undo(IGameController gameController)
         {
             throw new System.NotImplementedException();

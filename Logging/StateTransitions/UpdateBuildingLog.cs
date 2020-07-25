@@ -40,7 +40,10 @@ namespace Catan10
         {
             return gameController.UpdateBuilding(this);
         }
-
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
+        }
         public Task Redo(IGameController gameController)
         {
             return gameController.UpdateBuilding(this);

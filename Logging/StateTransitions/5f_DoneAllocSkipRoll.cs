@@ -52,6 +52,21 @@ namespace Catan10
             }
         }
 
+        public async Task Replay (IGameController gameController)
+        {
+
+            //
+            //  hide the rolls in the public data control
+            gameController.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.Resources.ResourcesThisTurn.Reset();
+            });
+
+
+
+            await gameController.PushRollState(RollState); // also set RandomGold tiles in the UI
+        }
+
         public Task Redo(IGameController gameController)
         {
             return Do(gameController);

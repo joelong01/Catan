@@ -40,7 +40,10 @@ namespace Catan10
             Contract.Assert(this.CurrentPlayer.PlayerName == gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
         }
-
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
+        }
         public Task Redo(IGameController gameController)
         {
             throw new System.NotImplementedException();

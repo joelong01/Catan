@@ -39,6 +39,10 @@ namespace Catan10
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
             return Task.CompletedTask;
         }
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
+        }
 
         public Task Redo(IGameController gameController)
         {

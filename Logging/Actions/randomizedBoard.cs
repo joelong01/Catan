@@ -71,6 +71,11 @@ namespace Catan10
             return gameController.SetRandomBoard(this);
         }
 
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
+        }
+
         public Task Redo(IGameController gameController)
         {
             return gameController.SetRandomBoard(this);

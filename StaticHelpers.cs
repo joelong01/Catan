@@ -331,7 +331,7 @@ namespace Catan10
                 return list.Last();
             }
 
-            return default(T);
+            return default;
         }
 
         public static T Pop<T>(this List<T> list)

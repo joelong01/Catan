@@ -295,6 +295,11 @@ namespace Catan10
 
         private async void Menu_OnEndGame(object sender, RoutedEventArgs e)
         {
+            await EndGame();
+        }
+
+        private async Task EndGame()
+        {
             if (MainPageModel.IsServiceGame)
             {
                 await MainPageModel.CatanService.DeleteGame(MainPageModel.GameInfo, TheHuman.PlayerName);

@@ -6,6 +6,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
+
+using Catan10.CatanService;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -29,7 +32,7 @@ namespace Catan10
                     break;
 
                 case GameState.BeginResourceAllocation:
-                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
+                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameInfo.Creator == TheHuman.PlayerName)
                     {
                         await SetStateLog.SetState(this, GameState.AllocateResourceForward);
                     }
@@ -39,7 +42,7 @@ namespace Catan10
                     //
                     //   if you go back to waiting for players, put the tiles facedown
                     GameContainer.CurrentGame.Tiles.ForEach((tile) => tile.TileOrientation = TileOrientation.FaceDown);
-                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameStartedBy == TheHuman)
+                    if (MainPageModel.Settings.AutoRespond && MainPageModel.GameInfo.Creator == TheHuman.PlayerName)
                     {
                         //
                         //  simulate clicking on Next
@@ -50,7 +53,7 @@ namespace Catan10
                 case GameState.PickingBoard:
 
                     await HideRollsInPublicUi();
-                    if (MainPageModel.GameStartedBy == TheHuman)
+                    if (MainPageModel.GameInfo.Creator == TheHuman.PlayerName)
                     {
                         //
                         //  we only need one person sending around a random board
@@ -171,6 +174,8 @@ namespace Catan10
 
         public ICatanService Proxy => MainPageModel?.CatanService;
 
+        
+
         #endregion Properties
 
         /// <summary>
@@ -194,7 +199,9 @@ namespace Catan10
         public Task AddPlayer(string playerToAdd)
         {
             if (playerToAdd == "Catan Spy") return Task.CompletedTask;
-            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.WaitingForNewGame);
+            //
+            //  7/25/2020:  if you are replaying a game, this call comes in at GameState.FinishedRollOrder
+            Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.FinishedRollOrder);
 
             var newPlayer = NameToPlayer(playerToAdd);
             Contract.Assert(newPlayer != null);
@@ -232,7 +239,14 @@ namespace Catan10
                 //  Whoever starts the game controls the game until a first player is picked -- this doesn't have to happen
                 //  as a message because we assume the clocks are shared
                 //
-                CurrentPlayer = MainPageModel.GameStartedBy;
+                if (MainPageModel.GameInfo == null || !String.IsNullOrEmpty(MainPageModel.GameInfo.Creator))
+                {
+                    CurrentPlayer = NameToPlayer(MainPageModel.GameInfo.Creator);
+                }
+                else
+                {
+                    CurrentPlayer = NameToPlayer(playerToAdd);
+                }
             }
             else
             {
@@ -360,7 +374,7 @@ namespace Catan10
                         ContentDialog dlg = new ContentDialog()
                         {
                             Title = "Catan - Roll For Order",
-                            Content = $"You are tied with {ListToCsv(tiedPlayers)}.\n\nRollAgain.",
+                            Content = $"You are tied with {PlayerListToCsv(tiedPlayers)}.\n\nRollAgain.",
                             CloseButtonText = "Ok",
                         };
 
@@ -397,15 +411,16 @@ namespace Catan10
             return true;
         }
 
-        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType)
+        public Task ExecuteSynchronously(LogHeader logHeader, ActionType msgType, MessageType messageType)
         {
             CatanMessage message = new CatanMessage()
             {
-                Data = logHeader,
+                Data = (object)logHeader,
                 From = TheHuman.PlayerName,
                 ActionType = msgType,
                 DataTypeName = logHeader.GetType().FullName,
-                GameInfo = MainPageModel.GameInfo
+                GameInfo = MainPageModel.GameInfo,
+                MessageType = messageType
             };
 
             MainPageModel.UnprocessedMessages++;
@@ -503,7 +518,6 @@ namespace Catan10
         public Task JoinOrCreateGame(GameInfo gameInfo)
         {
             MainPageModel.GameInfo = gameInfo;
-            MainPageModel.GameStartedBy = FindPlayerByName(MainPageModel.AllPlayers, gameInfo.Creator);
             _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
             MainPageModel.IsGameStarted = true;
             return Task.CompletedTask;
@@ -905,13 +919,9 @@ namespace Catan10
                         tr.AddResource(kvp.Value.ResourceType, -1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
-                    //  MainPageModel.GameResources += tr;
                 }
             }
 
-            //
-            //  NOTE:  these have to be called in this order so that the undo works correctly
-            //  await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
             CalculateAndSetLongestRoad();
         }
@@ -1004,7 +1014,7 @@ namespace Catan10
         /// </summary>
         /// <param name="players"></param>
         /// <returns></returns>
-        private string ListToCsv(List<PlayerModel> players)
+        public string PlayerListToCsv(List<PlayerModel> players)
         {
             int count = players.Count;
             if (count == 0) return "";

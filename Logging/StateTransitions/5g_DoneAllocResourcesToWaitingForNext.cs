@@ -51,6 +51,15 @@ namespace Catan10
             });
         }
 
+        public async Task Replay (IGameController gameController)
+        {
+            await gameController.Log.RollLog.RedoRoll();
+            gameController.PlayingPlayers.ForEach((p) =>
+            {
+                p.GameData.Resources.ResourcesThisTurn.Reset();
+            });
+        }
+
         public Task Redo(IGameController gameController)
         {
             return Do(gameController);

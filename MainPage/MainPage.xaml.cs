@@ -259,7 +259,7 @@ namespace Catan10
 
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            _doDragDrop = _doDragDrop ? false : true;
+            _doDragDrop = !_doDragDrop;
         }
 
         private void GameViewControlPointerPressed(object sender, PointerRoutedEventArgs pRoutedEvents)
@@ -549,7 +549,7 @@ namespace Catan10
         private async void OnGridPositionChanged(string name, GridPosition gridPosition)
         {
             // this.TraceMessage($"name={name}={MainPageModel.Settings.GridPositions[name]}");
-            if (!MainPageModel.Settings.GridPositions.TryGetValue(name, out GridPosition value))
+            if (!MainPageModel.Settings.GridPositions.TryGetValue(name, out GridPosition _))
             {
                 MainPageModel.Settings.GridPositions[name] = gridPosition;
             }
@@ -661,11 +661,11 @@ namespace Catan10
             }
         }
 
-        public static bool MyTurn
+        public bool MyTurn
         {
             get
             {
-                return MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer;
+                return TheHuman == CurrentPlayer;
             }
         }
 
@@ -1136,8 +1136,7 @@ namespace Catan10
             //  set everybody's zIndex
             foreach (var name in MainPageModel.Settings.GridPositions.Keys)
             {
-                FrameworkElement ctrl = this.FindName(name) as FrameworkElement;
-                if (ctrl != null)
+                if (this.FindName(name) is FrameworkElement ctrl)
                 {
                     Canvas.SetZIndex(ctrl, 10);
                 }

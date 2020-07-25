@@ -145,7 +145,8 @@ namespace Catan10
         [Description("Move Baron")]
         MustMoveBaron,
 
-       
+        [Description("Discard Cards")]
+        TooManyCards,
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

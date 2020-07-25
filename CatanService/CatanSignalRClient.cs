@@ -73,7 +73,6 @@ namespace Catan10.CatanService
                 {
                     if (message.To == "*" || message.To == MainPage.Current.TheHuman.PlayerName)
                     {
-
                         message = ParseMessage(message);
                         OnBroadcastMessageReceived.Invoke(message);
                     }
@@ -83,23 +82,6 @@ namespace Catan10.CatanService
                     this.TraceMessage(e.ToString());
                 }
             }
-        }
-
-        private async Task PostHubMessage (CatanMessage message)
-        {
-            await EnsureConnection();
-            if (message.Data != null && message.Data.GetType() != typeof(string))
-            {
-                //
-                //  make it an object so we can get the whole message
-                message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
-            }
-            else
-            {
-                this.TraceMessage($"message.Data is a string for {message}");
-            }
-
-            await HubConnection.SendAsync("PostMessage", message);
         }
 
         private void OnToOneClient (CatanMessage message)
@@ -118,8 +100,10 @@ namespace Catan10.CatanService
             }
         }
 
-        private CatanMessage ParseMessage (CatanMessage msg)
+        public static CatanMessage ParseMessage (CatanMessage msg)
         {
+            if (msg.Data == null) return msg;
+
             Type type = CurrentAssembly.GetType(msg.DataTypeName);
             if (type == null) throw new ArgumentException("Unknown type!");
 
@@ -134,6 +118,22 @@ namespace Catan10.CatanService
             return msg;
         }
 
+        public async Task PostHubMessage (CatanMessage message)
+        {
+            await EnsureConnection();
+            if (message.Data != null && message.Data.GetType() != typeof(string))
+            {
+                //
+                //  make it an object so we can get the whole message
+                message.Data = JsonSerializer.Serialize<object>(message.Data, GetJsonOptions());
+            }
+            else
+            {
+                this.TraceMessage($"message.Data is a string for {message}");
+            }
+
+            await HubConnection.SendAsync("PostMessage", message);
+        }
         #endregion Methods
 
         #region Constructors + Destructors
@@ -204,7 +204,6 @@ namespace Catan10.CatanService
         {
             try
             {
-
                 CatanMessage message = new CatanMessage()
                 {
                     MessageType = MessageType.DeleteGame,
@@ -252,12 +251,9 @@ namespace Catan10.CatanService
 
         public async Task<List<string>> GetAllPlayerNames (Guid gameId)
         {
-            if (HubConnection.State != HubConnectionState.Connected)
-            {
-                this.TraceMessage("Why isn't the hub Connected?");
-                await Task.Delay(2000);
-                this.TraceMessage($"Waited 2 seconds = state now {HubConnection.State}");
-            }
+
+            await EnsureConnection();
+
 
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
 
@@ -296,13 +292,26 @@ namespace Catan10.CatanService
                     logging.SetMinimumLevel(LogLevel.Trace);
                 }).Build();
 
+                //
+                //  7/23/2020:  these options made the whole thing fall apart.  no idea why.
+
+               //.AddJsonProtocol(options =>
+               // {
+               //     options.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+               //     options.PayloadSerializerOptions.PropertyNameCaseInsensitive = true;
+               //     options.PayloadSerializerOptions.IgnoreNullValues = true;
+               //     options.PayloadSerializerOptions.Converters.Add(new PlayerModelConverter());
+               //     options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+               // })
+
                 HubConnection.ServerTimeout = TimeSpan.FromMinutes(5);
                 HubConnection.HandshakeTimeout = TimeSpan.FromSeconds(10);
                 HubConnection.KeepAliveInterval = TimeSpan.FromSeconds(19);
 
                 HubConnection.Reconnecting += async error =>
                 {
-                    //   this.TraceMessage("Hub reconnecting!!");
+                    this.TraceMessage("Hub reconnecting!!");
                     Debug.Assert(HubConnection.State == HubConnectionState.Reconnecting);
                     if (GameInfo != null) // this puts us back into the channel with the other players.
                     {
@@ -315,7 +324,6 @@ namespace Catan10.CatanService
                             From = this.PlayerName,
                             To="*",
                             GameInfo = this.GameInfo,
-
                         };
                         await PostHubMessage(message);
                     }
@@ -348,7 +356,6 @@ namespace Catan10.CatanService
                         MessageLog.Add(message);
                         OnToAllClients(message);
                     });
-
                 });
 
                 HubConnection.On("ToOneClient", async (CatanMessage message) =>
@@ -380,38 +387,38 @@ namespace Catan10.CatanService
                     MessageLog.Add(message);
                 });
 
-                HubConnection.On("CreateGame", async (GameInfo gameInfo, string by) =>
+                HubConnection.On("CreateGame", async (CatanMessage message) =>
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        var message = CreateGameModel.CreateMessage(gameInfo);
+                        
                         MessageLog.Add(message);
-                        OnGameCreated?.Invoke(gameInfo, by);
+                        OnGameCreated?.Invoke(message.GameInfo, message.GameInfo.Creator );
                     });
                 });
-                HubConnection.On("DeleteGame", async (GameInfo gameInfo, string by) =>
+                HubConnection.On("DeleteGame", async (CatanMessage message) =>
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        RecordGameMessage(MessageType.DeleteGame, CatanAction.GameDeleted, gameInfo, by);
-                        OnGameDeleted?.Invoke(gameInfo, by);
+                        MessageLog.Add(message);
+                        OnGameDeleted?.Invoke(message.GameInfo, message.From);
                     });
                 });
-                HubConnection.On("JoinGame", async (GameInfo gameInfo, string playerName) =>
+                HubConnection.On("JoinGame", async (CatanMessage message) =>
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        RecordGameMessage(MessageType.JoinGame, CatanAction.GameJoined, gameInfo, playerName);
+                        MessageLog.Add(message);
 
-                        OnGameJoined?.Invoke(gameInfo, playerName);
+                        OnGameJoined?.Invoke(message.GameInfo, message.From);
                     });
                 });
-                HubConnection.On("LeaveGame", async (GameInfo gameInfo, string playerName) =>
+                HubConnection.On("LeaveGame", async (CatanMessage message) =>
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        RecordGameMessage(MessageType.LeaveGame, CatanAction.None, gameInfo, playerName);
-                        OnGameLeft?.Invoke(gameInfo, playerName);
+                        MessageLog.Add(message);
+                        OnGameLeft?.Invoke(message.GameInfo, message.From);
                     });
                 });
 
@@ -468,7 +475,6 @@ namespace Catan10.CatanService
                     From = playerName,
                     To="*",
                     GameInfo = gameInfo,
-
                 };
                 this.OnGameJoined += CatanSignalRClient_OnGameJoined;
                 await PostHubMessage(message);
@@ -555,7 +561,6 @@ namespace Catan10.CatanService
                     return;
                 }
 
-             
                 //
                 //  Ack timeout
                 //
@@ -666,15 +671,21 @@ namespace Catan10.CatanService
 
         private async Task EnsureConnection ()
         {
-            if (HubConnection.State == HubConnectionState.Connected) return;
-
-            TaskCompletionSource<object> connectionTCS = new TaskCompletionSource<object>(); ;
-            HubConnection.Reconnected += Reconnected;
-            Task Reconnected (string arg)
+            if (HubConnection.State == HubConnectionState.Connected)
             {
-                connectionTCS.TrySetResult(null);
-                HubConnection.Reconnected -= Reconnected;
-                return Task.CompletedTask;
+                return;
+            }
+
+            TaskCompletionSource<object> connectionTCS = new TaskCompletionSource<object>();
+            HubConnection.Reconnected += Reconnected;
+            async Task Reconnected (string arg)
+            {
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.TraceMessage($"{MainPage.Current.TheHuman.PlayerName} reconnected");
+                    connectionTCS.TrySetResult(null);
+                    HubConnection.Reconnected -= Reconnected;
+                });
             }
 
             int n = 0;
@@ -689,26 +700,6 @@ namespace Catan10.CatanService
             }
         }
 
-        private void RecordGameMessage (MessageType messageType, CatanAction action, GameInfo info, string by)
-        {
-            GameLog logHeader = new GameLog()
-            {
-                CanUndo = false,
-                Action = action,
-                GameInfo = info,
-                Name = by
-            };
-            CatanMessage message = new CatanMessage()
-            {
-                Data = logHeader,
-                From = info.Name,
-                ActionType = ActionType.Normal,
-                DataTypeName = logHeader.GetType().FullName,
-                To = "*",
-                MessageType = messageType
-            };
-            this.MessageLog.Add(message);
-        }
 
         private async Task RegisterClient ()
         {
@@ -721,7 +712,6 @@ namespace Catan10.CatanService
                 await HubConnection.InvokeAsync("Register", MainPage.Current.TheHuman.PlayerName);
             });
         }
-
     }
 
     public class PlayerModelConverter : JsonConverter<PlayerModel>

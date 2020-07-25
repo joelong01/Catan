@@ -150,7 +150,7 @@ namespace Catan10.Spy
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        var message = CreateGameModel.CreateMessage(gameInfo);
+                        var message = CreateGameModel.CreateMessage(gameInfo, by);
                         Messages.Add(message);
                     });
                 });

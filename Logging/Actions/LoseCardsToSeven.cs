@@ -30,12 +30,17 @@ namespace Catan10
             {
                 foreach (var player in gameController.MainPageModel.PlayingPlayers)
                 {
+                    //
+                    //  stop if any player has more than 7 cards
+                    //
                     if (player.GameData.Resources.Current.Count > 7)
                     {
                         return Task.CompletedTask;
                     }
                 }
 
+                //
+                //  no player has more than 7 cards -- move the baron!
                 return MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
             }
 
@@ -45,6 +50,14 @@ namespace Catan10
         public Task Redo(IGameController gameController)
         {
             throw new NotImplementedException();
+        }
+
+        public Task Replay (IGameController gameController)
+        {
+            PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
+            sentBy.GameData.Resources.GrantResources(LostResources.GetNegated());
+            gameController.MainPageModel.Bank.GameData.Resources.GrantResources(LostResources);
+            return Task.CompletedTask;
         }
 
         public Task Undo(IGameController gameController)

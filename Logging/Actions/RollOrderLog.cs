@@ -37,8 +37,18 @@ namespace Catan10
 
             if (finished && gameController.TheHuman == gameController.CurrentPlayer) // whoever wins sends the message saying we have finished rolling for order
             {
-                await RollOrderFinalizedLog.PostLog(gameController);
+                await RollOrderFinalizedLog.PostLog(gameController, gameController.PlayingPlayers);
             }
+        }
+
+        /// <summary>
+        ///     We don't need to worry about this message as after all these messages happen, an order is set and an explicit message is sent to set the order.
+        /// </summary>
+        /// <param name="gameController"></param>
+        /// <returns></returns>
+        public Task Replay (IGameController gameController)
+        {
+            return Task.CompletedTask;
         }
 
         public Task Redo(IGameController gameController)

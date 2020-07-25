@@ -41,13 +41,18 @@ namespace Catan10
                 CanUndo = false
             };
 
-            await gameController.ExecuteSynchronously(logHeader, ActionType.Normal);
+            await gameController.ExecuteSynchronously(logHeader, ActionType.Normal, action == CatanAction.GameCreated ? MessageType.CreateGame : MessageType.JoinGame);
         }
 
         public async Task Do(IGameController gameController)
         {
             await gameController.JoinOrCreateGame(this.GameInfo);
 
+        }
+
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
         }
 
         public Task Redo(IGameController gameController)

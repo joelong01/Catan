@@ -60,7 +60,7 @@ namespace Catan10
                 CanUndo = false
             };
 
-            await gameController.ExecuteSynchronously(logHeader, ActionType.Normal);
+            await gameController.ExecuteSynchronously(logHeader, ActionType.Normal, MessageType.JoinGame);
         }
 
         public async Task Do(IGameController gameController)
@@ -81,6 +81,11 @@ namespace Catan10
         public Task Undo(IGameController gameController)
         {
             return gameController.UndoAddPlayer(this);
+        }
+
+        public Task Replay (IGameController gameController)
+        {
+            return Do(gameController);
         }
 
         #endregion Methods

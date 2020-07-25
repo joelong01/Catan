@@ -71,6 +71,18 @@ namespace Catan10
                 await TradeGold.PostTradeMessage(gameController, picked);
             }
         }
+        /// <summary>
+        ///     this is bad -- here we do nothing unless this is the *last* message...then we have to call Do()
+        ///     need a way to figure out if it is the last message....for now I'll just assume we don't end up 
+        ///     here.  ugh.
+        /// </summary>
+        /// <param name="gameController"></param>
+        /// <returns></returns>
+
+        public Task Replay (IGameController gameController)
+        {
+            return Task.CompletedTask; //TODO: Fix this by calling Do() if this is the last message we are replaying.
+        }
 
         public Task Redo(IGameController gameController)
         {

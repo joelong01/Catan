@@ -56,7 +56,7 @@ namespace Catan10
         ///     in this case, recalc the longest road (a buidling can "break" a road) and then log it.
         ///     we also clear all the Pip ellipses if we are in the allocating phase
         /// </summary>
-        public async Task BuildingStateChanged(PlayerModel player, BuildingCtrl building, BuildingState oldState)
+        public async Task BuildingStateChanged (PlayerModel player, BuildingCtrl building, BuildingState oldState)
         {
             if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
             {
@@ -100,7 +100,7 @@ namespace Catan10
         ///     we can only do that if the state is WaitingForNext and the CurrentPlayer == the owner of the building
         /// </summary>
         /// <returns></returns>
-        public bool BuildingStateChangeOk(BuildingCtrl building)
+        public bool BuildingStateChangeOk (BuildingCtrl building)
         {
             if (!ValidateBuilding) return true;
             if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
@@ -159,7 +159,7 @@ namespace Catan10
         ///         3. works when an Undo action happens
         ///         5. works when a road is "broken"
         /// </summary>
-        public void CalculateAndSetLongestRoad()
+        public void CalculateAndSetLongestRoad ()
 
         {
             //
@@ -264,7 +264,7 @@ namespace Catan10
 
         //
         //  loop through all the players roads calculating the longest road from that point and then return the max found
-        public int CalculateLongestRoad(PlayerModel player, ObservableCollection<RoadCtrl> roads)
+        public int CalculateLongestRoad (PlayerModel player, ObservableCollection<RoadCtrl> roads)
         {
             int max = 0;
             RoadCtrl maxRoadStartedAt = null;
@@ -286,7 +286,7 @@ namespace Catan10
             return max;
         }
 
-        public bool CanBuildRoad()
+        public bool CanBuildRoad ()
 
         {
             if (ValidateBuilding == false) return true;
@@ -315,7 +315,7 @@ namespace Catan10
             return false;
         }
 
-        public async Task ChangeGame(CatanGameCtrl game)
+        public async Task ChangeGame (CatanGameCtrl game)
         {
             if (game == _gameView.CurrentGame)
             {
@@ -336,9 +336,9 @@ namespace Catan10
             }
         }
 
-        public async Task CurrentPlayerChanged()
+        public async Task CurrentPlayerChanged ()
         {
-           
+
             UpdateTurnFlag();
 
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);
@@ -357,27 +357,27 @@ namespace Catan10
             }
         }
 
-        public BuildingCtrl GetBuilding(int settlementIndex)
+        public BuildingCtrl GetBuilding (int settlementIndex)
         {
             return _gameView.GetBuilding(settlementIndex);
         }
 
-        public PlayerModel GetPlayerData(int playerIndex)
+        public PlayerModel GetPlayerData (int playerIndex)
         {
             return MainPageModel.AllPlayers[playerIndex];
         }
 
-        public RoadCtrl GetRoad(int roadIndex)
+        public RoadCtrl GetRoad (int roadIndex)
         {
             return _gameView.GetRoad(roadIndex);
         }
 
-        public TileCtrl GetTile(int tileIndex)
+        public TileCtrl GetTile (int tileIndex)
         {
             return _gameView.GetTile(tileIndex);
         }
 
-        public Task OnNewGame()
+        public Task OnNewGame ()
         {
             return Task.CompletedTask;
             //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
@@ -439,7 +439,7 @@ namespace Catan10
             //}
         }
 
-        public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
+        public void RoadEntered (RoadCtrl road, PointerRoutedEventArgs e)
         {
             if (!CanBuildRoad())
             {
@@ -468,7 +468,7 @@ namespace Catan10
             //}
         }
 
-        public void RoadExited(RoadCtrl road, PointerRoutedEventArgs e)
+        public void RoadExited (RoadCtrl road, PointerRoutedEventArgs e)
         {
             if (!CanBuildRoad())
             {
@@ -495,7 +495,7 @@ namespace Catan10
             //}
         }
 
-        public async void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e)
+        public async void RoadPressed (RoadCtrl road, PointerRoutedEventArgs e)
         {
             if (!CanBuildRoad())
             {
@@ -529,7 +529,7 @@ namespace Catan10
         //  if there is not, then they rolled 7
         //
         //
-        public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
+        public void TileRightTapped (TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
             if (log == null) return; // probably the wrong state
@@ -542,7 +542,7 @@ namespace Catan10
 
             //
             //  I made this a local function to capture the stack variables.
-            async void Baron_MenuClicked(object s, RoutedEventArgs e)
+            async void Baron_MenuClicked (object s, RoutedEventArgs e)
             {
                 //
                 //  pop the dialog to pick a card
@@ -566,7 +566,7 @@ namespace Catan10
                             SourceOrientation = TileOrientation.FaceDown,
                             HowMany = 1,
                             Source = source,
-                            Destination = destination,                            
+                            Destination = destination,
                             Instructions = $"Take a card from {victim.PlayerName}"
                         };
 
@@ -575,7 +575,7 @@ namespace Catan10
                         {
                             await ShowErrorMessage("You cancelled out of the dialog.  I'll pick a Random card for you.\n\n", "Catan", "");
                             Random rand = new Random((int)DateTime.Now.Ticks);
-                            
+
                             int index = rand.Next(source.Count);
                             destination.Add(source[index]);
                         }
@@ -721,7 +721,7 @@ namespace Catan10
         //
         //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
         ///
-        public Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
+        public Task UpdateRoadState (RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
         {
             if (newState == oldState)
             {
@@ -767,7 +767,7 @@ namespace Catan10
         //
         //
         //
-        public BuildingState ValidateBuildingLocation(BuildingCtrl building)
+        public BuildingState ValidateBuildingLocation (BuildingCtrl building)
         {
             if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.BeginResourceAllocation) && ValidateBuilding)
             {
@@ -865,7 +865,7 @@ namespace Catan10
             return BuildingState.Error;
         }
 
-        internal PlayerModel PlayerNameToPlayer(string name, ICollection<PlayerModel> players)
+        internal PlayerModel PlayerNameToPlayer (string name, ICollection<PlayerModel> players)
         {
             foreach (var player in players)
             {
@@ -883,7 +883,7 @@ namespace Catan10
         //      4. If Knight Played Increment the source player (which is always the current player) Knights played
         //      5. Log that it happened.
         //      6. check to see if we should update the Largest Army
-        private Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
+        private Task AssignBaronOrKnight (PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
         {
             int inc = 1;
             if (logType == LogType.Undo)
@@ -913,11 +913,11 @@ namespace Catan10
 
             if (action == CatanAction.PlayedKnight)
             {
-               
+
                 CurrentPlayer.GameData.Resources.KnightsPlayed += inc;
                 AssignLargestArmy();
             }
-            
+
             //  await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
 
             if (CurrentGameState == GameState.MustMoveBaron && logType != LogType.Undo)
@@ -949,7 +949,7 @@ namespace Catan10
         //
         //  since this is called from Undo, you have to set it to false if it is less than 2 in case you undid the one that made you the larget army
         //
-        private void AssignLargestArmy()
+        private void AssignLargestArmy ()
         {
             if (CurrentPlayer.GameData.Resources.KnightsPlayed > 2)
             {
@@ -989,7 +989,7 @@ namespace Catan10
         ///         3. works when an Undo action happens
         ///         5. works when a road is "broken"
         /// </summary>
-        private void CalculateAndSetLongestRoad(RoadRaceTracking raceTracking)
+        private void CalculateAndSetLongestRoad (RoadRaceTracking raceTracking)
         {
             var PlayingPlayers = MainPageModel.PlayingPlayers;
 
@@ -1097,7 +1097,7 @@ namespace Catan10
         //  Start is just any old road you want to start counting from
         //  counted are all the roads that have been counted so far -- presumably starts with .Count = 0
         //  blockedFork roads is set when we recurse so that we can pick a direction.  we need it in case of closed loops
-        private int CalculateLongestRoad(RoadCtrl start, List<RoadCtrl> counted, RoadCtrl blockedFork)
+        private int CalculateLongestRoad (RoadCtrl start, List<RoadCtrl> counted, RoadCtrl blockedFork)
         {
             int count = 1;
             int max = 1;
@@ -1212,7 +1212,7 @@ namespace Catan10
         //             because of an implicit Undo (e.g. if we've logged a state change
         //             in a road, and RoadState == UnOwned then LogType must be LogType.Undo)
         //
-        private RoadState NextRoadState(RoadCtrl road)
+        private RoadState NextRoadState (RoadCtrl road)
         {
             bool nextToSea = false;
             if (road.Keys.Count == 1 && _gameView.CurrentGame.GameData.MaxShips > 0)
@@ -1261,7 +1261,7 @@ namespace Catan10
             return nextState;
         }
 
-        private bool RoadAllowed(RoadCtrl road)
+        private bool RoadAllowed (RoadCtrl road)
         {
             if (!ValidateBuilding)
             {
@@ -1306,7 +1306,7 @@ namespace Catan10
         //  but after that, a road you must have!
         //
         //  to build you want this to return FALSE
-        private bool SettlementsWithinOneSpace(BuildingCtrl settlement)
+        private bool SettlementsWithinOneSpace (BuildingCtrl settlement)
         {
             foreach (BuildingCtrl adjacent in settlement.AdjacentBuildings)
             {
@@ -1319,7 +1319,7 @@ namespace Catan10
             return false;
         }
 
-        private void UpdateTileBuildingOwner(PlayerModel player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
+        private void UpdateTileBuildingOwner (PlayerModel player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
             foreach (BuildingKey key in building.Clones)
             {
@@ -1366,7 +1366,7 @@ namespace Catan10
             }
         }
 
-        private void UpdateTurnFlag()
+        private void UpdateTurnFlag ()
         {
             foreach (PlayerModel pd in MainPageModel.PlayingPlayers)
             {

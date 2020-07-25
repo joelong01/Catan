@@ -42,6 +42,10 @@ namespace Catan10
                 await BeginAllocationToAllocateResourcesForward.PostLog(gameController);
             }
         }
+        public Task Replay (IGameController gameController)
+        {
+            return Task.CompletedTask;
+        }
 
         public Task Redo(IGameController gameController)
         {

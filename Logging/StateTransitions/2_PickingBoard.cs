@@ -34,7 +34,7 @@ namespace Catan10
             var mainPageModel = gameController.MainPageModel;
             mainPageModel.FinishedAddingPlayers();
 
-            if (mainPageModel.GameStartedBy == gameController.TheHuman)
+            if (mainPageModel.GameInfo.Creator == gameController.TheHuman.PlayerName)
             {
                 //
                 //  we only need one person sending around a random board
@@ -50,12 +50,18 @@ namespace Catan10
             
         }
 
+        public Task Replay (IGameController gameController)
+        {
+            gameController.MainPageModel.FinishedAddingPlayers();
+            return Task.CompletedTask;
+        }
+
         public async Task Redo(IGameController gameController)
         {
             //
             //  do any state cleanup needed for transitioning into Pick board
             gameController.ShowRollsInPublicUi();
-            if (gameController.MainPageModel.GameStartedBy == gameController.TheHuman)
+            if (gameController.MainPageModel.GameInfo.Creator == gameController.TheHuman.PlayerName)
             {
                 //
                 //  The person that starts the game controlls the board

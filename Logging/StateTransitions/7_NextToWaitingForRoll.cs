@@ -52,6 +52,17 @@ namespace Catan10
             }
         }
 
+        public async Task Replay (IGameController gameController)
+        {
+            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
+            ChangePlayerHelper.ChangePlayer(gameController, 1);
+            Debug.Assert(this.RollState != null);
+            await gameController.ResetRollControl();
+
+            await gameController.PushRollState(this.RollState);
+            gameController.StopHighlightingTiles();
+        }
+
         public async Task Redo(IGameController gameController)
         {
             await Do(gameController);
