@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -23,7 +24,9 @@ namespace Catan10.CatanService
     {
         #region Delegates + Fields + Events + Enums
 
-        public delegate void AckHandler (CatanMessage message);
+        public delegate void AckHandler(CatanMessage message);
+        private delegate void PongHandler();
+        private event PongHandler OnPong;
 
         public event AckHandler OnAck;
 
@@ -34,18 +37,20 @@ namespace Catan10.CatanService
         public event DeleteGameHandler OnGameDeleted;
 
         public event GameLifeTimeHandler OnGameJoined;
+        public event GameLifeTimeHandler OnGameRejoined;
 
         public event GameLifeTimeHandler OnGameLeft;
 
         public event PrivateMessageReceivedHandler OnPrivateMessage;
 
-        private delegate void AllGamesReceivedHandler (List<GameInfo> games);
+        private delegate void AllGamesReceivedHandler(List<GameInfo> games);
 
-        private delegate void AllPlayersReceivedHandler (List<string> playerNames);
+        private delegate void AllPlayersReceivedHandler(List<string> playerNames);
 
         private event AllGamesReceivedHandler OnAllGamesReceived;
 
         private event AllPlayersReceivedHandler OnAllPlayersReceived;
+        private ConcurrentQueue<CatanMessage> MessageQueue { get; } = new ConcurrentQueue<CatanMessage>();
 
         #endregion Delegates + Fields + Events + Enums
 
@@ -59,13 +64,35 @@ namespace Catan10.CatanService
 
         private HubConnection HubConnection { get; set; }
 
-        private string ServiceUrl { get; set; } = "";
+        private string Host { get; set; } = "";
 
         #endregion Properties
 
         #region Methods
+        /// <summary>
+        ///     I'm being "clever" here and making this void.  this causes async await to continue without waiting
+        ///     this works by "borrowing" the thread that either sends the message or recieves the message to draing the queu
+        ///     of messages.
+        /// </summary>
+        private async void ProcessQueueAsync()
+        {
+            while (MessageQueue.TryDequeue(out CatanMessage message))
+            {
+                if (message.MessageDirection == MessageDirection.ClientToServer)
+                {
+                    await InternalSendBroadcastMessage(message);
+                }
+                else
+                {
+                    Contract.Assert(message.MessageDirection == MessageDirection.ServerToClient);
+                    OnBroadcastMessageReceived.Invoke(message);
+                }
+            }
 
-        private void OnToAllClients (CatanMessage message)
+        }
+
+
+        private void OnToAllClients(CatanMessage message)
         {
             if (OnBroadcastMessageReceived != null)
             {
@@ -74,7 +101,9 @@ namespace Catan10.CatanService
                     if (message.To == "*" || message.To == MainPage.Current.TheHuman.PlayerName)
                     {
                         message = ParseMessage(message);
-                        OnBroadcastMessageReceived.Invoke(message);
+                        MessageQueue.Enqueue(message);
+                        ProcessQueueAsync();
+                        // OnBroadcastMessageReceived.Invoke(message);
                     }
                 }
                 catch (Exception e)
@@ -84,7 +113,7 @@ namespace Catan10.CatanService
             }
         }
 
-        private void OnToOneClient (CatanMessage message)
+        private void OnToOneClient(CatanMessage message)
         {
             if (OnPrivateMessage != null)
             {
@@ -100,10 +129,10 @@ namespace Catan10.CatanService
             }
         }
 
-        public static CatanMessage ParseMessage (CatanMessage msg)
+        public static CatanMessage ParseMessage(CatanMessage msg)
         {
             if (msg.Data == null) return msg;
-
+            if (String.IsNullOrEmpty(msg.DataTypeName)) return msg;
             Type type = CurrentAssembly.GetType(msg.DataTypeName);
             if (type == null) throw new ArgumentException("Unknown type!");
 
@@ -118,9 +147,9 @@ namespace Catan10.CatanService
             return msg;
         }
 
-        public async Task PostHubMessage (CatanMessage message)
+        public async Task PostHubMessage(CatanMessage message)
         {
-            await EnsureConnection();
+
             if (message.Data != null && message.Data.GetType() != typeof(string))
             {
                 //
@@ -138,7 +167,7 @@ namespace Catan10.CatanService
 
         #region Constructors + Destructors
 
-        public CatanSignalRClient ()
+        public CatanSignalRClient()
         {
         }
 
@@ -152,12 +181,12 @@ namespace Catan10.CatanService
 
         private string PlayerName { get; set; }
 
-        static public T Deserialize<T> (string json)
+        static public T Deserialize<T>(string json)
         {
             return JsonSerializer.Deserialize<T>(json, GetJsonOptions());
         }
 
-        public static JsonSerializerOptions GetJsonOptions (bool indented = false)
+        public static JsonSerializerOptions GetJsonOptions(bool indented = false)
         {
             var options = new JsonSerializerOptions
             {
@@ -169,13 +198,13 @@ namespace Catan10.CatanService
             return options;
         }
 
-        static public string Serialize<T> (T obj, bool indented = false)
+        static public string Serialize<T>(T obj, bool indented = false)
         {
             if (obj == null) return null;
             return JsonSerializer.Serialize<T>(obj, GetJsonOptions(indented));
         }
 
-        public async Task CreateGame (GameInfo gameInfo)
+        public async Task CreateGame(GameInfo gameInfo)
         {
             Contract.Assert(!string.IsNullOrEmpty(gameInfo.Name));
             try
@@ -200,7 +229,7 @@ namespace Catan10.CatanService
             }
         }
 
-        public async Task DeleteGame (GameInfo gameInfo, string by)
+        public async Task DeleteGame(GameInfo gameInfo, string by)
         {
             try
             {
@@ -222,21 +251,21 @@ namespace Catan10.CatanService
             }
         }
 
-        public void Dispose ()
+        public void Dispose()
         {
             HubConnection.DisposeAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        public Task DisposeAsync ()
+        public Task DisposeAsync()
         {
             return HubConnection.DisposeAsync();
         }
 
-        public async Task<List<GameInfo>> GetAllGames ()
+        public async Task<List<GameInfo>> GetAllGames()
         {
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
             List<GameInfo> list = null;
-            void CatanSignalRClient_OnAllGamesReceived (List<GameInfo> games)
+            void CatanSignalRClient_OnAllGamesReceived(List<GameInfo> games)
             {
                 list = games;
                 this.OnAllGamesReceived -= CatanSignalRClient_OnAllGamesReceived;
@@ -249,7 +278,7 @@ namespace Catan10.CatanService
             return list;
         }
 
-        public async Task<List<string>> GetAllPlayerNames (Guid gameId)
+        public async Task<List<string>> GetAllPlayerNames(Guid gameId)
         {
 
             await EnsureConnection();
@@ -258,7 +287,7 @@ namespace Catan10.CatanService
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
 
             List<string> list = null;
-            void OnPlayerNamesReceived (List<string> playerNames)
+            void OnPlayerNamesReceived(List<string> playerNames)
             {
                 list = playerNames;
                 this.OnAllPlayersReceived -= OnPlayerNamesReceived;
@@ -271,22 +300,44 @@ namespace Catan10.CatanService
             return list;
         }
 
-        public async Task Initialize (string host, ICollection<CatanMessage> messageLog)
+        private void UnsubscribeAll()
+        {
+            if (HubConnection == null) return;
+
+            HubConnection.Remove("OnAck");
+            HubConnection.Remove("AllGames");
+            HubConnection.Remove("AllPlayers");
+            HubConnection.Remove("AllMessages");
+            HubConnection.Remove("CreateGame");
+            HubConnection.Remove("DeleteGame");
+            HubConnection.Remove("JoinGame");
+            HubConnection.Remove("RejoinGame");
+            HubConnection.Remove("LeaveGame");
+            HubConnection.Remove("ToAllClients");
+            HubConnection.Remove("ToOneClient");
+            HubConnection.Remove("ServiceError");
+            HubConnection.Remove("Pong");
+        }
+
+        public async Task Initialize(string host, ICollection<CatanMessage> messageLog)
         {
             MessageLog = messageLog;
+            this.Host = host;
             try
             {
-                if (host.Contains("192"))
+                UnsubscribeAll();
+                string serviceUrl;
+                if (host.Contains("192") || host.Contains("local"))
                 {
-                    ServiceUrl = "http://" + host + "/CatanHub";
+                    serviceUrl = "http://" + host + "/CatanHub";
                 }
                 else
                 {
-                    ServiceUrl = "https://" + host + "/CatanHub";
+                    serviceUrl = "https://" + host + "/CatanHub";
                 }
 
                 _lastReconnected = DateTime.Now;
-                HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(ServiceUrl).ConfigureLogging((logging) =>
+                HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(serviceUrl).ConfigureLogging((logging) =>
                 {
                     logging.AddConsole();
                     logging.SetMinimumLevel(LogLevel.Trace);
@@ -295,15 +346,15 @@ namespace Catan10.CatanService
                 //
                 //  7/23/2020:  these options made the whole thing fall apart.  no idea why.
 
-               //.AddJsonProtocol(options =>
-               // {
-               //     options.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-               //     options.PayloadSerializerOptions.PropertyNameCaseInsensitive = true;
-               //     options.PayloadSerializerOptions.IgnoreNullValues = true;
-               //     options.PayloadSerializerOptions.Converters.Add(new PlayerModelConverter());
-               //     options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                //.AddJsonProtocol(options =>
+                // {
+                //     options.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                //     options.PayloadSerializerOptions.PropertyNameCaseInsensitive = true;
+                //     options.PayloadSerializerOptions.IgnoreNullValues = true;
+                //     options.PayloadSerializerOptions.Converters.Add(new PlayerModelConverter());
+                //     options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 
-               // })
+                // })
 
                 HubConnection.ServerTimeout = TimeSpan.FromMinutes(5);
                 HubConnection.HandshakeTimeout = TimeSpan.FromSeconds(10);
@@ -343,6 +394,7 @@ namespace Catan10.CatanService
                     await HubConnection.StartAsync();
                 };
 
+
                 HubConnection.On("ToAllClients", async (CatanMessage message) =>
                 {
                     //
@@ -356,6 +408,11 @@ namespace Catan10.CatanService
                         MessageLog.Add(message);
                         OnToAllClients(message);
                     });
+                });
+
+                HubConnection.On("Pong", () =>
+                {
+                    OnPong?.Invoke();
                 });
 
                 HubConnection.On("ToOneClient", async (CatanMessage message) =>
@@ -391,9 +448,9 @@ namespace Catan10.CatanService
                 {
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        
+
                         MessageLog.Add(message);
-                        OnGameCreated?.Invoke(message.GameInfo, message.GameInfo.Creator );
+                        OnGameCreated?.Invoke(message.GameInfo, message.GameInfo.Creator);
                     });
                 });
                 HubConnection.On("DeleteGame", async (CatanMessage message) =>
@@ -411,6 +468,13 @@ namespace Catan10.CatanService
                         MessageLog.Add(message);
 
                         OnGameJoined?.Invoke(message.GameInfo, message.From);
+                    });
+                });
+                HubConnection.On("RejoinGame", async (CatanMessage message) =>
+                {
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        OnGameRejoined?.Invoke(message.GameInfo, message.From);
                     });
                 });
                 HubConnection.On("LeaveGame", async (CatanMessage message) =>
@@ -442,13 +506,13 @@ namespace Catan10.CatanService
             }
             catch (Exception e)
             {
-                this.TraceMessage($"Error connection to SignalR.  ServiceUrl: {ServiceUrl}\nException:{e}");
+                this.TraceMessage($"Error connection to SignalR.  ServiceUrl: {Host}\nException:{e}");
                 // await StaticHelpers.ShowErrorText($"Error connection to SignalR.  ServiceUrl: {ServiceUrl}\nException:{e}", "Catan");
                 throw;
             }
         }
 
-        public async Task<GameInfo> JoinGame (GameInfo gameInfo, string playerName)
+        private async Task<GameInfo> RejoinGame(GameInfo gameInfo, string playerName)
         {
             if (gameInfo == null) throw new ArgumentException("GameInfo can't be null");
             if (String.IsNullOrEmpty(playerName)) throw new ArgumentException("PlayerName can't be null");
@@ -460,7 +524,48 @@ namespace Catan10.CatanService
             {
                 TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
                 GameInfo serviceGameInfo = null;
-                void CatanSignalRClient_OnGameJoined (GameInfo info, string name)
+                void CatanSignalRClient_OnGameRejoined(GameInfo info, string name)
+                {
+                    this.OnGameRejoined -= CatanSignalRClient_OnGameRejoined;
+                    serviceGameInfo = info;
+                    tcs.TrySetResult(null);
+                };
+                CatanMessage message = new CatanMessage()
+                {
+                    MessageType = MessageType.RejoinGame,
+                    ActionType = ActionType.Normal,
+                    Data = null,
+                    DataTypeName="",
+                    From = playerName,
+                    To="*",
+                    GameInfo = gameInfo,
+                };
+                this.OnGameRejoined += CatanSignalRClient_OnGameRejoined;
+                await PostHubMessage(message);
+                await tcs.Task;
+                return serviceGameInfo;
+            }
+            catch (Exception ex)
+            {
+                this.TraceMessage($"Exception! [Message={ex.Message}");
+            }
+            return null;
+        }
+
+
+        public async Task<GameInfo> JoinGame(GameInfo gameInfo, string playerName)
+        {
+            if (gameInfo == null) throw new ArgumentException("GameInfo can't be null");
+            if (String.IsNullOrEmpty(playerName)) throw new ArgumentException("PlayerName can't be null");
+
+            this.GameInfo = gameInfo;
+            this.PlayerName = playerName;
+
+            try
+            {
+                TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+                GameInfo serviceGameInfo = null;
+                void CatanSignalRClient_OnGameJoined(GameInfo info, string name)
                 {
                     this.OnGameJoined -= CatanSignalRClient_OnGameJoined;
                     serviceGameInfo = info;
@@ -488,13 +593,13 @@ namespace Catan10.CatanService
             return null;
         }
 
-        public async Task<bool> KeepAlive ()
+        public async Task<bool> KeepAlive()
         {
             await Task.CompletedTask;
             return true;
         }
 
-        public async Task<List<string>> LeaveGame (GameInfo gameInfo, string playerName)
+        public async Task<List<string>> LeaveGame(GameInfo gameInfo, string playerName)
         {
             try
             {
@@ -518,9 +623,17 @@ namespace Catan10.CatanService
             return null;
         }
 
-        public async Task Reset ()
+        public async Task Reset()
         {
             await HubConnection.InvokeAsync("Reset");
+        }
+
+        public Task SendBroadcastMessage(CatanMessage message)
+        {
+            message.MessageDirection = MessageDirection.ClientToServer;
+            MessageQueue.Enqueue(message);
+            ProcessQueueAsync();
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -536,7 +649,7 @@ namespace Catan10.CatanService
         /// <param name="gameId"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SendBroadcastMessage (CatanMessage message)
+        private async Task InternalSendBroadcastMessage(CatanMessage message)
         {
             if (BroadcastTcs != null && !BroadcastTcs.Task.IsCompleted)
             {
@@ -567,7 +680,7 @@ namespace Catan10.CatanService
                 int timeout = 5 * 1000;
                 while (true)
                 {
-                    await EnsureConnection();
+
 
                     AckTracker ackTracker = new AckTracker()
                     {
@@ -592,6 +705,7 @@ namespace Catan10.CatanService
                             //  there is a race condition where you can timeout between the time you remove the player and setting the timeout...found it while debugging.  might not happen in practice.
                             break;
                         }
+
                         //
                         //  got a timeout
                         string s = "";
@@ -638,6 +752,8 @@ namespace Catan10.CatanService
                         ackTracker = null;
                         if (targets.Count == 0)
                             break; // don't have anybody more to Ack, but for some reason the system didn't fire
+
+                        await EnsureConnection();
                     }
                 }
             }
@@ -647,7 +763,7 @@ namespace Catan10.CatanService
             }
         }
 
-        public async Task SendPrivateMessage (string playerName, CatanMessage message)
+        public async Task SendPrivateMessage(string playerName, CatanMessage message)
         {
             if (string.IsNullOrEmpty(message.To))
             {
@@ -664,13 +780,62 @@ namespace Catan10.CatanService
             }
         }
 
-        public async Task StartConnection (GameInfo info, string playerName)
+        public async Task StartConnection(GameInfo info, string playerName)
         {
             await RegisterClient();
         }
 
-        private async Task EnsureConnection ()
+        public async Task<bool> DoPingPong()
         {
+            var  watch = new Stopwatch();
+            watch.Start();
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
+
+            this.OnPong += PongReceived;
+
+            void PongReceived()
+            {
+                watch.Stop();
+                this.TraceMessage($"pong recieved took: {watch.ElapsedMilliseconds}ms");
+                this.OnPong -= PongReceived;
+                tcs.TrySetResult(true);
+
+            }
+            this.TraceMessage("sending ping");
+            await HubConnection.InvokeAsync("Ping");
+            try
+            {
+                await tcs.Task.TimeoutAfter(500);
+                return true;
+            }
+            catch (TimeoutException)
+            {
+                //
+                //  timedout with a ping -- get a new HubConnection
+
+                this.OnPong -= PongReceived;
+                watch.Stop();
+                this.TraceMessage($"pong timed out: {watch.ElapsedMilliseconds}ms");
+                await this.Initialize(this.Host, MessageLog);
+                await this.RejoinGame(this.GameInfo, this.PlayerName);
+                return false;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+
+            }
+
+        }
+
+        private async Task EnsureConnection()
+        {
+            await DoPingPong();
+
             if (HubConnection.State == HubConnectionState.Connected)
             {
                 return;
@@ -678,7 +843,7 @@ namespace Catan10.CatanService
 
             TaskCompletionSource<object> connectionTCS = new TaskCompletionSource<object>();
             HubConnection.Reconnected += Reconnected;
-            async Task Reconnected (string arg)
+            async Task Reconnected(string arg)
             {
                 await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
@@ -701,7 +866,7 @@ namespace Catan10.CatanService
         }
 
 
-        private async Task RegisterClient ()
+        private async Task RegisterClient()
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
@@ -718,7 +883,7 @@ namespace Catan10.CatanService
     {
         #region Methods
 
-        public override PlayerModel Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override PlayerModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (typeToConvert == typeof(PlayerModel))
             {
@@ -740,7 +905,7 @@ namespace Catan10.CatanService
             return null;
         }
 
-        public override void Write (Utf8JsonWriter writer, PlayerModel player, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, PlayerModel player, JsonSerializerOptions options)
         {
             writer.WriteStringValue(player.PlayerName);
         }

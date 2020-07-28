@@ -117,6 +117,8 @@ namespace Catan10
 
                     if (Log == null) return true;
 
+                    if (this.GameInfo == null) return false;
+
                     Debug.Assert(UnprocessedMessages >= 0);
 
                     //
@@ -484,25 +486,19 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public int UnprocessedMessages
+        public int ChangeUnprocessMessage(int value, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
-            get
-            {
-                return _unprocessedMessages;
-            }
-            set
-            {
-                Debug.Assert(value >= 0);
-                if (_unprocessedMessages != value)
-                {
-                    _unprocessedMessages = value;
-                    NotifyPropertyChanged();
-                    DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-                 //   this.TraceMessage($"UnprocessedMessages: [Client={UnprocessedMessages}] [Service={CatanService.UnprocessedMessages}] ");
-                }
-            }
+            this.TraceMessage($"[Value={_unprocessedMessages + value}][OldValue={_unprocessedMessages}] [Delta={value}] State=[{MainPage.Current.MainPageModel.GameState}]", 1, cmb, cln, cfp);
+            _unprocessedMessages += value;
+            NotifyPropertyChanged();
+            DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
+            
+            return value;
         }
+
+        [JsonIgnore]
+        public int UnprocessedMessages => _unprocessedMessages;
+        
         [JsonIgnore]
         public bool WebSocketConnected
         {

@@ -33,17 +33,24 @@ namespace Catan10
         }
         private async Task LoseHalfYourCards ()
         {
-            TradeResources tr = new TradeResources()
-            {
-                Sheep = 3,
-                Wheat = 3,
-                Ore = 2,
-                Brick = 0,
-                Wood = 0
-            };
-            CurrentPlayer.GameData.Resources.GrantResources(tr);
-
             int loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
+            CurrentPlayer = TheHuman;
+            if (loss < 4)
+            {
+                TradeResources tr = new TradeResources()
+                {
+                    Sheep = 3,
+                    Wheat = 3,
+                    Ore = 2,
+                    Brick = 0,
+                    Wood = 0
+                };
+
+                CurrentPlayer.GameData.Resources.GrantResources(tr);
+            }
+            
+           
+            loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
             if (loss >= 4)
             {
                 ResourceCardCollection rc = new ResourceCardCollection(false);
@@ -55,9 +62,10 @@ namespace Catan10
                     SourceOrientation = TileOrientation.FaceUp,
                     CountVisible = true,
                     HowMany = loss,
-                    Source = rc,
+                    Source = rc,                    
                     Destination = new ResourceCardCollection(false),
-                    Instructions = $"Give {loss} cards to the bank."
+                    Instructions = $"Give {loss} cards to the bank.",
+                    ConsolidateCards = false,
                 };
                 var ret = await dlg.ShowAsync();
                 if (ret == ContentDialogResult.Primary)
@@ -84,8 +92,8 @@ namespace Catan10
         {
             TradeResources tr = new TradeResources()
             {
-                Sheep = 0,
-                Wheat = 0,
+                Sheep = 1,
+                Wheat = 3,
                 Ore = 2,
                 Brick = 1,
                 Wood = 1
@@ -131,7 +139,7 @@ namespace Catan10
             if (messages == null) return;
             if (messages.Count == 0) return;
             await EndGame();
-            GameInfo gameInfo;
+            GameInfo gameInfo = null;
             for (int i=0; i<messages.Count; i++)
             {
 
@@ -161,19 +169,17 @@ namespace Catan10
                             {
                                 parsedMessage.ActionType = ActionType.Replay;
                             }
-                            MainPageModel.UnprocessedMessages++;
+                            MainPageModel.ChangeUnprocessMessage(1);
                             await ProcessMessage(parsedMessage);
                         }
                         break;
                     case MessageType.CreateGame:
-                        //  parsedMessage.ActionType = ActionType.Retry;
-                        //  await this.Proxy.CreateGame(parsedMessage.GameInfo);
                         gameInfo = parsedMessage.GameInfo;
                         break;
                     case MessageType.DeleteGame:
                         break;
                     case MessageType.JoinGame:
-                        await JoinOrCreateGame(parsedMessage.GameInfo);
+                        await JoinOrCreateGame(parsedMessage.GameInfo); // this is local only
                         break;
                     case MessageType.LeaveGame:
                         break;
@@ -183,6 +189,16 @@ namespace Catan10
                         break;
                 }
 
+            }
+
+            //
+            //  now our state matches what is in the log...see if the game we are supposed to be in is running
+            if (gameInfo != null)
+            {
+                await CreateAndConfigureProxy();
+                await MainPageModel.CatanService.CreateGame(gameInfo);
+                await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);
+                this.TraceMessage($"Joined game {gameInfo}");
             }
 
         }

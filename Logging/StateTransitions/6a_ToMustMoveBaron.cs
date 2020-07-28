@@ -32,12 +32,12 @@ namespace Catan10
             if (gameController.CurrentGameState != GameState.WaitingForNext &&
                             gameController.CurrentGameState != GameState.WaitingForRoll)
             {
-                gameController.TraceMessage($"strange -- investigate.  currentstate is ${gameController.CurrentGameState}");
+                gameController.TraceMessage($"strange -- investigate.  currentstate is {gameController.CurrentGameState}");
             }
 
             if (reason == MoveBaronReason.Rolled7)
             {
-                Debug.Assert(gameController.CurrentGameState == GameState.WaitingForNext);
+                Debug.Assert(gameController.CurrentGameState == GameState.TooManyCards || gameController.CurrentGameState == GameState.WaitingForNext);
             }
 
             MustMoveBaronLog logHeader = new MustMoveBaronLog()

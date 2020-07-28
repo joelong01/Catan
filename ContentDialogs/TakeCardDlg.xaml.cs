@@ -29,6 +29,32 @@ namespace Catan10
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardDlg), new PropertyMetadata(null));
 
         public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(PlayerModel), typeof(TakeCardDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty ConsolidateCardsProperty = DependencyProperty.Register("ConsolidateCards", typeof(bool), typeof(TakeCardDlg), new PropertyMetadata(true, ConsolidateCardsChanged));
+        public bool ConsolidateCards
+        {
+            get => (bool)GetValue(ConsolidateCardsProperty);
+            set => SetValue(ConsolidateCardsProperty, value);
+        }
+        private static void ConsolidateCardsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as TakeCardDlg;
+            var depPropValue = (bool)e.NewValue;
+            depPropClass?.SetConsolidateCards(depPropValue);
+        }
+        private void SetConsolidateCards(bool consolidate)
+        {
+            if (consolidate)
+            {
+                Group(Source);
+                Group(Destination);
+            }
+            else
+            {
+                Flatten(Source);
+                Flatten(Destination);
+            }
+        }
+
 
         public bool CountVisible
         {
@@ -270,24 +296,27 @@ namespace Catan10
                 //
                 //  if you pull down a card that is more than you deserve, put the first one back into the source              
             }
-            while (ResourceModelCollectionCount(target) > HowMany)
+            if (gridView.Name == "GridView_Destination")
             {
-                var removed = target[0];
-                target.RemoveAt(0);
-                if (CountVisible)
+                while (ResourceModelCollectionCount(target) > HowMany)
                 {
-                    
-                    var sourceCard = FindCard(sourceCards, removed.ResourceType);
-                    if (source != null)
+                    var removed = target[0];
+                    target.RemoveAt(0);
+                    if (CountVisible)
                     {
-                        sourceCard.Count++;
-                        sourceCard.CountVisible = CountVisible;
+
+                        var sourceCard = FindCard(sourceCards, removed.ResourceType);
+                        if (sourceCard != null)
+                        {
+                            sourceCard.Count++;
+                            sourceCard.CountVisible = CountVisible;
+                        }
+
                     }
-                    
-                }
-                else
-                {                    
-                    sourceCards.Add(removed);
+                    else
+                    {
+                        sourceCards.Add(removed);
+                    }
                 }
             }
             e.Handled = true;
@@ -340,5 +369,64 @@ namespace Catan10
         }
 
         #endregion Methods
+
+        private void OnFlatten(object sender, RoutedEventArgs e)
+        {
+            Flatten(Source);
+            Flatten(Destination);
+        }
+
+        private void Flatten(ObservableCollection<ResourceCardModel> list)
+        {
+            List<ResourceCardModel> newList =  new List<ResourceCardModel>();
+
+            foreach (var card in list)
+            {
+                for (int i = 0; i < card.Count; i++)
+                {
+                    newList.Add(new ResourceCardModel()
+                    {
+                        ResourceType = card.ResourceType,
+                        Count = 1,
+                        CountVisible = false,
+                        Orientation = TileOrientation.FaceUp
+                    });
+                }
+            }
+
+            list.Clear();
+            list.AddRange(newList);
+            CountVisible = false;
+        }
+
+        private void Group(ObservableCollection<ResourceCardModel> list)
+        {
+            TradeResources tr = new TradeResources();
+            foreach (var card in list)
+            {
+                tr.AddResource(card.ResourceType, card.Count);
+            }
+
+            var rcc = tr.ToResourceCardCollection();
+            list.Clear();
+            for (int i= rcc.Count - 1; i>=0; i--)
+            {                
+                if (rcc[i].Count != 0)
+                {
+                    rcc[i].Orientation = TileOrientation.FaceUp;
+                    list.Add(rcc[i]);
+                }
+
+            }
+
+        }
+
+        private void OnGroup(object sender, RoutedEventArgs e)
+        {
+            Group(Source);
+            Group(Destination);
+            
+
+        }
     }
 }

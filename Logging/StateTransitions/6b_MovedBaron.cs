@@ -35,14 +35,19 @@ namespace Catan10
         public static async Task PostLog(IGameController gameController, PlayerModel victim, int targetTileIndex, int previousIndex, TargetWeapon weapon, MoveBaronReason reason, ResourceType stolenResource)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.MustMoveBaron);
-            GameState previousState = gameController.MainPageModel.Log.PeekAction.OldState;
-            Debug.Assert(((MustMoveBaronLog)gameController.MainPageModel.Log.PeekAction).StartingState == previousState);
+            GameState newState = gameController.MainPageModel.Log.PeekAction.OldState;
+            if (newState == GameState.TooManyCards)
+            {
+                newState = GameState.WaitingForNext;
+            }
+           
+            // Debug.Assert(((MustMoveBaronLog)gameController.MainPageModel.Log.PeekAction).StartingState == previousState);
 
             MovedBaronLog logHeader = new MovedBaronLog()
             {
                 CanUndo = true,
                 Action = CatanAction.MovingBaron,
-                NewState = previousState,
+                NewState = newState,
                 BaronModel = new BaronModel()
                 {
                     Victim = (victim == null) ? "" : victim.PlayerName,

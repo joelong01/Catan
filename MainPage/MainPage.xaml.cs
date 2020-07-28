@@ -115,6 +115,16 @@ namespace Catan10
 
         #region Methods
 
+        private bool _starting = true;
+
+        public bool MyTurn
+        {
+            get
+            {
+                return TheHuman == CurrentPlayer;
+            }
+        }
+
         private DispatcherTimer KeepAliveTimer { get; set; }
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
@@ -158,8 +168,6 @@ namespace Catan10
         {
             if (gameInfo == null || state == GameState.WaitingForNewGame) return "Catan";
 
-            
-
             return $"Playing {_gameView.Games[gameInfo.GameIndex].CatanGame} in channel \"{gameInfo.Name}\".  {player.PlayerName}'s Turn.";
         }
 
@@ -170,6 +178,34 @@ namespace Catan10
                 await AutoSetBuildingAndRoad();
                 await NextState();
             }
+        }
+
+        public void SimulateRoll(int roll)
+        {
+            var rand = new Random((int)DateTime.Now.Ticks);
+            if (roll < 2) roll = rand.Next(2, 12);
+            List<RollModel> rolls = new List<RollModel>();
+            var rollModel = new RollModel
+            {
+                DiceOne = roll / 2,
+                Selected = true
+            };
+            rollModel.DiceTwo = roll - rollModel.DiceOne;
+            rolls.Add(rollModel);
+
+            for (int i = 0; i < 3; i++)
+            {
+                rollModel = new RollModel
+                {
+                    DiceOne = rand.Next(1, 6),
+                    DiceTwo = rand.Next(1, 6),
+                    Selected = false
+                };
+                rolls.Add(rollModel);
+            }
+            //
+            //  set them in the roll UI
+            _rollControl.TestSetRolls(rolls);
         }
 
         public void UpdateBoardMeasurements()
@@ -195,6 +231,7 @@ namespace Catan10
 
             var ignored = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
+                _starting = true;
                 if (e.NavigationMode == NavigationMode.New)
                 {
                     _progress.IsActive = true;
@@ -215,6 +252,7 @@ namespace Catan10
                 SaveSettingsTimer.Tick += SaveSettingsTimer_Tick;
 
                 base.OnNavigatedTo(e);
+                _starting = false;
             });
         }
 
@@ -572,38 +610,14 @@ namespace Catan10
             }
         }
 
-        public void SimulateRoll(int roll)
-        {
-            var rand = new Random((int)DateTime.Now.Ticks);
-            if (roll < 2) roll = rand.Next(2, 12);
-            List<RollModel> rolls = new List<RollModel>();
-            var rollModel = new RollModel
-            {
-                DiceOne = roll / 2,
-                Selected = true
-            };
-            rollModel.DiceTwo = roll - rollModel.DiceOne;
-            rolls.Add(rollModel);
-            
-            for (int i = 0; i < 3; i++)
-            {
-
-                rollModel = new RollModel
-                {
-                    DiceOne = rand.Next(1, 6),
-                    DiceTwo = rand.Next(1, 6),
-                    Selected = false
-                };
-                rolls.Add(rollModel);
-            }
-            //
-            //  set them in the roll UI
-            _rollControl.TestSetRolls(rolls);
-        }
-
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
             if (!MainPageModel.IsServiceGame) return; // todo: make work for local game
+
+            if (MainPageModel.GameState != GameState.WaitingForRoll && MainPageModel.GameState != GameState.WaitingForRollForOrder)
+            {
+                return;
+            }
 
             if (((Button)sender).Content is CatanNumber number)
             {
@@ -644,7 +658,6 @@ namespace Catan10
             }
 
             Debug.Assert(rolls.Count == 4);
-           
 
             switch (CurrentGameState)
             {
@@ -658,14 +671,6 @@ namespace Catan10
 
                 default:
                     break;
-            }
-        }
-
-        public bool MyTurn
-        {
-            get
-            {
-                return TheHuman == CurrentPlayer;
             }
         }
 
@@ -897,10 +902,9 @@ namespace Catan10
                 player.Reset();
             }
 
-            _gameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;            
+            _gameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
             _raceTracking.Reset();
             await _rollControl.Reset();
-            
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
@@ -1064,6 +1068,11 @@ namespace Catan10
         /// <param name="e"></param>
         private async void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            //
+            //  7/28/2020: when you load a settigns files anything non-default causes us to do a bunch of work
+            //             set a flag and don't do property changed processing until we finish "starting" (OnNavigateTo)
+            //
+            if (_starting) return;
             await SaveGameState();
 
             if (e.PropertyName == "IsLocalGame")

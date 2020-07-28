@@ -4,7 +4,7 @@
     xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="This_TakeCardDlg" Title="Catan Card Exchange" Width="820" Height="750"
+    x:Name="This_TakeCardDlg" Title="Catan Card Exchange" Width="920" Height="850"
     CornerRadius="10" RequestedTheme="Dark" PrimaryButtonText="Accept and Continue"
     SecondaryButtonText="Cancel"
     IsPrimaryButtonEnabled="{x:Bind EnableOkButton(Destination.Count), Mode=OneWay}"
@@ -17,7 +17,7 @@
             <Setter Property="Foreground" Value="{x:Bind To.ForegroundBrush, Mode=OneWay}" />
         </Style>
     </ContentDialog.Resources>
-    <StackPanel Width="520" Height="440" CornerRadius="10" Background="{StaticResource ResourceType.GoldMine}">
+    <StackPanel Width="829" Height="460" CornerRadius="10" Background="{StaticResource ResourceType.GoldMine}">
         <GridView Name="GridView_Source" Grid.Row="2" Height="160" Margin="5"
             CornerRadius="5"
             Background="{x:Bind From.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Transparent}"
@@ -81,7 +81,7 @@
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:ResourceCardModel">
                     <Viewbox >
-                        <local:ResourceCardCtrl ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" />
+                        <local:ResourceCardCtrl ResourceCardModel="{x:Bind Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}"  />
                     </Viewbox>
                 </DataTemplate>
             </GridView.ItemTemplate>
@@ -98,10 +98,18 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Grid.ColumnSpan="2"
+            <Viewbox  Grid.ColumnSpan="2">
+                <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Grid.ColumnSpan="2"
                 Foreground="{x:Bind To.ForegroundBrush, Mode=OneWay}"
                 Text="{x:Bind Instructions, Mode=OneWay}"
                 TextAlignment="Left" FontSize="25" HorizontalTextAlignment="Center" />
+            </Viewbox>
         </Grid>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom"   Background="{x:Bind From.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Transparent}"
+            BorderBrush="{x:Bind From.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Black}">
+            
+                <ToggleSwitch IsOn="{x:Bind ConsolidateCards, Mode=TwoWay}" OnContent="Grouped" OffContent="Flattened" Margin="10, 0, 10, 0"/>
+            
+        </StackPanel>
     </StackPanel>
 </ContentDialog>

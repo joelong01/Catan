@@ -19,7 +19,7 @@ namespace Catan10
             TestGrantEntitlements logHeader = new TestGrantEntitlements()
             {
                 SentBy = gameController.CurrentPlayer,
-                LogType = LogType.DoNotLog,
+                LogType = LogType.Normal,
                 Entitlements = entitlements,
                 TradeResources = tradeResources,
                 DevCards = devCards

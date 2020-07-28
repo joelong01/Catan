@@ -32,7 +32,7 @@ namespace Catan10
                 //  this is about having too many cards
                 //
 
-                Contract.Assert(gameController.TheHuman.GameData.Resources.ResourcesThisTurn.Count == 0);
+                Contract.Assert(gameController.TheHuman.GameData.Resources.ResourcesThisTurn.ResourceCount == 0);
                 int loss = (int)gameController.TheHuman.GameData.Resources.Current.Count / 2;
                 TradeResources lost = new TradeResources();
                 ResourceCardCollection source = new ResourceCardCollection(false);
@@ -40,12 +40,14 @@ namespace Catan10
                 TakeCardDlg dlg = new TakeCardDlg()
                 {
                     To = gameController.MainPageModel.Bank,
-                    From = gameController.TheHuman,
+                    From = gameController.CurrentPlayer,
                     SourceOrientation = TileOrientation.FaceUp,
+                    CountVisible = true,
                     HowMany = loss,
                     Source = source,
-                    Destination = new ResourceCardCollection(),
-                    Instructions = $"Give {loss} cards to the bank."
+                    Destination = new ResourceCardCollection(false),                    
+                    Instructions = $"Give {loss} cards to the bank.",
+                    ConsolidateCards = false,
                 };
                 var ret = await dlg.ShowAsync();
                 if (ret == ContentDialogResult.Primary)

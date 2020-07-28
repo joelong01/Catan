@@ -27,6 +27,7 @@ namespace Catan10
 
         private async Task CreateAndConfigureProxy()
         {
+            this.TraceMessage("Creating Proxy");
             try
             {
                 using (new FunctionTimer("CreateAndConfigureProxy"))
@@ -317,7 +318,7 @@ namespace Catan10
             }
             if (message.From == TheHuman.PlayerName)
             {
-                MainPageModel.UnprocessedMessages--;
+                MainPageModel.ChangeUnprocessMessage(-1);
             }
         }
 

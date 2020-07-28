@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Catan.Proxy;
 
 using Catan10.CatanService;
-
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -423,7 +423,7 @@ namespace Catan10
                 MessageType = messageType
             };
 
-            MainPageModel.UnprocessedMessages++;
+            MainPageModel.ChangeUnprocessMessage(1);
             return ProcessMessage(message);
         }
 
@@ -564,7 +564,7 @@ namespace Catan10
                 To = "*"
             };
 
-            MainPageModel.UnprocessedMessages++;
+            MainPageModel.ChangeUnprocessMessage(1);
 
             //
             //  if you start spy before a game starts, nobody is there to recieve the message and decrement the message counter...
@@ -583,7 +583,7 @@ namespace Catan10
             {
                 await MainPageModel.CatanService.SendBroadcastMessage(message);
             }
-
+            this.TraceMessage($"returning PostMessage {message.DataTypeName} for id={message.MessageId}");
             return (!MainPageModel.Settings.IsLocalGame);
         }
 
