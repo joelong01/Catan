@@ -322,11 +322,20 @@ namespace Catan10
         /// <returns>true if everybody has rolled and their are no ties</returns>
         public async Task<bool> DetermineRollOrder(RollOrderLog logEntry)
         {
-
+            //
+            //  7/28/2020: if two (or more) people are tied, a dialog box pops below.  if the person doesn't clear it, and there is a second tie
+            //             then it will want to pop the dialog again, which will throw.  this checks to see if the dialog box is open, and if so
+            //             waits on a TCS, where the result is set when the dialog closes.  this was found via an assert on the order of players
+            //             and careful log analysis.
+            //  
+            TaskCompletionSource<object> tcsDialog = null;
             if (VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0)
             {
-                this.TraceMessage("a dialog is open...returning");
-                return false;
+                this.TraceMessage("a dialog is open...waiting on tcs");
+                tcsDialog = new TaskCompletionSource<object>();
+                await tcsDialog.Task;
+                tcsDialog = null;
+                this.TraceMessage("continuing after waiting for dialog to close");
             }
 
             //
@@ -379,6 +388,11 @@ namespace Catan10
                         };
 
                         await dlg.ShowAsync();
+
+                        if (tcsDialog != null)
+                        {
+                            tcsDialog.TrySetResult(null);                            
+                        }
                     }
 
                     //
