@@ -28,10 +28,10 @@ namespace Catan10
 
         #region Methods
 
-        private void InitTest ()
+        private void InitTest()
         {
         }
-        private async Task LoseHalfYourCards ()
+        private async Task LoseHalfYourCards()
         {
             int loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
             CurrentPlayer = TheHuman;
@@ -48,8 +48,8 @@ namespace Catan10
 
                 CurrentPlayer.GameData.Resources.GrantResources(tr);
             }
-            
-           
+
+
             loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
             if (loss >= 4)
             {
@@ -62,7 +62,7 @@ namespace Catan10
                     SourceOrientation = TileOrientation.FaceUp,
                     CountVisible = true,
                     HowMany = loss,
-                    Source = rc,                    
+                    Source = rc,
                     Destination = new ResourceCardCollection(false),
                     Instructions = $"Give {loss} cards to the bank.",
                     ConsolidateCards = false,
@@ -75,7 +75,7 @@ namespace Catan10
             }
         }
 
-        private async void Menu_OnResetService (object sender, RoutedEventArgs e)
+        private async void Menu_OnResetService(object sender, RoutedEventArgs e)
         {
 
             await CreateAndConfigureProxy();
@@ -83,18 +83,18 @@ namespace Catan10
 
 
         }
-        private async void OnGrantEntitlements (object sender, RoutedEventArgs e)
+        private async void OnGrantEntitlements(object sender, RoutedEventArgs e)
         {
             await TestGrantEntitlementMessage();
         }
 
-        private async void OnGrantResources (object sender, RoutedEventArgs e)
+        private async void OnGrantResources(object sender, RoutedEventArgs e)
         {
             TradeResources tr = new TradeResources()
             {
                 Sheep = 1,
-                Wheat = 3,
-                Ore = 2,
+                Wheat = 1,
+                Ore = 1,
                 Brick = 1,
                 Wood = 1
             };
@@ -102,8 +102,29 @@ namespace Catan10
             await TestGrantEntitlements.Post(this, tr, new List<Entitlement>(), new List<DevCardType>());
         }
 
+        private async void OnGrantDevCard(object sender, RoutedEventArgs e)
+        {
+            string tag = ((FrameworkElement) sender).Tag as string;
+            var dc = new List<DevCardType>();
+            if (tag == "All")
+            {
+                dc.Add(DevCardType.Knight);
+                dc.Add(DevCardType.YearOfPlenty);
+                dc.Add(DevCardType.Monopoly);
+                dc.Add(DevCardType.RoadBuilding);
+                dc.Add(DevCardType.VictoryPoint);                
+            }
+            else
+            {
+                DevCardType devCardType = Enum.Parse<DevCardType>(tag);
+                dc.Add(devCardType);
+            }
+
+            await TestGrantEntitlements.Post(this, new TradeResources(), new List<Entitlement>(), dc);
+        }
+
         // int toggle = 0;
-        private async void OnTest1 (object sdr, RoutedEventArgs rea)
+        private async void OnTest1(object sdr, RoutedEventArgs rea)
         {
 
             var picker = new Windows.Storage.Pickers.FileOpenPicker();
@@ -134,13 +155,13 @@ namespace Catan10
         /// </summary>
         /// <param name="messages"></param>
         /// <returns></returns>
-        private async Task DoReplay (List<CatanMessage> messages)
+        private async Task DoReplay(List<CatanMessage> messages)
         {
             if (messages == null) return;
             if (messages.Count == 0) return;
             await EndGame();
             GameInfo gameInfo = null;
-            for (int i=0; i<messages.Count; i++)
+            for (int i = 0; i < messages.Count; i++)
             {
 
                 if (messages[i].MessageType == MessageType.Ack) continue;
@@ -148,16 +169,16 @@ namespace Catan10
                 CatanMessage parsedMessage = null;
                 try
                 {
-                     parsedMessage =  CatanSignalRClient.ParseMessage(messages[i]);
+                    parsedMessage = CatanSignalRClient.ParseMessage(messages[i]);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.TraceMessage($"{e}");
                     Debugger.Break();
                     continue;
                 }
-                
-                 switch (parsedMessage.MessageType)
+
+                switch (parsedMessage.MessageType)
                 {
                     case MessageType.PrivateMessage:
                     case MessageType.BroadcastMessage:
@@ -203,18 +224,18 @@ namespace Catan10
 
         }
 
-        private async void OnTest2 (object sdr, RoutedEventArgs rea)
+        private async void OnTest2(object sdr, RoutedEventArgs rea)
         {
             await LoseHalfYourCards();
         }
 
         // Undo
-        private async void OnTest3 (object sdr, RoutedEventArgs rea)
+        private async void OnTest3(object sdr, RoutedEventArgs rea)
         {
             await TestGrantEntitlementMessage();
         }
 
-        private void OnTestExpansionGame (object sender, RoutedEventArgs e)
+        private void OnTestExpansionGame(object sender, RoutedEventArgs e)
         {
             //AnimationSpeedBase = 10; // speed up the animations
             //RandomGoldTileCount = 3;
@@ -239,7 +260,7 @@ namespace Catan10
             //await PickSettlementsAndRoads();
         }
 
-        private void OnTestRegularGame (object sender, RoutedEventArgs e)
+        private void OnTestRegularGame(object sender, RoutedEventArgs e)
         {
             //AnimationSpeedBase = 10; // speed up the animations
 
@@ -264,7 +285,7 @@ namespace Catan10
             //await PickSettlementsAndRoads();
         }
 
-        private async void OnTestService (object sender, RoutedEventArgs e)
+        private async void OnTestService(object sender, RoutedEventArgs e)
         {
             await CreateAndConfigureProxy();
 
@@ -274,7 +295,7 @@ namespace Catan10
             List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
             MainPageModel.CatanService.OnGameDeleted += CatanService_OnGameDeleted;
 
-            void CatanService_OnGameDeleted (GameInfo gameInfo, string by)
+            void CatanService_OnGameDeleted(GameInfo gameInfo, string by)
             {
                 this.TraceMessage($"Deleted game={gameInfo} by {by}");
                 if (gameInfo.Id == id)
@@ -299,7 +320,7 @@ namespace Catan10
             tcs = new TaskCompletionSource<object>();
 
             MainPageModel.CatanService.OnGameCreated += CatanService_OnGameCreated;
-            void CatanService_OnGameCreated (GameInfo gameInfo, string playerName)
+            void CatanService_OnGameCreated(GameInfo gameInfo, string playerName)
             {
                 if (gameInfo.Id == id)
                 {
@@ -323,7 +344,7 @@ namespace Catan10
 
             tcs = new TaskCompletionSource<object>();
             MainPageModel.CatanService.OnGameJoined += CatanService_OnGameJoined;
-            void CatanService_OnGameJoined (GameInfo gameInfo, string playerName)
+            void CatanService_OnGameJoined(GameInfo gameInfo, string playerName)
             {
                 if (playerName == TheHuman.PlayerName && gameInfo.Id == id)
                 {
@@ -347,7 +368,7 @@ namespace Catan10
 
         }
 
-        private async Task TestGrantEntitlementMessage ()
+        private async Task TestGrantEntitlementMessage()
         {
             TradeResources tr = new TradeResources()
             {
@@ -374,7 +395,7 @@ namespace Catan10
             await TestGrantEntitlements.Post(this, tr, entitlements, devCards);
         }
 
-        private void TestStats ()
+        private void TestStats()
         {
             CurrentPlayer.GameData.Score++;
 
@@ -391,7 +412,7 @@ namespace Catan10
             CurrentPlayer.GameData.Resources.TotalResources = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5, Brick = 10 };
         }
 
-        private async Task TestTargetPlayer ()
+        private async Task TestTargetPlayer()
         {
             var source = new ResourceCardCollection(false);
             var destination = new ResourceCardCollection(false);
@@ -415,7 +436,7 @@ namespace Catan10
             this.TraceMessage($"ret= {ret} Cards={ResourceCardCollection.ToTradeResources(dlg.Destination)}");
         }
 
-        private void TestTrade ()
+        private void TestTrade()
         {
 
             TradeResources tr = new TradeResources()
@@ -491,7 +512,7 @@ namespace Catan10
 
         }
 
-        private void TestTrades2 ()
+        private void TestTrades2()
         {
             MainPageModel.Settings.IsLocalGame = true;
             GameInfo info = new GameInfo()
@@ -588,7 +609,7 @@ namespace Catan10
 
         }
 
-        private async Task TestYearOfPlenty ()
+        private async Task TestYearOfPlenty()
         {
             TradeResources tr = new TradeResources()
             {
@@ -622,7 +643,7 @@ namespace Catan10
             this.TraceMessage($"{ResourceCardCollection.ToTradeResources(dlg.Destination)}");
         }
 
-        private async Task TradeGoldTest ()
+        private async Task TradeGoldTest()
         {
 
             int goldCards = 2;
@@ -665,7 +686,7 @@ namespace Catan10
             var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
             this.TraceMessage("trade gold: " + picked.ToString());
         }
-        private void VerifyRoundTrip<T> (T model)
+        private void VerifyRoundTrip<T>(T model)
         {
             //var options = new JsonSerializerOptions() { WriteIndented = true };
             //options.Converters.Add(new JsonStringEnumConverter());

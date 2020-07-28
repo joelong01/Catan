@@ -95,6 +95,18 @@
                             <MenuFlyoutItem Text="Change Count" Click="OnChangeRandomGoldTileCount" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
+                        <MenuFlyoutSubItem Text="Resource Tests">
+                            <MenuFlyoutSubItem Text="Resource Cards">
+                                <MenuFlyoutItem Text="All" Click="OnGrantDevCard" Tag="All" />
+                                <MenuFlyoutItem Text="Year of Plenty" Click="OnGrantDevCard" Tag="YearOfPlenty" />
+                                <MenuFlyoutItem Text="Knight" Click="OnGrantDevCard" Tag="Knight" />
+                                <MenuFlyoutItem Text="Road Building" Click="OnGrantDevCard" Tag="RoadBuilding" />
+                                <MenuFlyoutItem Text="Monopoly" Click="OnGrantDevCard" Tag="Monopoly" />
+                                <MenuFlyoutItem Text="Victory Point" Click="OnGrantDevCard" Tag="VictoryPoint" />
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="Grant Resources" Click="OnGrantResources" />
+                        </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Development">
                             <MenuFlyoutItem Text="Show Catan Spy" Click="OnShowCatanSpy" />
                             <MenuFlyoutSeparator />

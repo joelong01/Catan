@@ -1276,5 +1276,7 @@ namespace Catan10
             };
             await appWindow.TryShowAsync();
         }
+
+        
     }
 }
