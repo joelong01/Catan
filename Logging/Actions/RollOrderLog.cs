@@ -40,11 +40,7 @@ namespace Catan10
                 if (finished) // whoever wins sends the message saying we have finished rolling for order
                 {
                     await RollOrderFinalizedLog.PostLog(gameController, gameController.PlayingPlayers);
-                }
-                else
-                {
-                    await gameController.ResetRollControl();
-                }
+                }                
             }
         }
 
