@@ -416,7 +416,7 @@ namespace Catan10
             }
             finally
             {
-                if (tcsDialog != null && tcsDialog.Task.IsCompleted == false)
+                if (tcsDialog != null)
                 {
                     tcsDialog.TrySetResult(null);
                 }
