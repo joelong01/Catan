@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -322,13 +323,11 @@ namespace Catan10
             //             waits on a TCS, where the result is set when the dialog closes.  this was found via an assert on the order of players
             //             and careful log analysis.
             //
-            TaskCompletionSource<object> tcsDialog = null;
+            TaskCompletionSource<object> tcsDialog = new TaskCompletionSource<object>();
             if (VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0)
             {
                 this.TraceMessage("a dialog is open...waiting on tcs");
-                tcsDialog = new TaskCompletionSource<object>();
                 await tcsDialog.Task;
-                tcsDialog = null;
                 this.TraceMessage("continuing after waiting for dialog to close");
             }
             try
@@ -416,10 +415,8 @@ namespace Catan10
             }
             finally
             {
-                if (tcsDialog != null)
-                {
-                    tcsDialog.TrySetResult(null);
-                }
+                Debug.Assert(!tcsDialog.Task.IsCompleted);
+                tcsDialog.TrySetResult(null);                
             }
         }
 
