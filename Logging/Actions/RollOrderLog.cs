@@ -35,9 +35,16 @@ namespace Catan10
             gameController.ShowRollsInPublicUi();
             bool finished = await gameController.DetermineRollOrder(this);
 
-            if (finished && gameController.TheHuman == gameController.CurrentPlayer) // whoever wins sends the message saying we have finished rolling for order
+            if (gameController.TheHuman == gameController.CurrentPlayer)
             {
-                await RollOrderFinalizedLog.PostLog(gameController, gameController.PlayingPlayers);
+                if (finished) // whoever wins sends the message saying we have finished rolling for order
+                {
+                    await RollOrderFinalizedLog.PostLog(gameController, gameController.PlayingPlayers);
+                }
+                else
+                {
+                    await gameController.ResetRollControl();
+                }
             }
         }
 
