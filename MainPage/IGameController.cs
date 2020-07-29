@@ -317,19 +317,7 @@ namespace Catan10
         /// <returns>true if everybody has rolled and their are no ties</returns>
         public async Task<bool> DetermineRollOrder(RollOrderLog logEntry)
         {
-            //
-            //  7/28/2020: if two (or more) people are tied, a dialog box pops below.  if the person doesn't clear it, and there is a second tie
-            //             then it will want to pop the dialog again, which will throw.  this checks to see if the dialog box is open, and if so
-            //             waits on a TCS, where the result is set when the dialog closes.  this was found via an assert on the order of players
-            //             and careful log analysis.
-            //
-            TaskCompletionSource<object> tcsDialog = new TaskCompletionSource<object>();
-            if (VisualTreeHelper.GetOpenPopups(Window.Current).Count > 0)
-            {
-                this.TraceMessage("a dialog is open...waiting on tcs");
-                await tcsDialog.Task;
-                this.TraceMessage("continuing after waiting for dialog to close");
-            }
+
             try
             {
                 //
@@ -362,8 +350,7 @@ namespace Catan10
                     if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.Roll < 0) return false;
                 }
 
-                bool somebodyIsTied = false;
-
+                
                 //
                 //  they will be notified by the check above, but we need to bail out of the function
                 //  give everybody who is tied a
@@ -372,7 +359,7 @@ namespace Catan10
                     var tiedPlayers = PlayerInTie(p); // yes this is n!.  for 5 max...
                     if (tiedPlayers.Count > 0)
                     {
-                        if (p == TheHuman)
+                        if (p == TheHuman && VisualTreeHelper.GetOpenPopups(Window.Current).Count == 0) // if the dialog is already shown, don't show it again
                         {
                             ContentDialog dlg = new ContentDialog()
                             {
@@ -386,14 +373,19 @@ namespace Catan10
 
                         //
                         //  waiting for a roll from p...
-                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = -1;
-                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = -1;
-                        somebodyIsTied = true;
-                        await ResetRollControl();
+                        if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne != -1)
+                        {
+                            p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = -1;
+                            p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = -1;
+                            await ResetRollControl();
+                        }
+
+                        return false; // somebody is tied, we are not done
+
                     }
                 }
 
-                if (somebodyIsTied) return false;
+                
 
                 //
                 //  we got here because nobody is tied and all rolls have come in
@@ -415,8 +407,7 @@ namespace Catan10
             }
             finally
             {
-                Debug.Assert(!tcsDialog.Task.IsCompleted);
-                tcsDialog.TrySetResult(null);                
+
             }
         }
 
