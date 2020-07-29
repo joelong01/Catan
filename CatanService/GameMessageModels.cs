@@ -14,7 +14,7 @@ namespace Catan10.CatanService
 
         #region Methods
 
-        public static CatanMessage CreateMessage (CatanMessage msgToAck)
+        public static CatanMessage CreateMessage (CatanMessage msgToAck, string playerName)
         {
             var model = new AckModel()
             {
@@ -26,7 +26,7 @@ namespace Catan10.CatanService
                 ActionType = ActionType.Normal,
                 Data = (object)model,
                 DataTypeName = typeof(AckModel).FullName,
-                From = MainPage.Current.TheHuman.PlayerName,
+                From = playerName,
                 MessageType = MessageType.Ack,
                 Sequence = 0,
                 GameInfo = msgToAck.GameInfo,

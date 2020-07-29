@@ -13,6 +13,7 @@ using Catan.Proxy;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 
+using Windows.ApplicationModel.Contacts;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -210,7 +211,6 @@ namespace Catan10.CatanService
             try
             {
                 this.GameInfo = gameInfo;
-                this.PlayerName = gameInfo.Creator;
                 CatanMessage message = new CatanMessage()
                 {
                     MessageType = MessageType.CreateGame,
@@ -319,9 +319,14 @@ namespace Catan10.CatanService
             HubConnection.Remove("Pong");
         }
 
-        public async Task Initialize(string host, ICollection<CatanMessage> messageLog)
+        public async Task Initialize(string host, ICollection<CatanMessage> messageLog, string theHumanName)
         {
+            Contract.Assert(!String.IsNullOrEmpty(theHumanName));
+            Contract.Assert(messageLog != null);
+            Contract.Assert(!String.IsNullOrEmpty(host));
+
             MessageLog = messageLog;
+            this.PlayerName = theHumanName;
             this.Host = host;
             try
             {
@@ -400,7 +405,7 @@ namespace Catan10.CatanService
                     //
                     //  when we get the message, immediately send the ack -- don't switch threads to do so.
                     this.TraceMessage($"recieved id {message.MessageId}");
-                    var ack = AckModel.CreateMessage(message);
+                    var ack = AckModel.CreateMessage(message, PlayerName);
                     this.TraceMessage($"sent Ack: {((AckModel)ack.Data).AckedMessageId}");
                     await PostHubMessage(ack);
                     await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -421,7 +426,7 @@ namespace Catan10.CatanService
                     //  when we get the message, immediately send the ack -- don't switch threads to do so.
                     using (new FunctionTimer($"Ack + Process.  Id={message.MessageId} Type={message.DataTypeName}", true))
                     {
-                        var ack = AckModel.CreateMessage(message);
+                        var ack = AckModel.CreateMessage(message, PlayerName);
                         await PostHubMessage(ack);
                     }
 
@@ -518,7 +523,6 @@ namespace Catan10.CatanService
             if (String.IsNullOrEmpty(playerName)) throw new ArgumentException("PlayerName can't be null");
 
             this.GameInfo = gameInfo;
-            this.PlayerName = playerName;
 
             try
             {
@@ -817,7 +821,7 @@ namespace Catan10.CatanService
                 this.OnPong -= PongReceived;
                 watch.Stop();
                 this.TraceMessage($"pong timed out: {watch.ElapsedMilliseconds}ms");
-                await this.Initialize(this.Host, MessageLog);
+                await this.Initialize(this.Host, MessageLog, this.PlayerName);
                 await this.RejoinGame(this.GameInfo, this.PlayerName);
                 return false;
             }

@@ -65,7 +65,7 @@ namespace Catan10
                     MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
                     MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
 
-                    await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.Log.MessageLog as ICollection<CatanMessage>);
+                    await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.Log.MessageLog as ICollection<CatanMessage>, TheHuman.PlayerName);
                     await MainPageModel.CatanService.StartConnection(MainPageModel.GameInfo, TheHuman.PlayerName);
                 }
             }
@@ -243,7 +243,7 @@ namespace Catan10
 
                     using (new FunctionTimer("MainPageModel.CatanService.Initialize"))
                     {
-                        await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.Log.MessageLog);
+                        await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.Log.MessageLog, TheHuman.PlayerName);
                     }
 
                     CatanAction action;

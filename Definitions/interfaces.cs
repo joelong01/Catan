@@ -76,7 +76,7 @@ namespace Catan10
         /// <param name="hostName"></param>
         /// <param name="gameInfo"></param>
         /// <returns></returns>
-        Task Initialize(string hostName, ICollection<CatanMessage> messageLog);
+        Task Initialize(string hostName, ICollection<CatanMessage> messageLog, string playerName);
 
         Task<GameInfo> JoinGame(GameInfo info, string playerName);
 
