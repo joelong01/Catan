@@ -317,7 +317,7 @@ namespace Catan10
         /// <returns>true if everybody has rolled and their are no ties</returns>
         public async Task<bool> DetermineRollOrder(RollOrderLog logEntry)
         {
-
+         
             try
             {
                 //
@@ -350,7 +350,11 @@ namespace Catan10
                     if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.Roll < 0) return false;
                 }
 
-                
+                //
+                //  the reason you don't return emmediately is you need to find *all* the ties
+                //
+                bool somebodyIsTied = false;
+
                 //
                 //  they will be notified by the check above, but we need to bail out of the function
                 //  give everybody who is tied a
@@ -373,19 +377,18 @@ namespace Catan10
 
                         //
                         //  waiting for a roll from p...
-                        if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne != -1)
+                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = -1;
+                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = -1;
+                        somebodyIsTied = true;
+                        
+                        if (p == TheHuman)
                         {
-                            p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = -1;
-                            p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = -1;
                             await ResetRollControl();
                         }
-
-                        return false; // somebody is tied, we are not done
-
                     }
                 }
 
-                
+                if (somebodyIsTied) return false;
 
                 //
                 //  we got here because nobody is tied and all rolls have come in
@@ -407,7 +410,7 @@ namespace Catan10
             }
             finally
             {
-
+                     
             }
         }
 
