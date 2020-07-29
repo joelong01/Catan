@@ -40,7 +40,14 @@ namespace Catan10
                 if (finished) // whoever wins sends the message saying we have finished rolling for order
                 {
                     await RollOrderFinalizedLog.PostLog(gameController, gameController.PlayingPlayers);
-                }                
+                }
+            }
+            //
+            //  if the human needs to roll, reset the roll control to get a roll.  will never be true 
+            if (gameController.TheHuman.GameData.SyncronizedPlayerRolls.MustRoll)
+            {
+                Contract.Assert(!finished, "you can't be waiting for a roll if you are finished rolling!");
+                await gameController.ResetRollControl();
             }
         }
 
@@ -49,7 +56,7 @@ namespace Catan10
         /// </summary>
         /// <param name="gameController"></param>
         /// <returns></returns>
-        public Task Replay (IGameController gameController)
+        public Task Replay(IGameController gameController)
         {
             return Task.CompletedTask;
         }

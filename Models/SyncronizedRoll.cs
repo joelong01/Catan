@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Catan10
@@ -27,10 +25,11 @@ namespace Catan10
 
         private RollModel _rollModel = new RollModel();
 
-
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties
+
+        private bool _mustRoll = true;
 
         public RollModel CurrentRoll
         {
@@ -49,9 +48,23 @@ namespace Catan10
                 }
             }
         }
-
         public ObservableCollection<RollModel> LatestRolls { get; set; } = new ObservableCollection<RollModel>();
 
+        public bool MustRoll
+        {
+            get
+            {
+                return _mustRoll;
+            }
+            set
+            {
+                if (_mustRoll != value)
+                {
+                    _mustRoll = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         public List<int> RollValues { get; set; } = new List<int>();
 
         public bool ShowLatestRoll
@@ -93,8 +106,8 @@ namespace Catan10
                 }
             }
             NotifyPropertyChanged("LatestRolls");
-
-            RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);            
+            MustRoll = false;
+            RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);
             return CurrentRoll;
         }
 
@@ -109,7 +122,6 @@ namespace Catan10
                 return -1;
             }
 
-            
             int max = Math.Max(this.RollValues.Count, other.RollValues.Count);
 
             for (int i = 0; i < max; i++)

@@ -4,15 +4,13 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
-using Catan.Proxy;
+using Catan10.CatanService;
 
 using Windows.UI.Xaml;
-using Catan10.CatanService;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -55,12 +53,12 @@ namespace Catan10
         private int _ShipsPlayed = 0;
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
-        Trades _trades = new Trades();
-        
+        private Trades _trades = new Trades();
 
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties
+
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -300,7 +298,6 @@ namespace Catan10
             }
         }
 
-
         public PlayerModel PlayerModel
         {
             get
@@ -421,7 +418,6 @@ namespace Catan10
                 }
             }
         }
-
         [JsonIgnore]
         public ObservableCollection<RoadCtrl> Ships { get; } = new ObservableCollection<RoadCtrl>();
 
@@ -718,7 +714,7 @@ namespace Catan10
 
         #endregion Methods
     }
-    
+
     /// <summary>
     ///     The Data class that keeps track of trades.  the UI Lets you fill out a TradeOffer ("Request") and then you can add it to the PotentialTrades
     /// </summary>
@@ -728,9 +724,9 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        ObservableCollection<TradeOffer> _potentialTrades = new ObservableCollection<TradeOffer>();
+        private ObservableCollection<TradeOffer> _potentialTrades = new ObservableCollection<TradeOffer>();
 
-        TradeOffer _tradeRequest = new TradeOffer();
+        private TradeOffer _tradeRequest = new TradeOffer();
 
         #endregion Delegates + Fields + Events + Enums
 
@@ -752,27 +748,6 @@ namespace Catan10
             }
         }
 
-        public TradeOffer FindTradeByValue(TradeOffer offer)
-        {
-
-            foreach (var o in PotentialTrades)
-            {
-                //
-                //  need to be same players
-                if (o.Owner.Player != offer.Owner.Player) continue;
-                if (o.Partner.Player != offer.Partner.Player) continue;
-
-                //  with same resources
-                if (o.Owner.Resources.EqualValue(offer.Owner.Resources) == false) continue;
-                if (o.Partner.Resources.EqualValue(offer.Partner.Resources) == false) continue;
-                
-
-                return o;
-            }
-
-            return null;
-        }
-
         public TradeOffer TradeRequest
         {
             get
@@ -789,14 +764,30 @@ namespace Catan10
             }
         }
 
+        public TradeOffer FindTradeByValue(TradeOffer offer)
+        {
+            foreach (var o in PotentialTrades)
+            {
+                //
+                //  need to be same players
+                if (o.Owner.Player != offer.Owner.Player) continue;
+                if (o.Partner.Player != offer.Partner.Player) continue;
+
+                //  with same resources
+                if (o.Owner.Resources.EqualValue(offer.Owner.Resources) == false) continue;
+                if (o.Partner.Resources.EqualValue(offer.Partner.Resources) == false) continue;
+
+                return o;
+            }
+
+            return null;
+        }
         #endregion Properties
 
         #region Methods
 
-      
-    
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {            
+        {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 

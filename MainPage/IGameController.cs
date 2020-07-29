@@ -332,7 +332,7 @@ namespace Catan10
 
                 //
                 //  when this is called we either have no current rolls, or we hit a tie.
-                //  if we hit a tie, then the current roll == -1
+                //  if we hit a tie, then MustRoll == true
 
                 RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRoll(logEntry.Rolls);
 
@@ -342,12 +342,15 @@ namespace Catan10
 
                 //
                 //  7/4/2020: has everybody rolled? -- don't make any decisions until the rolls are in
-                //            we check to see if we are waiting for a roll by looking for a negative
-                //            value in CurrentRoll.Roll
+                //            we check to see if we are waiting for a roll by looking a flag
                 //
                 foreach (var p in MainPageModel.PlayingPlayers)
                 {
-                    if (p.GameData.SyncronizedPlayerRolls.CurrentRoll.Roll < 0) return false;
+                    if (p.GameData.SyncronizedPlayerRolls.MustRoll)
+                    {
+                        this.TraceMessage($"Waiting for a roll from {p.PlayerName}");
+                        return false;
+                    }
                 }
 
                 //
@@ -355,13 +358,18 @@ namespace Catan10
                 //
                 bool somebodyIsTied = false;
 
+
+
                 //
                 //  they will be notified by the check above, but we need to bail out of the function
                 //  give everybody who is tied a
                 foreach (var p in PlayingPlayers)
                 {
+                    //
+                    //  reset must roll flag
+                    p.GameData.SyncronizedPlayerRolls.MustRoll = false;
                     var tiedPlayers = PlayerInTie(p); // yes this is n!.  for 5 max...
-                    if (tiedPlayers.Count > 0)
+                    if (tiedPlayers.Count > 0) // this means player == p is tied with somebody
                     {
                         if (p == TheHuman && VisualTreeHelper.GetOpenPopups(Window.Current).Count == 0) // if the dialog is already shown, don't show it again
                         {
@@ -377,14 +385,8 @@ namespace Catan10
 
                         //
                         //  waiting for a roll from p...
-                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = -1;
-                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = -1;
-                        somebodyIsTied = true;
-                        
-                        if (p == TheHuman)
-                        {
-                            await ResetRollControl();
-                        }
+                        p.GameData.SyncronizedPlayerRolls.MustRoll = true;                        
+                        somebodyIsTied = true;                                                
                     }
                 }
 
