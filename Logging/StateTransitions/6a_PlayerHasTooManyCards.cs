@@ -40,7 +40,7 @@ namespace Catan10
                 TakeCardDlg dlg = new TakeCardDlg()
                 {
                     To = gameController.MainPageModel.Bank,
-                    From = gameController.CurrentPlayer,
+                    From = gameController.TheHuman,
                     SourceOrientation = TileOrientation.FaceUp,
                     CountVisible = true,
                     HowMany = loss,
