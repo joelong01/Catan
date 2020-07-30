@@ -37,7 +37,7 @@ namespace Catan10
             Client.OnAck += Client_OnAck;
             try
             {
-                using (new FunctionTimer("WaitForAllAcks", true))
+                using (new FunctionTimer("WaitForAllAcks"))
                 {
                   //  this.TraceMessage($"Waiting for acks on message: {MessageId}");
                     await TCS.Task.TimeoutAfter(timeoutMs);

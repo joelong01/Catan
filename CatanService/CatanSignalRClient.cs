@@ -101,7 +101,7 @@ namespace Catan10.CatanService
             }
             else
             {
-                this.TraceMessage($"message.Data is a string for {message}");
+              //  this.TraceMessage($"message.Data is a string for {message}");
             }
 
             await HubConnection.SendAsync("PostMessage", message);
@@ -273,11 +273,11 @@ namespace Catan10.CatanService
             void PongReceived()
             {
                 watch.Stop();
-                this.TraceMessage($"pong recieved took: {watch.ElapsedMilliseconds}ms");
+              //  this.TraceMessage($"pong recieved took: {watch.ElapsedMilliseconds}ms");
                 this.OnPong -= PongReceived;
                 tcs.TrySetResult(true);
             }
-            this.TraceMessage("sending ping");
+            //this.TraceMessage("sending ping");
             await HubConnection.InvokeAsync("Ping");
             try
             {
@@ -291,7 +291,7 @@ namespace Catan10.CatanService
 
                 this.OnPong -= PongReceived;
                 watch.Stop();
-                this.TraceMessage($"pong timed out: {watch.ElapsedMilliseconds}ms");
+               // this.TraceMessage($"pong timed out: {watch.ElapsedMilliseconds}ms");
                 await this.Initialize(this.Host, MessageLog, this.PlayerName);
                 await this.RejoinGame(this.GameInfo, this.PlayerName);
                 return false;
@@ -446,7 +446,7 @@ namespace Catan10.CatanService
                 {
                     //
                     //  when we get the message, immediately send the ack -- don't switch threads to do so.
-                    using (new FunctionTimer($"Ack + Process.  Id={message.MessageId} Type={message.DataTypeName}", true))
+                    using (new FunctionTimer($"Ack + Process.  Id={message.MessageId} Type={message.DataTypeName}"))
                     {
                         var ack = AckModel.CreateMessage(message, PlayerName);
                         await PostHubMessage(ack);
@@ -693,9 +693,9 @@ namespace Catan10.CatanService
         {
             if (BroadcastTcs != null && !BroadcastTcs.Task.IsCompleted)
             {
-                this.TraceMessage($"STARTED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
+              //  this.TraceMessage($"STARTED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
                 await BroadcastTcs.Task;
-                this.TraceMessage($"FINISHED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
+             //   this.TraceMessage($"FINISHED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
             }
 
             BroadcastTcs = new TaskCompletionSource<object>();

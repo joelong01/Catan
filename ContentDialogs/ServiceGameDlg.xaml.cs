@@ -316,12 +316,12 @@ namespace Catan10
 
         private void Proxy_OnGameJoined(GameInfo gameInfo, string playerName)
         {
-            this.TraceMessage($"{playerName} joined {gameInfo.Name}");
+           // this.TraceMessage($"{playerName} joined {gameInfo.Name}");
         }
 
         private void Proxy_OnGameLeft(GameInfo gameInfo, string playerName)
         {
-            this.TraceMessage($"{playerName} left {gameInfo.Name}");
+           // this.TraceMessage($"{playerName} left {gameInfo.Name}");
         }
 
         private void SetHostName(string value)

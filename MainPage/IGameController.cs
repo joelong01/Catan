@@ -360,6 +360,8 @@ namespace Catan10
 
                 }
 
+                this.TraceMessage("All rolls in.  looking for ties.");
+
                 //
                 //  the reason you don't return emmediately is you need to find *all* the ties
                 //
@@ -378,8 +380,13 @@ namespace Catan10
                     var tiedPlayers = PlayerInTie(p); // yes this is n!.  for 5 max...
                     if (tiedPlayers.Count > 0) // this means player == p is tied with somebody
                     {
+                        p.GameData.SyncronizedPlayerRolls.MustRoll = true;
+                        somebodyIsTied = true;
+
                         if (p == TheHuman && VisualTreeHelper.GetOpenPopups(Window.Current).Count == 0) // if the dialog is already shown, don't show it again
                         {
+                            //
+                            //  waiting for a roll from p...                            
                             ContentDialog dlg = new ContentDialog()
                             {
                                 Title = "Catan - Roll For Order",
@@ -388,12 +395,7 @@ namespace Catan10
                             };
 
                             await dlg.ShowAsync();
-                        }
-
-                        //
-                        //  waiting for a roll from p...
-                        p.GameData.SyncronizedPlayerRolls.MustRoll = true;                        
-                        somebodyIsTied = true;                                                
+                        }                                                                                                                          
                     }
                 }
 
@@ -621,7 +623,7 @@ namespace Catan10
             {
                 await MainPageModel.CatanService.SendBroadcastMessage(message);
             }
-            this.TraceMessage($"returning PostMessage {message.DataTypeName} for id={message.MessageId}");
+          //  this.TraceMessage($"returning PostMessage {message.DataTypeName} for id={message.MessageId}");
             return (!MainPageModel.Settings.IsLocalGame);
         }
 
