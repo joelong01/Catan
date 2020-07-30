@@ -317,7 +317,7 @@ namespace Catan10
         /// <returns>true if everybody has rolled and their are no ties</returns>
         public async Task<bool> DetermineRollOrder(RollOrderLog logEntry)
         {
-         
+
             try
             {
                 //
@@ -366,37 +366,48 @@ namespace Catan10
                 //  the reason you don't return emmediately is you need to find *all* the ties
                 //
                 bool somebodyIsTied = false;
-
+                bool showDialog = false;
 
 
                 //
-                //  they will be notified by the check above, but we need to bail out of the function
-                //  give everybody who is tied a
+                //  7/29/2020: be sure and loop over *all* the players and set which ones are in a tie and need to roll again.
+                //  
+                List<PlayerModel> playersInTie = new List<PlayerModel>();
                 foreach (var p in PlayingPlayers)
                 {
                     //
-                    //  reset must roll flag
-                    p.GameData.SyncronizedPlayerRolls.MustRoll = false;
-                    var tiedPlayers = PlayerInTie(p); // yes this is n!.  for 5 max...
-                    if (tiedPlayers.Count > 0) // this means player == p is tied with somebody
+                    //  reset MustRoll flag
+                    p.GameData.SyncronizedPlayerRolls.MustRoll = false;                    
+                    if (PlayerInTie(p).Count > 0) // this means player == p is tied with somebody
                     {
+                        playersInTie.Add(p); // we will catch the one that we are tied when we iterate to that player
                         p.GameData.SyncronizedPlayerRolls.MustRoll = true;
                         somebodyIsTied = true;
-
-                        if (p == TheHuman && VisualTreeHelper.GetOpenPopups(Window.Current).Count == 0) // if the dialog is already shown, don't show it again
+                        if (p == TheHuman)
                         {
                             //
-                            //  waiting for a roll from p...                            
-                            ContentDialog dlg = new ContentDialog()
-                            {
-                                Title = "Catan - Roll For Order",
-                                Content = $"You are tied with {PlayerListToCsv(tiedPlayers)}.\n\nRollAgain.",
-                                CloseButtonText = "Ok",
-                            };
-
-                            await dlg.ShowAsync();
-                        }                                                                                                                          
+                            //  if TheHuman is tied, show the dialog
+                            showDialog = true;
+                        }
                     }
+                }
+                if (somebodyIsTied)
+                {
+                    this.TraceMessage($"Players {PlayerListToCsv(playersInTie)} are tied");
+                }
+
+                if (showDialog && VisualTreeHelper.GetOpenPopups(Window.Current).Count == 0) // if the dialog is already shown, don't show it again
+                {
+                    //
+                    //  waiting for a roll from p...                            
+                    ContentDialog dlg = new ContentDialog()
+                    {
+                        Title = "Catan - Roll For Order",
+                        Content = $"You are tied with {PlayerListToCsv(playersInTie)}.\n\nRollAgain.",
+                        CloseButtonText = "Ok",
+                    };
+
+                    await dlg.ShowAsync();
                 }
 
                 if (somebodyIsTied) return false;
@@ -423,7 +434,7 @@ namespace Catan10
             }
             finally
             {
-                     
+
             }
         }
 
@@ -623,7 +634,7 @@ namespace Catan10
             {
                 await MainPageModel.CatanService.SendBroadcastMessage(message);
             }
-          //  this.TraceMessage($"returning PostMessage {message.DataTypeName} for id={message.MessageId}");
+            //  this.TraceMessage($"returning PostMessage {message.DataTypeName} for id={message.MessageId}");
             return (!MainPageModel.Settings.IsLocalGame);
         }
 
