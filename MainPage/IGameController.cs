@@ -344,13 +344,20 @@ namespace Catan10
                 //  7/4/2020: has everybody rolled? -- don't make any decisions until the rolls are in
                 //            we check to see if we are waiting for a roll by looking a flag
                 //
+                List<PlayerModel> waiting = new List<PlayerModel>();
                 foreach (var p in MainPageModel.PlayingPlayers)
                 {
                     if (p.GameData.SyncronizedPlayerRolls.MustRoll)
                     {
-                        this.TraceMessage($"Waiting for a roll from {p.PlayerName}");
-                        return false;
+                        waiting.Add(p);
                     }
+                }
+
+                if (waiting.Count > 0)
+                {
+                    this.TraceMessage($"Waiting for Rolls from {PlayerListToCsv(waiting)}");
+                    return false;
+
                 }
 
                 //
@@ -391,6 +398,8 @@ namespace Catan10
                 }
 
                 if (somebodyIsTied) return false;
+
+                this.TraceMessage("All Rolls in.  Setting final order");
 
                 //
                 //  we got here because nobody is tied and all rolls have come in

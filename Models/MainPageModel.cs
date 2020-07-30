@@ -488,7 +488,7 @@ namespace Catan10
 
         public int ChangeUnprocessMessage(int value, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
-            this.TraceMessage($"[Value={_unprocessedMessages + value}][OldValue={_unprocessedMessages}] [Delta={value}] State=[{MainPage.Current.MainPageModel.GameState}]", 1, cmb, cln, cfp);
+            //this.TraceMessage($"[Value={_unprocessedMessages + value}][OldValue={_unprocessedMessages}] [Delta={value}] State=[{MainPage.Current.MainPageModel.GameState}]", 1, cmb, cln, cfp);
             _unprocessedMessages += value;
             NotifyPropertyChanged();
             DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
