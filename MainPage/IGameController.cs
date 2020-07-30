@@ -586,9 +586,9 @@ namespace Catan10
             if (count == 2) return $"{players[0].PlayerName} and {players[1].PlayerName}";
 
             string s = $"{players[0].PlayerName}, ";
-            for (int i = 1; i < count - 2; i++)
+            for (int i = 1; i < count - 1; i++)
             {
-                s += $"{players[i + 1].PlayerName}, ";
+                s += $"{players[i].PlayerName}, ";
             }
             s += $"and {players[count - 1].PlayerName}";
             return s;
