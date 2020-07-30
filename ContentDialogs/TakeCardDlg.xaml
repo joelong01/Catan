@@ -17,8 +17,8 @@
             <Setter Property="Foreground" Value="{x:Bind To.ForegroundBrush, Mode=OneWay}" />
         </Style>
     </ContentDialog.Resources>
-    <StackPanel Width="829" Height="460" CornerRadius="10" Background="{StaticResource ResourceType.GoldMine}">
-        <GridView Name="GridView_Source" Grid.Row="2" Height="160" Margin="5"
+    <StackPanel Width="820" Height="400" CornerRadius="10" Background="{StaticResource ResourceType.GoldMine}">
+        <GridView Name="GridView_Source" Grid.Row="2" Height="140" Margin="5"
             CornerRadius="5"
             Background="{x:Bind From.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Transparent}"
             BorderBrush="{x:Bind From.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Black}"
@@ -30,7 +30,7 @@
             IsHitTestVisible="True"
             ItemsSource="{x:Bind Source, Mode=OneWay}">
             <GridView.Header>
-                <Border Height="50" Margin="5,5,0,0" Background="{x:Bind From.BackgroundBrush, Mode=OneWay}">
+                <Border Height="30" Margin="5,5,0,0" Background="{x:Bind From.BackgroundBrush, Mode=OneWay}">
                     <Grid>
                         <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind From.ImageBrush, Mode=OneWay}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -55,7 +55,7 @@
                 </Style>
             </GridView.ItemContainerStyle>
         </GridView>
-        <GridView Name="GridView_Destination" Height="160" Margin="5"
+        <GridView Name="GridView_Destination" Height="140" Margin="5"
             HorizontalAlignment="Stretch" CornerRadius="10" IsHitTestVisible="True"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
@@ -68,7 +68,7 @@
             BorderThickness="2"
             ItemsSource="{x:Bind Destination, Mode=OneWay}">
             <GridView.Header>
-                <Border Height="50" Margin="5,0,0,0" Background="{x:Bind To.BackgroundBrush, Mode=OneWay}">
+                <Border Height="30" Margin="5,0,0,0" Background="{x:Bind To.BackgroundBrush, Mode=OneWay}">
                     <Grid>
                         <Ellipse Width="30" Height="30" HorizontalAlignment="Left" Fill="{x:Bind To.ImageBrush, Mode=OneWay}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -105,7 +105,7 @@
                 TextAlignment="Left" FontSize="25" HorizontalTextAlignment="Center" />
             </Viewbox>
         </Grid>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom"   Background="{x:Bind From.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Transparent}"
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom"   Background="{x:Bind From.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Transparent}" Visibility="Collapsed" 
             BorderBrush="{x:Bind From.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=Black}">
             
                 <ToggleSwitch IsOn="{x:Bind ConsolidateCards, Mode=TwoWay}" OnContent="Grouped" OffContent="Flattened" Margin="10, 0, 10, 0"/>
