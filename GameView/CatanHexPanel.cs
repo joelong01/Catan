@@ -225,7 +225,7 @@ namespace Catan10
                         //  tag the Building with the tile and the position
 
                         bool cloned = FindBuildingAtVisualLocation(point, Buildings, location, tile, out BuildingCtrl building);
-                        if (!cloned)
+                        if (!cloned && count < Buildings.Count)
                         {
                             building = Buildings[count];
                             building.LayoutPoint = point;
@@ -793,9 +793,9 @@ namespace Catan10
             //  Build the roads and buildings on the TopLayer
             CreateBuildings();
 
-            maxSize.Width = (_normalWidth + TileGap) * (_colCount - 1) + 2 * UniformMargin;
+            maxSize.Width = (_normalWidth + TileGap) * (_colCount - 1) + UniformMargin.Left + UniformMargin.Right;
 
-            maxSize.Height = (_normalHeight + TileGap) * RowCounts[middleCol] + 2 * UniformMargin;
+            maxSize.Height = (_normalHeight + TileGap) * RowCounts[middleCol] + UniformMargin.Top + UniformMargin.Bottom;
 
             return maxSize;
         }
@@ -1194,10 +1194,9 @@ namespace Catan10
         //  layers
         public Grid TopLayer { get; set; } = new Grid();
 
-        // given a tile, tell me what Island it is in
-        public double UniformMargin
+        public Thickness UniformMargin
         {
-            get => (double)GetValue(UniformMarginProperty);
+            get => (Thickness)GetValue(UniformMarginProperty);
             set => SetValue(UniformMarginProperty, value);
         }
 
@@ -1243,7 +1242,7 @@ namespace Catan10
         public static readonly DependencyProperty TileCountProperty = DependencyProperty.Register("TileCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
         public static readonly DependencyProperty TileGapProperty = DependencyProperty.Register("TileGap", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(0));
         public static readonly DependencyProperty TileGroupsProperty = DependencyProperty.Register("TileGroups", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(""));
-        public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(double), typeof(CatanHexPanel), new PropertyMetadata(50));
+        public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(Thickness), typeof(CatanHexPanel), new PropertyMetadata(new Thickness(0,0,0,0)));
         public static readonly DependencyProperty VictoryPointsProperty = DependencyProperty.Register("VictoryPoints", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
         public static readonly DependencyProperty YearOfPlentyProperty = DependencyProperty.Register("YearOfPlenty", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
         public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
@@ -1843,7 +1842,7 @@ namespace Catan10
             //
             //
             int middleCol = _colCount / 2;
-            double left = UniformMargin + _normalWidth * 0.25;
+            double left = UniformMargin.Left + _normalWidth * 0.25;
             double top = 0;
             double gap = -TileGap / 2.0;
 
@@ -1862,7 +1861,7 @@ namespace Catan10
 
                 try
                 {
-                    top = Math.Abs((RowCounts[col] - RowCounts[middleCol])) * NormalHeight * .5 + UniformMargin - gap;
+                    top = Math.Abs((RowCounts[col] - RowCounts[middleCol])) * NormalHeight * .5 + UniformMargin.Top - gap;
                     foreach (TileCtrl tile in childColumn)
                     {
                         tile.Arrange(new Rect(0, 0, tile.DesiredSize.Width, tile.DesiredSize.Height));

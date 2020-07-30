@@ -167,7 +167,7 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-            <local:DragableGridCtrl x:Name="DGC_Game" Width="760" Height="825" HorizontalAlignment="Center"
+            <local:DragableGridCtrl x:Name="DGC_Game" Width="760" Height="835" HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}"
                 Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"
@@ -175,7 +175,7 @@
                 PointerPressed="Draggable_PointerPressed"
                 OnGridPositionChanged="OnGridPositionChanged" BorderThickness="2"
                 CornerRadius="5">
-                <local:GameContainerCtrl x:Name="_gameView" Margin="0" DoubleTapped="GameViewControlDoubleTapped"
+                <local:GameContainerCtrl x:Name="_gameView" Margin="0" DoubleTapped="GameViewControlDoubleTapped" 
                     Canvas.ZIndex="2" CornerRadius="0" RenderTransformOrigin="0.5,0.5"
                     IsEnabled="True" PointerPressed="GameViewControlPointerPressed" />
             </local:DragableGridCtrl>
