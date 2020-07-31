@@ -13,6 +13,11 @@ using Windows.Storage;
 using Catan10.CatanService;
 using System.Diagnostics.Contracts;
 using System.Diagnostics;
+using Windows.System;
+using Windows.Storage.Streams;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Media;
+using Windows.Foundation.Collections;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -112,7 +117,7 @@ namespace Catan10
                 dc.Add(DevCardType.YearOfPlenty);
                 dc.Add(DevCardType.Monopoly);
                 dc.Add(DevCardType.RoadBuilding);
-                dc.Add(DevCardType.VictoryPoint);                
+                dc.Add(DevCardType.VictoryPoint);
             }
             else
             {
@@ -226,7 +231,54 @@ namespace Catan10
 
         private async void OnTest2(object sdr, RoutedEventArgs rea)
         {
-            await LoseHalfYourCards();
+            IReadOnlyList<User> users = await User.FindAllAsync();
+
+            foreach (User user in users)
+            {
+                String[] desiredProperties = new String[]
+                    {
+                        KnownUserProperties.FirstName,
+                        KnownUserProperties.LastName,
+                        KnownUserProperties.ProviderName,
+                        KnownUserProperties.AccountName,
+                        KnownUserProperties.GuestHost,
+                        KnownUserProperties.PrincipalName,
+                        KnownUserProperties.DomainName,
+                        KnownUserProperties.SessionInitiationProtocolUri,
+                    };
+                // Issue a bulk query for all of the properties.
+                IPropertySet values = await user.GetPropertiesAsync(desiredProperties);
+                string result = "";
+                foreach (String property in desiredProperties)
+                {
+                    result += property + ": " + values[property] + "\n";
+                }
+                this.TraceMessage(result);
+
+                TheHuman = NameToPlayer((string)values[KnownUserProperties.FirstName]);
+                if (TheHuman != null)
+                {
+                    IRandomAccessStreamReference streamReference = await user.GetPictureAsync(UserPictureSize.Size64x64);
+                    if (streamReference != null)
+                    {
+                        IRandomAccessStream stream = await streamReference.OpenReadAsync();
+                        BitmapImage bitmapImage = new BitmapImage();
+                        bitmapImage.SetSource(stream);
+                        ImageBrush brush = new ImageBrush
+                        {
+                            AlignmentX = AlignmentX.Left,
+                            AlignmentY = AlignmentY.Top,
+                            Stretch = Stretch.UniformToFill,
+                            ImageSource = bitmapImage
+                        };
+
+                        TheHuman.ImageBrush = brush;
+
+
+                    }
+                }
+
+            }
         }
 
         // Undo

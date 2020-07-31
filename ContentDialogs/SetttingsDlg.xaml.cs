@@ -33,7 +33,7 @@ namespace Catan10
         public SettingsDlg()
         {
             this.InitializeComponent();
-            ValidServiceUris.Add("localhost:5000");
+            ValidServiceUris.Add("localhost:5001");
             ValidServiceUris.Add("192.168.1.128:5000");
             ValidServiceUris.Add("catanhub.azurewebsites.net");
         }
@@ -43,7 +43,7 @@ namespace Catan10
             this.InitializeComponent();
             this.Settings = settings;
             this.TheHuman = human;
-            ValidServiceUris.Add("localhost:5000");
+            ValidServiceUris.Add("localhost:5001");
             ValidServiceUris.Add("192.168.1.128:5000");
             ValidServiceUris.Add("catanhub.azurewebsites.net");
         }

@@ -3,7 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Net.Http;
+using System.Net.Security;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -101,7 +104,7 @@ namespace Catan10.CatanService
             }
             else
             {
-              //  this.TraceMessage($"message.Data is a string for {message}");
+                //  this.TraceMessage($"message.Data is a string for {message}");
             }
 
             await HubConnection.SendAsync("PostMessage", message);
@@ -273,7 +276,7 @@ namespace Catan10.CatanService
             void PongReceived()
             {
                 watch.Stop();
-              //  this.TraceMessage($"pong recieved took: {watch.ElapsedMilliseconds}ms");
+                //  this.TraceMessage($"pong recieved took: {watch.ElapsedMilliseconds}ms");
                 this.OnPong -= PongReceived;
                 tcs.TrySetResult(true);
             }
@@ -291,7 +294,7 @@ namespace Catan10.CatanService
 
                 this.OnPong -= PongReceived;
                 watch.Stop();
-               // this.TraceMessage($"pong timed out: {watch.ElapsedMilliseconds}ms");
+                // this.TraceMessage($"pong timed out: {watch.ElapsedMilliseconds}ms");
                 await this.Initialize(this.Host, MessageLog, this.PlayerName);
                 await this.RejoinGame(this.GameInfo, this.PlayerName);
                 return false;
@@ -341,34 +344,60 @@ namespace Catan10.CatanService
             await tcs.Task;
             return list;
         }
-
+        bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            //   we only call this when we are calling localhost, so we will always trust it
+            return true;
+        }
         public async Task Initialize(string host, ICollection<CatanMessage> messageLog, string theHumanName)
         {
             Contract.Assert(!String.IsNullOrEmpty(theHumanName));
             Contract.Assert(messageLog != null);
             Contract.Assert(!String.IsNullOrEmpty(host));
 
+            //
+            //  remember the inputs for when/if we have to reconnect
             MessageLog = messageLog;
             this.PlayerName = theHumanName;
             this.Host = host;
+
             try
             {
+                //
+                //  we need to call this because we call back in here sometimes when we reconnect -- make sure we don't get notified
+                //  twice for each message
                 UnsubscribeAll();
+
+
                 string serviceUrl;
-                if (host.Contains("192") || host.Contains("local"))
-                {
-                    serviceUrl = "http://" + host + "/CatanHub";
-                }
-                else
-                {
-                    serviceUrl = "https://" + host + "/CatanHub";
-                }
+                serviceUrl = "https://" + host + "/CatanHub";
 
                 _lastReconnected = DateTime.Now;
-                HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(serviceUrl).ConfigureLogging((logging) =>
+                HubConnection = new HubConnectionBuilder().WithAutomaticReconnect().WithUrl(serviceUrl, options => 
+                { 
+                    //
+                    //  this is to send up windows creds
+                    options.UseDefaultCredentials = true;
+
+                    //
+                    //  if we are calling localhost, it is for debugging purposes.  we need to validate the self-signed certificate
+                    if (host.Contains("localhost"))
+                    {
+                        options.HttpMessageHandlerFactory = (handler) =>
+                        {
+                            if (handler is HttpClientHandler clientHandler)
+                            {
+                                clientHandler.ServerCertificateCustomValidationCallback = ValidateCertificate;
+                            }
+                            return handler;
+                        };
+                    }
+
+                }).ConfigureLogging((logging) =>
                 {
                     logging.AddConsole();
                     logging.SetMinimumLevel(LogLevel.Trace);
+
                 }).Build();
 
                 //
@@ -693,9 +722,9 @@ namespace Catan10.CatanService
         {
             if (BroadcastTcs != null && !BroadcastTcs.Task.IsCompleted)
             {
-              //  this.TraceMessage($"STARTED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
+                //  this.TraceMessage($"STARTED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
                 await BroadcastTcs.Task;
-             //   this.TraceMessage($"FINISHED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
+                //   this.TraceMessage($"FINISHED waiting for BroadcastTcs for id={message.MessageId} Type={message.DataTypeName}", 1);
             }
 
             BroadcastTcs = new TaskCompletionSource<object>();
