@@ -25,7 +25,7 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            if (gameController.TheHuman.GameData.Resources.Current.Count > 7)
+            if (gameController.TheHuman.GameData.Resources.CurrentResources.Count > 7)
             {
                 //
                 //  we explicity discard before we target! -- this is *not* about the Baron, so don't move it.
@@ -33,10 +33,10 @@ namespace Catan10
                 //
 
                 Contract.Assert(gameController.TheHuman.GameData.Resources.ResourcesThisTurn.ResourceCount == 0);
-                int loss = (int)gameController.TheHuman.GameData.Resources.Current.Count / 2;
+                int loss = (int)gameController.TheHuman.GameData.Resources.CurrentResources.Count / 2;
                 TradeResources lost = new TradeResources();
                 ResourceCardCollection source = new ResourceCardCollection(false);
-                source.AddResources(gameController.TheHuman.GameData.Resources.Current);
+                source.AddResources(gameController.TheHuman.GameData.Resources.CurrentResources);
                 TakeCardDlg dlg = new TakeCardDlg()
                 {
                     To = gameController.MainPageModel.Bank,
@@ -57,7 +57,7 @@ namespace Catan10
                 else
                 {
                     await MainPage.Current.ShowErrorMessage($"Since you cancelled out of the dialog (I assume it was you Dodgy) the game will now pick {loss} random cards.\nNo Undo. Live and learn.\n", "Catan", "");
-                    var list = gameController.TheHuman.GameData.Resources.Current.ToList();
+                    var list = gameController.TheHuman.GameData.Resources.CurrentResources.ToList();
                     Random rand = new Random((int)DateTime.Now.Ticks);
 
                     for (int i = 0; i < loss; i++)

@@ -15,7 +15,7 @@ namespace Catan10
         public static Task PostMessage(IGameController gameController, TradeResources lostCards)
         {
             Contract.Assert(lostCards.Count > 0); //don't negate them
-            Contract.Assert(lostCards.Count == gameController.TheHuman.GameData.Resources.Current.Count / 2);
+            Contract.Assert(lostCards.Count == gameController.TheHuman.GameData.Resources.CurrentResources.Count / 2);
             var logHeader = new LoseCardsToSeven()
             {
                 LostResources = lostCards,
@@ -41,12 +41,12 @@ namespace Catan10
                     continue;
                 }
                 
-                this.TraceMessage($"{player} did NOT give up cards this turn.  Has {player.GameData.Resources.Current.Count} cards");
+                this.TraceMessage($"{player} did NOT give up cards this turn.  Has {player.GameData.Resources.CurrentResources.Count} cards");
 
                 //
                 //  stop if any player has more than 7 cards - the last person to get rid of 1/2 there cards will send the message to move the baron
                 //
-                if (player.GameData.Resources.Current.Count > 7)
+                if (player.GameData.Resources.CurrentResources.Count > 7)
                 {
                     return Task.CompletedTask;
                 }

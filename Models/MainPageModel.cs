@@ -389,7 +389,7 @@ namespace Catan10
                     if (resType == ResourceType.GoldMine) continue;
 
                     int total = 0;
-                    PlayingPlayers.ForEach((p) => total += p.GameData.Resources.Current.CountForResource(resType));
+                    PlayingPlayers.ForEach((p) => total += p.GameData.Resources.CurrentResources.CountForResource(resType));
                     total = MainPage.Current.GameContainer.CurrentGame.GameData.MaxResourceAllocated - total;
                     tr.AddResource(resType, total);
                 }

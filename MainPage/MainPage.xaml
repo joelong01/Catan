@@ -167,7 +167,7 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-            <local:DragableGridCtrl x:Name="DGC_Game" Width="760" Height="835" HorizontalAlignment="Center"
+            <local:DragableGridCtrl x:Name="DGC_Game" Width="735" Height="835" HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}"
                 Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"

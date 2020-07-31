@@ -79,7 +79,7 @@ namespace Catan10
                 // current player checks each player to see if anybody has gold
                 foreach (var player in gameController.PlayingPlayers)
                 {
-                    if (player.GameData.Resources.Current.GoldMine > 0)
+                    if (player.GameData.Resources.CurrentResources.GoldMine > 0)
                     {
                         // at least one person has gold
                         await MustTradeGold.PostMessage(gameController);
@@ -94,7 +94,7 @@ namespace Catan10
                 List<PlayerModel> playersWithTooManyCards = new List<PlayerModel>();
                 foreach (var player in gameController.PlayingPlayers)
                 {
-                    if (player.GameData.Resources.TotalResources.Count > 7)
+                    if (player.GameData.Resources.TotalResourcesForGame.Count > 7)
                     {
                         // at least one person has more than 7 cards and needs to get rid of 1/2 of them.
                         playersWithTooManyCards.Add(player);

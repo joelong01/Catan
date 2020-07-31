@@ -30,13 +30,13 @@ namespace Catan10
             PlayerModel player = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(player != null);
             var cost = TradeResources.GetEntitlementCost(PurchasedEntitlement);
-            player.GameData.Resources.Current += cost.GetNegated();
+            player.GameData.Resources.CurrentResources += cost.GetNegated();
             if (PurchasedEntitlement == Entitlement.DevCard)
             {
                 DevCardType devCard = gameController.PurchaseNextDevCard();
                 if (devCard == DevCardType.None) // ran out of DevCards!
                 {
-                    player.GameData.Resources.Current += cost; //refund!
+                    player.GameData.Resources.CurrentResources += cost; //refund!
                     return Task.CompletedTask;
                 }
 
@@ -64,7 +64,7 @@ namespace Catan10
             Contract.Assert(player.GameData.Resources.UnspentEntitlements.Contains(PurchasedEntitlement));
             Contract.Assert(PurchasedEntitlement != Entitlement.DevCard);
             var cost = TradeResources.GetEntitlementCost(PurchasedEntitlement);
-            player.GameData.Resources.Current += cost;
+            player.GameData.Resources.CurrentResources += cost;
             player.GameData.Resources.RevokeEntitlement(PurchasedEntitlement);
 
             return Task.CompletedTask;

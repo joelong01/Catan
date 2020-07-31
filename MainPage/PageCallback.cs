@@ -551,7 +551,7 @@ namespace Catan10
                 ResourceType stolenResource = ResourceType.None;
                 if (victim != null) // targeted nobody
                 {
-                    var source = ResourceCardCollection.Flatten(victim.GameData.Resources.Current);
+                    var source = ResourceCardCollection.Flatten(victim.GameData.Resources.CurrentResources);
                     Contract.Assert(source.ResourceCount == source.Count);
 
                     if (source.ResourceCount > 0) // it is ok to target a player with no cards

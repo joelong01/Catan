@@ -77,7 +77,7 @@ namespace Catan10
             await gameController.ResetRandomGoldTiles();
             gameController.PlayingPlayers.ForEach((p) =>
             {
-                p.GameData.Resources.ResourcesThisTurn.AddResources(p.GameData.Resources.Current);
+                p.GameData.Resources.ResourcesThisTurn.AddResources(p.GameData.Resources.CurrentResources);
             });
         }
     }

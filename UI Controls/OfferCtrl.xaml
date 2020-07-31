@@ -70,7 +70,7 @@
                     VerticalAlignment="Top" ShowButtons="True" Orientation="Horizontal"
                     CardWidth="120"
                     TradeResources="{x:Bind TheHuman.GameData.Trades.TradeRequest.Owner.Resources, Mode=OneWay}"
-                    AvailableResources="{x:Bind TheHuman.GameData.Resources.Current, Mode=OneWay}"
+                    AvailableResources="{x:Bind TheHuman.GameData.Resources.CurrentResources, Mode=OneWay}"
                     ShowAvailableResources="True" OnResourceChanged="OnOfferChanged" />
             </StackPanel>
             <!--  The vertical list of trading partners  -->

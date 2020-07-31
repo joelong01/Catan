@@ -28,7 +28,7 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            int goldCards = gameController.TheHuman.GameData.Resources.Current.GetCount(ResourceType.GoldMine);
+            int goldCards = gameController.TheHuman.GameData.Resources.CurrentResources.GetCount(ResourceType.GoldMine);
             if (goldCards > 0)
             {
                 Debug.Assert(VisualTreeHelper.GetOpenPopups(Window.Current).Count == 0); // we shouldn't have any popups at this time.

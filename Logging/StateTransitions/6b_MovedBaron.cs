@@ -81,7 +81,7 @@ namespace Catan10
                     TradeResources tr = new TradeResources();
                     tr.AddResource(BaronModel.StolenResource, 1);
                     //
-                    //  this needs to be face down and not show up in the Turn Resources, but it shoudl count towards Total Resource
+                    //  this needs to be face down and not show up in the Turn Resources, but it should count towards Total Resource
                     targetPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);        // I Taketh
                     gameController.CurrentPlayer.GameData.Resources.GrantResources(tr, false);     // I Giveth
 

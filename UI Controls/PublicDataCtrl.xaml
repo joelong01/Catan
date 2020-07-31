@@ -114,7 +114,7 @@
                         </Button>
                     </Viewbox>
                     <TextBlock Margin="2,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                        Text="{x:Bind Player.GameData.Resources.TotalResources.Count, Mode=OneWay, FallbackValue=0}"
+                        Text="{x:Bind Player.GameData.Resources.CurrentResources.Count, Mode=OneWay, FallbackValue=0}"
                         FontSize="38"
                         Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White, TargetNullValue=White}"
                         FontFamily="Century Schoolbook" />
@@ -260,7 +260,7 @@
                             StrokeThickness="1" />
                         <TextBlock Margin="-68,-8,0,0" Text="∑" FontSize="36" Foreground="Red"
                             FontWeight="ExtraBold" />
-                        <TextBlock Margin="0,0,10,0" FontSize="68" Text="{x:Bind Player.GameData.Resources.TotalResources.Count, Mode=OneWay, FallbackValue=68}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+                        <TextBlock Margin="0,0,10,0" FontSize="68" Text="{x:Bind Player.GameData.Resources.TotalResourcesForGame.Count, Mode=OneWay, FallbackValue=68}" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
                         <!--  Gold Cards  -->
                         <Rectangle Width="70" Height="100" Margin="10,0,0,0"
                             Fill="{StaticResource ResourceType.GoldMine}"

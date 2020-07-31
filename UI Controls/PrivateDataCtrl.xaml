@@ -30,30 +30,28 @@
             <ColumnDefinition Width="115" />
             <ColumnDefinition Width="0" />
         </Grid.ColumnDefinitions>
-        
+
         <s:SliderCtrl Grid.RowSpan="2" Grid.ColumnSpan="3" Width="200" Height="420"
-            HorizontalAlignment="Right" VerticalAlignment="Center" Canvas.ZIndex="99"                      
+            HorizontalAlignment="Right" VerticalAlignment="Center" Canvas.ZIndex="99"
             Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
             Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
-            Caption="Stolen Resource"
-            CornerRadius="0"
-                      FontSize="22"
+            Caption="Stolen Resource" CornerRadius="0" FontSize="22"
             Open="{x:Bind StolenResourceEmpty(Player.GameData.Resources.StolenResource), Mode=OneWay}"
             SlideDirection="Left">
             <s:SliderCtrl.Child>
-                <StackPanel>                    
+                <StackPanel>
                     <local:ResourceCardSlimCtrl ResourceType="{x:Bind Player.GameData.Resources.StolenResource, Mode=OneWay}" CountVisible="False" />
                 </StackPanel>
             </s:SliderCtrl.Child>
         </s:SliderCtrl>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wood}" Count="{x:Bind Player.GameData.Resources.Current.Wood, Mode=OneWay}" ShowButtons="False" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Sheep}" Count="{x:Bind Player.GameData.Resources.Current.Sheep, Mode=OneWay}" ShowButtons="False" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Brick}" Count="{x:Bind Player.GameData.Resources.Current.Brick, Mode=OneWay}" ShowButtons="False" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wheat}" Count="{x:Bind Player.GameData.Resources.Current.Wheat, Mode=OneWay}" ShowButtons="False" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Ore}" Count="{x:Bind Player.GameData.Resources.Current.Ore, Mode=OneWay}" ShowButtons="False" />
-                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.GoldMine}" Count="{x:Bind Player.GameData.Resources.Current.GoldMine, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wood}" Count="{x:Bind Player.GameData.Resources.CurrentResources.Wood, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Sheep}" Count="{x:Bind Player.GameData.Resources.CurrentResources.Sheep, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Brick}" Count="{x:Bind Player.GameData.Resources.CurrentResources.Brick, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wheat}" Count="{x:Bind Player.GameData.Resources.CurrentResources.Wheat, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Ore}" Count="{x:Bind Player.GameData.Resources.CurrentResources.Ore, Mode=OneWay}" ShowButtons="False" />
+                <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.GoldMine}" Count="{x:Bind Player.GameData.Resources.CurrentResources.GoldMine, Mode=OneWay}" ShowButtons="False" />
             </StackPanel>
             <Rectangle Width="465" Height="4" Margin="0,5,0,5" Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
 
@@ -77,10 +75,7 @@
                                         ToolTipService.ToolTip="{x:Bind DevCardType}">
                                         <Rectangle.ContextFlyout>
                                             <MenuFlyout>
-                                                <MenuFlyoutItem IsEnabled="{x:Bind local:PrivateDataCtrl.EnableMenuForGameState(DevCardType, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}" 
-                                                                Text="{x:Bind local:PrivateDataCtrl.MenuPlayString(DevCardType), Mode=OneWay}" 
-                                                                Click="OnAvailableCardPressed" 
-                                                                Tag="{x:Bind DevCardType, Mode=OneWay}" />
+                                                <MenuFlyoutItem IsEnabled="{x:Bind local:PrivateDataCtrl.EnableMenuForGameState(DevCardType, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}" Text="{x:Bind local:PrivateDataCtrl.MenuPlayString(DevCardType), Mode=OneWay}" Click="OnAvailableCardPressed" Tag="{x:Bind DevCardType, Mode=OneWay}" />
                                             </MenuFlyout>
                                         </Rectangle.ContextFlyout>
                                     </Rectangle>
@@ -153,47 +148,12 @@
                         ToolTipService.ToolTip="{x:Bind Player.GameData.Resources.ThisTurnsDevCard}" />
                 </Grid>
             </StackPanel>
-            <StackPanel Margin="0,5,0,0" Orientation="Horizontal" Visibility="Collapsed">
-                <Button Padding="0">
-                    <Button.Content>
-                        <Grid Width="70" Height="100" Background="{StaticResource DevCardType.Knight}" CornerRadius="10">
-                            <Border Height="20" HorizontalAlignment="Center" VerticalAlignment="Top" Background="Black">
-                                <TextBlock Text="Knight" Foreground="White" />
-                            </Border>
-                            <Viewbox Margin="0,20,0,0" HorizontalAlignment="Left">
-                                <StackPanel Margin="10,0,0,0">
-                                    <Border Width="25" Height="40" HorizontalAlignment="Left"
-                                        Background="{StaticResource DevCardType.Back}"
-                                        BorderBrush="Yellow" BorderThickness="2" CornerRadius="1" />
-                                    <Border Width="25" Height="40" HorizontalAlignment="Left"
-                                        Background="{StaticResource DevCardType.Knight}"
-                                        BorderBrush="Yellow" BorderThickness="2" CornerRadius="1" />
-                                    <Border Width="20" HorizontalAlignment="Left" Background="Black">
-                                        <TextBlock Margin="3" Text="&#xF738;" IsColorFontEnabled="False"
-                                            Foreground="White" FontFamily="Segoe MDL2 Assets" />
-                                    </Border>
-                                </StackPanel>
-                            </Viewbox>
-                        </Grid>
-                        <!--<local:ResourceCardCtrl Margin="1,0,0,0" DevCardType="Knight" Orientation="FaceUp" ReadOnly="True"
-                            Count="{x:Bind Player.GameData.Resources.UnplayedKnights, Mode=OneWay}" />-->
-                    </Button.Content>
-                    <Button.ContextFlyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem Text="Play" />
-                        </MenuFlyout>
-                    </Button.ContextFlyout>
-                </Button>
-                <local:ResourceCardSlimCtrl Margin="1,0,0,0" Image="{StaticResource DevCardType.YearOfPlenty}" Count="{x:Bind Player.GameData.Resources.UnplayedYearOfPlenty, Mode=OneWay}" />
-                <local:ResourceCardSlimCtrl Margin="1,0,0,0" Image="{StaticResource DevCardType.Monopoly}" Count="{x:Bind Player.GameData.Resources.UnplayedMonopoly, Mode=OneWay}" />
-                <local:ResourceCardSlimCtrl Margin="1,0,0,0" Image="{StaticResource DevCardType.RoadBuilding}" Count="{x:Bind Player.GameData.Resources.UnplayedRoadBuilding, Mode=OneWay}" />
-                <local:ResourceCardSlimCtrl Margin="109,0,0,0" Image="{StaticResource DevCardType.VictoryPoint}" Count="{x:Bind Player.GameData.Resources.VictoryPoints, Mode=OneWay}" />
-            </StackPanel>
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,-20,0,10"
-                        Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}" >
+
+            <StackPanel Grid.Row="1" Margin="0,-20,0,10" HorizontalAlignment="Stretch"
+                VerticalAlignment="Center" Orientation="Horizontal"
+                Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
                 <TextBlock Text="✨" FontSize="32" />
-                <TextBlock Text="{x:Bind ActualScore(Player.GameData.Score, Player.GameData.Resources.NewDevCards, Player.GameData.Resources.AvailableDevCards), Mode=OneWay}" 
-                           VerticalAlignment="Center" FontSize="30"/>
+                <TextBlock VerticalAlignment="Center" Text="{x:Bind ActualScore(Player.GameData.Score, Player.GameData.Resources.NewDevCards, Player.GameData.Resources.AvailableDevCards), Mode=OneWay}" FontSize="30" />
             </StackPanel>
             <StackPanel Margin="0,0,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
                 Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}"
@@ -202,7 +162,7 @@
                 <Button Margin="5" Padding="5" Background="Transparent"
                     BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
                     CornerRadius="5" ToolTipService.ToolTip="Buy Settlement" Click="OnBuySettlement"
-                    IsEnabled="{x:Bind EnabledEntitlementPurchase('Settlement', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}">
+                    IsEnabled="{x:Bind EnabledEntitlementPurchase('Settlement', Player.GameData.Resources.CurrentResources, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}">
                     <Button.Content>
                         <StackPanel Width="60" Height="65" Margin="0,0,0,0">
                             <local:SettlementCtrl Width="50" Height="50" Owner="{x:Bind Player, Mode=OneWay}" />
@@ -215,7 +175,7 @@
                 <Button Margin="5" Padding="5" Background="Transparent"
                     BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
                     CornerRadius="5"
-                    IsEnabled="{x:Bind EnabledEntitlementPurchase('City', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
+                    IsEnabled="{x:Bind EnabledEntitlementPurchase('City', Player.GameData.Resources.CurrentResources, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
                     ToolTipService.ToolTip="Buy City" Click="OnBuyCity">
                     <Button.Content>
                         <StackPanel Width="50" Height="65">
@@ -229,7 +189,7 @@
                 <Button Margin="5" Padding="5" Background="Transparent"
                     BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
                     CornerRadius="5"
-                    IsEnabled="{x:Bind EnabledEntitlementPurchase('Road', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
+                    IsEnabled="{x:Bind EnabledEntitlementPurchase('Road', Player.GameData.Resources.CurrentResources, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
                     ToolTipService.ToolTip="Buy Road" Click="OnBuyRoad">
                     <Button.Content>
                         <StackPanel Width="50" Height="65">
@@ -251,7 +211,7 @@
                 <Button Margin="5" Padding="5" Background="Transparent"
                     BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
                     CornerRadius="5"
-                    IsEnabled="{x:Bind EnabledEntitlementPurchase('DevCard', Player.GameData.Resources.Current, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
+                    IsEnabled="{x:Bind EnabledEntitlementPurchase('DevCard', Player.GameData.Resources.CurrentResources, local:MainPage.Current.MainPageModel.Log.GameState), Mode=OneWay}"
                     ToolTipService.ToolTip="Buy Dev Card" ToolTipService.Placement="Left"
                     Click="OnBuyDevCard">
                     <Button.Content>

@@ -5,76 +5,14 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 
-using Windows.UI;
-using Windows.UI.Xaml.Media;
-
 namespace Catan10
 {
-    public class DevCardModel : INotifyPropertyChanged
+    public class PlayerResources : INotifyPropertyChanged
     {
-        private DevCardType _devCardType = DevCardType.None;
-
-        private bool _played = false;
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public DevCardType DevCardType
-        {
-            get
-            {
-                return _devCardType;
-            }
-            set
-            {
-                if (_devCardType != value)
-                {
-                    _devCardType = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public bool Played
-        {
-            get
-            {
-                return _played;
-            }
-            set
-            {
-                if (_played != value)
-                {
-                    _played = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public DevCardModel Self => this;
+        #region Delegates + Fields + Events + Enums
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public static Brush DevCardTypeToImage(DevCardType devCardType)
-        {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
-            {
-                return new SolidColorBrush(Colors.AliceBlue);
-            }
-
-            string key = "DevCardType." + devCardType.ToString();
-            if (devCardType == DevCardType.Back || devCardType == DevCardType.None)
-            {
-                return App.Current.Resources["DevCardType.Back"] as ImageBrush;
-            }
-            return App.Current.Resources[key] as ImageBrush;
-        }
-    }
-
-    public class PlayerResources : INotifyPropertyChanged
-    {
         private int _cities = 0;
 
         private TradeResources _currentResources = new TradeResources();
@@ -82,12 +20,6 @@ namespace Catan10
         private int _goldTotal = 0;
 
         private int _knightsPlayed = 0;
-
-        private int _playedMonopoly = 0;
-
-        private int _playedRoadBuilding = 0;
-
-        private int _playedYearOfPlenty = 0;
 
         private TradeResources _resourcesLostSeven = new TradeResources();
 
@@ -99,66 +31,22 @@ namespace Catan10
 
         private int _settlements = 0;
 
+        private ResourceType _stolenResource = ResourceType.None;
         private DevCardModel _thisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None };
-
-        private int _totalDevCards = 0;
 
         private TradeResources _totalResources = new TradeResources();
 
-        private int _unplayedKnights = 0;
+     
 
-        private int _unplayedMonopoly = 0;
+        #endregion Delegates + Fields + Events + Enums
 
-        private int _unplayedYearOfPlenty = 0;
-
-        private int _victoryPoints = 0;
-        ResourceType _stolenResource = ResourceType.None;
-       
-        public ResourceType StolenResource
-        {
-            get
-            {
-                return _stolenResource;
-            }
-            set
-            {
-                if (_stolenResource != value)
-                {
-                    _stolenResource = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        
-        public bool HasUnusedEntitlment(Entitlement entitlement)
-        {
-            return HasEntitlement(entitlement);
-        }
-
-        internal bool ConsumeEntitlement(Entitlement entitlement)
-        {
-
-            Debug.Assert(HasEntitlement(entitlement));
-            if (HasEntitlement(entitlement))
-            {
-                UnspentEntitlements.Remove(entitlement);
-                return true;
-            }
-            return false;
-        }
-
-        internal void RevokeEntitlement(Entitlement entitlement)
-        {
-            this.ConsumeEntitlement(entitlement);
-        }
+        #region Properties
 
         public ObservableCollection<DevCardModel> AvailableDevCards { get; set; } = new ObservableCollection<DevCardModel>();
 
+        /// <summary>
+        ///     How many Cities the player has
+        /// </summary>
         public int Cities
         {
             get
@@ -175,7 +63,10 @@ namespace Catan10
             }
         }
 
-        public TradeResources Current
+        /// <summary>
+        ///     The Resources the player has in their hand
+        /// </summary>
+        public TradeResources CurrentResources
         {
             get
             {
@@ -207,6 +98,9 @@ namespace Catan10
             }
         }
 
+        /// <summary>
+        ///     Total number of knights played in the current game
+        /// </summary>
         public int KnightsPlayed
         {
             get => _knightsPlayed;
@@ -220,60 +114,19 @@ namespace Catan10
             }
         }
 
-        public int KnightsPlayed1 { get => this.KnightsPlayed; set => this.KnightsPlayed = value; }
-
+        /// <summary>
+        ///     a list of dev cards the player has bought this turn
+        /// </summary>
         public ObservableCollection<DevCardModel> NewDevCards { get; set; } = new ObservableCollection<DevCardModel>();
 
+        /// <summary>
+        ///     a list of all the dev cards the player has played in this game
+        /// </summary>
         public ObservableCollection<DevCardModel> PlayedDevCards { get; set; } = new ObservableCollection<DevCardModel>();
 
-        public int PlayedMonopoly
-        {
-            get
-            {
-                return _playedMonopoly;
-            }
-            set
-            {
-                if (_playedMonopoly != value)
-                {
-                    _playedMonopoly = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int PlayedRoadBuilding
-        {
-            get
-            {
-                return _playedRoadBuilding;
-            }
-            set
-            {
-                if (_playedRoadBuilding != value)
-                {
-                    _playedRoadBuilding = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int PlayedYearOfPlenty
-        {
-            get
-            {
-                return _playedYearOfPlenty;
-            }
-            set
-            {
-                if (_playedYearOfPlenty != value)
-                {
-                    _playedYearOfPlenty = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
+        /// <summary>
+        ///     The resources the player gave up when a 7 was rolled
+        /// </summary>
         public TradeResources ResourcesLostSeven
         {
             get
@@ -290,6 +143,9 @@ namespace Catan10
             }
         }
 
+        /// <summary>
+        ///     the resource the player gave up when a Baron was placed on them
+        /// </summary>
         public TradeResources ResourcesLostToBaron
         {
             get
@@ -306,6 +162,9 @@ namespace Catan10
             }
         }
 
+        /// <summary>
+        ///     the resources lost when another player played monopolyz
+        /// </summary>
         public TradeResources ResourcesLostToMonopoly
         {
             get
@@ -322,9 +181,14 @@ namespace Catan10
             }
         }
 
-     
-        public ResourceCardCollection ResourcesThisTurn { get;  } = new ResourceCardCollection(true);
+        /// <summary>
+        ///     The resources the player got this turn
+        /// </summary>
+        public ResourceCardCollection ResourcesThisTurn { get; } = new ResourceCardCollection(true);
 
+        /// <summary>
+        ///     How many roads the player has
+        /// </summary>
         public int Roads
         {
             get
@@ -341,6 +205,9 @@ namespace Catan10
             }
         }
 
+        /// <summary>
+        ///     How many Settlements the player has
+        /// </summary>
         public int Settlements
         {
             get
@@ -357,6 +224,28 @@ namespace Catan10
             }
         }
 
+        /// <summary>
+        ///     How many StolenResources the player has
+        /// </summary>
+        public ResourceType StolenResource
+        {
+            get
+            {
+                return _stolenResource;
+            }
+            set
+            {
+                if (_stolenResource != value)
+                {
+                    _stolenResource = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        ///     The one dev card played this turn
+        /// </summary>
         public DevCardModel ThisTurnsDevCard
         {
             get
@@ -373,23 +262,15 @@ namespace Catan10
             }
         }
 
-        public int TotalDevCards
-        {
-            get
-            {
-                return _totalDevCards;
-            }
-            set
-            {
-                if (_totalDevCards != value)
-                {
-                    _totalDevCards = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        /// <summary>
+        ///     the list of what resources the user has ever gotten.
+        /// </summary>
+        public ResourceCardCollection TotalResourcesCollection { get; set; } = new ResourceCardCollection(true);
 
-        public TradeResources TotalResources
+        /// <summary>
+        ///     the total number of resources the player has gotten by any means this game
+        /// </summary>
+        public TradeResources TotalResourcesForGame
         {
             get
             {
@@ -404,84 +285,22 @@ namespace Catan10
                 }
             }
         }
-
-        public ResourceCardCollection TotalResourcesCollection { get; set; } = new ResourceCardCollection(true);
-
-        public int UnplayedKnights
-        {
-            get
-            {
-                return _unplayedKnights;
-            }
-            set
-            {
-                if (_unplayedKnights != value)
-                {
-                    _unplayedKnights = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int UnplayedMonopoly
-        {
-            get
-            {
-                return _unplayedMonopoly;
-            }
-            set
-            {
-                if (_unplayedMonopoly != value)
-                {
-                    _unplayedMonopoly = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public int UnplayedRoadBuilding { get; set; } = 0;
-
-        public int UnplayedYearOfPlenty
-        {
-            get
-            {
-                return _unplayedYearOfPlenty;
-            }
-            set
-            {
-                if (_unplayedYearOfPlenty != value)
-                {
-                    _unplayedYearOfPlenty = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+       
 
         public ObservableCollection<Entitlement> UnspentEntitlements { get; } = new ObservableCollection<Entitlement>();
 
-        public int VictoryPoints
-        {
-            get
-            {
-                return _victoryPoints;
-            }
-            set
-            {
-                if (_victoryPoints != value)
-                {
-                    _victoryPoints = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
+        #endregion Properties
+
+        #region Constructors + Destructors
 
         public PlayerResources()
         {
             ResourcesThisTurn.AddGoldMine();
-            
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion Constructors + Destructors
+
+        #region Methods
 
         public void AddDevCard(DevCardType devCardType)
         {
@@ -495,46 +314,41 @@ namespace Catan10
             Contract.Assert(cost != null);
             foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
             {
-                if (cost.CountForResource(resourceType) > this.Current.CountForResource(resourceType))
+                if (cost.CountForResource(resourceType) > this.CurrentResources.CountForResource(resourceType))
                     return false;
             }
 
             return true;
         }
 
-        //        default:
-        //            break;
-        //    }
-        //}
         public bool Equivalent(TradeResources tradeResources)
         {
-            this.Current.Equivalent(tradeResources);
+            this.CurrentResources.Equivalent(tradeResources);
             return true;
         }
 
-        //        case DevCardType.Unknown:
-        //        case DevCardType.Back:
-        //            Contract.Assert(false, "don't pass that parameter");
-        //            break;
         public void GrantEntitlement(Entitlement entitlement)
         {
             UnspentEntitlements.Add(entitlement);
         }
 
-        //        case DevCardType.Monopoly:
-        //            UnplayedMonopoly++;
-        //            break;
-        public void GrantResources(TradeResources tr, bool addToThisTurn= true)
+        /// <summary>
+        ///     This will give and take resources away from a player.
+        ///     Some trades (e.g. stealing a card with a Knight) are not publicly visible.
+        /// </summary>
+        /// <param name="tr"></param>
+        /// <param name="publiclyVisible"></param>
+        public void GrantResources(TradeResources tr, bool publiclyVisible = true)
         {
-            Current += tr;
+            CurrentResources += tr;
 
-            if (addToThisTurn)
+            if (publiclyVisible)
             {
                 ResourcesThisTurn.AddResources(tr);
             }
             if (tr.Count != 0)
             {
-                TotalResources += tr;
+                TotalResourcesForGame += tr;
                 MainPage.Current.MainPageModel.GameResources += tr;
                 TotalResourcesCollection.AddResources(tr);
             }
@@ -545,13 +359,16 @@ namespace Catan10
             NotifyPropertyChanged("EnabledEntitlementPurchase");
         }
 
-      
         public bool HasEntitlement(Entitlement entitlement)
         {
             return UnspentEntitlements.Contains(entitlement);
         }
 
-      
+        public bool HasUnusedEntitlment(Entitlement entitlement)
+        {
+            return HasEntitlement(entitlement);
+        }
+
         public void MakeDevCardsAvailable()
         {
             NewDevCards.ForEach((dc) => AvailableDevCards.Add(dc));
@@ -575,6 +392,13 @@ namespace Catan10
 
             return false;
         }
+
+        // the list of cards that have been played.  this is public information!
+        public override string ToString()
+        {
+            return $"[Total={CurrentResources}][Ore={CurrentResources.Ore}][Brick={CurrentResources.Brick}][Wheat={CurrentResources.Wheat}][Wood={CurrentResources.Wood}][Sheep={CurrentResources.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
+        }
+
         /// <summary>
         ///     Move the DevCardPlayedThisTurn back and reset it
         /// </summary>
@@ -588,57 +412,29 @@ namespace Catan10
             AvailableDevCards.Add(ThisTurnsDevCard);
             ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None }; ;
             return true;
-
-            
         }
 
-        // the list of cards that have been played.  this is public information!
-        public override string ToString()
+        internal bool ConsumeEntitlement(Entitlement entitlement)
         {
-            return $"[Total={Current}][Ore={Current.Ore}][Brick={Current.Brick}][Wheat={Current.Wheat}][Wood={Current.Wood}][Sheep={Current.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
+            Debug.Assert(HasEntitlement(entitlement));
+            if (HasEntitlement(entitlement))
+            {
+                UnspentEntitlements.Remove(entitlement);
+                return true;
+            }
+            return false;
         }
 
-        //public void AddDevCard(DevCardType devCard)
-        //{
-        //    switch (devCard)
-        //    {
-        //        case DevCardType.Knight:
-        //            UnplayedKnights++;
-        //            break;
-        //public void PlayDevCard(DevCardType devCard)
-        //{
-        //    PlayedDevCards.Add(devCard);
-        //    switch (devCard)
-        //    {
-        //        case DevCardType.Knight:
-        //            UnplayedKnights--;
+        internal void RevokeEntitlement(Entitlement entitlement)
+        {
+            this.ConsumeEntitlement(entitlement);
+        }
 
-        //            break;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
-        //        case DevCardType.VictoryPoint:
-        //            VictoryPoints++;
-        //            break;
-
-        //        case DevCardType.YearOfPlenty:
-        //            UnplayedYearOfPlenty++;
-        //            break;
-
-        //        case DevCardType.RoadBuilding:
-        //            UnplayedRoadBuilding++;
-        //            break;
-
-        //        case DevCardType.Monopoly:
-        //            UnplayedMonopoly++;
-        //            break;
-
-        //        case DevCardType.Unknown:
-        //        case DevCardType.Back:
-        //            Contract.Assert(false, "don't pass that parameter");
-        //            break;
-
-        //        default:
-        //            break;
-        //    }
-        //}
+        #endregion Methods
     }
 }

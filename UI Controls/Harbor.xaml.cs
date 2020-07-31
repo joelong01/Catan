@@ -192,7 +192,7 @@ namespace Catan10
 
             //
             //  can't trade if you don't have enough resources
-            if (owner.GameData.Resources.Current.GetCount(give) < cost) return null;
+            if (owner.GameData.Resources.CurrentResources.GetCount(give) < cost) return null;
 
             //
             //  local function to handle the menu click event we create below

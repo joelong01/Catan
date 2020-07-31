@@ -33,7 +33,7 @@ namespace Catan10
         }
         private async Task LoseHalfYourCards()
         {
-            int loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
+            int loss = (int)CurrentPlayer.GameData.Resources.CurrentResources.Count / 2;
             CurrentPlayer = TheHuman;
             if (loss < 4)
             {
@@ -50,11 +50,11 @@ namespace Catan10
             }
 
 
-            loss = (int)CurrentPlayer.GameData.Resources.Current.Count / 2;
+            loss = (int)CurrentPlayer.GameData.Resources.CurrentResources.Count / 2;
             if (loss >= 4)
             {
                 ResourceCardCollection rc = new ResourceCardCollection(false);
-                rc.AddResources(CurrentPlayer.GameData.Resources.Current);
+                rc.AddResources(CurrentPlayer.GameData.Resources.CurrentResources);
                 TakeCardDlg dlg = new TakeCardDlg()
                 {
                     To = MainPageModel.Bank,
@@ -409,7 +409,7 @@ namespace Catan10
             CurrentPlayer.GameData.Resources.ResourcesLostToBaron = new TradeResources() { Ore = 10 };
             CurrentPlayer.GameData.NoResourceCount = 13;
             CurrentPlayer.GameData.GoldRolls = 5;
-            CurrentPlayer.GameData.Resources.TotalResources = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5, Brick = 10 };
+            CurrentPlayer.GameData.Resources.TotalResourcesForGame = new TradeResources() { Ore = 3, Wheat = 2, Wood = 5, Brick = 10 };
         }
 
         private async Task TestTargetPlayer()

@@ -51,12 +51,12 @@ namespace Catan10
             {
                 //
                 //
-                if (!this.TradeOffer.Owner.Player.GameData.Resources.Current.CanAfford(this.TradeOffer.Owner.Resources))
+                if (!this.TradeOffer.Owner.Player.GameData.Resources.CurrentResources.CanAfford(this.TradeOffer.Owner.Resources))
                 {
                     await MainPage.Current.ShowErrorMessage($"{this.TradeOffer.Owner.Player.PlayerName} is a bad person.\n\nThey approved a trade for resources they do not have.\n\nShame.\n\n", "Catan 10", "");
                     return;
                 }
-                if (!this.TradeOffer.Partner.Player.GameData.Resources.Current.CanAfford(this.TradeOffer.Partner.Resources))
+                if (!this.TradeOffer.Partner.Player.GameData.Resources.CurrentResources.CanAfford(this.TradeOffer.Partner.Resources))
                 {
                     await MainPage.Current.ShowErrorMessage($"{this.TradeOffer.Partner.Player.PlayerName} is a bad person.\n\nThey approved a trade for resources they do not have.\n\nShame.\n\n", "Catan 10", "");
                     return;

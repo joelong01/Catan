@@ -36,7 +36,7 @@ namespace Catan10
             //  if anybody has a gold card, do nothing else
             foreach (var p in gameController.PlayingPlayers)
             {
-                if (p.GameData.Resources.Current.GetCount(ResourceType.GoldMine) > 0)
+                if (p.GameData.Resources.CurrentResources.GetCount(ResourceType.GoldMine) > 0)
                 {
                     return Task.CompletedTask;
                 }

@@ -166,6 +166,7 @@
     <Compile Include="Logging\StateTransitions\6a_PlayerHasTooManyCards.cs" />
     <Compile Include="Logging\StateTransitions\6c_MustTradeGold.cs" />
     <Compile Include="Logging\StateTransitions\6d_TradeGoldToWaitingForNext.cs" />
+    <Compile Include="Models\DevCardModel.cs" />
     <Compile Include="Models\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />
     <Compile Include="MainPage\MainPageDependencyProperties.cs" />

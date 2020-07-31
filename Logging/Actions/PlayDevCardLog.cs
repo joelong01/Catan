@@ -103,7 +103,7 @@ namespace Catan10
                     player.GameData.Resources.ResourcesThisTurn.Reset();
                     if (player == sentBy) continue;
 
-                    int count = player.GameData.Resources.Current.CountForResource(pickedResourceType);
+                    int count = player.GameData.Resources.CurrentResources.CountForResource(pickedResourceType);
                     TradeResources lost = new TradeResources();
                     lost.AddResource(pickedResourceType, -count);
                     player.GameData.Resources.GrantResources(lost);
