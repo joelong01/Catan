@@ -343,6 +343,7 @@ namespace Catan10.Spy
         {
             if (e == null) return;
             if (e.AddedItems.Count == 0) return;
+            if (((CatanMessage)e.AddedItems[0]).Data == null) return;
             string json = ((CatanMessage)e.AddedItems[0]).Data.ToString();
             LogHeaderJson = FormatJson(json);
         }
