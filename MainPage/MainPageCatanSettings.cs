@@ -149,7 +149,7 @@ namespace Catan10
 
         public async Task ResetGridLayout()
         {
-            string json = @"{""PlayerTradeGrid"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-635,""TranslateY"":-199},""SynchronizedRolls"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":4,""TranslateY"":427},""Grid_BoardMeasurement"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":389,""TranslateY"":391},""Grid_RollStats"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-850,""TranslateY"":248},""ControlGrid"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-270,""TranslateY"":330},""Draggable_PrivateData"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-568,""TranslateY"":248},""_gameView"":{""ScaleX"":0.60000002384185791,""ScaleY"":0.60000002384185791,""TranslateX"":138,""TranslateY"":-215}}";
+            string json = @"{""PlayerTradeGrid"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-635,""TranslateY"":-199},""SynchronizedRolls"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":4,""TranslateY"":427},""Grid_BoardMeasurement"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":389,""TranslateY"":391},""Grid_RollStats"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-850,""TranslateY"":248},""ControlGrid"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-270,""TranslateY"":330},""Draggable_PrivateData"":{""ScaleX"":1,""ScaleY"":1,""TranslateX"":-568,""TranslateY"":248},""_gameView"":{""ScaleX"":0.60000002384185791,""ScaleY"":0.60000002384185791,""TranslateX"":138,""TranslateY"":-215},  ""DGC_Game"": {""ScaleX"": 1,""ScaleY"": 1,""TranslateX"": 0,""TranslateY"": 0}}";
             MainPageModel.Settings.GridPositions = JsonSerializer.Deserialize<Dictionary<string, GridPosition>>(json);
             //foreach (var kvp in MainPageModel.Settings.GridPositions)
             //{

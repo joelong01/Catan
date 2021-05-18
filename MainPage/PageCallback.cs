@@ -103,8 +103,11 @@ namespace Catan10
         public bool BuildingStateChangeOk (BuildingCtrl building)
         {
             if (!ValidateBuilding) return true;
-            if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
-            Contract.Assert(CurrentPlayer == TheHuman);
+            if (MainPageModel.Settings.IsServiceGame)
+            {
+                if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
+                Contract.Assert(CurrentPlayer == TheHuman);
+            }
 
             if (building.Owner != null)
             {
@@ -129,7 +132,10 @@ namespace Catan10
                     }
                 }
             }
-            if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse || CurrentGameState == GameState.Supplemental || CurrentGameState == GameState.WaitingForNext)
+            if (CurrentGameState == GameState.AllocateResourceForward || 
+                CurrentGameState == GameState.AllocateResourceReverse || 
+                CurrentGameState == GameState.Supplemental || 
+                CurrentGameState == GameState.WaitingForNext)
             {
                 if (building.BuildingState == BuildingState.Settlement)
                 {

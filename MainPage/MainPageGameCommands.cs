@@ -80,7 +80,6 @@ namespace Catan10
                 }
 
                 if (CurrentPlayer.PlayerIdentifier != TheHuman.PlayerIdentifier) return false;
-
                 if (CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;
 
                 // this.TraceMessage("starting NextStep");
@@ -91,24 +90,22 @@ namespace Catan10
                         OnStartDefaultNetworkGame(null, null);
                         break;
 
+                    //
+                    //  in a single player game, you set the order by drag and drop and the easiest way to pick up
+                    //  who is first is to set it when the human clicks on the button indicating they are done with
+                    //  players...so set the current player here.
+                    //
+                    //  in a network game it is much more complicated because you have to coordinate across all the machines
+                    //  and deal with ties.
+                    //
                     case GameState.WaitingForPlayers:
+                        CurrentPlayer = PlayingPlayers[0];
                         await WaitingForPlayersToPickingBoard.PostLog(this);
                         break;
 
                     case GameState.PickingBoard:  // you get here by clicking the "=>" button
-                        if (MainPageModel.Settings.IsLocalGame)
-                        {
-                            LogHeader logHeader = new LogHeader()
-                            {
-                                NewState = GameState.WaitingForRollForOrder,
-                            };
-                            await MainPageModel.Log.PushAction(logHeader);
-                            await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
-                        }
-                        else
-                        {
-                            await PickingBoardToWaitingForRollOrder.PostLog(this);
-                        }
+                        await PickingBoardToWaitingForRollOrder.PostLog(this);
+
                         break;
 
                     case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button

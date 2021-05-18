@@ -316,9 +316,22 @@ namespace Catan10
                 default:
                     break;
             }
-            if (message.From == TheHuman.PlayerName)
+
+            
+            if (message.From == TheHuman.PlayerName )
             {
                 MainPageModel.ChangeUnprocessMessage(-1);
+            }
+            else if (!MainPageModel.IsServiceGame &&
+                ( logHeader.OldState == GameState.AllocateResourceForward ||
+                  logHeader.OldState == GameState.AllocateResourceReverse))
+
+            {
+                MainPageModel.ChangeUnprocessMessage(-1);
+            }
+            else
+            {
+                Debug.Assert(false);
             }
         }
 

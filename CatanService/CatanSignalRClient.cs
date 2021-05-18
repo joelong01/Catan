@@ -262,7 +262,7 @@ namespace Catan10.CatanService
 
         public Task DisposeAsync()
         {
-            return HubConnection.DisposeAsync();
+            return HubConnection.DisposeAsync().AsTask();
         }
 
         public async Task<bool> DoPingPong()

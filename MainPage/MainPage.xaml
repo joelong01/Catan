@@ -169,7 +169,7 @@
             </Button>
             <local:DragableGridCtrl x:Name="DGC_Game" Width="735" Height="835" HorizontalAlignment="Center"
                 VerticalAlignment="Top"
-                Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}"
+                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                 Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"
                 BorderBrush="{StaticResource bmMaple}"
                 PointerPressed="Draggable_PointerPressed"
@@ -225,6 +225,7 @@
                 VerticalAlignment="Center" Canvas.ZIndex="10"
                 PointerPressed="Draggable_PointerPressed"
                 OnGridPositionChanged="OnGridPositionChanged"
+                Visibility="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=OneWay}"
                 Player="{x:Bind TheHuman, Mode=OneWay}"
                 Background="{StaticResource DevCardType.Knight}"
                 Caption="{x:Bind BuildCaption('Private Data', TheHuman.PlayerName), Mode=OneWay}"

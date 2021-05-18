@@ -167,8 +167,14 @@ namespace Catan10
         public string MainPageTitle(GameInfo gameInfo, PlayerModel player, GameState state)
         {
             if (gameInfo == null || state == GameState.WaitingForNewGame) return "Catan";
-
-            return $"Playing {_gameView.Games[gameInfo.GameIndex].CatanGame} in channel \"{gameInfo.Name}\".  {player.PlayerName}'s Turn.";
+            if (MainPageModel.Settings.IsServiceGame)
+            {
+                return $"Playing {_gameView.Games[gameInfo.GameIndex].CatanGame} in channel \"{gameInfo.Name}\".  {player.PlayerName}'s Turn.";
+            }
+            else
+            {
+                return $"{player.PlayerName}'s Turn.";
+            }
         }
 
         public async Task PickSettlementsAndRoads()
@@ -688,9 +694,9 @@ namespace Catan10
 
             _dt = dt;
 
-            if (MainPageModel.IsServiceGame && CurrentGameState == GameState.PickingBoard && e.KeyModifiers == VirtualKeyModifiers.None)
+            if (CurrentGameState == GameState.PickingBoard && e.KeyModifiers == VirtualKeyModifiers.None)
             {
-                await ScrollMouseWheelInServiceGame(e);
+                await ScrollMouseWheel(e);
                 return;
             }
 
@@ -1021,9 +1027,9 @@ namespace Catan10
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        private async Task ScrollMouseWheelInServiceGame(PointerRoutedEventArgs e)
+        private async Task ScrollMouseWheel(PointerRoutedEventArgs e)
         {
-            if (TheHuman.PlayerName != CurrentPlayer.PlayerName) return;
+            if (TheHuman.PlayerName != CurrentPlayer.PlayerName  && MainPageModel.Settings.IsServiceGame) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
@@ -1161,11 +1167,12 @@ namespace Catan10
             //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
             if (unprocessedMessages != 0)
             {
-                //   this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
+              //  this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
                 return false;
             }
-
+            
             bool enable = MainPageModel.EnableNextButton;
+            this.TraceMessage($"Next button enabled:{enable}");
             Debug.Assert(enable == enableNextButton);
             return enable;
         }

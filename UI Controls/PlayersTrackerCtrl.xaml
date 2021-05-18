@@ -27,22 +27,25 @@
 
         <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="2" Margin="0,5,0,0"
             Fill="{StaticResource bmMaple}" />
-        <ListBox x:Name="ListBox_PlayerResourceCountList" Grid.Row="2" Grid.ColumnSpan="2"
+        <ListView x:Name="ListBox_PlayerResourceCountList" Grid.Row="2" Grid.ColumnSpan="2"
             Height="922" Margin="0,5,0,0" HorizontalAlignment="Stretch"
+            CanReorderItems="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"                  
+            AllowDrop="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}" 
             ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
             Background="Transparent" UseSystemFocusVisuals="False"
-            ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
+            SelectionMode="Single"
+            ScrollViewer.VerticalScrollBarVisibility="Auto">            
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="5" />
                     <Setter Property="HorizontalAlignment" Value="Left" />
                 </Style>
-            </ListBox.ItemContainerStyle>
+            </ListView.ItemContainerStyle>
             <!--<ListBox.Items>
                 <local:PublicDataCtrl />
             </ListBox.Items>-->
-            <ListBox.ItemTemplate>
+            <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
                     <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}" RenderTransformOrigin="0 0">
                         <local:PublicDataCtrl.RenderTransform>
@@ -50,7 +53,7 @@
                         </local:PublicDataCtrl.RenderTransform>
                     </local:PublicDataCtrl>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ListView.ItemTemplate>
+        </ListView>
     </StackPanel>
 </UserControl>

@@ -30,12 +30,18 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     A place to update the GameUI when it is a new player's turn.
+        ///     A place to update the GameUI when it is a new player's turn.  when it is a local game, TheHuman tracks the CurrentPlayer
+        ///     to make all the game logic work right.
         /// </summary>
         /// <param name="player"></param>
         private void SetCurrentPlayer(PlayerModel player)
         {
             if (player == null) return;
+
+            if (!IsServiceGame)
+            {
+                TheHuman = player;
+            }
 
             UpdateTurnFlag();
 

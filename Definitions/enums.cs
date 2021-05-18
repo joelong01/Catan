@@ -115,7 +115,7 @@ namespace Catan10
         [Description("Done With Players.  Pick Board...")]
         WaitingForPlayers,
 
-        [Description("Acceptable. Roll For Order...")]
+        [Description("Accept Board")]
         PickingBoard,
 
         [Description("Select Roll...")]

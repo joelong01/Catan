@@ -940,6 +940,7 @@ namespace Catan10
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
             Contract.Assert(entitlement != Entitlement.Undefined);
             player.GameData.Resources.ConsumeEntitlement(entitlement);
+            
             await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
             if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
             {
@@ -947,6 +948,7 @@ namespace Catan10
                 _showPipGroupIndex = 0;
             }
             BuildingState oldState = updateBuildingLog.OldBuildingState;
+            
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
                 if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build))
@@ -957,8 +959,7 @@ namespace Catan10
                         tr.AddResource(kvp.Value.ResourceType, 1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
-                    // MainPageModel.GameResources += tr;
-                    // this.TraceMessage($"{CurrentPlayer.PlayerName} Granted: {CurrentPlayer.GameData.Resources.TotalResources}");
+                    
                 }
                 else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
                 {

@@ -131,8 +131,9 @@ namespace Catan10
 
                     if (MainPage.Current.CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;
 
-                    if (state == GameState.PickingBoard || state == GameState.WaitingForPlayers)
+                    if (state == GameState.PickingBoard || state == GameState.WaitingForPlayers) 
                     {
+                        if (!IsServiceGame) return true; // if it is a local game, you can hit Next when you want
                         ret = (MainPage.Current.TheHuman.PlayerName == this.GameInfo.Creator);
                         return ret;
                     }
@@ -488,7 +489,7 @@ namespace Catan10
 
         public int ChangeUnprocessMessage(int value, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
-            //this.TraceMessage($"[Value={_unprocessedMessages + value}][OldValue={_unprocessedMessages}] [Delta={value}] State=[{MainPage.Current.MainPageModel.GameState}]", 1, cmb, cln, cfp);
+            // this.TraceMessage($"[Value={_unprocessedMessages + value}][OldValue={_unprocessedMessages}] [Delta={value}] State=[{MainPage.Current.MainPageModel.GameState}]", 1, cmb, cln, cfp);
             _unprocessedMessages += value;
             NotifyPropertyChanged();
             DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
@@ -581,6 +582,8 @@ namespace Catan10
         /// <returns></returns>
         public Visibility ShowTradeUi(GameState gameState)
         {
+            if (Settings.IsLocalGame) return Visibility.Collapsed;
+
             switch (gameState)
             {
                 case GameState.WaitingForNewGame:

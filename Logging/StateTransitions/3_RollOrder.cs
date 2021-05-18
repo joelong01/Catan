@@ -32,11 +32,15 @@ namespace Catan10
         {
             Contract.Assert(gameController.CurrentGameState == GameState.PickingBoard);
 
+            //
+            //  if it is a local game, somebody has to manually set the roll order, so we transition directly
+            //  to allocating Resources
+            //
             PickingBoardToWaitingForRollOrder logHeader = new PickingBoardToWaitingForRollOrder()
             {
                 CanUndo = false,
                 Action = CatanAction.ChangedState,
-                NewState = GameState.WaitingForRollForOrder,
+                NewState = gameController.IsServiceGame ? GameState.WaitingForRollForOrder : GameState.AllocateResourceForward,
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -47,8 +51,16 @@ namespace Catan10
             //
             //  turn off pips
             gameController.ResetAllBuildings();
-            await gameController.TellServiceGameStarted();
+            if (gameController.IsServiceGame)
+            {
+                await gameController.TellServiceGameStarted();
+            }
             MainPageModel mainPageModel = gameController.MainPageModel;
+
+            if (mainPageModel.Settings.IsLocalGame)
+            {
+                AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
+            }
 
             if (mainPageModel.Settings.AutoRespond)
             {
@@ -59,7 +71,7 @@ namespace Catan10
         }
 
         public Task Replay (IGameController gameController)
-        {
+        {   
             gameController.ResetAllBuildings();
             return Task.CompletedTask;
         }
