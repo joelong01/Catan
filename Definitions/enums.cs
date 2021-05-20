@@ -112,13 +112,13 @@ namespace Catan10
         [Description("Start Pick Resources")]
         BeginResourceAllocation,
 
-        [Description("Done With Players.  Pick Board...")]
+        [Description("Done Adding Players.  Pick Board...")]
         WaitingForPlayers,
 
         [Description("Accept Board")]
         PickingBoard,
 
-        [Description("Select Roll...")]
+        [Description("Roll...")]
         WaitingForRollForOrder,
 
         [Description("Order Done")]

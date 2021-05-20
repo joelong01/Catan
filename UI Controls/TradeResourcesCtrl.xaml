@@ -1,64 +1,66 @@
-﻿<UserControl x:Class="Catan10.TradeResourcesCtrl"
+﻿<UserControl x:Name="_control"
+    x:Class="Catan10.TradeResourcesCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Catan10"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="_control" d:DesignHeight="400" d:DesignWidth="350" mc:Ignorable="d">
+    d:DesignHeight="400" d:DesignWidth="350"
+    mc:Ignorable="d">
 
-    <controls:WrapPanel Padding="0" Orientation="{x:Bind Orientation, Mode=OneWay}" VerticalSpacing="{x:Bind VerticalSpacing, Mode=OneWay}" HorizontalSpacing="{x:Bind HorizontalSpacing, Mode=OneWay}">
+    <controls:WrapPanel Padding="0" HorizontalSpacing="{x:Bind HorizontalSpacing, Mode=OneWay}" Orientation="{x:Bind Orientation, Mode=OneWay}" VerticalSpacing="{x:Bind VerticalSpacing, Mode=OneWay}">
 
         <Viewbox Width="{x:Bind CardWidth, Mode=OneWay}">
-            <local:ResourceCardSlimCtrl x:Name="Brick" Margin="0,0,0,0" HorizontalAlignment="Center"
-                OnResourceChanged="ResourceChanged"
-                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
-                Count="{x:Bind TradeResources.Brick, Mode=TwoWay}"
-                TopCount="{x:Bind AvailableResources.Brick, Mode=OneWay}"
-                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Brick), Mode=OneWay}"
-                ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
-                ResourceType="Brick" />
+            <local:ResourceCardSlimCtrl x:Name="Brick" Margin="0,0,0,0" HorizontalAlignment="Center" Count="{x:Bind TradeResources.Brick, Mode=TwoWay}" OnResourceChanged="ResourceChanged" ResourceType="Brick" ShowButtons="{x:Bind ShowButtons, Mode=OneWay}" ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}" TopCount="{x:Bind AvailableResources.Brick, Mode=OneWay}" Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Brick), Mode=OneWay}" />
         </Viewbox>
         <Viewbox Width="{x:Bind CardWidth, Mode=OneWay}">
-            <local:ResourceCardSlimCtrl x:Name="Wood" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2"
-                Margin="0,0,0,0" OnResourceChanged="ResourceChanged"
+            <local:ResourceCardSlimCtrl x:Name="Wood"
+                Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2"
+                Margin="0,0,0,0"
                 Count="{x:Bind TradeResources.Wood, Mode=TwoWay}"
-                TopCount="{x:Bind AvailableResources.Wood, Mode=OneWay}"
-                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
-                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Wood), Mode=OneWay}"
+                OnResourceChanged="ResourceChanged" ResourceType="Wood"
                 ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
-                ResourceType="Wood" />
+                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
+                TopCount="{x:Bind AvailableResources.Wood, Mode=OneWay}"
+                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Wood), Mode=OneWay}" />
         </Viewbox>
         <Viewbox Width="{x:Bind CardWidth, Mode=OneWay}">
-            <local:ResourceCardSlimCtrl x:Name="Sheep" Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2"
-                Margin="0,0,0,0" OnResourceChanged="ResourceChanged"
+            <local:ResourceCardSlimCtrl x:Name="Sheep"
+                Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2"
+                Margin="0,0,0,0"
                 Count="{x:Bind TradeResources.Sheep, Mode=TwoWay}"
-                TopCount="{x:Bind AvailableResources.Sheep, Mode=OneWay}"
-                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
-                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Sheep), Mode=OneWay}"
+                OnResourceChanged="ResourceChanged" ResourceType="Sheep"
                 ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
-                ResourceType="Sheep" />
+                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
+                TopCount="{x:Bind AvailableResources.Sheep, Mode=OneWay}"
+                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Sheep), Mode=OneWay}" />
         </Viewbox>
         <Viewbox Width="{x:Bind CardWidth, Mode=OneWay}">
 
-            <local:ResourceCardSlimCtrl x:Name="Wheat" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                Margin="0" OnResourceChanged="ResourceChanged"
+            <local:ResourceCardSlimCtrl x:Name="Wheat"
+                Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                Margin="0"
                 Count="{x:Bind TradeResources.Wheat, Mode=TwoWay}"
-                TopCount="{x:Bind AvailableResources.Wheat, Mode=OneWay}"
-                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
+                OnResourceChanged="ResourceChanged"
+                RelativePanel.Below="Wood" RelativePanel.RightOf="Sheep"
+                ResourceType="Wheat"
                 ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
-                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Wheat), Mode=OneWay}"
-                ResourceType="Wheat" RelativePanel.RightOf="Sheep" RelativePanel.Below="Wood" />
+                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
+                TopCount="{x:Bind AvailableResources.Wheat, Mode=OneWay}"
+                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Wheat), Mode=OneWay}" />
         </Viewbox>
         <Viewbox Width="{x:Bind CardWidth, Mode=OneWay}">
-            <local:ResourceCardSlimCtrl x:Name="Ore" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2"
-                Margin="0" OnResourceChanged="ResourceChanged"
+            <local:ResourceCardSlimCtrl x:Name="Ore"
+                Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2"
+                Margin="0"
                 Count="{x:Bind TradeResources.Ore, Mode=TwoWay}"
-                TopCount="{x:Bind AvailableResources.Ore, Mode=OneWay}"
-                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
+                OnResourceChanged="ResourceChanged"
+                RelativePanel.RightOf="Wheat" ResourceType="Ore"
                 ShowButtons="{x:Bind ShowButtons, Mode=OneWay}"
-                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Ore), Mode=OneWay}"
-                ResourceType="Ore" RelativePanel.RightOf="Wheat" />
+                ShowTopCount="{x:Bind ShowAvailableResources, Mode=OneWay}"
+                TopCount="{x:Bind AvailableResources.Ore, Mode=OneWay}"
+                Visibility="{x:Bind CountVisibility(TradeResources, local:ResourceType.Ore), Mode=OneWay}" />
         </Viewbox>
 
     </controls:WrapPanel>

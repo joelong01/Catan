@@ -34,7 +34,7 @@ namespace Catan10
             var mainPageModel = gameController.MainPageModel;
             mainPageModel.FinishedAddingPlayers();
 
-            if (mainPageModel.GameInfo.Creator == gameController.TheHuman.PlayerName)
+            if (mainPageModel.GameInfo.Creator == gameController.TheHuman.PlayerName || mainPageModel.Settings.IsLocalGame)
             {
                 //
                 //  we only need one person sending around a random board

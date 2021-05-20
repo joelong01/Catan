@@ -1,10 +1,4 @@
-﻿<UserControl x:Class="Catan10.TradeCtrl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:Catan10"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="510" d:DesignWidth="1020" mc:Ignorable="d">
+﻿<UserControl x:Class="Catan10.TradeCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="510" d:DesignWidth="1020" mc:Ignorable="d">
     <Grid Margin="0" BorderThickness="3" CornerRadius="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="0" />
@@ -19,131 +13,89 @@
         </Grid.ColumnDefinitions>
         <!--  left side:  Offer Creation  -->
 
-        <local:OfferCtrl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="1" Margin="0,0,0,0"
-            HorizontalAlignment="Left" VerticalAlignment="Top" ShowAllButton="True"
-            ShowPartnerApproval="False" ShowDeleteButton="False" ShowResourceButtons="true"
-            OnSendOffer="OnSendOffer" ShowResetButton="True" OnFilter="OnFilterOffers"
-            TheHuman="{x:Bind TheHuman, Mode=OneWay}"
+        <local:OfferCtrl
+            Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="1"
+            Margin="0,0,0,0" HorizontalAlignment="Left"
+            VerticalAlignment="Top"
             CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-            PlayingPlayers="{x:Bind PlayingPlayers, Mode=OneWay}" />
-
-        <Border Grid.Row="3" Grid.ColumnSpan="3" Margin="10,0,0,0" HorizontalAlignment="Left"
-            Visibility="Collapsed" Background="Black" CornerRadius="5">
-            <Button Foreground="White" Click="OnDone">
-                <Button.Content>
-                    <StackPanel>
-                        <TextBlock HorizontalAlignment="Center" Text="⮽" FontSize="22" />
-                        <TextBlock HorizontalAlignment="Center" Text="Done" FontSize="22" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-        </Border>
+            OnFilter="OnFilterOffers" OnSendOffer="OnSendOffer"
+            PlayingPlayers="{x:Bind PlayingPlayers, Mode=OneWay}"
+            ShowAllButton="True" ShowDeleteButton="False"
+            ShowPartnerApproval="False" ShowResetButton="True"
+            ShowResourceButtons="true"
+            TheHuman="{x:Bind TheHuman, Mode=OneWay}" />
         <!--  bottom:  A list of outstanding offers Width="188" "{x:Bind local:TradeCtrl.SmallOffers(local:MainPage.Current.MainPageModel.Settings.SmallOffers), FallbackValue=472, Mode=OneWay}"  -->
-        <GridView Grid.Row="2" Grid.Column="1" Margin="0" Padding="0"
-            HorizontalAlignment="Stretch" CornerRadius="10" Background="Transparent"
-            BorderBrush="White" BorderThickness="2" SelectionMode="None"
-            SelectedItem="{x:Bind SelectedOffer, Mode=TwoWay}"
+        <GridView
+            Grid.Row="2" Grid.Column="1"
+            Margin="0" Padding="0" HorizontalAlignment="Stretch"
+            Background="Transparent" BorderBrush="White"
+            BorderThickness="2" CornerRadius="10"
             IsItemClickEnabled="False"
-            ItemsSource="{x:Bind FilteredOffers(TheHuman.GameData.Trades.PotentialTrades, MyOffersOnly), Mode=OneWay}">
+            ItemsSource="{x:Bind FilteredOffers(TheHuman.GameData.Trades.PotentialTrades, MyOffersOnly), Mode=OneWay}"
+            SelectedItem="{x:Bind SelectedOffer, Mode=TwoWay}"
+            SelectionMode="None">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:TradeOffer">
                     <Viewbox Width="468">
-                        <StackPanel Width="530" Height="500" Margin="5,0,0,0"
-                            Background="{x:Bind Owner.Player.BackgroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
-                            BorderBrush="Gold" BorderThickness="1" CornerRadius="10">
-                            <Grid Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                                Background="Transparent"
-                                BorderBrush="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}"
-                                BorderThickness="1" CornerRadius="10">
+                        <StackPanel Width="530" Height="500" Margin="5,0,0,0" Background="{x:Bind Owner.Player.BackgroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}" BorderBrush="Gold" BorderThickness="1" CornerRadius="10">
+                            <Grid Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Transparent" BorderBrush="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}" BorderThickness="1" CornerRadius="10">
                                 <StackPanel Height="60" HorizontalAlignment="Left" Orientation="Horizontal">
 
-                                    <Ellipse Width="50" Height="50" Margin="10,0,0,0" VerticalAlignment="Center"
-                                        Fill="{x:Bind Owner.Player.ImageBrush, Mode=OneWay}"
-                                        Stroke="Black" />
+                                    <Ellipse Width="50" Height="50" Margin="10,0,0,0" VerticalAlignment="Center" Fill="{x:Bind Owner.Player.ImageBrush, Mode=OneWay}" Stroke="Black" />
 
-                                    <ToggleSwitch Margin="10,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                        Style="{StaticResource CatanToggleSwitch}"
-                                        Tag="{x:Bind}"
-                                        Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
-                                        Background="Red"
-                                        IsEnabled="{x:Bind local:TradeCtrl.IsHuman(Owner.Player), Mode=OneWay}"
-                                        IsOn="{x:Bind Owner.Approved, Mode=OneWay}"
-                                        Toggled="OwnerApprovalChanged">
+                                    <ToggleSwitch Margin="10,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Red" Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}" IsEnabled="{x:Bind local:TradeCtrl.IsHuman(Owner.Player), Mode=OneWay}" IsOn="{x:Bind Owner.Approved, Mode=OneWay}" Style="{StaticResource CatanToggleSwitch}" Tag="{x:Bind}" Toggled="OwnerApprovalChanged">
                                         <ToggleSwitch.OnContent>
-                                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                FontFamily="Segoe UI Symbol" FontSize="22"
-                                                Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}"
-                                                Text="&#xE19F;" />
+                                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI Symbol" FontSize="22" Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}" Text="&#xE19F;" />
                                         </ToggleSwitch.OnContent>
                                         <ToggleSwitch.OffContent>
-                                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                FontFamily="Segoe UI Symbol" FontSize="22"
-                                                Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}"
-                                                Text="&#xE19E;" />
+                                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI Symbol" FontSize="22" Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}" Text="&#xE19E;" />
                                         </ToggleSwitch.OffContent>
                                     </ToggleSwitch>
                                 </StackPanel>
                                 <!--  Partner Approval...themed as owner  -->
                                 <StackPanel Margin="0,0,10,0" HorizontalAlignment="Right" Orientation="Horizontal">
-                                    <Ellipse Width="50" Height="50" Margin="0,0,10,0" HorizontalAlignment="Right"
+                                    <Ellipse Width="50" Height="50" Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center" Fill="{x:Bind Partner.Player.ImageBrush, Mode=OneWay, TargetNullValue=Blue}" Stroke="Black" StrokeThickness="1" />
+                                    <ToggleSwitch
+                                        Width="85"
+                                        Margin="0,0,0,0" HorizontalAlignment="Right"
                                         VerticalAlignment="Center"
-                                        Fill="{x:Bind Partner.Player.ImageBrush, Mode=OneWay, TargetNullValue=Blue}"
-                                        Stroke="Black" StrokeThickness="1" />
-                                    <ToggleSwitch Width="85" Margin="0,0,0,0" HorizontalAlignment="Right"
-                                        VerticalAlignment="Center" Background="Blue"
-                                        Tag="{x:Bind}"
-                                        IsEnabled="{x:Bind local:TradeCtrl.IsHuman(Partner.Player), Mode=OneWay}"
+                                        Background="Blue"
                                         Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
-                                        Style="{StaticResource CatanToggleSwitch}"
+                                        IsEnabled="{x:Bind local:TradeCtrl.IsHuman(Partner.Player), Mode=OneWay}"
                                         IsOn="{x:Bind Partner.Approved, Mode=TwoWay}"
+                                        Style="{StaticResource CatanToggleSwitch}"
+                                        Tag="{x:Bind}"
                                         Toggled="PartnerApprovalChanged">
                                         <ToggleSwitch.OnContent>
-                                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                FontFamily="Segoe UI Symbol" FontSize="22"
-                                                Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}"
-                                                Text="&#xE19F;" />
+                                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Segoe UI Symbol" FontSize="22" Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}" Text="&#xE19F;" />
                                         </ToggleSwitch.OnContent>
                                         <ToggleSwitch.OffContent>
-                                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                FontFamily="Segoe UI Symbol" FontSize="22"
-                                                Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}"
-                                                Text="&#xE19E;" />
+                                            <TextBlock Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Segoe UI Symbol" FontSize="22" Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}" Text="&#xE19E;" />
                                         </ToggleSwitch.OffContent>
                                     </ToggleSwitch>
                                 </StackPanel>
                             </Grid>
-                            <TextBlock Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
-                                FontSize="32" Text="Offer" />
+                            <TextBlock Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="32" Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}" Text="Offer" />
                             <!--  My Offer  -->
-                            <local:TradeResourcesCtrl Grid.Row="1" Margin="5,0,0,0" ShowButtons="False"
-                                TradeResources="{x:Bind Owner.Resources, Mode=OneWay}"
-                                CardWidth="100" />
+                            <local:TradeResourcesCtrl Grid.Row="1" Margin="5,0,0,0" CardWidth="100" ShowButtons="False" TradeResources="{x:Bind Owner.Resources, Mode=OneWay}" />
                             <!--  Divider  -->
                             <StackPanel Margin="2" Orientation="Horizontal">
-                                <Rectangle Width="442" Height="2" Margin="0" HorizontalAlignment="Stretch"
-                                    Fill="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}" />
+                                <Rectangle Width="442" Height="2" Margin="0" HorizontalAlignment="Stretch" Fill="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}" />
                                 <Grid Margin="5,0,0,0">
                                     <!--  Delete Button  -->
-                                    <Button Margin="2,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                        CornerRadius="10" Click="OnDelete"
-                                        Tag="{x:Bind}"
-                                        Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}">
+                                    <Button Margin="2,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnDelete" CornerRadius="10" Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay}" Tag="{x:Bind}">
                                         <Button.Content>
                                             <StackPanel>
-                                                <TextBlock HorizontalAlignment="Center" Text="&#xE0D9;" FontFamily="Segoe UI Symbol" FontSize="18" />
-                                                <TextBlock Text="Delete" FontSize="18" />
+                                                <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI Symbol" FontSize="18" Text="&#xE0D9;" />
+                                                <TextBlock FontSize="18" Text="Delete" />
                                             </StackPanel>
                                         </Button.Content>
                                     </Button>
                                 </Grid>
                             </StackPanel>
-                            <TextBlock Grid.Column="2" Margin="5,-35,0,0" HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}"
-                                FontSize="32" Text="Desire" />
+                            <TextBlock Grid.Column="2" Margin="5,-35,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="32" Foreground="{x:Bind Owner.Player.ForegroundBrush, Mode=OneWay, TargetNullValue=Red, FallbackValue=Red}" Text="Desire" />
                             <!--  My Desire  -->
-                            <local:TradeResourcesCtrl HorizontalAlignment="Left" TradeResources="{x:Bind Partner.Resources, Mode=OneWay}" ShowButtons="False" CardWidth="100" />
+                            <local:TradeResourcesCtrl HorizontalAlignment="Left" CardWidth="100" ShowButtons="False" TradeResources="{x:Bind Partner.Resources, Mode=OneWay}" />
 
 
 
@@ -158,5 +110,16 @@
                 </Style>
             </GridView.ItemContainerStyle>
         </GridView>
+
+        <Border Grid.Row="3" Grid.ColumnSpan="3" Margin="10,0,0,0" HorizontalAlignment="Left" Background="Black" CornerRadius="5" Visibility="Collapsed">
+            <Button Click="OnDone" Foreground="White">
+                <Button.Content>
+                    <StackPanel>
+                        <TextBlock HorizontalAlignment="Center" FontSize="22" Text="⮽" />
+                        <TextBlock HorizontalAlignment="Center" FontSize="22" Text="Done" />
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </Border>
     </Grid>
 </UserControl>

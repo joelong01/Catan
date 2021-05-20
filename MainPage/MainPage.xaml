@@ -1,31 +1,25 @@
-﻿<Page x:Class="Catan10.MainPage"
+﻿<Page x:Name="_page"
+    x:Class="Catan10.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:s="using:Catan10.Sliders"
+    xmlns:local="using:Catan10"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="_page" d:DesignWidth="2560" d:DesignHeight="1440" IsTabStop="False"
-    RequestedTheme="Dark" UseLayoutRounding="True" NavigationCacheMode="Required"
-    RightTapped="OnRightTapped" mc:Ignorable="d">
+    xmlns:s="using:Catan10.Sliders"
+    d:DesignHeight="1440" d:DesignWidth="2560" IsTabStop="False"
+    NavigationCacheMode="Required" RequestedTheme="Dark"
+    RightTapped="OnRightTapped" UseLayoutRounding="True"
+    mc:Ignorable="d">
     <Page.Resources>
         <Storyboard x:Name="_sbShowHideSettings">
-            <DoubleAnimation x:Name="_daShowHideSettings" d:IsOptimized="True"
-                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
-                Storyboard.TargetName="_ctrlSettings" To="0" Duration="0:0:0.250" />
+            <DoubleAnimation x:Name="_daShowHideSettings" d:IsOptimized="True" Storyboard.TargetName="_ctrlSettings" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0" Duration="0:0:0.250" />
         </Storyboard>
         <Storyboard x:Name="_sbNumberOpacity">
-            <DoubleAnimation x:Name="_daNumberOpacity" d:IsOptimized="True" AutoReverse="False"
-                Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="RollGrid"
-                To="0" Duration="0:0:1.00" />
+            <DoubleAnimation x:Name="_daNumberOpacity" d:IsOptimized="True" AutoReverse="False" Storyboard.TargetName="RollGrid" Storyboard.TargetProperty="(UIElement.Opacity)" To="0" Duration="0:0:1.00" />
         </Storyboard>
         <Storyboard x:Name="_sbRotatePlayerAndRolls">
-            <DoubleAnimation x:Name="_daRotatePlayers" d:IsOptimized="True"
-                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)"
-                Storyboard.TargetName="_gameTracker" To="0" Duration="0:0:1" />
-            <DoubleAnimation x:Name="_daRotateRolls" d:IsOptimized="True"
-                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)"
-                Storyboard.TargetName="_rollHistoryChart" To="0" Duration="0:0:1" />
+            <DoubleAnimation x:Name="_daRotatePlayers" d:IsOptimized="True" Storyboard.TargetName="_gameTracker" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0" Duration="0:0:1" />
+            <DoubleAnimation x:Name="_daRotateRolls" d:IsOptimized="True" Storyboard.TargetName="_rollHistoryChart" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0" Duration="0:0:1" />
         </Storyboard>
         <Style x:Key="RollGridTextStyle" TargetType="TextBlock">
             <Setter Property="Margin" Value="2,-2" />
@@ -51,110 +45,95 @@
         </Style>
     </Page.Resources>
     <Viewbox Stretch="Uniform">
-        <Grid x:Name="ContentRoot" Width="1920" Height="1080"
-            local:CatanAttachedProperties.CurrentPlayerModel="{x:Bind CurrentPlayer, Mode=TwoWay}"
-            PointerWheelChanged="OnScrollMouseWheel"
-            Background="{StaticResource bmCherry}"
-            CornerRadius="50"
-            BorderBrush="{StaticResource bmMaple}"
-            BorderThickness="6">
+        <Grid x:Name="ContentRoot" Width="1920" Height="1080" local:CatanAttachedProperties.CurrentPlayerModel="{x:Bind CurrentPlayer, Mode=TwoWay}" Background="{StaticResource bmCherry}" BorderBrush="{StaticResource bmMaple}" BorderThickness="6" CornerRadius="50" PointerWheelChanged="OnScrollMouseWheel">
             <Button Visibility="Collapsed">
                 <Button.Flyout>
                     <MenuFlyout x:Name="_menuBaron" Placement="Right" />
                 </Button.Flyout>
             </Button>
-            <Viewbox Grid.Row="0" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="5"
-                Width="75" Margin="20,0,0,20" HorizontalAlignment="Left"
-                VerticalAlignment="Bottom">
-                <Grid Visibility="{x:Bind SpyVisible, Mode=OneWay}">
-                    <TextBlock Margin="5,14,5,-5" HorizontalAlignment="Center" FontSize="12" Text="{x:Bind TurnedSpyOn, Mode=OneWay}" />
-                    <TextBlock HorizontalAlignment="Center" FontSize="54" Text="" FontFamily="Segoe MDL2 Assets" />
-                </Grid>
-            </Viewbox>
-            <Button Margin="29,20,0,0" VerticalAlignment="Top" FontSize="22"
-                Background="Transparent" Canvas.ZIndex="10">
+            <Button Margin="29,20,0,0" VerticalAlignment="Top" Background="Transparent" Canvas.ZIndex="10" FontSize="22">
                 <Button.Content>
-                    <TextBlock Text="&#xE700;" FontFamily="Segoe MDL2 Assets" FontSize="30" />
+                    <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="30" Text="&#xE700;" />
                 </Button.Content>
                 <Button.Flyout>
-                    <MenuFlyout x:Name="_contextMenu" Placement="Bottom" Opened="OnMenuOpened" Closed="OnMenuClosed">
+                    <MenuFlyout x:Name="_contextMenu" Closed="OnMenuClosed" Opened="OnMenuOpened" Placement="Bottom">
                         <MenuFlyoutSubItem Text="Game">
-                            <MenuFlyoutItem Text="New Network Game" Click="OnNewNetworkGame" />
-                            <MenuFlyoutItem Text="New Local Game" Click="OnNewLocalGame" />
-                            <MenuFlyoutItem Text="Join Network Game" Click="OnJoinNetworkGame" />
+                            <MenuFlyoutItem Click="OnNewNetworkGame" Text="New Network Game" />
+                            <MenuFlyoutItem Click="OnNewLocalGame" Text="New Local Game" />
+                            <MenuFlyoutItem Click="OnJoinNetworkGame" Text="Join Network Game" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="End Game" Click="Menu_OnEndGame" />
-                            <MenuFlyoutItem Text="Delete All Games" Click="OnDeleteAllGames" />
+                            <MenuFlyoutItem Click="Menu_OnEndGame" Text="End Game" />
+                            <MenuFlyoutItem Click="OnDeleteAllGames" Text="Delete All Games" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Connect To Catan Service Hub" Click="OnNetworkConnect" />
-                            <ToggleMenuFlyoutItem Text="Local Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
+                            <MenuFlyoutItem Click="OnNetworkConnect" Text="Connect To Catan Service Hub" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" Text="Local Game" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Random Gold Tiles">
-                            <ToggleMenuFlyoutItem Text="Random Gold Tile" IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}" />
-                            <MenuFlyoutItem Text="Change Count" Click="OnChangeRandomGoldTileCount" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}" Text="Random Gold Tile" />
+                            <MenuFlyoutItem Click="OnChangeRandomGoldTileCount" Text="Change Count" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Resource Tests">
                             <MenuFlyoutSubItem Text="Resource Cards">
-                                <MenuFlyoutItem Text="All" Click="OnGrantDevCard" Tag="All" />
-                                <MenuFlyoutItem Text="Year of Plenty" Click="OnGrantDevCard" Tag="YearOfPlenty" />
-                                <MenuFlyoutItem Text="Knight" Click="OnGrantDevCard" Tag="Knight" />
-                                <MenuFlyoutItem Text="Road Building" Click="OnGrantDevCard" Tag="RoadBuilding" />
-                                <MenuFlyoutItem Text="Monopoly" Click="OnGrantDevCard" Tag="Monopoly" />
-                                <MenuFlyoutItem Text="Victory Point" Click="OnGrantDevCard" Tag="VictoryPoint" />
+                                <MenuFlyoutItem Click="OnGrantDevCard" Tag="All" Text="All" />
+                                <MenuFlyoutItem Click="OnGrantDevCard" Tag="YearOfPlenty" Text="Year of Plenty" />
+                                <MenuFlyoutItem Click="OnGrantDevCard" Tag="Knight" Text="Knight" />
+                                <MenuFlyoutItem Click="OnGrantDevCard" Tag="RoadBuilding" Text="Road Building" />
+                                <MenuFlyoutItem Click="OnGrantDevCard" Tag="Monopoly" Text="Monopoly" />
+                                <MenuFlyoutItem Click="OnGrantDevCard" Tag="VictoryPoint" Text="Victory Point" />
                             </MenuFlyoutSubItem>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Grant Resources" Click="OnGrantResources" />
+                            <MenuFlyoutItem Click="OnGrantResources" Text="Grant Resources" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Development">
-                            <MenuFlyoutItem Text="Show Catan Spy" Click="OnShowCatanSpy" />
+                            <MenuFlyoutItem Click="OnShowCatanSpy" Text="Show Catan Spy" />
                             <MenuFlyoutSeparator />
                             <MenuFlyoutSubItem Text="Game Type">
-                                <ToggleMenuFlyoutItem Text="Local Game" IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" />
-                                <ToggleMenuFlyoutItem Text="Service Game" IsChecked="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=TwoWay}" />
+                                <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" Text="Local Game" />
+                                <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=TwoWay}" Text="Service Game" />
                             </MenuFlyoutSubItem>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Save Settings" Click="OnSaveSettings" />
+                            <MenuFlyoutItem Click="OnSaveSettings" Text="Save Settings" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Test 1" Click="OnTest1" />
-                            <MenuFlyoutItem Text="Test 2" Click="OnTest2" />
-                            <MenuFlyoutItem Text="Test 3" Click="OnTest3" />
-                            <MenuFlyoutItem Text="Grant Resources" Click="OnGrantResources" />
-                            <MenuFlyoutItem Text="Grant Entitlements" Click="OnGrantEntitlements" />
-                            <MenuFlyoutItem Text="Test Service" Click="OnTestService" />
+                            <MenuFlyoutItem Click="OnTest1" Text="Test 1" />
+                            <MenuFlyoutItem Click="OnTest2" Text="Test 2" />
+                            <MenuFlyoutItem Click="OnTest3" Text="Test 3" />
+                            <MenuFlyoutItem Click="OnGrantResources" Text="Grant Resources" />
+                            <MenuFlyoutItem Click="OnGrantEntitlements" Text="Grant Entitlements" />
+                            <MenuFlyoutItem Click="OnTestService" Text="Test Service" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Test Game (Regular)" Click="OnTestRegularGame" />
-                            <MenuFlyoutItem Text="Test Game (Expansion)" Click="OnTestExpansionGame" />
+                            <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Game (Regular)" />
+                            <MenuFlyoutItem Click="OnTestExpansionGame" Text="Test Game (Expansion)" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Pick Settlements and Road" Click="PickSettlementsAndRoads" />
+                            <MenuFlyoutItem Click="PickSettlementsAndRoads" Text="Pick Settlements and Road" />
                             <MenuFlyoutSeparator />
-                            <ToggleMenuFlyoutItem Text="Show Tile Index" Click="ToggleShowTile" IsChecked="False" />
+                            <ToggleMenuFlyoutItem Click="ToggleShowTile" IsChecked="False" Text="Show Tile Index" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="New Game" Click="Menu_OnNewGame" />
-                            <MenuFlyoutItem Text="Reset Service" Click="Menu_OnResetService" />
-                            <MenuFlyoutItem Text="Start Default Network Game" Click="OnStartDefaultNetworkGame" />
-                            <ToggleMenuFlyoutItem Text="Auto Respond Mode" IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}" />
-                            <ToggleMenuFlyoutItem Text="Auto Join Network Game" IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}" />
+                            <MenuFlyoutItem Click="Menu_OnNewGame" Text="New Game" />
+                            <MenuFlyoutItem Click="Menu_OnResetService" Text="Reset Service" />
+                            <MenuFlyoutItem Click="OnStartDefaultNetworkGame" Text="Start Default Network Game" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}" Text="Auto Respond Mode" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}" Text="Auto Join Network Game" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Baron">
-                            <MenuFlyoutItem Text="Optimal" Click="OnPickOptimalBaron" />
-                            <MenuFlyoutItem Text="Random" Click="OnPickRandomBaron" />
+                            <MenuFlyoutItem Click="OnPickOptimalBaron" Text="Optimal" />
+                            <MenuFlyoutItem Click="OnPickRandomBaron" Text="Random" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Players">
-                            <MenuFlyoutItem Text="Set Default User" Click="OnSetUser" />
-                            <MenuFlyoutItem Text="Manage Players" Click="OnManagePlayers" />
-                            <MenuFlyoutItem Text="Reset To Default" Click="OnSetDefaultState" />
+                            <MenuFlyoutItem Click="OnSetUser" Text="Set Default User" />
+                            <MenuFlyoutItem Click="OnManagePlayers" Text="Manage Players" />
+                            <MenuFlyoutItem Click="OnSetDefaultState" Text="Reset To Default" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Options">
-                            <ToggleMenuFlyoutItem Text="Hide Players On Next" IsChecked="False" />
+                            <ToggleMenuFlyoutItem IsChecked="False" Text="Hide Players On Next" />
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutItem Text="Randomize Board" Click="OnAssignNumbers" />
-                        <MenuFlyoutItem Text="Settings" Click="OnViewSettings" />
-                        <MenuFlyoutItem Text="Show Saved Games" Click="Menu_ShowSavedGames" />
+                        <MenuFlyoutItem Click="OnAssignNumbers" Text="Randomize Board" />
+                        <MenuFlyoutItem Click="OnViewSettings" Text="Settings" />
+                        <MenuFlyoutItem Click="Menu_ShowSavedGames" Text="Show Saved Games" />
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem x:Name="Menu_Games" Text="Games" />
                         <MenuFlyoutSeparator />
@@ -163,35 +142,34 @@
                             <MenuFlyoutSubItem x:Name="Menu_Secondary_Color" Text="Secondary" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Cancel" Click="OnCancelClicked" />
+                        <MenuFlyoutItem Click="OnCancelClicked" Text="Cancel" />
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-            <local:DragableGridCtrl x:Name="DGC_Game" Width="735" Height="835" HorizontalAlignment="Center"
-                VerticalAlignment="Top"
+            <local:DragableGridCtrl x:Name="DGC_Game"
+                Width="735" Height="835"
+                HorizontalAlignment="Center" VerticalAlignment="Top"
                 Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"
                 BorderBrush="{StaticResource bmMaple}"
-                PointerPressed="Draggable_PointerPressed"
-                OnGridPositionChanged="OnGridPositionChanged" BorderThickness="2"
-                CornerRadius="5">
-                <local:GameContainerCtrl x:Name="_gameView" Margin="0" DoubleTapped="GameViewControlDoubleTapped" 
-                    Canvas.ZIndex="2" CornerRadius="0" RenderTransformOrigin="0.5,0.5"
-                    IsEnabled="True" PointerPressed="GameViewControlPointerPressed" />
+                BorderThickness="2"
+                Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"
+                CornerRadius="5"
+                OnGridPositionChanged="OnGridPositionChanged"
+                PointerPressed="Draggable_PointerPressed">
+                <local:GameContainerCtrl x:Name="_gameView" Margin="0" Canvas.ZIndex="2" CornerRadius="0" DoubleTapped="GameViewControlDoubleTapped" IsEnabled="True" PointerPressed="GameViewControlPointerPressed" RenderTransformOrigin="0.5,0.5" />
             </local:DragableGridCtrl>
 
-            <s:SliderCtrl Width="400" Height="220" Margin="0" HorizontalAlignment="Left"
-                VerticalAlignment="Center" CornerRadius="10" Canvas.ZIndex="15"
-                SlideDirection="Right" Caption="Board Stats" FontSize="18"
-                Open="{x:Bind MainPageModel.ShowBoardMeasurements(MainPageModel.GameState), Mode=OneWay}"
+            <s:SliderCtrl
+                Width="400" Height="220"
+                Margin="0" HorizontalAlignment="Left"
+                VerticalAlignment="Center"
                 Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}"
-                Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}">
-                <local:BoardMeasurementCtrl PipCount="{Binding Path=PipCount, Mode=OneWay}"
-                    FiveStarPositions="{x:Bind Path=MainPageModel.FiveStarPositions, Mode=OneWay}"
-                    FourStarPositions="{x:Bind Path=MainPageModel.FourStarPositions, Mode=OneWay}"
-                    ThreeStarPositions="{x:Bind Path=MainPageModel.ThreeStarPositions, Mode=OneWay}"
-                    TwoStarPositions="{x:Bind Path=MainPageModel.TwoStarPositions, Mode=OneWay}"
-                    CornerRadius="0" />
+                Canvas.ZIndex="15" Caption="Board Stats" CornerRadius="10"
+                FontSize="18"
+                Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
+                Open="{x:Bind MainPageModel.ShowBoardMeasurements(MainPageModel.GameState), Mode=OneWay}"
+                SlideDirection="Right">
+                <local:BoardMeasurementCtrl CornerRadius="0" FiveStarPositions="{x:Bind Path=MainPageModel.FiveStarPositions, Mode=OneWay}" FourStarPositions="{x:Bind Path=MainPageModel.FourStarPositions, Mode=OneWay}" PipCount="{Binding Path=PipCount, Mode=OneWay}" ThreeStarPositions="{x:Bind Path=MainPageModel.ThreeStarPositions, Mode=OneWay}" TwoStarPositions="{x:Bind Path=MainPageModel.TwoStarPositions, Mode=OneWay}" />
 
             </s:SliderCtrl>
 
@@ -221,35 +199,232 @@
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>-->
 
-            <local:DragableGridCtrl x:Name="Draggable_PrivateData" Width="360" HorizontalAlignment="Center"
-                VerticalAlignment="Center" Canvas.ZIndex="10"
-                PointerPressed="Draggable_PointerPressed"
-                OnGridPositionChanged="OnGridPositionChanged"
-                Visibility="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=OneWay}"
-                Player="{x:Bind TheHuman, Mode=OneWay}"
+            <local:DragableGridCtrl x:Name="Draggable_PrivateData"
+                Width="360"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
                 Background="{StaticResource DevCardType.Knight}"
-                Caption="{x:Bind BuildCaption('Private Data', TheHuman.PlayerName), Mode=OneWay}"
-                BorderThickness="2"
                 BorderBrush="{StaticResource bmMaple}"
-                CornerRadius="10">
+                BorderThickness="2" Canvas.ZIndex="10"
+                Caption="{x:Bind BuildCaption('Private Data', TheHuman.PlayerName), Mode=OneWay}"
+                CornerRadius="10"
+                OnGridPositionChanged="OnGridPositionChanged"
+                Player="{x:Bind TheHuman, Mode=OneWay}"
+                PointerPressed="Draggable_PointerPressed"
+                Visibility="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=OneWay}">
                 <local:DragableGridCtrl.Child>
                     <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" StolenResource="{x:Bind TheHuman.GameData.Resources.StolenResource, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Width="500" Margin="10"
-                HorizontalAlignment="Right" Canvas.ZIndex="5"
-                GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
-                PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
-                MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
-                GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" />
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Width="500" Margin="10" HorizontalAlignment="Right" Canvas.ZIndex="5" GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}" GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
+            <!--    -->
 
-            <Grid Name="_savedGameGrid" Grid.Row="1" Width="383" Height="280"
-                Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                x:Load="False" Canvas.ZIndex="10" PointerPressed="OnPointerPressed"
-                Visibility="Collapsed"
+            <local:DragableGridCtrl x:Name="PlayerTradeGrid"
+                Width="450"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="{StaticResource bmMaple}"
+                BorderBrush="{StaticResource WhiteBrush}"
+                Canvas.ZIndex="10" Caption="Resource Trades"
+                CornerRadius="10" Foreground="Black"
+                OnGridPositionChanged="OnGridPositionChanged"
+                Player="{x:Bind TheHuman, Mode=OneWay}"
+                PointerPressed="Draggable_PointerPressed"
+                Visibility="{x:Bind MainPageModel.ShowTradeUi(MainPageModel.GameState), Mode=OneWay}">
+                <local:DragableGridCtrl.Child>
+                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" TheHuman="{x:Bind TheHuman, Mode=OneWay}" />
+                </local:DragableGridCtrl.Child>
+            </local:DragableGridCtrl>
+
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Orientation="Horizontal">
+                <s:SliderCtrl  Name="Grid_RollStats"
+                             
+                    Width="220" Height="220"
+                    Margin="-450,0,20,0" HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}"
+                    BorderBrush="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
+                    Canvas.ZIndex="999" Caption="Roll Stats" CornerRadius="10"
+                    Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
+                    Open="False" SlideDirection="Up">
+                    <s:SliderCtrl.Child>
+                        <Viewbox Grid.Row="1" Margin="0" HorizontalAlignment="Stretch">
+                            <StackPanel>
+                                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="2" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TwoPercent}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="3" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.ThreePercent}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="4" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.FourPercent}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="5" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.FivePercent}" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
+
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="6" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.SixPercent}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" HideSeven="False" Number="7" Theme="Dark" Visibility="Visible" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.SevenPercent}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="8" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.EightPercent}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="9" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.NinePercent}" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
+
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="10" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TenPercent}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="11" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.ElevenPercent}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Button Style="{StaticResource NumberButtonKey}" Tapped="OnNumberTapped">
+                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="12" />
+                                        </Button>
+                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TwelvePercent}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ToggleButton Margin="0,-13,0,0" Background="Transparent" IsChecked="{x:Bind CanMoveBaronBeforeRoll, Mode=TwoWay}" IsEnabled="{x:Bind MainPageModel.Log.GameState, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToBooleanConverter}, FallbackValue=true, ConverterParameter=WaitingForRoll}">
+                                            <local:BaronCtrl Width="85" Height="71" />
+                                        </ToggleButton>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Viewbox>
+                    </s:SliderCtrl.Child>
+                </s:SliderCtrl>
+                <s:SliderCtrl x:Name="SynchronizedRolls"
+                    Width="445" Height="220"
+                    Margin="0,0,20,0" HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}"
+                    BorderBrush="{StaticResource WhiteBrush}"
+                    Canvas.ZIndex="10" Caption="Rolls" CornerRadius="10"
+                    Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
+                    Open="{x:Bind MainPageModel.ShowRollUi(MainPageModel.GameState), Mode=OneWay}"
+                    SlideDirection="Up"
+                    Visibility="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=OneWay}">
+                    <s:SliderCtrl.Child>
+                        <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" OnShowAllRolls="OnShowAllRolls" />
+                    </s:SliderCtrl.Child>
+                </s:SliderCtrl>
+                <s:SliderCtrl x:Name="ControlGrid"
+                    Width="175" Height="220"
+                    HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                    BorderBrush="{StaticResource WhiteBrush}"
+                    Canvas.ZIndex="10" Caption="Game Controls" CornerRadius="10"
+                    FontSize="14"
+                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                    Open="{x:Bind OpenControlGrid(CurrentPlayer, TheHuman), Mode=OneWay}"
+                    Player="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    SlideDirection="Up" Visibility="Visible">
+                    <s:SliderCtrl.Child>
+                        <StackPanel Width="350" Height="425" Margin="5" HorizontalAlignment="Center" Orientation="Vertical">
+                            <StackPanel>
+                                <Button x:Name="_btnNextStep" Margin="0,10,0,0" HorizontalAlignment="Center" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}" Click="OnNextStep" Content="&#xE101;" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}" Style="{StaticResource GameControllerStyle}" />
+                                <TextBlock Margin="5,0,5,0" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ControlGridTextStyle}" Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" />
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Center" Style="{StaticResource GameControllerStackPanelCommand}">
+                                <StackPanel Orientation="Vertical">
+                                    <Button x:Name="_btnUndo" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}" Click="OnUndo" Content="&#xE10E;" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}" Style="{StaticResource GameControllerStyle}" />
+                                    <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
+                                </StackPanel>
+                                <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                    <Button Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}" Click="OnRedo" Content="&#xE10D;" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}" Style="{StaticResource GameControllerStyle}" />
+                                    <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Center" Style="{StaticResource GameControllerStackPanelCommand}">
+                                <StackPanel Margin="0,10,0,10" HorizontalAlignment="Stretch">
+                                    <Button Width="80" Height="80" Margin="5,0,0,0" HorizontalAlignment="Center">
+                                        <Button.Content>
+                                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="*" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI Symbol" FontSize="50" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ControlGridTextStyle}" Text="⚃" />
+                                                <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI Symbol" FontSize="50" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ControlGridTextStyle}" Text="⚂" />
+                                            </Grid>
+                                        </Button.Content>
+                                    </Button>
+                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                        <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ControlGridTextStyle}" Text="Total Rolls: " />
+                                        <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ControlGridTextStyle}" Text="{x:Bind FallbackValue=20, Mode=OneWay, Path=TotalRolls}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <Grid Height="40" Margin="0,5,0,0" HorizontalAlignment="Center" Background="Black">
+                                <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Bottom" ColorCodeTimer="True" />
+                            </Grid>
+                        </StackPanel>
+                    </s:SliderCtrl.Child>
+                </s:SliderCtrl>
+
+            </StackPanel>
+
+            <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="20" IsActive="True" Visibility="Visible" />
+            <Viewbox Grid.Row="0" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="5" Width="75" Margin="20,0,0,20" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                <Grid Visibility="{x:Bind SpyVisible, Mode=OneWay}">
+                    <TextBlock Margin="5,14,5,-5" HorizontalAlignment="Center" FontSize="12" Text="{x:Bind TurnedSpyOn, Mode=OneWay}" />
+                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="54" Text="" />
+                </Grid>
+            </Viewbox>
+
+            <Grid Name="_savedGameGrid"
+                Grid.Row="1"
+                Width="383" Height="280"
+                Margin="0" HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                x:Load="False"
                 Background="{StaticResource bmCherry}"
                 BorderBrush="{StaticResource bmMaple}"
-                BorderThickness="4" CornerRadius="4">
+                BorderThickness="4" Canvas.ZIndex="10" CornerRadius="4"
+                PointerPressed="OnPointerPressed" Visibility="Collapsed">
                 <Grid.RenderTransform>
                     <CompositeTransform />
                 </Grid.RenderTransform>
@@ -262,8 +437,7 @@
                     <RowDefinition Height="33*" />
                 </Grid.RowDefinitions>
                 <Viewbox Grid.RowSpan="1" Grid.ColumnSpan="2">
-                    <TextBlock Grid.RowSpan="2" Grid.ColumnSpan="2" Text="Saved Games" CharacterSpacing="0"
-                        Foreground="White" />
+                    <TextBlock Grid.RowSpan="2" Grid.ColumnSpan="2" CharacterSpacing="0" Foreground="White" Text="Saved Games" />
                 </Viewbox>
                 <Viewbox HorizontalAlignment="Right" VerticalAlignment="Stretch">
                     <Button Background="Transparent" Click="OnCloseSavedGames" Content="&#xE947;" FontFamily="Segoe MDL2 Assets" />
@@ -280,217 +454,6 @@
                 </ListBox.ItemTemplate>
             </ListBox>-->
             </Grid>
-            <!--    -->
-
-            <local:DragableGridCtrl x:Name="PlayerTradeGrid" Width="450" HorizontalAlignment="Center"
-                VerticalAlignment="Center" Canvas.ZIndex="10"
-                PointerPressed="Draggable_PointerPressed"
-                OnGridPositionChanged="OnGridPositionChanged"
-                Background="{StaticResource bmMaple}"
-                Foreground="Black"
-                Visibility="{x:Bind MainPageModel.ShowTradeUi(MainPageModel.GameState), Mode=OneWay}"
-                CornerRadius="10"
-                Player="{x:Bind TheHuman, Mode=OneWay}"
-                Caption="Resource Trades"
-                BorderBrush="{StaticResource WhiteBrush}">
-                <local:DragableGridCtrl.Child>
-                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" TheHuman="{x:Bind TheHuman, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
-                </local:DragableGridCtrl.Child>
-            </local:DragableGridCtrl>
-
-            <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100"
-                HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="20"
-                IsActive="True" Visibility="Visible" />
-
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Orientation="Horizontal">
-                <s:SliderCtrl Width="220" Height="220" Margin="0,0,20,0" HorizontalAlignment="Left"
-                    VerticalAlignment="Bottom" Canvas.ZIndex="999" SlideDirection="Up"
-                    Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}"
-                    BorderBrush="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
-                    Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
-                    Open="False" Caption="Roll Stats" CornerRadius="10">
-                    <s:SliderCtrl.Child>
-                        <Viewbox Grid.Row="1" Margin="0" HorizontalAlignment="Stretch">
-                            <StackPanel>
-                                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="2" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TwoPercent}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="3" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.ThreePercent}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="4" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.FourPercent}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="5" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.FivePercent}" />
-                                    </StackPanel>
-                                </StackPanel>
-                                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
-
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="6" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.SixPercent}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="7"
-                                                Visibility="Visible" Theme="Dark" HideSeven="False" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.SevenPercent}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="8" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.EightPercent}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="9" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.NinePercent}" />
-                                    </StackPanel>
-                                </StackPanel>
-                                <StackPanel Style="{StaticResource GameControllerStackPanelCommand}">
-
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="10" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TenPercent}" />
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="11" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.ElevenPercent}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Vertical">
-                                        <Button Tapped="OnNumberTapped" Style="{StaticResource NumberButtonKey}">
-                                            <local:CatanNumber Width="75" Height="75" Margin="2,-2" Number="12" />
-                                        </Button>
-                                        <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TwelvePercent}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <ToggleButton Margin="0,-13,0,0" Background="Transparent" IsChecked="{x:Bind CanMoveBaronBeforeRoll, Mode=TwoWay}" IsEnabled="{x:Bind MainPageModel.Log.GameState, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToBooleanConverter}, FallbackValue=true, ConverterParameter=WaitingForRoll}">
-                                            <local:BaronCtrl Width="85" Height="71" />
-                                        </ToggleButton>
-                                    </StackPanel>
-                                </StackPanel>
-                            </StackPanel>
-                        </Viewbox>
-                    </s:SliderCtrl.Child>
-                </s:SliderCtrl>
-                <s:SliderCtrl x:Name="SynchronizedRolls" Width="445" Height="220" Margin="0,0,20,0"
-                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Canvas.ZIndex="10"
-                    Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}"
-                    Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
-                    Caption="Rolls"
-                    Open="{x:Bind MainPageModel.ShowRollUi(MainPageModel.GameState), Mode=OneWay}"
-                    CornerRadius="10" SlideDirection="Up"
-                    BorderBrush="{StaticResource WhiteBrush}">
-                    <s:SliderCtrl.Child>
-                        <local:PlayerRollCtrl x:Name="_rollControl" Grid.Row="1" OnRolled="OnRolled" OnShowAllRolls="OnShowAllRolls" />
-                    </s:SliderCtrl.Child>
-                </s:SliderCtrl>
-                <s:SliderCtrl x:Name="ControlGrid" Width="175" Height="220" HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom" Canvas.ZIndex="10"
-                    Open="{x:Bind OpenControlGrid(CurrentPlayer, TheHuman), Mode=OneWay}"
-                    SlideDirection="Up" Caption="Game Controls" FontSize="14"
-                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                    Visibility="Visible" CornerRadius="10"
-                    Player="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    BorderBrush="{StaticResource WhiteBrush}">
-                    <s:SliderCtrl.Child>
-                        <StackPanel Width="350" Height="425" Margin="5" HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <StackPanel>
-                                <Button x:Name="_btnNextStep" Margin="0,10,0,0" HorizontalAlignment="Center"
-                                    Content="&#xE101;"
-                                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                                    Style="{StaticResource GameControllerStyle}"
-                                    Click="OnNextStep"
-                                    IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}" />
-                                <TextBlock Margin="5,0,5,0" Style="{StaticResource ControlGridTextStyle}" Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
-                            </StackPanel>
-                            <StackPanel HorizontalAlignment="Center" Style="{StaticResource GameControllerStackPanelCommand}">
-                                <StackPanel Orientation="Vertical">
-                                    <Button x:Name="_btnUndo" Content="&#xE10E;"
-                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                        Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                                        Style="{StaticResource GameControllerStyle}"
-                                        Click="OnUndo"
-                                        IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}" />
-                                    <TextBlock Text="Undo" Style="{StaticResource ControlGridTextStyle}" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
-                                </StackPanel>
-                                <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
-                                    <Button Content="&#xE10D;"
-                                        Style="{StaticResource GameControllerStyle}"
-                                        Click="OnRedo"
-                                        IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}"
-                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                        Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}" />
-                                    <TextBlock Text="Redo" Style="{StaticResource ControlGridTextStyle}" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
-                                </StackPanel>
-                            </StackPanel>
-                            <StackPanel HorizontalAlignment="Center" Style="{StaticResource GameControllerStackPanelCommand}">
-                                <StackPanel Margin="0,10,0,10" HorizontalAlignment="Stretch">
-                                    <Button Width="80" Height="80" Margin="5,0,0,0" HorizontalAlignment="Center">
-                                        <Button.Content>
-                                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*" />
-                                                    <RowDefinition Height="*" />
-                                                </Grid.RowDefinitions>
-                                                <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center" Text="⚃" FontSize="50" FontFamily="Segoe UI Symbol"
-                                                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                                    Style="{StaticResource ControlGridTextStyle}" />
-                                                <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                                    Text="⚂" FontSize="50" FontFamily="Segoe UI Symbol"
-                                                    Style="{StaticResource ControlGridTextStyle}" />
-                                            </Grid>
-                                        </Button.Content>
-                                    </Button>
-                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                        <TextBlock Text="Total Rolls: " Style="{StaticResource ControlGridTextStyle}" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
-                                        <TextBlock Style="{StaticResource ControlGridTextStyle}" Text="{x:Bind FallbackValue=20, Mode=OneWay, Path=TotalRolls}" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </StackPanel>
-                            <Grid Height="40" Margin="0,5,0,0" HorizontalAlignment="Center" Background="Black">
-                                <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1" Margin="5"
-                                    HorizontalAlignment="Left" VerticalAlignment="Bottom" ColorCodeTimer="True" />
-                            </Grid>
-                        </StackPanel>
-                    </s:SliderCtrl.Child>
-                </s:SliderCtrl>
-
-            </StackPanel>
         </Grid>
     </Viewbox>
 </Page>

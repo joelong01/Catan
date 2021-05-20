@@ -148,6 +148,12 @@ namespace Catan10
                     {
                         return false;
                     }
+
+                    if (state == GameState.WaitingForRollForOrder && Settings.IsLocalGame)
+                    {
+                        return true;
+                    }
+
                     switch (state)
                     {
                         case GameState.WaitingForNewGame:
@@ -179,7 +185,11 @@ namespace Catan10
             get
             {
                 if (Log == null) return false;
+                //
+                //  5/20/21:  MainPageModel.TheHuman has a string that represetns the human of the *local machine*, so we need to keep
+                //            it around because it is very important for the service game.  But it never changes for the local game.
 
+                if (Settings.IsLocalGame) return Log.CanRedo;
                 return (Log.CanRedo && MainPage.Current.CurrentPlayer.PlayerName == TheHuman);
             }
         }
@@ -229,6 +239,14 @@ namespace Catan10
             get
             {
                 if (Log == null) return false;
+
+                this.TraceMessage($"CanUndo={Log.CanUndo} CurrentPlayer={MainPage.Current.CurrentPlayer.PlayerName} Human={TheHuman}");
+
+                //
+                //  5/20/21:  MainPageModel.TheHuman has a string that represetns the human of the *local machine*, so we need to keep
+                //            it around because it is very important for the service game.  But it never changes for the local game.
+
+                if (Settings.IsLocalGame) return Log.CanUndo;
 
                 return (Log.CanUndo && MainPage.Current.CurrentPlayer.PlayerName == TheHuman);
             }
@@ -555,11 +573,16 @@ namespace Catan10
         /// <summary>
         ///     Binding function for setting the visibility of the RollUi
         ///     Added WaitingForNewGame so that the setting of the grid positions works.
+        ///     
+        ///     5/18/21:  We don't show this UI when it is a local game.  we might revisit this later if we want to replace the dice.    
+        /// 
         /// </summary>
         /// <param name="gameState"></param>
         /// <returns></returns>
         public bool ShowRollUi(GameState gameState)
         {
+            if (Settings.IsLocalGame) return false;
+
             switch (gameState)
             {
                 

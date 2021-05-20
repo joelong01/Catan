@@ -1,10 +1,4 @@
-﻿<UserControl x:Class="Catan10.RollCtrl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:Catan10"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="175" d:DesignWidth="120" mc:Ignorable="d">
+﻿<UserControl x:Class="Catan10.RollCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="175" d:DesignWidth="120" mc:Ignorable="d">
     <Control.Resources>
         <Storyboard x:Name="FlipOpen">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_FaceDown" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
@@ -34,32 +28,20 @@
         </Style>
     </Control.Resources>
     <Viewbox Stretch="Uniform">
-        <Grid Width="120" Height="170" >
-            <Grid Name="Grid_FaceDown" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource ResourceType.Back}">
+        <Grid Width="120" Height="170">
+            <Grid Name="Grid_FaceDown" Background="{StaticResource ResourceType.Back}" Style="{StaticResource RollCtrl_GridStyle}">
                 <Grid.Projection>
                     <PlaneProjection x:Name="PlaneProjection_FaceDown" RotationY="0" />
                 </Grid.Projection>
                 <Image Width="100" Height="100" Margin="1" Source="ms-appx:///Assets/dice_dark.svg" />
             </Grid>
-            <Grid Name="Grid_FaceUp" Style="{StaticResource RollCtrl_GridStyle}" Background="{StaticResource ResourceType.GoldMine}">
+            <Grid Name="Grid_FaceUp" Background="{StaticResource ResourceType.GoldMine}" Style="{StaticResource RollCtrl_GridStyle}">
                 <Grid.Projection>
                     <PlaneProjection x:Name="PlaneProjection_FaceUp" RotationY="-90" />
                 </Grid.Projection>
-                <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Left"                    
-                    VerticalAlignment="Top"
-                    FillColor="{StaticResource WhiteBrush}"
-                    Thickness="15"
-                    Number="{x:Bind Roll.DiceOne, Mode=OneWay}" />
-                <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    FillColor="{StaticResource WhiteBrush}"
-                    Thickness="15"
-                    Number="{x:Bind Roll.DiceTwo, Mode=OneWay}" />
-                <TextBlock Margin="0,-10,-10,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Text="⊘"
-                    Visibility="{x:Bind Roll.NotSelected, Mode=OneWay}"
-                    Foreground="Red" FontSize="80" LineStackingStrategy="BaselineToBaseline"
-                    TextLineBounds="Tight" />
+                <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" FillColor="{StaticResource WhiteBrush}" Number="{x:Bind Roll.DiceOne, Mode=OneWay}" Thickness="15" />
+                <local:DiceCtrl Width="50" Height="50" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" FillColor="{StaticResource WhiteBrush}" Number="{x:Bind Roll.DiceTwo, Mode=OneWay}" Thickness="15" />
+                <TextBlock Margin="0,-10,-10,0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="80" Foreground="Red" LineStackingStrategy="BaselineToBaseline" Text="⊘" TextLineBounds="Tight" Visibility="{x:Bind Roll.NotSelected, Mode=OneWay}" />
             </Grid>
         </Grid>
     </Viewbox>

@@ -1,18 +1,8 @@
-﻿<UserControl x:Class="Catan10.PlayerPickerItemCtrl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Width="120" Margin="0" IsHitTestVisible="False" mc:Ignorable="d">
+﻿<UserControl x:Class="Catan10.PlayerPickerItemCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" Width="120" Margin="0" IsHitTestVisible="False" mc:Ignorable="d">
     <Grid Margin="0" Background="{x:Bind Player.BackgroundBrush, FallbackValue=Blue, Mode=OneWay}" CornerRadius="10">
         <StackPanel Width="120">
-            <Rectangle Grid.Row="1" Height="100" Margin="5"
-                Fill="{x:Bind Path=Player.ImageBrush, Mode=OneWay}"
-                RadiusX="10" RadiusY="10" />
-            <TextBlock Margin="0,0,0,5" HorizontalAlignment="Center" FontSize="22"
-                Text="{x:Bind Player.PlayerName, FallbackValue=Nameless, Mode=OneWay}"
-                Foreground="{x:Bind Path=Player.ForegroundBrush, Mode=OneWay}" />
+            <Rectangle Grid.Row="1" Height="100" Margin="5" Fill="{x:Bind Path=Player.ImageBrush, Mode=OneWay}" RadiusX="10" RadiusY="10" />
+            <TextBlock Margin="0,0,0,5" HorizontalAlignment="Center" FontSize="22" Foreground="{x:Bind Path=Player.ForegroundBrush, Mode=OneWay}" Text="{x:Bind Player.PlayerName, FallbackValue=Nameless, Mode=OneWay}" />
         </StackPanel>
     </Grid>
 </UserControl>

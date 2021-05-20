@@ -486,7 +486,7 @@ namespace Catan10
                     {
                         AllPlayers = list,
                         Settings = new Settings(),
-                        TheHuman = "",
+                        
                     };
 
                     await SaveGameState();
@@ -618,7 +618,7 @@ namespace Catan10
 
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
-            if (!MainPageModel.IsServiceGame) return; // todo: make work for local game
+            
 
             if (MainPageModel.GameState != GameState.WaitingForRoll && MainPageModel.GameState != GameState.WaitingForRollForOrder)
             {
@@ -1172,7 +1172,7 @@ namespace Catan10
             }
             
             bool enable = MainPageModel.EnableNextButton;
-            this.TraceMessage($"Next button enabled:{enable}");
+           // this.TraceMessage($"Next button enabled:{enable}");
             Debug.Assert(enable == enableNextButton);
             return enable;
         }

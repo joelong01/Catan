@@ -34,7 +34,7 @@ namespace Catan10
         ///     to make all the game logic work right.
         /// </summary>
         /// <param name="player"></param>
-        private void SetCurrentPlayer(PlayerModel player)
+        public void SetCurrentPlayer(PlayerModel player)
         {
             if (player == null) return;
 

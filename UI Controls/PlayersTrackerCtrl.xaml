@@ -1,40 +1,37 @@
-﻿<UserControl x:Class="Catan10.PlayersTrackerCtrl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="600" d:DesignWidth="615" Background="SlateBlue" mc:Ignorable="d">
+﻿<UserControl x:Class="Catan10.PlayersTrackerCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="600" d:DesignWidth="615" Background="SlateBlue" mc:Ignorable="d">
     <Control.Resources />
-    <StackPanel Name="Grid_PlayerResourceCount" HorizontalAlignment="Left"
-        VerticalAlignment="Top" Background="Transparent" CornerRadius="10">
+    <StackPanel Name="Grid_PlayerResourceCount" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" CornerRadius="10">
 
 
 
-        <StackPanel Name="StackPanel_TotalResourceCount" Grid.Row="0" Grid.RowSpan="1"
-            Grid.Column="1" Margin="0,5,0,0" HorizontalAlignment="Center"
-            VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal"
+        <StackPanel Name="StackPanel_TotalResourceCount"
+            Grid.Row="0" Grid.RowSpan="1" Grid.Column="1"
+            Margin="0,5,0,0" HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Background="Transparent"
             BorderBrush="{StaticResource bmMaple}"
-            BorderThickness="1" CornerRadius="10">
-            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wood}" Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay}" />
-            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Sheep}" Count="{x:Bind MainPageModel.GameResources.Sheep, Mode=OneWay}" />
-            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Brick}" Count="{x:Bind MainPageModel.GameResources.Brick, Mode=OneWay}" />
-            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Wheat}" Count="{x:Bind MainPageModel.GameResources.Wheat, Mode=OneWay}" />
-            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Ore}" Count="{x:Bind MainPageModel.GameResources.Ore, Mode=OneWay}" />
-            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.GoldMine}" Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}" />
+            BorderThickness="1" CornerRadius="10"
+            Orientation="Horizontal">
+            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay}" Image="{StaticResource ResourceType.Wood}" />
+            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Sheep, Mode=OneWay}" Image="{StaticResource ResourceType.Sheep}" />
+            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Brick, Mode=OneWay}" Image="{StaticResource ResourceType.Brick}" />
+            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wheat, Mode=OneWay}" Image="{StaticResource ResourceType.Wheat}" />
+            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Ore, Mode=OneWay}" Image="{StaticResource ResourceType.Ore}" />
+            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}" Image="{StaticResource ResourceType.GoldMine}" />
         </StackPanel>
 
 
-        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="2" Margin="0,5,0,0"
-            Fill="{StaticResource bmMaple}" />
-        <ListView x:Name="ListBox_PlayerResourceCountList" Grid.Row="2" Grid.ColumnSpan="2"
-            Height="922" Margin="0,5,0,0" HorizontalAlignment="Stretch"
-            CanReorderItems="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"                  
-            AllowDrop="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}" 
+        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="2" Margin="0,5,0,0" Fill="{StaticResource bmMaple}" />
+        <ListView x:Name="ListBox_PlayerResourceCountList"
+            Grid.Row="2" Grid.ColumnSpan="2"
+            Height="922"
+            Margin="0,5,0,0" HorizontalAlignment="Stretch"
+            AllowDrop="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
+            Background="Transparent"
+            CanReorderItems="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
             ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
-            Background="Transparent" UseSystemFocusVisuals="False"
-            SelectionMode="Single"
-            ScrollViewer.VerticalScrollBarVisibility="Auto">            
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            SelectionMode="Single" UseSystemFocusVisuals="False">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Margin" Value="0" />
@@ -47,7 +44,7 @@
             </ListBox.Items>-->
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}" RenderTransformOrigin="0 0">
+                    <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" RenderTransformOrigin="0 0" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
                         <local:PublicDataCtrl.RenderTransform>
                             <CompositeTransform ScaleX="1" ScaleY="1" TranslateX="0" />
                         </local:PublicDataCtrl.RenderTransform>

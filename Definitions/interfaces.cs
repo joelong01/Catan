@@ -300,6 +300,7 @@ namespace Catan10
 
         void SimulateRoll(int roll);
         string PlayerListToCsv (List<PlayerModel> playersWithTooManyCards);
+        void SetCurrentPlayer(PlayerModel playerModel);
     }
 
     public interface IGameViewCallback

@@ -1,15 +1,16 @@
-﻿<UserControl x:Class="Catan10.RoadCtrl"
+﻿<UserControl Name="userControl"
+    x:Class="Catan10.RoadCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Name="userControl" HorizontalAlignment="Left" VerticalAlignment="Top"
+    HorizontalAlignment="Left" VerticalAlignment="Top"
     d:DesignHeight="16" d:DesignWidth="68" Background="Green"
-    RenderTransformOrigin=".5 .5" PointerEntered="Road_PointerEntered"
-    PointerExited="Road_PointerExited" PointerPressed="Road_PointerPressed"
+    PointerEntered="Road_PointerEntered"
+    PointerExited="Road_PointerExited"
+    PointerPressed="Road_PointerPressed"
+    RenderTransformOrigin=".5 .5"
     mc:Ignorable="d">
-
     <UserControl.RenderTransform>
         <CompositeTransform x:Name="_transform" />
     </UserControl.RenderTransform>
@@ -26,54 +27,30 @@
             <Setter Property="StrokeStartLineCap" Value="Triangle" />
         </Style>
         <Storyboard x:Name="_sbMove">
-            <DoubleAnimation x:Name="_daToX" d:IsOptimized="True"
-                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
-                Storyboard.TargetName="userControl" To="0" Duration="0:0:1" />
-            <DoubleAnimation x:Name="_daToY" d:IsOptimized="True"
-                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
-                Storyboard.TargetName="userControl" To="0" Duration="0:0:1" />
+            <DoubleAnimation x:Name="_daToX" d:IsOptimized="True" Storyboard.TargetName="userControl" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0" Duration="0:0:1" />
+            <DoubleAnimation x:Name="_daToY" d:IsOptimized="True" Storyboard.TargetName="userControl" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0" Duration="0:0:1" />
         </Storyboard>
         <Storyboard x:Name="_sbRotate">
-            <DoubleAnimation x:Name="_daRotate" d:IsOptimized="True" BeginTime="0:0:1"
-                Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)"
-                Storyboard.TargetName="userControl" To="0" Duration="0:0:1" />
+            <DoubleAnimation x:Name="_daRotate" d:IsOptimized="True" BeginTime="0:0:1" Storyboard.TargetName="userControl" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0" Duration="0:0:1" />
         </Storyboard>
         <Storyboard x:Name="_sbAnimateOpacity">
-            <DoubleAnimation x:Name="_daAnimateOpacity" BeginTime="0:0:2" AutoReverse="False"
-                Storyboard.TargetProperty="(UIElement.Opacity)"
-                Storyboard.TargetName="userControl" To="0.5" Duration="0:0:1" />
+            <DoubleAnimation x:Name="_daAnimateOpacity" AutoReverse="False" BeginTime="0:0:2" Storyboard.TargetName="userControl" Storyboard.TargetProperty="(UIElement.Opacity)" To="0.5" Duration="0:0:1" />
         </Storyboard>
     </Control.Resources>
-
-    <Grid Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-        Background="Transparent" SizeChanged="OnSizeChanged">
+    <Grid Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" SizeChanged="OnSizeChanged">
         <Grid Name="_gridRoads" Visibility="{x:Bind GetStateBasedVisibility(RoadState, 'road'),Mode=OneWay}">
+            <Line Name="_lineTop" Style="{StaticResource RoadLineStyle}" X1="4.5" X2="63.5" Y1="10" Y2="10" />
+            <Line Name="_lineMiddle" StrokeDashArray="4" StrokeThickness="1" Style="{StaticResource RoadLineStyle}" X1="4.5" X2="63.5" Y1="12" Y2="12" />
+            <Line Name="_lineBottom" StrokeThickness="1" Style="{StaticResource RoadLineStyle}" X1="4.5" X2="63.5" Y1="14" Y2="14" />
             <!--  0    1    2       3    4       5  -->
             <!--<Polygon Name="_doublePolygon" Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,15" Stroke="BurlyWood" Fill="Blue" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" StrokeThickness="0" />
             <Line Name="_lineTop" X1="4.5" Y1="2" X2="63.5" Y2="2" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle" />
             <Line  Name="_doubleMiddleLine" X1="4.5" Y1="8" X2="63.5" Y2="8" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle" StrokeDashArray="4" />
             <Line Name="_doubleBottomLine" X1="4.5" Y1="14" X2="63.5" Y2="14" StrokeThickness="1" Stroke="White" StrokeEndLineCap="Triangle" StrokeStartLineCap="Triangle" />-->
-
-            <Polygon Name="_doublePolygon" Grid.Column="1" Margin="0" HorizontalAlignment="Left"
-                VerticalAlignment="Top" Points=".5,8 68,8 63.5,16 4,16"
-                Style="{StaticResource RoadPolyStyle}" />
-            <Line Name="_lineTop" X1="4.5" Y1="10" X2="63.5"
-                Y2="10"
-                Style="{StaticResource RoadLineStyle}" />
-            <Line Name="_lineMiddle" X1="4.5" Y1="12" X2="63.5"
-                Y2="12" StrokeThickness="1"
-                Style="{StaticResource RoadLineStyle}"
-                StrokeDashArray="4" />
-            <Line Name="_lineBottom" X1="4.5" Y1="14" X2="63.5"
-                Y2="14" StrokeThickness="1"
-                Style="{StaticResource RoadLineStyle}" />
+            <Polygon Name="_doublePolygon" Grid.Column="1" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Points=".5,8 68,8 63.5,16 4,16" Style="{StaticResource RoadPolyStyle}" />
         </Grid>
-
         <Grid Name="_gridShip" Background="Transparent" Visibility="{x:Bind GetStateBasedVisibility(RoadState, 'ship'),Mode=OneWay}">
-            <Polygon Name="_shipPolygon" Grid.Column="1" Margin="0" HorizontalAlignment="Left"
-                VerticalAlignment="Top" Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,15"
-                Style="{StaticResource RoadPolyStyle}"
-                StrokeThickness="1" />
+            <Polygon Name="_shipPolygon" Grid.Column="1" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,15" StrokeThickness="1" Style="{StaticResource RoadPolyStyle}" />
         </Grid>
     </Grid>
 </UserControl>

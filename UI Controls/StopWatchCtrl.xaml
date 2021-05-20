@@ -1,15 +1,8 @@
-﻿<UserControl x:Class="Catan10.StopWatchCtrl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="50" d:DesignWidth="100" mc:Ignorable="d">
+﻿<UserControl x:Class="Catan10.StopWatchCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="50" d:DesignWidth="100" mc:Ignorable="d">
 
     <Grid Name="LayoutRoot" Background="Black">
         <Viewbox>
-            <TextBlock Name="_tbTime" HorizontalAlignment="Center" VerticalAlignment="Center"
-                Text="00:00" Foreground="White" TextLineBounds="Tight" />
+            <TextBlock Name="_tbTime" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" Text="00:00" TextLineBounds="Tight" />
         </Viewbox>
     </Grid>
 </UserControl>

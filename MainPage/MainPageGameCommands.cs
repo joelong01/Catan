@@ -105,14 +105,27 @@ namespace Catan10
 
                     case GameState.PickingBoard:  // you get here by clicking the "=>" button
                         await PickingBoardToWaitingForRollOrder.PostLog(this);
-
+                        //
+                        // 5/20/21: skip this stage on a local game -- it is just another "Next" click
+                        if (MainPageModel.Settings.IsLocalGame)
+                        {
+                            await RollOrderFinalizedLog.PostLog(this, PlayingPlayers);
+                        }
                         break;
 
-                    case GameState.WaitingForRollForOrder: // you get here by clicking the "=>" button
-
+                    case GameState.WaitingForRollForOrder: 
+                      
                         break;
 
                     case GameState.FinishedRollOrder:
+                        //
+                        //  5/18/2021:  in a local game, the CurrentPlayer hasn't been set yet because we are doign drag and drop ... set it here.
+                        //              won't impact service game.
+
+                        CurrentPlayer = PlayingPlayers[0];
+
+                        this.SetCurrentPlayer(this.PlayingPlayers[0]);
+
                         await WaitingForRollOrderToBeginResourceAllocation.PostLog(this);
                         break;
 
@@ -683,7 +696,7 @@ namespace Catan10
             {
                 CurrentPlayer = TheHuman;  //  this is useful for debugging
             }
-            MainPageModel.TheHuman = TheHuman.PlayerName;
+            
             MainPageModel.DefaultUser = TheHuman.PlayerName;
             await SaveGameState();
             return true;

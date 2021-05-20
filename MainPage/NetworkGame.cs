@@ -317,22 +317,14 @@ namespace Catan10
                     break;
             }
 
-            
-            if (message.From == TheHuman.PlayerName )
+            //
+            //  5/20/2021:  all local messages get processed locally...
+            //  
+            if (message.From == TheHuman.PlayerName || MainPageModel.Settings.IsLocalGame )
             {
                 MainPageModel.ChangeUnprocessMessage(-1);
             }
-            else if (!MainPageModel.IsServiceGame &&
-                ( logHeader.OldState == GameState.AllocateResourceForward ||
-                  logHeader.OldState == GameState.AllocateResourceReverse))
-
-            {
-                MainPageModel.ChangeUnprocessMessage(-1);
-            }
-            else
-            {
-                Debug.Assert(false);
-            }
+           
         }
 
         private Task ReplayGame(GameInfo game, string playerName)

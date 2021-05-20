@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 
-using Windows.UI.Input;
+using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Shapes;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -117,6 +117,56 @@ namespace Catan10
             }
 
             return count.ToString();
+        }
+
+        private bool IsControlOrShiftPressed
+        {
+            get
+            {
+                var shiftState = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
+                var ctrlState = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
+
+                var isShiftDown = shiftState == CoreVirtualKeyStates.Down;
+                var isCtrlDown = ctrlState == CoreVirtualKeyStates.Down;
+
+                return (isShiftDown || isCtrlDown);
+            }
+        }
+
+        private void OnBuySettlement(object sender, RoutedEventArgs e)
+        {
+            if (IsControlOrShiftPressed && Player.GameData.Resources.HasEntitlement(Entitlement.Settlement))
+            {
+                Player.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);                 
+            }
+            else
+            {
+                Player.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
+            }
+        }
+
+        private void OnBuyCity(object sender, RoutedEventArgs e)
+        {
+            if (IsControlOrShiftPressed && Player.GameData.Resources.HasEntitlement(Entitlement.City))
+            {
+                Player.GameData.Resources.RevokeEntitlement(Entitlement.City);
+            }
+            else
+            {
+                Player.GameData.Resources.GrantEntitlement(Entitlement.City);
+            }
+        }
+
+        private void OnBuyRoad(object sender, RoutedEventArgs e)
+        {
+            if (IsControlOrShiftPressed && Player.GameData.Resources.HasEntitlement(Entitlement.Road))
+            {
+                Player.GameData.Resources.RevokeEntitlement(Entitlement.Road);
+            }
+            else
+            {
+                Player.GameData.Resources.GrantEntitlement(Entitlement.Road);
+            }
         }
     }
 }

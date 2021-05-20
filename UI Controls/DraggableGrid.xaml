@@ -1,10 +1,4 @@
-﻿<UserControl x:Class="Catan10.DragableGridCtrl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:Catan10"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="userControl" d:DesignHeight="300" d:DesignWidth="400" mc:Ignorable="d">
+﻿<UserControl x:Class="Catan10.DragableGridCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" x:Name="userControl" d:DesignHeight="300" d:DesignWidth="400" mc:Ignorable="d">
     <UserControl.Resources>
         <Storyboard x:Name="AnimateMove">
             <DoubleAnimation Storyboard.TargetName="LayoutRoot" Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="{x:Bind GridPosition.TranslateX, Mode=TwoWay}" Duration="00:00:0.250" />
@@ -18,14 +12,7 @@
                 ScaleY="{Binding GridPosition.ScaleY, Mode=TwoWay}"
                 TranslateX="{Binding GridPosition.TranslateX, Mode=TwoWay}"
                 TranslateY="{Binding GridPosition.TranslateY, Mode=TwoWay}" />-->
-    <Grid Name="LayoutRoot"
-        Width="{Binding Width, ElementName=userControl, FallbackValue=400, TargetNullValue=400, Mode=OneWay}"
-        Height="{Binding Height, ElementName=userControl, FallbackValue=300, TargetNullValue=300, Mode=OneWay}"
-        Background="{x:Bind userControl.Background, Mode=OneWay}"
-        BorderBrush="{x:Bind userControl.BorderBrush, Mode=OneWay}"
-        BorderThickness="{x:Bind userControl.BorderThickness, Mode=OneWay}"
-        CornerRadius="{x:Bind userControl.CornerRadius, Mode=OneWay}"
-        PointerPressed="OnPointerPressed">
+    <Grid Name="LayoutRoot" Width="{Binding Width, ElementName=userControl, FallbackValue=400, TargetNullValue=400, Mode=OneWay}" Height="{Binding Height, ElementName=userControl, FallbackValue=300, TargetNullValue=300, Mode=OneWay}" Background="{x:Bind userControl.Background, Mode=OneWay}" BorderBrush="{x:Bind userControl.BorderBrush, Mode=OneWay}" BorderThickness="{x:Bind userControl.BorderThickness, Mode=OneWay}" CornerRadius="{x:Bind userControl.CornerRadius, Mode=OneWay}" PointerPressed="OnPointerPressed">
         <Grid.RenderTransform>
             <CompositeTransform />
         </Grid.RenderTransform>
@@ -33,17 +20,12 @@
             <RowDefinition Height="25" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Rectangle Fill="{x:Bind Player.BackgroundBrush, Mode=OneWay}" />
+        <Rectangle Fill="{x:Bind Player.SolidSecondaryBrush, Mode=OneWay}" />
         <Viewbox Grid.Row="0" Margin="25,0,25,0">
-            <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=Player.ForegroundBrush, TargetNullValue=Colors.Blue}"
-                Style="{StaticResource HeaderTextBlockStyle}"
-                Text="{x:Bind Caption, Mode=OneWay}" />
+            <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=Player.ForegroundBrush, TargetNullValue=Colors.Blue}" Style="{StaticResource HeaderTextBlockStyle}" Text="{x:Bind Caption, Mode=OneWay}" />
         </Viewbox>
         <Viewbox Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
-            <Button Background="Transparent" Click="OnGrowOrShrinkControls"
-                Content="&#xE740;" FontFamily="Segoe MDL2 Assets"
-                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+            <Button Background="Transparent" Click="OnGrowOrShrinkControls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
         </Viewbox>
         <Viewbox Name="ViewBox_Parent" Grid.Row="1">
             <ContentPresenter Content="{x:Bind Child}" />

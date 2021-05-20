@@ -31,16 +31,11 @@ namespace Catan10
         public static async Task PostLog(IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.PickingBoard);
-
-            //
-            //  if it is a local game, somebody has to manually set the roll order, so we transition directly
-            //  to allocating Resources
-            //
             PickingBoardToWaitingForRollOrder logHeader = new PickingBoardToWaitingForRollOrder()
             {
                 CanUndo = false,
                 Action = CatanAction.ChangedState,
-                NewState = gameController.IsServiceGame ? GameState.WaitingForRollForOrder : GameState.AllocateResourceForward,
+                NewState = GameState.WaitingForRollForOrder,
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -57,10 +52,6 @@ namespace Catan10
             }
             MainPageModel mainPageModel = gameController.MainPageModel;
 
-            if (mainPageModel.Settings.IsLocalGame)
-            {
-                AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
-            }
 
             if (mainPageModel.Settings.AutoRespond)
             {

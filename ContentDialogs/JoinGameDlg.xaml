@@ -1,23 +1,24 @@
-﻿<ContentDialog x:Class="Catan10.JoinGameDlg"
+﻿<ContentDialog
+    x:Class="Catan10.JoinGameDlg"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Catan10" xmlns:proxy="using:Catan.Proxy"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Catan10"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Catan Join Game" Width="620" Height="210" PrimaryButtonText="Ok"
-    SecondaryButtonText="Cancel"
+    xmlns:proxy="using:Catan.Proxy"
+    Title="Catan Join Game"
+    Width="620" Height="210"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    SecondaryButtonClick="ContentDialog_SecondaryButtonClick" mc:Ignorable="d">
+    PrimaryButtonText="Ok"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    SecondaryButtonText="Cancel"
+    mc:Ignorable="d">
 
     <Grid HorizontalAlignment="Stretch" Background="{x:Bind Player.BackgroundBrush, TargetNullValue=Blue, FallbackValue=Red}">
-        <ComboBox HorizontalAlignment="Stretch"
-            ItemsSource="{x:Bind GameNames}"
-            Header="Game Names"
-            SelectedItem="{x:Bind GameSelected, Mode=TwoWay}"
-            Foreground="{x:Bind Player.ForegroundBrush}">
+        <ComboBox HorizontalAlignment="Stretch" Foreground="{x:Bind Player.ForegroundBrush}" Header="Game Names" ItemsSource="{x:Bind GameNames}" SelectedItem="{x:Bind GameSelected, Mode=TwoWay}">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="proxy:GameInfo">
-                    <TextBlock Text="{x:Bind Name}" FontSize="20" />
+                    <TextBlock FontSize="20" Text="{x:Bind Name}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>

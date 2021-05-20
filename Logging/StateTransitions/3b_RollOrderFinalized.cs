@@ -34,6 +34,8 @@ namespace Catan10
             {
                 Contract.Assert(PlayersInOrder[i].PlayerIdentifier == gameController.PlayingPlayers[i].PlayerIdentifier);
             }
+
+            
             return Task.CompletedTask;
         }
         /// <summary>

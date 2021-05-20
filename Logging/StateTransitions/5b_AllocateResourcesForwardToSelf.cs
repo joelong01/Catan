@@ -49,8 +49,14 @@ namespace Catan10
 
         public Task Undo(IGameController gameController)
         {
-            ChangePlayerHelper.ChangePlayer(gameController, -1);
+            //
+            //  take back the resources I granted above...
             AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
+
+            //
+            //  move to the next player.  
+            ChangePlayerHelper.ChangePlayer(gameController, -1);
+            
             return Task.CompletedTask;
         }
     }

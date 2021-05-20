@@ -37,6 +37,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task Do(IGameController gameController)
         {
+
             if (gameController.AutoRespondAndTheHuman)
             {
                 await BeginAllocationToAllocateResourcesForward.PostLog(gameController);
