@@ -11,77 +11,7 @@ namespace Catan10
 {
     public sealed partial class NewGameDlg : ContentDialog
     {
-        private void GridView_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
-        {
-            var source = PlayingPlayers;
-            var gridView = sender as GridView;
-
-            if (gridView.Name == "GridView_AvailablePlayers")
-            {
-                source = AvailablePlayers;
-            }
-            List<PlayerModel> movedPlayers = new List<PlayerModel>();
-            foreach (PlayerModel p in e.Items)
-            {
-                movedPlayers.Add(p);
-            }
-            if (movedPlayers.Count == 0) return;
-
-            e.Data.Properties.Add("movedPlayers", movedPlayers);
-            e.Data.Properties.Add("source", source);
-        }
-
-        private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-        }
-
-        private void OnDrageEnter(object target, DragEventArgs e)
-        {
-            SetThickness(target, 3);
-        }
-
-        private void OnDragLeave(object sender, DragEventArgs e)
-        {
-            SetThickness(sender, 1);
-        }
-
-        private void OnDragOver(object sender, DragEventArgs e)
-        {
-            e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
-            e.DragUIOverride.IsGlyphVisible = false;
-            e.DragUIOverride.IsCaptionVisible = false;
-        }
-
-        private void OnDrop(object sender, DragEventArgs e)
-        {
-            var target = PlayingPlayers;
-            var gridView = sender as GridView;
-
-            if (gridView.Name == "GridView_AvailablePlayers")
-            {
-                target = AvailablePlayers;
-            }
-
-            var source = e.Data.Properties["source"];
-            if (source == target)
-            {
-                e.Handled = false;
-                return;
-            }
-            IEnumerable<PlayerModel> movedPlayers = e.Data.Properties["movedPlayers"] as IEnumerable<PlayerModel>;
-            ObservableCollection<PlayerModel> sourcePlayers = e.Data.Properties["source"] as ObservableCollection<PlayerModel>;
-            foreach (var player in movedPlayers)
-            {
-                bool ret = sourcePlayers.Remove(player);
-                if (!ret)
-                {
-                    throw new ArgumentException("A player to be moved wasn't in the source collection.");
-                }
-                target.Add(player);
-            }
-            e.Handled = true;
-        }
-
+       
         private void OnGameChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SelectedGame == null)
@@ -105,6 +35,11 @@ namespace Catan10
             }
         }
 
+
+        private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+        }
+
         private void SetThickness(object target, double thickness)
         {
             if (target.GetType() == typeof(Grid))
@@ -119,7 +54,23 @@ namespace Catan10
 
         public ObservableCollection<CatanGameCtrl> AvailableGames { get; } = new ObservableCollection<CatanGameCtrl>();
         public ObservableCollection<PlayerModel> AvailablePlayers { get; } = new ObservableCollection<PlayerModel>();
-        public ObservableCollection<PlayerModel> PlayingPlayers { get; } = new ObservableCollection<PlayerModel>();
+        public ObservableCollection<PlayerModel> PlayingPlayers
+        {
+            get
+            {
+                var players = new ObservableCollection<PlayerModel>();
+                foreach (PlayerModel player in GridView_AvailablePlayers.SelectedItems)
+                {
+                    players.Add(player);
+                }
+                return players;
+            }
+        }
+        
+
+
+
+
 
         public string SaveFileName
         {

@@ -315,7 +315,10 @@ namespace Catan10
             {
                 await MainPage.Current.ShowErrorMessage($"You have purchased all available cities.\n\n", "Catan", "");
             }
-            await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.City);
+            else
+            {
+                await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.City);
+            }
         }
 
         private async void OnBuyDevCard(object sender, RoutedEventArgs e)
@@ -335,7 +338,10 @@ namespace Catan10
             {
                 await MainPage.Current.ShowErrorMessage($"You have purchased all available roads.", "Catan", "");
             }
-            await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Road);
+            else
+            {
+                await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Road);
+            }
         }
 
         private async void OnBuySettlement(object sender, RoutedEventArgs e)
@@ -348,7 +354,10 @@ namespace Catan10
                 {
                     await MainPage.Current.ShowErrorMessage($"You have purchased all available Settlements.", "Catan", "");
                 }
-                await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement);
+                else
+                {
+                    await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement);
+                }
             }
         }
 

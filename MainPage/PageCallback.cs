@@ -555,7 +555,7 @@ namespace Catan10
                 //
                 PlayerModel victim = (PlayerModel)((MenuFlyoutItem)s).Tag;
                 ResourceType stolenResource = ResourceType.None;
-                if (victim != null) // targeted nobody
+                if (victim != null && MainPageModel.Settings.IsServiceGame) // targeted nobody
                 {
                     var source = ResourceCardCollection.Flatten(victim.GameData.Resources.CurrentResources);
                     Contract.Assert(source.ResourceCount == source.Count);
@@ -935,15 +935,15 @@ namespace Catan10
             {
                 if (logType == LogType.Undo)
                 {
-                    CanMoveBaronBeforeRoll = true;
+                    MustMoveBaron = true;
                 }
                 else if (logType == LogType.Normal)
                 {
                     //
                     //  we assigned the baron before rolling --
 
-                    Debug.Assert(this.CanMoveBaronBeforeRoll, "To hit this condition, the Baron Button needed to be checked");
-                    CanMoveBaronBeforeRoll = false;
+                    Debug.Assert(this.MustMoveBaron, "To hit this condition, the Baron Button needed to be checked");
+                    MustMoveBaron = false;
                 }
             }
             return Task.CompletedTask;

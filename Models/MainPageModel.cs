@@ -240,7 +240,7 @@ namespace Catan10
             {
                 if (Log == null) return false;
 
-                this.TraceMessage($"CanUndo={Log.CanUndo} CurrentPlayer={MainPage.Current.CurrentPlayer.PlayerName} Human={TheHuman}");
+                // this.TraceMessage($"CanUndo={Log.CanUndo} CurrentPlayer={MainPage.Current.CurrentPlayer.PlayerName} Human={TheHuman}");
 
                 //
                 //  5/20/21:  MainPageModel.TheHuman has a string that represetns the human of the *local machine*, so we need to keep

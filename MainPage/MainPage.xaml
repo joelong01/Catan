@@ -43,6 +43,13 @@
             <!--<Setter Property="IsEnabled" Value="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}" />-->
             <Setter Property="IsEnabled" Value="True" />
         </Style>
+         <Style x:Key="ButtonTextStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,5,0,0" />
+        </Style>
     </Page.Resources>
     <Viewbox Stretch="Uniform">
         <Grid x:Name="ContentRoot" Width="1920" Height="1080" local:CatanAttachedProperties.CurrentPlayerModel="{x:Bind CurrentPlayer, Mode=TwoWay}" Background="{StaticResource bmCherry}" BorderBrush="{StaticResource bmMaple}" BorderThickness="6" CornerRadius="50" PointerWheelChanged="OnScrollMouseWheel">
@@ -215,8 +222,48 @@
                     <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" StolenResource="{x:Bind TheHuman.GameData.Resources.StolenResource, Mode=OneWay}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Width="500" Margin="10" HorizontalAlignment="Right" Canvas.ZIndex="5" GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}" GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
-            <!--    -->
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Width="500" Margin="10" HorizontalAlignment="Right" Canvas.ZIndex="5" GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}" GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" 
+                                      MainPageModel="{x:Bind MainPageModel, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
+
+            <local:DragableGridCtrl x:Name="LocalPurchase" Width="300" Height="150" Margin="0,500,0,0" CornerRadius="10" OnGridPositionChanged="OnGridPositionChanged"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center" 
+                                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}" BorderBrush="{x:Bind CurrentPlayer.SolidPrimaryBrush, Mode=OneWay}" Caption="Purchase" Player="{x:Bind CurrentPlayer, Mode=OneWay}"
+                                    Visibility="{x:Bind ShowLocalPurchase(MainPageModel.GameState), Mode=OneWay}">
+                <local:DragableGridCtrl.Child>
+                    <Viewbox>
+                        <StackPanel Height="100" Orientation="Horizontal">
+                            <Button Margin="5" Padding="5" Background="Transparent" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Click="OnLocalBuySettlement" CornerRadius="5" ToolTipService.ToolTip="Buy Settlement">
+                                <Button.Content>
+                                    <StackPanel Width="60" Height="65" Margin="0,0,0,0">
+                                        <local:SettlementCtrl Width="50" Height="50" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                        <TextBlock Margin="0,-2,0,0" HorizontalAlignment="Center" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ButtonTextStyle}" Text="Settlement" />
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Margin="5" Padding="5" Background="Transparent" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Click="OnLocalBuyCity" CornerRadius="5" ToolTipService.ToolTip="Buy City">
+                                <Button.Content>
+                                    <StackPanel Width="50" Height="65">
+                                        <local:CityCtrl Width="50" Height="50" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                        <TextBlock Margin="0,-2,0,0" HorizontalAlignment="Center" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Style="{StaticResource ButtonTextStyle}" Text="City" />
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Margin="5" Padding="5" Background="Transparent" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" Click="OnLocalBuyRoad" CornerRadius="5" ToolTipService.ToolTip="Buy Road">
+                                <Button.Content>
+                                    <StackPanel Width="50" Height="65">
+                                        <Grid Width="50" Height="50" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
+                                            <Line Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" X1="15" X2="15" Y1="5" Y2="45" />
+                                            <Line Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeDashArray="2 1" StrokeThickness="3" X1="25" X2="25" Y1="5" Y2="45" />
+                                            <Line Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" X1="35" X2="35" Y1="5" Y2="45" />
+                                        </Grid>
+                                        <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}" Text="Road" />
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>                           
+                        </StackPanel>
+                    </Viewbox>
+                </local:DragableGridCtrl.Child>
+            </local:DragableGridCtrl>
 
             <local:DragableGridCtrl x:Name="PlayerTradeGrid"
                 Width="450"
@@ -235,8 +282,7 @@
             </local:DragableGridCtrl>
 
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom" Orientation="Horizontal">
-                <s:SliderCtrl  Name="Grid_RollStats"
-                             
+                <s:SliderCtrl Name="Grid_RollStats"
                     Width="220" Height="220"
                     Margin="-450,0,20,0" HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
@@ -323,7 +369,11 @@
                                         <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TwelvePercent}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <ToggleButton Margin="0,-13,0,0" Background="Transparent" IsChecked="{x:Bind CanMoveBaronBeforeRoll, Mode=TwoWay}" IsEnabled="{x:Bind MainPageModel.Log.GameState, Mode=OneWay, Converter={StaticResource ResourceKey=GameStateToBooleanConverter}, FallbackValue=true, ConverterParameter=WaitingForRoll}">
+                                        <ToggleButton Margin="0,-13,0,0" Background="Transparent" 
+                                                      IsChecked="{x:Bind MustMoveBaron, Mode=TwoWay}" 
+                                                      IsEnabled="{x:Bind PlayBaronButtonEnabled(MainPageModel.Log.GameState), Mode=OneWay}"
+                                                      Click="EnableMoveBaron">
+                                                        
                                             <local:BaronCtrl Width="85" Height="71" />
                                         </ToggleButton>
                                     </StackPanel>

@@ -343,6 +343,31 @@ namespace Catan10
 
         public int RoadsLeft => MaxRoads - RoadsPlayed;
 
+        public int EntitlementsLeft(Entitlement entitlement)
+        {
+            switch (entitlement)
+            {
+                case Entitlement.Undefined:
+                    break;
+                case Entitlement.DevCard:
+                    break;
+                case Entitlement.Settlement:
+                    return SettlementsLeft;                    
+                case Entitlement.City:
+                    return CitiesLeft;
+                case Entitlement.Road:
+                    return RoadsLeft;
+                case Entitlement.Ship:
+                    return MaxShips - ShipsLeft;
+                case Entitlement.Knight:
+                    break;
+                default:
+                    break;
+            }
+
+            return 0;
+        }
+
         public int RoadsPlayed
         {
             get => _RoadsPlayed;

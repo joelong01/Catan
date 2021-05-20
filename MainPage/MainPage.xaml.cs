@@ -1284,6 +1284,55 @@ namespace Catan10
             await appWindow.TryShowAsync();
         }
 
-        
+        private async void OnLocalBuySettlement(object sender, RoutedEventArgs e)
+        {
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Settlement);
+        }
+
+        private async void OnLocalBuyCity(object sender, RoutedEventArgs e)
+        {
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.City);
+        }
+
+        private async void OnLocalBuyRoad(object sender, RoutedEventArgs e)
+        {
+
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Road);
+        }
+
+        private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement)
+        {
+            if (MainPageModel.GameState != GameState.WaitingForNext && MainPageModel.GameState != GameState.Supplemental) return;
+            
+            if (player.GameData.EntitlementsLeft(entitlement) == 0)
+            {
+                await ShowErrorMessage($"You have purchased all available {entitlement}.", "Catan", "");
+                return;
+            }
+            await PurchaseLog.PostLog(this, player, entitlement);
+        }
+
+        public Visibility ShowLocalPurchase(GameState state)
+        {          
+            if (state == GameState.WaitingForNewGame) return Visibility.Visible;
+
+            if (MainPageModel.Settings.IsServiceGame) return Visibility.Collapsed;
+            if (state == GameState.WaitingForNext || 
+                MainPageModel.GameState == GameState.Supplemental) 
+                        return Visibility.Visible;
+            return Visibility.Collapsed;
+        }
+
+        private async void EnableMoveBaron(object sender, RoutedEventArgs e)
+        {
+            await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
+        }
+
+        private bool PlayBaronButtonEnabled(GameState state)
+        {
+            if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll) return true;
+
+            return false;
+        }
     }
 }

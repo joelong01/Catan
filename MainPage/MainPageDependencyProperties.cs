@@ -75,10 +75,10 @@ namespace Catan10
         {
         }
 
-        public bool CanMoveBaronBeforeRoll
+        public bool MustMoveBaron
         {
-            get => (bool)GetValue(CanMoveBaronBeforeRollProperty);
-            set => SetValue(CanMoveBaronBeforeRollProperty, value);
+            get => (bool)GetValue(MustMoveBaronProperty);
+            set => SetValue(MustMoveBaronProperty, value);
         }
 
         public PlayerModel CurrentPlayer
@@ -177,7 +177,7 @@ namespace Catan10
             set => SetValue(TwoPercentProperty, value);
         }
 
-        public static readonly DependencyProperty CanMoveBaronBeforeRollProperty = DependencyProperty.Register("CanMoveBaronBeforeRoll", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
+        public static readonly DependencyProperty MustMoveBaronProperty = DependencyProperty.Register("MustMoveBaron", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(new PlayerModel() { PlayerName = "Unset" }, CurrentPlayerChanged));
         public static readonly DependencyProperty EightPercentProperty = DependencyProperty.Register("EightPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
         public static readonly DependencyProperty ElevenPercentProperty = DependencyProperty.Register("ElevenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));

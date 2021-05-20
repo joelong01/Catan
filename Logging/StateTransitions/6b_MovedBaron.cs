@@ -92,7 +92,7 @@ namespace Catan10
             }
 
             // if they played a dev card, consume it
-            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
+            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
             {
                 var ret = gameController.CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
                 Contract.Assert(ret, "A knight was not found in AvailableDevCards");
@@ -162,8 +162,8 @@ namespace Catan10
                 }
             }
 
-            // if they played a dev card, undo it
-            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
+            // if they played a dev card, undo it if it is a service game (local games don't track resources)
+            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
             {
                 
                 gameController.CurrentPlayer.GameData.Resources.UndoPlayDevCard(DevCardType.Knight);                
