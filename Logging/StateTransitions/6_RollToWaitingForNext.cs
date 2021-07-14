@@ -74,7 +74,9 @@ namespace Catan10
             //  does anybody have any gold?
             //  this message goes everywhere, so we only need one machien to send it. so even if 2 people need to trade gold, only one sends it
             //
-            if (gameController.TheHuman == gameController.CurrentPlayer)
+            //  7/14/2021: don't send this message for local games as we don't use the gameui to trade gold in local games
+            //
+            if (gameController.TheHuman == gameController.CurrentPlayer  && gameController.IsServiceGame)
             {
                 // current player checks each player to see if anybody has gold
                 foreach (var player in gameController.PlayingPlayers)
