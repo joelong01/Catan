@@ -89,7 +89,7 @@ namespace Catan10
             }
 
             // only the current player's machine should send this message.  everybody will get it
-            if (rollLog.LastRoll == 7 && gameController.MyTurn)
+            if (rollLog.LastRoll == 7 && gameController.MyTurn )
             {
                 List<PlayerModel> playersWithTooManyCards = new List<PlayerModel>();
                 foreach (var player in gameController.PlayingPlayers)
@@ -102,7 +102,7 @@ namespace Catan10
                     }
                 }
 
-                if (playersWithTooManyCards.Count > 0)
+                if (playersWithTooManyCards.Count > 0 && gameController.IsServiceGame)
                 {
                     //
                     //  somebody has too many cards.  pop a dialog box telling everybody indicating which player(s) need(s) to discard

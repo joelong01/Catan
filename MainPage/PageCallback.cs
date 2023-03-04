@@ -538,9 +538,9 @@ namespace Catan10
         public void TileRightTapped (TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
-            if (log == null) return; // probably the wrong state
+            //if (log == null) return; // probably the wrong state
 
-            this.TraceMessage($"Reason = {log.Reason}");
+            //this.TraceMessage($"Reason = {log.Reason}");
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
 
@@ -597,7 +597,7 @@ namespace Catan10
                                             targetTile.Index,
                                             weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index,  // the previous index
                                             weapon,
-                                            log.Reason,
+                                            log == null ? MoveBaronReason.Rolled7 : log.Reason,
                                             stolenResource);
             }
 
@@ -691,7 +691,7 @@ namespace Catan10
                     {
                         // create it
                         item = new MenuFlyoutItem();
-                        if (log.Reason == MoveBaronReason.PlayedDevCard)
+                        if (log != null && log.Reason == MoveBaronReason.PlayedDevCard)
                         {
                             s = "Playing Knight to Target: " + settlement.Owner.PlayerName;
                         }
