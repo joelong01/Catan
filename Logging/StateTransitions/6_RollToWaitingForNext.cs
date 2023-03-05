@@ -74,7 +74,9 @@ namespace Catan10
             //  does anybody have any gold?
             //  this message goes everywhere, so we only need one machien to send it. so even if 2 people need to trade gold, only one sends it
             //
-            if (gameController.TheHuman == gameController.CurrentPlayer)
+            //  7/14/2021: don't send this message for local games as we don't use the gameui to trade gold in local games
+            //
+            if (gameController.TheHuman == gameController.CurrentPlayer  && gameController.IsServiceGame)
             {
                 // current player checks each player to see if anybody has gold
                 foreach (var player in gameController.PlayingPlayers)
@@ -87,11 +89,14 @@ namespace Catan10
                     }
                 }
             }
+            List<PlayerModel> playersWithTooManyCards = new List<PlayerModel>();
 
             // only the current player's machine should send this message.  everybody will get it
-            if (rollLog.LastRoll == 7 && gameController.MyTurn )
+            //
+            //  7/14/2021:  only count # cards in a hand on service games.  by not filling in the card count, the list will be length 0 for the check below
+            if (rollLog.LastRoll == 7 && gameController.MyTurn && gameController.IsServiceGame)
             {
-                List<PlayerModel> playersWithTooManyCards = new List<PlayerModel>();
+
                 foreach (var player in gameController.PlayingPlayers)
                 {
                     if (player.GameData.Resources.TotalResourcesForGame.Count > 7)
@@ -101,46 +106,47 @@ namespace Catan10
 
                     }
                 }
-
-                if (playersWithTooManyCards.Count > 0 && gameController.IsServiceGame)
-                {
-                    //
-                    //  somebody has too many cards.  pop a dialog box telling everybody indicating which player(s) need(s) to discard
-                    //  
-
-                    string csv = gameController.PlayerListToCsv(playersWithTooManyCards);
-                    string msg = "";
-
-                    if (playersWithTooManyCards.Count == 1)
-                    {
-                        msg = $"{csv} has too many cards and must discard 1/2 of them before we continue.";
-                    }
-                    else if (playersWithTooManyCards.Count > 1)
-                    {
-                        msg = $"{csv} all have too many cards and must discard 1/2 of them before we continue.";
-                    }
-
-                    ContentDialog dlg = new ContentDialog()
-                    {
-                        Title = "Catan - Rolled 7",
-                        Content = msg,
-                        CloseButtonText = "Ok",
-                    };
-
-                    await dlg.ShowAsync();
-
-                    await PlayerHasTooManyCards.PostMessage(gameController);
-                }
-                else
-                {
-                    // 
-                    //  we transition out of this state above and then return.  if we get through it, we know that 
-                    //  nobody has too many cards -- so now we can move the Baron
-                    //
-
-                    await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
-                }
             }
+
+            if (playersWithTooManyCards.Count > 0)
+            {
+                //
+                //  somebody has too many cards.  pop a dialog box telling everybody indicating which player(s) need(s) to discard
+                //  
+
+                string csv = gameController.PlayerListToCsv(playersWithTooManyCards);
+                string msg = "";
+
+                if (playersWithTooManyCards.Count == 1)
+                {
+                    msg = $"{csv} has too many cards and must discard 1/2 of them before we continue.";
+                }
+                else if (playersWithTooManyCards.Count > 1)
+                {
+                    msg = $"{csv} all have too many cards and must discard 1/2 of them before we continue.";
+                }
+
+                ContentDialog dlg = new ContentDialog()
+                {
+                    Title = "Catan - Rolled 7",
+                    Content = msg,
+                    CloseButtonText = "Ok",
+                };
+
+                await dlg.ShowAsync();
+
+                await PlayerHasTooManyCards.PostMessage(gameController);
+            }
+            else
+            {
+                // 
+                //  we transition out of this state above and then return.  if we get through it, we know that 
+                //  nobody has too many cards -- so now we can move the Baron
+                //
+
+                await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
+            }
+            
         }
 
         public async Task Replay (IGameController gameController)
