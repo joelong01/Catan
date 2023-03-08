@@ -17,6 +17,7 @@ using Windows.Storage.Search;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Popups;
+using Windows.UI.ViewManagement;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -647,7 +648,7 @@ namespace Catan10
 
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            // ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
 
         /// <summary>
