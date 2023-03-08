@@ -1,4 +1,5 @@
 ﻿
+    
 <UserControl x:Name="userControl"
     x:Class="Catan10.PublicDataCtrl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
