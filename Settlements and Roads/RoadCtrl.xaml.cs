@@ -464,7 +464,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return String.Format($"Index={Index} Owner={Owner} RoadState={RoadState}");
+            return String.Format($"Index={Index} Owner={Owner} RoadState={RoadState} keys={ToString2()}");
         }
 
         public string ToString2()

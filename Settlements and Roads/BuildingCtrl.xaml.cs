@@ -139,6 +139,18 @@ namespace Catan10
             this.TraceMessage(s);
         }
 
+        public BuildingLocation GetLocationForTile(TileCtrl tile)
+        {
+            foreach (BuildingKey key in Clones)
+            {
+                if (key.Tile.Index == tile.Index)
+                {
+                    return key.Location;
+                }
+            }
+            return BuildingLocation.None;
+        }
+
         private void SetBuildingState(BuildingCtrl ctrl, BuildingState value)
         {
         }

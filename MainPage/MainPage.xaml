@@ -94,6 +94,7 @@
                             <MenuFlyoutItem Click="OnGrantResources" Text="Grant Resources" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSubItem Text="Development">
+                            <MenuFlyoutItem Click="OnUpdateCompanion" Text="Update Companion"/>
                             <MenuFlyoutItem Click="OnShowCatanSpy" Text="Show Catan Spy" />
                             <MenuFlyoutSeparator />
                             <MenuFlyoutSubItem Text="Game Type">

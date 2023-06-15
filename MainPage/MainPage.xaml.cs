@@ -9,9 +9,9 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
+using Catan10.CatanService;
 using Catan10.Spy;
-
+using CatanCompanion;
 using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.System;
@@ -81,7 +81,7 @@ namespace Catan10
 
         public MainPageModel MainPageModel
         {
-            get => (MainPageModel)GetValue(MainPageModelProperty);
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
             set => SetValue(MainPageModelProperty, value);
         }
 
@@ -90,7 +90,7 @@ namespace Catan10
         // a global for the game
         public PlayerModel TheHuman
         {
-            get => (PlayerModel)GetValue(TheHumanProperty);
+            get => ( PlayerModel )GetValue(TheHumanProperty);
             set => SetValue(TheHumanProperty, value);
         }
 
@@ -138,7 +138,7 @@ namespace Catan10
 
             if (speed == AnimationSpeed.Ultra)
             {
-                return (double)speed;
+                return ( double )speed;
             }
             // AnimationSpeedFactor is a value of 1...4
             double d = (double)speed / (baseSpeed + 2);
@@ -267,7 +267,7 @@ namespace Catan10
         {
             var depPropClass = d as MainPage;
             var depPropValue = (MainPageModel)e.NewValue;
-            depPropClass?.SetMainPageModel((MainPageModel)e.OldValue, (MainPageModel)e.NewValue);
+            depPropClass?.SetMainPageModel(( MainPageModel )e.OldValue, ( MainPageModel )e.NewValue);
         }
 
         private Task AddPlayer(PlayerModel pData, LogType logType)
@@ -487,7 +487,7 @@ namespace Catan10
                     {
                         AllPlayers = list,
                         Settings = new Settings(),
-                        
+
                     };
 
                     await SaveGameState();
@@ -619,14 +619,14 @@ namespace Catan10
 
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
-            
+
 
             if (MainPageModel.GameState != GameState.WaitingForRoll && MainPageModel.GameState != GameState.WaitingForRollForOrder)
             {
                 return;
             }
 
-            if (((Button)sender).Content is CatanNumber number)
+            if (( ( Button )sender ).Content is CatanNumber number)
             {
                 SimulateRoll(number.Number);
             }
@@ -648,7 +648,7 @@ namespace Catan10
 
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
 
         /// <summary>
@@ -1030,14 +1030,14 @@ namespace Catan10
         /// <returns></returns>
         private async Task ScrollMouseWheel(PointerRoutedEventArgs e)
         {
-            if (TheHuman.PlayerName != CurrentPlayer.PlayerName  && MainPageModel.Settings.IsServiceGame) return;
+            if (TheHuman.PlayerName != CurrentPlayer.PlayerName && MainPageModel.Settings.IsServiceGame) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
                 {
                     _gameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
-                    if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
+                    if (MainPageModel.Log.CanRedo && ( MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard ))
                     {
                         await RedoAsync();
                     }
@@ -1123,13 +1123,13 @@ namespace Catan10
 
         public bool SpyVisible
         {
-            get => (bool)GetValue(SpyVisibleProperty);
+            get => ( bool )GetValue(SpyVisibleProperty);
             set => SetValue(SpyVisibleProperty, value);
         }
 
         public string TurnedSpyOn
         {
-            get => (string)GetValue(TurnedSpyOnProperty);
+            get => ( string )GetValue(TurnedSpyOnProperty);
             set => SetValue(TurnedSpyOnProperty, value);
         }
 
@@ -1160,7 +1160,7 @@ namespace Catan10
 
             //
             //  boost the one clicked
-            Canvas.SetZIndex(((FrameworkElement)sender), 11);
+            Canvas.SetZIndex(( ( FrameworkElement )sender ), 11);
         }
 
         private bool EnableNextButton(bool enableNextButton, GameState gameState, int unprocessedMessages)
@@ -1168,12 +1168,12 @@ namespace Catan10
             //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
             if (unprocessedMessages != 0)
             {
-              //  this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
+                //  this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
                 return false;
             }
-            
+
             bool enable = MainPageModel.EnableNextButton;
-           // this.TraceMessage($"Next button enabled:{enable}");
+            // this.TraceMessage($"Next button enabled:{enable}");
             Debug.Assert(enable == enableNextButton);
             return enable;
         }
@@ -1224,7 +1224,7 @@ namespace Catan10
             NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
 
             ContentDialogResult result = await dlg.ShowAsync();
-            if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
+            if (( dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6 ) && result == ContentDialogResult.Primary)
             {
                 string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
                 MessageDialog msgDlg = new MessageDialog(content);
@@ -1304,7 +1304,7 @@ namespace Catan10
         private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement)
         {
             if (MainPageModel.GameState != GameState.WaitingForNext && MainPageModel.GameState != GameState.Supplemental) return;
-            
+
             if (player.GameData.EntitlementsLeft(entitlement) == 0)
             {
                 await ShowErrorMessage($"You have purchased all available {entitlement}.", "Catan", "");
@@ -1314,13 +1314,13 @@ namespace Catan10
         }
 
         public Visibility ShowLocalPurchase(GameState state)
-        {          
+        {
             if (state == GameState.WaitingForNewGame) return Visibility.Visible;
 
             if (MainPageModel.Settings.IsServiceGame) return Visibility.Collapsed;
-            if (state == GameState.WaitingForNext || 
-                MainPageModel.GameState == GameState.Supplemental) 
-                        return Visibility.Visible;
+            if (state == GameState.WaitingForNext ||
+                MainPageModel.GameState == GameState.Supplemental)
+                return Visibility.Visible;
             return Visibility.Collapsed;
         }
 
@@ -1334,6 +1334,56 @@ namespace Catan10
             if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll) return true;
 
             return false;
+        }
+
+        private void OnUpdateCompanion(object sender, RoutedEventArgs e)
+        {
+            CompanionState cs = new CompanionState();
+            foreach (PlayerModel player in MainPageModel.PlayingPlayers)
+            {
+               var p = new Player
+                {
+                    Name=player.PlayerName,
+                    PrimaryColor=player.ForegroundColor.ToString(),
+                    SecondaryColor=player.PrimaryBackgroundColor.ToString(),
+                };
+
+                cs.Players.Add(p);
+            }
+            int tileCount = GameContainer.AllTiles.Count;
+
+            for (int i = 0; i < tileCount; i++)
+            {
+                var tile = new Tile
+                {
+                    Number = GameContainer.AllTiles[i].Number,
+                    ResourceType = GameContainer.AllTiles[i].ResourceType,
+                    Index = GameContainer.AllTiles[i].Index
+                };
+              
+
+                if (GameContainer.AllTiles[i].OwnedBuilding.Count != 0)
+                {
+                    var buildings = GameContainer.AllTiles[i].OwnedBuilding;
+                    foreach (BuildingCtrl building in buildings)
+                    {
+                        Building b = new Building
+                        {
+                            Location = building.GetLocationForTile(GameContainer.AllTiles[i]),
+                            State = building.BuildingState,
+                            TileIndex = GameContainer.AllTiles[i].Index,
+                            Owner = building.Owner.PlayerName
+                        };
+                        tile.OwnedBuildings.Add(b); 
+                    }
+                }
+
+                cs.Tiles.Add(tile);
+            }
+
+         var o = JsonSerializer.Serialize(cs,  CatanSignalRClient.GetJsonOptions());
+            Debug.WriteLine(o);
+
         }
     }
 }
