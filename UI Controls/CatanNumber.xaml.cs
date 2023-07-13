@@ -18,11 +18,11 @@ namespace Catan10
 
     public sealed partial class CatanNumber : UserControl, INotifyPropertyChanged
     {
-        private readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
+        private readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("White", Colors.White);
         private readonly SolidColorBrush _redBrush = CatanColors.GetResourceBrush("Red", Colors.Red);
         private readonly SolidColorBrush _whiteBrush = CatanColors.GetResourceBrush("White", Colors.White);
         private bool _showEyes = false;
-        private NumberColorTheme myTheme = NumberColorTheme.Dark;
+        private NumberColorTheme myTheme = NumberColorTheme.Light;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {

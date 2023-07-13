@@ -26,7 +26,7 @@
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="FontSize" Value="22" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Foreground" Value="White" />
             <Setter Property="CharacterSpacing" Value="0" />
             <Setter Property="FontFamily" Value="Bookman Old Style" />
         </Style>

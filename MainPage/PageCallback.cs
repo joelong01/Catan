@@ -537,6 +537,8 @@ namespace Catan10
         //
         public void TileRightTapped (TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
+            if (CurrentGameState != GameState.MustMoveBaron) return;
+
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
             //if (log == null) return; // probably the wrong state
 
