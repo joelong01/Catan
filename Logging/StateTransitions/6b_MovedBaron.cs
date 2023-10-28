@@ -40,7 +40,7 @@ namespace Catan10
             {
                 newState = GameState.WaitingForNext;
             }
-           
+
             // Debug.Assert(((MustMoveBaronLog)gameController.MainPageModel.Log.PeekAction).StartingState == previousState);
 
             MovedBaronLog logHeader = new MovedBaronLog()
@@ -92,13 +92,22 @@ namespace Catan10
             }
 
             // if they played a dev card, consume it
-            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
+            // 10/23/2023: we weren't counting knights played this fix will says "if it is a local game,
+            //             give them a knight and then let them play it.
+            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
             {
+                if (!gameController.IsServiceGame)
+                {
+                    DevCardModel model = new DevCardModel() { DevCardType = DevCardType.Knight };
+                    gameController.CurrentPlayer.GameData.Resources.AvailableDevCards.Add(model);
+                }
                 var ret = gameController.CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
                 Contract.Assert(ret, "A knight was not found in AvailableDevCards");
                 gameController.CurrentPlayer.GameData.Resources.KnightsPlayed++;
-                
+                gameController.AssignLargestArmy();
             }
+
+
 
 
             //
@@ -118,7 +127,7 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
-        public Task Replay (IGameController gameController)
+        public Task Replay(IGameController gameController)
         {
             return Do(gameController);
         }
@@ -165,13 +174,15 @@ namespace Catan10
             // if they played a dev card, undo it if it is a service game (local games don't track resources)
             if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
             {
-                
-                gameController.CurrentPlayer.GameData.Resources.UndoPlayDevCard(DevCardType.Knight);                
-                gameController.CurrentPlayer.GameData.Resources.KnightsPlayed--;
+
+                gameController.CurrentPlayer.GameData.Resources.UndoPlayDevCard(DevCardType.Knight);
 
             }
 
-           
+            // 10/23/2023: this was the corresponding fix to bug above -- we need to decrement knight count on undo, for all game types
+            gameController.CurrentPlayer.GameData.Resources.KnightsPlayed--;
+            gameController.AssignLargestArmy();
+
 
             return Task.CompletedTask;
         }

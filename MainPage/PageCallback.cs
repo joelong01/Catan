@@ -957,7 +957,7 @@ namespace Catan10
         //
         //  since this is called from Undo, you have to set it to false if it is less than 2 in case you undid the one that made you the larget army
         //
-        private void AssignLargestArmy ()
+        public void AssignLargestArmy ()
         {
             if (CurrentPlayer.GameData.Resources.KnightsPlayed > 2)
             {

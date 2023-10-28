@@ -212,8 +212,12 @@ namespace Catan10
             }
         }
 
-        bool _isServiceGame = true;
-        bool _isLocalGame = false;
+        //
+        //  10/23/2023
+        //  Make local game the default
+
+        bool _isServiceGame = false;
+        bool _isLocalGame = true;
 
         public bool IsLocalGame
         {
@@ -237,16 +241,17 @@ namespace Catan10
         {
             get
             {
-                return _isServiceGame;
+                return false;
             }
             set
             {
-                if (_isServiceGame != value)
-                {
-                    _isServiceGame = value;
-                    IsLocalGame = !value;
-                    NotifyPropertyChanged();
-                }
+                // 10/28/2003: removing this setting as we are not using the remote game implementation and it is easier to turn off than rip out
+                //if (_isServiceGame != value)
+                //{
+                //    _isServiceGame = value;
+                //    IsLocalGame = !value;
+                //    NotifyPropertyChanged();
+                //}
                 
             }
         }

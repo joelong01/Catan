@@ -45,7 +45,6 @@ namespace Catan10
                 }
             }
         }
-
         [JsonIgnore]
         public int Count => Wheat + Wood + Brick + Ore + Sheep + GoldMine;
 

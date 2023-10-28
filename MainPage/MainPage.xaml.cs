@@ -1326,6 +1326,11 @@ namespace Catan10
 
         private async void EnableMoveBaron(object sender, RoutedEventArgs e)
         {
+            //  10/23/2023
+            //  User could play a knight more than once -- check to make sure that a knight has not alread
+            //  played a knight
+            if (CurrentPlayer == null) return;
+            if (CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType != DevCardType.None) return;
             await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
         }
 

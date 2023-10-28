@@ -157,7 +157,7 @@
                         <!--  Score  -->
                         <TextBlock Margin="10,0,0,0" FontSize="72" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" Text="{x:Bind Player.GameData.Score, Mode=OneWay, FallbackValue=12}" ToolTipService.ToolTip="Score" />
                         <!--  Resources Acquired  -->
-                        <Rectangle Width="70" Height="100" Margin="30,0,0,0" Fill="{StaticResource ResourceType.Back}" RadiusX="10" RadiusY="10" Stroke="{x:Bind Player.ForegroundBrush}" StrokeThickness="1" />
+                        <Rectangle Width="70" Height="100" Margin="30,0,0,0" Fill="{StaticResource ResourceType.Back}" RadiusX="10" RadiusY="10" Stroke="{x:Bind Player.ForegroundBrush}" StrokeThickness="1" ToolTipService.ToolTip="Total Resources" />
                         <TextBlock Margin="-68,-8,0,0" FontSize="36" FontWeight="ExtraBold" Foreground="Red" Text="∑" />
                         <TextBlock Margin="0,0,10,0" FontSize="68" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}" Text="{x:Bind Player.GameData.Resources.TotalResourcesForGame.Count, Mode=OneWay, FallbackValue=68}" />
                         <!--  Gold Cards  -->

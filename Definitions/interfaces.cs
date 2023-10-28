@@ -296,6 +296,8 @@ namespace Catan10
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
+        void AssignLargestArmy();
+
         #endregion Methods
 
         void SimulateRoll(int roll);
