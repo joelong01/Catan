@@ -67,7 +67,7 @@
                 </local:CatanNumber>
                 <TextBlock Name="_txtIndex" Margin="0,0,0,5" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="20" Foreground="Red" Text="{x:Bind Index, FallbackValue=27, Mode=TwoWay}" Visibility="Collapsed" />
                 <Viewbox Width="18.75" Height="28.5" Margin="0,0,0,6" VerticalAlignment="Bottom">
-                    <local:ResourceCardSlimCtrl CountVisible="False" Image="{x:Bind BrushifyResourceType(ResourceType), Mode=OneTime}" Visibility="{x:Bind ShownResourceType, Converter={StaticResource ResourceTypeToVisibilityConverter}, Mode=OneWay, ConverterParameter=GoldMine}" />
+                    <local:ResourceCardSlimCtrl CountVisible="False" Image="{x:Bind BrushifyResourceType(ResourceType), Mode=OneWay}" Visibility="{x:Bind ShownResourceType, Converter={StaticResource ResourceTypeToVisibilityConverter}, Mode=OneWay, ConverterParameter=GoldMine}" />
                 </Viewbox>
             </Grid>
             <Grid x:Name="_hexBackGrid" HorizontalAlignment="Center" VerticalAlignment="Center">

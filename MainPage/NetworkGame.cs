@@ -36,19 +36,24 @@ namespace Catan10
                     MainPageModel.GameInfo = MainPageModel.DefaultGame; // the dialog will set the chosen name here
                     MainPageModel.GameInfo.Name = MainPageModel.Settings.DefaultGameName;
                     MainPageModel.GameInfo.Creator = TheHuman.PlayerName;
-                    MainPageModel.IsServiceGame = true;
+                    //
+                    //  10/23/2023
+                    //  this comments out the start of a network game since we aren't using that.  before this it would assert.
 
-                    if (MainPageModel.CatanService != null)
-                    {
-                        MainPageModel.CatanService.OnBroadcastMessageReceived -= Service_OnBroadcastMessageReceived;
-                        MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
-                        MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
-                        MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
-                        await MainPageModel.CatanService.DisposeAsync();
-                        MainPageModel.CatanService = null;
-                    }
 
-                    MainPageModel.CatanService = new CatanSignalRClient();
+                    //MainPageModel.IsServiceGame = true;
+
+                    //if (MainPageModel.CatanService != null)
+                    //{
+                    //    MainPageModel.CatanService.OnBroadcastMessageReceived -= Service_OnBroadcastMessageReceived;
+                    //    MainPageModel.CatanService.OnGameCreated -= Service_OnGameCreated;
+                    //    MainPageModel.CatanService.OnGameDeleted -= Service_OnGameDeleted;
+                    //    MainPageModel.CatanService.OnPrivateMessage -= Service_OnPrivateMessage;
+                    //    await MainPageModel.CatanService.DisposeAsync();
+                    //    MainPageModel.CatanService = null;
+                    //}
+
+                    //MainPageModel.CatanService = new CatanSignalRClient();
 
                     //if (MainPageModel.Settings.IsSignalRGame)
                     //{
@@ -59,14 +64,14 @@ namespace Catan10
                     //    MainPageModel.CatanService = new CatanRestService();
                     //}
 
-                    MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
-                    MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
-                    MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
-                    MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
-                    MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
+                    //MainPageModel.CatanService.OnBroadcastMessageReceived += Service_OnBroadcastMessageReceived;
+                    //MainPageModel.CatanService.OnGameCreated += Service_OnGameCreated;
+                    //MainPageModel.CatanService.OnGameDeleted += Service_OnGameDeleted;
+                    //MainPageModel.CatanService.OnPrivateMessage += Service_OnPrivateMessage;
+                    //MainPageModel.CatanService.OnGameJoined += Service_OnGameJoined;
 
-                    await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.Log.MessageLog as ICollection<CatanMessage>, TheHuman.PlayerName);
-                    await MainPageModel.CatanService.StartConnection(MainPageModel.GameInfo, TheHuman.PlayerName);
+                    //await MainPageModel.CatanService.Initialize(MainPageModel.Settings.HostName, MainPageModel.Log.MessageLog as ICollection<CatanMessage>, TheHuman.PlayerName);
+                    //await MainPageModel.CatanService.StartConnection(MainPageModel.GameInfo, TheHuman.PlayerName);
                 }
             }
             catch (Exception e)

@@ -65,14 +65,14 @@
                 <Button.Flyout>
                     <MenuFlyout x:Name="_contextMenu" Closed="OnMenuClosed" Opened="OnMenuOpened" Placement="Bottom">
                         <MenuFlyoutSubItem Text="Game">
-                            <MenuFlyoutItem Click="OnNewNetworkGame" Text="New Network Game" />
+                            <!--<MenuFlyoutItem Click="OnNewNetworkGame" Text="New Network Game" />-->
                             <MenuFlyoutItem Click="OnNewLocalGame" Text="New Local Game" />
-                            <MenuFlyoutItem Click="OnJoinNetworkGame" Text="Join Network Game" />
+                            <!--<MenuFlyoutItem Click="OnJoinNetworkGame" Text="Join Network Game" />-->
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Click="Menu_OnEndGame" Text="End Game" />
                             <MenuFlyoutItem Click="OnDeleteAllGames" Text="Delete All Games" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Click="OnNetworkConnect" Text="Connect To Catan Service Hub" />
+                            <!--<MenuFlyoutItem Click="OnNetworkConnect" Text="Connect To Catan Service Hub" />-->
                             <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}" Text="Local Game" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
@@ -369,13 +369,13 @@
                                         <TextBlock Style="{StaticResource RollGridTextStyle}" Text="{x:Bind FallbackValue=0 (0%), Mode=OneWay, Path=MainPageModel.Log.RollLog.TwelvePercent}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <ToggleButton Margin="0,-13,0,0" Background="Transparent" 
-                                                      IsChecked="{x:Bind MustMoveBaron, Mode=TwoWay}" 
+                                        <Button Margin="0,-13,0,0" Background="Transparent" 
+                                                 
                                                       IsEnabled="{x:Bind PlayBaronButtonEnabled(MainPageModel.Log.GameState), Mode=OneWay}"
                                                       Click="EnableMoveBaron">
                                                         
                                             <local:BaronCtrl Width="85" Height="71" />
-                                        </ToggleButton>
+                                        </Button>
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>

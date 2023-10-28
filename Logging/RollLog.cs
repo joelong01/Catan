@@ -135,7 +135,7 @@ namespace Catan10
                     }
 
                     player.GameData.Resources.ResourcesLostToBaron += Baroned;
-                    //                     GameController.MainPageModel.GameResources += Granted;
+
 
                     if (Granted.Count == 0)
                     {
