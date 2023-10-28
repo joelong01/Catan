@@ -97,6 +97,8 @@ namespace Catan10
                 var ret = gameController.CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
                 Contract.Assert(ret, "A knight was not found in AvailableDevCards");
                 gameController.CurrentPlayer.GameData.Resources.KnightsPlayed++;
+            }
+
                 
             }
 
