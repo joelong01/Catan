@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml;
+﻿using System;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -46,6 +47,11 @@ namespace Catan10
         public BoardMeasurementCtrl()
         {
             this.InitializeComponent();
+        }
+
+        private void OnPointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            var number = Int32.Parse(((FrameworkElement)sender).Tag as String);
         }
     }
 }

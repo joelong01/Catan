@@ -187,48 +187,7 @@
 
             </s:SliderCtrl>
 
-            <!--<local:DragableGridCtrl x:Name="Grid_BoardMeasurement" Grid.Row="1" Grid.RowSpan="10" Width="360"
-                HorizontalAlignment="Center" VerticalAlignment="Center" Canvas.ZIndex="10"
-                PointerPressed="Draggable_PointerPressed"
-                OnGridPositionChanged="OnGridPositionChanged" Caption="Board Measurements"
-                Visibility="{x:Bind MainPageModel.ShowBoardMeasurements(MainPageModel.GameState), Mode=OneWay}"
-                BorderBrush="{StaticResource bmMaple}"
-                Background="{StaticResource DevCardType.Knight}"
-                Player="{x:Bind TheHuman, Mode=OneWay}"
-                CornerRadius="10" BorderThickness="4">
-                <local:DragableGridCtrl.Child>
-                    <local:BoardMeasurementCtrl Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                        PipCount="{Binding Path=PipCount, Mode=OneWay}"
-                        FiveStarPositions="{x:Bind Path=MainPageModel.FiveStarPositions, Mode=OneWay}"
-                        FourStarPositions="{x:Bind Path=MainPageModel.FourStarPositions, Mode=OneWay}"
-                        ThreeStarPositions="{x:Bind Path=MainPageModel.ThreeStarPositions, Mode=OneWay}"
-                        TwoStarPositions="{x:Bind Path=MainPageModel.TwoStarPositions, Mode=OneWay}"
-                        CornerRadius="10">
-                        <local:BoardMeasurementCtrl.Transitions>
-                            <TransitionCollection>
-                                <EntranceThemeTransition />
-                            </TransitionCollection>
-                        </local:BoardMeasurementCtrl.Transitions>
-                    </local:BoardMeasurementCtrl>
-                </local:DragableGridCtrl.Child>
-            </local:DragableGridCtrl>-->
-
-            <local:DragableGridCtrl x:Name="Draggable_PrivateData"
-                Width="360"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="{StaticResource DevCardType.Knight}"
-                BorderBrush="{StaticResource bmMaple}"
-                BorderThickness="2" Canvas.ZIndex="10"
-                Caption="{x:Bind BuildCaption('Private Data', TheHuman.PlayerName), Mode=OneWay}"
-                CornerRadius="10"
-                OnGridPositionChanged="OnGridPositionChanged"
-                Player="{x:Bind TheHuman, Mode=OneWay}"
-                PointerPressed="Draggable_PointerPressed"
-                Visibility="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=OneWay}">
-                <local:DragableGridCtrl.Child>
-                    <local:PrivateDataCtrl Player="{x:Bind TheHuman, Mode=OneWay}" StolenResource="{x:Bind TheHuman.GameData.Resources.StolenResource, Mode=OneWay}" />
-                </local:DragableGridCtrl.Child>
-            </local:DragableGridCtrl>
+           
             <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Width="500" Margin="10" HorizontalAlignment="Right" Canvas.ZIndex="5" GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}" GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}" 
                                       MainPageModel="{x:Bind MainPageModel, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
 
@@ -272,21 +231,7 @@
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
 
-            <local:DragableGridCtrl x:Name="PlayerTradeGrid"
-                Width="450"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="{StaticResource bmMaple}"
-                BorderBrush="{StaticResource WhiteBrush}"
-                Canvas.ZIndex="10" Caption="Resource Trades"
-                CornerRadius="10" Foreground="Black"
-                OnGridPositionChanged="OnGridPositionChanged"
-                Player="{x:Bind TheHuman, Mode=OneWay}"
-                PointerPressed="Draggable_PointerPressed"
-                Visibility="{x:Bind MainPageModel.ShowTradeUi(MainPageModel.GameState), Mode=OneWay}">
-                <local:DragableGridCtrl.Child>
-                    <local:TradeCtrl x:Name="MyPlayerTraderCtrl" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" TheHuman="{x:Bind TheHuman, Mode=OneWay}" />
-                </local:DragableGridCtrl.Child>
-            </local:DragableGridCtrl>
+
             <local:DragableGridCtrl x:Name="ActionAndStats"
                 Height="480"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
