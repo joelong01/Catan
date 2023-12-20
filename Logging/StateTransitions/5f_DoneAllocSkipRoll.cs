@@ -46,9 +46,9 @@ namespace Catan10
 
             //
             // if we have a roll for this turn already, use it.
-            if (RollState.Rolls != null && RollState.Rolls.Count > 0)
+            if (RollState.Roll > 0)
             {
-                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, RollState.Rolls);
+                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, RollState.Roll);
             }
         }
 

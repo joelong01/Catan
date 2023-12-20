@@ -32,11 +32,7 @@ namespace Catan10
         #region Methods
 
         /// <summary>
-        ///     a Roll has come in to this machine -- it can come from any machine (including this one)
-        ///     update *all* players
-        ///
-        ///     by the time we get here, the Log has been pushed, so the state is correct.
-        ///     The Roll has also been pushed
+        ///    a Roll has been entered via clicking on the roll in the UI
         ///
         ///     the UI for the Roll has not been updated - need to call that here.
         ///
@@ -49,19 +45,6 @@ namespace Catan10
             // if the state is wrong, there is a big bug someplace
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
 
-            //
-            //  get the player and make sure they are playing
-            PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
-            Contract.Assert(sentBy != null);
-            Contract.Assert(this.RollState.Rolls != null);
-
-            //
-            //  what roll did the user pick?
-            //  make sure it is valid, otherwise there is a bug
-            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRoll(this.RollState.Rolls);
-            Contract.Assert(pickedRoll != null);
-            Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
-            Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
 
             IRollLog rollLog = gameController.RollLog;
 
@@ -161,17 +144,6 @@ namespace Catan10
         {
 
             //
-            //  get the player and make sure they are playing
-            PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
-
-            //
-            //  what roll did the user pick?
-            //  make sure it is valid, otherwise there is a bug
-            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRoll(this.RollState.Rolls);
-
-            IRollLog rollLog = gameController.RollLog;
-
-            //
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
@@ -180,54 +152,34 @@ namespace Catan10
             //  TODO: This also needs to do somethign different if it is the last message -- e.g. call Do();
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            return Do(gameController);
+            await gameController.Log.RollLog.RedoRoll();
         }
 
         public async Task Undo(IGameController gameController)
         { //
             // if the state is wrong, there is a big bug someplace
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
-
-            //
-            //  get the player and make sure they are playing
-            PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
-            Contract.Assert(sentBy != null);
-
-            //
-            //  what roll did the user pick?
-            //  make sure it is valid, otherwise there is a bug
-            RollModel pickedRoll = sentBy.GameData.SyncronizedPlayerRolls.AddRoll(this.RollState.Rolls);
-            Contract.Assert(pickedRoll != null);
-            Contract.Assert(pickedRoll.DiceOne > 0 && pickedRoll.DiceOne < 7);
-            Contract.Assert(pickedRoll.DiceTwo > 0 && pickedRoll.DiceTwo < 7);
-
             await gameController.Log.RollLog.UndoRoll();
         }
-
-        internal static async Task PostRollMessage(IGameController gameController, List<RollModel> rolls)
+        //
+        //  the rollstate is pushed to the look
+        internal static async Task PostRollMessage(IGameController gameController, int roll)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
             var rollState = gameController.Log.RollLog.Peek();
-            Contract.Assert(rolls.Count > 0);
-            Contract.Assert(rollState != null);
-            rollState.Rolls = rolls;
-            rollState.SelectedRoll = rolls.Find((roll) => roll.Selected == true).Roll;
-
+          
+            rollState.Roll = roll;
+         
             WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
             {
-                CanUndo = false,
+                CanUndo = true,
                 RollState = rollState,
                 Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForNext,
             };
 
-            if (logHeader.RollState.Rolls != null)
-            {
-                Contract.Assert(logHeader.RollState.Rolls.Count == rolls.Count);
-                logHeader.TraceMessage("Find a better way to make sure the rolls are the same");
-            }
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }

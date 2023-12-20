@@ -56,8 +56,8 @@ namespace Catan10
             if (mainPageModel.Settings.AutoRespond)
             {
                 //
-                // simulate a roll
-                gameController.SimulateRoll(-1);
+                // todo:  simulate a roll
+                
             }
         }
 

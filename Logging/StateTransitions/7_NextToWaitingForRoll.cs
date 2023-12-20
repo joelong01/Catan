@@ -36,19 +36,22 @@ namespace Catan10
         {
             //
             //  remember the log is already written!
-
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
+            var currentGameState = gameController.CurrentGameState; 
+            Contract.Assert(currentGameState == GameState.WaitingForRoll);
             ChangePlayerHelper.ChangePlayer(gameController, 1);
             Debug.Assert(this.RollState != null);
             await gameController.ResetRollControl();
 
+            //
+            //  RollState is the random gold tiles + the roll
+            //  this pushes the random gold tiles to the log
             await gameController.PushRollState(this.RollState);
             gameController.StopHighlightingTiles();
             //
             // if we have a roll for this turn already, use it.
-            if (this.RollState.Rolls != null && this.RollState.Rolls.Count > 0)
+            if ( this.RollState.Roll > 0)
             {
-                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRolls);
+                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRoll);
             }
         }
 
@@ -83,7 +86,7 @@ namespace Catan10
             // if we have a roll for this turn already, use it.
             if (gameController.RollLog.CanRedo)
             {
-                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRolls);
+                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRoll);
             }
         }
     }

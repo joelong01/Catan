@@ -50,7 +50,7 @@ namespace Catan10
 
                 case GameState.PickingBoard:
 
-                 
+
                     if (MainPageModel.GameInfo.Creator == TheHuman.PlayerName)
                     {
                         //
@@ -107,7 +107,7 @@ namespace Catan10
                     break;
 
                 case GameState.WaitingForRoll:
-                 
+
                     break;
 
                 case GameState.WaitingForNext:
@@ -126,7 +126,7 @@ namespace Catan10
 
         #region Properties
 
-        public bool AutoRespondAndTheHuman => (this.MainPageModel.Settings.AutoRespond && CurrentPlayer == TheHuman);
+        public bool AutoRespondAndTheHuman => ( this.MainPageModel.Settings.AutoRespond && CurrentPlayer == TheHuman );
 
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
@@ -275,7 +275,7 @@ namespace Catan10
             // we need to check to make sure that we haven't already picked random goal tiles for this particular role.  the scenario is
             // we hit Next and are waiting for a role (and have thus picked random gold tiles) and then hit undo for some reason so that the
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
-            if ((changePlayerLog.NewState == GameState.WaitingForRoll) || (changePlayerLog.NewState == GameState.WaitingForNext))
+            if (( changePlayerLog.NewState == GameState.WaitingForRoll ) || ( changePlayerLog.NewState == GameState.WaitingForNext ))
             {
                 await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
             }
@@ -377,7 +377,7 @@ namespace Catan10
                 {
                     //
                     //  reset MustRoll flag
-                    p.GameData.SyncronizedPlayerRolls.MustRoll = false;                    
+                    p.GameData.SyncronizedPlayerRolls.MustRoll = false;
                     if (PlayerInTie(p).Count > 0) // this means player == p is tied with somebody
                     {
                         playersInTie.Add(p); // we will catch the one that we are tied when we iterate to that player
@@ -487,7 +487,7 @@ namespace Catan10
             return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
         }
 
- 
+
 
         /// <summary>
         ///     starting back as early as possible -- load MainPageModel from disk and recreate all the players.
@@ -503,7 +503,7 @@ namespace Catan10
             _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             _progress.IsActive = false;
 
-        
+
             CurrentPlayer = TheHuman;
             //
             //  start the connection to the SignalR servi0ce
@@ -625,7 +625,7 @@ namespace Catan10
                 await MainPageModel.CatanService.SendBroadcastMessage(message);
             }
             //  this.TraceMessage($"returning PostMessage {message.DataTypeName} for id={message.MessageId}");
-            return (!MainPageModel.Settings.IsLocalGame);
+            return ( !MainPageModel.Settings.IsLocalGame );
         }
 
         public DevCardType PurchaseNextDevCard()
@@ -673,7 +673,7 @@ namespace Catan10
 
         //
         //  find all the tiles with building for this roll where the onwer == Player
-        public (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll)
+        public (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll, RollAction action)
         {
             TradeResources tr = new TradeResources();
             TradeResources baron = new TradeResources();
@@ -695,6 +695,12 @@ namespace Catan10
                         }
                     }
                 }
+            }
+
+            if (action == RollAction.Undo)
+            {
+                tr = tr.GetNegated();
+                baron = baron.GetNegated();
             }
             return (tr, baron);
         }
@@ -930,7 +936,7 @@ namespace Catan10
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
             Contract.Assert(entitlement != Entitlement.Undefined);
             player.GameData.Resources.ConsumeEntitlement(entitlement);
-            
+
             await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
             if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
             {
@@ -938,10 +944,10 @@ namespace Catan10
                 _showPipGroupIndex = 0;
             }
             BuildingState oldState = updateBuildingLog.OldBuildingState;
-            
+
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
-                if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build))
+                if (building.BuildingState == BuildingState.Settlement && ( oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build ))
                 {
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
@@ -949,9 +955,9 @@ namespace Catan10
                         tr.AddResource(kvp.Value.ResourceType, 1);
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
-                    
+
                 }
-                else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
+                else if (( building.BuildingState == BuildingState.None ) && ( oldState == BuildingState.Settlement ))
                 {
                     //
                     //  user did an undo
