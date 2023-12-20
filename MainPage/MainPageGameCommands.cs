@@ -1,6 +1,7 @@
 ﻿using System;
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
@@ -793,6 +794,19 @@ namespace Catan10
             {
                 this.TraceMessage($"Exception: {e}");
             }
+        }
+
+        private void OnShowPips(int pipCount)
+        {
+            _gameView.AllBuildings.ForEach(async (b) =>
+            {
+                b.Reset();
+                if (b.Pips >= pipCount)
+                {
+                    await b.UpdateBuildingState(CurrentPlayer, b.BuildingState, BuildingState.Pips);
+                }
+
+            });
         }
 
         #endregion Methods

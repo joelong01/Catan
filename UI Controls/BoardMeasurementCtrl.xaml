@@ -20,20 +20,20 @@
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="26" Text="13" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="26" Text="{x:Bind Path=FiveStarPositions, Mode=OneWay, FallbackValue=0}" />
                     </Grid>
-                    <Grid>
+                    <Grid PointerPressed="OnPointerPressed" Tag="12">
                         <Ellipse Width="75" Height="75" Fill="{StaticResource ResourceType.GoldMine}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Foreground="Red" Text="★★★★" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="26" Text="12" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="26" Text="{x:Bind Path=FourStarPositions, Mode=OneWay}" />
                     </Grid>
-                    <Grid>
+                    <Grid PointerPressed="OnPointerPressed" Tag="11">
                         <Ellipse Width="75" Height="75" Fill="{Binding Path=Current.TheHuman.BackgroundBrush, Mode=OneWay}" />
                         <Ellipse Width="75" Height="75" Fill="{StaticResource ResourceType.GoldMine}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Foreground="Red" Text="★★★" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="26" Text="11" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="26" Text="{x:Bind ThreeStarPositions, Mode=OneWay}" />
                     </Grid>
-                    <Grid>
+                    <Grid PointerPressed="OnPointerPressed" Tag="10">
                         <Ellipse Width="75" Height="75" Fill="{StaticResource ResourceType.GoldMine}" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Foreground="Red" Text="★★" />
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="26" Text="10" />
