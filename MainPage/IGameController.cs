@@ -50,7 +50,7 @@ namespace Catan10
 
                 case GameState.PickingBoard:
 
-                    await HideRollsInPublicUi();
+                 
                     if (MainPageModel.GameInfo.Creator == TheHuman.PlayerName)
                     {
                         //
@@ -107,7 +107,7 @@ namespace Catan10
                     break;
 
                 case GameState.WaitingForRoll:
-                    await HideRollsInPublicUi();
+                 
                     break;
 
                 case GameState.WaitingForNext:
@@ -487,17 +487,7 @@ namespace Catan10
             return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
         }
 
-        public async Task HideRollsInPublicUi()
-        {
-            await _rollControl.Reset();
-
-            MainPageModel.PlayingPlayers.ForEach((p) =>
-            {
-                p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = 0;
-                p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = 0;
-                p.GameData.RollOrientation = TileOrientation.FaceDown;
-            }); // I hate this hack but I couldn't figure out how to do it with DataBinding
-        }
+ 
 
         /// <summary>
         ///     starting back as early as possible -- load MainPageModel from disk and recreate all the players.
@@ -513,7 +503,7 @@ namespace Catan10
             _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             _progress.IsActive = false;
 
-            await _rollControl.Reset();
+        
             CurrentPlayer = TheHuman;
             //
             //  start the connection to the SignalR servi0ce
@@ -678,7 +668,7 @@ namespace Catan10
 
         public Task ResetRollControl()
         {
-            return _rollControl.Reset();
+            return Task.CompletedTask;
         }
 
         //

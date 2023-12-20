@@ -215,8 +215,6 @@ namespace Catan10
         //
         //  10/23/2023
         //  Make local game the default
-
-        bool _isServiceGame = false;
         bool _isLocalGame = true;
 
         public bool IsLocalGame

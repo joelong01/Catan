@@ -210,9 +210,7 @@ namespace Catan10
                 };
                 rolls.Add(rollModel);
             }
-            //
-            //  set them in the roll UI
-            _rollControl.TestSetRolls(rolls);
+            OnRolled(rolls);
         }
 
         public void UpdateBoardMeasurements()
@@ -601,10 +599,7 @@ namespace Catan10
             await SaveGameState();
         }
 
-        private async void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
-        {
-            await GrowOrShrink(ControlGrid);
-        }
+
 
         private async void OnManagePlayers(object sender, RoutedEventArgs e)
         {
@@ -911,7 +906,7 @@ namespace Catan10
 
             _gameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
             _raceTracking.Reset();
-            await _rollControl.Reset();
+           
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
@@ -1249,7 +1244,8 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.Clear();
                 GameInfo info = new GameInfo()
                 {
-                    Creator = "Joe",
+                    Creator = TheHuman.PlayerName,
+                    GameIndex = dlg.SelectedIndex,
                     Id = Guid.NewGuid(),
                     Started = false
                 };

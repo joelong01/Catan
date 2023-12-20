@@ -38,7 +38,7 @@ namespace Catan10
             {
                 if (Control != null)
                 {
-                    return ((ICatanGameData)Control).HexPanel;
+                    return ( ( ICatanGameData )Control ).HexPanel;
                 }
                 return null;
             }
@@ -146,7 +146,7 @@ namespace Catan10
 
         public CatanGameCtrl CurrentGame
         {
-            get => (CatanGameCtrl)GetValue(CurrentGameProperty);
+            get => ( CatanGameCtrl )GetValue(CurrentGameProperty);
             set => SetValue(CurrentGameProperty, value);
         }
 
@@ -168,7 +168,7 @@ namespace Catan10
 
         public List<CatanGameCtrl> Games
         {
-            get => (List<CatanGameCtrl>)GetValue(GamesProperty);
+            get => ( List<CatanGameCtrl> )GetValue(GamesProperty);
             set => SetValue(GamesProperty, value);
         }
 
@@ -220,7 +220,7 @@ namespace Catan10
                             sum += i;
                         }
 
-                        _probabilities[resourceType] = sum / (double)tempList.Count;
+                        _probabilities[resourceType] = sum / ( double )tempList.Count;
                     }
                 }
 
@@ -1056,6 +1056,14 @@ namespace Catan10
         /// <summary>
         ///     Given a tileGroup (e.g. a set of Tiles completely surrounded by water (or a continuguous set of tiles like the standard board)
         ///     return a list of numbers that represent the random numbers for that TileGroup
+        ///     
+        ///     12/19/2023
+        ///         New algorithm:
+        ///             1. assign random numbers
+        ///             2. go through the list and find the desert tile(s)
+        ///             3. swap whatever the desert tile's number is with the tile that has the 7
+        ///             4. do this for all the desert tiles.
+        ///             5. make sure the layout is valid, if not do it again.
         /// </summary>
         /// <param name="tileGroup"></param>
         /// <returns></returns>
@@ -1064,85 +1072,85 @@ namespace Catan10
             bool valid = false;
             int iterations = 0;
             List<int> randomNumberSequence = new List<int>();
-
+            _currentHexPanel.DesertTiles.Clear();
+            _currentHexPanel.DesertTiles.AddRange(tileGroup.TilesToRandomize.FindAll(t => t.ResourceType == ResourceType.Desert));
             while (!valid)
             {
+                // get a random list of numbers
                 randomNumberSequence = GetRandomList(tileGroup.StartingTileNumbers.Count - 1); // this is the index *into* TileGroup.StartingTileNumbers
-                _currentHexPanel.DesertTiles.Clear();
-                _currentHexPanel.DesertTiles.AddRange(tileGroup.TilesToRandomize.FindAll(t => t.ResourceType == ResourceType.Desert));
-                int startingDesertIndex = 0;
-                int randomDesertIndex = 0;
-                for (int i = 0; i < _currentHexPanel.DesertTiles.Count; i++)
-                {
-                    //
-                    //  the index into the TileGroup.StartingTileNumbers that has the desert number (7)
-                    startingDesertIndex = tileGroup.StartingTileNumbers.IndexOf(7, startingDesertIndex);
 
-                    //
-                    //  find the index in the random array that has that index
-                    randomDesertIndex = randomNumberSequence.IndexOf(startingDesertIndex, randomDesertIndex);
 
-                    // where is the Desert in the Randomtiles?
-
-                    TileCtrl desertTile = _currentHexPanel.DesertTiles[i];
-                    int desertTileIndex = tileGroup.TilesToRandomize.IndexOf(desertTile);
-
-                    randomNumberSequence.Swap(desertTileIndex, randomDesertIndex);
-                }
-
+                //// assign them to tiles
                 for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
                 {
                     TileCtrl t = tileGroup.TilesToRandomize[i];
                     t.HasBaron = false;
-                    int number = tileGroup.StartingTileNumbers[randomNumberSequence[i]];
-                    if (number == 7)
-                    {
-                        Debug.Assert(t.ResourceType == ResourceType.Desert);
-                    }
-                    else
-                    {
-                        Debug.Assert(t.ResourceType != ResourceType.Desert);
-                    }
+                    t.Number = tileGroup.StartingTileNumbers[randomNumberSequence[i]];
 
-                    t.Number = number;
                 }
+
+                var sevenTiles = tileGroup.TilesToRandomize.FindAll( t => t.Number == 7);
+                Debug.Assert(sevenTiles.Count == _currentHexPanel.DesertTiles.Count);
+
+                for (int i=0; i < sevenTiles.Count; i++) 
+                {
+                    if (sevenTiles[i].ResourceType == ResourceType.Desert) continue; // already a 7 on the desert, go to the next one
+
+                    // not a 7, need to swap both the TilesToRandomize and the randomNumberSequence
+
+                    var desertIndex = tileGroup.TilesToRandomize.IndexOf(_currentHexPanel.DesertTiles[i]);
+                    Debug.Assert(desertIndex >= 0);
+                    var sevenIndex = tileGroup.TilesToRandomize.IndexOf(sevenTiles[i]);
+                    Debug.Assert(sevenIndex >= 0);
+
+                    tileGroup.TilesToRandomize[sevenIndex].Number = tileGroup.TilesToRandomize[desertIndex].Number;
+                    var temp = randomNumberSequence[sevenIndex];
+                    randomNumberSequence[sevenIndex] = randomNumberSequence[desertIndex];
+                    randomNumberSequence[desertIndex] = temp;
+
+                    tileGroup.TilesToRandomize[desertIndex].Number = 7;
+                    
+                }
+                    
                 iterations++;
                 valid = IsValidNumberLayout();
             }
+        
 
             //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanSignalRClient.Serialize(randomNumberSequence)}");
             return randomNumberSequence;
         }
 
-        //
-        // 1. the dependency property SetGame gets called
-        // 2. the change notification function OnCurrentGameChanged gets called
-        // 3. that calls this function
-        //
-        //  please don't call this directly, as it will bypass any UI that has bound to the DP
-        //
-        private void SetGame(CatanGameCtrl newGame)
+
+    //
+    // 1. the dependency property SetGame gets called
+    // 2. the change notification function OnCurrentGameChanged gets called
+    // 3. that calls this function
+    //
+    //  please don't call this directly, as it will bypass any UI that has bound to the DP
+    //
+    private void SetGame(CatanGameCtrl newGame)
+    {
+        if (newGame.Control == null)
         {
-            if (newGame.Control == null)
-            {
-                newGame.Control = (UserControl)Activator.CreateInstance(newGame.ControlType);
-            }
-
-            PanelGrid.Children.Clear();
-            PanelGrid.Children.Add(newGame.Control);
-            PanelGrid.UpdateLayout();
-            _currentHexPanel = newGame.HexPanel;
-            _currentHexPanel.GameCallback = _gameCallback;
-            _currentHexPanel.TileCallback = _tileCallback;
-
-            FlipAllAsync(TileOrientation.FaceDown);
+            newGame.Control = ( UserControl )Activator.CreateInstance(newGame.ControlType);
         }
 
-        #endregion Methods
+        PanelGrid.Children.Clear();
+        PanelGrid.Children.Add(newGame.Control);
+        PanelGrid.UpdateLayout();
+        _currentHexPanel = newGame.HexPanel;
+        _currentHexPanel.GameCallback = _gameCallback;
+        _currentHexPanel.TileCallback = _tileCallback;
 
-        /**
-        *  flip tiles to facedown, change them to temp gold, and then flip them back up
-        *
-        */
+        FlipAllAsync(TileOrientation.FaceDown);
     }
+
+    #endregion Methods
+
+    /**
+    *  flip tiles to facedown, change them to temp gold, and then flip them back up
+    *
+    */
+}
 }
