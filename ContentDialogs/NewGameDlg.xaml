@@ -13,7 +13,7 @@
     mc:Ignorable="d">
     <ContentDialog.Resources>
         <DataTemplate x:Key="CatanGameTemplate" x:DataType="local:CatanGameCtrl">
-            <TextBlock Style="{StaticResource DesignerTextBlockStyle}" Text="{x:Bind Description}" />
+            <TextBlock Style="{StaticResource DesignerTextBlockStyle}" Text="{x:Bind Description}" Foreground="White" />
         </DataTemplate>
     </ContentDialog.Resources>
     <Viewbox>
