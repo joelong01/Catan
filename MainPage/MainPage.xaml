@@ -183,7 +183,14 @@
                 Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
                 Open="{x:Bind MainPageModel.ShowBoardMeasurements(MainPageModel.GameState), Mode=OneWay}"
                 SlideDirection="Right">
-                <local:BoardMeasurementCtrl CornerRadius="0" FiveStarPositions="{x:Bind Path=MainPageModel.FiveStarPositions, Mode=OneWay}" FourStarPositions="{x:Bind Path=MainPageModel.FourStarPositions, Mode=OneWay}" PipCount="{Binding Path=PipCount, Mode=OneWay}" ThreeStarPositions="{x:Bind Path=MainPageModel.ThreeStarPositions, Mode=OneWay}" TwoStarPositions="{x:Bind Path=MainPageModel.TwoStarPositions, Mode=OneWay}" />
+                <local:BoardMeasurementCtrl 
+                    CornerRadius="0" 
+                    FiveStarPositions="{x:Bind Path=MainPageModel.FiveStarPositions, Mode=OneWay}" 
+                    FourStarPositions="{x:Bind Path=MainPageModel.FourStarPositions, Mode=OneWay}" 
+                    PipCount="{Binding Path=PipCount, Mode=OneWay}" 
+                    ThreeStarPositions="{x:Bind Path=MainPageModel.ThreeStarPositions, Mode=OneWay}" 
+                    TwoStarPositions="{x:Bind Path=MainPageModel.TwoStarPositions, Mode=OneWay}" 
+                    ShowPips="OnShowPips"/>
 
             </s:SliderCtrl>
 
