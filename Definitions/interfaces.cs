@@ -232,9 +232,7 @@ namespace Catan10
 
         RandomBoardSettings GetRandomBoard();
 
-        Task HideRollsInPublicUi();
-
-        Task JoinOrCreateGame(GameInfo gameInfo);
+         Task JoinOrCreateGame(GameInfo gameInfo);
 
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection
