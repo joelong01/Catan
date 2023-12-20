@@ -56,7 +56,7 @@ namespace Catan10
 
         private int[] RollCount(IEnumerable<RollState> stack)
         {
-            int[] counts = new int[11]; // yes, there really are 11 different possible rolls
+            int[] counts = new int[11]; // yes, there really are 11 different possible roll
             Array.Clear(counts, 0, 11);
             if (Done.Count != 0)
             {
@@ -64,8 +64,12 @@ namespace Catan10
                 //  go through each roll and fill in the array with the count of what was rolled
                 foreach (var rollState in stack)
                 {
-                    Debug.Assert(rollState.SelectedRoll > 1 && rollState.SelectedRoll < 13);
-                    counts[rollState.SelectedRoll - 2]++;
+                    //12/20/2023 - when an Undo happens, the top of the stack is going to have a 0 in the roll.
+                    //             just skip it.
+                    if (rollState.Roll > 1 && rollState.Roll < 13)
+                    {
+                        counts[rollState.Roll - 2]++;
+                    }
                 }
             }
             return counts;
@@ -86,87 +90,122 @@ namespace Catan10
 
             for (int i = 0; i < 11; i++)
             {
-                percents[i] = counts[i] / (double)total;
+                percents[i] = counts[i] / ( double )total;
             }
 
             return (counts, percents);
         }
+        /// <summary>
+        ///     called while handling the roll processing
+        /// </summary>
+        /// <param name="action"></param>
 
         private void UpdatePlayerStats(RollAction action)
         {
+
+
             int roll = 0;
-            if (Done.Count != 0)
+
+
+
+            int toAddForNoResourceCount = 1;
+            if (action == RollAction.Undo)
             {
-                roll = Done.Peek().SelectedRoll;
-            }
-
-            int toAdd = 1;
-            if (action == RollAction.Undo) toAdd = -1;
-            PlayerModel sentBy = GameController.CurrentPlayer;
-            //
-            //   now update stats for the roll
-
-            if (roll == 7)
-            {
-               
-
-                foreach (PlayerModel player in GameController.PlayingPlayers)
-                {
-                    player.GameData.NoResourceCount += toAdd;
-                }
-
-                this.TraceMessage("Here is where you do the Baron work");
-                // await SetStateAsync(CurrentPlayer, GameState.MustMoveBaron, false);
+                toAddForNoResourceCount = -1;
+                //12/20/2023: when undoing, the actuall roll is on the undo stack
+                roll = Undone.Peek().Roll;
             }
             else
             {
-             
-                //
-                //  get the resources for the roll
-                foreach (var player in GameController.PlayingPlayers)
+                roll = Done.Peek().Roll;
+            }
+
+            //
+            //   now update stats for the roll
+            if (roll == 7)
+            {
+
+                foreach (PlayerModel player in GameController.PlayingPlayers)
                 {
-                    (TradeResources Granted, TradeResources Baroned) = GameController.ResourcesForRoll(player, roll);
-
-                    player.GameData.Resources.GrantResources(Granted);
-                    if (action == RollAction.Undo)
-                    {
-                        Baroned = Baroned.GetNegated();
-                        Granted = Baroned.GetNegated();
-                    }
-
-                    player.GameData.Resources.ResourcesLostToBaron += Baroned;
+                    player.GameData.NoResourceCount += toAddForNoResourceCount;
+                }
+                return;
+            }
 
 
-                    if (Granted.Count == 0)
-                    {
-                        player.GameData.GoodRoll = false; // how to undo this??
-                        player.GameData.NoResourceCount += toAdd;
-                    }
-                    else
-                    {
-                        player.GameData.NoResourceCount = 0; // ??
-                        player.GameData.GoodRoll = true;
-                        player.GameData.RollsWithResource += toAdd;
-                    }
+            //
+            //  get the resources for the roll
+            foreach (var player in GameController.PlayingPlayers)
+            {
+                (TradeResources Granted, TradeResources Baroned) = GameController.ResourcesForRoll(player, roll, action);
+
+                //12/20/2023: we pushed the action into ResourcesForRoll to make this work always
+                player.GameData.Resources.ResourcesLostToBaron += Baroned;
+                player.GameData.Resources.GrantResources(Granted);
+
+                if (Granted.Count == 0)
+                {
+                    player.GameData.GoodRoll = false; // how to undo this??
+                    player.GameData.NoResourceCount += toAddForNoResourceCount;
+                }
+                else
+                {
+                    player.GameData.NoResourceCount = 0; // ??
+                    player.GameData.GoodRoll = true;
+                    player.GameData.RollsWithResource += toAddForNoResourceCount;
                 }
             }
+
         }
 
         private void UpdateRollStats()
         {
-            var (Count, Percent) = RollPercents();
 
-            TwoPercent = string.Format($"{Count[0]} ({Percent[0] * 100:0.#}%)");
-            ThreePercent = string.Format($"{Count[1]} ({Percent[1] * 100:0.#}%)");
-            FourPercent = string.Format($"{Count[2]} ({Percent[2] * 100:0.#}%)");
-            FivePercent = string.Format($"{Count[3]} ({Percent[3] * 100:0.#}%)");
-            SixPercent = string.Format($"{Count[4]} ({Percent[4] * 100:0.#}%)");
-            SevenPercent = string.Format($"{Count[5]} ({Percent[5] * 100:0.#}%)");
-            EightPercent = string.Format($"{Count[6]} ({Percent[6] * 100:0.#}%)");
-            NinePercent = string.Format($"{Count[7]} ({Percent[7] * 100:0.#}%)");
-            TenPercent = string.Format($"{Count[8]} ({Percent[8] * 100:0.#}%)");
-            ElevenPercent = string.Format($"{Count[9]} ({Percent[9] * 100:0.#}%)");
-            TwelvePercent = string.Format($"{Count[10]} ({Percent[10] * 100:0.#}%)");
+            if (Done.Count == 1 && Done.Peek().Roll == 0)
+            {
+                TwoPercent = "";
+                ThreePercent = "";
+                FourPercent = "";
+                FivePercent = "";
+                SixPercent = "";
+                SevenPercent = "";
+                EightPercent = "";
+                NinePercent = "";
+                TenPercent = "";
+                ElevenPercent = "";
+                TwelvePercent = "";
+            }
+            else if (Done.Count > 0)
+            {
+                var (Count, Percent) = RollPercents();
+
+                TwoPercent = string.Format($"{Count[0]} ({Percent[0] * 100:0.#}%)");
+                ThreePercent = string.Format($"{Count[1]} ({Percent[1] * 100:0.#}%)");
+                FourPercent = string.Format($"{Count[2]} ({Percent[2] * 100:0.#}%)");
+                FivePercent = string.Format($"{Count[3]} ({Percent[3] * 100:0.#}%)");
+                SixPercent = string.Format($"{Count[4]} ({Percent[4] * 100:0.#}%)");
+                SevenPercent = string.Format($"{Count[5]} ({Percent[5] * 100:0.#}%)");
+                EightPercent = string.Format($"{Count[6]} ({Percent[6] * 100:0.#}%)");
+                NinePercent = string.Format($"{Count[7]} ({Percent[7] * 100:0.#}%)");
+                TenPercent = string.Format($"{Count[8]} ({Percent[8] * 100:0.#}%)");
+                ElevenPercent = string.Format($"{Count[9]} ({Percent[9] * 100:0.#}%)");
+                TwelvePercent = string.Format($"{Count[10]} ({Percent[10] * 100:0.#}%)");
+            }
+            else // 12/20/2023 - if you undo the first roll, you don't want to see NaN, you want empty strings
+            {
+
+                TwoPercent = "";
+                ThreePercent = "";
+                FourPercent = "";
+                FivePercent = "";
+                SixPercent = "";
+                SevenPercent = "";
+                EightPercent = "";
+                NinePercent = "";
+                TenPercent = "";
+                ElevenPercent = "";
+                TwelvePercent = "";
+            }
         }
 
         private async Task UpdateUi(RollAction action)
@@ -181,13 +220,13 @@ namespace Catan10
             //
             if (action != RollAction.Undo)
             {
-                GameController.SetHighlightedTiles(Done.Peek().SelectedRoll);
+                GameController.SetHighlightedTiles(Done.Peek().Roll);
                 await GameController.SetRandomTileToGold(Done.Peek().GoldTiles);
             }
             else
             {
                 GameController.StopHighlightingTiles();
-                await GameController.ResetRandomGoldTiles();
+                //  await GameController.ResetRandomGoldTiles(); // 12/20/2023 - we want to see what tile is gold when the roll is undone
             }
         }
 
@@ -282,20 +321,20 @@ namespace Catan10
             get
             {
                 if (Done.Count == 0) return 0;
-                return Done.Peek().SelectedRoll;
+                return Done.Peek().Roll;
             }
         }
 
-        public List<RollModel> NextRolls
+        public int NextRoll
         {
             get
             {
                 if (Undone.Count > 0)
                 {
-                    return Undone.Peek().Rolls;
+                    return Undone.Peek().Roll;
                 }
 
-                return null;
+                return 0;
             }
         }
 
@@ -420,14 +459,13 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Task DoRoll(List<RollModel> rolls, List<int> goldTiles)
+        public Task DoRoll(int roll, List<int> goldTiles)
         {
-            Contract.Assert(Undone.Count == 0, "You can't add a roll if you have rolls in the unused stack");
-            RollModel selected = rolls.Find((roll) => roll.Selected == true);
-            Contract.Assert(selected != null);
-            this.TraceMessage("YOu commented ths out.  fix it.");
+            Contract.Assert(Undone.Count == 0, "You can't add a roll if you have roll in the unused stack");
+
+            this.TraceMessage("Yuu commented ths out.  fix it.");
             // if (goldTiles == null) goldTiles = GameController.NextRandomGoldTiles;
-            var rollState = new RollState() { SelectedRoll = selected.Roll, Rolls = rolls, GoldTiles = goldTiles };
+            var rollState = new RollState() { Roll = roll, GoldTiles = goldTiles };
             Done.Push(rollState);
             UpdatePlayerStats(RollAction.Do);
             return UpdateUi(RollAction.Do);
@@ -453,14 +491,19 @@ namespace Catan10
             Done.Push(rollState);
             await GameController.SetRandomTileToGold(rollState.GoldTiles);
         }
-
+        /// <summary>
+        ///     We have a RollState on the Undone stack that has the roll and we have a RollState on the Done stack
+        ///     that has a 0 for the roll. we pop the Undone and throw it away after setting the roll in the Done stack
+        /// </summary>
+        /// <returns></returns>
         public Task RedoRoll()
         {
             Contract.Assert(CanRedo, "please check this before calling me");
-            var rollState = Undone.Pop();
-            Contract.Assert(rollState.PlayerName == GameController.CurrentPlayer.PlayerName);
-
-            Done.Push(rollState);
+            var undoneRollState = Undone.Pop();
+            var doneRollState = Done.Peek();
+            Contract.Assert(undoneRollState.Roll != 0);
+            Contract.Assert(doneRollState.Roll == 0);
+            doneRollState.Roll = undoneRollState.Roll;
 
             UpdatePlayerStats(RollAction.Redo);
             return UpdateUi(RollAction.Redo);
@@ -471,22 +514,38 @@ namespace Catan10
         /// </summary>
         /// <param name="rolls"></param>
         /// <returns></returns>
-        public Task SetLastRoll(List<RollModel> rolls)
+        public Task SetLastRoll(int roll)
         {
             RollState rollState = Done.Peek();
-            RollModel selected = rolls.Find((roll) => roll.Selected == true);
-            Debug.Assert(selected.Roll > 1 && selected.Roll < 13);
-            rollState.SelectedRoll = selected.Roll;
+
+            Debug.Assert(roll > 1 && roll < 13);
+            rollState.Roll = roll;
             UpdatePlayerStats(RollAction.Do);
             return UpdateUi(RollAction.Do);
         }
+
+        /// <summary>
+        ///     12/20/2023 - unfortunately when the idiot dev implemented this, there are 2 actions that are done in one log entry
+        ///     the first is setting the random gold tiles, the second is setting the roll. there was a bug where both got "undone"
+        ///     so here, we create a new undoneRollState that has the correct random gold tiles, but the roll set to 0 and we leave that 
+        ///     in the Done stack.
+        /// </summary>
+        /// <returns></returns>
 
         public Task UndoRoll()
         {
             Contract.Assert(Done.Count != 0, "please check this before calling me");
 
-            RollState rollState = Done.Pop();
-            Undone.Push(rollState);
+            RollState rollState = Done.Peek();
+            RollState newRollState = new RollState
+            {
+                Roll = rollState.Roll,
+                GoldTiles = new List<int>(rollState.GoldTiles),
+                PlayerName = rollState.PlayerName
+
+            };
+            Undone.Push(newRollState);
+            rollState.Roll = 0;
             UpdatePlayerStats(RollAction.Undo);
             return UpdateUi(RollAction.Undo);
         }
@@ -499,13 +558,13 @@ namespace Catan10
     {
         public List<int> GoldTiles { get; set; }
         public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer.PlayerName;
-        public List<RollModel> Rolls { get; set; }
-        public int SelectedRoll { get; set; }
+        public int Roll { get; set; }
+
 
         // I want to use this for debugging...you should never apply a roll to a different player
         public override string ToString()
         {
-            return $"[Roll={SelectedRoll}]";
+            return $"[Roll={Roll}]";
         }
     }
 
@@ -515,9 +574,9 @@ namespace Catan10
 
         int LastRoll { get; }
 
-        List<RollModel> NextRolls { get; }
+        int NextRoll { get; }
 
-        Task DoRoll(List<RollModel> rolls, List<int> goldTiles);
+        Task DoRoll(int roll, List<int> goldTiles);
 
         Task RedoRoll();
 

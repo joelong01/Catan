@@ -187,32 +187,6 @@ namespace Catan10
             }
         }
 
-        public void SimulateRoll(int roll)
-        {
-            var rand = new Random((int)DateTime.Now.Ticks);
-            if (roll < 2) roll = rand.Next(2, 12);
-            List<RollModel> rolls = new List<RollModel>();
-            var rollModel = new RollModel
-            {
-                DiceOne = roll / 2,
-                Selected = true
-            };
-            rollModel.DiceTwo = roll - rollModel.DiceOne;
-            rolls.Add(rollModel);
-
-            for (int i = 0; i < 3; i++)
-            {
-                rollModel = new RollModel
-                {
-                    DiceOne = rand.Next(1, 6),
-                    DiceTwo = rand.Next(1, 6),
-                    Selected = false
-                };
-                rolls.Add(rollModel);
-            }
-            OnRolled(rolls);
-        }
-
         public void UpdateBoardMeasurements()
         {
             PipCount = GetPipCount();
@@ -612,19 +586,22 @@ namespace Catan10
             }
         }
 
-        private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
+        private async void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {
-            
-
-            if (MainPageModel.GameState != GameState.WaitingForRoll && MainPageModel.GameState != GameState.WaitingForRollForOrder)
+            if (!MainPageModel.EnableRolls)
             {
+                this.TraceMessage("Warning: OnRolled called but EnableRolls is false!");
                 return;
             }
-
-            if (((Button)sender).Content is CatanNumber number)
+            if (( ( Button )sender ).Content is CatanNumber number)
             {
-                SimulateRoll(number.Number);
+                await WaitingForRollToWaitingForNext.PostRollMessage(this, number.Number);
             }
+
+          
+
+
+            
         }
 
         private async Task OnOpenSavedGame()
@@ -646,35 +623,7 @@ namespace Catan10
              ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
 
-        /// <summary>
-        ///     When the user clicks on the PlayerRollCtrl, it comes here.  We need to call the appropriate Log object
-        ///     based on the state to coordinate the UI updaes
-        /// </summary>
-        /// <param name="rolls"></param>
-        private async void OnRolled(List<RollModel> rolls)
-        {
-            if (!MainPageModel.EnableRolls)
-            {
-                this.TraceMessage("Warning: OnRolled called but EnableRolls is false!");
-                return;
-            }
-
-            Debug.Assert(rolls.Count == 4);
-
-            switch (CurrentGameState)
-            {
-                case GameState.WaitingForRollForOrder:
-                    await RollOrderLog.PostMessage(this, rolls);
-                    break;
-
-                case GameState.WaitingForRoll:
-                    await WaitingForRollToWaitingForNext.PostRollMessage(this, rolls);
-                    break;
-
-                default:
-                    break;
-            }
-        }
+       
 
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {

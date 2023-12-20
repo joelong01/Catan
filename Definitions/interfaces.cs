@@ -256,7 +256,7 @@ namespace Catan10
 
         Task ResetRollControl();
 
-        (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll);
+        (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll, RollAction action);
 
         void SetHighlightedTiles(int roll);
 
@@ -298,7 +298,6 @@ namespace Catan10
 
         #endregion Methods
 
-        void SimulateRoll(int roll);
         string PlayerListToCsv (List<PlayerModel> playersWithTooManyCards);
         void SetCurrentPlayer(PlayerModel playerModel);
     }

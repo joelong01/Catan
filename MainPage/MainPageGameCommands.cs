@@ -36,7 +36,7 @@ namespace Catan10
 
         public async Task DoUndo()
         {
-            if ((CurrentGameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction) && ValidateBuilding)
+            if (( CurrentGameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction ) && ValidateBuilding)
             {
                 return;
             }
@@ -114,8 +114,8 @@ namespace Catan10
                         }
                         break;
 
-                    case GameState.WaitingForRollForOrder: 
-                      
+                    case GameState.WaitingForRollForOrder:
+
                         break;
 
                     case GameState.FinishedRollOrder:
@@ -697,7 +697,7 @@ namespace Catan10
             {
                 CurrentPlayer = TheHuman;  //  this is useful for debugging
             }
-            
+
             MainPageModel.DefaultUser = TheHuman.PlayerName;
             await SaveGameState();
             return true;
@@ -724,7 +724,7 @@ namespace Catan10
                 }
             }
 
-            CurrentPlayer.PrimaryBackgroundColor = (Color)item.Tag;
+            CurrentPlayer.PrimaryBackgroundColor = ( Color )item.Tag;
 
             await SaveGameState();
         }
@@ -745,7 +745,7 @@ namespace Catan10
                 }
             }
 
-            CurrentPlayer.SecondaryBackgroundColor = (Color)item.Tag;
+            CurrentPlayer.SecondaryBackgroundColor = ( Color )item.Tag;
 
             await SaveGameState();
         }
@@ -800,10 +800,16 @@ namespace Catan10
         {
             _gameView.AllBuildings.ForEach(async (b) =>
             {
-                b.Reset();
-                if (b.Pips >= pipCount)
+                if (b.BuildingState == BuildingState.Pips)
                 {
-                    await b.UpdateBuildingState(CurrentPlayer, b.BuildingState, BuildingState.Pips);
+                    await b.UpdateBuildingState(CurrentPlayer, b.BuildingState, BuildingState.None); 
+                }
+                if (b.Pips >= pipCount && b.BuildingState == BuildingState.None)
+                {
+                    if (ValidateBuildingLocation(b) == BuildingState.Build || CurrentGameState == GameState.PickingBoard)
+                    {
+                        await b.UpdateBuildingState(CurrentPlayer, b.BuildingState, BuildingState.Pips);
+                    }
                 }
 
             });
