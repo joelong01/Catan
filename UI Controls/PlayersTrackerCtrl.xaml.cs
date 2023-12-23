@@ -7,6 +7,27 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
+
+    public class GameTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate Expansion { get; set; }
+        public DataTemplate Regular { get; set; }
+        public ObservableCollection<PlayerModel> SourceCollection { get; set; }  
+
+        protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
+        {
+            if (SourceCollection.Count >=5)
+            {
+                return Expansion;
+            }
+            else
+            {
+                return Regular;
+            }
+        }
+    }
+
+
     public sealed partial class PlayersTrackerCtrl : UserControl
     {
         /// <summary>
@@ -38,31 +59,31 @@ namespace Catan10
 
         public TradeResources GameResources
         {
-            get => (TradeResources)GetValue(GameResourcesProperty);
+            get => ( TradeResources )GetValue(GameResourcesProperty);
             set => SetValue(GameResourcesProperty, value);
         }
 
         public GameState GameState
         {
-            get => (GameState)GetValue(GameStateProperty);
+            get => ( GameState )GetValue(GameStateProperty);
             set => SetValue(GameStateProperty, value);
         }
 
         public MainPage MainPage
         {
-            get => (MainPage)GetValue(MainPageProperty);
+            get => ( MainPage )GetValue(MainPageProperty);
             set => SetValue(MainPageProperty, value);
         }
 
         public MainPageModel MainPageModel
         {
-            get => (MainPageModel)GetValue(MainPageModelProperty);
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
             set => SetValue(MainPageModelProperty, value);
         }
 
         public ObservableCollection<PlayerModel> PlayingPlayers
         {
-            get => (ObservableCollection<PlayerModel>)GetValue(PlayingPlayersProperty);
+            get => ( ObservableCollection<PlayerModel> )GetValue(PlayingPlayersProperty);
             set => SetValue(PlayingPlayersProperty, value);
         }
 
@@ -80,5 +101,18 @@ namespace Catan10
         {
             this.InitializeComponent();
         }
+
+        public double ControlHeight
+        {
+            get
+            {
+                if (MainPageModel.PlayingPlayers.Count < 5)
+                    return 225.0;
+
+                return 175.0;
+            }
+        }
+
+
     }
 }
