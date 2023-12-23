@@ -165,6 +165,7 @@
     <Compile Include="Logging\StateTransitions\6a_PlayerHasTooManyCards.cs" />
     <Compile Include="Logging\StateTransitions\6c_MustTradeGold.cs" />
     <Compile Include="Logging\StateTransitions\6d_TradeGoldToWaitingForNext.cs" />
+    <Compile Include="Logging\StateTransitions\7b_NextToSupplementatl.cs" />
     <Compile Include="Models\DevCardModel.cs" />
     <Compile Include="Models\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />
@@ -191,7 +192,6 @@
     <Compile Include="Logging\StateTransitions\8c_SupToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\1_WaitingForPlayers.cs" />
     <Compile Include="Logging\StateTransitions\6b_MovedBaron.cs" />
-    <Compile Include="Logging\StateTransitions\8a_Supplemental.cs" />
     <Compile Include="Logging\StateTransitions\7_NextToWaitingForRoll.cs" />
     <Compile Include="Logging\StateTransitions\2_PickingBoard.cs" />
     <Compile Include="Logging\StateTransitions\4_BeginResourceAllocation.cs" />

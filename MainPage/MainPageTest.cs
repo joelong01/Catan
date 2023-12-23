@@ -287,29 +287,44 @@ namespace Catan10
             await TestGrantEntitlementMessage();
         }
 
-        private void OnTestExpansionGame(object sender, RoutedEventArgs e)
+        private async void OnTestExpansionGame(object sender, RoutedEventArgs e)
         {
-            //AnimationSpeedBase = 10; // speed up the animations
-            //RandomGoldTileCount = 3;
-            //await this.Reset();
-            //// await MainPageModel.Log.Init(CreateSaveFileName("Expansion Game"));
-            //await SetStateAsync(null, GameState.WaitingForNewGame, true);
-            //_gameView.CurrentGame = _gameView.Games[1];
+            AnimationSpeedBase = 10; // speed up the animations
+            RandomGoldTileCount = 3;
+            await this.Reset();
+            _gameView.Reset();
+            await this.Reset();
 
-            ////   SavedGames.Insert(0, MainPageModel.Log);
-            ////   await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, 1);
-            //List<PlayerModel> PlayerDataList = new List<PlayerModel>
-            //{
-            //    MainPageModel.AllPlayers[0],
-            //    MainPageModel.AllPlayers[1],
-            //    MainPageModel.AllPlayers[2],
-            //    MainPageModel.AllPlayers[3],
-            //    MainPageModel.AllPlayers[4],
-            //};
-            //await StartGame(PlayerDataList, 1);
-            //await NextState(); // simluates pushing "Start"
-            //CurrentPlayer = MainPageModel.PlayingPlayers[0];
-            //await PickSettlementsAndRoads();
+            _gameView.CurrentGame = _gameView.Games[1];
+            MainPageModel.PlayingPlayers.Clear();
+            GameInfo info = new GameInfo()
+            {
+                Creator = TheHuman.PlayerName,
+                GameIndex = 1,
+                Id = Guid.NewGuid(),
+                Started = false
+            };
+            await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
+
+            MainPageModel.PlayingPlayers.Clear();
+
+            for (int i = 0; i < 5; i++)
+            {
+                await AddPlayerLog.AddPlayer(this, MainPageModel.AllPlayers[i].PlayerName);
+            };
+
+            await NextState(); // Order Done
+            await NextState(); // Board Accepted
+            await NextState(); // Start Game
+            await NextState(); // Start Pick Resources
+
+            while (Log.GameState != GameState.DoneResourceAllocation)
+            {
+                await AutoSetBuildingAndRoad();
+                await NextState();
+            }
+
+            await NextState();
         }
 
         private void OnTestRegularGame(object sender, RoutedEventArgs e)

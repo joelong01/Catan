@@ -127,6 +127,7 @@ namespace Catan10
         #region Properties
 
         public bool AutoRespondAndTheHuman => ( this.MainPageModel.Settings.AutoRespond && CurrentPlayer == TheHuman );
+        public PlayerModel LastPlayerToRoll { get; set; }
 
         public CatanGames CatanGame { get; set; } = CatanGames.Regular;
 
@@ -159,6 +160,25 @@ namespace Catan10
                     }
                 }
                 return list;
+            }
+        }
+
+        public PlayerModel NextPlayer
+        {
+            get
+            {
+                List<PlayerModel> playingPlayers = PlayingPlayers;
+
+                int idx = playingPlayers.IndexOf(CurrentPlayer);
+
+                Contract.Assert(idx != -1, "The player needs to be playing!");
+
+                int count = playingPlayers.Count;
+
+                // Calculate the index of the next player, wrapping around if necessary
+                int nextIndex = (idx + 1) % count;
+
+                return playingPlayers[nextIndex];
             }
         }
 

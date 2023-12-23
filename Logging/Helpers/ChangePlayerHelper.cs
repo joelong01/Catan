@@ -11,16 +11,12 @@ namespace Catan10
     /// </summary>
     public static class ChangePlayerHelper
     {
-        public static void ChangePlayer(IGameController gameController, int numberofPositions)
+        public static void ChangePlayer(IGameController gameController, int numberOfPositions)
         {
             Contract.Assert(gameController.CurrentPlayer != null);
 
-            //
-            //  tell everybody the turn ended
-            gameController.PlayingPlayers.ForEach((p) =>
-            {
-                p.TurnEnded();
-            });
+            // Notify all players that the turn ended
+            gameController.PlayingPlayers.ForEach(p => p.TurnEnded());
 
             List<PlayerModel> playingPlayers = gameController.PlayingPlayers;
 
@@ -28,16 +24,20 @@ namespace Catan10
 
             Contract.Assert(idx != -1, "The player needs to be playing!");
 
-            idx += numberofPositions;
             int count = playingPlayers.Count;
-            if (idx >= count) idx -= count;
-            if (idx < 0) idx += count;
 
-            var newPlayer = playingPlayers[idx];
+            // Calculate the index of the new player, wrapping around if necessary
+            int newPlayerIndex = (idx + numberOfPositions) % count;
+            if (newPlayerIndex < 0)
+            {
+                // Ensure it's positive if it became negative due to modulo
+                newPlayerIndex += count;
+            }
+
+            var newPlayer = playingPlayers[newPlayerIndex];
             gameController.CurrentPlayer = newPlayer;
 
-            //
-            //  tell current player that turn started
+            // Notify the current player that the turn started
             gameController.CurrentPlayer.TurnStarted();
 
             if (gameController.MainPageModel.Settings.IsLocalGame)
@@ -45,5 +45,6 @@ namespace Catan10
                 MainPage.Current.TheHuman = gameController.CurrentPlayer;
             }
         }
+
     }
 }
