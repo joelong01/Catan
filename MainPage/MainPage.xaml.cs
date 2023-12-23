@@ -595,6 +595,7 @@ namespace Catan10
             }
             if (( ( Button )sender ).Content is CatanNumber number)
             {
+                LastPlayerToRoll = CurrentPlayer; // need this to know which player to skip in supplemental builds
                 await WaitingForRollToWaitingForNext.PostRollMessage(this, number.Number);
             }
 

@@ -187,6 +187,8 @@ namespace Catan10
         ///     The current player in the game
         /// </summary>
         PlayerModel CurrentPlayer { get; set; }
+        PlayerModel LastPlayerToRoll { get; set; } //used in Supplemental builds
+        PlayerModel NextPlayer { get; }
 
         List<int> CurrentRandomGoldTiles { get; }
         GameContainerCtrl GameContainer { get; }

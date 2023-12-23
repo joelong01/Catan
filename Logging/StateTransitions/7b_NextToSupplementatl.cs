@@ -1,14 +1,18 @@
-﻿using Catan.Proxy;
+﻿
 using System.Threading.Tasks;
+using Catan.Proxy;
 
 namespace Catan10
 {
-    internal class SupplementalToSupplemental : LogHeader, ILogController
+    /// <summary>
+    ///     Transition into the Supplemental build phase
+    /// </summary>
+    public class WaitingForNextToSupplemental : LogHeader, ILogController
     {
         public static async Task PostLog(IGameController gameController)
         {
 
-            SupplementalToSupplemental logHeader = new SupplementalToSupplemental()
+            WaitingForNextToSupplemental logHeader = new WaitingForNextToSupplemental()
             {
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
@@ -18,11 +22,11 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
-
+            await gameController.ResetRollControl();
+            gameController.StopHighlightingTiles();
             ChangePlayerHelper.ChangePlayer(gameController, 1);
-            return Task.CompletedTask;
 
         }
 
@@ -36,10 +40,12 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
+            await gameController.ResetRollControl();
+            gameController.StopHighlightingTiles();
             ChangePlayerHelper.ChangePlayer(gameController, -1);
-            return Task.CompletedTask;
         }
     }
 }
+

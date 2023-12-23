@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Popups;
+using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -182,7 +183,30 @@ namespace Catan10
                         break;
 
                     case GameState.WaitingForNext:
-                        await WaitingForNextToWaitingForRoll.PostLog(this);
+                        if (HasSupplementalBuild)
+                        {
+                            await WaitingForNextToSupplemental.PostLog(this);
+                        }
+                        else
+                        {
+                            await WaitingForNextToWaitingForRoll.PostLog(this);
+                        }
+                        break;
+                    case GameState.Supplemental:
+                        //
+                        //  when you transition in supplemental build phase, if the next player is the one that last rolled, 
+                        //  you skip them and the player after them rolls
+                        if (NextPlayer.PlayerIdentifier == LastPlayerToRoll.PlayerIdentifier)
+                        {
+                            // this will skip the next player (+2 to current player)
+                            await SupplementalToWaitingForRoll.PostLog(this);
+                        }
+                        else
+                        {
+                            await SupplementalToSupplemental.PostLog(this);
+                          
+                        }
+
                         break;
 
                     //
@@ -802,7 +826,7 @@ namespace Catan10
             {
                 if (b.BuildingState == BuildingState.Pips)
                 {
-                    await b.UpdateBuildingState(CurrentPlayer, b.BuildingState, BuildingState.None); 
+                    await b.UpdateBuildingState(CurrentPlayer, b.BuildingState, BuildingState.None);
                 }
                 if (b.Pips >= pipCount && b.BuildingState == BuildingState.None)
                 {

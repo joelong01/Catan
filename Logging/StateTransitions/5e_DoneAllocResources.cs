@@ -19,7 +19,7 @@ namespace Catan10
             {
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
-                OldState = GameState.AllocateResourceReverse,
+                OldState = GameState.AllocateResourceReverse,   
                 NewState = GameState.DoneResourceAllocation,
             };
 
