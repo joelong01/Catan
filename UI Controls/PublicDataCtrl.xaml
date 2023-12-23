@@ -7,7 +7,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Catan10"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:proxy="using:Catan.Proxy"
     d:DesignHeight="265" d:DesignWidth="605"
     mc:Ignorable="d">
     <Control.Resources>

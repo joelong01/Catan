@@ -81,7 +81,7 @@ namespace Catan10
 
         public MainPageModel MainPageModel
         {
-            get => (MainPageModel)GetValue(MainPageModelProperty);
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
             set => SetValue(MainPageModelProperty, value);
         }
 
@@ -90,7 +90,7 @@ namespace Catan10
         // a global for the game
         public PlayerModel TheHuman
         {
-            get => (PlayerModel)GetValue(TheHumanProperty);
+            get => ( PlayerModel )GetValue(TheHumanProperty);
             set => SetValue(TheHumanProperty, value);
         }
 
@@ -138,7 +138,7 @@ namespace Catan10
 
             if (speed == AnimationSpeed.Ultra)
             {
-                return (double)speed;
+                return ( double )speed;
             }
             // AnimationSpeedFactor is a value of 1...4
             double d = (double)speed / (baseSpeed + 2);
@@ -239,7 +239,7 @@ namespace Catan10
         {
             var depPropClass = d as MainPage;
             var depPropValue = (MainPageModel)e.NewValue;
-            depPropClass?.SetMainPageModel((MainPageModel)e.OldValue, (MainPageModel)e.NewValue);
+            depPropClass?.SetMainPageModel(( MainPageModel )e.OldValue, ( MainPageModel )e.NewValue);
         }
 
         private Task AddPlayer(PlayerModel pData, LogType logType)
@@ -459,7 +459,7 @@ namespace Catan10
                     {
                         AllPlayers = list,
                         Settings = new Settings(),
-                        
+
                     };
 
                     await SaveGameState();
@@ -586,23 +586,18 @@ namespace Catan10
             }
         }
 
-        private async void OnNumberTapped(object sender, TappedRoutedEventArgs e)
+        private async void OnNumberTapped(int roll)
         {
             if (!MainPageModel.EnableRolls)
             {
                 this.TraceMessage("Warning: OnRolled called but EnableRolls is false!");
                 return;
             }
-            if (( ( Button )sender ).Content is CatanNumber number)
-            {
-                LastPlayerToRoll = CurrentPlayer; // need this to know which player to skip in supplemental builds
-                await WaitingForRollToWaitingForNext.PostRollMessage(this, number.Number);
-            }
-
-          
 
 
-            
+            LastPlayerToRoll = CurrentPlayer; // need this to know which player to skip in supplemental builds
+            await WaitingForRollToWaitingForNext.PostRollMessage(this, roll);
+
         }
 
         private async Task OnOpenSavedGame()
@@ -621,10 +616,10 @@ namespace Catan10
 
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
 
-       
+
 
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {
@@ -856,7 +851,7 @@ namespace Catan10
 
             _gameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
             _raceTracking.Reset();
-           
+
         }
 
         private async Task ResetTiles(bool bMakeFaceDown)
@@ -975,14 +970,14 @@ namespace Catan10
         /// <returns></returns>
         private async Task ScrollMouseWheel(PointerRoutedEventArgs e)
         {
-            if (TheHuman.PlayerName != CurrentPlayer.PlayerName  && MainPageModel.Settings.IsServiceGame) return;
+            if (TheHuman.PlayerName != CurrentPlayer.PlayerName && MainPageModel.Settings.IsServiceGame) return;
 
             if (MainPageModel.Log.GameState == GameState.PickingBoard)
             {
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
                 {
                     _gameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
-                    if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
+                    if (MainPageModel.Log.CanRedo && ( MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard ))
                     {
                         await RedoAsync();
                     }
@@ -1068,13 +1063,13 @@ namespace Catan10
 
         public bool SpyVisible
         {
-            get => (bool)GetValue(SpyVisibleProperty);
+            get => ( bool )GetValue(SpyVisibleProperty);
             set => SetValue(SpyVisibleProperty, value);
         }
 
         public string TurnedSpyOn
         {
-            get => (string)GetValue(TurnedSpyOnProperty);
+            get => ( string )GetValue(TurnedSpyOnProperty);
             set => SetValue(TurnedSpyOnProperty, value);
         }
 
@@ -1105,7 +1100,7 @@ namespace Catan10
 
             //
             //  boost the one clicked
-            Canvas.SetZIndex(((FrameworkElement)sender), 11);
+            Canvas.SetZIndex(( ( FrameworkElement )sender ), 11);
         }
 
         private bool EnableNextButton(bool enableNextButton, GameState gameState, int unprocessedMessages)
@@ -1113,12 +1108,12 @@ namespace Catan10
             //   this.TraceMessage($"State={gameState}|Unprocesed={unprocessedMessages}|enableNextButton={enableNextButton}");
             if (unprocessedMessages != 0)
             {
-              //  this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
+                //  this.TraceMessage($"disabling Next button because UnprocessedMessages={unprocessedMessages}");
                 return false;
             }
-            
+
             bool enable = MainPageModel.EnableNextButton;
-           // this.TraceMessage($"Next button enabled:{enable}");
+            // this.TraceMessage($"Next button enabled:{enable}");
             Debug.Assert(enable == enableNextButton);
             return enable;
         }
@@ -1169,7 +1164,7 @@ namespace Catan10
             NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
 
             ContentDialogResult result = await dlg.ShowAsync();
-            if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
+            if (( dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6 ) && result == ContentDialogResult.Primary)
             {
                 string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
                 MessageDialog msgDlg = new MessageDialog(content);
@@ -1250,7 +1245,7 @@ namespace Catan10
         private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement)
         {
             if (MainPageModel.GameState != GameState.WaitingForNext && MainPageModel.GameState != GameState.Supplemental) return;
-            
+
             if (player.GameData.EntitlementsLeft(entitlement) == 0)
             {
                 await ShowErrorMessage($"You have purchased all available {entitlement}.", "Catan", "");
@@ -1260,13 +1255,13 @@ namespace Catan10
         }
 
         public Visibility ShowLocalPurchase(GameState state)
-        {          
+        {
             if (state == GameState.WaitingForNewGame) return Visibility.Visible;
 
             if (MainPageModel.Settings.IsServiceGame) return Visibility.Collapsed;
-            if (state == GameState.WaitingForNext || 
-                MainPageModel.GameState == GameState.Supplemental) 
-                        return Visibility.Visible;
+            if (state == GameState.WaitingForNext ||
+                MainPageModel.GameState == GameState.Supplemental)
+                return Visibility.Visible;
             return Visibility.Collapsed;
         }
 
@@ -1287,6 +1282,6 @@ namespace Catan10
             return false;
         }
 
-      
+
     }
 }
