@@ -1,8 +1,37 @@
 ﻿<UserControl x:Class="Catan10.PlayersTrackerCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="600" d:DesignWidth="615" Background="SlateBlue" mc:Ignorable="d">
-    <Control.Resources />
+    <Control.Resources >
+
+        <DataTemplate x:Key="RegularTemplate" x:DataType="local:PlayerModel">
+            <Grid>
+                <local:PublicDataCtrl 
+                        Player="{x:Bind Mode=OneWay}" 
+                        Height="225"
+                        RenderTransformOrigin="0 0" 
+                        RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
+                    <local:PublicDataCtrl.RenderTransform>
+                        <CompositeTransform ScaleX="1" ScaleY="1" TranslateX="0" />
+                    </local:PublicDataCtrl.RenderTransform>
+                </local:PublicDataCtrl>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ExpansionTemplate" x:DataType="local:PlayerModel">
+           <Grid>
+                <local:PublicDataCtrl 
+                Player="{x:Bind Mode=OneWay}" 
+                Height="175"
+                RenderTransformOrigin="0 0" 
+                RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
+                    <local:PublicDataCtrl.RenderTransform>
+                        <CompositeTransform ScaleX="1" ScaleY="1" TranslateX="0" />
+                    </local:PublicDataCtrl.RenderTransform>
+                </local:PublicDataCtrl> 
+            </Grid>
+        </DataTemplate>
+
+    </Control.Resources>
+
     <StackPanel Name="Grid_PlayerResourceCount" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" CornerRadius="10">
-
-
 
         <StackPanel Name="StackPanel_TotalResourceCount"
             Grid.Row="0" Grid.RowSpan="1" Grid.Column="1"
@@ -20,12 +49,9 @@
             <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}" Image="{StaticResource ResourceType.GoldMine}" />
         </StackPanel>
 
-
         <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="2" Margin="0,5,0,0" Fill="{StaticResource bmMaple}" />
         <ListView x:Name="ListBox_PlayerResourceCountList"
-            Grid.Row="2" Grid.ColumnSpan="2"
-            Height="922"
-            Margin="0,5,0,0" HorizontalAlignment="Stretch"
+            Margin="0,5,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
             AllowDrop="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
             Background="Transparent"
             CanReorderItems="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
@@ -39,18 +65,15 @@
                     <Setter Property="HorizontalAlignment" Value="Left" />
                 </Style>
             </ListView.ItemContainerStyle>
-            <!--<ListBox.Items>
-                <local:PublicDataCtrl />
-            </ListBox.Items>-->
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="local:PlayerModel">
-                    <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" RenderTransformOrigin="0 0" RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
-                        <local:PublicDataCtrl.RenderTransform>
-                            <CompositeTransform ScaleX="1" ScaleY="1" TranslateX="0" />
-                        </local:PublicDataCtrl.RenderTransform>
-                    </local:PublicDataCtrl>
-                </DataTemplate>
-            </ListView.ItemTemplate>
+            <ListView.ItemTemplateSelector>
+                <local:GameTemplateSelector
+                    Regular ="{StaticResource RegularTemplate}"
+                    Expansion ="{StaticResource ExpansionTemplate}"
+                    SourceCollection ="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
+                />
+
+            </ListView.ItemTemplateSelector>
         </ListView>
+
     </StackPanel>
 </UserControl>
