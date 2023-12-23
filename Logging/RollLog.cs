@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -43,7 +44,7 @@ namespace Catan10
 
         private string _twoPercent = "";
 
-        private string[] DynamicPropertyNames = new string[] { "TotalRolls", "LastRoll" };
+        private string[] DynamicPropertyNames = new string[] { "TotalRolls", "LastRoll", "GetRollCount", "GetRollPercent" };
 
         private RollLog()
         {
@@ -73,6 +74,26 @@ namespace Catan10
                 }
             }
             return counts;
+        }
+
+        public int GetRollCount(int roll)
+        {
+            if (Done.Count == 0)
+            {
+                return 0;
+            }
+            return RollCount(Done)[roll - 2];
+        }
+        public string GetRollPercent(int roll)
+        {
+            if (Done.Count == 0)
+            {
+                return "0%";
+            }
+            var (_, Percent) = RollPercents();
+            string percentFormat = "{0:#0.#}%";
+            return string.Format(percentFormat, Percent[roll - 2] * 100);
+
         }
 
         private (int[] Count, double[] Percent) RollPercents()
@@ -158,6 +179,197 @@ namespace Catan10
 
         }
 
+        #region count properties
+        private int _twoCount = 0;
+        private int _threeCount = 0;
+        private int _fourCount = 0;
+        private int _fiveCount = 0;
+        private int _sixCount = 0;
+        private int _sevenCount = 0;
+        private int _eightCount = 0;
+        private int _nineCount = 0;
+        private int _tenCount = 0;
+        private int _elevenCount = 0;
+        private int _twelveCount = 0;
+
+
+        public int TwoCount
+        {
+            get
+            {
+                return _twoCount;
+            }
+            set
+            {
+                if (value != _twoCount)
+                {
+                    _twoCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int ThreeCount
+        {
+            get
+            {
+                return _threeCount;
+            }
+            set
+            {
+                if (value != _threeCount)
+                {
+                    _threeCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int FourCount
+        {
+            get
+            {
+                return _fourCount;
+            }
+            set
+            {
+                if (value != _fourCount)
+                {
+                    _fourCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int FiveCount
+        {
+            get
+            {
+                return _fiveCount;
+            }
+            set
+            {
+                if (value != _fiveCount)
+                {
+                    _fiveCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int SixCount
+        {
+            get
+            {
+                return _sixCount;
+            }
+            set
+            {
+                if (value != _sixCount)
+                {
+                    _sixCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int SevenCount
+        {
+            get
+            {
+                return _sevenCount;
+            }
+            set
+            {
+                if (value != _sevenCount)
+                {
+                    _sevenCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int EightCount
+        {
+            get
+            {
+                return _eightCount;
+            }
+            set
+            {
+                if (value != _eightCount)
+                {
+                    _eightCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int NineCount
+        {
+            get
+            {
+                return _nineCount;
+            }
+            set
+            {
+                if (value != _nineCount)
+                {
+                    _nineCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int TenCount
+        {
+            get
+            {
+                return _tenCount;
+            }
+            set
+            {
+                if (value != _tenCount)
+                {
+                    _tenCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int ElevenCount
+        {
+            get
+            {
+                return _elevenCount;
+            }
+            set
+            {
+                if (value != _elevenCount)
+                {
+                    _elevenCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int TwelveCount
+        {
+            get
+            {
+                return _twelveCount;
+            }
+            set
+            {
+                if (value != _twelveCount)
+                {
+                    _twelveCount = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
         private void UpdateRollStats()
         {
 
@@ -177,19 +389,35 @@ namespace Catan10
             }
             else if (Done.Count > 0)
             {
-                var (Count, Percent) = RollPercents();
 
-                TwoPercent = string.Format($"{Count[0]} ({Percent[0] * 100:0.#}%)");
-                ThreePercent = string.Format($"{Count[1]} ({Percent[1] * 100:0.#}%)");
-                FourPercent = string.Format($"{Count[2]} ({Percent[2] * 100:0.#}%)");
-                FivePercent = string.Format($"{Count[3]} ({Percent[3] * 100:0.#}%)");
-                SixPercent = string.Format($"{Count[4]} ({Percent[4] * 100:0.#}%)");
-                SevenPercent = string.Format($"{Count[5]} ({Percent[5] * 100:0.#}%)");
-                EightPercent = string.Format($"{Count[6]} ({Percent[6] * 100:0.#}%)");
-                NinePercent = string.Format($"{Count[7]} ({Percent[7] * 100:0.#}%)");
-                TenPercent = string.Format($"{Count[8]} ({Percent[8] * 100:0.#}%)");
-                ElevenPercent = string.Format($"{Count[9]} ({Percent[9] * 100:0.#}%)");
-                TwelvePercent = string.Format($"{Count[10]} ({Percent[10] * 100:0.#}%)");
+                var (RollCounts, Percent) = RollPercents();
+                TwoCount = RollCounts[0];
+                ThreeCount = RollCounts[1];
+                FourCount = RollCounts[2];
+                FiveCount = RollCounts[3];
+                SixCount = RollCounts[4];
+                SevenCount = RollCounts[5];
+                EightCount = RollCounts[6];
+                NineCount = RollCounts[7];
+                TenCount = RollCounts[8];
+                ElevenCount = RollCounts[9];
+                TwelveCount = RollCounts[10];
+
+                // Format percentages with a consistent width for counts
+                string percentFormat = "({0:#0.#}%)";
+                TwoPercent = string.Format(percentFormat, Percent[0] * 100);
+                ThreePercent = string.Format(percentFormat, Percent[1] * 100);
+                FourPercent = string.Format(percentFormat, Percent[2] * 100);
+                FivePercent = string.Format(percentFormat, Percent[3] * 100);
+                SixPercent = string.Format(percentFormat, Percent[4] * 100);
+                SevenPercent = string.Format(percentFormat, Percent[5] * 100);
+                EightPercent = string.Format(percentFormat, Percent[6] * 100);
+                NinePercent = string.Format(percentFormat, Percent[7] * 100);
+                TenPercent = string.Format(percentFormat, Percent[8] * 100);
+                ElevenPercent = string.Format(percentFormat, Percent[9] * 100);
+
+
+
             }
             else // 12/20/2023 - if you undo the first roll, you don't want to see NaN, you want empty strings
             {
@@ -320,6 +548,7 @@ namespace Catan10
         {
             get
             {
+                if (Done == null) return 0;
                 if (Done.Count == 0) return 0;
                 return Done.Peek().Roll;
             }

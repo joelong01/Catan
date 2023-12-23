@@ -269,6 +269,9 @@
     <Compile Include="UI Controls\RollCtrl.xaml.cs">
       <DependentUpon>RollCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\Rolls\SingleRollCtrl.xaml.cs">
+      <DependentUpon>SingleRollCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\SailboatCtrl.xaml.cs">
       <DependentUpon>SailboatCtrl.xaml</DependentUpon>
     </Compile>
@@ -348,6 +351,9 @@
     </Compile>
     <Compile Include="UI Controls\TradeResourcesCtrl.xaml.cs">
       <DependentUpon>TradeResourcesCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Rolls\TraditionalRollCtrl.xaml.cs">
+      <DependentUpon>TraditionalRollCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValueConverter.cs" />
   </ItemGroup>
@@ -525,6 +531,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI Controls\Rolls\SingleRollCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\SailboatCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -614,6 +624,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\TradeResourcesCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Rolls\TraditionalRollCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
