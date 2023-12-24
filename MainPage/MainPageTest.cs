@@ -55,7 +55,7 @@ namespace Catan10
             }
 
 
-            loss = (int)CurrentPlayer.GameData.Resources.CurrentResources.Count / 2;
+            loss = ( int )CurrentPlayer.GameData.Resources.CurrentResources.Count / 2;
             if (loss >= 4)
             {
                 ResourceCardCollection rc = new ResourceCardCollection(false);
@@ -129,26 +129,9 @@ namespace Catan10
         }
 
         // int toggle = 0;
-        private async void OnTest1(object sdr, RoutedEventArgs rea)
+        private void OnTest1(object sdr, RoutedEventArgs rea)
         {
-
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
-            picker.FileTypeFilter.Add(".json");
-
-
-            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
-            if (file == null)
-            {
-                return;
-            }
-
-
-            string json =await FileIO.ReadTextAsync(file);
-
-            List<CatanMessage> messages = CatanSignalRClient.Deserialize<List<CatanMessage>>(json);
-            await DoReplay(messages);
+            CTRL_InvationCounter.Next();
         }
 
         /// <summary>
@@ -190,7 +173,7 @@ namespace Catan10
                         if (messages[i + 1].MessageType == MessageType.Ack)
                         {
                             var ack = CatanSignalRClient.ParseMessage(messages[i+1]);
-                            Debug.Assert(((AckModel)ack.Data).AckedMessageId == parsedMessage.MessageId);
+                            Debug.Assert(( ( AckModel )ack.Data ).AckedMessageId == parsedMessage.MessageId);
                             if (parsedMessage.ActionType == ActionType.Normal)
                             {
                                 parsedMessage.ActionType = ActionType.Replay;
@@ -255,7 +238,7 @@ namespace Catan10
                 }
                 this.TraceMessage(result);
 
-                TheHuman = NameToPlayer((string)values[KnownUserProperties.FirstName]);
+                TheHuman = NameToPlayer(( string )values[KnownUserProperties.FirstName]);
                 if (TheHuman != null)
                 {
                     IRandomAccessStreamReference streamReference = await user.GetPictureAsync(UserPictureSize.Size64x64);
@@ -342,7 +325,8 @@ namespace Catan10
                 Creator = TheHuman.PlayerName,
                 GameIndex = 0,
                 Id = Guid.NewGuid(),
-                Started = false
+                Started = false,
+                Pirates=true
             };
             await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
 

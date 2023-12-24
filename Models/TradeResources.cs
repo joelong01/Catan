@@ -220,6 +220,12 @@ namespace Catan10
                     break;
 
                 case Entitlement.Knight:
+                    cost = new TradeResources()
+                    {
+                        Ore = 1,
+                        Sheep = 1,
+                    };
+                    break;
                 case Entitlement.Undefined:
                 default:
                     Contract.Assert(false, "Bad Entitlement");
@@ -265,7 +271,7 @@ namespace Catan10
             };
         }
 
-       
+
 
         public void AddResource(ResourceType resourceType, int toAdd)
         {
@@ -370,12 +376,12 @@ namespace Catan10
         {
             if (b == null) return false;
             return (
-                (this.Wheat == b.Wheat) &&
-                (this.Wood == b.Wood) &&
-                (this.Ore == b.Ore) &&
-                (this.Sheep == b.Sheep) &&
-                (this.Brick == b.Brick) &&
-                (this.GoldMine == b.GoldMine));
+                ( this.Wheat == b.Wheat ) &&
+                ( this.Wood == b.Wood ) &&
+                ( this.Ore == b.Ore ) &&
+                ( this.Sheep == b.Sheep ) &&
+                ( this.Brick == b.Brick ) &&
+                ( this.GoldMine == b.GoldMine ) );
         }
 
         public bool Equivalent(TradeResources tradeResources)

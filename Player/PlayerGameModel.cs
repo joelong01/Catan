@@ -63,6 +63,9 @@ namespace Catan10
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
 
+        [JsonIgnore]
+        public ObservableCollection<BuildingCtrl> Knights { get; } = new ObservableCollection<BuildingCtrl>();
+
         public int CitiesLeft => MaxCities - CitiesPlayed;
 
         public int CitiesPlayed
@@ -359,8 +362,9 @@ namespace Catan10
                     return RoadsLeft;
                 case Entitlement.Ship:
                     return MaxShips - ShipsLeft;
-                case Entitlement.Knight:
-                    break;
+                case Entitlement.Knight:         
+                    return 1; // TODO: implement proper knight counting in pirates
+
                 default:
                     break;
             }

@@ -269,7 +269,13 @@ namespace Catan10
             await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
 
             // pick a Random Road
-            var road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
+          
+            RoadCtrl road;
+            do
+            {
+                road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
+            }
+            while (road.Owner != null); 
 
             await UpdateRoadLog.SetRoadState(this, road, RoadState.Road, _raceTracking);
         }
@@ -1192,7 +1198,8 @@ namespace Catan10
                     Creator = TheHuman.PlayerName,
                     GameIndex = dlg.SelectedIndex,
                     Id = Guid.NewGuid(),
-                    Started = false
+                    Started = false,
+                    Pirates = dlg.Pirates
                 };
                 await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
 
@@ -1235,7 +1242,10 @@ namespace Catan10
         {
             await PurchaseEntitlement(CurrentPlayer, Entitlement.City);
         }
-
+        private async void OnBuyKnight(object sender, RoutedEventArgs e)
+        {
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Knight);
+        }
         private async void OnLocalBuyRoad(object sender, RoutedEventArgs e)
         {
 
@@ -1245,7 +1255,7 @@ namespace Catan10
         private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement)
         {
             if (MainPageModel.GameState != GameState.WaitingForNext && MainPageModel.GameState != GameState.Supplemental) return;
-
+   
             if (player.GameData.EntitlementsLeft(entitlement) == 0)
             {
                 await ShowErrorMessage($"You have purchased all available {entitlement}.", "Catan", "");
@@ -1282,6 +1292,6 @@ namespace Catan10
             return false;
         }
 
-
+       
     }
 }

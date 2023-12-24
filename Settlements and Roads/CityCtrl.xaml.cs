@@ -11,6 +11,12 @@ namespace Catan10
     /// </summary>
     public sealed partial class CityCtrl : UserControl
     {
+        public CityCtrl()
+        {
+            this.DataContext = this;
+            this.InitializeComponent();
+        }
+
         public PlayerModel CurrentPlayer
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
@@ -27,11 +33,7 @@ namespace Catan10
 
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
 
-        public CityCtrl()
-        {
-            this.DataContext = this;
-            this.InitializeComponent();
-        }
+       
 
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {

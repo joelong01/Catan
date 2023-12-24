@@ -302,6 +302,8 @@ namespace Catan10
 
         string PlayerListToCsv (List<PlayerModel> playersWithTooManyCards);
         void SetCurrentPlayer(PlayerModel playerModel);
+
+        Task RolledSeven();
     }
 
     public interface IGameViewCallback

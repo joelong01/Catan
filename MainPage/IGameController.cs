@@ -954,6 +954,8 @@ namespace Catan10
             Entitlement entitlement = Entitlement.Undefined;
             if (updateBuildingLog.NewBuildingState == BuildingState.City) entitlement = Entitlement.City;
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
+            if (updateBuildingLog.NewBuildingState == BuildingState.Knight) entitlement = Entitlement.Knight;
+
             Contract.Assert(entitlement != Entitlement.Undefined);
             player.GameData.Resources.ConsumeEntitlement(entitlement);
 
@@ -1094,6 +1096,12 @@ namespace Catan10
             }
 
             return list;
+        }
+
+        public async Task RolledSeven()
+        {
+            CTRL_InvationCounter.Next();
+            await MustMoveBaronLog.PostLog(this, MoveBaronReason.Rolled7);
         }
     }
 }

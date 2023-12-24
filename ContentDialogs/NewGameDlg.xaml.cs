@@ -87,7 +87,12 @@ namespace Catan10
         public int SelectedIndex => AvailableGames.IndexOf(SelectedGame);
         public static readonly DependencyProperty SaveFileNameProperty = DependencyProperty.Register("SaveFileName", typeof(string), typeof(NewGameDlg), new PropertyMetadata(""));
         public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(CatanGameCtrl), typeof(NewGameDlg), new PropertyMetadata(null));
-
+        public static readonly DependencyProperty PiratesProperty =  DependencyProperty.Register("Pirates", typeof(bool), typeof(NewGameDlg), new PropertyMetadata(false));
+        public bool Pirates
+        {
+            get { return ( bool )GetValue(PiratesProperty); }
+            set { SetValue(PiratesProperty, value); }
+        }
         public NewGameDlg()
         {
             this.InitializeComponent();

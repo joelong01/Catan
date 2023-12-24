@@ -19,7 +19,7 @@ namespace Catan10
         public event RollSelectedHandler OnRoll;
 
 
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(null, GameChanged));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(new MainPageModel(), GameChanged));
 
         private static void GameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

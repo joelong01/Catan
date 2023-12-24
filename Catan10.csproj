@@ -236,6 +236,12 @@
     <Compile Include="UI Controls\OfferCtrl.xaml.cs">
       <DependentUpon>OfferCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\Pirates\Invasion.xaml.cs">
+      <DependentUpon>Invasion.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Pirates\KnightCtrl.xaml.cs">
+      <DependentUpon>KnightCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\PotentialTradesCtrl.xaml.cs">
       <DependentUpon>PotentialTradesCtrl.xaml</DependentUpon>
     </Compile>
@@ -487,6 +493,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI Controls\Pirates\Invasion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Pirates\KnightCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\PotentialTradesCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -637,7 +651,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CatanProxy">
-      <Version>2020.7.28.91303</Version>
+      <Version>2023.12.23.185528</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsApps">
       <Version>1.1.1</Version>

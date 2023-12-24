@@ -114,7 +114,7 @@
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Click="OnSaveSettings" Text="Save Settings" />
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Click="OnTest1" Text="Test 1" />
+                            <MenuFlyoutItem Click="OnTest1" Text="Test Journey" />
                             <MenuFlyoutItem Click="OnTest2" Text="Test 2" />
                             <MenuFlyoutItem Click="OnTest3" Text="Test 3" />
                             <MenuFlyoutItem Click="OnGrantResources" Text="Grant Resources" />
@@ -166,7 +166,22 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
+            <local:DragableGridCtrl x:Name="DGC_PirateInvasion" Caption="Invasion Status" Width="500" Height="500"
+                    HorizontalAlignment="Left" VerticalAlignment="Center"
+                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    BorderBrush="{StaticResource bmMaple}" BorderThickness="2" CornerRadius="5"
+                    OnGridPositionChanged="OnGridPositionChanged" PointerPressed="Draggable_PointerPressed">
+                <Viewbox Stretch="UniformToFill">
+                    <local:InvasionCtrl x:Name="CTRL_InvationCounter" Width="400" Height="400"
+                            MainPageModel="{x:Bind MainPageModel, Mode=OneWay}">
+                        <local:InvasionCtrl.RenderTransform>
+                            <CompositeTransform />
+                        </local:InvasionCtrl.RenderTransform>
+                    </local:InvasionCtrl>
+                </Viewbox>
 
+            </local:DragableGridCtrl>
             <local:DragableGridCtrl x:Name="DGC_Game" Height="1075" HorizontalAlignment="Center" VerticalAlignment="Top"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2"
@@ -261,6 +276,23 @@
                                                     StrokeThickness="2" X1="35" X2="35" Y1="5" Y2="45" />
                                         </Grid>
                                         <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}" Text="Road" />
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+
+                            <Border Margin="5" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                    BorderThickness="1" CornerRadius="5"
+                                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Button Background="Transparent" Click="OnBuyKnight" ToolTipService.ToolTip="Buy Or Upgrade Knight">
+                                    <StackPanel Width="50" Height="65">
+                                        <Grid Width="50" Height="50"
+                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
+                                            <Viewbox Stretch="UniformToFill">
+                                                <local:KnightCtrl Width="50" Height="50" 
+                                                        Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                            </Viewbox>
+                                        </Grid>
+                                        <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}" Text="Knight" />
                                     </StackPanel>
                                 </Button>
                             </Border>

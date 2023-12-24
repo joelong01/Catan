@@ -21,6 +21,7 @@ namespace Catan10
             Entitlement entitlement = Entitlement.Undefined;
             if (newState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
             if (newState == BuildingState.City) entitlement = Entitlement.City;
+            if (newState == BuildingState.Knight) entitlement = Entitlement.Knight; 
 
             if (gameController.CurrentPlayer.GameData.Resources.HasEntitlement(entitlement) == false)
                 return; // user double clicked

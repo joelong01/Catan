@@ -78,14 +78,24 @@ namespace Catan10
 
         public int GetRollCount(int roll)
         {
-            if (Done.Count == 0)
+            try
             {
-                return 0;
+                if (Done == null) return 0;
+
+                if (Done.Count == 0)
+                {
+                    return 0;
+                }
+                return RollCount(Done)[roll - 2];
             }
-            return RollCount(Done)[roll - 2];
+            catch
+            {
+                return -1;
+            }
         }
         public string GetRollPercent(int roll)
         {
+            if (Done == null) return "0%";
             if (Done.Count == 0)
             {
                 return "0%";

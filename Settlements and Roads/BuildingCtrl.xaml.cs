@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
-
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -17,7 +17,7 @@ namespace Catan10
     /// <summary>
     ///     The states that a building can be in
     /// </summary>
-    public enum BuildingState { None, Build, Error, Pips, Settlement, City, NoEntitlement };
+    public enum BuildingState { None, Build, Error, Pips, Settlement, City, NoEntitlement, Knight };
 
     public sealed partial class BuildingCtrl : UserControl
     {
@@ -80,6 +80,12 @@ namespace Catan10
             {
                 this.BuildingState = BuildingState.None;
             }
+
+            if (this.BuildingState == BuildingState.Knight && this.Owner == null)
+            {
+                this.BuildingState = BuildingState.None;
+            }
+
         }
 
         /// <summary>
@@ -96,6 +102,14 @@ namespace Catan10
             if (!valid)
             {
                 return;
+            }
+
+            if (this.BuildingState == BuildingState.Knight)
+            {
+
+                await UpdateBuildingLog.UpdateBuildingState(Callback as IGameController, this, BuildingState.Knight);
+                return;
+
             }
 
             BuildingState oldState = this.BuildingState;
@@ -170,7 +184,7 @@ namespace Catan10
 
         public BuildingState BuildingState
         {
-            get => (BuildingState)GetValue(BuildingStateProperty);
+            get => ( BuildingState )GetValue(BuildingStateProperty);
             private set => SetValue(BuildingStateProperty, value);  // call UpdateBuildingState instead
         }
 
@@ -179,14 +193,14 @@ namespace Catan10
 
         public PlayerModel CurrentPlayer
         {
-            get => (PlayerModel)GetValue(CurrentPlayerProperty);
+            get => ( PlayerModel )GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
         }
 
         // the Index into the Settlement list owned by the HexPanel...so we can save it and set it later
         public int Index
         {
-            get => (int)GetValue(IndexProperty);
+            get => ( int )GetValue(IndexProperty);
             set => SetValue(IndexProperty, value);
         }
 
@@ -196,19 +210,19 @@ namespace Catan10
 
         public PlayerModel Owner
         {
-            get => (PlayerModel)GetValue(OwnerProperty);
+            get => ( PlayerModel )GetValue(OwnerProperty);
             set => SetValue(OwnerProperty, value);
         }
 
         public int PipGroup
         {
-            get => (int)GetValue(PipGroupProperty);
+            get => ( int )GetValue(PipGroupProperty);
             set => SetValue(PipGroupProperty, value);
         }
 
         public int Pips
         {
-            get => (int)GetValue(PipsProperty);
+            get => ( int )GetValue(PipsProperty);
             set => SetValue(PipsProperty, value);
         }
 
@@ -233,7 +247,7 @@ namespace Catan10
             }
         }
 
-        public CompositeTransform Transform => (CompositeTransform)this.RenderTransform;
+        public CompositeTransform Transform => ( CompositeTransform )this.RenderTransform;
         public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
@@ -288,6 +302,17 @@ namespace Catan10
             var controlState = (BuildingState)Enum.Parse(typeof(BuildingState), match, true);
             Contract.Assert(controlState != BuildingState.None);
             var vis = (state == controlState) ? Visibility.Visible : Visibility.Collapsed;
+            if (DesignMode.DesignModeEnabled)
+            {
+                if (state == BuildingState.Knight)
+                {
+                    return Visibility.Visible;
+                }
+                else
+                {
+                    return Visibility.Collapsed;
+                }
+            }
             return vis;
         }
 
@@ -343,7 +368,10 @@ namespace Catan10
                     ret = player.GameData.Cities.Remove(this);
                     Contract.Assert(ret, "a settlement needs to be in the Settlements Collection");
                     break;
-
+                case BuildingState.Knight: // remove it and if we are supposed to, we'll add it later.  this means that the knight shows up in the collection and then leaves the collection when the mouse leaves
+                    player.GameData.Knights.Remove(this);
+                 
+                    break;
                 default:
                     break;
             }
@@ -372,7 +400,10 @@ namespace Catan10
                     Owner = player;
                     player.GameData.Cities.Add(this);
                     break;
-
+                case BuildingState.Knight:
+                    Owner = player;
+                    player.GameData.Knights.Add(this);
+                    break;
                 default:
                     break;
             }

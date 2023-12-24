@@ -56,7 +56,7 @@ namespace Catan10
         ///     in this case, recalc the longest road (a buidling can "break" a road) and then log it.
         ///     we also clear all the Pip ellipses if we are in the allocating phase
         /// </summary>
-        public async Task BuildingStateChanged (PlayerModel player, BuildingCtrl building, BuildingState oldState)
+        public async Task BuildingStateChanged(PlayerModel player, BuildingCtrl building, BuildingState oldState)
         {
             if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
             {
@@ -66,7 +66,7 @@ namespace Catan10
 
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
-                if (building.BuildingState == BuildingState.Settlement && (oldState == BuildingState.None || oldState == BuildingState.Pips))
+                if (building.BuildingState == BuildingState.Settlement && ( oldState == BuildingState.None || oldState == BuildingState.Pips ))
                 {
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
@@ -75,7 +75,7 @@ namespace Catan10
                     }
                     CurrentPlayer.GameData.Resources.GrantResources(tr);
                 }
-                else if ((building.BuildingState == BuildingState.None) && (oldState == BuildingState.Settlement))
+                else if (( building.BuildingState == BuildingState.None ) && ( oldState == BuildingState.Settlement ))
                 {
                     //
                     //  user did an undo
@@ -100,7 +100,7 @@ namespace Catan10
         ///     we can only do that if the state is WaitingForNext and the CurrentPlayer == the owner of the building
         /// </summary>
         /// <returns></returns>
-        public bool BuildingStateChangeOk (BuildingCtrl building)
+        public bool BuildingStateChangeOk(BuildingCtrl building)
         {
             if (!ValidateBuilding) return true;
             if (MainPageModel.Settings.IsServiceGame)
@@ -132,9 +132,9 @@ namespace Catan10
                     }
                 }
             }
-            if (CurrentGameState == GameState.AllocateResourceForward || 
-                CurrentGameState == GameState.AllocateResourceReverse || 
-                CurrentGameState == GameState.Supplemental || 
+            if (CurrentGameState == GameState.AllocateResourceForward ||
+                CurrentGameState == GameState.AllocateResourceReverse ||
+                CurrentGameState == GameState.Supplemental ||
                 CurrentGameState == GameState.WaitingForNext)
             {
                 if (building.BuildingState == BuildingState.Settlement)
@@ -155,6 +155,9 @@ namespace Catan10
                 }
             }
             if (building.BuildingState == BuildingState.NoEntitlement) return false;
+            //
+            //  12/23/2023: if the state is a Knight but nobody owns it, you can build a knight there.
+            if (building.BuildingState == BuildingState.Knight && building.Owner == null) return true;
             return false;
         }
 
@@ -165,7 +168,7 @@ namespace Catan10
         ///         3. works when an Undo action happens
         ///         5. works when a road is "broken"
         /// </summary>
-        public void CalculateAndSetLongestRoad ()
+        public void CalculateAndSetLongestRoad()
 
         {
             //
@@ -270,7 +273,7 @@ namespace Catan10
 
         //
         //  loop through all the players roads calculating the longest road from that point and then return the max found
-        public int CalculateLongestRoad (PlayerModel player, ObservableCollection<RoadCtrl> roads)
+        public int CalculateLongestRoad(PlayerModel player, ObservableCollection<RoadCtrl> roads)
         {
             int max = 0;
             RoadCtrl maxRoadStartedAt = null;
@@ -292,7 +295,7 @@ namespace Catan10
             return max;
         }
 
-        public bool CanBuildRoad ()
+        public bool CanBuildRoad()
 
         {
             if (ValidateBuilding == false) return true;
@@ -321,7 +324,7 @@ namespace Catan10
             return false;
         }
 
-        public async Task ChangeGame (CatanGameCtrl game)
+        public async Task ChangeGame(CatanGameCtrl game)
         {
             if (game == _gameView.CurrentGame)
             {
@@ -342,7 +345,7 @@ namespace Catan10
             }
         }
 
-        public async Task CurrentPlayerChanged ()
+        public async Task CurrentPlayerChanged()
         {
 
             UpdateTurnFlag();
@@ -363,27 +366,27 @@ namespace Catan10
             }
         }
 
-        public BuildingCtrl GetBuilding (int settlementIndex)
+        public BuildingCtrl GetBuilding(int settlementIndex)
         {
             return _gameView.GetBuilding(settlementIndex);
         }
 
-        public PlayerModel GetPlayerData (int playerIndex)
+        public PlayerModel GetPlayerData(int playerIndex)
         {
             return MainPageModel.AllPlayers[playerIndex];
         }
 
-        public RoadCtrl GetRoad (int roadIndex)
+        public RoadCtrl GetRoad(int roadIndex)
         {
             return _gameView.GetRoad(roadIndex);
         }
 
-        public TileCtrl GetTile (int tileIndex)
+        public TileCtrl GetTile(int tileIndex)
         {
             return _gameView.GetTile(tileIndex);
         }
 
-        public Task OnNewGame ()
+        public Task OnNewGame()
         {
             return Task.CompletedTask;
             //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
@@ -445,7 +448,7 @@ namespace Catan10
             //}
         }
 
-        public void RoadEntered (RoadCtrl road, PointerRoutedEventArgs e)
+        public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)
         {
             if (!CanBuildRoad())
             {
@@ -474,7 +477,7 @@ namespace Catan10
             //}
         }
 
-        public void RoadExited (RoadCtrl road, PointerRoutedEventArgs e)
+        public void RoadExited(RoadCtrl road, PointerRoutedEventArgs e)
         {
             if (!CanBuildRoad())
             {
@@ -501,7 +504,7 @@ namespace Catan10
             //}
         }
 
-        public async void RoadPressed (RoadCtrl road, PointerRoutedEventArgs e)
+        public async void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e)
         {
             if (!CanBuildRoad())
             {
@@ -535,7 +538,7 @@ namespace Catan10
         //  if there is not, then they rolled 7
         //
         //
-        public void TileRightTapped (TileCtrl targetTile, RightTappedRoutedEventArgs rte)
+        public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
             if (CurrentGameState != GameState.MustMoveBaron) return;
 
@@ -550,7 +553,7 @@ namespace Catan10
 
             //
             //  I made this a local function to capture the stack variables.
-            async void Baron_MenuClicked (object s, RoutedEventArgs e)
+            async void Baron_MenuClicked(object s, RoutedEventArgs e)
             {
                 //
                 //  pop the dialog to pick a card
@@ -683,7 +686,7 @@ namespace Catan10
                     // is it already there?
                     foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
                     {
-                        if (mnuItem.Tag == (object)settlement.Owner)
+                        if (mnuItem.Tag == ( object )settlement.Owner)
                         {
                             found = true;
                             break;
@@ -729,7 +732,7 @@ namespace Catan10
         //
         //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
         ///
-        public Task UpdateRoadState (RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
+        public Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
         {
             if (newState == oldState)
             {
@@ -775,14 +778,14 @@ namespace Catan10
         //
         //
         //
-        public BuildingState ValidateBuildingLocation (BuildingCtrl building)
+        public BuildingState ValidateBuildingLocation(BuildingCtrl building)
         {
-            if ((CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.BeginResourceAllocation) && ValidateBuilding)
+            if (( CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.BeginResourceAllocation ) && ValidateBuilding)
             {
                 return BuildingState.None;
             }
 
-            if (!ValidateBuilding)
+            if (!ValidateBuilding) // if i'm not validating building, build anywhere
             {
                 return BuildingState.Build;
             }
@@ -809,7 +812,7 @@ namespace Catan10
                 allocationPhase = true;
             }
 
-            bool error = SettlementsWithinOneSpace(building);
+
 
             if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
@@ -840,40 +843,61 @@ namespace Catan10
                 return BuildingState.None;
             }
 
-            if (!allocationPhase && error == false)
+            // 12/24/2023
+            //              You can build a Knight if:
+            //              1. you are running Pirates
+            //              2. you have the entitlement
+            //              3. you are next to a road
+            //
+            //     this logic means you *must* spend your knights before you build any other kind of settlements.
+            if (MainPageModel.GameInfo.Pirates && CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Knight) && OwnedAdjacentRoad(CurrentPlayer, building))
             {
-                error = true;
-                //
-                //   if the settlement is not next to another settlement and we are not in allocation phase, we have to be next to a road
-                foreach (RoadCtrl road in building.AdjacentRoads)
+                return BuildingState.Knight;
+            }
+
+            if (SettlementsWithinOneSpace(building))
+            {
+
+                return BuildingState.Error;
+            }
+            if (!OwnedAdjacentRoad(CurrentPlayer, building))
+            {
+                // you can't build within one space of another settlement and you have to have a road next to a building...unless you are allocating
+
+                if (!allocationPhase)
                 {
-                    if (road.Owner == CurrentPlayer && road.RoadState != RoadState.Unowned)
-                    {
-                        error = false;
-                        break;
-                    }
+                    return BuildingState.Error;
                 }
             }
+
 
             //
             //  if we get here, we have a valid place to build (or we've bypassed the business logic)...make sure there is an entitlement
 
-            if (error == false)
+            if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement))
             {
-                if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Settlement))
-                {
-                    return BuildingState.Build;
-                }
-                else
-                {
-                    return BuildingState.NoEntitlement;
-                }
+                return BuildingState.Build;
+            }
+            else
+            {
+                return BuildingState.NoEntitlement;
             }
 
-            return BuildingState.Error;
         }
 
-        internal PlayerModel PlayerNameToPlayer (string name, ICollection<PlayerModel> players)
+        private bool OwnedAdjacentRoad(PlayerModel player, BuildingCtrl building)
+        {
+            foreach (RoadCtrl road in building.AdjacentRoads)
+            {
+                if (road.Owner == player && road.RoadState != RoadState.Unowned)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal PlayerModel PlayerNameToPlayer(string name, ICollection<PlayerModel> players)
         {
             foreach (var player in players)
             {
@@ -891,7 +915,7 @@ namespace Catan10
         //      4. If Knight Played Increment the source player (which is always the current player) Knights played
         //      5. Log that it happened.
         //      6. check to see if we should update the Largest Army
-        private Task AssignBaronOrKnight (PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
+        private Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
         {
             int inc = 1;
             if (logType == LogType.Undo)
@@ -957,7 +981,7 @@ namespace Catan10
         //
         //  since this is called from Undo, you have to set it to false if it is less than 2 in case you undid the one that made you the larget army
         //
-        public void AssignLargestArmy ()
+        public void AssignLargestArmy()
         {
             if (CurrentPlayer.GameData.Resources.KnightsPlayed > 2)
             {
@@ -997,7 +1021,7 @@ namespace Catan10
         ///         3. works when an Undo action happens
         ///         5. works when a road is "broken"
         /// </summary>
-        private void CalculateAndSetLongestRoad (RoadRaceTracking raceTracking)
+        private void CalculateAndSetLongestRoad(RoadRaceTracking raceTracking)
         {
             var PlayingPlayers = MainPageModel.PlayingPlayers;
 
@@ -1105,7 +1129,7 @@ namespace Catan10
         //  Start is just any old road you want to start counting from
         //  counted are all the roads that have been counted so far -- presumably starts with .Count = 0
         //  blockedFork roads is set when we recurse so that we can pick a direction.  we need it in case of closed loops
-        private int CalculateLongestRoad (RoadCtrl start, List<RoadCtrl> counted, RoadCtrl blockedFork)
+        private int CalculateLongestRoad(RoadCtrl start, List<RoadCtrl> counted, RoadCtrl blockedFork)
         {
             int count = 1;
             int max = 1;
@@ -1220,7 +1244,7 @@ namespace Catan10
         //             because of an implicit Undo (e.g. if we've logged a state change
         //             in a road, and RoadState == UnOwned then LogType must be LogType.Undo)
         //
-        private RoadState NextRoadState (RoadCtrl road)
+        private RoadState NextRoadState(RoadCtrl road)
         {
             bool nextToSea = false;
             if (road.Keys.Count == 1 && _gameView.CurrentGame.GameData.MaxShips > 0)
@@ -1269,7 +1293,7 @@ namespace Catan10
             return nextState;
         }
 
-        private bool RoadAllowed (RoadCtrl road)
+        private bool RoadAllowed(RoadCtrl road)
         {
             if (!ValidateBuilding)
             {
@@ -1314,7 +1338,7 @@ namespace Catan10
         //  but after that, a road you must have!
         //
         //  to build you want this to return FALSE
-        private bool SettlementsWithinOneSpace (BuildingCtrl settlement)
+        private bool SettlementsWithinOneSpace(BuildingCtrl settlement)
         {
             foreach (BuildingCtrl adjacent in settlement.AdjacentBuildings)
             {
@@ -1327,7 +1351,7 @@ namespace Catan10
             return false;
         }
 
-        private void UpdateTileBuildingOwner (PlayerModel player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
+        private void UpdateTileBuildingOwner(PlayerModel player, BuildingCtrl building, BuildingState newState, BuildingState oldState)
         {
             foreach (BuildingKey key in building.Clones)
             {
@@ -1355,7 +1379,7 @@ namespace Catan10
                 else
                 {
                     // tell the tile that this settlement is owned
-                    if (key.Tile.OwnedBuilding.Contains(building) == false)
+                    if (key.Tile.OwnedBuilding.Contains(building) == false && building.BuildingState != BuildingState.Knight) // 12/23/2023: don't count Knight as a TileOwner so that resource allocation works
                     {
                         key.Tile.OwnedBuilding.Add(building);
                     }
@@ -1374,7 +1398,7 @@ namespace Catan10
             }
         }
 
-        private void UpdateTurnFlag ()
+        private void UpdateTurnFlag()
         {
             foreach (PlayerModel pd in MainPageModel.PlayingPlayers)
             {
