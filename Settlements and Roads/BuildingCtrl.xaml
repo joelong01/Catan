@@ -108,11 +108,21 @@
         </Grid>
         <Grid Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
                 Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent"
-                Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'Knight'), Mode=OneWay}">
+                Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'Knight'), Mode=OneWay}"
+                RightTapped="OnRightTapped">
             <Viewbox Name="_vbKnight" Width="30" Height="30" Stretch="Uniform">
-                <local:KnightCtrl Width="30" Height="30" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        Owner="{x:Bind Owner, Mode=OneWay}" />
+                <local:KnightCtrl x:Name="CTRL_Knight" Width="30" Height="30"
+                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
+            <Button Visibility="Collapsed">
+                <Button.Flyout>
+                    <MenuFlyout x:Name="Menu_Knight" Placement="Right">
+                        <MenuFlyoutItem Text="Upgrade" Click="OnUpgrade" />
+                        <MenuFlyoutItem Text="Activate" Click="OnActivate" />
+                        <MenuFlyoutItem Text="Move" Click="OnMove" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>

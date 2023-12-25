@@ -39,6 +39,7 @@ namespace Catan10
             GameData.RoadBuilding = _HexPanel.RoadBuilding;
             GameData.Monopoly = _HexPanel.Monopoly;
             GameData.MaxShips = _HexPanel.MaxShips;
+            GameData.MaxKnights = _HexPanel.MaxKnights;
             GameData.BuildDevCardList();
         }
     }

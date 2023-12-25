@@ -150,6 +150,7 @@ namespace Catan10
 
     public interface IGameCallback
     {
+ 
         #region Methods
 
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
@@ -165,7 +166,8 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
-
+        Task UpgradeKnight(BuildingCtrl building);
+        Task ActivateKnight(BuildingCtrl building, bool activate);
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
 
         #endregion Methods
@@ -295,6 +297,8 @@ namespace Catan10
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
+
+        Task UpdateKnight(KnightStateChangeLog knightStateChangeLog, ActionType actionType);
 
         void AssignLargestArmy();
 

@@ -729,6 +729,17 @@ namespace Catan10
             }
         }
 
+        public  Task UpgradeKnight(BuildingCtrl building)
+        {
+            int newRank = (int) building.Knight.KnightRank + 1;
+            return KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, (KnightRank)newRank, building.Knight.Activated );
+
+        }
+       public  Task ActivateKnight(BuildingCtrl building, bool activated)
+        {
+            return KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, building.Knight.KnightRank, activated);
+        }
+
         //
         //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
         ///

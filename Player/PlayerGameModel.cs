@@ -27,7 +27,7 @@ namespace Catan10
 
         // does this instance win the ties for this count of roads?
         private int _CitiesPlayed = 0;
-
+        private int _KnightsPlayed = 0;
         private int _goldRolls = 0;
         private bool _goodRoll = false;
         private bool _HasLongestRoad = false;
@@ -37,6 +37,7 @@ namespace Catan10
         private bool _LargestArmy = false;
         private int _LongestRoad = 0;
         private int _MaxCities = 0;
+        private int _MaxKnights = 0;
         private int _maxNoResourceRolls = 0;
         private int _MaxRoads = 0;
         private int _MaxSettlements = 0;
@@ -67,7 +68,7 @@ namespace Catan10
         public ObservableCollection<BuildingCtrl> Knights { get; } = new ObservableCollection<BuildingCtrl>();
 
         public int CitiesLeft => MaxCities - CitiesPlayed;
-
+        public int KnightsLeft => MaxKnights - KnightsPlayed;
         public int CitiesPlayed
         {
             get => _CitiesPlayed;
@@ -78,6 +79,20 @@ namespace Catan10
                     _CitiesPlayed = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("CitiesLeft");
+                }
+            }
+        }
+
+        public int KnightsPlayed
+        {
+            get => _KnightsPlayed;
+            set
+            {
+                if (_KnightsPlayed != value)
+                {
+                    _KnightsPlayed = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("KnightsLeft");
                 }
             }
         }
@@ -187,7 +202,7 @@ namespace Catan10
             }
             set
             {
-                HasLongestRoad = (value == Visibility.Visible) ? true : false;
+                HasLongestRoad = ( value == Visibility.Visible ) ? true : false;
             }
         }
 
@@ -201,6 +216,20 @@ namespace Catan10
                     _MaxCities = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("CitiesLeft");
+                }
+            }
+        }
+
+        public int MaxKnights
+        {
+            get => _MaxKnights;
+            set
+            {
+                if (_MaxKnights != value)
+                {
+                    _MaxKnights = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("KnightsLeft");
                 }
             }
         }
@@ -261,7 +290,7 @@ namespace Catan10
             }
         }
 
-       
+
 
         public int NoResourceCount
         {
@@ -355,15 +384,15 @@ namespace Catan10
                 case Entitlement.DevCard:
                     break;
                 case Entitlement.Settlement:
-                    return SettlementsLeft;                    
+                    return SettlementsLeft - _resources.GetUnspentEntitlements(entitlement);
                 case Entitlement.City:
-                    return CitiesLeft;
+                    return CitiesLeft  - _resources.GetUnspentEntitlements(entitlement); ;
                 case Entitlement.Road:
-                    return RoadsLeft;
+                    return RoadsLeft - _resources.GetUnspentEntitlements(entitlement); ;
                 case Entitlement.Ship:
                     return MaxShips - ShipsLeft;
-                case Entitlement.Knight:         
-                    return 1; // TODO: implement proper knight counting in pirates
+                case Entitlement.Knight:
+                    return KnightsLeft - _resources.GetUnspentEntitlements(entitlement); ;
 
                 default:
                     break;
@@ -470,7 +499,7 @@ namespace Catan10
         {
             get
             {
-                return (MaxShips > 0 ? Visibility.Visible : Visibility.Collapsed);
+                return ( MaxShips > 0 ? Visibility.Visible : Visibility.Collapsed );
             }
         }
 
@@ -534,8 +563,11 @@ namespace Catan10
             Settlements.CollectionChanged += Settlements_CollectionChanged;
             Cities.CollectionChanged += Cities_CollectionChanged;
             Ships.CollectionChanged += Ships_CollectionChanged;
+            Knights.CollectionChanged += Knights_CollectionChanged;
             PlayerModel = pData;
         }
+
+     
 
         #endregion Constructors + Destructors
 
@@ -631,6 +663,7 @@ namespace Catan10
             Roads.Clear();
             Settlements.Clear();
             Cities.Clear();
+            Knights.Clear();
             Ships.Clear();
             IsCurrentPlayer = false;
             MaxShips = 0;
@@ -675,6 +708,12 @@ namespace Catan10
             CitiesPlayed = Cities.Count;
             UpdateScore();
             Pips = CalculatePips(Settlements, Cities);
+        }
+
+        private void Knights_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            KnightsPlayed = Knights.Count;
+
         }
 
         private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")

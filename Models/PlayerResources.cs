@@ -307,7 +307,15 @@ namespace Catan10
             DevCardModel model = new DevCardModel() { DevCardType = devCardType };
             NewDevCards.Add(model);
         }
-
+        public int GetUnspentEntitlements(Entitlement entitlement)
+        {
+            int count = 0;
+            foreach (var e in UnspentEntitlements)
+            {
+                if (e == entitlement) count++;
+            }
+            return count;
+        }
         public bool CanAfford(Entitlement entitlement)
         {
             TradeResources cost = TradeResources.GetEntitlementCost(entitlement);

@@ -254,7 +254,7 @@ namespace Catan10
             pData.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
             pData.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
             pData.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
-
+            pData.GameData.MaxKnights = _gameView.CurrentGame.GameData.MaxKnights;
             return Task.CompletedTask;
         }
 

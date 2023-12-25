@@ -966,6 +966,13 @@ namespace Catan10
             set => SetValue(MaxRoadsProperty, value);
         }
 
+
+        public int MaxKnights
+        {
+            get => ( int )GetValue(MaxKnightsProperty);
+            set => SetValue(MaxKnightsProperty, value);
+        }
+
         public int MaxSettlements
         {
             get => (int)GetValue(MaxSettlementsProperty);
@@ -1233,6 +1240,7 @@ namespace Catan10
         public static readonly DependencyProperty MaxCitiesProperty = DependencyProperty.Register("MaxCities", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(4));
         public static readonly DependencyProperty MaxResourceAllocatedProperty = DependencyProperty.Register("MaxResourceAllocated", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
         public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.Register("MaxRoads", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(15));
+        public static readonly DependencyProperty MaxKnightsProperty = DependencyProperty.Register("MaxKnights", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(6));
         public static readonly DependencyProperty MaxSettlementsProperty = DependencyProperty.Register("MaxSettlements", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
         public static readonly DependencyProperty MaxShipsProperty = DependencyProperty.Register("MaxShips", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(0));
         public static readonly DependencyProperty MonopolyProperty = DependencyProperty.Register("Monopoly", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));

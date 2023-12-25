@@ -106,7 +106,12 @@ namespace Catan10
 
             if (this.BuildingState == BuildingState.Knight)
             {
-
+                if (this.Owner != null)
+                {
+                    // left click on an owned knight - no action
+                    return;
+                }
+                this.BuildingState = BuildingState.None;
                 await UpdateBuildingLog.UpdateBuildingState(Callback as IGameController, this, BuildingState.Knight);
                 return;
 
@@ -206,6 +211,7 @@ namespace Catan10
 
         public bool IsCity => BuildingState == BuildingState.City;
         public bool IsSettlement => BuildingState == BuildingState.Settlement;
+        public bool IsKnight => BuildingState == BuildingState.Knight;
         public Point LayoutPoint { get; set; }
 
         public PlayerModel Owner
@@ -338,6 +344,22 @@ namespace Catan10
             this.BuildingState = BuildingState.Pips;
         }
 
+        public KnightCtrl Knight
+        {
+            get
+            {
+                if (IsKnight)
+                {
+                    return CTRL_Knight;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+
         public override string ToString()
         {
             return String.Format($"Index={Index};State={BuildingState};Owner={Owner};Pips={Pips};PipGroup={PipGroup}");
@@ -413,6 +435,26 @@ namespace Catan10
             }
 
             return Task.CompletedTask;
+        }
+
+        private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            Menu_Knight.ShowAt(this);
+        }
+
+        private async void OnUpgrade(object sender, RoutedEventArgs e)
+        {
+           await Callback.UpgradeKnight(this);
+        }
+
+        private async void OnActivate(object sender, RoutedEventArgs e)
+        {
+            await Callback.ActivateKnight(this, true);
+        }
+
+        private void OnMove(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 

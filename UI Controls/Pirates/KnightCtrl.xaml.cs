@@ -19,8 +19,11 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
+    public enum KnightRank { Unset = -1, RankOne=1, RankTwo=2, RankThree=3 };
+
     public sealed partial class KnightCtrl : UserControl
     {
+      
         public KnightCtrl()
         {
             this.InitializeComponent();
@@ -39,8 +42,20 @@ namespace Catan10
         }
 
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(new PlayerModel()));
-
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty KnightRankProperty = DependencyProperty.Register("KnightRank", typeof(KnightRank), typeof(KnightCtrl), new PropertyMetadata(KnightRank.RankOne));
+        public static readonly DependencyProperty ActivatedProperty = DependencyProperty.Register("Activated", typeof(bool), typeof(KnightCtrl), new PropertyMetadata(false));
+        public bool Activated
+        {
+            get => ( bool )GetValue(ActivatedProperty);
+            set => SetValue(ActivatedProperty, value);
+        }
+
+        public KnightRank KnightRank
+        {
+            get => ( KnightRank )GetValue(KnightRankProperty);
+            set => SetValue(KnightRankProperty, value);
+        }
 
 
 
@@ -73,5 +88,17 @@ namespace Catan10
             }
             return PlayerBindingFunctions.GetForegroundBrush(current, owner);
         }
+
+        public Visibility RankVisibility(KnightRank currentRank, KnightRank rankToShow)
+        {
+            int current =(int)currentRank;
+            int show = (int) rankToShow;
+
+            if (show <= current) return Visibility.Visible;
+            return Visibility.Collapsed;
+
+        }
+
+       
     }
 }

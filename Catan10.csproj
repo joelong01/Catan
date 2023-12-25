@@ -148,6 +148,7 @@
     <Compile Include="GameView\TileGroup.cs" />
     <Compile Include="Logging\Actions\CreateGameModel.cs" />
     <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
+    <Compile Include="Logging\StateTransitions\KnightStateChangeKnightStateChange.cs" />
     <Compile Include="Logging\Actions\PlayerTradesLog.cs" />
     <Compile Include="Logging\Actions\ResourceExchangeLog.cs" />
     <Compile Include="Logging\Actions\SpyLog.cs" />

@@ -230,6 +230,7 @@ namespace Catan10
                 newPlayer.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
                 newPlayer.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
                 newPlayer.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
+                newPlayer.GameData.MaxKnights = _gameView.CurrentGame.GameData.MaxKnights;
                 newPlayer.GameData.NotificationsEnabled = true;
                 newPlayer.AddedTime = DateTime.Now;
                 newPlayer.GameData.Trades.TradeRequest.Owner.Player = newPlayer;
@@ -929,9 +930,12 @@ namespace Catan10
             {
                 player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Settlement);
             }
-            else
+            else if (updateBuildingLog.NewBuildingState == BuildingState.Knight)
             {
-                Contract.Assert(false, "should be city or settlement");
+                player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Knight);
+            }
+            else { 
+                Contract.Assert(false, "should be city, settlement, or knight");
             }
 
             if (updateBuildingLog.OldState == GameState.AllocateResourceReverse)
@@ -944,7 +948,23 @@ namespace Catan10
                 CurrentPlayer.GameData.Resources.GrantResources(tr);
             }
         }
+        public Task UpdateKnight(KnightStateChangeLog knightStateChangeLog, ActionType actionType)
+        {
+            var Knight = GetBuilding(knightStateChangeLog.BuildingIndex)?.Knight;
+            Contract.Assert(Knight != null);
 
+            if (actionType == ActionType.Undo)
+            {
+                Knight.KnightRank = knightStateChangeLog.OldRank;
+                Knight.Activated = knightStateChangeLog.OldActivated;
+            } else
+            {
+                Knight.KnightRank = knightStateChangeLog.NewRank;
+                Knight.Activated = knightStateChangeLog.NewActivated;
+            }
+
+            return Task.CompletedTask;
+        }
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);

@@ -161,6 +161,8 @@ namespace Catan10
                     break;
 
                 case Entitlement.Knight:
+                    if (player.GameData.Knights.Count -1 == MainPage.Current.GameData.MaxKnights)
+                        return true;
                     break;
 
                 default:

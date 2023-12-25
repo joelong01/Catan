@@ -32,6 +32,7 @@ namespace Catan10
         private int _maxSettlements = 5;
 
         private int _maxShips = 0;
+        private int _maxKnights = 4;
 
         private int _monopoly = 2;
 
@@ -189,7 +190,21 @@ namespace Catan10
                 }
             }
         }
-
+        public int MaxKnights
+        {
+            get
+            {
+                return _maxKnights;
+            }
+            set
+            {
+                if (value != _maxKnights)
+                {
+                    _maxKnights = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         public int MaxResourceAllocated
         {
             get
