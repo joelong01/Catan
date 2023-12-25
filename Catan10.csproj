@@ -148,7 +148,7 @@
     <Compile Include="GameView\TileGroup.cs" />
     <Compile Include="Logging\Actions\CreateGameModel.cs" />
     <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
-    <Compile Include="Logging\StateTransitions\KnightStateChangeKnightStateChange.cs" />
+    <Compile Include="Logging\StateTransitions\KnightStateChange.cs" />
     <Compile Include="Logging\Actions\PlayerTradesLog.cs" />
     <Compile Include="Logging\Actions\ResourceExchangeLog.cs" />
     <Compile Include="Logging\Actions\SpyLog.cs" />
@@ -167,6 +167,7 @@
     <Compile Include="Logging\StateTransitions\6c_MustTradeGold.cs" />
     <Compile Include="Logging\StateTransitions\6d_TradeGoldToWaitingForNext.cs" />
     <Compile Include="Logging\StateTransitions\7b_NextToSupplementatl.cs" />
+    <Compile Include="Logging\StateTransitions\MoveKnight.cs" />
     <Compile Include="Models\DevCardModel.cs" />
     <Compile Include="Models\MainPageModel.cs" />
     <Compile Include="MainPage\MainPageTest.cs" />

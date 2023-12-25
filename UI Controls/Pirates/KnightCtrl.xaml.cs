@@ -45,6 +45,13 @@ namespace Catan10
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty KnightRankProperty = DependencyProperty.Register("KnightRank", typeof(KnightRank), typeof(KnightCtrl), new PropertyMetadata(KnightRank.RankOne));
         public static readonly DependencyProperty ActivatedProperty = DependencyProperty.Register("Activated", typeof(bool), typeof(KnightCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty BuildingIndexProperty = DependencyProperty.Register("BuildingIndex", typeof(int), typeof(KnightCtrl), new PropertyMetadata(false));
+        public int BuildingIndex
+        {
+            get => ( int )GetValue(BuildingIndexProperty);
+            set => SetValue(BuildingIndexProperty, value);
+        }
+
         public bool Activated
         {
             get => ( bool )GetValue(ActivatedProperty);

@@ -1007,6 +1007,35 @@ namespace Catan10
 
             return Task.CompletedTask;
         }
+
+        public async Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType)
+        {
+            BuildingCtrl building = GetBuilding(moveKnightLog.Index);
+            Contract.Assert(building != null);
+            PlayerModel player = NameToPlayer(moveKnightLog.SentBy);
+            Contract.Assert(player != null);
+            if (actionType == ActionType.Undo)
+            {
+                // Undo means that we put the knight back in the location
+                await building.UpdateBuildingState(player, BuildingState.None, BuildingState.Knight);
+                building.Knight.KnightRank = moveKnightLog.KnightRank;
+                building.Knight.Activated = true;
+                player.GameData.Resources.GrantEntitlement(Entitlement.MoveKnight);
+            }
+            else
+            {
+                // refund the whole knight -- rely on the players to enforce the fules
+                for (int i = 0; i < ( int )moveKnightLog.KnightRank; i++)
+                {
+                    player.GameData.Resources.GrantEntitlement(Entitlement.BuyOrUpgradeKnight);
+
+                }
+
+                await building.UpdateBuildingState(player, BuildingState.Knight, BuildingState.None);
+                player.GameData.Resources.ConsumeEntitlement(Entitlement.MoveKnight);
+
+            }
+        }
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);

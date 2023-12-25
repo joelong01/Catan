@@ -109,9 +109,9 @@
         <Grid Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
                 Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent"
                 Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'Knight'), Mode=OneWay}"
-                RightTapped="OnRightTapped">
+                RightTapped="OnRightTapped" PointerPressed="OnKnightLeftClick">
             <Viewbox Name="_vbKnight" Width="30" Height="30" Stretch="Uniform">
-                <local:KnightCtrl x:Name="CTRL_Knight" Width="30" Height="30"
+                <local:KnightCtrl x:Name="CTRL_Knight" Width="30" Height="30" BuildingIndex="{x:Bind Index, Mode=OneWay}"
                         CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
             <Button Visibility="Collapsed">

@@ -743,12 +743,21 @@ namespace Catan10
         {
             if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.ActivateKnight))
             {
-                return Task.CompletedTask; //ignoring the requrst
+                return Task.CompletedTask; //ignoring the request
             }
 
             return KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, building.Knight.KnightRank, activated);
         }
+        public Task MoveKnight(KnightCtrl knight)
+        {
+            if (knight.Activated == false)
+            {
+                return Task.CompletedTask;
+            }
 
+            return MoveKnightLog.PostLog(this, knight);
+        }
+           
         //
         //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
         ///

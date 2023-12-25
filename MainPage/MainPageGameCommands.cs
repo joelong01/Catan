@@ -708,15 +708,16 @@ namespace Catan10
 
         private async Task<bool> PickDefaultUser()
         {
-            var picker = new PlayerPickerDlg(MainPageModel.AllPlayers);
-            var ret = await picker.ShowAsync();
-            if (picker.Player == null)
-            {
-                await ShowErrorMessage("You have to pick a player!  Stop messing around Dodgy!", "Catan", "");
-                return false;
-            }
+            TheHuman = MainPageModel.AllPlayers[0];
+            //var picker = new PlayerPickerDlg(MainPageModel.AllPlayers);
+            //var ret = await picker.ShowAsync();
+            //if (picker.Player == null)
+            //{
+            //    await ShowErrorMessage("You have to pick a player!  Stop messing around Dodgy!", "Catan", "");
+            //    return false;
+            //}
 
-            TheHuman = picker.Player;
+           // TheHuman = picker.Player;
             if (!ValidateBuilding && MainPageModel.PlayingPlayers.Count == 1)
             {
                 CurrentPlayer = TheHuman;  //  this is useful for debugging

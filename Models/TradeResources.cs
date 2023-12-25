@@ -232,6 +232,12 @@ namespace Catan10
                         Wheat = 1
                     };
                     break;
+                case Entitlement.MoveKnight:
+                    cost = new TradeResources()
+                    {
+                        
+                    };
+                    break;
                 case Entitlement.Undefined:
                 default:
                     Contract.Assert(false, "Bad Entitlement");

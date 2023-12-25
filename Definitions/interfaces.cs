@@ -168,6 +168,7 @@ namespace Catan10
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
         Task UpgradeKnight(BuildingCtrl building);
         Task ActivateKnight(BuildingCtrl building, bool activate);
+        Task MoveKnight(KnightCtrl Knight);
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
 
         bool HasEntitlement(Entitlement entitlement);
@@ -301,7 +302,7 @@ namespace Catan10
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateKnight(KnightStateChangeLog knightStateChangeLog, ActionType actionType);
-
+        Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType);
         void AssignLargestArmy();
 
         #endregion Methods
@@ -310,6 +311,7 @@ namespace Catan10
         void SetCurrentPlayer(PlayerModel playerModel);
 
         Task RolledSeven();
+     
     }
 
     public interface IGameViewCallback

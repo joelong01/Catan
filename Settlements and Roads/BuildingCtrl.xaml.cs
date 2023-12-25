@@ -441,7 +441,7 @@ namespace Catan10
         {
             MNU_Activate.IsEnabled = Callback.HasEntitlement(Entitlement.ActivateKnight);
             MNU_Upgrade.IsEnabled = Callback.HasEntitlement(Entitlement.BuyOrUpgradeKnight);
-        
+
             Menu_Knight.ShowAt(this);
         }
 
@@ -454,9 +454,35 @@ namespace Catan10
         {
             await Callback.ActivateKnight(this, true);
         }
-
-        private void OnMove(object sender, RoutedEventArgs e)
+        /// <summary>
+        ///     To make it wasy for now, moving a knight just refunds the entitlements to replace the same knight. 
+        ///     We will rely on the players to enforce the rules.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnMove(object sender, RoutedEventArgs e)
         {
+            if (this.BuildingState == BuildingState.Knight && this.Owner != null && this.Knight.Activated == true)
+            {
+                await Callback.MoveKnight(this.Knight);
+            }
+
+        }
+
+        private async void OnKnightLeftClick(object sender, PointerRoutedEventArgs e)
+        {
+            if (this.BuildingState == BuildingState.Knight && this.Owner != null)
+            {
+                if (this.Knight.Activated == false && Callback.HasEntitlement(Entitlement.ActivateKnight))
+                {
+                    await Callback.ActivateKnight(this, true);
+                }
+                else if (Callback.HasEntitlement(Entitlement.BuyOrUpgradeKnight) && this.Knight.KnightRank < KnightRank.RankThree)
+                {
+                    await Callback.UpgradeKnight(this);
+                }
+            }
+
 
         }
     }
