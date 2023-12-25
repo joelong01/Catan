@@ -15,15 +15,15 @@
         </Storyboard>
         <Style x:Key="PathStyle" TargetType="Path">
             <Setter Property="Fill"
-                    Value="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay, FallbackValue=White}" />
+                    Value="{x:Bind GetForegroundBrush(CurrentPlayer, Owner, Activated), Mode=OneWay, FallbackValue=White}" />
             <Setter Property="StrokeThickness" Value="1" />
         </Style>
         <Style x:Key="EllipseStyle" TargetType="Ellipse">
             <Setter Property="Fill"
-                    Value="{x:Bind GetBackgroundBrush(CurrentPlayer, Owner), Mode=OneWay, FallbackValue=Black}" />
+                    Value="{x:Bind GetBackgroundBrush(CurrentPlayer, Owner, Activated), Mode=OneWay, FallbackValue=Black}" />
             <Setter Property="StrokeThickness" Value="0" />
             <Setter Property="Stroke"
-                    Value="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay, FallbackValue=White}" />
+                    Value="{x:Bind GetForegroundBrush(CurrentPlayer, Owner, Activated), Mode=OneWay, FallbackValue=White}" />
         </Style>
     </UserControl.Resources>
 
@@ -32,7 +32,8 @@
     </Control.RenderTransform>
 
     <Grid Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}"
-            Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}">
+            Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}"
+          Opacity="{x:Bind ActivatedOpacity(Activated), Mode=OneWay}">
         <Ellipse Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}"
                 Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}"
                 Style="{StaticResource EllipseStyle}" Stroke="White" StrokeThickness="1" StrokeDashArray=".2" />

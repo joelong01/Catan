@@ -65,7 +65,7 @@ namespace Catan10
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
 
         [JsonIgnore]
-        public ObservableCollection<BuildingCtrl> Knights { get; } = new ObservableCollection<BuildingCtrl>();
+        public ObservableCollection<KnightCtrl> Knights { get; } = new ObservableCollection<KnightCtrl>();
 
         public int CitiesLeft => MaxCities - CitiesPlayed;
         public int KnightsLeft => MaxKnights - KnightsPlayed;
@@ -393,7 +393,8 @@ namespace Catan10
                     return MaxShips - ShipsLeft;
                 case Entitlement.Knight:
                     return KnightsLeft - _resources.GetUnspentEntitlements(entitlement); ;
-
+                case Entitlement.ActivateKnight:
+                    return 1; // we have already checked to make sure that there is a knight to activate
                 default:
                     break;
             }

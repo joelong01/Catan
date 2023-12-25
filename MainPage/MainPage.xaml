@@ -283,16 +283,36 @@
                             <Border Margin="5" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                     BorderThickness="1" CornerRadius="5"
                                     Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <Button Background="Transparent" Click="OnBuyKnight" ToolTipService.ToolTip="Buy Or Upgrade Knight">
+                                <Button Background="Transparent" Click="OnBuyKnight"
+                                        ToolTipService.ToolTip="Buy Or Upgrade Knight">
                                     <StackPanel Width="50" Height="65">
                                         <Grid Width="50" Height="50"
                                                 Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
                                             <Viewbox Stretch="UniformToFill">
-                                                <local:KnightCtrl Width="50" Height="50" 
-                                                        Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                                <local:KnightCtrl Width="50" Height="50" Activated="False"
+                                                        KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
                                             </Viewbox>
                                         </Grid>
-                                        <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}" Text="Knight" />
+                                        <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}"
+                                                Text="Knight" />
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                            <Border Margin="5" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                    BorderThickness="1" CornerRadius="5"
+                                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Button Background="Transparent" Click="OnActivateKnight"
+                                        ToolTipService.ToolTip="Activate Knight">
+                                    <StackPanel Width="50" Height="65">
+                                        <Grid Width="50" Height="50"
+                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
+                                            <Viewbox Stretch="UniformToFill">
+                                                <local:KnightCtrl Width="50" Height="50" Activated="True"
+                                                        KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                            </Viewbox>
+                                        </Grid>
+                                        <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}"
+                                                Text="Activate" />
                                     </StackPanel>
                                 </Button>
                             </Border>

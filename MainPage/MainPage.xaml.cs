@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -269,13 +270,13 @@ namespace Catan10
             await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
 
             // pick a Random Road
-          
+
             RoadCtrl road;
             do
             {
                 road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
             }
-            while (road.Owner != null); 
+            while (road.Owner != null);
 
             await UpdateRoadLog.SetRoadState(this, road, RoadState.Road, _raceTracking);
         }
@@ -1246,16 +1247,41 @@ namespace Catan10
         {
             await PurchaseEntitlement(CurrentPlayer, Entitlement.Knight);
         }
+        /// <summary>
+        ///     make sure that the current user has a knight that is not activated, and if so, let them
+        ///     buy an entitlement to activate the knight
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnActivateKnight(object sender, RoutedEventArgs e)
+        {
+            bool found = false;
+
+            foreach (var knight in CurrentPlayer.GameData.Knights)
+            {
+                if (!knight.Activated)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (found)
+            {
+                await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight);
+            }
+        }
+
+
+
         private async void OnLocalBuyRoad(object sender, RoutedEventArgs e)
         {
-
             await PurchaseEntitlement(CurrentPlayer, Entitlement.Road);
         }
 
         private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement)
         {
             if (MainPageModel.GameState != GameState.WaitingForNext && MainPageModel.GameState != GameState.Supplemental) return;
-   
+
             if (player.GameData.EntitlementsLeft(entitlement) == 0)
             {
                 await ShowErrorMessage($"You have purchased all available {entitlement}.", "Catan", "");
@@ -1292,6 +1318,6 @@ namespace Catan10
             return false;
         }
 
-       
+
     }
 }

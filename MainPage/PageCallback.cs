@@ -729,14 +729,23 @@ namespace Catan10
             }
         }
 
-        public  Task UpgradeKnight(BuildingCtrl building)
+        public Task UpgradeKnight(BuildingCtrl building)
         {
+            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Knight))
+            {
+                return Task.CompletedTask; //ignoring the requrst
+            }
             int newRank = (int) building.Knight.KnightRank + 1;
-            return KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, (KnightRank)newRank, building.Knight.Activated );
+            return KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, ( KnightRank )newRank, building.Knight.Activated);
 
         }
-       public  Task ActivateKnight(BuildingCtrl building, bool activated)
+        public Task ActivateKnight(BuildingCtrl building, bool activated)
         {
+            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.ActivateKnight))
+            {
+                return Task.CompletedTask; //ignoring the requrst
+            }
+
             return KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, building.Knight.KnightRank, activated);
         }
 

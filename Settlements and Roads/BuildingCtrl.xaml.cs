@@ -391,7 +391,7 @@ namespace Catan10
                     Contract.Assert(ret, "a settlement needs to be in the Settlements Collection");
                     break;
                 case BuildingState.Knight: // remove it and if we are supposed to, we'll add it later.  this means that the knight shows up in the collection and then leaves the collection when the mouse leaves
-                    player.GameData.Knights.Remove(this);
+                    player.GameData.Knights.Remove(this.Knight);
                  
                     break;
                 default:
@@ -424,7 +424,7 @@ namespace Catan10
                     break;
                 case BuildingState.Knight:
                     Owner = player;
-                    player.GameData.Knights.Add(this);
+                    player.GameData.Knights.Add(this.Knight);
                     break;
                 default:
                     break;

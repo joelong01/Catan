@@ -934,7 +934,8 @@ namespace Catan10
             {
                 player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Knight);
             }
-            else { 
+            else
+            {
                 Contract.Assert(false, "should be city, settlement, or knight");
             }
 
@@ -948,19 +949,60 @@ namespace Catan10
                 CurrentPlayer.GameData.Resources.GrantResources(tr);
             }
         }
-        public Task UpdateKnight(KnightStateChangeLog knightStateChangeLog, ActionType actionType)
+
+        /// <summary>
+        ///     when the building state goes from None to knight, it goes through the UpgradeBuilding Path
+        ///     when it changes Rank or changes Activation, it goes through this path.  so this needs to 
+        ///     take care of the entitlement
+        /// </summary>
+        /// <param name="logEntry"></param>
+        /// <param name="actionType"></param>
+        /// <returns></returns>
+        public Task UpdateKnight(KnightStateChangeLog logEntry, ActionType actionType)
         {
-            var Knight = GetBuilding(knightStateChangeLog.BuildingIndex)?.Knight;
-            Contract.Assert(Knight != null);
+            var knight = GetBuilding(logEntry.BuildingIndex)?.Knight;
+            Contract.Assert(knight != null);
+            PlayerModel player = NameToPlayer(logEntry.SentBy);
 
             if (actionType == ActionType.Undo)
             {
-                Knight.KnightRank = knightStateChangeLog.OldRank;
-                Knight.Activated = knightStateChangeLog.OldActivated;
-            } else
+                if (logEntry.OldRank != logEntry.NewRank)
+                {
+                    player.GameData.Resources.GrantEntitlement(Entitlement.Knight);
+                    knight.KnightRank = logEntry.OldRank;
+                }
+                if (logEntry.OldActivated != logEntry.NewActivated)
+                {
+                    player.GameData.Resources.GrantEntitlement(Entitlement.ActivateKnight);
+                    knight.Activated = logEntry.OldActivated;
+                }
+            }
+            else
             {
-                Knight.KnightRank = knightStateChangeLog.NewRank;
-                Knight.Activated = knightStateChangeLog.NewActivated;
+                if (logEntry.OldRank != logEntry.NewRank)
+                {
+                    Contract.Assert(player.GameData.Resources.HasUnusedEntitlment(Entitlement.Knight));
+                    knight.KnightRank = logEntry.NewRank;
+                    player.GameData.Resources.ConsumeEntitlement(Entitlement.Knight);
+
+                }
+
+                if (logEntry.OldActivated != logEntry.NewActivated)
+                {
+                    //
+                    //  the only way to go from not activated to activated is to buy an entitlement
+                    //  but you go to not activated via game mechanics such as moving or attacking baron
+                    if (logEntry.NewActivated)
+                    {
+                        Contract.Assert(player.GameData.Resources.HasUnusedEntitlment(Entitlement.ActivateKnight));
+                        player.GameData.Resources.GrantEntitlement(Entitlement.ActivateKnight);
+                    }
+                    knight.Activated = logEntry.NewActivated;
+                }
+
+
+
+
             }
 
             return Task.CompletedTask;

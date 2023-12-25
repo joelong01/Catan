@@ -98,7 +98,7 @@ namespace Catan10
     {
         Undefined, DevCard, Settlement, City, Road,
         Ship,
-        Knight
+        Knight, ActivateKnight
     }
 
     public enum GameState

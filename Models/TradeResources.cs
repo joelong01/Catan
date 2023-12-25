@@ -226,6 +226,12 @@ namespace Catan10
                         Sheep = 1,
                     };
                     break;
+                case Entitlement.ActivateKnight:
+                    cost = new TradeResources()
+                    {
+                        Wheat = 1
+                    };
+                    break;
                 case Entitlement.Undefined:
                 default:
                     Contract.Assert(false, "Bad Entitlement");

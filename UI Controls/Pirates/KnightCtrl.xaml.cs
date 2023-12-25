@@ -23,7 +23,7 @@ namespace Catan10
 
     public sealed partial class KnightCtrl : UserControl
     {
-      
+
         public KnightCtrl()
         {
             this.InitializeComponent();
@@ -57,26 +57,22 @@ namespace Catan10
             set => SetValue(KnightRankProperty, value);
         }
 
-
-
-        public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
+        public double ActivatedOpacity(bool activated)
         {
-            if (DesignMode.DesignMode2Enabled)
-            {
-                var gradientStopCollection = new GradientStopCollection
-                {
-                    new GradientStop() { Color = Colors.Black },
-                    new GradientStop() { Color = Colors.White }
-                };
-                var brush = new LinearGradientBrush(gradientStopCollection, 45);
-                brush.StartPoint = new Windows.Foundation.Point(0.5, 0);
-                brush.EndPoint = new Windows.Foundation.Point(0.5, 1.0);
-                return brush;
-            }
-            return PlayerBindingFunctions.GetBackgroundBrush(current, owner);
+            if (activated) return 1.0;
+
+            return 0.5;
         }
 
-        public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
+
+        public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner, bool activated)
+        {
+
+            return PlayerBindingFunctions.GetBackgroundBrush(current, owner);
+
+        }
+
+        public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner, bool activated)
         {
             if (owner != null)
             {
@@ -99,6 +95,6 @@ namespace Catan10
 
         }
 
-       
+
     }
 }
