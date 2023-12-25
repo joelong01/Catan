@@ -156,7 +156,7 @@ namespace Catan10
             }
             if (building.BuildingState == BuildingState.NoEntitlement) return false;
             //
-            //  12/23/2023: if the state is a Knight but nobody owns it, you can build a knight there.
+            //  12/23/2023: if the state is a BuyOrUpgradeKnight but nobody owns it, you can build a knight there.
             if (building.BuildingState == BuildingState.Knight && building.Owner == null) return true;
             return false;
         }
@@ -532,7 +532,7 @@ namespace Catan10
         //  this is where the CurrentPlayer can pick somebody to target for the Baron.  this is always called from the tile, so first
         //  make sure that the user is elligible to move baron/ship
         //
-        //  it can happen because the user rolled 7 or they played a Knight, or they could do both in the same turn
+        //  it can happen because the user rolled 7 or they played a BuyOrUpgradeKnight, or they could do both in the same turn
         //
         //  if there is a knight entitlement, then they played a knight
         //  if there is not, then they rolled 7
@@ -731,7 +731,7 @@ namespace Catan10
 
         public Task UpgradeKnight(BuildingCtrl building)
         {
-            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Knight))
+            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight))
             {
                 return Task.CompletedTask; //ignoring the requrst
             }
@@ -795,9 +795,10 @@ namespace Catan10
             return Task.CompletedTask;
         }
 
-        //
-        //
-        //
+        public bool HasEntitlement(Entitlement entitlement)
+        {
+            return CurrentPlayer.GameData.Resources.HasEntitlement(entitlement);
+        }
         public BuildingState ValidateBuildingLocation(BuildingCtrl building)
         {
             if (( CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.BeginResourceAllocation ) && ValidateBuilding)
@@ -864,13 +865,13 @@ namespace Catan10
             }
 
             // 12/24/2023
-            //              You can build a Knight if:
+            //              You can build a BuyOrUpgradeKnight if:
             //              1. you are running Pirates
             //              2. you have the entitlement
             //              3. you are next to a road
             //
             //     this logic means you *must* spend your knights before you build any other kind of settlements.
-            if (MainPageModel.GameInfo.Pirates && CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Knight) && OwnedAdjacentRoad(CurrentPlayer, building))
+            if (MainPageModel.GameInfo.Pirates && CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight) && OwnedAdjacentRoad(CurrentPlayer, building))
             {
                 return BuildingState.Knight;
             }
@@ -928,11 +929,11 @@ namespace Catan10
         }
 
         //
-        //   when a Knight is played
+        //   when a BuyOrUpgradeKnight is played
         //      1. Increment the target's TimesTargetted
         //      2. Move the ship or baron to the target tile
-        //      3. set the flag that says a Knight has been played this turn or that the Robber has been moved because of a 7
-        //      4. If Knight Played Increment the source player (which is always the current player) Knights played
+        //      3. set the flag that says a BuyOrUpgradeKnight has been played this turn or that the Robber has been moved because of a 7
+        //      4. If BuyOrUpgradeKnight Played Increment the source player (which is always the current player) Knights played
         //      5. Log that it happened.
         //      6. check to see if we should update the Largest Army
         private Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
@@ -1399,7 +1400,7 @@ namespace Catan10
                 else
                 {
                     // tell the tile that this settlement is owned
-                    if (key.Tile.OwnedBuilding.Contains(building) == false && building.BuildingState != BuildingState.Knight) // 12/23/2023: don't count Knight as a TileOwner so that resource allocation works
+                    if (key.Tile.OwnedBuilding.Contains(building) == false && building.BuildingState != BuildingState.Knight) // 12/23/2023: don't count BuyOrUpgradeKnight as a TileOwner so that resource allocation works
                     {
                         key.Tile.OwnedBuilding.Add(building);
                     }

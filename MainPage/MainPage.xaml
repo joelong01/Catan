@@ -48,9 +48,26 @@
         <Style x:Key="ButtonTextStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
+            <Setter Property="Foreground" Value="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,5,0,0" />
+        </Style>
+        <Style x:Key="TextUnspentEntitlementStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Foreground" Value="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+        </Style>
+
+        <Style x:Key="PurchaseGridStyle" TargetType="Grid">
+            <Setter Property="BorderBrush" Value="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Red}" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="105" />
         </Style>
     </Page.Resources>
     <Viewbox Stretch="Uniform">
@@ -223,100 +240,143 @@
                     MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
 
-            <local:DragableGridCtrl x:Name="LocalPurchase" Width="300" Height="150" Margin="0,500,0,0" CornerRadius="10"
+            <local:DragableGridCtrl x:Name="LocalPurchase" Width="300" Margin="0,500,0,0" CornerRadius="10"
                     OnGridPositionChanged="OnGridPositionChanged" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{x:Bind CurrentPlayer.SolidPrimaryBrush, Mode=OneWay}" Caption="Purchase"
                     Player="{x:Bind CurrentPlayer, Mode=OneWay}"
                     Visibility="{x:Bind ShowLocalPurchase(MainPageModel.GameState), Mode=OneWay}">
                 <local:DragableGridCtrl.Child>
-                    <Viewbox>
-                        <StackPanel Height="100" Orientation="Horizontal">
-                            <Border Margin="5" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                    BorderThickness="1" CornerRadius="5">
-                                <Button Background="Transparent" Click="OnLocalBuySettlement"
-                                        ToolTipService.ToolTip="Buy Settlement">
-                                    <StackPanel>
-                                        <local:SettlementCtrl Width="50" Height="50"
-                                                Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                                        <TextBlock Margin="0,-2,0,0" HorizontalAlignment="Center"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                                Style="{StaticResource ButtonTextStyle}" Text="Settlement" />
-                                    </StackPanel>
-                                </Button>
-                            </Border>
+                    <Viewbox Stretch="Uniform">
+                        <StackPanel Name="SP_UniversalPurchase">
+                            <StackPanel Orientation="Horizontal">
 
-                            <Border Margin="5" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                    BorderThickness="1" CornerRadius="5">
-                                <Button Background="Transparent" Click="OnLocalBuyCity"
-                                        ToolTipService.ToolTip="Buy City">
-                                    <StackPanel Width="50" Height="65">
-                                        <local:CityCtrl Width="50" Height="50"
-                                                Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                                        <TextBlock Margin="0,-2,0,0" HorizontalAlignment="Center"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                                Style="{StaticResource ButtonTextStyle}" Text="City" />
-                                    </StackPanel>
-                                </Button>
-                            </Border>
+                                <Grid Style="{StaticResource PurchaseGridStyle}">
+                                    <Button Background="Transparent" Click="OnLocalBuySettlement"
+                                            ToolTipService.ToolTip="Buy Settlement">
+                                        <StackPanel>
+                                            <local:SettlementCtrl Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                            <TextBlock Margin="0,-2,0,0" HorizontalAlignment="Center"
+                                                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
+                                                    Style="{StaticResource ButtonTextStyle}" Text="Settlement" />
+                                        </StackPanel>
+                                    </Button>
+                                    <TextBlock Style="{StaticResource TextUnspentEntitlementStyle}"
+                                            Text="{x:Bind UnplayedResourceCount(CurrentPlayer.GameData.Resources.UnspentEntitlements, local:Entitlement.Settlement), Mode=OneWay}" />
 
-                            <Border Margin="5" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                    BorderThickness="1" CornerRadius="5">
-                                <Button Background="Transparent" Click="OnLocalBuyRoad"
-                                        ToolTipService.ToolTip="Buy Road">
-                                    <StackPanel Width="50" Height="65">
-                                        <Grid Width="50" Height="50"
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
-                                            <Line Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                                    StrokeThickness="2" X1="15" X2="15" Y1="5" Y2="45" />
-                                            <Line Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                                    StrokeDashArray="2 1" StrokeThickness="3" X1="25" X2="25" Y1="5"
-                                                    Y2="45" />
-                                            <Line Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                                    StrokeThickness="2" X1="35" X2="35" Y1="5" Y2="45" />
-                                        </Grid>
-                                        <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}" Text="Road" />
-                                    </StackPanel>
-                                </Button>
-                            </Border>
+                                </Grid>
 
-                            <Border Margin="5" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                    BorderThickness="1" CornerRadius="5"
+                                <Grid Style="{StaticResource PurchaseGridStyle}">
+                                    <Button Background="Transparent" Click="OnLocalBuyCity"
+                                            ToolTipService.ToolTip="Buy City">
+                                        <StackPanel>
+                                            <!--Need to give CityCtrl width&height because of the way it was converted from SVG-->
+                                            <local:CityCtrl Width="70" Height="70"
+                                                    Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                            <TextBlock Margin="0,-2,0,0" HorizontalAlignment="Center"
+                                                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Red}"
+                                                    Style="{StaticResource ButtonTextStyle}" Text="City" />
+                                        </StackPanel>
+                                    </Button>
+                                    <TextBlock Style="{StaticResource TextUnspentEntitlementStyle}"
+                                            Text="{x:Bind UnplayedResourceCount(CurrentPlayer.GameData.Resources.UnspentEntitlements, local:Entitlement.City), Mode=OneWay}" />
+
+                                </Grid>
+                                <Grid Style="{StaticResource PurchaseGridStyle}">
+                                    <Button Background="Transparent" Click="OnLocalBuyRoad" HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" ToolTipService.ToolTip="Buy Road">
+                                        <Viewbox Stretch="Uniform">
+                                            <StackPanel>
+                                                <Viewbox Stretch="Uniform" HorizontalAlignment="Left">
+                                                    <Grid Width="50" Height="50" CornerRadius="25"
+                                                            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}">
+                                                        <Line
+                                                                Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                                StrokeThickness="2" X1="15" X2="15" Y1="5" Y2="45" />
+                                                        <Line
+                                                                Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                                StrokeDashArray="2 1" StrokeThickness="3" X1="25"
+                                                                X2="25" Y1="5" Y2="45" />
+                                                        <Line
+                                                                Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                                StrokeThickness="2" X1="35" X2="35" Y1="5" Y2="45" />
+                                                    </Grid>
+                                                </Viewbox>
+                                                <TextBlock Margin="0" Style="{StaticResource ButtonTextStyle}"
+                                                        Text="Road">
+
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Viewbox>
+                                    </Button>
+                                    <TextBlock Style="{StaticResource TextUnspentEntitlementStyle}"
+                                            Text="{x:Bind UnplayedResourceCount(CurrentPlayer.GameData.Resources.UnspentEntitlements, local:Entitlement.Road), Mode=OneWay}" />
+
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Name="SP_PiratesPurchase"
                                     Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <Button Background="Transparent" Click="OnBuyKnight"
-                                        ToolTipService.ToolTip="Buy Or Upgrade Knight">
-                                    <StackPanel Width="50" Height="65">
-                                        <Grid Width="50" Height="50"
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
-                                            <Viewbox Stretch="UniformToFill">
-                                                <local:KnightCtrl Width="50" Height="50" Activated="False"
-                                                        KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                                            </Viewbox>
-                                        </Grid>
-                                        <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}"
-                                                Text="Knight" />
-                                    </StackPanel>
-                                </Button>
-                            </Border>
-                            <Border Margin="5" BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
-                                    BorderThickness="1" CornerRadius="5"
-                                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <Button Background="Transparent" Click="OnActivateKnight"
-                                        ToolTipService.ToolTip="Activate Knight">
-                                    <StackPanel Width="50" Height="65">
-                                        <Grid Width="50" Height="50"
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
-                                            <Viewbox Stretch="UniformToFill">
-                                                <local:KnightCtrl Width="50" Height="50" Activated="True"
-                                                        KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                                            </Viewbox>
-                                        </Grid>
-                                        <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}"
-                                                Text="Activate" />
-                                    </StackPanel>
-                                </Button>
-                            </Border>
+                                <Grid Style="{StaticResource PurchaseGridStyle}"
+                                        Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Button Background="Transparent" Click="OnBuyKnight" HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" ToolTipService.ToolTip="Buy Or Upgrade Knight">
 
+                                        <local:KnightCtrl Activated="True" KnightRank="Unset" Width="70" Height="70"
+                                                Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+
+                                    </Button>
+                                    <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}" Text="Knight"
+                                            VerticalAlignment="Bottom" />
+
+                                    <TextBlock Text="&#xE7BF;" FontSize="22" HorizontalAlignment="Right" Padding="0"
+                                            FontFamily="Segoe MDL2 Assets" Margin="2" TextAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}" />
+
+                                    <TextBlock Style="{StaticResource TextUnspentEntitlementStyle}"
+                                            Text="{x:Bind UnplayedResourceCount(CurrentPlayer.GameData.Resources.UnspentEntitlements, local:Entitlement.BuyOrUpgradeKnight), Mode=OneWay}" />
+                                </Grid>
+
+                                <Grid Style="{StaticResource PurchaseGridStyle}"
+                                        Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Button Background="Transparent" Click="OnActivateKnight"
+                                            ToolTipService.ToolTip="Activate Knight">
+
+                                        <local:KnightCtrl Width="70" Height="70" Activated="True" KnightRank="Unset"
+                                                Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                    </Button>
+
+                                    <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}" Text="Activate"
+                                            HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+
+                                    <TextBlock Text="&#xE7E8;" FontSize="22" HorizontalAlignment="Right" Padding="0"
+                                            FontFamily="Segoe MDL2 Assets" Margin="2" TextAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}" />
+                                    <TextBlock Style="{StaticResource TextUnspentEntitlementStyle}"
+                                            Text="{x:Bind UnplayedResourceCount(CurrentPlayer.GameData.Resources.UnspentEntitlements, local:Entitlement.ActivateKnight), Mode=OneWay}" />
+
+                                </Grid>
+                                <Grid Style="{StaticResource PurchaseGridStyle}"
+                                        Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Button Background="Transparent" Click="OnMoveKnight"
+                                            ToolTipService.ToolTip="Move Knight">
+
+                                        <local:KnightCtrl Width="70" Height="70" Activated="True" KnightRank="Unset"
+                                                Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                                    </Button>
+
+                                    <TextBlock Margin="0,0,0,0" Style="{StaticResource ButtonTextStyle}" Text="Move"
+                                            HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+
+                                    <TextBlock Text="&#xE811;" FontSize="22" Margin="2" FontFamily="Segoe MDL2 Assets"
+                                            TextAlignment="Center" VerticalAlignment="Top" HorizontalAlignment="Right"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}" />
+                                    <TextBlock Style="{StaticResource TextUnspentEntitlementStyle}"
+                                            Text="{x:Bind UnplayedResourceCount(CurrentPlayer.GameData.Resources.UnspentEntitlements, local:Entitlement.MoveKnight), Mode=OneWay}" />
+                                </Grid>
+
+                            </StackPanel>
                         </StackPanel>
                     </Viewbox>
                 </local:DragableGridCtrl.Child>
@@ -343,11 +403,11 @@
                                 <Button x:Name="_btnNextStep" Margin="0,10,0,0" HorizontalAlignment="Center"
                                         Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                                         Click="OnNextStep" Content="&#xE101;"
-                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                         IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}"
                                         Style="{StaticResource GameControllerStyle}" />
                                 <TextBlock Margin="5,0,5,0"
-                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                         Style="{StaticResource ControlGridTextStyle}"
                                         Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" />
                             </StackPanel>
@@ -355,21 +415,21 @@
                                     Style="{StaticResource GameControllerStackPanelCommand}">
                                 <StackPanel Orientation="Vertical">
                                     <Button x:Name="_btnUndo"
-                                            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                                            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
                                             Click="OnUndo" Content="&#xE10E;"
-                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                             IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}"
                                             Style="{StaticResource GameControllerStyle}" />
-                                    <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                    <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                             Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
                                 </StackPanel>
                                 <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
-                                    <Button Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                                    <Button Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
                                             Click="OnRedo" Content="&#xE10D;"
-                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                             IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}"
                                             Style="{StaticResource GameControllerStyle}" />
-                                    <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                    <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                             Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
                                 </StackPanel>
                             </StackPanel>

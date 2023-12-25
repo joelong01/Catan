@@ -16,7 +16,7 @@ namespace Catan10
         ///     For Monopoly, this is the resource requested
         ///     For YoP, these are the two Cards picked
         ///     for RB, this is empty
-        ///     Knight is more complicated and is its own message
+        ///     BuyOrUpgradeKnight is more complicated and is its own message
         /// </summary>
         public TradeResources TradeResources { get; set; }
 

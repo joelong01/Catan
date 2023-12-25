@@ -1245,7 +1245,7 @@ namespace Catan10
         }
         private async void OnBuyKnight(object sender, RoutedEventArgs e)
         {
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.Knight);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight);
         }
         /// <summary>
         ///     make sure that the current user has a knight that is not activated, and if so, let them
@@ -1265,13 +1265,36 @@ namespace Catan10
                     break;
                 }
             }
+
+            if (!found)
+            {
+                //
+                //  didn't find a knight to activate in the ones on the board - look for one that 
+                //  hasn't been played yet, but don't let the player over buy
+                int knightCount = 0;
+                int activateCount = 0;
+                foreach (var entitlement in CurrentPlayer.GameData.Resources.UnspentEntitlements)
+                {
+                    if (entitlement == Entitlement.BuyOrUpgradeKnight) knightCount++;
+                    if (entitlement == Entitlement.ActivateKnight) activateCount++; 
+                }
+
+                if (knightCount > activateCount) found = true;
+            }
+
             if (found)
             {
                 await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight);
             }
         }
 
+        private async void OnMoveKnight(object sender, RoutedEventArgs e)
+        {
+            if (CurrentPlayer.GameData.Knights.Count == 0) return;
 
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight);
+
+        }
 
         private async void OnLocalBuyRoad(object sender, RoutedEventArgs e)
         {
@@ -1316,6 +1339,21 @@ namespace Catan10
             if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll) return true;
 
             return false;
+        }
+
+        private string UnplayedResourceCount(ObservableCollection<Entitlement> entitlements, Entitlement toCheck)
+        {
+            int count = 0;
+
+            foreach (Entitlement entitlement in entitlements)
+            {
+                if (entitlement.Equals(toCheck))
+                {
+                    count++;
+                }
+            }
+
+            return count.ToString();
         }
 
 

@@ -170,6 +170,8 @@ namespace Catan10
         Task ActivateKnight(BuildingCtrl building, bool activate);
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
 
+        bool HasEntitlement(Entitlement entitlement);
+
         #endregion Methods
     }
 

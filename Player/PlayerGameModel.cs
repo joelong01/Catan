@@ -391,7 +391,7 @@ namespace Catan10
                     return RoadsLeft - _resources.GetUnspentEntitlements(entitlement); ;
                 case Entitlement.Ship:
                     return MaxShips - ShipsLeft;
-                case Entitlement.Knight:
+                case Entitlement.BuyOrUpgradeKnight:
                     return KnightsLeft - _resources.GetUnspentEntitlements(entitlement); ;
                 case Entitlement.ActivateKnight:
                     return 1; // we have already checked to make sure that there is a knight to activate

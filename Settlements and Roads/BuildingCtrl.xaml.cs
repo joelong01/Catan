@@ -392,7 +392,7 @@ namespace Catan10
                     break;
                 case BuildingState.Knight: // remove it and if we are supposed to, we'll add it later.  this means that the knight shows up in the collection and then leaves the collection when the mouse leaves
                     player.GameData.Knights.Remove(this.Knight);
-                 
+
                     break;
                 default:
                     break;
@@ -439,12 +439,15 @@ namespace Catan10
 
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
+            MNU_Activate.IsEnabled = Callback.HasEntitlement(Entitlement.ActivateKnight);
+            MNU_Upgrade.IsEnabled = Callback.HasEntitlement(Entitlement.BuyOrUpgradeKnight);
+        
             Menu_Knight.ShowAt(this);
         }
 
         private async void OnUpgrade(object sender, RoutedEventArgs e)
         {
-           await Callback.UpgradeKnight(this);
+            await Callback.UpgradeKnight(this);
         }
 
         private async void OnActivate(object sender, RoutedEventArgs e)

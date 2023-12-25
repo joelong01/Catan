@@ -342,7 +342,7 @@ namespace Catan10
 
         /// <summary>
         ///     This will give and take resources away from a player.
-        ///     Some trades (e.g. stealing a card with a Knight) are not publicly visible.
+        ///     Some trades (e.g. stealing a card with a BuyOrUpgradeKnight) are not publicly visible.
         /// </summary>
         /// <param name="tr"></param>
         /// <param name="publiclyVisible"></param>

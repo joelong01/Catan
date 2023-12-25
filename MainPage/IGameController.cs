@@ -932,7 +932,7 @@ namespace Catan10
             }
             else if (updateBuildingLog.NewBuildingState == BuildingState.Knight)
             {
-                player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Knight);
+                player.GameData.Resources.UnspentEntitlements.Add(Entitlement.BuyOrUpgradeKnight);
             }
             else
             {
@@ -968,7 +968,7 @@ namespace Catan10
             {
                 if (logEntry.OldRank != logEntry.NewRank)
                 {
-                    player.GameData.Resources.GrantEntitlement(Entitlement.Knight);
+                    player.GameData.Resources.GrantEntitlement(Entitlement.BuyOrUpgradeKnight);
                     knight.KnightRank = logEntry.OldRank;
                 }
                 if (logEntry.OldActivated != logEntry.NewActivated)
@@ -981,9 +981,9 @@ namespace Catan10
             {
                 if (logEntry.OldRank != logEntry.NewRank)
                 {
-                    Contract.Assert(player.GameData.Resources.HasUnusedEntitlment(Entitlement.Knight));
+                    Contract.Assert(player.GameData.Resources.HasUnusedEntitlment(Entitlement.BuyOrUpgradeKnight));
                     knight.KnightRank = logEntry.NewRank;
-                    player.GameData.Resources.ConsumeEntitlement(Entitlement.Knight);
+                    player.GameData.Resources.ConsumeEntitlement(Entitlement.BuyOrUpgradeKnight);
 
                 }
 
@@ -995,7 +995,7 @@ namespace Catan10
                     if (logEntry.NewActivated)
                     {
                         Contract.Assert(player.GameData.Resources.HasUnusedEntitlment(Entitlement.ActivateKnight));
-                        player.GameData.Resources.GrantEntitlement(Entitlement.ActivateKnight);
+                        player.GameData.Resources.ConsumeEntitlement(Entitlement.ActivateKnight);
                     }
                     knight.Activated = logEntry.NewActivated;
                 }
@@ -1016,7 +1016,7 @@ namespace Catan10
             Entitlement entitlement = Entitlement.Undefined;
             if (updateBuildingLog.NewBuildingState == BuildingState.City) entitlement = Entitlement.City;
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
-            if (updateBuildingLog.NewBuildingState == BuildingState.Knight) entitlement = Entitlement.Knight;
+            if (updateBuildingLog.NewBuildingState == BuildingState.Knight) entitlement = Entitlement.BuyOrUpgradeKnight;
 
             Contract.Assert(entitlement != Entitlement.Undefined);
             player.GameData.Resources.ConsumeEntitlement(entitlement);

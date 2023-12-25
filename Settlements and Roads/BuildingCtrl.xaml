@@ -117,9 +117,9 @@
             <Button Visibility="Collapsed">
                 <Button.Flyout>
                     <MenuFlyout x:Name="Menu_Knight" Placement="Right">
-                        <MenuFlyoutItem Text="Upgrade" Click="OnUpgrade" />
-                        <MenuFlyoutItem Text="Activate" Click="OnActivate" />
-                        <MenuFlyoutItem Text="Move" Click="OnMove" />
+                        <MenuFlyoutItem x:Name="MNU_Upgrade" Text="Upgrade" Click="OnUpgrade"/>
+                        <MenuFlyoutItem x:Name="MNU_Activate" Text="Activate" Click="OnActivate" />
+                        <MenuFlyoutItem x:Name="MNU_Move" Text="Move" Click="OnMove" />
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
