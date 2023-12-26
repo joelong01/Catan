@@ -22,7 +22,7 @@ namespace Catan10
                 PlayersInOrder = players
             };
 
-            return gameController.PostMessage(logHeader, Catan.Proxy.ActionType.Normal);
+            return gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         //

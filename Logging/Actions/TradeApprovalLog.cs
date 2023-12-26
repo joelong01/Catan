@@ -26,7 +26,7 @@ namespace Catan10
                 Action = CatanAction.ChangedTradeApproval
             };
 
-            return gameController.PostMessage(logHeader, Catan.Proxy.ActionType.Normal);
+            return gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
         public async Task Do(IGameController gameController)

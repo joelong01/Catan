@@ -163,6 +163,16 @@ namespace Catan10
             this.Add(ResourceType.Wheat);
             this.Add(ResourceType.Sheep);
             this.Add(ResourceType.Ore);
+            if (MainPage.Current != null)
+            {
+                if (MainPage.Current.MainPageModel.GameInfo != null && MainPage.Current.MainPageModel.GameInfo.Pirates)
+               
+                {
+                    this.Add(ResourceType.Paper);
+                    this.Add(ResourceType.Cloth);
+                    this.Add(ResourceType.Coin);
+                }
+            }
         }
 
         public ObservableCollection<ResourceCardModel> ToObservableCollection(bool flat)

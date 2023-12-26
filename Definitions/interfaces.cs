@@ -299,7 +299,7 @@ namespace Catan10
 
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
-        Task UpdateBuilding(UpdateBuildingLog updateBuildingLog);
+        Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType action);
 
         Task UpdateKnight(KnightStateChangeLog knightStateChangeLog, ActionType actionType);
         Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType);

@@ -39,7 +39,7 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            return gameController.UpdateBuilding(this);
+            return gameController.UpdateBuilding(this, ActionType.Normal);
         }
         public Task Replay (IGameController gameController)
         {
@@ -47,7 +47,7 @@ namespace Catan10
         }
         public Task Redo(IGameController gameController)
         {
-            return gameController.UpdateBuilding(this);
+            return gameController.UpdateBuilding(this, ActionType.Redo);
         }
 
         public Task Undo(IGameController gameController)

@@ -17,6 +17,16 @@
             <Setter Property="Stroke" Value="Black" />
             <Setter Property="StrokeThickness" Value="4" />
         </Style>
+        <Style TargetType="local:TileCtrl" x:Name="TileCtrlStyle">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="100" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="ResourceType" Value="Sea" />
+            <Setter Property="RenderTransformOrigin" Value="0, 0" />
+        </Style>
         <Storyboard x:Key="RotatePirateShip" x:Name="SB_RotateShip" AutoReverse="False">
             <DoubleAnimation Storyboard.TargetName="PirateShip" x:Name="PirateShipAnimation"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="60"
@@ -25,39 +35,39 @@
     </Control.Resources>
 
     <Grid Background="Transparent">
-        <Ellipse x:Name="Ellipse_Path" Width="300" Height="300" Fill="Transparent" Style="{StaticResource EllipseStyle}" />
-  
+        <Ellipse x:Name="Ellipse_Path" Width="300" Height="300" Fill="Transparent" Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" 
+                 StrokeThickness="4" StrokeDashArray="0.5"/>
 
-        <Ellipse Style="{StaticResource EllipseStyle}">
-            <Ellipse.RenderTransform>
+        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+            <local:TileCtrl.RenderTransform>
                 <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="0" CenterX="50" CenterY="200" />
-            </Ellipse.RenderTransform>
-        </Ellipse>
-        <Ellipse Style="{StaticResource EllipseStyle}">
-            <Ellipse.RenderTransform>
+            </local:TileCtrl.RenderTransform>
+        </local:TileCtrl>
+        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+            <local:TileCtrl.RenderTransform>
                 <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="60" CenterX="50" CenterY="200" />
-            </Ellipse.RenderTransform>
-        </Ellipse>
-        <Ellipse Style="{StaticResource EllipseStyle}">
-            <Ellipse.RenderTransform>
+            </local:TileCtrl.RenderTransform>
+        </local:TileCtrl>
+        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+            <local:TileCtrl.RenderTransform>
                 <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="120" CenterX="50" CenterY="200" />
-            </Ellipse.RenderTransform>
-        </Ellipse>
-        <Ellipse Style="{StaticResource EllipseStyle}">
-            <Ellipse.RenderTransform>
+            </local:TileCtrl.RenderTransform>
+        </local:TileCtrl>
+        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+            <local:TileCtrl.RenderTransform>
                 <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="180" CenterX="50" CenterY="200" />
-            </Ellipse.RenderTransform>
-        </Ellipse>
-        <Ellipse Style="{StaticResource EllipseStyle}">
-            <Ellipse.RenderTransform>
+            </local:TileCtrl.RenderTransform>
+        </local:TileCtrl>
+        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+            <local:TileCtrl.RenderTransform>
                 <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="240" CenterX="50" CenterY="200" />
-            </Ellipse.RenderTransform>
-        </Ellipse>
-        <Ellipse Style="{StaticResource EllipseStyle}">
-            <Ellipse.RenderTransform>
+            </local:TileCtrl.RenderTransform>
+        </local:TileCtrl>
+        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+            <local:TileCtrl.RenderTransform>
                 <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="300" CenterX="50" CenterY="200" />
-            </Ellipse.RenderTransform>
-        </Ellipse>
+            </local:TileCtrl.RenderTransform>
+        </local:TileCtrl>
         <Viewbox Canvas.ZIndex="99" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80"
                 Height="75" x:Name="PirateShip">
             <local:PirateShip />

@@ -131,6 +131,7 @@ namespace Catan10
         // int toggle = 0;
         private void OnTest1(object sdr, RoutedEventArgs rea)
         {
+            MainPageModel.GameInfo.Pirates = true;
             CTRL_InvationCounter.Next();
         }
 
@@ -348,7 +349,7 @@ namespace Catan10
                 await NextState();
             }
 
-            await NextState();
+          //  await NextState();
         }
 
         private async void OnTestService(object sender, RoutedEventArgs e)

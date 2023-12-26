@@ -14,7 +14,7 @@ namespace Catan10
                 SpyOn = spyOn,
                 CanUndo = false
             };
-            return gameController.PostMessage(logHeader, Catan.Proxy.ActionType.Normal);
+            return gameController.PostMessage(logHeader, ActionType.Normal);
         }
         #region Methods
 

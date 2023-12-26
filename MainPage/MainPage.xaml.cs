@@ -267,7 +267,16 @@ namespace Catan10
         {
             // pick a tile with the highest pips and put a settlement on it
             var building = GetHighestPipsBuilding();
+            if (building == null)
+            {
+                Debug.WriteLine("got null building)");
+            }
             await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
+            if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.City))
+            {
+                // you get a city the second time around with pirates
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.City);
+            }
 
             // pick a Random Road
 

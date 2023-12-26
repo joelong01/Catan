@@ -21,7 +21,7 @@ namespace Catan10
                 LostResources = lostCards,
                 CanUndo = false
             };
-            return gameController.PostMessage(logHeader, Catan.Proxy.ActionType.Normal);
+            return gameController.PostMessage(logHeader, ActionType.Normal);
         }
         public Task Do(IGameController gameController)
         {

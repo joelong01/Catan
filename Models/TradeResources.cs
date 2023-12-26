@@ -25,6 +25,13 @@ namespace Catan10
 
         private int _wood = 0;
 
+        private int _paper = 0;
+
+        private int _cloth = 0;
+
+        private int _coin = 0;
+
+
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties
@@ -77,6 +84,9 @@ namespace Catan10
                 if (Sheep != 0) list.Add(ResourceType.Sheep);
                 if (Ore != 0) list.Add(ResourceType.Ore);
                 if (GoldMine != 0) list.Add(ResourceType.GoldMine);
+                if (Coin != 0) list.Add(ResourceType.Coin);
+                if (Cloth != 0) list.Add(ResourceType.Cloth);
+                if (Paper != 0) list.Add(ResourceType.Paper);
                 return list;
             }
         }
@@ -148,7 +158,54 @@ namespace Catan10
                 }
             }
         }
-
+        public int Coin
+        {
+            get
+            {
+                return _coin;
+            }
+            set
+            {
+                if (value != _coin)
+                {
+                    _coin = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
+        public int Paper
+        {
+            get
+            {
+                return _paper;
+            }
+            set
+            {
+                if (value != _paper)
+                {
+                    _paper = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
+        public int Cloth
+        {
+            get
+            {
+                return _cloth;
+            }
+            set
+            {
+                if (value != _cloth)
+                {
+                    _cloth = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
         #endregion Properties
 
         #region Constructors + Destructors
@@ -165,6 +222,9 @@ namespace Catan10
             Ore = tradeResources.Ore;
             Sheep = tradeResources.Sheep;
             GoldMine = tradeResources.GoldMine;
+            Cloth = tradeResources.Cloth;
+            Coin = tradeResources.Coin;
+            Paper = tradeResources.Paper;
         }
 
         #endregion Constructors + Destructors
@@ -235,7 +295,97 @@ namespace Catan10
                 case Entitlement.MoveKnight:
                     cost = new TradeResources()
                     {
-                        
+
+                    };
+                    break;
+                case Entitlement.PoliticsUpgradeOne:
+                    cost = new TradeResources()
+                    {
+                        Coin = 1
+                    };
+                    break;
+                case Entitlement.PoliticsUpgradeTwo:
+                    cost = new TradeResources()
+                    {
+                        Coin = 2
+                    };
+                    break;
+                case Entitlement.PoliticsUpgradeThree:
+                    cost = new TradeResources()
+                    {
+                        Coin = 3
+                    };
+                    break;
+                case Entitlement.PoliticsUpgradeFour:
+                    cost = new TradeResources()
+                    {
+                        Coin = 4
+                    };
+                    break;
+                case Entitlement.PoliticsUpgradeFive:
+                    cost = new TradeResources()
+                    {
+                        Coin = 5
+                    };
+                    break;
+                case Entitlement.TradeUpgradeOne:
+                    cost = new TradeResources()
+                    {
+                        Cloth = 1
+                    };
+                    break;
+                case Entitlement.TradeUpgradeTwo:
+                    cost = new TradeResources()
+                    {
+                        Cloth = 2
+                    };
+                    break;
+                case Entitlement.TradeUpgradeThree:
+                    cost = new TradeResources()
+                    {
+                        Cloth = 3
+                    };
+                    break;
+                case Entitlement.TradeUpgradeFour:
+                    cost = new TradeResources()
+                    {
+                        Cloth = 4
+                    };
+                    break;
+                case Entitlement.TradeUpgradeFive:
+                    cost = new TradeResources()
+                    {
+                        Cloth = 5
+                    };
+                    break;
+                case Entitlement.ScienceUpgradeOne:
+                    cost = new TradeResources()
+                    {
+                        Paper = 1
+                    };
+                    break;
+                case Entitlement.ScienceUpgradeTwo:
+                    cost = new TradeResources()
+                    {
+                        Paper = 2
+                    };
+                    break;
+                case Entitlement.ScienceUpgradeThree:
+                    cost = new TradeResources()
+                    {
+                        Paper = 3
+                    };
+                    break;
+                case Entitlement.ScienceUpgradeFour:
+                    cost = new TradeResources()
+                    {
+                        Paper = 4
+                    };
+                    break;
+                case Entitlement.ScienceUpgradeFive:
+                    cost = new TradeResources()
+                    {
+                        Paper = 5
                     };
                     break;
                 case Entitlement.Undefined:
@@ -257,6 +407,9 @@ namespace Catan10
                 case ResourceType.Wheat:
                 case ResourceType.Brick:
                 case ResourceType.GoldMine:
+                case ResourceType.Cloth:
+                case ResourceType.Paper:
+                case ResourceType.Coin:
                     return true;
 
                 case ResourceType.Desert:
@@ -279,11 +432,65 @@ namespace Catan10
                 Ore = a.Ore + b.Ore,
                 Sheep = a.Sheep + b.Sheep,
                 Brick = a.Brick + b.Brick,
-                GoldMine = a.GoldMine + b.GoldMine
+                GoldMine = a.GoldMine + b.GoldMine,
+                Coin = a.Coin + b.Coin,
+                Paper = a.Paper + b.Paper,
+                Cloth = a.Cloth + b.Cloth
+
             };
         }
 
+        public static TradeResources TradeResourcesForCity(ResourceType resourceType, bool pirates)
+        {
+            TradeResources tr = new TradeResources();
 
+            switch (resourceType)
+            {
+                case ResourceType.Sheep:
+                    tr.Sheep++;
+                    tr.Cloth += pirates ? 1 : 0;
+                    tr.Sheep += pirates ? 0 : 1;
+                    break;
+                case ResourceType.Wood:
+                    tr.Wood++;
+                    tr.Wood += pirates ? 0 : 1;
+                    tr.Paper += pirates ? 1 : 0;
+                    break;
+                case ResourceType.Ore:
+                    tr.Ore++;
+                    tr.Ore += pirates ? 0 : 1;
+                    tr.Coin += pirates ? 1 : 0;
+                    break;
+                case ResourceType.Wheat:
+                    tr.Wheat += 2;
+                    break;
+                case ResourceType.Brick:
+                    tr.Brick += 2;
+                    break;
+                case ResourceType.GoldMine:
+                    tr.GoldMine += 2;
+                    break;
+                default:
+                    break;
+            }
+            return tr;
+        }
+
+        public static TradeResources TradeResourcesForBuilding(BuildingState buildingState, ResourceType resourceType, bool pirates)
+        {
+            var tr = new TradeResources();
+            switch (buildingState)
+            {
+                case BuildingState.Settlement:
+                    tr.AddResource(resourceType, 1);
+                    break;
+                case BuildingState.City:
+                case BuildingState.Metropolis:
+                    return TradeResources.TradeResourcesForCity(resourceType, pirates);
+            }
+       
+            return tr;
+        }
 
         public void AddResource(ResourceType resourceType, int toAdd)
         {
@@ -312,7 +519,15 @@ namespace Catan10
                 case ResourceType.GoldMine:
                     GoldMine += toAdd;
                     break;
-
+                case ResourceType.Cloth:
+                    Cloth += toAdd;
+                    break;
+                case ResourceType.Coin:
+                    Coin += toAdd;
+                    break;
+                case ResourceType.Paper:
+                    Paper += toAdd;
+                    break;
                 case ResourceType.Desert:
                     break;
 
@@ -374,6 +589,12 @@ namespace Catan10
 
                 case ResourceType.GoldMine:
                     return GoldMine;
+                case ResourceType.Cloth:
+                    return Cloth;
+                case ResourceType.Paper:
+                    return Paper;
+                case ResourceType.Coin:
+                    return Coin;
 
                 case ResourceType.Desert:
                 case ResourceType.Back:
@@ -393,13 +614,17 @@ namespace Catan10
                 ( this.Ore == b.Ore ) &&
                 ( this.Sheep == b.Sheep ) &&
                 ( this.Brick == b.Brick ) &&
-                ( this.GoldMine == b.GoldMine ) );
+                ( this.GoldMine == b.GoldMine ) &&
+                ( this.Cloth == b.Cloth ) &&
+                ( this.Coin == b.Coin ) &&
+                ( this.Paper == b.Paper ) );
         }
 
         public bool Equivalent(TradeResources tradeResources)
         {
             if (Wheat != tradeResources.Wheat || Wood != tradeResources.Wood || Ore != tradeResources.Ore ||
-                Sheep != tradeResources.Sheep || Brick != tradeResources.Brick || GoldMine != tradeResources.GoldMine)
+                Sheep != tradeResources.Sheep || Brick != tradeResources.Brick || GoldMine != tradeResources.GoldMine ||
+                Coin != tradeResources.Coin || Paper != tradeResources.Paper || Cloth != tradeResources.Cloth)
             {
                 return false;
             }
@@ -416,7 +641,10 @@ namespace Catan10
                 Ore = -Ore,
                 Sheep = -Sheep,
                 Brick = -Brick,
-                GoldMine = -GoldMine
+                GoldMine = -GoldMine,
+                Cloth = -Cloth,
+                Coin = -Coin,
+                Paper = -Paper,
             };
         }
 
@@ -447,16 +675,20 @@ namespace Catan10
                 case ResourceType.GoldMine:
                     GoldMine = value;
                     break;
-
+                case ResourceType.Cloth:
+                    Cloth = value;
+                    break;
+                case ResourceType.Coin:
+                    Coin = value;
+                    break;
+                case ResourceType.Paper:
+                    Paper = value;
+                    break;
                 case ResourceType.Desert:
                     break;
-
                 case ResourceType.Back:
-
                 case ResourceType.None:
-
                 case ResourceType.Sea:
-
                 default:
                     this.TraceMessage($"{resourceType} passed to SetResource");
                     break;
@@ -486,6 +718,18 @@ namespace Catan10
             {
                 list.Add(ResourceType.Sheep);
             }
+            for (int i = 0; i < Coin; i++)
+            {
+                list.Add(ResourceType.Coin);
+            }
+            for (int i = 0; i < Paper; i++)
+            {
+                list.Add(ResourceType.Paper);
+            }
+            for (int i = 0; i < Cloth; i++)
+            {
+                list.Add(ResourceType.Cloth);
+            }
             return list;
         }
 
@@ -498,7 +742,7 @@ namespace Catan10
 
         public override string ToString()
         {
-            return $"[Count={Count}][Ore={Ore}][Brick={Brick}][Wheat={Wheat}][Wood={Wood}][Sheep={Sheep}][Gold={GoldMine}]";
+            return $"[Count={Count}][Ore={Ore}][Brick={Brick}][Wheat={Wheat}][Wood={Wood}][Sheep={Sheep}][Gold={GoldMine}][Coin={Coin}][Cloth={Cloth}][Paper={Paper}]";
         }
 
         internal int GetCount(ResourceType resourceType)
@@ -522,19 +766,20 @@ namespace Catan10
 
                 case ResourceType.GoldMine:
                     return GoldMine;
-
+                case ResourceType.Coin:
+                    return Coin;
+                case ResourceType.Paper:
+                    return Paper;
+                case ResourceType.Cloth:
+                    return Cloth;
                 case ResourceType.Desert:
                     break;
-
                 case ResourceType.Back:
                     break;
-
                 case ResourceType.None:
                     break;
-
                 case ResourceType.Sea:
                     break;
-
                 default:
                     break;
             }

@@ -367,6 +367,9 @@
             <ImageBrush x:Key="ResourceType.Wood" ImageSource="Assets/ResourceCards/wood.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="ResourceType.Desert" ImageSource="Assets/Tiles/desert.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="ResourceType.Sea" ImageSource="Assets/water.png" Stretch="UniformToFill" />
+             <ImageBrush x:Key="ResourceType.Cloth" ImageSource="Assets/ResourceCards/cloth.png" Stretch="UniformToFill" />
+             <ImageBrush x:Key="ResourceType.Paper" ImageSource="Assets/ResourceCards/paper.png" Stretch="UniformToFill" />
+             <ImageBrush x:Key="ResourceType.Coin" ImageSource="Assets/ResourceCards/coin.png" Stretch="UniformToFill" />
             <!--<SolidColorBrush x:Key="ResourceType.None" Color="Transparent" />-->
             <Style x:Key="GameControllerStyle" TargetType="Button">
                 <Setter Property="HorizontalAlignment" Value="Center" />

@@ -19,7 +19,7 @@ namespace Catan10
                 Action = CatanAction.DeleteOffer
             };
 
-            return gameController.PostMessage(logHeader, Catan.Proxy.ActionType.Normal);
+            return gameController.PostMessage(logHeader, ActionType.Normal);
         }
         public Task Do(IGameController gameController)
         {

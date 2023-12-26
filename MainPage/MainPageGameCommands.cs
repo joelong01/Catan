@@ -147,11 +147,9 @@ namespace Catan10
                         break;
 
                     case GameState.AllocateResourceReverse:
-
-                        int players = MainPageModel.PlayingPlayers.IndexOf(CurrentPlayer) - 1;
-
-                        if (MainPageModel.PlayingPlayers[0].GameData.Score == 2)
+                        if (CurrentPlayer == PlayingPlayers[0])
                         {
+
                             await AllocateResourcesReverseToDoneAllocResources.PostLog(this);
                         }
                         else

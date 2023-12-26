@@ -693,7 +693,7 @@ namespace Catan10
         }
 
         //
-        //  find all the tiles with building for this roll where the onwer == Player
+        //  find all the tiles with building for this roll where the owner == Player
         public (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll, RollAction action)
         {
             TradeResources tr = new TradeResources();
@@ -708,7 +708,38 @@ namespace Catan10
                     {
                         if (kvp.Value.HasBaron == false)
                         {
-                            tr.AddResource(kvp.Value.ResourceType, building.ScoreValue);
+                            if (MainPageModel.GameInfo.Pirates && ( building.BuildingState == BuildingState.City || building.BuildingState == BuildingState.Metropolis ))
+                            {
+                                //
+                                //  in pirates - you get one of the resource types plus one commodity when you have a City or Metropolis
+                                tr.AddResource(kvp.Value.ResourceType, 1);
+                                switch (kvp.Value.ResourceType)
+                                {
+                                    case ResourceType.Sheep:
+                                        tr.AddResource(ResourceType.Cloth, 1);
+                                        break;
+                                    case ResourceType.Wood:
+                                        tr.AddResource(ResourceType.Paper, 1);
+                                        break;
+                                    case ResourceType.Ore:
+                                        tr.AddResource(ResourceType.Coin, 1);
+                                        break;
+                                    case ResourceType.Wheat:
+
+                                    case ResourceType.Brick:
+
+                                    case ResourceType.GoldMine:
+                                        tr.AddResource(kvp.Value.ResourceType, 1);
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                tr.AddResource(kvp.Value.ResourceType, building.ScoreValue);
+                            }
                         }
                         else
                         {
@@ -1036,7 +1067,7 @@ namespace Catan10
 
             }
         }
-        public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog)
+        public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType actionType)
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
             Contract.Assert(building != null);
@@ -1060,31 +1091,35 @@ namespace Catan10
 
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
-                if (building.BuildingState == BuildingState.Settlement && ( oldState == BuildingState.None || oldState == BuildingState.Pips || oldState == BuildingState.Build ))
+                if (( building.BuildingState == BuildingState.Settlement && !MainPageModel.GameInfo.Pirates ) || ( building.BuildingState == BuildingState.City && MainPageModel.GameInfo.Pirates ))
                 {
+
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
-                        tr.AddResource(kvp.Value.ResourceType, 1);
+                        tr += TradeResources.TradeResourcesForBuilding(building.BuildingState, kvp.Value.ResourceType, MainPageModel.GameInfo.Pirates);
                     }
-                    CurrentPlayer.GameData.Resources.GrantResources(tr);
+                    switch (actionType)
+                    {
+                        case ActionType.Normal:
+                        case ActionType.Redo:
+                        case ActionType.Replay:
+                        case ActionType.Retry:
+                            CurrentPlayer.GameData.Resources.GrantResources(tr);
+                            break;
+
+                        case ActionType.Undo:
+                            CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated());
+                            break;
+                        default:
+                            break;
+                    }
 
                 }
-                else if (( building.BuildingState == BuildingState.None ) && ( oldState == BuildingState.Settlement ))
-                {
-                    //
-                    //  user did an undo
-                    TradeResources tr = new TradeResources();
-                    foreach (var kvp in building.BuildingToTileDictionary)
-                    {
-                        tr.AddResource(kvp.Value.ResourceType, -1);
-                    }
-                    CurrentPlayer.GameData.Resources.GrantResources(tr);
-                }
+
+                UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
+                CalculateAndSetLongestRoad();
             }
-
-            UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
-            CalculateAndSetLongestRoad();
         }
 
         /// <summary>
