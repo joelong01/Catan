@@ -13,15 +13,13 @@ namespace Catan10
 {
     public sealed partial class RollCtrl : UserControl
     {
-        #region Delegates + Fields + Events + Enums
+
 
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(RollCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
 
         public static readonly DependencyProperty RollProperty = DependencyProperty.Register("Roll", typeof(RollModel), typeof(RollCtrl), new PropertyMetadata(new RollModel()));
 
-        #endregion Delegates + Fields + Events + Enums
 
-        #region Properties
 
         public TileOrientation Orientation
         {
@@ -35,19 +33,13 @@ namespace Catan10
             set => SetValue(RollProperty, value);
         }
 
-        #endregion Properties
 
-        #region Constructors + Destructors
 
         public RollCtrl()
         {
             this.InitializeComponent();
             FlipClose.Begin();
         }
-
-        #endregion Constructors + Destructors
-
-        #region Methods
 
         public Task GetFlipTask(TileOrientation orientation)
         {
@@ -80,52 +72,83 @@ namespace Catan10
             }
         }
 
-        #endregion Methods
     }
 
     public class RollModel : INotifyPropertyChanged
     {
-        #region Delegates + Fields + Events + Enums
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private int _diceOne = -1;
-        private int _diceTwo = -1;
+        private int _redDie = -1;
+        private int _whiteDie = -1;
         private TileOrientation _Orientation = TileOrientation.FaceDown;
         private bool _selected = false;
+        private SpecialDice _specialDice = SpecialDice.None;
 
-        #endregion Delegates + Fields + Events + Enums
 
-        #region Properties
 
-        public int DiceOne
+        private int _roll = -1;
+        public int Roll
         {
             get
             {
-                return _diceOne;
+                return _roll;
             }
             set
             {
-                if (value != _diceOne)
+                if (value != _roll)
                 {
-                    _diceOne = value;
+                    _roll = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+      
+        public SpecialDice SpecialDice
+        {
+            get
+            {
+                return _specialDice;
+            }
+            set
+            {
+                if (value != _specialDice)
+                {
+                    _specialDice = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int RedDie
+        {
+            get
+            {
+                return _redDie;
+            }
+            set
+            {
+                if (value != _redDie)
+                {
+                    _redDie = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Roll");
                 }
             }
         }
 
-        public int DiceTwo
+        public int WhiteDie
         {
             get
             {
-                return _diceTwo;
+                return _whiteDie;
             }
             set
             {
-                if (value != _diceTwo)
+                if (value != _whiteDie)
                 {
-                    _diceTwo = value;
+                    _whiteDie = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Roll");
                 }
@@ -151,9 +174,6 @@ namespace Catan10
             }
         }
 
-        [JsonIgnore]
-        public int Roll => DiceOne + DiceTwo;
-
         public bool Selected
         {
             get
@@ -173,28 +193,25 @@ namespace Catan10
 
         static private MersenneTwister Twist { get; } = new MersenneTwister((int)DateTime.Now.Ticks);
 
-        #endregion Properties
 
-        #region Constructors + Destructors
 
         public RollModel()
         {
         }
 
-        #endregion Constructors + Destructors
+   
 
-        #region Methods
 
         public void Randomize()
         {
-            DiceOne = Twist.Next(1, 7);
-            DiceTwo = Twist.Next(1, 7);
+            RedDie = Twist.Next(1, 7);
+            WhiteDie = Twist.Next(1, 7);
             Selected = false;
         }
 
         public override string ToString()
         {
-            return $"[Selected={Selected}][Roll={Roll}][One={DiceOne}][Two={DiceTwo}][Orientation={Orientation}]";
+            return $"[Selected={Selected}][Roll={Roll}][Red={RedDie}][White={WhiteDie}][Special={SpecialDice}][Orientation={Orientation}]";
         }
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -202,6 +219,5 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion Methods
     }
 }

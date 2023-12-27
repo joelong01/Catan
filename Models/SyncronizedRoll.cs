@@ -71,7 +71,7 @@ namespace Catan10
         {
             get
             {
-                return ((CurrentRoll.DiceOne > 0 && CurrentRoll.DiceTwo > 0));
+                return ((CurrentRoll.RedDie > 0 && CurrentRoll.WhiteDie > 0));
             }
         }
 
@@ -97,8 +97,8 @@ namespace Catan10
             for (int i = 0; i < rolls.Count; i++)
             {
                 LatestRolls[i].Selected = rolls[i].Selected;
-                LatestRolls[i].DiceOne = rolls[i].DiceOne;
-                LatestRolls[i].DiceTwo = rolls[i].DiceTwo;
+                LatestRolls[i].RedDie = rolls[i].RedDie;
+                LatestRolls[i].WhiteDie = rolls[i].WhiteDie;
                 LatestRolls[i].Orientation = rolls[i].Orientation;
                 if (rolls[i].Selected)
                 {
@@ -107,7 +107,7 @@ namespace Catan10
             }
             NotifyPropertyChanged("LatestRolls");
             MustRoll = false;
-            RollValues.Add(CurrentRoll.DiceOne + CurrentRoll.DiceTwo);
+            RollValues.Add(CurrentRoll.RedDie + CurrentRoll.WhiteDie);
             return CurrentRoll;
         }
 

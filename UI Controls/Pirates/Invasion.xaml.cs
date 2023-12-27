@@ -42,13 +42,14 @@ namespace Catan10
         }
  
 
-        public void Next()
+        public int Next()
         {
             currentCount++;
-            currentCount = currentCount % 6;
-            double angle = currentCount * 60;
+            currentCount = currentCount % 8;
+            double angle = currentCount * 45;
             PirateShipAnimation.To = angle;
             SB_RotateShip.Begin();
+            return currentCount;
         }
     }
 }

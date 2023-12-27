@@ -38,7 +38,7 @@ namespace Catan10
         public async Task Do(IGameController gameController)
         {
             await gameController.Log.RollLog.RedoRoll();
-            if (gameController.Log.RollLog.LastRoll == 7)
+            if (gameController.Log.RollLog.LastRoll.Roll == 7)
             {
                 await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
             }

@@ -239,6 +239,9 @@
     <Compile Include="UI Controls\OfferCtrl.xaml.cs">
       <DependentUpon>OfferCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\Pirates\EntryGateCtrl.xaml.cs">
+      <DependentUpon>EntryGateCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\Pirates\Invasion.xaml.cs">
       <DependentUpon>Invasion.xaml</DependentUpon>
     </Compile>
@@ -451,6 +454,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Assets\Pirates\PirateShip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ContentDialogs\ErrorDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -496,6 +503,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\OfferCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Pirates\EntryGateCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

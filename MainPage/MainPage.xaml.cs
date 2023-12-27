@@ -602,7 +602,7 @@ namespace Catan10
             }
         }
 
-        private async void OnNumberTapped(int roll)
+        private async void OnNumberTapped(RollModel roll)
         {
             if (!MainPageModel.EnableRolls)
             {

@@ -8,7 +8,7 @@ using Windows.UI.Xaml.Input;
 
 namespace Catan10
 {
-    public delegate void RollSelectedHandler(int roll);
+    public delegate void RollSelectedHandler(RollModel roll);
     /// <summary>
     ///     has a button with a number on it to enter the roll
     ///     keeps track of the count of the roll and the % of the roll
@@ -46,7 +46,11 @@ namespace Catan10
         {
             if (( ( Button )sender ).Content is CatanNumber number)
             {
-                RollSelected?.Invoke(number.Number);
+                RollModel rm = new RollModel()
+                {
+                    Roll = number.Number
+                };
+                RollSelected?.Invoke(rm);
             }
         }
     }

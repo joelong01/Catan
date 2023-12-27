@@ -93,6 +93,7 @@ namespace Catan10
                     _KnightsPlayed = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("KnightsLeft");
+                    NotifyPropertyChanged("TotalKnightRanks");
                 }
             }
         }

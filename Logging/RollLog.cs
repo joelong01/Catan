@@ -57,19 +57,19 @@ namespace Catan10
 
         private int[] RollCount(IEnumerable<RollState> stack)
         {
-            int[] counts = new int[11]; // yes, there really are 11 different possible roll
+            int[] counts = new int[11]; // yes, there really are 11 different possible rollModel
             Array.Clear(counts, 0, 11);
             if (Done.Count != 0)
             {
                 //
-                //  go through each roll and fill in the array with the count of what was rolled
+                //  go through each rollModel and fill in the array with the count of what was rolled
                 foreach (var rollState in stack)
                 {
-                    //12/20/2023 - when an Undo happens, the top of the stack is going to have a 0 in the roll.
+                    //12/20/2023 - when an Undo happens, the top of the stack is going to have a 0 in the rollModel.
                     //             just skip it.
-                    if (rollState.Roll > 1 && rollState.Roll < 13)
+                    if (rollState.RollModel.Roll > 1 && rollState.RollModel.Roll < 13)
                     {
-                        counts[rollState.Roll - 2]++;
+                        counts[rollState.RollModel.Roll - 2]++;
                     }
                 }
             }
@@ -127,7 +127,7 @@ namespace Catan10
             return (counts, percents);
         }
         /// <summary>
-        ///     called while handling the roll processing
+        ///     called while handling the rollModel processing
         /// </summary>
         /// <param name="action"></param>
 
@@ -135,7 +135,7 @@ namespace Catan10
         {
 
 
-            int roll = 0;
+            RollModel rollModel;
 
 
 
@@ -143,17 +143,17 @@ namespace Catan10
             if (action == RollAction.Undo)
             {
                 toAddForNoResourceCount = -1;
-                //12/20/2023: when undoing, the actuall roll is on the undo stack
-                roll = Undone.Peek().Roll;
+                //12/20/2023: when undoing, the actuall rollModel is on the undo stack
+                rollModel = Undone.Peek().RollModel;
             }
             else
             {
-                roll = Done.Peek().Roll;
+                rollModel = Done.Peek().RollModel;
             }
 
             //
-            //   now update stats for the roll
-            if (roll == 7)
+            //   now update stats for the rollModel
+            if (rollModel.Roll == 7)
             {
 
                 foreach (PlayerModel player in GameController.PlayingPlayers)
@@ -165,10 +165,10 @@ namespace Catan10
 
 
             //
-            //  get the resources for the roll
+            //  get the resources for the rollModel
             foreach (var player in GameController.PlayingPlayers)
             {
-                (TradeResources Granted, TradeResources Baroned) = GameController.ResourcesForRoll(player, roll, action);
+                (TradeResources Granted, TradeResources Baroned) = GameController.ResourcesForRoll(player, rollModel.Roll, action);
 
                 //12/20/2023: we pushed the action into ResourcesForRoll to make this work always
                 player.GameData.Resources.ResourcesLostToBaron += Baroned;
@@ -383,7 +383,7 @@ namespace Catan10
         private void UpdateRollStats()
         {
 
-            if (Done.Count == 1 && Done.Peek().Roll == 0)
+            if (Done.Count == 1 && Done.Peek().RollModel.Roll == 0)
             {
                 TwoPercent = "";
                 ThreePercent = "";
@@ -429,7 +429,7 @@ namespace Catan10
 
 
             }
-            else // 12/20/2023 - if you undo the first roll, you don't want to see NaN, you want empty strings
+            else // 12/20/2023 - if you undo the first rollModel, you don't want to see NaN, you want empty strings
             {
 
                 TwoPercent = "";
@@ -458,13 +458,13 @@ namespace Catan10
             //
             if (action != RollAction.Undo)
             {
-                GameController.SetHighlightedTiles(Done.Peek().Roll);
+                GameController.SetHighlightedTiles(Done.Peek().RollModel.Roll);
                 await GameController.SetRandomTileToGold(Done.Peek().GoldTiles);
             }
             else
             {
                 GameController.StopHighlightingTiles();
-                //  await GameController.ResetRandomGoldTiles(); // 12/20/2023 - we want to see what tile is gold when the roll is undone
+                //  await GameController.ResetRandomGoldTiles(); // 12/20/2023 - we want to see what tile is gold when the rollModel is undone
             }
         }
 
@@ -478,6 +478,7 @@ namespace Catan10
             var top = Done.Pop();
             Contract.Assert(top.PlayerName == rollState.PlayerName);
             Done.Push(rollState);
+            NotifyPropertyChanged("LastRoll");
             UpdatePlayerStats(RollAction.Do);
             return this.UpdateUi(RollAction.Do);
         }
@@ -554,26 +555,26 @@ namespace Catan10
             }
         }
 
-        public int LastRoll
+        public RollModel LastRoll
         {
             get
             {
-                if (Done == null) return 0;
-                if (Done.Count == 0) return 0;
-                return Done.Peek().Roll;
+                if (Done == null) return null;
+                if (Done.Count == 0) return null;
+                return Done.Peek().RollModel;
             }
         }
 
-        public int NextRoll
+        public RollModel NextRoll
         {
             get
             {
                 if (Undone.Count > 0)
                 {
-                    return Undone.Peek().Roll;
+                    return Undone.Peek().RollModel;
                 }
 
-                return 0;
+                return null;
             }
         }
 
@@ -698,20 +699,25 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Task DoRoll(int roll, List<int> goldTiles)
+        public Task DoRoll(RollModel rollModel, List<int> goldTiles)
         {
             Contract.Assert(Undone.Count == 0, "You can't add a roll if you have roll in the unused stack");
 
             this.TraceMessage("Yuu commented ths out.  fix it.");
             // if (goldTiles == null) goldTiles = GameController.NextRandomGoldTiles;
-            var rollState = new RollState() { Roll = roll, GoldTiles = goldTiles };
+            var rollState = new RollState() 
+            { 
+                
+                RollModel = rollModel, 
+                GoldTiles = goldTiles 
+            };
             Done.Push(rollState);
             UpdatePlayerStats(RollAction.Do);
             return UpdateUi(RollAction.Do);
         }
 
         /// <summary>
-        ///     before you roll, you get the Undone Roll
+        ///     before you rollModel, you get the Undone RollModel
         /// </summary>
         /// <returns></returns>
         public RollState PopUndoneRoll()
@@ -721,7 +727,7 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     Before the roll, you create a RollState object and stick Random GoldTiles into it.
+        ///     Before the rollModel, you create a RollState object and stick Random GoldTiles into it.
         /// </summary>
         /// <param name="rollState"></param>
         /// <returns></returns>
@@ -731,8 +737,8 @@ namespace Catan10
             await GameController.SetRandomTileToGold(rollState.GoldTiles);
         }
         /// <summary>
-        ///     We have a RollState on the Undone stack that has the roll and we have a RollState on the Done stack
-        ///     that has a 0 for the roll. we pop the Undone and throw it away after setting the roll in the Done stack
+        ///     We have a RollState on the Undone stack that has the rollModel and we have a RollState on the Done stack
+        ///     that has a 0 for the rollModel. we pop the Undone and throw it away after setting the rollModel in the Done stack
         /// </summary>
         /// <returns></returns>
         public Task RedoRoll()
@@ -740,33 +746,33 @@ namespace Catan10
             Contract.Assert(CanRedo, "please check this before calling me");
             var undoneRollState = Undone.Pop();
             var doneRollState = Done.Peek();
-            Contract.Assert(undoneRollState.Roll != 0);
-            Contract.Assert(doneRollState.Roll == 0);
-            doneRollState.Roll = undoneRollState.Roll;
+            Contract.Assert(undoneRollState.RollModel.Roll != 0);
+            Contract.Assert(doneRollState.RollModel.Roll == 0);
+            doneRollState.RollModel = undoneRollState.RollModel;
 
             UpdatePlayerStats(RollAction.Redo);
             return UpdateUi(RollAction.Redo);
         }
 
         /// <summary>
-        ///     after a roll is completed, go to the RollStack and stick it into the top roll
+        ///     after a rollModel is completed, go to the RollStack and stick it into the top rollModel
         /// </summary>
         /// <param name="rolls"></param>
         /// <returns></returns>
-        public Task SetLastRoll(int roll)
+        public Task SetLastRoll(RollModel rollModel)
         {
             RollState rollState = Done.Peek();
 
-            Debug.Assert(roll > 1 && roll < 13);
-            rollState.Roll = roll;
+            Debug.Assert(rollModel.Roll > 1 && rollModel.Roll < 13);
+            rollState.RollModel = rollModel;
             UpdatePlayerStats(RollAction.Do);
             return UpdateUi(RollAction.Do);
         }
 
         /// <summary>
         ///     12/20/2023 - unfortunately when the idiot dev implemented this, there are 2 actions that are done in one log entry
-        ///     the first is setting the random gold tiles, the second is setting the roll. there was a bug where both got "undone"
-        ///     so here, we create a new undoneRollState that has the correct random gold tiles, but the roll set to 0 and we leave that 
+        ///     the first is setting the random gold tiles, the second is setting the rollModel. there was a bug where both got "undone"
+        ///     so here, we create a new undoneRollState that has the correct random gold tiles, but the rollModel set to 0 and we leave that 
         ///     in the Done stack.
         /// </summary>
         /// <returns></returns>
@@ -778,13 +784,13 @@ namespace Catan10
             RollState rollState = Done.Peek();
             RollState newRollState = new RollState
             {
-                Roll = rollState.Roll,
+                RollModel = rollState.RollModel,
                 GoldTiles = new List<int>(rollState.GoldTiles),
                 PlayerName = rollState.PlayerName
 
             };
             Undone.Push(newRollState);
-            rollState.Roll = 0;
+            rollState.RollModel.Roll = 0;
             UpdatePlayerStats(RollAction.Undo);
             return UpdateUi(RollAction.Undo);
         }
@@ -797,13 +803,13 @@ namespace Catan10
     {
         public List<int> GoldTiles { get; set; }
         public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer.PlayerName;
-        public int Roll { get; set; }
+        public RollModel RollModel { get; set; }
 
 
-        // I want to use this for debugging...you should never apply a roll to a different player
+        // I want to use this for debugging...you should never apply a rollModel to a different player
         public override string ToString()
         {
-            return $"[Roll={Roll}]";
+            return $"[Roll={RollModel}]";
         }
     }
 
@@ -811,11 +817,11 @@ namespace Catan10
     {
         bool CanRedo { get; }
 
-        int LastRoll { get; }
+        RollModel LastRoll { get; }
 
-        int NextRoll { get; }
+        RollModel NextRoll { get; }
 
-        Task DoRoll(int roll, List<int> goldTiles);
+        Task DoRoll(RollModel rollModel, List<int> goldTiles);
 
         Task RedoRoll();
 

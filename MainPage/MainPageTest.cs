@@ -336,15 +336,18 @@ namespace Catan10
             for (int i = 0; i < 3; i++)
             {
                 await AddPlayerLog.AddPlayer(this, MainPageModel.AllPlayers[i].PlayerName);
+                await Task.Delay(10);
             };
 
             await NextState(); // Order Done
             await NextState(); // Board Accepted
             await NextState(); // Start Game
             await NextState(); // Start Pick Resources
+            await Task.Delay(10);
 
             while (Log.GameState != GameState.DoneResourceAllocation)
             {
+                await Task.Delay(10);
                 await AutoSetBuildingAndRoad();
                 await NextState();
             }

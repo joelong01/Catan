@@ -305,6 +305,8 @@ namespace Catan10
         Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType);
         void AssignLargestArmy();
 
+        Task HandlePirateRoll(RollModel rollModel);
+
         #endregion Methods
 
         string PlayerListToCsv (List<PlayerModel> playersWithTooManyCards);

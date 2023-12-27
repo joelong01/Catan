@@ -183,6 +183,7 @@ namespace Catan10
     public enum TileLocation { Self = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
 
     public enum TileOrientation { FaceDown, FaceUp, None };
+    public enum SpecialDice { Yellow, Blue, Green, Pirate, None };
 
     //
     //  actions are things we can undo

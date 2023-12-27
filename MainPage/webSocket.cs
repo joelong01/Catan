@@ -51,7 +51,7 @@
         //{
         //    switch (msg.ID)
         //    {
-        //        case MessageType.Roll:
+        //        case MessageType.RollModel:
         //            if (_mainPage.GameState != GameState.WaitingForRoll)
         //            {
         //                await SendMessage(MessageType.Admonishment, $" {msg.User} stop fucking around!");

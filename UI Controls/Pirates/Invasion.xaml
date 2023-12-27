@@ -25,7 +25,8 @@
             <Setter Property="Margin" Value="0" />
             <Setter Property="Opacity" Value="1" />
             <Setter Property="ResourceType" Value="Sea" />
-            <Setter Property="RenderTransformOrigin" Value="0, 0" />
+            <Setter Property="RenderTransformOrigin" Value="0.5, 0.5" />
+
         </Style>
         <Storyboard x:Key="RotatePirateShip" x:Name="SB_RotateShip" AutoReverse="False">
             <DoubleAnimation Storyboard.TargetName="PirateShip" x:Name="PirateShipAnimation"
@@ -35,45 +36,55 @@
     </Control.Resources>
 
     <Grid Background="Transparent">
-        <Ellipse x:Name="Ellipse_Path" Width="300" Height="300" Fill="Transparent" Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" 
-                 StrokeThickness="4" StrokeDashArray="0.5"/>
+        <Ellipse x:Name="Ellipse_Path" Width="300" Height="300" Fill="Transparent"
+                Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeThickness="4" StrokeDashArray="0.5" />
 
         <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
             <local:TileCtrl.RenderTransform>
-                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="0" CenterX="50" CenterY="200" />
+                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="0" CenterX="0" CenterY="150" />
             </local:TileCtrl.RenderTransform>
         </local:TileCtrl>
         <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
             <local:TileCtrl.RenderTransform>
-                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="60" CenterX="50" CenterY="200" />
+                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="45" CenterX="0" CenterY="150" />
             </local:TileCtrl.RenderTransform>
         </local:TileCtrl>
         <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
             <local:TileCtrl.RenderTransform>
-                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="120" CenterX="50" CenterY="200" />
+                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="90" CenterX="0" CenterY="150" />
             </local:TileCtrl.RenderTransform>
         </local:TileCtrl>
         <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
             <local:TileCtrl.RenderTransform>
-                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="180" CenterX="50" CenterY="200" />
+                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="135" CenterX="0" CenterY="150" />
             </local:TileCtrl.RenderTransform>
         </local:TileCtrl>
         <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
             <local:TileCtrl.RenderTransform>
-                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="240" CenterX="50" CenterY="200" />
+                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="180" CenterX="0" CenterY="150" />
             </local:TileCtrl.RenderTransform>
         </local:TileCtrl>
         <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
             <local:TileCtrl.RenderTransform>
-                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="300" CenterX="50" CenterY="200" />
+                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="225" CenterX="0" CenterY="150" />
+            </local:TileCtrl.RenderTransform>
+        </local:TileCtrl>
+        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+            <local:TileCtrl.RenderTransform>
+                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="270" CenterX="0" CenterY="150" />
+            </local:TileCtrl.RenderTransform>
+        </local:TileCtrl>
+        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+            <local:TileCtrl.RenderTransform>
+                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="315" CenterX="0" CenterY="150" />
             </local:TileCtrl.RenderTransform>
         </local:TileCtrl>
         <Viewbox Canvas.ZIndex="99" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80"
-                Height="75" x:Name="PirateShip">
+                Height="75" x:Name="PirateShip" RenderTransformOrigin=".5 .5">
             <local:PirateShip />
             <Viewbox.RenderTransform>
-                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="0" CenterX="40" CenterY="185"
-                        ScaleX="1.0" ScaleY="1" />
+                <CompositeTransform TranslateX="0" TranslateY="-155" Rotation="0" CenterX="0" CenterY="155" ScaleX="1.0"
+                        ScaleY="1" />
             </Viewbox.RenderTransform>
         </Viewbox>
 
@@ -84,9 +95,23 @@
             </local:TileCtrl.RenderTransform>
         </local:TileCtrl>
 
-        <local:BaronCtrl HorizontalAlignment="Center" VerticalAlignment="Center" Width="100">
+        <local:BaronCtrl x:Name="CTRL_Baron" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Black" Width="50" Height="50"
+                Margin="0,0,0,0">
 
-        </local:BaronCtrl>
+            <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform">
+                <TextBlock x:Name="TB_CityCount" FontSize="32" Text="4" Foreground="Red" />
 
+            </Viewbox>
+        </Grid>
+
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Black" Width="50" Height="50"
+                Margin="0,0,0,0">
+
+            <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform">
+                <TextBlock x:Name="TB_KnightCount" FontSize="32" Text="{x:Bind MainPageModel.TotalKnightRanks(), Mode=OneWay}" Foreground="Green" />
+
+            </Viewbox>
+        </Grid>
     </Grid>
 </UserControl>

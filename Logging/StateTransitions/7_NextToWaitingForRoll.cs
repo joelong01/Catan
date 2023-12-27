@@ -49,7 +49,7 @@ namespace Catan10
             gameController.StopHighlightingTiles();
             //
             // if we have a roll for this turn already, use it.
-            if ( this.RollState.Roll > 0)
+            if (this.RollState.RollModel != null && this.RollState.RollModel.Roll > 0)
             {
                 await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRoll);
             }

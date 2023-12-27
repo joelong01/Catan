@@ -15,26 +15,38 @@ namespace Catan10
     /// </summary>
     public class WaitingForRollToWaitingForNext : LogHeader, ILogController
     {
-        #region Properties
+
 
         public RollState RollState { get; set; } = null;
 
-        #endregion Properties
 
-        #region Constructors + Destructors
 
         public WaitingForRollToWaitingForNext() : base()
         {
         }
+        internal static async Task PostRollMessage(IGameController gameController, RollModel roll)
+        {
+            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
+            var rollState = gameController.Log.RollLog.Peek();
 
-        #endregion Constructors + Destructors
+            rollState.RollModel = roll;
 
-        #region Methods
+            WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
+            {
+                CanUndo = true,
+                RollState = rollState,
+                Action = CatanAction.ChangedState,
+                NewState = GameState.WaitingForNext,
+            };
+
+
+            await gameController.PostMessage(logHeader, ActionType.Normal);
+        }
 
         /// <summary>
-        ///    a Roll has been entered via clicking on the roll in the UI
+        ///    a RollModel has been entered via clicking on the roll in the UI
         ///
-        ///     the UI for the Roll has not been updated - need to call that here.
+        ///     the UI for the RollModel has not been updated - need to call that here.
         ///
         /// </summary>
         /// <param name="gameController"></param>
@@ -52,6 +64,14 @@ namespace Catan10
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
+
+            //
+            //   if this is a pirate game, handle the pirate roll
+
+            if (gameController.MainPageModel.GameInfo.Pirates)
+            {
+                await gameController.HandlePirateRoll(this.RollState.RollModel);
+            }
 
             //
             //  does anybody have any gold?
@@ -77,7 +97,7 @@ namespace Catan10
             // only the current player's machine should send this message.  everybody will get it
             //
             //  7/14/2021:  only count # cards in a hand on service games.  by not filling in the card count, the list will be length 0 for the check below
-            if (rollLog.LastRoll == 7)
+            if (rollLog.LastRoll.Roll == 7)
             {
                 await gameController.RolledSeven();
                 
@@ -110,27 +130,6 @@ namespace Catan10
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
             await gameController.Log.RollLog.UndoRoll();
         }
-        //
-        //  the rollstate is pushed to the look
-        internal static async Task PostRollMessage(IGameController gameController, int roll)
-        {
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
-            var rollState = gameController.Log.RollLog.Peek();
-          
-            rollState.Roll = roll;
-         
-            WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
-            {
-                CanUndo = true,
-                RollState = rollState,
-                Action = CatanAction.ChangedState,
-                NewState = GameState.WaitingForNext,
-            };
-
-
-            await gameController.PostMessage(logHeader, ActionType.Normal);
-        }
-
-        #endregion Methods
+    
     }
 }

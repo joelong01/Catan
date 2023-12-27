@@ -330,6 +330,7 @@
             <ImageBrush x:Key="bmDice_6" ImageSource="Assets/Dice/sixWhite.svg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmCherry" ImageSource="Assets/cherry.jpg" Stretch="UniformToFill" />
             <ImageBrush x:Key="bmMaple" ImageSource="Assets/maple.jpg" Stretch="UniformToFill" />
+            <ImageBrush x:Key="bmWater" ImageSource="Assets/water.png" Stretch="UniformToFill" />
             <!--  TileType Brushes - should be one per ResourceType enum value, but these are the hex images  -->
             <ImageBrush x:Key="TileType.Back" ImageSource="Assets/Tiles/back.jpg" Stretch="UniformToFill" />
             <ImageBrush x:Key="TileType.Sea" ImageSource="Assets/Tiles/back.jpg" Stretch="UniformToFill" />

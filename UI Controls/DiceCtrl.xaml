@@ -1,9 +1,14 @@
-﻿<UserControl x:Class="Catan10.DiceCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="250" d:DesignWidth="250" mc:Ignorable="d">
+﻿<UserControl x:Class="Catan10.DiceCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="250" d:DesignWidth="250"
+        mc:Ignorable="d">
     <Control.Resources>
         <!--<Ellipse Width="50" Height="50" Margin="25,25,0,0" HorizontalAlignment="Left"
                 VerticalAlignment="Top" Fill="{Binding Path=FillColor, Mode=OneWay, FallbackValue=White}" />-->
         <Style x:Key="Dice_EllipseStyle" TargetType="Ellipse">
-            <Setter Property="Fill" Value="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}" />
+            <Setter Property="Fill"
+                    Value="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}" />
             <Setter Property="Height" Value="50" />
             <Setter Property="Width" Value="50" />
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -11,33 +16,44 @@
         </Style>
     </Control.Resources>
     <Viewbox>
-        <Grid Width="250" Height="250" BorderBrush="{Binding Path=FillColor, Mode=OneWay, TargetNullValue=Blue, FallbackValue=Red}" BorderThickness="{Binding Path=Thickness, Mode=OneWay, FallbackValue=10}" CornerRadius="20">
-            <Grid Name="one" Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=1, Mode=OneWay, FallbackValue=Visible}">
-                <Ellipse HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Dice_EllipseStyle}" />
+        <Grid Width="250" Height="250"
+                BorderBrush="{Binding Path=FillColor, Mode=OneWay, TargetNullValue=Blue, FallbackValue=Red}"
+                BorderThickness="{Binding Path=Thickness, Mode=OneWay, FallbackValue=10}" CornerRadius="20">
+            <Grid Name="one"
+                    Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=1, Mode=OneWay, FallbackValue=Visible}">
+                <Ellipse HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Style="{StaticResource Dice_EllipseStyle}" />
             </Grid>
-            <Grid Name="two" Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=2, Mode=OneWay, FallbackValue=Collapsed}">
+            <Grid Name="two"
+                    Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=2, Mode=OneWay, FallbackValue=Collapsed}">
                 <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
             </Grid>
-            <Grid Name="three" Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=3, Mode=OneWay, FallbackValue=Collapsed}">
+            <Grid Name="three"
+                    Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=3, Mode=OneWay, FallbackValue=Collapsed}">
                 <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Dice_EllipseStyle}" />
+                <Ellipse Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Style="{StaticResource Dice_EllipseStyle}" />
             </Grid>
-            <Grid Name="four" Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=4, Mode=OneWay, FallbackValue=Collapsed}">
+            <Grid Name="four"
+                    Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=4, Mode=OneWay, FallbackValue=Collapsed}">
                 <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="25,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="150,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
             </Grid>
-            <Grid Name="five" Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=5, Mode=OneWay, FallbackValue=Collapsed}">
+            <Grid Name="five"
+                    Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=5, Mode=OneWay, FallbackValue=Collapsed}">
                 <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="25,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="150,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Dice_EllipseStyle}" />
+                <Ellipse Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Style="{StaticResource Dice_EllipseStyle}" />
             </Grid>
-            <Grid Name="six" Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=6, Mode=OneWay, FallbackValue=Collapsed}">
+            <Grid Name="six"
+                    Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=6, Mode=OneWay, FallbackValue=Collapsed}">
                 <Ellipse Margin="25,20,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="25,90,0,0" Style="{StaticResource Dice_EllipseStyle}" />
                 <Ellipse Margin="25,155,0,0" Style="{StaticResource Dice_EllipseStyle}" />

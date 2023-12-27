@@ -86,8 +86,8 @@ namespace Catan10
                     MainPageModel.PlayingPlayers.ForEach((p) =>
                     {
                         p.GameData.RollOrientation = TileOrientation.FaceDown;
-                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceOne = 0;
-                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.DiceTwo = 0;
+                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.RedDie = 0;
+                        p.GameData.SyncronizedPlayerRolls.CurrentRoll.WhiteDie = 0;
                     });
 
                     //
@@ -476,8 +476,8 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     We store Rolls as RollModels which have both the GoldTiles (set before Roll) and the Roll (set after Roll).
-        ///     Once you are assigned a Roll, that is your roll.  you can undo it, but when Redo (or even Next) happens,
+        ///     We store Rolls as RollModels which have both the GoldTiles (set before RollModel) and the RollModel (set after RollModel).
+        ///     Once you are assigned a RollModel, that is your roll.  you can undo it, but when Redo (or even Next) happens,
         ///     you get the same Gold Tiles and the same value of the roll.
         /// </summary>
         /// <returns>the rollState object to use for this turn</returns>
@@ -832,7 +832,7 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     Need to clean up any UI actions  -- e.g. if the GameStarter clicks on "Roll to See who goes first", then that will cause
+        ///     Need to clean up any UI actions  -- e.g. if the GameStarter clicks on "RollModel to See who goes first", then that will cause
         ///     messages to be Posted to the other clients.  They end up calling this function.  it needs to be exactly the same as if the
         ///     button was clicked on.
         /// </summary>
@@ -1067,6 +1067,23 @@ namespace Catan10
 
             }
         }
+
+        public Task HandlePirateRoll(RollModel rollModel)
+        {
+            if (!MainPageModel.GameInfo.Pirates)
+            {
+                return Task.CompletedTask;
+            }
+
+            if (rollModel.SpecialDice == SpecialDice.Pirate)
+            {
+                int count =  CTRL_InvationCounter.Next();
+            }
+
+
+            return Task.CompletedTask;
+
+        }
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType actionType)
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
@@ -1180,8 +1197,8 @@ namespace Catan10
             {
                 rolls.Add(new RollModel()
                 {
-                    DiceOne = -1,
-                    DiceTwo = -1
+                    RedDie = -1,
+                    WhiteDie = -1
                 });
             }
             rolls[0].Selected = true;

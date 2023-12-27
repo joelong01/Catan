@@ -24,7 +24,7 @@ namespace Catan10
         private int _ThreeStarPosition = 0;
         private int _TwoStarPosition = 0;
         private bool _WebSocketConnected = false;
-        private string[] DynamicProperties { get; } = new string[] { "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
+        private string[] DynamicProperties { get; } = new string[] { "TotalKnightRanks", "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
         #endregion Properties + Fields
 
 
@@ -613,6 +613,27 @@ namespace Catan10
                 default:
                     return Visibility.Collapsed;
             }
+        }
+        /// <summary>
+        ///  go through all the players and add up the knight ranks for each one
+        /// </summary>
+        /// <returns></returns>
+
+        public string TotalKnightRanks()
+        {
+            int rank = 0; 
+            foreach (var player in PlayingPlayers)
+            {
+                foreach (var knight in player.GameData.Knights)
+                {
+                    if (knight.Activated)
+                    {
+                        rank += ( int )knight.KnightRank;
+                    }
+                }
+            }
+
+            return rank.ToString();
         }
     }
 }
