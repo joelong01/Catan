@@ -133,27 +133,29 @@
                 </ToggleButton.Content>
             </ToggleButton>
 
-            <ToggleButton Name="SpecialGreen" Grid.Row="1" Grid.Column="2" Background="DimGray" Padding="2"
+            <ToggleButton Name="SpecialGreen" Grid.Row="1" Grid.Column="2" Background="Black" Padding="2"
                     Click="OnSpecialClick" Tag="Green">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
-                        <local:EntryGateCtrl StrokeColor="LightGreen" Thickness="10" FillColor="Transparent" />
+                        <Border BorderBrush="Purple" BorderThickness="2" CornerRadius="5">
+                            <local:EntryGateCtrl StrokeColor="LightGreen" StrokeThickness="30" FillColor="Transparent" />
+                        </Border>
                     </Viewbox>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Name="SpecialYellow" Grid.Row="2" Grid.Column="2" Background="DimGray" Padding="2"
+            <ToggleButton Name="SpecialYellow" Grid.Row="2" Grid.Column="2" Background="Black" Padding="2"
                     Click="OnSpecialClick" Tag="Yellow">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
-                        <local:EntryGateCtrl StrokeColor="Yellow" Thickness="10" FillColor="Transparent" />
+                        <local:EntryGateCtrl StrokeColor="Yellow" StrokeThickness="30" FillColor="Transparent" />
                     </Viewbox>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Name="SpecialBlue" Grid.Row="3" Grid.Column="2" Background="DimGray" Padding="2"
+            <ToggleButton Name="SpecialBlue" Grid.Row="3" Grid.Column="2" Background="Black" Padding="2"
                     Click="OnSpecialClick" Tag="Blue">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
-                        <local:EntryGateCtrl StrokeColor="DarkBlue" Thickness="4" FillColor="Transparent" />
+                        <local:EntryGateCtrl StrokeColor="Blue" StrokeThickness="30" FillColor="Transparent" />
                     </Viewbox>
                 </ToggleButton.Content>
             </ToggleButton>
@@ -169,7 +171,7 @@
             </ToggleButton>
 
             <Button Grid.Row="6" Grid.Column="3" Padding="0" CornerRadius="5" BorderBrush="White" BorderThickness="1"
-                    Background="Black" Margin="5" Click="OnOk"  >
+                    Background="Black" Margin="5" Click="OnOk">
                 <Button.Content>
                     <Viewbox Stretch="Uniform">
                         <TextBlock Text="&#xE10B;" Foreground="White" FontSize="33" FontFamily="Segoe MDL2 Assets" />
@@ -231,7 +233,8 @@
                             <TextBlock Text="Last:" Style="{StaticResource RollGridTextStyle}"
                                     HorizontalAlignment="Left" />
 
-                            <TextBlock Text="{x:Bind MainPageModel.Log.RollLog.LastRoll.Roll, FallbackValue=?, Mode=OneWay}"
+                            <TextBlock
+                                    Text="{x:Bind MainPageModel.Log.RollLog.LastRoll.Roll, FallbackValue=?, Mode=OneWay}"
                                     HorizontalAlignment="Left" Style="{StaticResource RollGridTextStyle}" />
                         </StackPanel>
                     </StackPanel>

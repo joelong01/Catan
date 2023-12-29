@@ -200,7 +200,7 @@
     <Compile Include="Logging\StateTransitions\8c_SupToGoldTile.cs" />
     <Compile Include="Logging\StateTransitions\1_WaitingForPlayers.cs" />
     <Compile Include="Logging\StateTransitions\6b_MovedBaron.cs" />
-    <Compile Include="Logging\StateTransitions\7_NextToWaitingForRoll.cs" />
+    <Compile Include="Logging\StateTransitions\7_NextToPickRandomGold.cs" />
     <Compile Include="Logging\StateTransitions\2_PickingBoard.cs" />
     <Compile Include="Logging\StateTransitions\4_BeginResourceAllocation.cs" />
     <Compile Include="Logging\StateTransitions\6_RollToWaitingForNext.cs" />

@@ -269,7 +269,7 @@ namespace Catan10
             var building = GetHighestPipsBuilding();
             if (building == null)
             {
-                Debug.WriteLine("got null building)");
+                this.TraceMessage("got null building)");
             }
             await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
             if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.City))
@@ -684,7 +684,7 @@ namespace Catan10
                     List<BuildingCtrl> list = dictPipsToBuildings[hideIndex];
                     if (list.Count == 0)
                     {
-                        Debug.WriteLine($"{hideIndex} doesn't have any buildings");
+                        this.TraceMessage($"{hideIndex} doesn't have any buildings");
                     }
                     foreach (BuildingCtrl building in list)
                     {
@@ -708,13 +708,13 @@ namespace Catan10
                 List<BuildingCtrl> list = dictPipsToBuildings[i];
                 if (list.Count == 0)
                 {
-                    Debug.WriteLine($"going up and no buildigs for {i}");
+                    this.TraceMessage($"going up and no buildigs for {i}");
                 }
                 foreach (BuildingCtrl building in list)
                 {
                     if (building.Pips == 0)  // throw out the ones that have no pips
                     {
-                        Debug.WriteLine("Buildings.pips == 0");
+                        this.TraceMessage("Buildings.pips == 0");
                         building.PipGroup = -1;
                         continue; // outside the main map or a desert next to nothing
                     }

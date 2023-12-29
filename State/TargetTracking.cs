@@ -14,7 +14,7 @@ namespace Catan10
         {
             Player = p;
             Tile = t;
-            foreach (var building in Tile.OwnedBuilding)
+            foreach (var building in Tile.OwnedBuildings)
             {
                 if (building.BuildingState == BuildingState.Settlement)
                 {

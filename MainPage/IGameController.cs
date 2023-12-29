@@ -312,12 +312,12 @@ namespace Catan10
 
         public void CompleteRedo()
         {
-            this.TraceMessage("complete");
+           // this.TraceMessage("complete");
         }
 
         public void CompleteUndo()
         {
-            this.TraceMessage("complete");
+           // this.TraceMessage("complete");
         }
 
         public RandomBoardSettings CurrentRandomBoard()
@@ -1266,9 +1266,12 @@ namespace Catan10
 
                 }
 
-                UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
-                CalculateAndSetLongestRoad();
+              
+                
             }
+
+            CalculateAndSetLongestRoad();
+            UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
         }
 
         /// <summary>

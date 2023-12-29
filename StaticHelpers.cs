@@ -25,6 +25,50 @@ using Windows.UI.Xaml.Media.Animation;
 
 namespace Catan10
 {
+
+    public static class ListExtensions
+    {
+        public static string ToString<T>(this List<T> list, char separator)
+        {
+            if (list == null || list.Count == 0)
+                return string.Empty;
+
+            return string.Join(separator, list.Select(item => item?.ToString()));
+        }
+
+        public static string FlattenMethod<T>(this List<T> list, string methodName, char sep)
+        {
+            if (list == null)
+                throw new ArgumentNullException(nameof(list));
+
+            var methodInfo = typeof(T).GetMethod(methodName);
+            if (methodInfo == null)
+                throw new InvalidOperationException($"No method named '{methodName}' found in type {typeof(T)}.");
+
+            return string.Join(sep, list.Select(item =>
+            {
+                var methodResult = methodInfo.Invoke(item, null);
+                return methodResult?.ToString() ?? string.Empty;
+            }));
+        }
+
+        public static string FlattenProperty<T>(this List<T> list, string propertyName, string sep)
+        {
+            if (list == null)
+                throw new ArgumentNullException(nameof(list));
+
+            var propertyInfo = typeof(T).GetProperty(propertyName);
+            if (propertyInfo == null)
+                throw new InvalidOperationException($"No property named '{propertyName}' found in type {typeof(T)}.");
+
+            return string.Join(sep, list.Select(item =>
+            {
+                var propertyValue = propertyInfo.GetValue(item);
+                return propertyValue?.ToString() ?? string.Empty;
+            }));
+        }
+    }
+
     public static class BindingExtensions
 
     {
@@ -109,7 +153,7 @@ namespace Catan10
     {
         #region Properties
 
-        public static bool IsInVisualStudioDesignMode => !(Application.Current is App);
+        public static bool IsInVisualStudioDesignMode => !( Application.Current is App );
 
         #endregion Properties
 
@@ -177,7 +221,7 @@ namespace Catan10
                     Y = pt.Y - pointMouseDown.Y
                 };
 
-                if (!(control.RenderTransform is CompositeTransform compositeTransform))
+                if (!( control.RenderTransform is CompositeTransform compositeTransform ))
                 {
                     compositeTransform = new CompositeTransform();
                     control.RenderTransform = compositeTransform;
@@ -252,7 +296,7 @@ namespace Catan10
             }
             catch (Exception except)
             {
-                Debug.WriteLine(except.ToString());
+                MainPage.Current.TraceMessage(except.ToString());
             }
 
             return null;
@@ -261,7 +305,7 @@ namespace Catan10
         public static async Task<string> GetUserString(string title, string defaultText)
         {
             var inputTextBox = new TextBox { AcceptsReturn = false, Text = defaultText };
-            (inputTextBox as FrameworkElement).VerticalAlignment = VerticalAlignment.Bottom;
+            ( inputTextBox as FrameworkElement ).VerticalAlignment = VerticalAlignment.Bottom;
             var dialog = new ContentDialog
             {
                 Content = inputTextBox,
@@ -306,12 +350,12 @@ namespace Catan10
 
         public static bool IsNumber(VirtualKey key)
         {
-            if ((int)key >= (int)VirtualKey.Number0 && (int)key <= (int)VirtualKey.Number9)
+            if (( int )key >= ( int )VirtualKey.Number0 && ( int )key <= ( int )VirtualKey.Number9)
             {
                 return true;
             }
 
-            if ((int)key >= (int)VirtualKey.NumberPad0 && (int)key <= (int)VirtualKey.NumberPad9)
+            if (( int )key >= ( int )VirtualKey.NumberPad0 && ( int )key <= ( int )VirtualKey.NumberPad9)
             {
                 return true;
             }
@@ -321,7 +365,7 @@ namespace Catan10
 
         public static T ParseEnum<T>(string value)
         {
-            return (T)Enum.Parse(typeof(T), value);
+            return ( T )Enum.Parse(typeof(T), value);
         }
 
         public static T Peek<T>(this List<T> list)
@@ -494,9 +538,9 @@ namespace Catan10
             return tcs.Task;
         }
 
-        public static void TraceMessage(this object o, string toWrite, int indentLevel=0, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
+        public static void TraceMessage(this object o, string toWrite, int indentLevel = 0, [CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
-            for(int i=0; i<indentLevel; i++)
+            for (int i = 0; i < indentLevel; i++)
             {
                 Debug.Indent();
             }
@@ -525,7 +569,7 @@ namespace Catan10
             {
                 if (Enum.IsDefined(typeof(T), intEnumValue))
                 {
-                    returnValue = (T)(object)intEnumValue;
+                    returnValue = ( T )( object )intEnumValue;
                     return true;
                 }
             }

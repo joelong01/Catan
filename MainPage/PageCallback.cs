@@ -558,6 +558,7 @@ namespace Catan10
         //
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
+         //   this.TraceMessage($"Tile={targetTile} CurrentPlayer={CurrentPlayer.PlayerName} Owners={targetTile.OwnedBuildings.FlattenProperty("Owner", ",")}" );
             if (CurrentGameState != GameState.MustMoveBaron) return;
 
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
@@ -578,41 +579,7 @@ namespace Catan10
                 //
                 PlayerModel victim = (PlayerModel)((MenuFlyoutItem)s).Tag;
                 ResourceType stolenResource = ResourceType.None;
-                if (victim != null && MainPageModel.Settings.IsServiceGame) // targeted nobody
-                {
-                    var source = ResourceCardCollection.Flatten(victim.GameData.Resources.CurrentResources);
-                    Contract.Assert(source.ResourceCount == source.Count);
-
-                    if (source.ResourceCount > 0) // it is ok to target a player with no cards
-                    {
-                        source.Shuffle();
-                        var destination = new ResourceCardCollection(false);
-
-                        TakeCardDlg dlg = new TakeCardDlg()
-                        {
-                            To = CurrentPlayer,
-                            From = victim,
-                            SourceOrientation = TileOrientation.FaceDown,
-                            HowMany = 1,
-                            Source = source,
-                            Destination = destination,
-                            Instructions = $"Take a card from {victim.PlayerName}"
-                        };
-
-                        var ret = await dlg.ShowAsync();
-                        if (ret != ContentDialogResult.Primary)
-                        {
-                            await ShowErrorMessage("You cancelled out of the dialog.  I'll pick a Random card for you.\n\n", "Catan", "");
-                            Random rand = new Random((int)DateTime.Now.Ticks);
-
-                            int index = rand.Next(source.Count);
-                            destination.Add(source[index]);
-                        }
-
-                        Contract.Assert(destination.Count == 1);
-                        stolenResource = destination[0].ResourceType;
-                    }
-                }
+             
                 //
                 //  log to tell the other clients what we did
                 await MovedBaronLog.PostLog(this,
@@ -696,7 +663,7 @@ namespace Catan10
             }
             else
             {
-                foreach (BuildingCtrl settlement in targetTile.OwnedBuilding)
+                foreach (BuildingCtrl settlement in targetTile.OwnedBuildings)
                 {
                     string s = "";
 
@@ -729,7 +696,7 @@ namespace Catan10
                     }
                 }
 
-                if (targetTile.OwnedBuilding.Count == 0)
+                if (targetTile.OwnedBuildings.Count == 0)
                 {
                     item = new MenuFlyoutItem
                     {
@@ -1411,7 +1378,7 @@ namespace Catan10
                 if (newState == BuildingState.None)
                 {
                     // tell the tile that this settlement is no longer owned
-                    key.Tile.OwnedBuilding.Remove(building);
+                    key.Tile.OwnedBuildings.Remove(building);
                     if (_gameView.HasIslands)
                     {
                         Island island = _gameView.GetIsland(key.Tile);
@@ -1427,9 +1394,9 @@ namespace Catan10
                 else
                 {
                     // tell the tile that this settlement is owned
-                    if (key.Tile.OwnedBuilding.Contains(building) == false && building.BuildingState != BuildingState.Knight) // 12/23/2023: don't count BuyOrUpgradeKnight as a TileOwner so that resource allocation works
+                    if (key.Tile.OwnedBuildings.Contains(building) == false && building.BuildingState != BuildingState.Knight) // 12/23/2023: don't count BuyOrUpgradeKnight as a TileOwner so that resource allocation works
                     {
-                        key.Tile.OwnedBuilding.Add(building);
+                        key.Tile.OwnedBuildings.Add(building);
                     }
                     if (_gameView.HasIslands)
                     {

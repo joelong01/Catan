@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Catan10.CatanService;
+using System.Diagnostics;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -84,6 +85,8 @@ namespace Catan10
 
         private void OnTileRightTapped(object sender, RightTappedRoutedEventArgs e)
         {
+
+           
             _tileControlCallback?.TileRightTapped(this, e);
         }
 
@@ -141,7 +144,7 @@ namespace Catan10
 
         internal void Reset()
         {
-            OwnedBuilding.Clear();
+            OwnedBuildings.Clear();
             StopHighlightingTile();
         }
 
@@ -234,7 +237,7 @@ namespace Catan10
             set => _number.NumberStyle = value;
         }
 
-        public List<BuildingCtrl> OwnedBuilding { get; } = new List<BuildingCtrl>();
+        public List<BuildingCtrl> OwnedBuildings { get; } = new List<BuildingCtrl>();
 
         public int Pips
         {

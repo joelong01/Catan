@@ -74,8 +74,8 @@ namespace Catan10
                 if (lines == 3) break;
             }
 
-            Debug.WriteLine(actionLine);
-            Debug.WriteLine(undoLine + "\n");
+            this.TraceMessage(actionLine);
+            this.TraceMessage(undoLine + "\n");
         }
 
         public static bool PrintLogFlag { get; set; } = false;

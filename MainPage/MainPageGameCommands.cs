@@ -678,7 +678,7 @@ namespace Catan10
                 }
 
                 bool impactsCurrentPlayer = false;
-                foreach (var building in targetTile.OwnedBuilding)
+                foreach (var building in targetTile.OwnedBuildings)
                 {
                     //  got to go through all of them because you don't want
                     //  to pick a tile that impacts the CurrentPlayer
@@ -690,11 +690,11 @@ namespace Catan10
                     }
                 }
 
-                if (!impactsCurrentPlayer && targetTile.OwnedBuilding.Count > 0)
+                if (!impactsCurrentPlayer && targetTile.OwnedBuildings.Count > 0)
                 {
                     //
                     //  now go through and add them to the list
-                    foreach (var building in targetTile.OwnedBuilding)
+                    foreach (var building in targetTile.OwnedBuildings)
                     {
                         targetList.Add(new Target(building.Owner, targetTile));
                         if (weighCities && building.BuildingState == BuildingState.City)

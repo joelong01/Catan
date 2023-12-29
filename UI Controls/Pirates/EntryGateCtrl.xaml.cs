@@ -29,8 +29,12 @@ namespace Catan10
 
         public static readonly DependencyProperty StrokeColorProperty = DependencyProperty.Register("StrokeColor", typeof(SolidColorBrush), typeof(EntryGateCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("FillColor", typeof(SolidColorBrush), typeof(DiceCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty ThicknessProperty = DependencyProperty.Register("Thickness", typeof(Thickness), typeof(DiceCtrl), new PropertyMetadata(new Thickness(5)));
-
+         public static readonly DependencyProperty StrokeThicknessProperty = DependencyProperty.Register("StrokeThickness", typeof(double), typeof(EntryGateCtrl), new PropertyMetadata(3.0));
+        public double StrokeThickness
+        {
+            get => ( double )GetValue(StrokeThicknessProperty);
+            set => SetValue(StrokeThicknessProperty, value);
+        }
         public SolidColorBrush FillColor
         {
             get => ( SolidColorBrush )GetValue(FillColorProperty);
@@ -41,11 +45,7 @@ namespace Catan10
             get => ( SolidColorBrush )GetValue(StrokeColorProperty);
             set => SetValue(StrokeColorProperty, value);
         }
-        public Thickness Thickness
-        {
-            get => ( Thickness )GetValue(ThicknessProperty);
-            set => SetValue(ThicknessProperty, value);
-        }
+ 
 
 
     }
