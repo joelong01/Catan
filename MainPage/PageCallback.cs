@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
-
+using Catan10.Logging.StateTransitions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -49,6 +49,24 @@ namespace Catan10
 
         #region Methods
 
+        public async Task DestroyCity(BuildingCtrl building)
+        {
+            if (building.Owner != CurrentPlayer) return;
+
+            if (building.City.HasWall)
+            {
+                await DestroyWall.PostDestroyWall(this, building);
+
+            }
+            else
+            {
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
+            }
+
+            await DestroyCity_Next.PostLog(this);
+
+        }
+
         /// <summary>
         ///     called after the settlement status has been updated.  the PlayerData has already been fixed to represent the new state
         ///     the Views bind directly to the PlayerData, so we don't do anything with the Score (or anything else with PlayerData)
@@ -90,7 +108,7 @@ namespace Catan10
 
             //
             //  NOTE:  these have to be called in this order so that the undo works correctly
-            //  await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.UpdateBuildingState, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
+            //  await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.ProtectCity, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
             CalculateAndSetLongestRoad();
         }
@@ -757,7 +775,7 @@ namespace Catan10
 
             return MoveKnightLog.PostLog(this, knight);
         }
-           
+
         //
         //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
         ///

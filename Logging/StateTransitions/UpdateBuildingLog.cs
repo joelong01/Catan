@@ -21,10 +21,14 @@ namespace Catan10
             Entitlement entitlement = Entitlement.Undefined;
             if (newState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
             if (newState == BuildingState.City) entitlement = Entitlement.City;
-            if (newState == BuildingState.Knight) entitlement = Entitlement.BuyOrUpgradeKnight; 
+            if (newState == BuildingState.Knight) entitlement = Entitlement.BuyOrUpgradeKnight;
+
+            if (newState == BuildingState.Settlement && building.BuildingState == BuildingState.City) entitlement = Entitlement.DestroyCity;
 
             if (gameController.CurrentPlayer.GameData.Resources.HasEntitlement(entitlement) == false)
+            {
                 return; // user double clicked
+            }
 
             UpdateBuildingLog logHeader = new UpdateBuildingLog()
             {
@@ -47,7 +51,8 @@ namespace Catan10
         }
         public Task Redo(IGameController gameController)
         {
-            return gameController.UpdateBuilding(this, ActionType.Redo);
+            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.DestroyCity);
+            return Do(gameController);
         }
 
         public Task Undo(IGameController gameController)

@@ -115,7 +115,7 @@ namespace Catan10
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return ((bool)value) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
+            return ( ( bool )value ) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -124,7 +124,7 @@ namespace Catan10
             {
                 if (value is TileOrientation)
                 {
-                    if (((TileOrientation)value) == TileOrientation.FaceDown)
+                    if (( ( TileOrientation )value ) == TileOrientation.FaceDown)
                     {
                         return false;
                     }
@@ -151,12 +151,12 @@ namespace Catan10
             {
                 if (parameter is string)
                 {
-                    if (((string)parameter).ToLower() == "true")  // pass in TRUE to invert!
+                    if (( ( string )parameter ).ToLower() == "true")  // pass in TRUE to invert!
                     {
-                        return ((bool)value == false) ? Visibility.Visible : Visibility.Collapsed;
+                        return ( ( bool )value == false ) ? Visibility.Visible : Visibility.Collapsed;
                     }
                 }
-                return (bool)value ? Visibility.Visible : Visibility.Collapsed;
+                return ( bool )value ? Visibility.Visible : Visibility.Collapsed;
             }
 
             return Visibility.Visible;
@@ -164,7 +164,7 @@ namespace Catan10
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            if ((Visibility)value == Visibility.Visible)
+            if (( Visibility )value == Visibility.Visible)
             {
                 return true;
             }
@@ -217,7 +217,7 @@ namespace Catan10
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return ((int)value) > 0 ? TileOrientation.FaceUp : TileOrientation.FaceDown;
+            return ( ( int )value ) > 0 ? TileOrientation.FaceUp : TileOrientation.FaceDown;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -226,7 +226,7 @@ namespace Catan10
             {
                 if (value is TileOrientation)
                 {
-                    if (((TileOrientation)value) == TileOrientation.FaceDown)
+                    if (( ( TileOrientation )value ) == TileOrientation.FaceDown)
                     {
                         return 0;
                     }
@@ -374,7 +374,7 @@ namespace Catan10
         {
             HarborType harbor = (HarborType)value;
             string key = "HarborType." + harbor.ToString();
-            return (Brush)App.Current.Resources[key];
+            return ( Brush )App.Current.Resources[key];
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -411,7 +411,7 @@ namespace Catan10
         {
             try
             {
-                return Int32.Parse((string)value);
+                return Int32.Parse(( string )value);
             }
             catch
             {
@@ -424,7 +424,7 @@ namespace Catan10
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if ((int)value > 0)
+            if (( int )value > 0)
                 return Visibility.Visible;
 
             return Visibility.Collapsed;
@@ -469,6 +469,42 @@ namespace Catan10
         public object ConvertBack(object value, Type targetType,
                                   object parameter, string language)
         {
+            return value;
+        }
+    }
+
+    public class NegativeValueConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter,
+                              string language)
+        {
+            if (value is double doubleValue)
+            {
+                return -doubleValue;
+            }
+
+            if (value is Int32 intVal)
+            {
+                return -intVal;
+            }
+
+
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType,
+                                  object parameter, string language)
+        {
+            if (value is double doubleValue)
+            {
+                return -doubleValue;
+            }
+
+            if (value is Int32 intVal)
+            {
+                return -intVal;
+            }
+
             return value;
         }
     }
@@ -603,7 +639,7 @@ namespace Catan10
             ObservableCollection<StorageFile> list = bx.Tag as ObservableCollection<StorageFile>;
             foreach (StorageFile f in list)
             {
-                if (f.DisplayName == (string)value)
+                if (f.DisplayName == ( string )value)
                 {
                     return f;
                 }
@@ -655,7 +691,7 @@ namespace Catan10
                 return null;
             }
 
-            return ((BitmapImage)value).UriSource.ToString();
+            return ( ( BitmapImage )value ).UriSource.ToString();
         }
     }
 
@@ -680,7 +716,7 @@ namespace Catan10
                 return null;
             }
 
-            return ((BitmapImage)value).UriSource.ToString();
+            return ( ( BitmapImage )value ).UriSource.ToString();
         }
     }
 
@@ -698,7 +734,7 @@ namespace Catan10
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
-            return Int32.TryParse((string)value, out int result) ? result : 0;
+            return Int32.TryParse(( string )value, out int result) ? result : 0;
         }
     }
 
@@ -709,7 +745,7 @@ namespace Catan10
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             string s = "";
-            foreach (int val in (List<int>)value)
+            foreach (int val in ( List<int> )value)
             {
                 s += val.ToString() + ",";
             }
@@ -747,7 +783,7 @@ namespace Catan10
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             string s = "";
-            foreach (TileGroup val in (List<TileGroup>)value)
+            foreach (TileGroup val in ( List<TileGroup> )value)
             {
                 s += val.ToString() + ";";
             }
@@ -786,7 +822,7 @@ namespace Catan10
         {
             if (value is string)
             {
-                if (String.IsNullOrEmpty((string)value)) return Visibility.Collapsed;
+                if (String.IsNullOrEmpty(( string )value)) return Visibility.Collapsed;
             }
 
             return Visibility.Visible;

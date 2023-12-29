@@ -24,7 +24,7 @@ namespace Catan10
         private int _ThreeStarPosition = 0;
         private int _TwoStarPosition = 0;
         private bool _WebSocketConnected = false;
-        private string[] DynamicProperties { get; } = new string[] { "TotalKnightRanks", "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
+        private string[] DynamicProperties { get; } = new string[] { "TotalCities", "TotalKnightRanks", "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
         #endregion Properties + Fields
 
 
@@ -128,16 +128,16 @@ namespace Catan10
 
                     if (MainPage.Current.CurrentPlayer.GameData.Resources.UnspentEntitlements.Count > 0) return false;
 
-                    if (state == GameState.PickingBoard || state == GameState.WaitingForPlayers) 
+                    if (state == GameState.PickingBoard || state == GameState.WaitingForPlayers)
                     {
                         if (!IsServiceGame) return true; // if it is a local game, you can hit Next when you want
-                        ret = (MainPage.Current.TheHuman.PlayerName == this.GameInfo.Creator);
+                        ret = ( MainPage.Current.TheHuman.PlayerName == this.GameInfo.Creator );
                         return ret;
                     }
 
                     if (state == GameState.WaitingForNext)
                     {
-                        ret = (MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer); // only the person whose turn it is can hit "Next"
+                        ret = ( MainPage.Current.TheHuman == MainPage.Current.CurrentPlayer ); // only the person whose turn it is can hit "Next"
                         return ret;
                     }
 
@@ -187,7 +187,7 @@ namespace Catan10
                 //            it around because it is very important for the service game.  But it never changes for the local game.
 
                 if (Settings.IsLocalGame) return Log.CanRedo;
-                return (Log.CanRedo && MainPage.Current.CurrentPlayer.PlayerName == TheHuman);
+                return ( Log.CanRedo && MainPage.Current.CurrentPlayer.PlayerName == TheHuman );
             }
         }
 
@@ -205,7 +205,7 @@ namespace Catan10
             }
         }
 
-     
+
         [JsonIgnore]
         public bool EnableUiInteraction
         {
@@ -245,7 +245,7 @@ namespace Catan10
 
                 if (Settings.IsLocalGame) return Log.CanUndo;
 
-                return (Log.CanUndo && MainPage.Current.CurrentPlayer.PlayerName == TheHuman);
+                return ( Log.CanUndo && MainPage.Current.CurrentPlayer.PlayerName == TheHuman );
             }
         }
 
@@ -331,7 +331,7 @@ namespace Catan10
             }
         }
 
-        
+
         [JsonIgnore]
         public GameState GameState
         {
@@ -435,7 +435,7 @@ namespace Catan10
                 if (Log.GameState == GameState.WaitingForNewGame) return Visibility.Visible;
 
                 GameState state = Log.GameState;
-                if (EnableUiInteraction && (state == GameState.WaitingForRoll || state == GameState.WaitingForPlayers)) return Visibility.Visible;
+                if (EnableUiInteraction && ( state == GameState.WaitingForRoll || state == GameState.WaitingForPlayers )) return Visibility.Visible;
                 return Visibility.Collapsed;
             }
         }
@@ -508,13 +508,13 @@ namespace Catan10
             _unprocessedMessages += value;
             NotifyPropertyChanged();
             DynamicProperties.ForEach((name) => NotifyPropertyChanged(name));
-            
+
             return value;
         }
 
         [JsonIgnore]
         public int UnprocessedMessages => _unprocessedMessages;
-        
+
         [JsonIgnore]
         public bool WebSocketConnected
         {
@@ -582,7 +582,7 @@ namespace Catan10
 
             switch (gameState)
             {
-                
+
                 case GameState.WaitingForRoll:
                 case GameState.WaitingForRollForOrder:
                 case GameState.FinishedRollOrder:
@@ -615,13 +615,13 @@ namespace Catan10
             }
         }
         /// <summary>
-        ///  go through all the players and add up the knight ranks for each one
+        ///  go through all the players and add up the city ranks for each one
         /// </summary>
         /// <returns></returns>
 
-        public string TotalKnightRanks()
+        public int TotalKnightRanks()
         {
-            int rank = 0; 
+            int rank = 0;
             foreach (var player in PlayingPlayers)
             {
                 foreach (var knight in player.GameData.Knights)
@@ -633,7 +633,19 @@ namespace Catan10
                 }
             }
 
-            return rank.ToString();
+            return rank;
+        }
+
+        public int TotalCities()
+        {
+            int Cities = 0;
+            foreach (var player in PlayingPlayers)
+            {
+
+                Cities += ( int )player.GameData.Cities.Count;
+            }
+
+            return Cities;
         }
     }
 }

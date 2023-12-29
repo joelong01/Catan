@@ -1,44 +1,57 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
+
 using Catan.Proxy;
+using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 
 namespace Catan10
 {
-    internal class SupplementalToWaitingForRoll : LogHeader, ILogController
+    /// <summary>
+    ///
+    ///
+    /// </summary>
+    public class ChangeStateToMustDestroyCity : LogHeader, ILogController
     {
+
+
         public static async Task PostLog(IGameController gameController)
         {
 
-            SupplementalToWaitingForRoll logHeader = new SupplementalToWaitingForRoll()
+            ChangeStateToMustDestroyCity logHeader = new ChangeStateToMustDestroyCity()
             {
+                NewState = GameState.MustDestroyCity,
                 CanUndo = true,
-                Action = CatanAction.ChangedState,
-                NewState = GameState.WaitingForRoll,
+
+
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-
         public Task Do(IGameController gameController)
         {
-            ChangePlayerHelper.ChangePlayer(gameController, 2);
+            // move current player to the first player that needs to destroy a city
+           
             return Task.CompletedTask;
         }
 
         public Task Redo(IGameController gameController)
         {
-            return Do(gameController);
+            return Task.CompletedTask;
         }
 
         public Task Replay(IGameController gameController)
         {
-            return Do(gameController);
+            return Task.CompletedTask;
         }
 
         public Task Undo(IGameController gameController)
         {
-            ChangePlayerHelper.ChangePlayer(gameController, -2);
             return Task.CompletedTask;
         }
+
+
     }
 }

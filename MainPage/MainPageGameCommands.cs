@@ -44,7 +44,10 @@ namespace Catan10
             try
             {
                 MainPageModel.EnableUiInteraction = false;
-                bool ret = await UndoAsync();
+                do
+                {
+                    bool ret = await UndoAsync();
+                } while (Log.CanUndo && !Log.PeekAction.WaitForNext);
             }
             finally
             {
@@ -160,14 +163,11 @@ namespace Catan10
                         break;
 
                     case GameState.DoneResourceAllocation:
-                        if (Log.RollLog.CanRedo)
-                        {
-                            await DoneAllocResourcesToWaitingForNext.PostLog(this); // skip the roll and use the one that is there....
-                        }
-                        else
-                        {
-                            await DoneAllocResourcesToWaitingForRoll.PostLog(this);
-                        }
+                         await DoneAllocResourcesToPickingGoldTile.PostLog(this);
+                        
+                        break;
+                    case GameState.PickingRandomGoldTiles:
+                        Contract.Assert(false, "this should always be moved passed in the state transition classes");
                         break;
 
                     case GameState.WaitingForRoll:
@@ -180,14 +180,19 @@ namespace Catan10
                         Contract.Assert(false, "this is done in pagecallback");
                         break;
 
+                    case GameState.MustDestroyCity:
+                        Contract.Assert(false, "This is done via clicking on Cities");
+                        break;
                     case GameState.WaitingForNext:
+                        await GameContainer.ResetRandomGoldTiles();
                         if (HasSupplementalBuild)
                         {
                             await WaitingForNextToSupplemental.PostLog(this);
                         }
                         else
                         {
-                            await WaitingForNextToWaitingForRoll.PostLog(this);
+                            await WaitingForNextToPickingRandomGoldTiles.PostLog(this);
+                            
                         }
                         break;
                     case GameState.Supplemental:
@@ -197,12 +202,13 @@ namespace Catan10
                         if (NextPlayer.PlayerIdentifier == LastPlayerToRoll.PlayerIdentifier)
                         {
                             // this will skip the next player (+2 to current player)
-                            await SupplementalToWaitingForRoll.PostLog(this);
+                            await SupplementalToPickingGoldTiles.PostLog(this);
+                       
                         }
                         else
                         {
                             await SupplementalToSupplemental.PostLog(this);
-                          
+
                         }
 
                         break;
@@ -715,7 +721,7 @@ namespace Catan10
             //    return false;
             //}
 
-           // TheHuman = picker.Player;
+            // TheHuman = picker.Player;
             if (!ValidateBuilding && MainPageModel.PlayingPlayers.Count == 1)
             {
                 CurrentPlayer = TheHuman;  //  this is useful for debugging

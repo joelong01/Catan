@@ -40,15 +40,41 @@ namespace Catan10
             get => ( PlayerModel )GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
         }
- 
+
+
+        public static readonly DependencyProperty AngleProperty = DependencyProperty.Register("Angle", typeof(double), typeof(InvasionCtrl), new PropertyMetadata(0.0, AngleChanged));
+        public double Angle
+        {
+            get => ( double )GetValue(AngleProperty);
+            set => SetValue(AngleProperty, value);
+        }
+
+        private static void AngleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as InvasionCtrl;
+            var depPropValue = (double)e.NewValue;
+            depPropClass?.SetAngle(depPropValue);
+
+        }
+        private void SetAngle(double _v)
+        {
+            SB_RotateShip.Begin();
+        }
 
         public int Next()
         {
             currentCount++;
             currentCount = currentCount % 8;
-            double angle = currentCount * 45;
-            PirateShipAnimation.To = angle;
-            SB_RotateShip.Begin();
+            Angle = (double) currentCount * 45;
+            return currentCount;
+        }
+
+        public int Previous()
+        {
+            currentCount--;
+            if (currentCount < 0) currentCount += 8;
+            currentCount = currentCount % 8;
+            Angle = ( double )currentCount * 45;
             return currentCount;
         }
     }

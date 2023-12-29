@@ -298,7 +298,10 @@ namespace Catan10
             // previous player can finish their turn.  when we hit Next again, we want the same tiles to be chosen to be gold.
             if (( changePlayerLog.NewState == GameState.WaitingForRoll ) || ( changePlayerLog.NewState == GameState.WaitingForNext ))
             {
-                await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
+                // 12/28/2023 - changing this to be an explicit state change
+                // await SetRandomTileToGold(changePlayerLog.NewRandomGoldTiles);
+
+                await ToPickGold.PostLog(this, RandomGoldTileCount);
             }
 
             if (changePlayerLog.NewState != changePlayerLog.OldState)
@@ -488,7 +491,7 @@ namespace Catan10
             {
                 rollState = new RollState()
                 {
-                    GoldTiles = this.GetRandomGoldTiles(),
+               
                     PlayerName = CurrentPlayer.PlayerName
                 };
             }
@@ -654,18 +657,7 @@ namespace Catan10
             return _gameView.CurrentGame.GetNextDevCard();
         }
 
-        /// <summary>
-        ///     this is the second phase of doing a roll -- put it on the stack with possibly Gold Tiles only
-        ///
-        /// </summary>
-        /// <param name="rollState"></param>
-        /// <returns></returns>
-        public async Task PushRollState(RollState rollState)
-        {
-            Contract.Assert(rollState != null);
-            Contract.Assert(rollState.GoldTiles != null);
-            await Log.RollLog.PushStateNoRoll(rollState);
-        }
+
 
         public async Task<bool> RedoAsync()
         {
@@ -1067,22 +1059,161 @@ namespace Catan10
 
             }
         }
-
-        public Task HandlePirateRoll(RollModel rollModel)
+        /// <summary>
+        ///     in pirates, the red die is special (possible grants dev cards)
+        ///     if the special die is a pirate, we increment the journey.
+        ///     if the journey is done, we have an invasion.
+        ///     the normal roll to allocate resources is handled outside (prior) to this function.
+        /// </summary>
+        /// <param name="rollModel"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public async Task HandlePirateRoll(RollModel rollModel, ActionType action)
         {
             if (!MainPageModel.GameInfo.Pirates)
             {
-                return Task.CompletedTask;
+                return;
             }
 
-            if (rollModel.SpecialDice == SpecialDice.Pirate)
+            if (action != ActionType.Undo)
             {
-                int count =  CTRL_InvationCounter.Next();
+
+
+                if (rollModel.SpecialDice == SpecialDice.Pirate)
+                {
+                    int count =  CTRL_InvationCounter.Next();
+                    if (count > 1)
+                    {
+
+                        if (MainPageModel.TotalCities() > MainPageModel.TotalKnightRanks())
+                        {
+                            // find lowest knight rank
+                            int lowestKnightRank = 100; // arbitrary big number
+                            int highestKnightRank = 0;
+                            foreach (var player in PlayingPlayers)
+                            {
+                                int rank=0;
+
+                                foreach (var knight in player.GameData.Knights)
+                                {
+                                    if (knight.Activated)
+                                    {
+                                        rank += ( int )knight.KnightRank;
+                                    }
+                                }
+
+                                if (rank < lowestKnightRank)
+                                {
+                                    lowestKnightRank = rank;
+                                }
+                                if (rank > highestKnightRank)
+                                {
+                                    highestKnightRank = rank;
+                                }
+                            }
+
+                            var playersWithHighestKnightRank = new List<PlayerModel>();
+
+                            // go through and find all the victims
+                            bool foundAtLeastOneVictim = false;
+                            foreach (var player in PlayingPlayers)
+                            {
+                                int rank=0;
+
+                                foreach (var knight in player.GameData.Knights)
+                                {
+                                    if (knight.Activated)
+                                    {
+                                        rank += ( int )knight.KnightRank;
+                                    }
+                                }
+
+                                if (rank == lowestKnightRank)
+                                {
+                                    if (player.GameData.Cities.Count > 0)
+                                    {
+                                        player.GameData.Resources.GrantEntitlement(Entitlement.DestroyCity);
+                                        foundAtLeastOneVictim = true;
+                                    }
+
+                                }
+
+                                if (rank == highestKnightRank)
+                                {
+                                    playersWithHighestKnightRank.Add(player);
+                                }
+
+                            }
+
+
+                            if (foundAtLeastOneVictim)
+                            {
+                                await DestroyCity_Next.PostLog(this);
+                            }
+
+                            if (playersWithHighestKnightRank.Count == 1)
+                            {
+                                playersWithHighestKnightRank[0].GameData.Resources.VictoryPoints++;
+                            }
+                        }
+
+
+
+
+                        /**
+                         * after the invastion, all knights go inactive
+                         */
+
+                        foreach (var player in PlayingPlayers)
+                        {
+
+
+                            foreach (var knight in player.GameData.Knights)
+                            {
+                                knight.Activated = false;
+                            }
+
+                        }
+
+                    }
+                }
+            }
+            else
+            {
+                if (rollModel.SpecialDice == SpecialDice.Pirate)
+                {
+                    int count =  CTRL_InvationCounter.Previous();
+                }
+            }
+
+
+            return;
+
+        }
+        /**
+         * find the city and the player, update the city.Wall property and consume or refund the entitlement
+         */
+        public Task ProtectCity(ProtectCityLog protectCityLog, ActionType action)
+        {
+            BuildingCtrl building = GetBuilding(protectCityLog.BuildingIndex);
+            Contract.Assert(building != null);
+            Contract.Assert(building.IsCity);
+            PlayerModel player = NameToPlayer(protectCityLog.SentBy);
+            Contract.Assert(player != null);
+            if (action == ActionType.Undo)
+            {
+                building.City.HasWall = false;
+                player.GameData.Resources.GrantEntitlement(Entitlement.Wall);
+
+            }
+            else
+            {
+                building.City.HasWall = true;
+                player.GameData.Resources.ConsumeEntitlement(Entitlement.Wall);
             }
 
 
             return Task.CompletedTask;
-
         }
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType actionType)
         {
@@ -1094,6 +1225,7 @@ namespace Catan10
             if (updateBuildingLog.NewBuildingState == BuildingState.City) entitlement = Entitlement.City;
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
             if (updateBuildingLog.NewBuildingState == BuildingState.Knight) entitlement = Entitlement.BuyOrUpgradeKnight;
+            if (updateBuildingLog.NewBuildingState == BuildingState.Settlement && updateBuildingLog.OldBuildingState == BuildingState.City) entitlement = Entitlement.DestroyCity;
 
             Contract.Assert(entitlement != Entitlement.Undefined);
             player.GameData.Resources.ConsumeEntitlement(entitlement);

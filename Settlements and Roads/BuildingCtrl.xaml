@@ -81,7 +81,7 @@
                 Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent"
                 Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'City'), Mode=OneWay}">
             <Viewbox Name="_vbCity" Width="30" Height="30" Stretch="Uniform">
-                <local:CityCtrl Width="30" Height="30" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                <local:CityCtrl x:Name="CTRL_City" Width="30" Height="30" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
                         Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
         </Grid>

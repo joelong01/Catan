@@ -47,6 +47,7 @@ namespace Catan10
         
 
         public string TypeName { get; set; }
+        public bool WaitForNext { get; set; } = true; // if this is false, then it is expected that the user never has to click on next to move past this state
 
         #endregion Properties + Fields
 

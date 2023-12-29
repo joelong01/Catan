@@ -388,6 +388,12 @@ namespace Catan10
                         Paper = 5
                     };
                     break;
+                case Entitlement.Wall:
+                    cost = new TradeResources()
+                    {
+                        Brick = 2
+                    };
+                    break;
                 case Entitlement.Undefined:
                 default:
                     Contract.Assert(false, "Bad Entitlement");

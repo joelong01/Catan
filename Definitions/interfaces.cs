@@ -172,12 +172,15 @@ namespace Catan10
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
 
         bool HasEntitlement(Entitlement entitlement);
+        Task DestroyCity(BuildingCtrl buildingCtrl);
 
         #endregion Methods
     }
 
     public interface IGameController
     {
+
+        BuildingCtrl GetBuilding(int index);
         #region Properties + Fields
 
         bool AutoRespondAndTheHuman { get; }
@@ -253,8 +256,6 @@ namespace Catan10
 
         DevCardType PurchaseNextDevCard();
 
-        Task PushRollState(RollState rollState);
-
         Task<bool> RedoAsync();
 
         void ResetAllBuildings();
@@ -305,7 +306,7 @@ namespace Catan10
         Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType);
         void AssignLargestArmy();
 
-        Task HandlePirateRoll(RollModel rollModel);
+        Task HandlePirateRoll(RollModel rollModel, ActionType action);
 
         #endregion Methods
 
@@ -313,7 +314,7 @@ namespace Catan10
         void SetCurrentPlayer(PlayerModel playerModel);
 
         Task RolledSeven();
-     
+        Task ProtectCity(ProtectCityLog protectCityLog, ActionType normal);
     }
 
     public interface IGameViewCallback

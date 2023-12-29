@@ -8,18 +8,19 @@ namespace Catan10
     /// <summary>
     ///     Need to get the random gold tiles for this turn
     /// </summary>
-    public class DoneAllocResourcesToWaitingForRoll : LogHeader, ILogController
+    public class DoneAllocResourcesToPickingGoldTile : LogHeader, ILogController
     {
         internal static async Task PostLog(IGameController gameController)
         {
-            Contract.Assert(gameController.CurrentGameState == GameState.DoneResourceAllocation);
+            Contract.Assert(gameController.CurrentGameState == GameState.DoneResourceAllocation ||
+                gameController.CurrentGameState == GameState.PickingRandomGoldTiles);
 
-            DoneAllocResourcesToWaitingForRoll logHeader = new DoneAllocResourcesToWaitingForRoll()
+            DoneAllocResourcesToPickingGoldTile logHeader = new DoneAllocResourcesToPickingGoldTile()
             {
                 CanUndo = true,
                 RollState = gameController.GetNextRollState(),
                 Action = CatanAction.ChangedState,
-                NewState = GameState.WaitingForRoll,
+                NewState = GameState.PickingRandomGoldTiles,
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -40,19 +41,12 @@ namespace Catan10
                 p.GameData.Resources.ResourcesThisTurn.Reset();
             });
 
-
-
-            await gameController.PushRollState(RollState); // also set RandomGold tiles in the UI
-
             //
-            // if we have a roll for this turn already, use it.
-            if (RollState.RollModel != null && RollState.RollModel.Roll > 0)
-            {
-                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, RollState.RollModel);
-            }
+            //  pick random gold count
+            await ToPickGold.PostLog(gameController, MainPage.Current.RandomGoldTileCount);
         }
 
-        public async Task Replay (IGameController gameController)
+        public  Task Replay (IGameController gameController)
         {
 
             //
@@ -62,9 +56,8 @@ namespace Catan10
                 p.GameData.Resources.ResourcesThisTurn.Reset();
             });
 
+            return Task.CompletedTask;
 
-
-            await gameController.PushRollState(RollState); // also set RandomGold tiles in the UI
         }
 
         public Task Redo(IGameController gameController)

@@ -136,7 +136,9 @@ namespace Catan10
         {
             get
             {
-                return ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
+                var brush = ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
+           
+                return brush;
             }
         }
 
@@ -267,6 +269,7 @@ namespace Catan10
                     NotifyPropertyChanged("SolidPrimaryBrush");
                     NotifyPropertyChanged("UseWhiteImages");
                     NotifyPropertyChanged("GetBackgroundBrush"); // this is the binding function name that the roads and buildings use
+                    NotifyPropertyChanged("GetForegroundBrush");
                 }
             }
         }
@@ -284,8 +287,10 @@ namespace Catan10
                     _secondaryBackgroundColor = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("BackgroundBrush");
+                    NotifyPropertyChanged("UseWhiteImages");
                     NotifyPropertyChanged("SolidSecondaryBrush");
                     NotifyPropertyChanged("GetBackgroundBrush");    // this is the binding function name that the roads and buildings use
+                    NotifyPropertyChanged("GetForegroundBrush");
                 }
             }
         }

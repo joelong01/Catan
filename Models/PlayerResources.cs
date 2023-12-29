@@ -44,6 +44,23 @@ namespace Catan10
 
         public ObservableCollection<DevCardModel> AvailableDevCards { get; set; } = new ObservableCollection<DevCardModel>();
 
+        private int _victoryPoints = 0;
+        public int VictoryPoints
+        {
+            get
+            {
+                return _victoryPoints;
+            }
+            set
+            {
+                if (value != _victoryPoints)
+                {
+                    _victoryPoints = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         /// <summary>
         ///     How many Cities the player has
         /// </summary>

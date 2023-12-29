@@ -352,7 +352,7 @@ namespace Catan10
                 await NextState();
             }
 
-          //  await NextState();
+            await NextState();
         }
 
         private async void OnTestService(object sender, RoutedEventArgs e)

@@ -719,10 +719,10 @@ namespace Catan10
                     tile.SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
                 }
             }
+            if (!taskList.Any()) return;
 
-            //if (taskList.Count == 0) return;
-            //await Task.WhenAll(taskList);
-            //taskList.Clear();
+            taskList.Add(Task.Delay(250));
+
             foreach (var tile in TilesInIndexOrder)
             {
                 if (tile.TemporarilyGold)

@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
+using Windows.UI.WindowManagement;
 
 namespace Catan10
 {
@@ -12,21 +13,19 @@ namespace Catan10
     ///     3. reset ResourcesThisTurn
     ///     4. Reset and Show the roll UI
     /// </summary>
-    public class WaitingForNextToWaitingForRoll : LogHeader, ILogController
+    public class WaitingForNextToPickingRandomGoldTiles : LogHeader, ILogController
     {
         public TradeResources ResourcesThisTurn { get; set; }
-        public RollState RollState { get; set; }
 
         public static async Task PostLog(IGameController gameController)
         {
-            var rollState = gameController.GetNextRollState();
-            WaitingForNextToWaitingForRoll logHeader = new WaitingForNextToWaitingForRoll()
+
+            WaitingForNextToPickingRandomGoldTiles logHeader = new WaitingForNextToPickingRandomGoldTiles()
             {
-                CanUndo = true,
-                RollState = rollState,
                 ResourcesThisTurn = ResourceCardCollection.ToTradeResources(gameController.CurrentPlayer.GameData.Resources.ResourcesThisTurn),
                 Action = CatanAction.ChangedState,
-                NewState = GameState.WaitingForRoll,
+                NewState = GameState.PickingRandomGoldTiles,
+                WaitForNext = false // this is false because when we undo PickingRandomGoldTiles, we also Undo this state
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -36,33 +35,17 @@ namespace Catan10
         {
             //
             //  remember the log is already written!
-            var currentGameState = gameController.CurrentGameState; 
-            Contract.Assert(currentGameState == GameState.WaitingForRoll);
             ChangePlayerHelper.ChangePlayer(gameController, 1);
-            Debug.Assert(this.RollState != null);
             await gameController.ResetRollControl();
-
-            //
-            //  RollState is the random gold tiles + the roll
-            //  this pushes the random gold tiles to the log
-            await gameController.PushRollState(this.RollState);
             gameController.StopHighlightingTiles();
-            //
-            // if we have a roll for this turn already, use it.
-            if (this.RollState.RollModel != null && this.RollState.RollModel.Roll > 0)
-            {
-                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRoll);
-            }
+            await ToPickGold.PostLog(gameController, MainPage.Current.RandomGoldTileCount); // this will move the state to waiting for roll
         }
 
         public async Task Replay (IGameController gameController)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
             ChangePlayerHelper.ChangePlayer(gameController, 1);
-            Debug.Assert(this.RollState != null);
             await gameController.ResetRollControl();
-
-            await gameController.PushRollState(this.RollState);
             gameController.StopHighlightingTiles();
         }
 
@@ -71,7 +54,7 @@ namespace Catan10
             await Do(gameController);
         }
 
-        public async Task Undo(IGameController gameController)
+        public  Task Undo(IGameController gameController)
         {
             ChangePlayerHelper.ChangePlayer(gameController, -1);
 
@@ -82,12 +65,9 @@ namespace Catan10
                 p.GameData.Resources.ResourcesThisTurn.Reset();
             });
 
-            //
-            // if we have a roll for this turn already, use it.
-            if (gameController.RollLog.CanRedo)
-            {
-                await WaitingForRollToWaitingForNext.PostRollMessage(gameController, gameController.RollLog.NextRoll);
-            }
+         
+
+            return Task.CompletedTask;
         }
     }
 }

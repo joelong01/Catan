@@ -27,9 +27,10 @@ namespace Catan10
         internal static async Task PostRollMessage(IGameController gameController, RollModel roll)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
-            var rollState = gameController.Log.RollLog.Peek();
-
-            rollState.RollModel = roll;
+            var rollState = new RollState()
+            {
+                RollModel = roll
+            };
 
             WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
             {
@@ -61,47 +62,26 @@ namespace Catan10
             IRollLog rollLog = gameController.RollLog;
 
             //
+            //   if this is a pirate game, handle the pirate roll first, as this will change the resource allocation
+
+            if (gameController.MainPageModel.GameInfo.Pirates)
+            {
+                await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Normal);
+            }
+
+            //
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
 
-            //
-            //   if this is a pirate game, handle the pirate roll
-
-            if (gameController.MainPageModel.GameInfo.Pirates)
-            {
-                await gameController.HandlePirateRoll(this.RollState.RollModel);
-            }
-
-            //
-            //  does anybody have any gold?
-            //  this message goes everywhere, so we only need one machien to send it. so even if 2 people need to trade gold, only one sends it
-            //
-            //  7/14/2021: don't send this message for local games as we don't use the gameui to trade gold in local games
-            //
-            if (gameController.TheHuman == gameController.CurrentPlayer && gameController.IsServiceGame)
-            {
-                // current player checks each player to see if anybody has gold
-                foreach (var player in gameController.PlayingPlayers)
-                {
-                    if (player.GameData.Resources.CurrentResources.GoldMine > 0)
-                    {
-                        // at least one person has gold
-                        await MustTradeGold.PostMessage(gameController);
-                        break;
-                    }
-                }
-            }
+       
 
 
-            // only the current player's machine should send this message.  everybody will get it
             //
             //  7/14/2021:  only count # cards in a hand on service games.  by not filling in the card count, the list will be length 0 for the check below
             if (rollLog.LastRoll.Roll == 7)
             {
                 await gameController.RolledSeven();
-                
-                
                 
             }
 
@@ -114,6 +94,13 @@ namespace Catan10
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
+            //
+            //   if this is a pirate game, handle the pirate roll
+
+            if (gameController.MainPageModel.GameInfo.Pirates)
+            {
+                await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Normal);
+            }
 
             //
             //  TODO: This also needs to do somethign different if it is the last message -- e.g. call Do();
@@ -122,6 +109,13 @@ namespace Catan10
         public async Task Redo(IGameController gameController)
         {
             await gameController.Log.RollLog.RedoRoll();
+            //
+            //   if this is a pirate game, handle the pirate roll
+
+            if (gameController.MainPageModel.GameInfo.Pirates)
+            {
+                await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Normal);
+            }
         }
 
         public async Task Undo(IGameController gameController)
@@ -129,6 +123,13 @@ namespace Catan10
             // if the state is wrong, there is a big bug someplace
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
             await gameController.Log.RollLog.UndoRoll();
+            //
+            //   if this is a pirate game, handle the pirate roll
+
+            if (gameController.MainPageModel.GameInfo.Pirates)
+            {
+                await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Undo);
+            }
         }
     
     }

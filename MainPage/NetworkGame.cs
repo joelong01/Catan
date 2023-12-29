@@ -27,7 +27,7 @@ namespace Catan10
 
         private async Task CreateAndConfigureProxy()
         {
-          //  this.TraceMessage("Creating Proxy");
+            //  this.TraceMessage("Creating Proxy");
             try
             {
                 using (new FunctionTimer("CreateAndConfigureProxy"))
@@ -84,8 +84,8 @@ namespace Catan10
                 this.MainPageModel.Settings.IsLocalGame = true;
             }
 
-            
-            
+
+
         }
 
         public async Task ShowErrorMessage(string message, string caption, string extended)
@@ -94,7 +94,7 @@ namespace Catan10
             {
                 bool ret = await PickDefaultUser();
                 if (!ret) return;
-                    
+
             }
             while (IsAnyContentDialogOpen())
             {
@@ -110,7 +110,7 @@ namespace Catan10
             };
             if (String.IsNullOrEmpty(dlg.ExtendedMessage))
             {
-                
+
             }
             await dlg.ShowAsync();
         }
@@ -200,7 +200,7 @@ namespace Catan10
                 if (!ret) return;
             };
             MainPageModel.Settings.IsLocalGame = false;
-            
+
 
             List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
             ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, MainPageModel.AllPlayers, games, MainPageModel.CatanService)
@@ -313,23 +313,19 @@ namespace Catan10
                     await Log.Undo(logHeader);
                     break;
 
-                
+
                 case ActionType.Redo:
                     await logController.Redo(this);
                     await Log.Redo(logHeader);
-                    break;               
+                    break;
                 default:
                     break;
             }
 
-            //
-            //  5/20/2021:  all local messages get processed locally...
-            //  
-            if (message.From == TheHuman.PlayerName || MainPageModel.Settings.IsLocalGame )
-            {
-                MainPageModel.ChangeUnprocessMessage(-1);
-            }
-           
+
+            MainPageModel.ChangeUnprocessMessage(-1);
+
+
         }
 
         private Task ReplayGame(GameInfo game, string playerName)
@@ -345,7 +341,7 @@ namespace Catan10
 
             if (message.ActionType == ActionType.Retry)
             {
-                for (int i=MainPageModel.Log.MessageLog.Count - 1; i>=0; i--)                
+                for (int i = MainPageModel.Log.MessageLog.Count - 1; i >= 0; i--)
                 {
                     var loggedMessage = MainPageModel.Log.MessageLog[i];
                     if (loggedMessage.MessageId == message.MessageId)
@@ -356,15 +352,15 @@ namespace Catan10
                     }
                 }
             }
-          //  MainPageModel.Log.RecordMessage(message);
+            //  MainPageModel.Log.RecordMessage(message);
             await ProcessMessage(message);
 
         }
-       
+
         private async void Service_OnGameCreated(GameInfo gameInfo, string playerName)
         {
-         //   this.TraceMessage($"{gameInfo} playerName={playerName}");
-            
+            //   this.TraceMessage($"{gameInfo} playerName={playerName}");
+
             if (TheHuman.PlayerName == gameInfo.Creator)
             {
                 await NewGameLog.JoinOrCreateGame(this, gameInfo, CatanAction.GameCreated); // the local action to join as the service is already created
@@ -386,7 +382,7 @@ namespace Catan10
 
         private async void Service_OnGameDeleted(GameInfo gameInfo, string by)
         {
-           // this.TraceMessage($"{gameInfo.Id} playerName={by}");
+            // this.TraceMessage($"{gameInfo.Id} playerName={by}");
             if (MainPageModel == null || MainPageModel.GameInfo == null) return;
 
 
@@ -417,7 +413,7 @@ namespace Catan10
 
             if (CurrentGameState != GameState.WaitingForNewGame && CurrentGameState != GameState.WaitingForPlayers) return;
 
-            
+
             foreach (var player in MainPageModel.PlayingPlayers)
             {
                 if (player.PlayerName != playerName) continue;
@@ -474,7 +470,7 @@ namespace Catan10
         }
         private async void Service_OnPrivateMessage(CatanMessage message)
         {
-          //  MainPageModel.Log.RecordMessage(message);
+            //  MainPageModel.Log.RecordMessage(message);
             await ProcessMessage(message);
         }
 

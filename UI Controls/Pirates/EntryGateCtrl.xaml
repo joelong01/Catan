@@ -3,8 +3,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" Height="721" Width="788">
     <Viewbox Stretch="UniformToFill">
-        <Grid Background="{Binding Path=FillColor, Mode=OneWay, TargetNullValue=Blue, FallbackValue=Black}"
-                BorderBrush="{Binding Path=StrokeColor, Mode=OneWay, TargetNullValue=Blue, FallbackValue=Yellow}"
+        <Grid Background="Transparent"
+                BorderBrush="Transparent"
                 CornerRadius="20"  BorderThickness="{Binding Path=Thickness, Mode=OneWay, FallbackValue=5}">
             <Path Margin="5, 5" Stroke="{Binding Path=StrokeColor, Mode=OneWay, TargetNullValue=Blue, FallbackValue=Purple}"
                     StrokeThickness="{Binding Path=Thickness, Mode=OneWay, FallbackValue=10}"

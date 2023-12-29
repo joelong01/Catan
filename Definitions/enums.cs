@@ -102,6 +102,8 @@ namespace Catan10
         PoliticsUpgradeOne,PoliticsUpgradeTwo,PoliticsUpgradeThree,PoliticsUpgradeFour,PoliticsUpgradeFive,
         ScienceUpgradeOne, ScienceUpgradeTwo, ScienceUpgradeThree, ScienceUpgradeFour, ScienceUpgradeFive,
         TradeUpgradeOne, TradeUpgradeTwo, TradeUpgradeThree, TradeUpgradeFour, TradeUpgradeFive,
+        Wall,
+        DestroyCity,
     }
 
     public enum GameState
@@ -150,6 +152,12 @@ namespace Catan10
 
         [Description("Discard Cards")]
         TooManyCards,
+
+        [Description("Destroy City")]
+        MustDestroyCity,
+
+        [Description("Picking Random Gold Cards")]
+        PickingRandomGoldTiles
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };
@@ -170,7 +178,7 @@ namespace Catan10
 
     public enum MoveBaronReason { PlayedDevCard, Rolled7 };
 
-    public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea, Coin, Cloth, Paper };
+    public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea, Coin, Cloth, Paper, Invasion };
 
     public enum RoadLocation { None = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
 

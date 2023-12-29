@@ -39,11 +39,8 @@ namespace Catan10
 
             // Notify the current player that the turn started
             gameController.CurrentPlayer.TurnStarted();
+            MainPage.Current.TheHuman = gameController.CurrentPlayer;
 
-            if (gameController.MainPageModel.Settings.IsLocalGame)
-            {
-                MainPage.Current.TheHuman = gameController.CurrentPlayer;
-            }
         }
 
     }

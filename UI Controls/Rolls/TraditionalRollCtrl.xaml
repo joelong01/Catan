@@ -133,7 +133,7 @@
                 </ToggleButton.Content>
             </ToggleButton>
 
-            <ToggleButton Name="SpecialGreen" Grid.Row="1" Grid.Column="2" Background="Black" Padding="2"
+            <ToggleButton Name="SpecialGreen" Grid.Row="1" Grid.Column="2" Background="DimGray" Padding="2"
                     Click="OnSpecialClick" Tag="Green">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
@@ -141,7 +141,7 @@
                     </Viewbox>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Name="SpecialYellow" Grid.Row="2" Grid.Column="2" Background="Black" Padding="2"
+            <ToggleButton Name="SpecialYellow" Grid.Row="2" Grid.Column="2" Background="DimGray" Padding="2"
                     Click="OnSpecialClick" Tag="Yellow">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
@@ -149,11 +149,11 @@
                     </Viewbox>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Name="SpecialBlue" Grid.Row="3" Grid.Column="2" Background="Black" Padding="2"
+            <ToggleButton Name="SpecialBlue" Grid.Row="3" Grid.Column="2" Background="DimGray" Padding="2"
                     Click="OnSpecialClick" Tag="Blue">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
-                        <local:EntryGateCtrl StrokeColor="LightBlue" Thickness="10" FillColor="Transparent" />
+                        <local:EntryGateCtrl StrokeColor="DarkBlue" Thickness="4" FillColor="Transparent" />
                     </Viewbox>
                 </ToggleButton.Content>
             </ToggleButton>

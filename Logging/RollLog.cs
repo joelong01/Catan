@@ -12,7 +12,7 @@ namespace Catan10
     public enum RollAction { Do, Undo, Redo }
 
     /// <summary>
-    ///     This class is used to track data that is global to the game -- Rolls and GoldTiles in particular
+    ///     This class is used to track data that is global to the game -- Rolls in particular
     /// </summary>
     public class RollLog : INotifyPropertyChanged, IRollLog, IRollStats
     {
@@ -446,7 +446,7 @@ namespace Catan10
             }
         }
 
-        private async Task UpdateUi(RollAction action)
+        private Task UpdateUi(RollAction action)
         {
             UpdateRollStats();
 
@@ -459,24 +459,18 @@ namespace Catan10
             if (action != RollAction.Undo)
             {
                 GameController.SetHighlightedTiles(Done.Peek().RollModel.Roll);
-                await GameController.SetRandomTileToGold(Done.Peek().GoldTiles);
             }
             else
             {
                 GameController.StopHighlightingTiles();
-                //  await GameController.ResetRandomGoldTiles(); // 12/20/2023 - we want to see what tile is gold when the rollModel is undone
             }
-        }
 
-        internal RollState Peek()
-        {
-            return Done.Peek();
+            return Task.CompletedTask;
         }
 
         internal Task UpdateUiForRoll(RollState rollState)
         {
-            var top = Done.Pop();
-            Contract.Assert(top.PlayerName == rollState.PlayerName);
+            
             Done.Push(rollState);
             NotifyPropertyChanged("LastRoll");
             UpdatePlayerStats(RollAction.Do);
@@ -699,17 +693,14 @@ namespace Catan10
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Task DoRoll(RollModel rollModel, List<int> goldTiles)
+        public Task DoRoll(RollModel rollModel)
         {
             Contract.Assert(Undone.Count == 0, "You can't add a roll if you have roll in the unused stack");
 
-            this.TraceMessage("Yuu commented ths out.  fix it.");
-            // if (goldTiles == null) goldTiles = GameController.NextRandomGoldTiles;
-            var rollState = new RollState() 
-            { 
-                
+            var rollState = new RollState()
+            {
+               
                 RollModel = rollModel, 
-                GoldTiles = goldTiles 
             };
             Done.Push(rollState);
             UpdatePlayerStats(RollAction.Do);
@@ -726,16 +717,7 @@ namespace Catan10
             return Undone.Pop();
         }
 
-        /// <summary>
-        ///     Before the rollModel, you create a RollState object and stick Random GoldTiles into it.
-        /// </summary>
-        /// <param name="rollState"></param>
-        /// <returns></returns>
-        public async Task PushStateNoRoll(RollState rollState)
-        {
-            Done.Push(rollState);
-            await GameController.SetRandomTileToGold(rollState.GoldTiles);
-        }
+
         /// <summary>
         ///     We have a RollState on the Undone stack that has the rollModel and we have a RollState on the Done stack
         ///     that has a 0 for the rollModel. we pop the Undone and throw it away after setting the rollModel in the Done stack
@@ -745,10 +727,7 @@ namespace Catan10
         {
             Contract.Assert(CanRedo, "please check this before calling me");
             var undoneRollState = Undone.Pop();
-            var doneRollState = Done.Peek();
-            Contract.Assert(undoneRollState.RollModel.Roll != 0);
-            Contract.Assert(doneRollState.RollModel.Roll == 0);
-            doneRollState.RollModel = undoneRollState.RollModel;
+            Done.Push(undoneRollState);
 
             UpdatePlayerStats(RollAction.Redo);
             return UpdateUi(RollAction.Redo);
@@ -773,6 +752,8 @@ namespace Catan10
         ///     12/20/2023 - unfortunately when the idiot dev implemented this, there are 2 actions that are done in one log entry
         ///     the first is setting the random gold tiles, the second is setting the rollModel. there was a bug where both got "undone"
         ///     so here, we create a new undoneRollState that has the correct random gold tiles, but the rollModel set to 0 and we leave that 
+        ///     
+        ///     12/28/2023 - the idiot dev pulled all reference to gold tiles from this class.  thank god.
         ///     in the Done stack.
         /// </summary>
         /// <returns></returns>
@@ -781,16 +762,8 @@ namespace Catan10
         {
             Contract.Assert(Done.Count != 0, "please check this before calling me");
 
-            RollState rollState = Done.Peek();
-            RollState newRollState = new RollState
-            {
-                RollModel = rollState.RollModel,
-                GoldTiles = new List<int>(rollState.GoldTiles),
-                PlayerName = rollState.PlayerName
-
-            };
-            Undone.Push(newRollState);
-            rollState.RollModel.Roll = 0;
+            RollState rollState = Done.Pop(); 
+            Undone.Push(rollState);
             UpdatePlayerStats(RollAction.Undo);
             return UpdateUi(RollAction.Undo);
         }
@@ -801,7 +774,6 @@ namespace Catan10
     /// </summary>
     public class RollState
     {
-        public List<int> GoldTiles { get; set; }
         public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer.PlayerName;
         public RollModel RollModel { get; set; }
 
@@ -821,7 +793,7 @@ namespace Catan10
 
         RollModel NextRoll { get; }
 
-        Task DoRoll(RollModel rollModel, List<int> goldTiles);
+        Task DoRoll(RollModel rollModel);
 
         Task RedoRoll();
 

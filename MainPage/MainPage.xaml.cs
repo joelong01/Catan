@@ -1305,6 +1305,23 @@ namespace Catan10
 
         }
 
+        private async void OnBuyCityWall(object sender, RoutedEventArgs e)
+        {
+            bool foundUnprotectedCity = false; 
+            foreach (var building in CurrentPlayer.GameData.Cities)
+            {
+                if (building.City.HasWall == false)
+                {
+                    foundUnprotectedCity = true;
+                    break;
+                }
+            }
+
+            if (!foundUnprotectedCity) return;
+
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Wall);
+        }
+
         private async void OnLocalBuyRoad(object sender, RoutedEventArgs e)
         {
             await PurchaseEntitlement(CurrentPlayer, Entitlement.Road);

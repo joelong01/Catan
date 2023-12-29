@@ -55,11 +55,13 @@ namespace Catan10
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         private Trades _trades = new Trades();
+       
+        
+
 
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties
-
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -82,7 +84,7 @@ namespace Catan10
                 }
             }
         }
-
+       
         public int KnightsPlayed
         {
             get => _KnightsPlayed;
@@ -396,6 +398,8 @@ namespace Catan10
                     return KnightsLeft - _resources.GetUnspentEntitlements(entitlement); ;
                 case Entitlement.ActivateKnight:
                     return 1; // we have already checked to make sure that there is a knight to activate
+                case Entitlement.Wall:
+                    return 1; // checked previously
                 case Entitlement.MoveKnight:
                     return 1; // no restrictions on how many times a knight can move
                 default:
@@ -674,9 +678,9 @@ namespace Catan10
             MaxRoads = 0;
             MaxSettlements = 0;
             MaxCities = 0;
-
             Pips = 0;
-            _goldRolls = 0;
+            GoldRolls = 0;
+
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {
@@ -712,6 +716,7 @@ namespace Catan10
             CitiesPlayed = Cities.Count;
             UpdateScore();
             Pips = CalculatePips(Settlements, Cities);
+            NotifyPropertyChanged("TotalCities");
         }
 
         private void Knights_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

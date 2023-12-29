@@ -9,7 +9,23 @@ namespace Catan10
     {
         public static LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
+            try
+            {
+
+
+                if (owner != null)
+                {
+                    return owner.BackgroundBrush;
+                }
+
+                if (current != null)
+                {
+                    return current.BackgroundBrush;
+                }
+
+                return ConverterGlobals.GetLinearGradientBrush(Colors.Black, Colors.Red);
+            }
+            catch
             {
                 var gradientStopCollection = new GradientStopCollection();
                 gradientStopCollection.Add(new GradientStop() { Color = Colors.Black }); ;
@@ -19,24 +35,13 @@ namespace Catan10
                 brush.EndPoint = new Windows.Foundation.Point(0.5, 1.0);
                 return brush;
             }
-            if (owner != null)
-            {
-                return owner.BackgroundBrush;
-            }
-
-            if (current != null)
-            {
-                return current.BackgroundBrush;
-            }
-
-            return ConverterGlobals.GetLinearGradientBrush(Colors.Black, Colors.Red);
         }
 
         public static Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
         {
             if (StaticHelpers.IsInVisualStudioDesignMode)
             {
-                return new SolidColorBrush(Colors.White);
+                return new SolidColorBrush(Colors.DarkSlateGray);
             }
 
             if (owner != null)
@@ -48,7 +53,7 @@ namespace Catan10
             {
                 return current.ForegroundBrush;
             }
-
+          
             return ConverterGlobals.GetBrush(Colors.White);
         }
 

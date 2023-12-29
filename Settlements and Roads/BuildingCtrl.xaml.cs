@@ -98,6 +98,23 @@ namespace Catan10
             //
             //  need to validate that the GameState is a valid state to change the state of a building
             if (Callback == null) return;
+
+            //
+            //  if you have a City and the Wall entitlment, you can click on a city to protect it.
+            if (this.BuildingState == BuildingState.City && 
+                Callback.HasEntitlement(Entitlement.Wall)  && 
+                ((IGameController)Callback).CurrentPlayer == Owner)
+            {
+                await ProtectCityLog.ProtectCity(Callback as IGameController, this);
+                return;
+            }
+
+            if (this.BuildingState == BuildingState.City && Callback.HasEntitlement(Entitlement.DestroyCity))
+            {
+                await Callback.DestroyCity(this);
+                return;
+            }
+
             bool valid = (bool)Callback?.BuildingStateChangeOk(this);
             if (!valid)
             {
@@ -116,6 +133,8 @@ namespace Catan10
                 return;
 
             }
+
+            
 
             BuildingState oldState = this.BuildingState;
             BuildingState newState = BuildingState.None;
@@ -190,7 +209,7 @@ namespace Catan10
         public BuildingState BuildingState
         {
             get => ( BuildingState )GetValue(BuildingStateProperty);
-            private set => SetValue(BuildingStateProperty, value);  // call UpdateBuildingState instead
+            private set => SetValue(BuildingStateProperty, value);  // call ProtectCity instead
         }
 
         public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
@@ -359,6 +378,21 @@ namespace Catan10
             }
         }
 
+        public CityCtrl City
+        {
+            get
+            {
+                if (IsCity)
+                {
+                    return CTRL_City;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
 
         public override string ToString()
         {
@@ -429,12 +463,17 @@ namespace Catan10
                 default:
                     break;
             }
-            if (AdjacentHarbor != null)
+            if (AdjacentHarbor != null && GeneratesResources())
             {
                 AdjacentHarbor.Owner = Owner;
             }
 
             return Task.CompletedTask;
+        }
+
+        private bool GeneratesResources()
+        {
+            return ( this.BuildingState == BuildingState.Settlement || this.BuildingState == BuildingState.City );
         }
 
         private void OnRightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -477,7 +516,7 @@ namespace Catan10
                 {
                     await Callback.ActivateKnight(this, true);
                 }
-                else if (Callback.HasEntitlement(Entitlement.BuyOrUpgradeKnight) && this.Knight.KnightRank < KnightRank.RankThree)
+                else if (Callback.HasEntitlement(Entitlement.BuyOrUpgradeKnight) && this.Knight.KnightRank < KnightRank.Mighty)
                 {
                     await Callback.UpgradeKnight(this);
                 }

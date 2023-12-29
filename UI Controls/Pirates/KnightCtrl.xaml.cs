@@ -19,7 +19,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
-    public enum KnightRank { Unset = -1, RankOne=1, RankTwo=2, RankThree=3 };
+    public enum KnightRank { Unset = -1, Basic=1, Strong=2, Mighty=3 };
 
     public sealed partial class KnightCtrl : UserControl
     {
@@ -43,7 +43,7 @@ namespace Catan10
 
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(new PlayerModel()));
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty KnightRankProperty = DependencyProperty.Register("KnightRank", typeof(KnightRank), typeof(KnightCtrl), new PropertyMetadata(KnightRank.RankOne));
+        public static readonly DependencyProperty KnightRankProperty = DependencyProperty.Register("KnightRank", typeof(KnightRank), typeof(KnightCtrl), new PropertyMetadata(KnightRank.Basic));
         public static readonly DependencyProperty ActivatedProperty = DependencyProperty.Register("Activated", typeof(bool), typeof(KnightCtrl), new PropertyMetadata(false));
         public static readonly DependencyProperty BuildingIndexProperty = DependencyProperty.Register("BuildingIndex", typeof(int), typeof(KnightCtrl), new PropertyMetadata(false));
         public int BuildingIndex
