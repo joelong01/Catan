@@ -191,7 +191,7 @@ namespace Catan10
         {
             //
             //  make the compiler error go away
-            // await Task.Delay(0);
+            //await Task.Delay(0);
 
             PlayerModel longestRoadPlayer = null;
             int maxRoads = -1;
@@ -404,9 +404,9 @@ namespace Catan10
             return _gameView.GetTile(tileIndex);
         }
 
-        public Task OnNewGame()
+        public async Task OnNewGame()
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
             //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
             //{
             //    if (State.GameState != GameState.WaitingForNewGame)
@@ -714,43 +714,43 @@ namespace Catan10
             }
         }
 
-        public Task UpgradeKnight(BuildingCtrl building)
+        public async Task UpgradeKnight(BuildingCtrl building)
         {
             if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight))
             {
-                return Task.CompletedTask; //ignoring the requrst
+                 await Task.Delay(0); //ignoring the requrst
             }
             int newRank = (int) building.Knight.KnightRank + 1;
-            return KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, ( KnightRank )newRank, building.Knight.Activated);
+            await KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, ( KnightRank )newRank, building.Knight.Activated);
 
         }
-        public Task ActivateKnight(BuildingCtrl building, bool activated)
+        public async Task ActivateKnight(BuildingCtrl building, bool activated)
         {
             if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.ActivateKnight))
             {
-                return Task.CompletedTask; //ignoring the request
+                 await Task.Delay(0); //ignoring the request
             }
 
-            return KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, building.Knight.KnightRank, activated);
+            await KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, building.Knight.KnightRank, activated);
         }
-        public Task MoveKnight(KnightCtrl knight)
+        public async Task MoveKnight(KnightCtrl knight)
         {
             if (knight.Activated == false)
             {
-                return Task.CompletedTask;
+                 await Task.Delay(0);
             }
 
-            return MoveKnightLog.PostLog(this, knight);
+            await MoveKnightLog.PostLog(this, knight);
         }
 
         //
         //  why put this in a seperate function?  so you can find it with CTL+, w/o having to remember it is because of a PointerPressed event...
         ///
-        public Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
+        public async Task UpdateRoadState(RoadCtrl road, RoadState oldState, RoadState newState, LogType logType)
         {
             if (newState == oldState)
             {
-                return Task.CompletedTask;
+                 await Task.Delay(0);
             }
 
             road.RoadState = newState;
@@ -786,7 +786,7 @@ namespace Catan10
             }
 
             CalculateAndSetLongestRoad();
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public bool HasEntitlement(Entitlement entitlement)
@@ -930,7 +930,7 @@ namespace Catan10
         //      4. If BuyOrUpgradeKnight Played Increment the source player (which is always the current player) Knights played
         //      5. Log that it happened.
         //      6. check to see if we should update the Largest Army
-        private Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
+        private async Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
         {
             int inc = 1;
             if (logType == LogType.Undo)
@@ -987,7 +987,7 @@ namespace Catan10
                     MustMoveBaron = false;
                 }
             }
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         //
@@ -1042,7 +1042,7 @@ namespace Catan10
 
             //
             //  make the compiler error go away
-            // await Task.Delay(0);
+            //await Task.Delay(0);
 
             PlayerModel longestRoadPlayer = null;
             int maxRoads = -1;

@@ -62,7 +62,7 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             PlayerModel targetPlayer = null;
             if (this.BaronModel.Victim != null && this.BaronModel.Victim != "")
@@ -124,7 +124,7 @@ namespace Catan10
             //
             //  Show the card taken in the UI - but only for the Victim and the player that took the card
 
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Replay(IGameController gameController)
@@ -137,7 +137,7 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             PlayerModel targetPlayer = gameController.NameToPlayer(this.BaronModel.Victim);
             var previousTile = gameController.TileFromIndex(this.BaronModel.PreviousTile);
@@ -184,7 +184,7 @@ namespace Catan10
             gameController.AssignLargestArmy();
 
 
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         #endregion Methods

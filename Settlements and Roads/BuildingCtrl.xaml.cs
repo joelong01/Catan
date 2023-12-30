@@ -404,7 +404,7 @@ namespace Catan10
         ///     we need this functionality in Undo/Redo and ReplayLog
         /// </summary>
         /// <returns></returns>
-        public Task UpdateBuildingState(PlayerModel player, BuildingState oldState, BuildingState newState)
+        public async Task UpdateBuildingState(PlayerModel player, BuildingState oldState, BuildingState newState)
         {
             bool ret = false;
             switch (oldState)
@@ -468,7 +468,7 @@ namespace Catan10
                 AdjacentHarbor.Owner = Owner;
             }
 
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         private bool GeneratesResources()

@@ -50,10 +50,10 @@ namespace Catan10
             
         }
 
-        public Task Replay (IGameController gameController)
+        public async Task Replay (IGameController gameController)
         {
             gameController.MainPageModel.FinishedAddingPlayers();
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public async Task Redo(IGameController gameController)
@@ -81,9 +81,9 @@ namespace Catan10
             return $"[Action={Action}][SentBy={SentBy}][OldState={OldState}][NewState={NewState}]";
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
     }
 }

@@ -243,7 +243,7 @@ namespace Catan10
             depPropClass?.SetMainPageModel(( MainPageModel )e.OldValue, ( MainPageModel )e.NewValue);
         }
 
-        private Task AddPlayer(PlayerModel pData, LogType logType)
+        private async Task AddPlayer(PlayerModel pData, LogType logType)
         {
             MainPageModel.PlayingPlayers.Add(pData);
 
@@ -256,7 +256,7 @@ namespace Catan10
             pData.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
             pData.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
             pData.GameData.MaxKnights = _gameView.CurrentGame.GameData.MaxKnights;
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         /// <summary>
@@ -601,18 +601,44 @@ namespace Catan10
                 await SaveGameState();
             }
         }
-
-        private async void OnNumberTapped(RollModel roll)
+        /// <summary>
+        ///     this is the event Handler so it has to be void
+        /// </summary>
+        /// <param name="roll"></param>
+        private async void OnNumberRolled(RollModel roll)
         {
+            await OnRolledNumber(roll);
+        }
+        /// <summary>
+        ///     we call this so we can Test it with a Task returned
+        /// </summary>
+        /// <param name="roll"></param>
+        /// <returns></returns>
+        private async Task OnRolledNumber(RollModel roll)
+        { 
             if (!MainPageModel.EnableRolls)
             {
                 this.TraceMessage("Warning: OnRolled called but EnableRolls is false!");
                 return;
             }
 
-
             LastPlayerToRoll = CurrentPlayer; // need this to know which player to skip in supplemental builds
-            await WaitingForRollToWaitingForNext.PostRollMessage(this, roll);
+
+            if (roll.SpecialDice == SpecialDice.Pirate)
+            {
+                //
+                //  do all pirate work before doing roll work
+                this.TraceMessage("PIRATE   Start");
+                await WaitingForRollToPirateRoll.PostRollMessage(this, roll);
+                this.TraceMessage("PIRATE   End Pirate roll");
+
+            } else
+            {
+                this.TraceMessage("ROLL start roll processing");
+                await WaitingForRollToWaitingForNext.PostRollMessage(this, roll);
+                this.TraceMessage("ROLL end roll processing");
+            }
+       
 
         }
 
@@ -896,12 +922,12 @@ namespace Catan10
             await Task.WhenAll(tasks.ToArray());
         }
 
-        private Task SaveGameState()
+        private async Task SaveGameState()
         {
-            if (SaveSettingsTimer == null) return Task.CompletedTask;
-            if (SaveSettingsTimer.IsEnabled) return Task.CompletedTask;
+            if (SaveSettingsTimer == null) await Task.Delay(0);
+            if (SaveSettingsTimer.IsEnabled) await Task.Delay(0);
             SaveSettingsTimer.Start();
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         /// <summary>
@@ -975,7 +1001,7 @@ namespace Catan10
             }
             finally
             {
-                this.TraceMessage($"Saved Settings file. saved {count} times");
+                // this.TraceMessage($"Saved Settings file. saved {count} times");
             }
         }
 
@@ -1211,7 +1237,7 @@ namespace Catan10
                     Started = false,
                     Pirates = dlg.Pirates
                 };
-                await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
+                await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
 
                 MainPageModel.PlayingPlayers.Clear();
 
@@ -1285,7 +1311,7 @@ namespace Catan10
                 foreach (var entitlement in CurrentPlayer.GameData.Resources.UnspentEntitlements)
                 {
                     if (entitlement == Entitlement.BuyOrUpgradeKnight) knightCount++;
-                    if (entitlement == Entitlement.ActivateKnight) activateCount++; 
+                    if (entitlement == Entitlement.ActivateKnight) activateCount++;
                 }
 
                 if (knightCount > activateCount) found = true;
@@ -1307,7 +1333,7 @@ namespace Catan10
 
         private async void OnBuyCityWall(object sender, RoutedEventArgs e)
         {
-            bool foundUnprotectedCity = false; 
+            bool foundUnprotectedCity = false;
             foreach (var building in CurrentPlayer.GameData.Cities)
             {
                 if (building.City.HasWall == false)

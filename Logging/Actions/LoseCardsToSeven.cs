@@ -23,7 +23,7 @@ namespace Catan10
             };
             return gameController.PostMessage(logHeader, ActionType.Normal);
         }
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             sentBy.GameData.Resources.GrantResources(LostResources.GetNegated());
@@ -48,13 +48,13 @@ namespace Catan10
                 //
                 if (player.GameData.Resources.CurrentResources.Count > 7)
                 {
-                    return Task.CompletedTask;
+                     await Task.Delay(0);
                 }
             }
 
             //
             //  no player has more than 7 cards -- move the baron!
-            return MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
+            await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Rolled7);
         }
 
         public bool PlayerGaveUpCardsThisTurn(PlayerModel player, IGameController gameController)
@@ -84,12 +84,12 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        public Task Replay(IGameController gameController)
+        public async Task Replay(IGameController gameController)
         {
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             sentBy.GameData.Resources.GrantResources(LostResources.GetNegated());
             gameController.MainPageModel.Bank.GameData.Resources.GrantResources(LostResources);
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Undo(IGameController gameController)

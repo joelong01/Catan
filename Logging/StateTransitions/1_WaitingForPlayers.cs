@@ -47,9 +47,9 @@ namespace Catan10
             }
         }
 
-        public Task Replay (IGameController gameController)
+        public async Task Replay (IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace Catan10
         /// </summary>
         /// <param name="gameController"></param>
         /// <returns></returns>
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public override string ToString()
@@ -67,9 +67,9 @@ namespace Catan10
             return $"[Action={Action}][SentBy={SentBy}][OldState={OldState}][NewState={NewState}]";
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
     }
 }

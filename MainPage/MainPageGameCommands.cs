@@ -163,8 +163,8 @@ namespace Catan10
                         break;
 
                     case GameState.DoneResourceAllocation:
-                         await DoneAllocResourcesToPickingGoldTile.PostLog(this);
-                        
+                        await DoneAllocResourcesToPickingGoldTile.PostLog(this);
+
                         break;
                     case GameState.PickingRandomGoldTiles:
                         Contract.Assert(false, "this should always be moved passed in the state transition classes");
@@ -180,8 +180,13 @@ namespace Catan10
                         Contract.Assert(false, "this is done in pagecallback");
                         break;
 
-                    case GameState.MustDestroyCity:
-                        Contract.Assert(false, "This is done via clicking on Cities");
+                    case GameState.DoneDestroyingCities:
+                        // after the invasion, we return the pirate ship back to the starting position
+                        CTRL_Invasion.StartOver();
+                        var logEntry = Current.Log.FindLatestLogEntry(typeof(WaitingForRollToPirateRoll)) as WaitingForRollToPirateRoll;
+                       
+                        Debug.Assert(logEntry != null);
+                        await WaitingForRollToWaitingForNext.PostRollMessage(this, logEntry.RollModel);
                         break;
                     case GameState.WaitingForNext:
                         await GameContainer.ResetRandomGoldTiles();
@@ -192,7 +197,7 @@ namespace Catan10
                         else
                         {
                             await WaitingForNextToPickingRandomGoldTiles.PostLog(this);
-                            
+
                         }
                         break;
                     case GameState.Supplemental:
@@ -203,7 +208,7 @@ namespace Catan10
                         {
                             // this will skip the next player (+2 to current player)
                             await SupplementalToPickingGoldTiles.PostLog(this);
-                       
+
                         }
                         else
                         {

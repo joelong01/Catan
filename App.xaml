@@ -342,7 +342,7 @@
             <ImageBrush x:Key="TileType.Wheat" ImageSource="Assets/Tiles/wheat.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="TileType.Wood" ImageSource="Assets/Tiles/wood.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="TileType.Desert" ImageSource="Assets/Tiles/desert.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="TileType.Invasion" ImageSource="Assets/Tiles/invasion.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="TileType.Invasion" ImageSource="Assets/Tiles/gpt invasion.png" Stretch="UniformToFill" />
             <!--  ResourceType HarborType - should be one per enum value  -->
             <ImageBrush x:Key="HarborType.Brick" ImageSource="Assets/Harbors/2 for 1 brick.png" Stretch="UniformToFill" />
             <ImageBrush x:Key="HarborType.Ore" ImageSource="Assets/Harbors/2 for 1 ore.png" Stretch="UniformToFill" />
@@ -373,7 +373,7 @@
              <ImageBrush x:Key="ResourceType.Cloth" ImageSource="Assets/ResourceCards/cloth.png" Stretch="UniformToFill" />
              <ImageBrush x:Key="ResourceType.Paper" ImageSource="Assets/ResourceCards/paper.png" Stretch="UniformToFill" />
              <ImageBrush x:Key="ResourceType.Coin" ImageSource="Assets/ResourceCards/coin.png" Stretch="UniformToFill" />
-            <ImageBrush x:Key="ResourceType.Invasion" ImageSource="Assets/Tiles/invasion.png" Stretch="UniformToFill" />
+            <ImageBrush x:Key="ResourceType.Invasion" ImageSource="Assets\Tiles\gpt invasion.png" Stretch="Fill" />
             <!--<SolidColorBrush x:Key="ResourceType.None" Color="Transparent" />-->
             <Style x:Key="GameControllerStyle" TargetType="Button">
                 <Setter Property="HorizontalAlignment" Value="Center" />

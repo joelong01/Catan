@@ -199,7 +199,15 @@ namespace Catan10
         {
         }
 
-   
+        public RollModel Copy()
+        {
+            return new RollModel()
+            {
+                WhiteDie = this.WhiteDie,
+                RedDie = this.RedDie,
+                SpecialDice = this.SpecialDice
+            };
+        }
 
 
         public void Randomize()

@@ -78,9 +78,9 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        public Task Replay (IGameController gameController)
+        public async Task Replay (IGameController gameController)
         {
-            return Task.CompletedTask; // TODO: what if this is the last message?
+             await Task.Delay(0); // TODO: what if this is the last message?
         }
 
         public Task Undo(IGameController gameController)

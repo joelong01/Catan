@@ -23,5 +23,17 @@ namespace Catan10
             _daY.To = to.Y;
             _sbMove.Begin();
         }
+
+        public void ShowAsync()
+        {
+            DA_Opacity.To = 1.0;
+            SB_AnimateOpacity.Begin();
+        }
+
+        public void HideAsync()
+        {
+            DA_Opacity.To = 0.0;
+            SB_AnimateOpacity.Begin();
+        }
     }
 }

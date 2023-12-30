@@ -26,7 +26,7 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             var player = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(player != null);
@@ -38,7 +38,7 @@ namespace Catan10
             {
                 if (p.GameData.Resources.CurrentResources.GetCount(ResourceType.GoldMine) > 0)
                 {
-                    return Task.CompletedTask;
+                     await Task.Delay(0);
                 }
             }
 
@@ -46,17 +46,17 @@ namespace Catan10
             {
                 //
                 //  otherwise set the state so things can continue along
-                return TradeGoldToWaitingForNext.PostMessage(gameController);
+                await TradeGoldToWaitingForNext.PostMessage(gameController);
             }
 
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Replay (IGameController gameController)
+        public async Task Replay (IGameController gameController)
         {
             var player = gameController.NameToPlayer(this.SentBy);            
             player.GameData.Resources.GrantResources(this.GoldTrade);           
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Redo(IGameController gameController)

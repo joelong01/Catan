@@ -46,7 +46,7 @@ namespace Catan10
             await ToPickGold.PostLog(gameController, MainPage.Current.RandomGoldTileCount);
         }
 
-        public  Task Replay (IGameController gameController)
+        public async Task Replay (IGameController gameController)
         {
 
             //
@@ -56,7 +56,7 @@ namespace Catan10
                 p.GameData.Resources.ResourcesThisTurn.Reset();
             });
 
-            return Task.CompletedTask;
+             await Task.Delay(0);
 
         }
 

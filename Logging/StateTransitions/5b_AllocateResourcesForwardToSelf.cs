@@ -47,7 +47,7 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             //
             //  take back the resources I granted above...
@@ -57,7 +57,7 @@ namespace Catan10
             //  move to the next player.  
             ChangePlayerHelper.ChangePlayer(gameController, -1);
             
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
     }
 }

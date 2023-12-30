@@ -28,18 +28,20 @@
             <Setter Property="RenderTransformOrigin" Value="0.5, 0.5" />
         </Style>
         <Storyboard x:Key="RotatePirateShip" x:Name="SB_RotateShip" AutoReverse="False">
-            <DoubleAnimation Storyboard.TargetName="FirstRotateTransform"
-                         Storyboard.TargetProperty="Angle"
-                         To="{x:Bind Angle, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
-                         Duration="0:0:1" />
-        <DoubleAnimation Storyboard.TargetName="SecondRotateTransform"
-                         Storyboard.TargetProperty="Angle"
-                         To="{x:Bind Angle, Mode=OneWay}"
-                         Duration="0:0:1" />
+            <DoubleAnimation Storyboard.TargetName="FirstRotateTransform" Storyboard.TargetProperty="Angle"
+                    To="{x:Bind Angle, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}" Duration="0:0:1" />
+            <DoubleAnimation Storyboard.TargetName="SecondRotateTransform" Storyboard.TargetProperty="Angle"
+                    To="{x:Bind Angle, Mode=OneWay}" Duration="0:0:1" />
         </Storyboard>
     </Control.Resources>
 
     <Grid Background="Transparent">
+        <TextBlock x:Name="TXT_InvasionCount" Text="{x:Bind InvasionCount, Mode=OneWay}" Foreground="Red" Canvas.ZIndex="999"
+                HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="30" FontFamily="Segoe UI" FontWeight="ExtraBold">
+            <TextBlock.RenderTransform>
+                <CompositeTransform TranslateX="87" TranslateY="95" />
+            </TextBlock.RenderTransform>
+        </TextBlock>
         <Ellipse x:Name="Ellipse_Path" Width="300" Height="300" Fill="Transparent"
                 Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeThickness="4" StrokeDashArray="0.5" />
 
@@ -135,8 +137,9 @@
         <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent" Width="60" Height="60"
                 Margin="0,0,0,0">
 
-            <local:CityCtrl Width="60" Height="60" Background="Black"/>
-            <TextBlock x:Name="TB_CityCount" FontSize="22" Text="{x:Bind MainPageModel.TotalCities(), Mode=OneWay}"
+            <local:CityCtrl Width="60" Height="60" Background="Black" />
+            <TextBlock x:Name="TB_CityCount" FontSize="22"
+                    Text="{x:Bind MainPageModel.TotalCitiesBinding(), Mode=OneWay}"
                     Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
         </Grid>
@@ -147,7 +150,8 @@
             <local:KnightCtrl Background="Green" Foreground="White" Activated="true" />
 
             <TextBlock x:Name="TB_KnightCount" FontSize="22" HorizontalAlignment="Right" VerticalAlignment="Top"
-                    Text="{x:Bind MainPageModel.TotalKnightRanks(), Mode=OneWay}" Foreground="White" />
+                    Text="{x:Bind MainPageModel.TotalKnightRanksBinding(), Mode=OneWay}"
+                    Foreground="White" />
         </Grid>
     </Grid>
 </UserControl>

@@ -446,7 +446,7 @@ namespace Catan10
             }
         }
 
-        private Task UpdateUi(RollAction action)
+        private async Task UpdateUi(RollAction action)
         {
             UpdateRollStats();
 
@@ -465,7 +465,7 @@ namespace Catan10
                 GameController.StopHighlightingTiles();
             }
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         internal Task UpdateUiForRoll(RollState rollState)

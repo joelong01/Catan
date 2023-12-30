@@ -629,7 +629,7 @@ namespace Catan10
             _currentHexPanel.TileCallback = _tileCallback;
         }
 
-        public Task InitialPlaceBaron()
+        public async Task InitialPlaceBaron()
         {
             if (_currentHexPanel.DesertTiles.Count > 0)
             {
@@ -649,7 +649,7 @@ namespace Catan10
                 }
             }
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         /// <summary>

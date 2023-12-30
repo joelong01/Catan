@@ -132,7 +132,7 @@ namespace Catan10
         private void OnTest1(object sdr, RoutedEventArgs rea)
         {
             MainPageModel.GameInfo.Pirates = true;
-            CTRL_InvationCounter.Next();
+            CTRL_Invasion.Next();
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace Catan10
                     case MessageType.DeleteGame:
                         break;
                     case MessageType.JoinGame:
-                        await JoinOrCreateGame(parsedMessage.GameInfo); // this is local only
+                        await CreateGame(parsedMessage.GameInfo); // this is local only
                         break;
                     case MessageType.LeaveGame:
                         break;
@@ -213,56 +213,9 @@ namespace Catan10
 
         }
 
-        private async void OnTest2(object sdr, RoutedEventArgs rea)
+        private void OnTest2(object sdr, RoutedEventArgs rea)
         {
-            IReadOnlyList<User> users = await User.FindAllAsync();
-
-            foreach (User user in users)
-            {
-                String[] desiredProperties = new String[]
-                    {
-                        KnownUserProperties.FirstName,
-                        KnownUserProperties.LastName,
-                        KnownUserProperties.ProviderName,
-                        KnownUserProperties.AccountName,
-                        KnownUserProperties.GuestHost,
-                        KnownUserProperties.PrincipalName,
-                        KnownUserProperties.DomainName,
-                        KnownUserProperties.SessionInitiationProtocolUri,
-                    };
-                // Issue a bulk query for all of the properties.
-                IPropertySet values = await user.GetPropertiesAsync(desiredProperties);
-                string result = "";
-                foreach (String property in desiredProperties)
-                {
-                    result += property + ": " + values[property] + "\n";
-                }
-                this.TraceMessage(result);
-
-                TheHuman = NameToPlayer(( string )values[KnownUserProperties.FirstName]);
-                if (TheHuman != null)
-                {
-                    IRandomAccessStreamReference streamReference = await user.GetPictureAsync(UserPictureSize.Size64x64);
-                    if (streamReference != null)
-                    {
-                        IRandomAccessStream stream = await streamReference.OpenReadAsync();
-                        BitmapImage bitmapImage = new BitmapImage();
-                        bitmapImage.SetSource(stream);
-                        ImageBrush brush = new ImageBrush
-                        {
-                            AlignmentX = AlignmentX.Left,
-                            AlignmentY = AlignmentY.Top,
-                            Stretch = Stretch.UniformToFill,
-                            ImageSource = bitmapImage
-                        };
-
-                        TheHuman.ImageBrush = brush;
-
-
-                    }
-                }
-
-            }
+            Log.DumpActionStack();
         }
 
         // Undo
@@ -288,7 +241,7 @@ namespace Catan10
                 Id = Guid.NewGuid(),
                 Started = false
             };
-            await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
+            await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
 
             MainPageModel.PlayingPlayers.Clear();
 
@@ -329,7 +282,7 @@ namespace Catan10
                 Started = false,
                 Pirates=true
             };
-            await NewGameLog.JoinOrCreateGame(this, info, CatanAction.GameCreated);
+            await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
 
             MainPageModel.PlayingPlayers.Clear();
 
@@ -355,85 +308,20 @@ namespace Catan10
             await NextState();
         }
 
-        private async void OnTestService(object sender, RoutedEventArgs e)
+        private async void OnTestRollSeven(object sender, RoutedEventArgs e)
         {
-            await CreateAndConfigureProxy();
-
-            Guid id = Guid.Parse("{A2D8D755-9015-41F3-9CF3-560B2BE758EF}");
-            string gameName = "Test_Game_{A2D8D755-9015-41F3-9CF3-560B2BE758EF}";
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-            List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
-            MainPageModel.CatanService.OnGameDeleted += CatanService_OnGameDeleted;
-
-            void CatanService_OnGameDeleted(GameInfo gameInfo, string by)
+            RollModel rm = new RollModel()
             {
-                this.TraceMessage($"Deleted game={gameInfo} by {by}");
-                if (gameInfo.Id == id)
-                {
-                    MainPageModel.CatanService.OnGameDeleted -= CatanService_OnGameDeleted;
-                    tcs.TrySetResult(null);
-                }
-            }
-
-
-
-            foreach (var game in games)
-            {
-                this.TraceMessage($"Found game={game.Name}");
-                if (game.Name == gameName)
-                {
-                    await MainPageModel.CatanService.DeleteGame(game, TheHuman.PlayerName);
-                    await tcs.Task;
-                }
-            }
-
-            tcs = new TaskCompletionSource<object>();
-
-            MainPageModel.CatanService.OnGameCreated += CatanService_OnGameCreated;
-            void CatanService_OnGameCreated(GameInfo gameInfo, string playerName)
-            {
-                if (gameInfo.Id == id)
-                {
-                    MainPageModel.CatanService.OnGameCreated -= CatanService_OnGameCreated;
-                    tcs.TrySetResult(null);
-                }
-            }
-
-            GameInfo newGame = new GameInfo()
-            {
-                Id = id,
-                Name = gameName,
-                Creator = TheHuman.PlayerName,
-                RequestAutoJoin = false,
-                Started = false
+                RedDie = 1,
+                WhiteDie = 6,
+                SpecialDice = SpecialDice.Pirate
             };
-
-            await MainPageModel.CatanService.CreateGame(newGame);
-            await tcs.Task;
-
-
-            tcs = new TaskCompletionSource<object>();
-            MainPageModel.CatanService.OnGameJoined += CatanService_OnGameJoined;
-            void CatanService_OnGameJoined(GameInfo gameInfo, string playerName)
+            for (int i = 0; i < 6; i++)
             {
-                if (playerName == TheHuman.PlayerName && gameInfo.Id == id)
-                {
-                    tcs.TrySetResult(null);
-                    MainPageModel.CatanService.OnGameJoined -= CatanService_OnGameJoined;
-                }
-            }
-            await MainPageModel.CatanService.JoinGame(newGame, TheHuman.PlayerName);
 
-            await tcs.Task;
-
-
-            var players = await MainPageModel.CatanService.GetAllPlayerNames(id);
-            foreach (var name in players)
-            {
-                if (name == TheHuman.PlayerName)
-                {
-                    this.TraceMessage("found player");
-                }
+                var roll = rm.Copy();
+                await this.OnRolledNumber(roll);
+                await NextState();
             }
 
         }

@@ -23,7 +23,7 @@ namespace Catan10
 
             return gameController.PostMessage(logHeader, ActionType.Normal);
         }
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
 
             foreach (PlayerModel player in this.TradePartners)
@@ -50,7 +50,7 @@ namespace Catan10
                 gameController.TheHuman.GameData.Trades.PotentialTrades.Add(o);
             }
 
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Replay (IGameController gameController)
@@ -58,14 +58,14 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
     }
 }

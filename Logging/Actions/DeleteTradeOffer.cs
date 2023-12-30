@@ -21,24 +21,24 @@ namespace Catan10
 
             return gameController.PostMessage(logHeader, ActionType.Normal);
         }
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             TradeOffer localOffer = gameController.TheHuman.GameData.Trades.FindTradeByValue(this.TradeOffer);
             if (localOffer == null)
             {
-               //
-               //   this might happen if the user has deleted an offer locally (e.g. not the owner) and then 
-               //   the owner subsequently deletes it.  not a problem.                
-                return Task.CompletedTask;
+                //
+                //   this might happen if the user has deleted an offer locally (e.g. not the owner) and then 
+                //   the owner subsequently deletes it.  not a problem.                
+                await Task.Delay(0);
             }
 
             gameController.TheHuman.GameData.Trades.PotentialTrades.Remove(localOffer);
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Replay (IGameController gameController)
@@ -46,9 +46,9 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Do(gameController);
+            await Do(gameController);
         }
     }
 }

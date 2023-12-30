@@ -36,10 +36,10 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             ChangePlayerHelper.ChangePlayer(gameController, -2);
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
     }
 }

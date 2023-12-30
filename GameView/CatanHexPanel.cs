@@ -288,7 +288,7 @@ namespace Catan10
                     Tiles.Insert(0, element as TileCtrl);
                     if (StaticHelpers.IsInVisualStudioDesignMode)
                     {
-                        ((TileCtrl)element).ShowIndex = true;
+                        ( ( TileCtrl )element ).ShowIndex = true;
                     }
                 }
 
@@ -401,7 +401,7 @@ namespace Catan10
             count = VisualTiles[0].Count; // first edges
             for (int i = 0; i < middleCol; i++)
             {
-                count += 2 * (VisualTiles[i].Count + 1);
+                count += 2 * ( VisualTiles[i].Count + 1 );
             }
 
             count += VisualTiles[middleCol].Count + 1;
@@ -588,13 +588,13 @@ namespace Catan10
 
             //
             //  next is the edges of the fist and last colums (e.g. the TopLeft, BottomLeft of the first column and the corresponding ones on the last column
-            total += (RowCounts[0] - 2) * 4;
+            total += ( RowCounts[0] - 2 ) * 4;
 
             //
             //  next the TopRight/Top, Top/TopLeft, Bottom/BottomRight, and Bottom/BottomLeft pairs around the board.
             //  these are the top and bottom of the columns between the first and middle and between the middle and last column
             int middleCol = _colCount / 2;
-            total += (middleCol - 1) * 8;
+            total += ( middleCol - 1 ) * 8;
 
             // at this point, Total == count of roads on the perimiter...now look for the roads in the middle -- they all overlap
 
@@ -672,7 +672,7 @@ namespace Catan10
                     Start = int.Parse(tokens[i]),
                     End = int.Parse(tokens[i + 1])
                 };
-                island.BonusPoint = (island.Start != 0); // no points for the default map
+                island.BonusPoint = ( island.Start != 0 ); // no points for the default map
                 for (int count = island.Start; count <= island.End; count++)
                 {
                     TileToIslandDictionary[TilesInIndexOrder[count]] = island;
@@ -754,7 +754,7 @@ namespace Catan10
         // Arrange the child elements to their final position
         protected override Size ArrangeOverride(Size finalSize)
         {
-            if (DisableLayout || (RowCounts.Count == 0))
+            if (DisableLayout || ( RowCounts.Count == 0 ))
             {
                 return finalSize;
             }
@@ -775,7 +775,7 @@ namespace Catan10
         /// <returns></returns>
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (DisableLayout || (RowCounts.Count == 0) || NormalHeight == 0 || NormalWidth == 0)
+            if (DisableLayout || ( RowCounts.Count == 0 ) || NormalHeight == 0 || NormalWidth == 0)
             {
                 return availableSize;
             }
@@ -793,9 +793,9 @@ namespace Catan10
             //  Build the roads and buildings on the TopLayer
             CreateBuildings();
 
-            maxSize.Width = (_normalWidth + TileGap) * (_colCount - 1) + UniformMargin.Left + UniformMargin.Right;
+            maxSize.Width = ( _normalWidth + TileGap ) * ( _colCount - 1 ) + UniformMargin.Left + UniformMargin.Right;
 
-            maxSize.Height = (_normalHeight + TileGap) * RowCounts[middleCol] + UniformMargin.Top + UniformMargin.Bottom;
+            maxSize.Height = ( _normalHeight + TileGap ) * RowCounts[middleCol] + UniformMargin.Top + UniformMargin.Bottom;
 
             return maxSize;
         }
@@ -831,24 +831,24 @@ namespace Catan10
 
         public bool AllowShips
         {
-            get => (bool)GetValue(AllowShipsProperty);
+            get => ( bool )GetValue(AllowShipsProperty);
             set => SetValue(AllowShipsProperty, value);
         }
 
         public TileCtrl BaronTile
         {
-            get => (TileCtrl)GetValue(BaronTileProperty);
+            get => ( TileCtrl )GetValue(BaronTileProperty);
             set => SetValue(BaronTileProperty, value);
         }
 
         public Visibility BaronVisibility
         {
-            get => (Visibility)GetValue(BaronVisibilityProperty);
+            get => ( Visibility )GetValue(BaronVisibilityProperty);
             set
             {   //
                 // 7/23/202: the changed property handler isn't being called...don't know why.
                 //           instead of debugging it, will set it directly here.
-                
+
                 SetValue(BaronVisibilityProperty, value);
                 _baron.Visibility = value;
             }
@@ -856,7 +856,7 @@ namespace Catan10
 
         public string BuildingIndexToHarborIndex
         {
-            get => (string)GetValue(BuildingIndexToHarborIndexProperty);
+            get => ( string )GetValue(BuildingIndexToHarborIndexProperty);
             set => SetValue(BuildingIndexToHarborIndexProperty, value);
         }
 
@@ -866,7 +866,7 @@ namespace Catan10
 
         public CatanGames CatanGame
         {
-            get => (CatanGames)GetValue(CatanGameProperty);
+            get => ( CatanGames )GetValue(CatanGameProperty);
             set => SetValue(CatanGameProperty, value);
         }
 
@@ -874,7 +874,7 @@ namespace Catan10
 
         public string Description
         {
-            get => (string)GetValue(DescriptionProperty);
+            get => ( string )GetValue(DescriptionProperty);
             set => SetValue(DescriptionProperty, value);
         }
 
@@ -886,13 +886,13 @@ namespace Catan10
 
         public List<DevCardType> DevCards
         {
-            get => (List<DevCardType>)GetValue(DevCardsProperty);
+            get => ( List<DevCardType> )GetValue(DevCardsProperty);
             set => SetValue(DevCardsProperty, value);
         }
 
         public bool DisableLayout
         {
-            get => (bool)GetValue(DisableLayoutProperty);
+            get => ( bool )GetValue(DisableLayoutProperty);
             set => SetValue(DisableLayoutProperty, value);
         }
 
@@ -917,19 +917,19 @@ namespace Catan10
 
         public CatanGames GameName
         {
-            get => (CatanGames)GetValue(GameNameProperty);
+            get => ( CatanGames )GetValue(GameNameProperty);
             set => SetValue(GameNameProperty, value);
         }
 
         public GameType GameType
         {
-            get => (GameType)GetValue(GameTypeProperty);
+            get => ( GameType )GetValue(GameTypeProperty);
             set => SetValue(GameTypeProperty, value);
         }
 
         public int HarborCount
         {
-            get => (int)GetValue(HarborCountProperty);
+            get => ( int )GetValue(HarborCountProperty);
             set => SetValue(HarborCountProperty, value);
         }
 
@@ -938,31 +938,31 @@ namespace Catan10
 
         public string Islands
         {
-            get => (string)GetValue(IslandsProperty);
+            get => ( string )GetValue(IslandsProperty);
             set => SetValue(IslandsProperty, value);
         }
 
         public int Knights
         {
-            get => (int)GetValue(KnightsProperty);
+            get => ( int )GetValue(KnightsProperty);
             set => SetValue(KnightsProperty, value);
         }
 
         public int MaxCities
         {
-            get => (int)GetValue(MaxCitiesProperty);
+            get => ( int )GetValue(MaxCitiesProperty);
             set => SetValue(MaxCitiesProperty, value);
         }
 
         public int MaxResourceAllocated
         {
-            get => (int)GetValue(MaxResourceAllocatedProperty);
+            get => ( int )GetValue(MaxResourceAllocatedProperty);
             set => SetValue(MaxResourceAllocatedProperty, value);
         }
 
         public int MaxRoads
         {
-            get => (int)GetValue(MaxRoadsProperty);
+            get => ( int )GetValue(MaxRoadsProperty);
             set => SetValue(MaxRoadsProperty, value);
         }
 
@@ -975,19 +975,19 @@ namespace Catan10
 
         public int MaxSettlements
         {
-            get => (int)GetValue(MaxSettlementsProperty);
+            get => ( int )GetValue(MaxSettlementsProperty);
             set => SetValue(MaxSettlementsProperty, value);
         }
 
         public int MaxShips
         {
-            get => (int)GetValue(MaxShipsProperty);
+            get => ( int )GetValue(MaxShipsProperty);
             set => SetValue(MaxShipsProperty, value);
         }
 
         public int Monopoly
         {
-            get => (int)GetValue(MonopolyProperty);
+            get => ( int )GetValue(MonopolyProperty);
             set => SetValue(MonopolyProperty, value);
         }
 
@@ -1011,13 +1011,13 @@ namespace Catan10
 
         public TileCtrl PirateShipTile
         {
-            get => (TileCtrl)GetValue(PirateShipTileProperty);
+            get => ( TileCtrl )GetValue(PirateShipTileProperty);
             set => SetValue(PirateShipTileProperty, value);
         }
 
         public Visibility PirateVisibility
         {
-            get => (Visibility)GetValue(PirateVisibilityProperty);
+            get => ( Visibility )GetValue(PirateVisibilityProperty);
             set => SetValue(PirateVisibilityProperty, value);
         }
 
@@ -1032,7 +1032,7 @@ namespace Catan10
 
         public int RoadBuilding
         {
-            get => (int)GetValue(RoadBuildingProperty);
+            get => ( int )GetValue(RoadBuildingProperty);
             set => SetValue(RoadBuildingProperty, value);
         }
 
@@ -1094,13 +1094,13 @@ namespace Catan10
 
         public double TileGap
         {
-            get => (double)GetValue(TileGapProperty);
+            get => ( double )GetValue(TileGapProperty);
             set => SetValue(TileGapProperty, value);
         }
 
         public string TileGroups
         {
-            get => (string)GetValue(TileGroupsProperty);
+            get => ( string )GetValue(TileGroupsProperty);
             set => SetValue(TileGroupsProperty, value);
         }
 
@@ -1203,13 +1203,13 @@ namespace Catan10
 
         public Thickness UniformMargin
         {
-            get => (Thickness)GetValue(UniformMarginProperty);
+            get => ( Thickness )GetValue(UniformMarginProperty);
             set => SetValue(UniformMarginProperty, value);
         }
 
         public int VictoryPoints
         {
-            get => (int)GetValue(VictoryPointsProperty);
+            get => ( int )GetValue(VictoryPointsProperty);
             set => SetValue(VictoryPointsProperty, value);
         }
 
@@ -1217,7 +1217,7 @@ namespace Catan10
 
         public int YearOfPlenty
         {
-            get => (int)GetValue(YearOfPlentyProperty);
+            get => ( int )GetValue(YearOfPlentyProperty);
             set => SetValue(YearOfPlentyProperty, value);
         }
 
@@ -1305,7 +1305,9 @@ namespace Catan10
             this.Children.Add(TopLayer);
         }
 
-       public void ArrangeRoads()
+
+
+        public void ArrangeRoads()
         {
             if (RoadKeyToRoadDictionary.Count != 0)
             {
@@ -1869,7 +1871,7 @@ namespace Catan10
 
                 try
                 {
-                    top = Math.Abs((RowCounts[col] - RowCounts[middleCol])) * NormalHeight * .5 + UniformMargin.Top - gap;
+                    top = Math.Abs(( RowCounts[col] - RowCounts[middleCol] )) * NormalHeight * .5 + UniformMargin.Top - gap;
                     foreach (TileCtrl tile in childColumn)
                     {
                         tile.Arrange(new Rect(0, 0, tile.DesiredSize.Width, tile.DesiredSize.Height));
@@ -1903,7 +1905,19 @@ namespace Catan10
             CalculateAdjacentBuildings();
             return finalSize;
         }
-    }
+
+        public void HideBaron()
+        {
+            _baron.HideAsync();
+        }
+
+        public void ShowBaron()
+        {
+            _baron.ShowAsync();
+        }
+
+
+    } // End CatanHexPanel
 
     public class HarborLayoutData
     {
@@ -1962,7 +1976,7 @@ namespace Catan10
 
         public static int GetMaxRoads(CatanHexPanel element)
         {
-            return (int)element.GetValue(MaxRoadsProperty);
+            return ( int )element.GetValue(MaxRoadsProperty);
         }
 
         public static void SetMaxRoads(CatanHexPanel element, int value)

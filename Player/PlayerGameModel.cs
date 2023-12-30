@@ -96,6 +96,7 @@ namespace Catan10
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("KnightsLeft");
                     NotifyPropertyChanged("TotalKnightRanks");
+                    NotifyPropertyChanged("TotalKnightRanksBinding");
                 }
             }
         }
@@ -717,6 +718,7 @@ namespace Catan10
             UpdateScore();
             Pips = CalculatePips(Settlements, Cities);
             NotifyPropertyChanged("TotalCities");
+            NotifyPropertyChanged("TotalCitiesBinding");
         }
 
         private void Knights_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

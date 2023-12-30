@@ -25,7 +25,7 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             PlayerModel player = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(player != null);
@@ -37,7 +37,7 @@ namespace Catan10
                 if (devCard == DevCardType.None) // ran out of DevCards!
                 {
                     player.GameData.Resources.CurrentResources += cost; //refund!
-                    return Task.CompletedTask;
+                    await Task.Delay(0);
                 }
 
                 player.GameData.Resources.AddDevCard(devCard);
@@ -46,7 +46,7 @@ namespace Catan10
             {
                 player.GameData.Resources.GrantEntitlement(PurchasedEntitlement);
             }
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
         public Task Replay (IGameController gameController)
         {
@@ -57,7 +57,7 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             PlayerModel player = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(player != null);
@@ -67,7 +67,7 @@ namespace Catan10
             player.GameData.Resources.CurrentResources += cost;
             player.GameData.Resources.RevokeEntitlement(PurchasedEntitlement);
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
     }
 }

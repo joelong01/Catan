@@ -30,26 +30,26 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             // move current player to the first player that needs to destroy a city
            
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Replay(IGameController gameController)
+        public async Task Replay(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
 

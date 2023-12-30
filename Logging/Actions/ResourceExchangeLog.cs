@@ -28,7 +28,7 @@ namespace Catan10
             return gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             //
             //  if a trade happens, I flip the cards showing what resources came from a roll so that we can see what the trade was
@@ -36,7 +36,7 @@ namespace Catan10
 
             var owner = gameController.NameToPlayer(this.SentBy);
             owner.GameData.Resources.GrantResources(this.Traded);
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public Task Replay (IGameController gameController)
@@ -49,11 +49,11 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             var owner = gameController.NameToPlayer(this.SentBy);
             owner.GameData.Resources.GrantResources(this.Traded.GetNegated());
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         #endregion Methods

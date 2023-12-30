@@ -157,7 +157,13 @@ namespace Catan10
         MustDestroyCity,
 
         [Description("Picking Random Gold Cards")]
-        PickingRandomGoldTiles
+        PickingRandomGoldTiles,
+
+        [Description("Handling Pirates")]
+        HandlePirates,
+
+        [Description("Done Destroying Cities")]
+        DoneDestroyingCities
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

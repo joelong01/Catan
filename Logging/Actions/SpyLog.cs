@@ -18,10 +18,10 @@ namespace Catan10
         }
         #region Methods
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             gameController.SetSpyInfo(this.SentBy.PlayerName, this.SpyOn);
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
         public Task Replay (IGameController gameController)
         {

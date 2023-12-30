@@ -56,9 +56,9 @@ namespace Catan10
         /// </summary>
         /// <param name="gameController"></param>
         /// <returns></returns>
-        public Task Replay(IGameController gameController)
+        public async Task Replay(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Redo(IGameController gameController)

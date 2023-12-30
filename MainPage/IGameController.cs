@@ -211,9 +211,9 @@ namespace Catan10
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
-        public Task AddPlayer(string playerToAdd)
+        public async Task AddPlayer(string playerToAdd)
         {
-            if (playerToAdd == "Catan Spy") return Task.CompletedTask;
+            if (playerToAdd == "Catan Spy") await Task.Delay(0);
             //
             //  7/25/2020:  if you are replaying a game, this call comes in at GameState.FinishedRollOrder
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.FinishedRollOrder);
@@ -269,7 +269,7 @@ namespace Catan10
                 this.TraceMessage($"Recieved an AddPlayer call for {newPlayer} when they are already in the game");
             }
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
@@ -312,12 +312,12 @@ namespace Catan10
 
         public void CompleteRedo()
         {
-           // this.TraceMessage("complete");
+            // this.TraceMessage("complete");
         }
 
         public void CompleteUndo()
         {
-           // this.TraceMessage("complete");
+            // this.TraceMessage("complete");
         }
 
         public RandomBoardSettings CurrentRandomBoard()
@@ -491,7 +491,7 @@ namespace Catan10
             {
                 rollState = new RollState()
                 {
-               
+
                     PlayerName = CurrentPlayer.PlayerName
                 };
             }
@@ -553,15 +553,20 @@ namespace Catan10
         ///     Not a lot to do when Start happens.  Just get ready for the board to get set and players to be added.
         ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition
         ///     of new players.
+        ///     
+        ///     if we are playing a Pirates game, the Baron starts out hidden
+        /// 
         /// </summary>
         /// <param name="logHeader"></param>
         /// <returns></returns>
-        public Task JoinOrCreateGame(GameInfo gameInfo)
+        public async Task CreateGame(GameInfo gameInfo)
         {
             MainPageModel.GameInfo = gameInfo;
             _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
             MainPageModel.IsGameStarted = true;
-            return Task.CompletedTask;
+            if (gameInfo.Pirates)
+            { _gameView.CurrentGame.HexPanel.HideBaron(); }
+            await Task.Delay(0);
         }
 
         public PlayerModel NameToPlayer(string playerName)
@@ -679,9 +684,9 @@ namespace Catan10
             await _gameView.ResetRandomGoldTiles();
         }
 
-        public Task ResetRollControl()
+        public async Task ResetRollControl()
         {
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         //
@@ -798,7 +803,7 @@ namespace Catan10
             }
         }
 
-        public Task SetRoadState(UpdateRoadLog updateRoadModel)
+        public async Task SetRoadState(UpdateRoadLog updateRoadModel)
         {
             RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
             Contract.Assert(road != null);
@@ -814,7 +819,7 @@ namespace Catan10
 
             UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public void SetSpyInfo(string sentBy, bool spyOn)
@@ -848,12 +853,12 @@ namespace Catan10
             GameContainer.AllTiles.ForEach((tile) => tile.StopHighlightingTile());
         }
 
-        public Task TellServiceGameStarted()
+        public async Task TellServiceGameStarted()
         {
-            if (MainPageModel.CatanService == null) return Task.CompletedTask;
+            if (MainPageModel.CatanService == null) await Task.Delay(0);
             this.TraceMessage("you took this out.  put it back or delete it.");
             // await MainPageModel.CatanService.StartGame(MainPageModel.GameInfo);
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public TileCtrl TileFromIndex(int targetTile)
@@ -867,12 +872,12 @@ namespace Catan10
         /// </summary>
         /// <param name="playerLogHeader"></param>
         /// <returns></returns>
-        public Task UndoAddPlayer(AddPlayerLog playerLogHeader)
+        public async Task UndoAddPlayer(AddPlayerLog playerLogHeader)
         {
             var player = NameToPlayer(playerLogHeader.SentBy);
             Contract.Assert(player != null, "Player Can't Be Null");
             MainPageModel.PlayingPlayers.Remove(player);
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public async Task<bool> UndoAsync()
@@ -913,7 +918,7 @@ namespace Catan10
             }
         }
 
-        public Task UndoSetRoadState(UpdateRoadLog updateRoadModel)
+        public async Task UndoSetRoadState(UpdateRoadLog updateRoadModel)
         {
             RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
             Contract.Assert(road != null);
@@ -922,7 +927,7 @@ namespace Catan10
 
             UpdateRoadState(player, road, updateRoadModel.NewRoadState, updateRoadModel.OldRoadState, updateRoadModel.OldRaceTracking);
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         //
@@ -981,7 +986,7 @@ namespace Catan10
         /// <param name="logEntry"></param>
         /// <param name="actionType"></param>
         /// <returns></returns>
-        public Task UpdateKnight(KnightStateChangeLog logEntry, ActionType actionType)
+        public async Task UpdateKnight(KnightStateChangeLog logEntry, ActionType actionType)
         {
             var knight = GetBuilding(logEntry.BuildingIndex)?.Knight;
             Contract.Assert(knight != null);
@@ -1028,7 +1033,7 @@ namespace Catan10
 
             }
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public async Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType)
@@ -1070,22 +1075,28 @@ namespace Catan10
         /// <returns></returns>
         public async Task HandlePirateRoll(RollModel rollModel, ActionType action)
         {
-            if (!MainPageModel.GameInfo.Pirates)
-            {
-                return;
-            }
+            Debug.Assert(MainPageModel.GameInfo.Pirates);
 
             if (action != ActionType.Undo)
             {
-
-
                 if (rollModel.SpecialDice == SpecialDice.Pirate)
                 {
-                    int count =  CTRL_InvationCounter.Next();
-                    if (count > 1)
+                    int count =  CTRL_Invasion.Next();
+                    this.TraceMessage($"PIRATE      [Count={count}] [steps={CTRL_Invasion.StepsBeforeInvasion}]");
+                    if (count < CTRL_Invasion.StepsBeforeInvasion)
                     {
+                        //
+                        //  we've moved the ship and now we just deal with the roll
 
-                        if (MainPageModel.TotalCities() > MainPageModel.TotalKnightRanks())
+                        await WaitingForRollToWaitingForNext.PostRollMessage(this, rollModel);
+                        return;
+                    }
+                    if (count == CTRL_Invasion.StepsBeforeInvasion)
+                    {
+                        CTRL_Invasion.HideBaron();
+                        this.GameContainer.CurrentGame.HexPanel.ShowBaron();
+
+                        if (MainPageModel.TotalCities > MainPageModel.TotalKnightRanks)
                         {
                             // find lowest knight rank
                             int lowestKnightRank = 100; // arbitrary big number
@@ -1148,7 +1159,9 @@ namespace Catan10
 
                             if (foundAtLeastOneVictim)
                             {
+                                this.TraceMessage("DESTROY CITY: Start");
                                 await DestroyCity_Next.PostLog(this);
+                                this.TraceMessage("DESTROY CITY: End");
                             }
 
                             if (playersWithHighestKnightRank.Count == 1)
@@ -1175,25 +1188,32 @@ namespace Catan10
 
                         }
 
+
                     }
                 }
             }
+
             else
             {
                 if (rollModel.SpecialDice == SpecialDice.Pirate)
                 {
-                    int count =  CTRL_InvationCounter.Previous();
+                    CTRL_Invasion.Previous();
+                    if (CTRL_Invasion.InvasionCount == 0)
+                    {
+                        CTRL_Invasion.ShowBaron();
+                        this.GameContainer.CurrentGame.HexPanel.HideBaron();
+
+                    }
                 }
             }
 
-
-            return;
+            await Task.Delay(0);
 
         }
         /**
          * find the city and the player, update the city.Wall property and consume or refund the entitlement
          */
-        public Task ProtectCity(ProtectCityLog protectCityLog, ActionType action)
+        public async Task ProtectCity(ProtectCityLog protectCityLog, ActionType action)
         {
             BuildingCtrl building = GetBuilding(protectCityLog.BuildingIndex);
             Contract.Assert(building != null);
@@ -1213,7 +1233,7 @@ namespace Catan10
             }
 
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType actionType)
         {
@@ -1266,8 +1286,8 @@ namespace Catan10
 
                 }
 
-              
-                
+
+
             }
 
             CalculateAndSetLongestRoad();
@@ -1378,8 +1398,11 @@ namespace Catan10
 
         public async Task RolledSeven()
         {
-            CTRL_InvationCounter.Next();
-            await MustMoveBaronLog.PostLog(this, MoveBaronReason.Rolled7);
+
+            if (GameInfo.Pirates && CTRL_Invasion.InvasionCount > 0)
+            {
+                await MustMoveBaronLog.PostLog(this, MoveBaronReason.Rolled7);
+            }
         }
     }
 }

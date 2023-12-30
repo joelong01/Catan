@@ -19,12 +19,12 @@ namespace Catan10.Logging.StateTransitions
             await gameController.PostMessage(logEntry, ActionType.Normal);
 
         }
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             BuildingCtrl building = gameController.GetBuilding(this.Index);
             building.City.HasWall = false;
             gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.DestroyCity);
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Redo(IGameController gameController)
@@ -37,11 +37,11 @@ namespace Catan10.Logging.StateTransitions
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             BuildingCtrl building = gameController.GetBuilding(this.Index);
             building.City.HasWall = true;
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
     }
 }

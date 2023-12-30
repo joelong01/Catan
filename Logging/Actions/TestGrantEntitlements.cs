@@ -28,7 +28,7 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             var player = gameController.NameToPlayer(this.SentBy);
             player.GameData.Resources.GrantResources(this.TradeResources);
@@ -47,7 +47,7 @@ namespace Catan10
                 player.GameData.Resources.AvailableDevCards.Add(model);
             }
 
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
         public Task Replay (IGameController gameController)
         {

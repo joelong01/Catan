@@ -54,7 +54,7 @@ namespace Catan10
             Rolls.ForEach((roll) => roll.Randomize());
         }
 
-        public Task Reset ()
+        public async Task Reset ()
         {
             PopulateControlList();
             Rolls.ForEach((roll) =>
@@ -65,7 +65,7 @@ namespace Catan10
 
             _rolled = false;
 
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public void TestSetRolls (List<RollModel> rolls)

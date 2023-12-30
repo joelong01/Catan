@@ -32,12 +32,12 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
            
 
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
         public Task Replay (IGameController gameController)
         {
@@ -49,10 +49,10 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
     }
 }

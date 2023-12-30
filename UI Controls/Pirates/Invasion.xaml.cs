@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -21,13 +22,24 @@ namespace Catan10
 {
     public sealed partial class InvasionCtrl : UserControl
     {
+        public int StepsBeforeInvasion { get; } = 7;
 
-        private int currentCount = 0;
+        private int currentCount = 0; // this is the count of steps it goes from 0 - StepsBeforeInvasion
 
         public InvasionCtrl()
         {
             this.InitializeComponent();
         }
+        //
+        //  this is the number of invastions.
+        public static readonly DependencyProperty InvasionCountProperty = DependencyProperty.Register("InvasionCount", typeof(int), typeof(InvasionCtrl), new PropertyMetadata(0));
+        public int InvasionCount
+        {
+            get => ( int )GetValue(InvasionCountProperty);
+            set => SetValue(InvasionCountProperty, value);
+        }
+
+
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(new MainPageModel()));
         public MainPageModel MainPageModel
         {
@@ -60,22 +72,50 @@ namespace Catan10
         {
             SB_RotateShip.Begin();
         }
+        public void StartOver()
+        {
+            this.TraceMessage("Starting Over");
+            Angle = 0;
+            
+        }
 
         public int Next()
         {
             currentCount++;
-            currentCount = currentCount % 8;
-            Angle = (double) currentCount * 45;
-            return currentCount;
+            double angle =  ( double )( currentCount % 8 ) * 45;
+            if (angle > 0)
+            {
+                Angle = angle;
+            }
+            if (currentCount % StepsBeforeInvasion == 0)
+            {
+                InvasionCount++;
+            }
+            return currentCount % 8;
         }
 
         public int Previous()
         {
+            Debug.Assert(currentCount > 0);
             currentCount--;
-            if (currentCount < 0) currentCount += 8;
-            currentCount = currentCount % 8;
-            Angle = ( double )currentCount * 45;
-            return currentCount;
+
+            if (currentCount == 0)
+            {
+                InvasionCount--;
+            }
+
+            Angle = ( double )( currentCount % 8 ) * 45;
+            return currentCount % 8;
+        }
+
+        public void HideBaron()
+        {
+            CTRL_Baron.HideAsync();
+        }
+
+        internal void ShowBaron()
+        {
+            CTRL_Baron.ShowAsync();
         }
     }
 }

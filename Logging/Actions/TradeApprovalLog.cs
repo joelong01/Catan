@@ -84,14 +84,14 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         #endregion Methods

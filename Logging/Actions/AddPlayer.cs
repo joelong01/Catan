@@ -46,7 +46,7 @@ namespace Catan10
             GameState state = gameController.CurrentGameState;
 
             //
-            //  6/16/2020:  if the state !=  GameState.WaitingForPlayers then that means that the JoinOrCreateGame call hasn't completed.
+            //  6/16/2020:  if the state !=  GameState.WaitingForPlayers then that means that the CreateGame call hasn't completed.
             //              which probably means there is an issue calling the service
             //  
             Contract.Assert(state == GameState.WaitingForPlayers); // you can only add players in this state

@@ -27,7 +27,7 @@ namespace Catan10
 
         //
         //  on .Do, just check as these have already been set...ReDo is different
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             Contract.Assert(PlayersInOrder.Count == gameController.PlayingPlayers.Count);
             for (int i=0; i<PlayersInOrder.Count; i++)
@@ -35,8 +35,8 @@ namespace Catan10
                 Contract.Assert(PlayersInOrder[i].PlayerIdentifier == gameController.PlayingPlayers[i].PlayerIdentifier);
             }
 
-            
-            return Task.CompletedTask;
+
+            await Task.Delay(0);
         }
         /// <summary>
         ///     this is where we set the correct order for the players, having ignored the rolls previously
@@ -59,19 +59,19 @@ namespace Catan10
 
         //
         //  when redoing, set the order
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
             Contract.Assert(PlayersInOrder.Count == gameController.PlayingPlayers.Count);
             for (int i = 0; i < PlayersInOrder.Count; i++)
             {
                 gameController.PlayingPlayers[i] = PlayersInOrder[i];
             }
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         #endregion Methods

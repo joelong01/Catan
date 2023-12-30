@@ -47,12 +47,14 @@ namespace Catan10
             }
             if (stack.Count > 0)
             {
-                sb.Length -= (1 + Environment.NewLine.Length); // remove trailing comma
+                sb.Length -= ( 1 + Environment.NewLine.Length ); // remove trailing comma
                 sb.Append(Environment.NewLine);
             }
             sb.Append("]");
             return sb.ToString();
         }
+
+
 
         internal void PrintLog([CallerMemberName] string caller = "")
         {
@@ -179,6 +181,19 @@ namespace Catan10
             ToJson(UndoneStack, sb, "UndoneStack");
             return sb.ToString();
         }
+
+        public LogHeader FindLatestEntry(Type headerType)
+        {
+
+            foreach (LogHeader logHeader in DoneStack)
+            {
+                if (logHeader.GetType().FullName == headerType.FullName)
+                {
+                    return logHeader;
+                }
+            }
+            return null;
+        }
     }
 
     public class Log : INotifyPropertyChanged, IDisposable
@@ -212,7 +227,7 @@ namespace Catan10
                 sb.Append(",");
                 sb.Append(Environment.NewLine);
             }
-            sb.Length -= (1 + Environment.NewLine.Length); // remove trailing comma
+            sb.Length -= ( 1 + Environment.NewLine.Length ); // remove trailing comma
             sb.Append(Environment.NewLine);
             sb.Append("]");
             return sb.ToString();
@@ -345,7 +360,7 @@ namespace Catan10
             });
         }
 
-        public Task PushAction(LogHeader logHeader)
+        public async Task PushAction(LogHeader logHeader)
         {
             try
             {
@@ -355,12 +370,19 @@ namespace Catan10
                 }
                 logHeader.LogType = LogType.Normal;
                 Stacks.PushAction(logHeader);
-                return Task.CompletedTask;
+                await Task.Delay(0);
             }
             finally
             {
                 // PrintLog();
+                NotifyPropertyChanged("EnableNextButton");
+                NotifyPropertyChanged("StateMessage");
             }
+        }
+
+        public void DumpActionStack()
+        {
+            Stacks.PrintLog();
         }
 
         internal bool IsMessageRecorded(CatanMessage message)
@@ -376,7 +398,7 @@ namespace Catan10
         ///
         /// </summary>
         /// <returns></returns>
-        public Task Redo(LogHeader incomingLogHeader)
+        public async Task Redo(LogHeader incomingLogHeader)
         {
             try
             {
@@ -385,11 +407,11 @@ namespace Catan10
                 Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
                 logHeader.LogType = LogType.Redo;  // 5/21/2020:  We need this so that we know to know clear the undo stack on the push
                 Stacks.PushAction(logHeader);
-                return Task.CompletedTask;
+                await Task.Delay(0);
             }
             finally
             {
-               
+
                 //   PrintLog();
             }
         }
@@ -408,7 +430,7 @@ namespace Catan10
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public Task Undo(LogHeader incomingLogHeader)
+        public async Task Undo(LogHeader incomingLogHeader)
         {
             try
             {
@@ -417,18 +439,24 @@ namespace Catan10
                 Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
                 if (!logHeader.CanUndo)
                 {
-                    return Task.CompletedTask;
+                    await Task.Delay(0);
+                    return;
                 }
                 Stacks.PopAction();
                 logHeader.LogType = LogType.Undo;
                 Stacks.PushUndo(logHeader);
-                return Task.CompletedTask;
+                await Task.Delay(0);
             }
             finally
             {
                 GameController.CompleteUndo();
                 //  PrintLog();
             }
+        }
+
+        internal LogHeader FindLatestLogEntry(Type type)
+        {
+            return Stacks.FindLatestEntry(type);
         }
     }
 }

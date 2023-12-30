@@ -24,7 +24,7 @@ namespace Catan10
         private int _ThreeStarPosition = 0;
         private int _TwoStarPosition = 0;
         private bool _WebSocketConnected = false;
-        private string[] DynamicProperties { get; } = new string[] { "TotalCities", "TotalKnightRanks", "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
+        private string[] DynamicProperties { get; } = new string[] {  "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
         #endregion Properties + Fields
 
 
@@ -163,6 +163,7 @@ namespace Catan10
                         case GameState.DoneResourceAllocation:
                         case GameState.WaitingForNext:
                         case GameState.Supplemental:
+                        case GameState.DoneDestroyingCities:
                             return true;
 
                         default:
@@ -619,33 +620,52 @@ namespace Catan10
         /// </summary>
         /// <returns></returns>
 
-        public int TotalKnightRanks()
+        public int TotalKnightRanks
         {
-            int rank = 0;
-            foreach (var player in PlayingPlayers)
+            get
             {
-                foreach (var knight in player.GameData.Knights)
+                int rank = 0;
+                if (PlayingPlayers == null) return -1;
+                foreach (var player in PlayingPlayers)
                 {
-                    if (knight.Activated)
+                    foreach (var knight in player.GameData.Knights)
                     {
-                        rank += ( int )knight.KnightRank;
+                        if (knight.Activated)
+                        {
+                            rank += ( int )knight.KnightRank;
+                        }
                     }
                 }
-            }
 
-            return rank;
+                return rank;
+            }
         }
 
-        public int TotalCities()
+        public string TotalKnightRanksBinding()
         {
-            int Cities = 0;
-            foreach (var player in PlayingPlayers)
+            return TotalKnightRanks.ToString();
+        }
+
+        public int TotalCities
+        {
+            get
             {
+                int Cities = 0;
+                if (PlayingPlayers == null) return -1;
 
-                Cities += ( int )player.GameData.Cities.Count;
+                foreach (var player in PlayingPlayers)
+                {
+
+                    Cities += ( int )player.GameData.Cities.Count;
+                }
+
+                return Cities;
             }
+        }
 
-            return Cities;
+        public string TotalCitiesBinding()
+        {
+            return TotalCities.ToString();
         }
     }
 }

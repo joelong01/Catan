@@ -265,7 +265,7 @@ namespace Catan10
                     //  note that we join or create the game and this returns when the message is sent, not when the message is processed
                     //
 
-                    await NewGameLog.JoinOrCreateGame(this, MainPageModel.GameInfo, action);
+                    await NewGameLog.CreateGame(this, MainPageModel.GameInfo, action);
 
                     //
                     //  6/16/2020: If there is an issue connecting to the service we call AddPlayer() before creating the game
@@ -328,10 +328,10 @@ namespace Catan10
 
         }
 
-        private Task ReplayGame(GameInfo game, string playerName)
+        private async Task ReplayGame(GameInfo game, string playerName)
         {
             this.TraceMessage("You need to build this...");
-            return Task.CompletedTask;
+             await Task.Delay(0);
             //   var messages = await Proxy.
         }
 
@@ -363,7 +363,7 @@ namespace Catan10
 
             if (TheHuman.PlayerName == gameInfo.Creator)
             {
-                await NewGameLog.JoinOrCreateGame(this, gameInfo, CatanAction.GameCreated); // the local action to join as the service is already created
+                await NewGameLog.CreateGame(this, gameInfo, CatanAction.GameCreated); // the local action to join as the service is already created
             }
             else
             {
@@ -374,7 +374,7 @@ namespace Catan10
                 }
                 //
                 //  send a message to the service to Join the game
-                await NewGameLog.JoinOrCreateGame(this, gameInfo, CatanAction.GameJoined); // the local action to join as the service is already created
+                await NewGameLog.CreateGame(this, gameInfo, CatanAction.GameJoined); // the local action to join as the service is already created
                 await MainPageModel.CatanService.JoinGame(gameInfo, TheHuman.PlayerName);   // join the service Hub for this group -- will cause the client events to fire
             }
 
@@ -432,7 +432,7 @@ namespace Catan10
             {
                 //
                 //  this sets the client up to start a game
-                await NewGameLog.JoinOrCreateGame(this, gameInfo, CatanAction.GameJoined); // the local action to join as the service is already created
+                await NewGameLog.CreateGame(this, gameInfo, CatanAction.GameJoined); // the local action to join as the service is already created
             }
 
             if (CurrentGameState != GameState.WaitingForPlayers)

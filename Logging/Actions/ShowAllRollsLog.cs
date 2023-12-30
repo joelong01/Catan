@@ -34,17 +34,17 @@ namespace Catan10
         /// </summary>
         /// <param name="gameController"></param>
         /// <returns></returns>
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             Contract.Assert(sentBy != null);
-            sentBy.GameData.SyncronizedPlayerRolls.LatestRolls.ForEach((r) => r.Orientation = TileOrientation.FaceUp);            
-            
-            return Task.CompletedTask;
+            sentBy.GameData.SyncronizedPlayerRolls.LatestRolls.ForEach((r) => r.Orientation = TileOrientation.FaceUp);
+
+            await Task.Delay(0);
         }
-        public Task Replay (IGameController gameController)
+        public async Task Replay(IGameController gameController)
         {
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public Task Redo(IGameController gameController)

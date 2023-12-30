@@ -36,28 +36,28 @@ namespace Catan10
         /// <param name="gameController"></param>
         /// <returns></returns>
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             gameController.PlayingPlayers.ForEach((p) =>
             {
                 p.GameData.Resources.ResourcesThisTurn.Reset();
                 p.GameData.Resources.ResourcesThisTurn.AddResources(p.GameData.Resources.CurrentResources);
             });
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
         public Task Replay (IGameController gameController)
         {
             return Do(gameController);
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
     }
 }

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Catan10
 {
-    
+
     internal class DestroyCity_Next : LogHeader, ILogController
     {
-        int Count { get; set; }    
+        int Count { get; set; }
 
         public static async Task PostLog(IGameController gameController)
         {
@@ -18,7 +18,7 @@ namespace Catan10
             GameState newState = GameState.MustDestroyCity;
             PlayerModel nextVictim = null;
             int currentPlayerIndex = players.IndexOf(gameController.CurrentPlayer);
-            for (int i=0; i< players.Count; i++)
+            for (int i = 0; i < players.Count; i++)
             {
                 int idx = (i + currentPlayerIndex) % players.Count;
                 if (players[idx].GameData.Resources.HasUnusedEntitlment(Entitlement.DestroyCity))
@@ -33,14 +33,15 @@ namespace Catan10
                 if (gameController.CurrentPlayer != gameController.LastPlayerToRoll)
                 {
                     toMove = GetPlayerDistance(players, gameController.CurrentPlayer, gameController.LastPlayerToRoll);
-                    newState = GameState.WaitingForNext;
+                    newState = GameState.DoneDestroyingCities;
                 }
-            } else
+            }
+            else
             {
                 toMove = GetPlayerDistance(players, gameController.CurrentPlayer, nextVictim);
             }
 
-      
+
 
             var logHeader = new DestroyCity_Next()
             {
@@ -63,14 +64,19 @@ namespace Catan10
         public static int GetNextPlayer(IList<PlayerModel> players, PlayerModel startPlayer)
         {
             int startIndex = players.IndexOf (startPlayer);
-            startIndex = (startIndex + 1) % players.Count;
+            startIndex = ( startIndex + 1 ) % players.Count;
             return startIndex;
 
         }
-
-        public Task Do(IGameController gameController)
+        /// <summary>
+        ///     This just moves the current player
+        ///     the actual work of destorying the city is done int the PageCallback when the user clicks on the City
+        /// </summary>
+        /// <param name="gameController"></param>
+        /// <returns></returns>
+        public async Task Do(IGameController gameController)
         {
-            if (this.Count == 0) return Task.CompletedTask;
+            this.TraceMessage("Destroy Cit:: Do");
 
             List<PlayerModel> playingPlayers = gameController.PlayingPlayers;
 
@@ -91,7 +97,7 @@ namespace Catan10
             var newPlayer = playingPlayers[newPlayerIndex];
             gameController.CurrentPlayer = newPlayer;
             MainPage.Current.TheHuman = gameController.CurrentPlayer;
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public Task Redo(IGameController gameController)
@@ -104,7 +110,7 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             List<PlayerModel> playingPlayers = gameController.PlayingPlayers;
 
@@ -125,7 +131,7 @@ namespace Catan10
             var newPlayer = playingPlayers[newPlayerIndex];
             gameController.CurrentPlayer = newPlayer;
             MainPage.Current.TheHuman = gameController.CurrentPlayer;
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
+using Windows.Media.Playback;
 using Windows.UI.Xaml.Controls;
 
 namespace Catan10
@@ -26,10 +27,13 @@ namespace Catan10
         }
         internal static async Task PostRollMessage(IGameController gameController, RollModel roll)
         {
-            Contract.Assert(gameController.CurrentGameState == GameState.WaitingForRoll);
+            System.Diagnostics.Debug.Assert(gameController.CurrentGameState == GameState.WaitingForRoll ||
+                gameController.CurrentGameState == GameState.HandlePirates ||
+                gameController.CurrentGameState == GameState.DoneDestroyingCities);
             var rollState = new RollState()
             {
-                RollModel = roll
+                RollModel = roll,
+                PlayerName = gameController.CurrentPlayer.PlayerName
             };
 
             WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
@@ -61,20 +65,14 @@ namespace Catan10
 
             IRollLog rollLog = gameController.RollLog;
 
-            //
-            //   if this is a pirate game, handle the pirate roll first, as this will change the resource allocation
 
-            if (gameController.MainPageModel.GameInfo.Pirates)
-            {
-                await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Normal);
-            }
 
             //
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
 
-       
+
 
 
             //
@@ -82,7 +80,7 @@ namespace Catan10
             if (rollLog.LastRoll.Roll == 7)
             {
                 await gameController.RolledSeven();
-                
+
             }
 
         }
@@ -94,13 +92,7 @@ namespace Catan10
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
-            //
-            //   if this is a pirate game, handle the pirate roll
 
-            if (gameController.MainPageModel.GameInfo.Pirates)
-            {
-                await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Normal);
-            }
 
             //
             //  TODO: This also needs to do somethign different if it is the last message -- e.g. call Do();
@@ -112,10 +104,7 @@ namespace Catan10
             //
             //   if this is a pirate game, handle the pirate roll
 
-            if (gameController.MainPageModel.GameInfo.Pirates)
-            {
-                await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Normal);
-            }
+
         }
 
         public async Task Undo(IGameController gameController)
@@ -123,14 +112,8 @@ namespace Catan10
             // if the state is wrong, there is a big bug someplace
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
             await gameController.Log.RollLog.UndoRoll();
-            //
-            //   if this is a pirate game, handle the pirate roll
-
-            if (gameController.MainPageModel.GameInfo.Pirates)
-            {
-                await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Undo);
-            }
+            await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Undo);
         }
-    
     }
+
 }

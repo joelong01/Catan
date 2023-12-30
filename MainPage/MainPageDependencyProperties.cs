@@ -34,7 +34,7 @@ namespace Catan10
         ///     to make all the game logic work right.
         /// </summary>
         /// <param name="player"></param>
-        public void SetCurrentPlayer(PlayerModel player)
+        public async void SetCurrentPlayer(PlayerModel player)
         {
             if (player == null) return;
 
@@ -47,7 +47,7 @@ namespace Catan10
 
             if (player == TheHuman)
             {
-                ResetRollControl();
+               await ResetRollControl();
             }
 
             _stopWatchForTurn.TotalTime = TimeSpan.FromSeconds(0);

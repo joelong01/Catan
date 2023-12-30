@@ -151,6 +151,7 @@
     <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
     <Compile Include="Logging\StateTransitions\6b_DestroyNextCity.cs" />
     <Compile Include="Logging\StateTransitions\6b_ToMustDesroyCity.cs" />
+    <Compile Include="Logging\StateTransitions\6_WaitingForRollToPirateRoll.cs" />
     <Compile Include="Logging\StateTransitions\DestroyWall.cs" />
     <Compile Include="Logging\StateTransitions\KnightStateChange.cs" />
     <Compile Include="Logging\Actions\PlayerTradesLog.cs" />
@@ -411,7 +412,6 @@
     <Content Include="Assets\maple.jpg" />
     <Content Include="Assets\monopoly_dark.svg" />
     <Content Include="Assets\monopoly_light.svg" />
-    <Content Include="Assets\Tiles\invasion.png" />
     <Content Include="Assets\Tiles\goldMine.png" />
     <Content Include="Assets\Harbors\2 for 1 brick.png" />
     <Content Include="Assets\Harbors\2 for 1 ore.png" />
@@ -421,8 +421,10 @@
     <Content Include="Assets\Harbors\3 for 1.png" />
     <Content Include="Assets\Tiles\brick.png" />
     <Content Include="Assets\Tiles\desert.png" />
+    <Content Include="Assets\Tiles\gpt invasion.png" />
     <Content Include="Assets\Tiles\ore.png" />
     <Content Include="Assets\Tiles\sheep.png" />
+    <Content Include="Assets\Tiles\invasion.png" />
     <Content Include="Assets\Tiles\wheat.png" />
     <Content Include="Assets\Tiles\wood.png" />
     <Content Include="Assets\sailboat_light.png" />

@@ -61,10 +61,10 @@ namespace Catan10
             }
         }
 
-        public Task Replay (IGameController gameController)
+        public async Task Replay (IGameController gameController)
         {   
             gameController.ResetAllBuildings();
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         /// <summary>
@@ -73,15 +73,15 @@ namespace Catan10
         /// </summary>
         /// <param name="gameController"></param>
         /// <returns></returns>
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
             gameController.ResetAllBuildings();
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         #endregion Methods

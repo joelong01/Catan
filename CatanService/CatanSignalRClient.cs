@@ -642,12 +642,12 @@ namespace Catan10.CatanService
             await HubConnection.InvokeAsync("Reset");
         }
 
-        public Task SendBroadcastMessage(CatanMessage message)
+        public async Task SendBroadcastMessage(CatanMessage message)
         {
             message.MessageDirection = MessageDirection.ClientToServer;
             MessageQueue.Enqueue(message);
             ProcessQueueAsync();
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public async Task SendPrivateMessage(string playerName, CatanMessage message)

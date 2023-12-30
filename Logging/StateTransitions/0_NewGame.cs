@@ -27,7 +27,7 @@ namespace Catan10
 
         #region Methods
 
-        public static async Task JoinOrCreateGame(IGameController gameController, GameInfo gameInfo, CatanAction action)
+        public static async Task CreateGame(IGameController gameController, GameInfo gameInfo, CatanAction action)
         {
             Contract.Assert(action == CatanAction.GameCreated || action == CatanAction.GameJoined);
 
@@ -46,7 +46,7 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            await gameController.JoinOrCreateGame(this.GameInfo);
+            await gameController.CreateGame(this.GameInfo);
 
         }
 
@@ -65,9 +65,9 @@ namespace Catan10
             return $"StartGame: [StartedBy={GameInfo.Creator}][SendBy={SentBy}[id={LogId}]";
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         #endregion Methods

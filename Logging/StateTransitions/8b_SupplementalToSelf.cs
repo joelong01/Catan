@@ -18,11 +18,11 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
 
             ChangePlayerHelper.ChangePlayer(gameController, 1);
-            return Task.CompletedTask;
+             await Task.Delay(0);
 
         }
 
@@ -36,10 +36,10 @@ namespace Catan10
             return Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
             ChangePlayerHelper.ChangePlayer(gameController, -1);
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
     }
 }

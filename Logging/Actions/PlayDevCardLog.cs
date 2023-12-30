@@ -42,7 +42,7 @@ namespace Catan10
         /// </summary>
         /// <param name="gameController"></param>
         /// <returns></returns>
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             Contract.Assert(DevCardType == DevCardType.YearOfPlenty || DevCardType == DevCardType.Monopoly || DevCardType == DevCardType.RoadBuilding);
             Contract.Assert(gameController.CurrentGameState == GameState.WaitingForNext);
@@ -121,7 +121,7 @@ namespace Catan10
                 Contract.Assert(false, "What kind of devcard is it?");
             }
 
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Redo(IGameController gameController)

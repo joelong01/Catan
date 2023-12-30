@@ -242,7 +242,7 @@ namespace Catan10
 
         RandomBoardSettings GetRandomBoard();
 
-         Task JoinOrCreateGame(GameInfo gameInfo);
+         Task CreateGame(GameInfo gameInfo);
 
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection

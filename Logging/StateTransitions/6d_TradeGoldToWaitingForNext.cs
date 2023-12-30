@@ -22,9 +22,9 @@ namespace Catan10
 
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Redo(IGameController gameController)
@@ -32,9 +32,9 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        public Task Replay (IGameController gameController)
+        public async Task Replay (IGameController gameController)
         {
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
 
         public Task Undo(IGameController gameController)

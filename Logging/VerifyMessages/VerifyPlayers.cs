@@ -30,7 +30,7 @@ namespace Catan10
             await gameController.PostMessage(log, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
             Contract.Assert(this.PlayingPlayers.Count == gameController.PlayingPlayers.Count);
             for (int i = 0; i < PlayingPlayers.Count; i++)
@@ -38,7 +38,7 @@ namespace Catan10
                 Debug.Assert(this.PlayingPlayers[i].PlayerName == gameController.PlayingPlayers[i].PlayerName);
             }
             Contract.Assert(this.CurrentPlayer.PlayerName == gameController.CurrentPlayer.PlayerName);
-            return Task.CompletedTask;
+             await Task.Delay(0);
         }
         public Task Replay (IGameController gameController)
         {

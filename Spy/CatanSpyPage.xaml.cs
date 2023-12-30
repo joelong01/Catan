@@ -224,11 +224,11 @@ namespace Catan10.Spy
 
             TaskCompletionSource<object> connectionTCS = new TaskCompletionSource<object>(); ;
             HubConnection.Reconnected += Reconnected;
-            Task Reconnected (string arg)
+            async Task Reconnected (string arg)
             {
                 connectionTCS.TrySetResult(null);
                 HubConnection.Reconnected -= Reconnected;
-                return Task.CompletedTask;
+                 await Task.Delay(0);
             }
 
             int n = 0;
