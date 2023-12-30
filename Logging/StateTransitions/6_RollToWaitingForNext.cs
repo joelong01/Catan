@@ -36,12 +36,19 @@ namespace Catan10
                 PlayerName = gameController.CurrentPlayer.PlayerName
             };
 
+            bool undoNext = false;
+            if (gameController.CurrentGameState == GameState.HandlePirates)
+            {
+                undoNext = true;
+            }
+
             WaitingForRollToWaitingForNext logHeader = new WaitingForRollToWaitingForNext()
             {
                 CanUndo = true,
                 RollState = rollState,
                 Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForNext,
+                UndoNext = undoNext
             };
 
 
@@ -112,7 +119,7 @@ namespace Catan10
             // if the state is wrong, there is a big bug someplace
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
             await gameController.Log.RollLog.UndoRoll();
-            await gameController.HandlePirateRoll(this.RollState.RollModel, ActionType.Undo);
+     
         }
     }
 

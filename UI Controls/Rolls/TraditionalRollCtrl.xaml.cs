@@ -69,48 +69,49 @@ namespace Catan10
             return Visibility.Collapsed;
         }
 
-        private void OnOk(object sender, RoutedEventArgs e)
+
+        private RollModel BuildRollModel()
         {
-            if (MainPageModel.EnableRolls == false) return;
-            int redValue = -1;
-            int whiteValue = -1;
-            SpecialDice special = SpecialDice.None;
+            RollModel rollModel = new RollModel()
+            {
+                RedDie = -1,
+                WhiteDie = -1,
+                SpecialDice = SpecialDice.None,
+                Roll = -2,
+            };
+
+
             foreach (ToggleButton d in RedDice)
             {
                 if (d.IsChecked == true)
                 {
-                    redValue = ( d.Content as DiceCtrl ).Number;
+                    rollModel.RedDie = ( d.Content as DiceCtrl ).Number;
+                    break;
                 }
             }
-            if (redValue == -1) return;
+
 
             foreach (ToggleButton d in WhiteDice)
             {
                 if (d.IsChecked == true)
                 {
-                    whiteValue = ( d.Content as DiceCtrl ).Number;
+                    rollModel.WhiteDie = ( d.Content as DiceCtrl ).Number;
+                    break;
+
                 }
             }
-            if (whiteValue == -1) return;
-
             foreach (ToggleButton d in Specials)
             {
                 if (d.IsChecked == true)
                 {
-                    special = ( SpecialDice )Enum.Parse(typeof(SpecialDice), d.Tag as string);
+                    rollModel.SpecialDice = ( SpecialDice )Enum.Parse(typeof(SpecialDice), d.Tag as string);
+                    break;
                 }
             }
-            if (special == SpecialDice.None) return;
 
-            RollModel rollModel = new RollModel()
-            {
-                RedDie = redValue,
-                WhiteDie = whiteValue,
-                SpecialDice = special,
-                Roll = redValue + whiteValue,
+            rollModel.Roll = rollModel.RedDie + rollModel.WhiteDie;
 
-            };
-            OnRoll?.Invoke(rollModel);
+            return rollModel;
         }
 
         private void OnRedClick(object sender, RoutedEventArgs e)
@@ -121,6 +122,12 @@ namespace Catan10
                 {
                     tb.IsChecked = false;
                 }
+            }
+
+            var rollModel = BuildRollModel();
+            if (rollModel.IsValidRoll)
+            {
+                OnRoll?.Invoke(rollModel);
             }
         }
 
@@ -133,6 +140,11 @@ namespace Catan10
                     tb.IsChecked = false;
                 }
             }
+            var rollModel = BuildRollModel();
+            if (rollModel.IsValidRoll)
+            {
+                OnRoll?.Invoke(rollModel);
+            }
         }
 
         private void OnWhiteClick(object sender, RoutedEventArgs e)
@@ -143,6 +155,11 @@ namespace Catan10
                 {
                     tb.IsChecked = false;
                 }
+            }
+            var rollModel = BuildRollModel();
+            if (rollModel.IsValidRoll)
+            {
+                OnRoll?.Invoke(rollModel);
             }
         }
     }

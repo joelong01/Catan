@@ -1353,20 +1353,6 @@ namespace Catan10
             CalculateAndSetLongestRoad(raceTracking);
         }
 
-        private static void AddRollPlaceHolder(PlayerModel tiedPlayer)
-        {
-            List<RollModel> rolls = new List<RollModel>();
-            for (int i = 0; i < 4; i++)
-            {
-                rolls.Add(new RollModel()
-                {
-                    RedDie = -1,
-                    WhiteDie = -1
-                });
-            }
-            rolls[0].Selected = true;
-            tiedPlayer.GameData.SyncronizedPlayerRolls.AddRoll(rolls);
-        }
 
         private void DumpAllRolls()
         {

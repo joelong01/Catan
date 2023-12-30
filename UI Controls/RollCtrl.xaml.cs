@@ -86,7 +86,25 @@ namespace Catan10
         private bool _selected = false;
         private SpecialDice _specialDice = SpecialDice.None;
 
+        public bool IsValidRoll
+        {
+            get
+            {
+                if (MainPage.Current.GameInfo.Pirates)
+                {
+                    if (_whiteDie == -1 || _redDie == -1 || _specialDice == SpecialDice.None)
+                    {
+                        return false;
+                    }
+                } else
+                {
+                    if (_roll == -1) return false;
+                        
+                }
 
+                return true;
+            }
+        }
 
         private int _roll = -1;
         public int Roll
@@ -101,6 +119,7 @@ namespace Catan10
                 {
                     _roll = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("IsValidRoll");
                 }
             }
         }
@@ -117,6 +136,7 @@ namespace Catan10
                 {
                     _specialDice = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("IsValidRoll");
                 }
             }
         }
@@ -134,6 +154,7 @@ namespace Catan10
                     _redDie = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Roll");
+                    NotifyPropertyChanged("IsValidRoll");
                 }
             }
         }
@@ -151,6 +172,7 @@ namespace Catan10
                     _whiteDie = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Roll");
+                    NotifyPropertyChanged("IsValidRoll");
                 }
             }
         }

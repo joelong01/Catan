@@ -108,7 +108,7 @@ namespace Catan10
             Debug.Assert(currentCount > 0);
             currentCount--;
 
-            if (currentCount == 0)
+            if (currentCount == 0 && InvasionCount > 0)
             {
                 InvasionCount--;
             }

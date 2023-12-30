@@ -170,15 +170,6 @@
                 </ToggleButton.Content>
             </ToggleButton>
 
-            <Button Grid.Row="6" Grid.Column="3" Padding="0" CornerRadius="5" BorderBrush="White" BorderThickness="1"
-                    Background="Black" Margin="5" Click="OnOk">
-                <Button.Content>
-                    <Viewbox Stretch="Uniform">
-                        <TextBlock Text="&#xE10B;" Foreground="White" FontSize="33" FontFamily="Segoe MDL2 Assets" />
-                    </Viewbox>
-                </Button.Content>
-            </Button>
-
         </Grid>
         <Grid Margin="5">
             <Grid.RowDefinitions>
