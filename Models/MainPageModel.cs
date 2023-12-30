@@ -44,7 +44,7 @@ namespace Catan10
             }
             );
         }
-
+        public static MainPageModel Default { get; } = new MainPageModel();
         private void InitBank()
         {
             Bank = new PlayerModel()

@@ -71,7 +71,8 @@ namespace Catan10
             {
                 NewState = GameState.WaitingForRoll,
                 GoldTiles = tiles,
-                CanUndo = true
+                CanUndo = true,
+                UndoNext = true // this is true because when we undo PickingRandomGoldTiles, we also Undo the next state
 
             };
 

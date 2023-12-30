@@ -33,13 +33,16 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page
     {
+        // 12/30/2023 - Create a static MainPageModel for all the controls to use as their default when they are created
+
+    
         #region Delegates + Fields + Events + Enums
 
         public const string PlayerDataFile = "catansettings.json";
 
         // used to calculate longest road -- whoever gets their first wins LR, and it has to work if an Undo action ahppanes
         //  State for MainPage -- the thought was to move all save/load state into one place...but that work hasn't finished
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(new MainPageModel(), MainPageModelChanged));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(MainPageModel.Default, MainPageModelChanged));
 
         public static readonly string SAVED_GAME_EXTENSION = ".log.json";
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
@@ -882,7 +885,7 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.RemoveAt(0); // the clear doesn't trigger the unsubscribe because the NewItems and the OldItems are both null
             }
 
-            MainPageModel.Log = new Log(this);
+           MainPageModel.Log = new Log(this);
 
             await ResetTiles(true);
 
@@ -893,6 +896,8 @@ namespace Catan10
 
             _gameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
             _raceTracking.Reset();
+
+            CTRL_Invasion.Reset();
 
         }
 

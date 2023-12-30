@@ -561,6 +561,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task CreateGame(GameInfo gameInfo)
         {
+
             MainPageModel.GameInfo = gameInfo;
             _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
             MainPageModel.IsGameStarted = true;
@@ -956,7 +957,14 @@ namespace Catan10
             }
             else if (updateBuildingLog.NewBuildingState == BuildingState.Settlement)
             {
-                player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Settlement);
+                if (updateBuildingLog.OldBuildingState == BuildingState.City) // Destoying a City
+                {
+                    player.GameData.Resources.UnspentEntitlements.Add(Entitlement.DestroyCity);
+                }
+                else
+                {
+                    player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Settlement);
+                }
             }
             else if (updateBuildingLog.NewBuildingState == BuildingState.Knight)
             {

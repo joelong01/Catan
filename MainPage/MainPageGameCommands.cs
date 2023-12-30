@@ -44,10 +44,12 @@ namespace Catan10
             try
             {
                 MainPageModel.EnableUiInteraction = false;
+                bool undoNext;
                 do
                 {
-                    bool ret = await UndoAsync();
-                } while (Log.CanUndo && !Log.PeekAction.WaitForNext);
+                    undoNext = Log.PeekAction.UndoNext;
+                    await UndoAsync();
+                } while (Log.CanUndo && undoNext);
             }
             finally
             {
@@ -184,7 +186,7 @@ namespace Catan10
                         // after the invasion, we return the pirate ship back to the starting position
                         CTRL_Invasion.StartOver();
                         var logEntry = Current.Log.FindLatestLogEntry(typeof(WaitingForRollToPirateRoll)) as WaitingForRollToPirateRoll;
-                       
+
                         Debug.Assert(logEntry != null);
                         await WaitingForRollToWaitingForNext.PostRollMessage(this, logEntry.RollModel);
                         break;

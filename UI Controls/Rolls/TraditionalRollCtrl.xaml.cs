@@ -42,7 +42,7 @@ namespace Catan10
         public event RollSelectedHandler OnRoll;
 
 
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(new MainPageModel(), GameChanged));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(MainPageModel.Default, GameChanged));
 
         private static void GameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -75,7 +75,7 @@ namespace Catan10
             int redValue = -1;
             int whiteValue = -1;
             SpecialDice special = SpecialDice.None;
-            foreach(ToggleButton d in RedDice)
+            foreach (ToggleButton d in RedDice)
             {
                 if (d.IsChecked == true)
                 {

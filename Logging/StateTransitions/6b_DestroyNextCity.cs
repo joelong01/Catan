@@ -18,6 +18,7 @@ namespace Catan10
             GameState newState = GameState.MustDestroyCity;
             PlayerModel nextVictim = null;
             int currentPlayerIndex = players.IndexOf(gameController.CurrentPlayer);
+
             for (int i = 0; i < players.Count; i++)
             {
                 int idx = (i + currentPlayerIndex) % players.Count;
@@ -46,7 +47,10 @@ namespace Catan10
             var logHeader = new DestroyCity_Next()
             {
                 Count = toMove,
-                NewState = newState
+                NewState = newState,
+                UndoNext = true,
+                CanUndo = true
+
 
             };
 

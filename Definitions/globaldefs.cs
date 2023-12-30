@@ -47,7 +47,7 @@ namespace Catan10
         
 
         public string TypeName { get; set; }
-        public bool WaitForNext { get; set; } = true; // if this is false, then it is expected that the user never has to click on next to move past this state
+        public bool UndoNext { get; set; } = false; // if this is true, then on an Undo, the record following this one is also undone
 
         #endregion Properties + Fields
 

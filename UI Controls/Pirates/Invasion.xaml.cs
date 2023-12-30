@@ -29,7 +29,16 @@ namespace Catan10
         public InvasionCtrl()
         {
             this.InitializeComponent();
+            Reset();
         }
+
+        public void Reset()
+        {
+            currentCount = 0;
+            InvasionCount = 0;
+            Angle = 0;
+        }
+
         //
         //  this is the number of invastions.
         public static readonly DependencyProperty InvasionCountProperty = DependencyProperty.Register("InvasionCount", typeof(int), typeof(InvasionCtrl), new PropertyMetadata(0));
@@ -40,7 +49,7 @@ namespace Catan10
         }
 
 
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(new MainPageModel()));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(MainPageModel.Default));
         public MainPageModel MainPageModel
         {
             get => ( MainPageModel )GetValue(MainPageModelProperty);

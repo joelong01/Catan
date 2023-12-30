@@ -26,7 +26,7 @@ namespace Catan10
             this.InitializeComponent();
         }
 
-        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(new MainPageModel()));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(MainPageModel.Default));
         public static readonly DependencyProperty NumberProperty = DependencyProperty.Register("Number", typeof(int), typeof(SingleRollCtrl), new PropertyMetadata(2));
         public int Number
         {

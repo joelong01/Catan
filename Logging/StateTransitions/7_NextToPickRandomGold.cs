@@ -24,8 +24,8 @@ namespace Catan10
             {
                 ResourcesThisTurn = ResourceCardCollection.ToTradeResources(gameController.CurrentPlayer.GameData.Resources.ResourcesThisTurn),
                 Action = CatanAction.ChangedState,
-                NewState = GameState.PickingRandomGoldTiles,
-                WaitForNext = false // this is false because when we undo PickingRandomGoldTiles, we also Undo this state
+                NewState = GameState.PickingRandomGoldTiles
+               
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
