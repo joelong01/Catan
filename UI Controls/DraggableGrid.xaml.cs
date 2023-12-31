@@ -26,7 +26,7 @@ namespace Catan10
 
         public static readonly DependencyProperty GridPositionProperty = DependencyProperty.Register("GridPosition", typeof(GridPosition), typeof(DragableGridCtrl), new PropertyMetadata(new GridPosition(0, 0, 1.0, 1.0), GridPositionChanged));
 
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(DragableGridCtrl), new PropertyMetadata(new PlayerModel()));
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(DragableGridCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
 
         private int fullSize = 1;
 

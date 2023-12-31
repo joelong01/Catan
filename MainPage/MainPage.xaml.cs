@@ -45,7 +45,7 @@ namespace Catan10
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MainPage), new PropertyMetadata(MainPageModel.Default, MainPageModelChanged));
 
         public static readonly string SAVED_GAME_EXTENSION = ".log.json";
-        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(null));
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(PlayerModel.DefaultPlayer));
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
         private readonly RoadRaceTracking _raceTracking = null;

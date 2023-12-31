@@ -425,7 +425,7 @@
                     <StackPanel Orientation="Vertical" Canvas.ZIndex="99999" Width="625"
                             Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
                         <Viewbox Stretch="UniformToFill">
-                            <local:TraditionalRollCtrl MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
+                            <local:TraditionalRollCtrl x:Name="CTRL_RollControl" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                                     OnRoll="OnNumberRolled" />
                         </Viewbox>
                         <Rectangle Height="3" Fill="{StaticResource bmMaple}" Margin="0,0, 0, 0" />

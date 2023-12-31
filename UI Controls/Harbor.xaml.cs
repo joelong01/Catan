@@ -23,7 +23,7 @@ namespace Catan10
 
         public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(null, OwnerChanged));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(PlayerModel.DefaultPlayer, OwnerChanged));
         private readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
 
         private readonly string[] _savePropName = new string[] { "HarborLocation" };

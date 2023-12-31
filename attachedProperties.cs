@@ -15,7 +15,7 @@ namespace Catan10
         }
 
         public static DependencyProperty CurrentPlayerForegroundBrushProperty = DependencyProperty.RegisterAttached("GetCurrentPlayerForegroundBrush", typeof(Color), typeof(CatanAttachedProperties), new PropertyMetadata(Colors.White));
-        public static DependencyProperty CurrentPlayerModelProperty = DependencyProperty.RegisterAttached("GetCurrentPlayerModel", typeof(PlayerModel), typeof(CatanAttachedProperties), new PropertyMetadata(new PlayerModel(), PlayerModelChanged));
+        public static DependencyProperty CurrentPlayerModelProperty = DependencyProperty.RegisterAttached("GetCurrentPlayerModel", typeof(PlayerModel), typeof(CatanAttachedProperties), new PropertyMetadata(PlayerModel.DefaultPlayer, PlayerModelChanged));
 
         public static Color GetCurrentPlayerForegroundBrush(DependencyObject obj)
         {

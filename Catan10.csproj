@@ -385,7 +385,13 @@
     <Content Include="Assets\bank.png" />
     <Content Include="Assets\dice_stop_dark.svg" />
     <Content Include="Assets\dice_stop_light.svg" />
+    <Content Include="Assets\ResourceCards\anydevcard.png" />
     <Content Include="Assets\ResourceCards\cloth.png" />
+    <Content Include="Assets\ResourceCards\politics - Copy.png" />
+    <Content Include="Assets\ResourceCards\science.png" />
+    <Content Include="Assets\ResourceCards\politics.png" />
+    <Content Include="Assets\ResourceCards\victorypoint.png" />
+    <Content Include="Assets\ResourceCards\trade.png" />
     <Content Include="Assets\ResourceCards\coin.png" />
     <Content Include="Assets\ResourceCards\paper.png" />
     <Content Include="Assets\SVG\city.svg" />

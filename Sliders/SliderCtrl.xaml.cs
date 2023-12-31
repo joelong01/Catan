@@ -18,7 +18,7 @@ namespace Catan10.Sliders
 
         public static readonly DependencyProperty ChildProperty = DependencyProperty.Register(nameof(Child), typeof(UIElement), typeof(SliderCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty OpenProperty = DependencyProperty.Register("Open", typeof(bool), typeof(SliderCtrl), new PropertyMetadata(true, OpenChanged));
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(SliderCtrl), new PropertyMetadata(new PlayerModel()));
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(SliderCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty SlideDirectionProperty = DependencyProperty.Register("SlideDirection", typeof(SlideDirection), typeof(SliderCtrl), new PropertyMetadata(SlideDirection.Right, SlideDirectionChanged));
         public static readonly DependencyProperty CaptionProperty = DependencyProperty.Register("Caption", typeof(string), typeof(SliderCtrl), new PropertyMetadata(""));
         public string Caption

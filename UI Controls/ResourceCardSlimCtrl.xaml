@@ -8,14 +8,16 @@
         <Grid Width="67" Height="100" Margin="1"
                 Background="{x:Bind Image, Mode=OneWay, TargetNullValue={StaticResource ResourceKey=ResourceType.Back}}"
                 CornerRadius="5">
-            <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0" HorizontalAlignment="Right"
+            <Border Height="30" Width="30" Margin="0" Padding="0" HorizontalAlignment="Center"
                     VerticalAlignment="Bottom" Background="Black" CornerRadius="6"
                     Visibility="{x:Bind ShowCount(Count), Mode=OneWay}">
                 <Viewbox>
-                    <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}"
+                    <TextBlock HorizontalAlignment="Stretch" Style="{StaticResource TEXTSTYLE_Count}" Padding="0"
                             Text="{x:Bind Count, Mode=OneWay}" />
                 </Viewbox>
             </Border>
+
+          
 
             <Border Width="20" Height="20" Margin="0,0,2,4" Padding="0" HorizontalAlignment="Right"
                     VerticalAlignment="Top" Background="Black" CornerRadius="6"

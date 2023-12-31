@@ -21,7 +21,7 @@ namespace Catan10
 
         public static readonly DependencyProperty PlayedDevCardIndexProperty = DependencyProperty.Register("PlayedDevCardIndex", typeof(int), typeof(PrivateDataCtrl), new PropertyMetadata(0));
 
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PrivateDataCtrl), new PropertyMetadata(new PlayerModel(), PlayerChanged));
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PrivateDataCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer, PlayerChanged));
 
         public static readonly DependencyProperty SelectedAvailableDevCardProperty = DependencyProperty.Register("SelectedAvailableDevCard", typeof(DevCardModel), typeof(PrivateDataCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty StolenResourceProperty = DependencyProperty.Register("StolenResource", typeof(ResourceType), typeof(PrivateDataCtrl), new PropertyMetadata(ResourceType.None, StolenResourceChanged));

@@ -58,6 +58,11 @@ namespace Catan10
                 _ = HideAllPipEllipses();
                 _showPipGroupIndex = 0;
             }
+
+            if (GameInfo != null && GameInfo.Pirates)
+            {
+                CTRL_RollControl.NewTurn();
+            }
         }
 
         private void SetRandomGold()
@@ -178,7 +183,7 @@ namespace Catan10
         }
 
         public static readonly DependencyProperty MustMoveBaronProperty = DependencyProperty.Register("MustMoveBaron", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(new PlayerModel() { PlayerName = "Unset" }, CurrentPlayerChanged));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(PlayerModel.DefaultPlayer, CurrentPlayerChanged));
         public static readonly DependencyProperty EightPercentProperty = DependencyProperty.Register("EightPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
         public static readonly DependencyProperty ElevenPercentProperty = DependencyProperty.Register("ElevenPercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));
         public static readonly DependencyProperty FivePercentProperty = DependencyProperty.Register("FivePercent", typeof(string), typeof(MainPage), new PropertyMetadata("0 (0%)"));

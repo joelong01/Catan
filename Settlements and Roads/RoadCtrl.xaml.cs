@@ -403,9 +403,9 @@ namespace Catan10
             set => SetValue(TileZeroZeroProperty, value);
         }
 
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty LocationProperty = DependencyProperty.Register("Location", typeof(RoadLocation), typeof(RoadCtrl), new PropertyMetadata(RoadLocation.None, LocationChanged));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(RoadCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty RoadStateProperty = DependencyProperty.Register("RoadState", typeof(RoadState), typeof(RoadCtrl), new PropertyMetadata(RoadState.Unowned, RoadStateChanged));
         public static readonly DependencyProperty RoadTypeProperty = DependencyProperty.Register("RoadType", typeof(RoadType), typeof(RoadCtrl), new PropertyMetadata(RoadType.Single, RoadTypeChanged));
         public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));

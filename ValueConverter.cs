@@ -19,10 +19,7 @@ namespace Catan10
 
         public static SolidColorBrush GetBrush(Color color)
         {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
-            {
-                return new SolidColorBrush(color);
-            }
+          
 
             if (ConverterGlobals.SolidColorBrushCache.TryGetValue(color, out SolidColorBrush brush))
             {
@@ -36,59 +33,24 @@ namespace Catan10
 
         public static LinearGradientBrush GetLinearGradientBrush(Color color1, Color color2)
         {
-            //< LinearGradientBrush EndPoint = "0.5,1" StartPoint = "0.5,0" >
-
-            //               < GradientStop Color = "Black" />
-
-            //                < GradientStop Color = "Purple" Offset = "1" />
-
-            //               </ LinearGradientBrush >
-
-            if (!StaticHelpers.IsInVisualStudioDesignMode && ConverterGlobals.LinearGradientBrushCache.TryGetValue((color1, color2), out LinearGradientBrush brush))
+           
+            if (ConverterGlobals.LinearGradientBrushCache.TryGetValue((color1, color2), out LinearGradientBrush brush))
             {
                 return brush;
             }
-            var gradientStopCollection = new GradientStopCollection();
-            gradientStopCollection.Add(new GradientStop() { Color = color1, Offset = 0 });
-            gradientStopCollection.Add(new GradientStop() { Color = color2, Offset = 1 });
+            var gradientStopCollection = new GradientStopCollection
+            {
+                new GradientStop() { Color = color1, Offset = 0 },
+                new GradientStop() { Color = color2, Offset = 1 }
+            };
             brush = new LinearGradientBrush(gradientStopCollection, 45);
             brush.StartPoint = new Windows.Foundation.Point(0, 0);
             brush.EndPoint = new Windows.Foundation.Point(1.0, 1.0);
-
-            if (!StaticHelpers.IsInVisualStudioDesignMode)
-            {
-                ConverterGlobals.LinearGradientBrushCache[(color1, color2)] = brush;
-            }
+            ConverterGlobals.LinearGradientBrushCache[(color1, color2)] = brush;
             return brush;
         }
     }
 
-    //public class RoadOwnerOrVisitorColorConverter : IValueConverter
-    //{
-    //    public object Convert(object value, Type targetType, object parameter, string language)
-    //    {
-    //        RoadCtrl ctrl = (RoadCtrl)value;
-    //        if (ctrl != null)
-    //        {
-    //            if (ctrl.Owner != null)
-    //            {
-    //                if ((string)parameter == "Foreground")
-    //                {
-    //                    return ConverterGlobals.GetBrush(ctrl.Owner.Foreground);
-    //                }
-    //                else
-    //                {
-    //                    return ctrl.Owner.;
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 
     public class AnimationSpeedValueConverter : IValueConverter
     {

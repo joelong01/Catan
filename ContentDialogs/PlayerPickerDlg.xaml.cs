@@ -32,7 +32,7 @@ namespace Catan10
             set => SetValue(PlayerProperty, value);
         }
 
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PlayerPickerDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PlayerPickerDlg), new PropertyMetadata(PlayerModel.DefaultPlayer));
 
         public PlayerPickerDlg()
         {

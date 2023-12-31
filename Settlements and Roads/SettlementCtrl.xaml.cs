@@ -20,9 +20,9 @@ namespace Catan10
             set => SetValue(OwnerProperty, value);
         }
 
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(SettlementCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(SettlementCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
 
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(SettlementCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(SettlementCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
 
         public SettlementCtrl()
         {

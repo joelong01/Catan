@@ -233,10 +233,10 @@ namespace Catan10
 
         public static readonly DependencyProperty DestinationProperty = DependencyProperty.Register("Destination", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty FromBankProperty = DependencyProperty.Register("FromBank", typeof(bool), typeof(TakeCardCtrl), new PropertyMetadata(false, FromBankChanged));
-        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof(PlayerModel), typeof(TakeCardCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof(PlayerModel), typeof(TakeCardCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty HowManyProperty = DependencyProperty.Register("HowMany", typeof(int), typeof(TakeCardCtrl), new PropertyMetadata(1, HowManyChanged));
         public static readonly DependencyProperty InstructionsProperty = DependencyProperty.Register("Instructions", typeof(string), typeof(TakeCardCtrl), new PropertyMetadata(""));
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(PlayerModel), typeof(TakeCardCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(PlayerModel), typeof(TakeCardCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
     }
 }

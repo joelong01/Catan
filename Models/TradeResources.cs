@@ -9,33 +9,105 @@ namespace Catan10
 {
     public class TradeResources : INotifyPropertyChanged
     {
-        #region Delegates + Fields + Events + Enums
-
         public event PropertyChangedEventHandler PropertyChanged;
-
         private int _brick = 0;
-
         private int _goldMine = 0;
-
         private int _ore = 0;
-
         private int _sheep = 0;
-
         private int _wheat = 0;
-
         private int _wood = 0;
-
         private int _paper = 0;
-
         private int _cloth = 0;
-
         private int _coin = 0;
+        private int _politics = 0;
+        private int _trade = 0;
+        private int _science = 0;
+        private int _victoryPoint = 0;
+        private int _anyDevcard = 0;
+        public int Trade
+        {
+            get
+            {
+                return _trade;
+            }
+            set
+            {
+                if (value != _trade)
+                {
+                    _trade = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
 
+        public int Politics
+        {
+            get
+            {
+                return _politics;
+            }
+            set
+            {
+                if (value != _politics)
+                {
+                    _politics = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
 
-        #endregion Delegates + Fields + Events + Enums
+        public int Science
+        {
+            get
+            {
+                return _science;
+            }
+            set
+            {
+                if (value != _science)
+                {
+                    _science = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
 
-        #region Properties
+        public int VictoryPoint
+        {
+            get
+            {
+                return _victoryPoint;
+            }
+            set
+            {
+                if (value != _victoryPoint)
+                {
+                    _victoryPoint = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
 
+        public int AnyDevCard
+        {
+            get
+            {
+                return _anyDevcard;
+            }
+            set
+            {
+                if (value != _anyDevcard)
+                {
+                    _anyDevcard = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged("Count");
+                }
+            }
+        }
         public int Brick
         {
             get
@@ -53,7 +125,7 @@ namespace Catan10
             }
         }
         [JsonIgnore]
-        public int Count => Wheat + Wood + Brick + Ore + Sheep + GoldMine;
+        public int Count => Wheat + Wood + Brick + Ore + Sheep + GoldMine + Cloth + Coin + Paper + VictoryPoint + Politics + Science + Trade + AnyDevCard;
 
         public int GoldMine
         {
@@ -87,6 +159,12 @@ namespace Catan10
                 if (Coin != 0) list.Add(ResourceType.Coin);
                 if (Cloth != 0) list.Add(ResourceType.Cloth);
                 if (Paper != 0) list.Add(ResourceType.Paper);
+
+                if (Paper != 0) list.Add(ResourceType.Science);
+                if (Paper != 0) list.Add(ResourceType.Trade);
+                if (Paper != 0) list.Add(ResourceType.Politics);
+                if (Paper != 0) list.Add(ResourceType.VictoryPoint);
+                if (Paper != 0) list.Add(ResourceType.AnyDevCard);
                 return list;
             }
         }
@@ -206,9 +284,6 @@ namespace Catan10
                 }
             }
         }
-        #endregion Properties
-
-        #region Constructors + Destructors
 
         public TradeResources()
         {
@@ -225,11 +300,14 @@ namespace Catan10
             Cloth = tradeResources.Cloth;
             Coin = tradeResources.Coin;
             Paper = tradeResources.Paper;
+
+            Politics = tradeResources.Politics;
+            Trade = tradeResources.Trade;
+            Science = tradeResources.Science;
+            VictoryPoint = tradeResources.VictoryPoint;
+            AnyDevCard = tradeResources.AnyDevCard;
         }
 
-        #endregion Constructors + Destructors
-
-        #region Methods
 
         public static TradeResources GetEntitlementCost(Entitlement entitlement)
         {
@@ -416,6 +494,11 @@ namespace Catan10
                 case ResourceType.Cloth:
                 case ResourceType.Paper:
                 case ResourceType.Coin:
+                case ResourceType.Politics:
+                case ResourceType.Science:
+                case ResourceType.Trade:
+                case ResourceType.VictoryPoint:
+                case ResourceType.AnyDevCard:
                     return true;
 
                 case ResourceType.Desert:
@@ -441,9 +524,37 @@ namespace Catan10
                 GoldMine = a.GoldMine + b.GoldMine,
                 Coin = a.Coin + b.Coin,
                 Paper = a.Paper + b.Paper,
-                Cloth = a.Cloth + b.Cloth
+                Cloth = a.Cloth + b.Cloth,
+
+                Politics = a.Politics + b.Politics,
+                Trade = a.Trade + b.Trade,
+                Science = a.Science + b.Science,
+                VictoryPoint = a.VictoryPoint + b.VictoryPoint,
+                AnyDevCard = a.AnyDevCard + b.AnyDevCard
 
             };
+        }
+
+        public static TradeResources TradeResourcesForRedDie(SpecialDice roll)
+        {
+            TradeResources tr = new TradeResources();
+            switch (roll)
+            {
+                case SpecialDice.Yellow:
+                    tr.Trade++;
+                    break;
+                case SpecialDice.Blue:
+                    tr.Science++;
+                    break;
+                case SpecialDice.Green:
+                    tr.Politics++;
+                    break;
+                case SpecialDice.Pirate:
+                    break;
+                case SpecialDice.None:
+                    break;
+            }
+            return tr;
         }
 
         public static TradeResources TradeResourcesForCity(ResourceType resourceType, bool pirates)
@@ -494,7 +605,7 @@ namespace Catan10
                 case BuildingState.Metropolis:
                     return TradeResources.TradeResourcesForCity(resourceType, pirates);
             }
-       
+
             return tr;
         }
 
@@ -601,7 +712,16 @@ namespace Catan10
                     return Paper;
                 case ResourceType.Coin:
                     return Coin;
-
+                case ResourceType.Politics:
+                    return Politics;
+                case ResourceType.Science:
+                    return Science;
+                case ResourceType.Trade:
+                    return Trade;
+                case ResourceType.VictoryPoint:
+                    return VictoryPoint;
+                case ResourceType.AnyDevCard:
+                    return AnyDevCard;
                 case ResourceType.Desert:
                 case ResourceType.Back:
                 case ResourceType.None:
@@ -623,14 +743,21 @@ namespace Catan10
                 ( this.GoldMine == b.GoldMine ) &&
                 ( this.Cloth == b.Cloth ) &&
                 ( this.Coin == b.Coin ) &&
-                ( this.Paper == b.Paper ) );
+                ( this.Paper == b.Paper ) &&
+                ( this.Politics == b.Politics ) &&
+                ( this.Science == b.Science ) &&
+                ( this.Trade == b.Trade ) &&
+                ( this.VictoryPoint == b.VictoryPoint ) &&
+                ( this.AnyDevCard == b.AnyDevCard ) );
         }
 
         public bool Equivalent(TradeResources tradeResources)
         {
             if (Wheat != tradeResources.Wheat || Wood != tradeResources.Wood || Ore != tradeResources.Ore ||
                 Sheep != tradeResources.Sheep || Brick != tradeResources.Brick || GoldMine != tradeResources.GoldMine ||
-                Coin != tradeResources.Coin || Paper != tradeResources.Paper || Cloth != tradeResources.Cloth)
+                Coin != tradeResources.Coin || Paper != tradeResources.Paper || Cloth != tradeResources.Cloth ||
+                Politics != tradeResources.Politics || Science != tradeResources.Science || Trade != tradeResources.Trade ||
+                VictoryPoint != tradeResources.VictoryPoint || AnyDevCard != tradeResources.AnyDevCard)
             {
                 return false;
             }
@@ -651,6 +778,11 @@ namespace Catan10
                 Cloth = -Cloth,
                 Coin = -Coin,
                 Paper = -Paper,
+                Trade = -Trade,
+                Politics = -Politics,
+                Science = -Science,
+                VictoryPoint = -VictoryPoint,
+                AnyDevCard = -AnyDevCard,
             };
         }
 
@@ -690,8 +822,24 @@ namespace Catan10
                 case ResourceType.Paper:
                     Paper = value;
                     break;
+                case ResourceType.Politics:
+                    Politics = value;
+                    break;
+                case ResourceType.Science:
+                    Science = value;
+                    break;
+                case ResourceType.Trade:
+                    Trade = value;
+                    break;
+                case ResourceType.VictoryPoint:
+                    VictoryPoint = value;
+                    break;
+                case ResourceType.AnyDevCard:
+                    AnyDevCard = value;
+                    break;
                 case ResourceType.Desert:
                     break;
+
                 case ResourceType.Back:
                 case ResourceType.None:
                 case ResourceType.Sea:
@@ -736,6 +884,26 @@ namespace Catan10
             {
                 list.Add(ResourceType.Cloth);
             }
+            for (int i = 0; i < Science; i++)
+            {
+                list.Add(ResourceType.Science);
+            }
+            for (int i = 0; i < Trade; i++)
+            {
+                list.Add(ResourceType.Trade);
+            }
+            for (int i = 0; i < Politics; i++)
+            {
+                list.Add(ResourceType.Politics);
+            }
+            for (int i = 0; i < VictoryPoint; i++)
+            {
+                list.Add(ResourceType.VictoryPoint);
+            }
+            for (int i = 0; i < AnyDevCard; i++)
+            {
+                list.Add(ResourceType.AnyDevCard);
+            }
             return list;
         }
 
@@ -778,6 +946,16 @@ namespace Catan10
                     return Paper;
                 case ResourceType.Cloth:
                     return Cloth;
+                case ResourceType.Politics:
+                    return Politics;
+                case ResourceType.Trade:
+                    return Trade;
+                case ResourceType.Science:
+                    return Science;
+                case ResourceType.VictoryPoint:
+                    return VictoryPoint;
+                case ResourceType.AnyDevCard:
+                    return AnyDevCard;
                 case ResourceType.Desert:
                     break;
                 case ResourceType.Back:
@@ -797,6 +975,6 @@ namespace Catan10
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion Methods
+
     }
 }

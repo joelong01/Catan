@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using Windows.ApplicationModel.VoiceCommands;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -161,6 +163,26 @@ namespace Catan10
             {
                 OnRoll?.Invoke(rollModel);
             }
+        }
+
+        public void NewTurn()
+        {
+            SetRolls(new RollModel());
+        }
+
+        private void SetDie(IList<ToggleButton> ctrls, int roll)
+        {
+            for (int i = 0; i < ctrls.Count; i++)
+            {
+                ctrls[i].IsChecked = ( roll == i ); // -1 won't error...
+            }
+        }
+
+        public void SetRolls(RollModel roll)
+        {
+            SetDie(RedDice, roll.RedDie);
+            SetDie(WhiteDice, roll.WhiteDie);
+            SetDie(Specials, ( int )roll.SpecialDice);
         }
     }
 }

@@ -97,14 +97,33 @@ namespace Catan10
         {
             TradeResources tr = new TradeResources()
             {
-                Sheep = 1,
-                Wheat = 1,
-                Ore = 1,
-                Brick = 1,
-                Wood = 1
+                Wood = 1,
+                Brick = 2,
+
+                Wheat = 3,
+                Sheep = 4,
+                Ore = 5,
+
+                Paper = 6,
+                Cloth = 7,
+                Coin = 8,
+
+
+                VictoryPoint= 7,
+                Trade=6,
+                Politics=5,
+
+                Science = 4,
+                AnyDevCard = 3
             };
 
             await TestGrantEntitlements.Post(this, tr, new List<Entitlement>(), new List<DevCardType>());
+
+            MainPage.Current.CurrentPlayer.GameData.PoliticsRank = 3;
+            MainPage.Current.CurrentPlayer.GameData.TradeRank = 2;
+            MainPage.Current.CurrentPlayer.GameData.ScienceRank = 1;
+            MainPage.Current.CurrentPlayer.GameData.VictoryPoints = 2;
+            CurrentPlayer.GameData.Resources.ResourcesLostToBaron.Ore = 5;
         }
 
         private async void OnGrantDevCard(object sender, RoutedEventArgs e)

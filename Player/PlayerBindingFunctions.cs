@@ -39,10 +39,10 @@ namespace Catan10
 
         public static Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
         {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
-            {
-                return new SolidColorBrush(Colors.DarkSlateGray);
-            }
+            //if (StaticHelpers.IsInVisualStudioDesignMode)
+            //{
+            //    return new SolidColorBrush(Colors.White);
+            //}
 
             if (owner != null)
             {

@@ -312,7 +312,7 @@ namespace Catan10
 
         public PlayerResources()
         {
-            ResourcesThisTurn.AddGoldMine();
+           
         }
 
         #endregion Constructors + Destructors

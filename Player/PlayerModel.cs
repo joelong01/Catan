@@ -41,21 +41,32 @@ namespace Catan10
     //
     public class PlayerModel : INotifyPropertyChanged
     {
-        private Color _Foreground = Colors.White;
+        //
+        /// <summary>
+        ///     a default player model for UI binding in design mode
+        /// </summary>
 
+        public static PlayerModel DefaultPlayer { get; } = new PlayerModel()
+        {
+
+        };
+
+        private Color _Foreground = Colors.White;
+        private Color _primaryBackgroundColor = Colors.Purple;
+        private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
+        private Color _secondaryBackgroundColor = Colors.Black;
+        private string _playerName = "Nameless";
         private ImageBrush _imageBrush = null;
 
-        private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
+
 
         private PlayerGameModel _playerGameData = null;
 
         private Guid _PlayerIdentifier;
 
-        private string _playerName = "Nameless";
 
-        private Color _primaryBackgroundColor = Colors.SlateBlue;
 
-        private Color _secondaryBackgroundColor = Colors.Black;
+
         double _serviceLatency = 0;
         public double ServiceLatency
         {
@@ -90,7 +101,7 @@ namespace Catan10
 
         private int PerceivedBrightness(Color c)
         {
-            return (int)Math.Sqrt(
+            return ( int )Math.Sqrt(
             c.R * c.R * .299 +
             c.G * c.G * .587 +
             c.B * c.B * .114);
@@ -109,7 +120,7 @@ namespace Catan10
             GameData.Trades = new Trades();
             GameData.Trades.TradeRequest.Owner.Player = MainPage.Current.TheHuman;
             GameData.Resources.StolenResource = ResourceType.None;
-            
+
         }
 
         /// <summary>
@@ -137,7 +148,7 @@ namespace Catan10
             get
             {
                 var brush = ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
-           
+
                 return brush;
             }
         }
@@ -325,21 +336,21 @@ namespace Catan10
             }
         }
 
+
         public PlayerModel()
         {
-            if (StaticHelpers.IsInVisualStudioDesignMode)
+
+            BitmapImage bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/DefaultPlayers/guest.jpg", UriKind.RelativeOrAbsolute));
+            ImageBrush brush = new ImageBrush
             {
-                BitmapImage bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/DefaultPlayers/guest.jpg", UriKind.RelativeOrAbsolute));
-                ImageBrush brush = new ImageBrush
-                {
-                    AlignmentX = AlignmentX.Left,
-                    AlignmentY = AlignmentY.Top,
-                    Stretch = Stretch.UniformToFill,
-                    ImageSource = bitmapImage
-                };
-                ImageBrush = brush;
-                _imageBrush = new ImageBrush();
-            }
+                AlignmentX = AlignmentX.Left,
+                AlignmentY = AlignmentY.Top,
+                Stretch = Stretch.UniformToFill,
+                ImageSource = bitmapImage
+            };
+            ImageBrush = brush;
+            _imageBrush = new ImageBrush();
+
 
             GameData = new PlayerGameModel(this);
         }

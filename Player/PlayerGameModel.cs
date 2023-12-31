@@ -18,7 +18,7 @@ namespace Catan10
 {
     public class PlayerGameModel : INotifyPropertyChanged
     {
-        #region Delegates + Fields + Events + Enums
+  
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -55,13 +55,16 @@ namespace Catan10
         private int _timesTargeted = 0;
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         private Trades _trades = new Trades();
-       
-        
 
 
-        #endregion Delegates + Fields + Events + Enums
 
-        #region Properties
+        private int _TradeRank = 0;
+        private int _PoliticsRank = 0;
+        private int _ScienceRanks = 0;
+        private int _VictoryPoints = 0;
+
+
+    
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -467,6 +470,70 @@ namespace Catan10
             }
         }
 
+        public int TradeRank
+        {
+            get
+            {
+                return _TradeRank;
+            }
+            set
+            {
+                if (value != _TradeRank)
+                {
+                    _TradeRank = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int PoliticsRank
+        {
+            get
+            {
+                return _PoliticsRank;
+            }
+            set
+            {
+                if (value != _PoliticsRank)
+                {
+                    _PoliticsRank = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int ScienceRank
+        {
+            get
+            {
+                return _ScienceRanks;
+            }
+            set
+            {
+                if (value != _ScienceRanks)
+                {
+                    _ScienceRanks = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int VictoryPoints
+        {
+            get
+            {
+                return _VictoryPoints;
+            }
+            set
+            {
+                if (value != _VictoryPoints)
+                {
+                    _VictoryPoints = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Settlements { get; } = new ObservableCollection<BuildingCtrl>();
 
@@ -557,10 +624,6 @@ namespace Catan10
             }
         }
 
-        #endregion Properties
-
-        #region Constructors + Destructors
-
         public PlayerGameModel()
         {
             NotificationsEnabled = true;
@@ -578,9 +641,6 @@ namespace Catan10
 
      
 
-        #endregion Constructors + Destructors
-
-        #region Methods
 
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
         {
@@ -681,6 +741,10 @@ namespace Catan10
             MaxCities = 0;
             Pips = 0;
             GoldRolls = 0;
+            PoliticsRank = 0;
+            ScienceRank = 0;
+            TradeRank = 0;
+            VictoryPoints = 0;
 
 
             for (int i = 0; i < _RoadTie.Count(); i++)
@@ -791,7 +855,6 @@ namespace Catan10
             Score = score;
         }
 
-        #endregion Methods
     }
 
     /// <summary>
@@ -799,7 +862,7 @@ namespace Catan10
     /// </summary>
     public class Trades : INotifyPropertyChanged
     {
-        #region Delegates + Fields + Events + Enums
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -807,9 +870,7 @@ namespace Catan10
 
         private TradeOffer _tradeRequest = new TradeOffer();
 
-        #endregion Delegates + Fields + Events + Enums
 
-        #region Properties
 
         public ObservableCollection<TradeOffer> PotentialTrades
         {
@@ -861,15 +922,13 @@ namespace Catan10
 
             return null;
         }
-        #endregion Properties
 
-        #region Methods
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion Methods
+
     }
 }

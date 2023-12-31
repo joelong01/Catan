@@ -274,9 +274,9 @@ namespace Catan10
 
         public CompositeTransform Transform => ( CompositeTransform )this.RenderTransform;
         public static readonly DependencyProperty BuildingStateProperty = DependencyProperty.Register("BuildingState", typeof(BuildingState), typeof(BuildingCtrl), new PropertyMetadata(BuildingState.None, BuildingStateChanged));
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer, CurrentPlayerChanged));
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
         public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
 

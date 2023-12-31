@@ -98,8 +98,8 @@ namespace Catan10
     {
         Undefined, DevCard, Settlement, City, Road,
         Ship,
-        BuyOrUpgradeKnight, ActivateKnight, MoveKnight, 
-        PoliticsUpgradeOne,PoliticsUpgradeTwo,PoliticsUpgradeThree,PoliticsUpgradeFour,PoliticsUpgradeFive,
+        BuyOrUpgradeKnight, ActivateKnight, MoveKnight,
+        PoliticsUpgradeOne, PoliticsUpgradeTwo, PoliticsUpgradeThree, PoliticsUpgradeFour, PoliticsUpgradeFive,
         ScienceUpgradeOne, ScienceUpgradeTwo, ScienceUpgradeThree, ScienceUpgradeFour, ScienceUpgradeFive,
         TradeUpgradeOne, TradeUpgradeTwo, TradeUpgradeThree, TradeUpgradeFour, TradeUpgradeFive,
         Wall,
@@ -184,7 +184,7 @@ namespace Catan10
 
     public enum MoveBaronReason { PlayedDevCard, Rolled7 };
 
-    public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea, Coin, Cloth, Paper, Invasion };
+    public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea, Coin, Cloth, Paper, Politics, Trade, Science, AnyDevCard, VictoryPoint, Invasion };
 
     public enum RoadLocation { None = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
 
@@ -197,7 +197,7 @@ namespace Catan10
     public enum TileLocation { Self = -1, Top = 0, TopRight = 1, BottomRight = 2, Bottom = 3, BottomLeft = 4, TopLeft = 5 };
 
     public enum TileOrientation { FaceDown, FaceUp, None };
-    public enum SpecialDice { Yellow, Blue, Green, Pirate, None };
+    public enum SpecialDice { Yellow=0, Blue=1, Green=2, Pirate=3, None=-1 };
 
     //
     //  actions are things we can undo

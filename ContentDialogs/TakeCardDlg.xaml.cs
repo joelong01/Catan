@@ -18,7 +18,7 @@ namespace Catan10
         public static readonly DependencyProperty CountVisibleProperty = DependencyProperty.Register("CountVisible", typeof(bool), typeof(TakeCardDlg), new PropertyMetadata(true, CountVisibleChanged));
         public static readonly DependencyProperty DestinationProperty = DependencyProperty.Register("Destination", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardDlg), new PropertyMetadata(null));
 
-        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof(PlayerModel), typeof(TakeCardDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty FromProperty = DependencyProperty.Register("From", typeof(PlayerModel), typeof(TakeCardDlg), new PropertyMetadata(PlayerModel.DefaultPlayer));
 
         public static readonly DependencyProperty HowManyProperty = DependencyProperty.Register("HowMany", typeof(int), typeof(TakeCardDlg), new PropertyMetadata(1, HowManyChanged));
 
@@ -28,7 +28,7 @@ namespace Catan10
 
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(ObservableCollection<ResourceCardModel>), typeof(TakeCardDlg), new PropertyMetadata(null));
 
-        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(PlayerModel), typeof(TakeCardDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty ToProperty = DependencyProperty.Register("To", typeof(PlayerModel), typeof(TakeCardDlg), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty ConsolidateCardsProperty = DependencyProperty.Register("ConsolidateCards", typeof(bool), typeof(TakeCardDlg), new PropertyMetadata(true, ConsolidateCardsChanged));
         public bool ConsolidateCards
         {

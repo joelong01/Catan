@@ -175,7 +175,7 @@ namespace Catan10
         public static readonly DependencyProperty IsForegroundCheckedProperty = DependencyProperty.Register("IsForegroundChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
         public static readonly DependencyProperty IsPrimaryCheckedProperty = DependencyProperty.Register("IsPrimaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(true));
         public static readonly DependencyProperty IsSecondaryCheckedProperty = DependencyProperty.Register("IsSecondaryChecked", typeof(bool), typeof(PlayerManagementDlg), new PropertyMetadata(false));
-        public static readonly DependencyProperty SelectedPlayerProperty = DependencyProperty.Register("SelectedPlayer", typeof(PlayerModel), typeof(PlayerManagementDlg), new PropertyMetadata(null));
+        public static readonly DependencyProperty SelectedPlayerProperty = DependencyProperty.Register("SelectedPlayer", typeof(PlayerModel), typeof(PlayerManagementDlg), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(PlayerManagementDlg), typeof(PlayerManagementDlg), new PropertyMetadata(null));
 
         public PlayerManagementDlg(ICollection<PlayerModel> playerData)

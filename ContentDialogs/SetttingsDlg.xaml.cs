@@ -59,7 +59,7 @@ namespace Catan10
         #region Properties
 
         public static readonly DependencyProperty SettingsProperty = DependencyProperty.Register("Settings", typeof(Settings), typeof(SettingsDlg), new PropertyMetadata(new Settings()));
-        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(SettingsDlg), new PropertyMetadata(MainPage.Current.TheHuman));
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(SettingsDlg), new PropertyMetadata(PlayerModel.DefaultPlayer));
 
         public Settings Settings
         {

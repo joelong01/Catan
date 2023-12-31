@@ -55,7 +55,7 @@ namespace Catan10
             get => ( MainPageModel )GetValue(MainPageModelProperty);
             set => SetValue(MainPageModelProperty, value);
         }
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TraditionalRollCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TraditionalRollCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public PlayerModel CurrentPlayer
         {
             get => ( PlayerModel )GetValue(CurrentPlayerProperty);

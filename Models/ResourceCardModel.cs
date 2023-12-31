@@ -163,6 +163,7 @@ namespace Catan10
             this.Add(ResourceType.Wheat);
             this.Add(ResourceType.Sheep);
             this.Add(ResourceType.Ore);
+            this.Add(ResourceType.GoldMine);
             if (MainPage.Current != null)
             {
                 if (MainPage.Current.MainPageModel.GameInfo != null && MainPage.Current.MainPageModel.GameInfo.Pirates)
@@ -171,6 +172,13 @@ namespace Catan10
                     this.Add(ResourceType.Paper);
                     this.Add(ResourceType.Cloth);
                     this.Add(ResourceType.Coin);
+
+                    this.Add(ResourceType.VictoryPoint);
+                    this.Add(ResourceType.Trade);
+                    this.Add(ResourceType.Politics);
+                    this.Add(ResourceType.Science);
+                    this.Add(ResourceType.AnyDevCard);
+
                 }
             }
         }
@@ -360,8 +368,8 @@ namespace Catan10
                 {
                     return (Brush)App.Current.Resources["ResourceType.Back"];
                 }
-
-                return (Brush)App.Current.Resources["ResourceType." + ResourceType.ToString()];
+                var key = "ResourceType." + ResourceType.ToString();
+                return (Brush)Application.Current.Resources[key];
             }
         }
 

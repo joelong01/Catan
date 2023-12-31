@@ -26,7 +26,7 @@ namespace Catan10
        // private ObservableCollection<PlayerModel> TradingPartners { get; set; } = new ObservableCollection<PlayerModel>();
         public event SendOfferHandler OnSendOffer;
 
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(OfferCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(OfferCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
 
         public static readonly DependencyProperty EnableSendProperty = DependencyProperty.Register("EnableSend", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(false));
 
@@ -43,7 +43,7 @@ namespace Catan10
 
         public static readonly DependencyProperty ShowSendButtonProperty = DependencyProperty.Register("ShowSendButton", typeof(bool), typeof(OfferCtrl), new PropertyMetadata(true));
 
-        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(OfferCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(OfferCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(OfferCtrl), new PropertyMetadata(null));
         public ObservableCollection<PlayerModel> PlayingPlayers
         {

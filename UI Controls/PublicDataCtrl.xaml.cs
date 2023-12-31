@@ -26,10 +26,6 @@ namespace Catan10
             depPropClass?.SetRollOrientation((TileOrientation)e.OldValue, (TileOrientation)e.NewValue);
         }
 
-        private void OnFlipRollGrid(object sender, RoutedEventArgs e)
-        {
-            Player.GameData.RollOrientation = (Player.GameData.RollOrientation == TileOrientation.FaceDown) ? TileOrientation.FaceUp : TileOrientation.FaceDown;
-        }
 
         private void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
@@ -81,7 +77,7 @@ namespace Catan10
             set => SetValue(RollOrientationProperty, value);
         }
 
-        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(null, PlayerChanged));
+        public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(PublicDataCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer, PlayerChanged));
 
         public static readonly DependencyProperty RollOrientationProperty = DependencyProperty.Register("RollOrientation", typeof(TileOrientation), typeof(PublicDataCtrl), new PropertyMetadata(TileOrientation.FaceDown, RollOrientationChanged));
 
@@ -133,40 +129,6 @@ namespace Catan10
             }
         }
 
-        private void OnBuySettlement(object sender, RoutedEventArgs e)
-        {
-            if (IsControlOrShiftPressed && Player.GameData.Resources.HasEntitlement(Entitlement.Settlement))
-            {
-                Player.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);                 
-            }
-            else
-            {
-                Player.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
-            }
-        }
-
-        private void OnBuyCity(object sender, RoutedEventArgs e)
-        {
-            if (IsControlOrShiftPressed && Player.GameData.Resources.HasEntitlement(Entitlement.City))
-            {
-                Player.GameData.Resources.RevokeEntitlement(Entitlement.City);
-            }
-            else
-            {
-                Player.GameData.Resources.GrantEntitlement(Entitlement.City);
-            }
-        }
-
-        private void OnBuyRoad(object sender, RoutedEventArgs e)
-        {
-            if (IsControlOrShiftPressed && Player.GameData.Resources.HasEntitlement(Entitlement.Road))
-            {
-                Player.GameData.Resources.RevokeEntitlement(Entitlement.Road);
-            }
-            else
-            {
-                Player.GameData.Resources.GrantEntitlement(Entitlement.Road);
-            }
-        }
+       
     }
 }
