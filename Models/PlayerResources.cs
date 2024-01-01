@@ -333,9 +333,9 @@ namespace Catan10
             }
             return count;
         }
-        public bool CanAfford(Entitlement entitlement)
+        public bool CanAfford(PlayerModel player, Entitlement entitlement)
         {
-            TradeResources cost = TradeResources.GetEntitlementCost(entitlement);
+            TradeResources cost = TradeResources.GetEntitlementCost(player, entitlement);
             Contract.Assert(cost != null);
             foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
             {

@@ -69,12 +69,10 @@
                             IsRightTapEnabled="True" IsTapEnabled="True" PointerPressed="Picture_PointerPressed"
                             Stroke="{x:Bind Player.ForegroundBrush}" Tag="{x:Bind Player, Mode=OneTime}" />
                     <!--  Score  -->
-                    <Viewbox Height="20" Width="20" Stretch="Fill" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Border Background="Black" 
-                                BorderBrush="Gold" BorderThickness="2" CornerRadius="3">
-                            <TextBlock Padding="2"
-                                    Foreground="White"
-                                    Text="{x:Bind Player.GameData.Score, Mode=OneWay}"
+                    <Viewbox Height="20" Width="20" Stretch="Fill" HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom">
+                        <Border Background="Black" BorderBrush="Gold" BorderThickness="2" CornerRadius="3">
+                            <TextBlock Padding="2" Foreground="White" Text="{x:Bind Player.GameData.Score, Mode=OneWay}"
                                     ToolTipService.ToolTip="Score" />
                         </Border>
                     </Viewbox>
@@ -108,7 +106,7 @@
                             Image="{StaticResource ResourceType.GoldMine}" />
 
                     <local:ResourceCardSlimCtrl Margin="0,0,5,0"
-                            Count="{x:Bind Player.GameData.Resources.TotalResourcesCollection.Count, Mode=OneWay, FallbackValue=0}"
+                            Count="{x:Bind Player.GameData.Resources.TotalResourcesForGame.Count, Mode=OneWay, FallbackValue=0}"
                             Image="{StaticResource ResourceType.Back}" />
 
                     <Viewbox Height="50" Width="30">
@@ -274,7 +272,7 @@
                 <Viewbox Grid.Row="1" Grid.RowSpan="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0"
                         HorizontalAlignment="Left" VerticalAlignment="Top">
                     <GridView Grid.Row="0" Grid.RowSpan="1" Grid.Column="1" Margin="0,0,0,0" HorizontalAlignment="Left"
-                            Background="Green" BorderBrush="{StaticResource bmMaple}" BorderThickness="0"
+                            BorderBrush="{StaticResource bmMaple}" BorderThickness="0"
                             ItemsSource="{x:Bind Player.GameData.Resources.ResourcesThisTurn, Mode=OneWay}"
                             ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionMode="None">
                         <GridView.ItemsPanel>

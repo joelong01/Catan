@@ -309,7 +309,7 @@ namespace Catan10
         }
 
 
-        public static TradeResources GetEntitlementCost(Entitlement entitlement)
+        public static TradeResources GetEntitlementCost(PlayerModel player, Entitlement entitlement)
         {
             TradeResources cost = null;
             switch (entitlement)
@@ -376,94 +376,25 @@ namespace Catan10
 
                     };
                     break;
-                case Entitlement.PoliticsUpgradeOne:
+                case Entitlement.PoliticsUpgrade:
                     cost = new TradeResources()
                     {
-                        Coin = 1
+                        Coin = player.GameData.PoliticsRank
                     };
                     break;
-                case Entitlement.PoliticsUpgradeTwo:
+               
+               
+                case Entitlement.TradeUpgrade:
                     cost = new TradeResources()
                     {
-                        Coin = 2
+                        Cloth = player.GameData.TradeRank
                     };
                     break;
-                case Entitlement.PoliticsUpgradeThree:
+                
+                case Entitlement.ScienceUpgrade:
                     cost = new TradeResources()
                     {
-                        Coin = 3
-                    };
-                    break;
-                case Entitlement.PoliticsUpgradeFour:
-                    cost = new TradeResources()
-                    {
-                        Coin = 4
-                    };
-                    break;
-                case Entitlement.PoliticsUpgradeFive:
-                    cost = new TradeResources()
-                    {
-                        Coin = 5
-                    };
-                    break;
-                case Entitlement.TradeUpgradeOne:
-                    cost = new TradeResources()
-                    {
-                        Cloth = 1
-                    };
-                    break;
-                case Entitlement.TradeUpgradeTwo:
-                    cost = new TradeResources()
-                    {
-                        Cloth = 2
-                    };
-                    break;
-                case Entitlement.TradeUpgradeThree:
-                    cost = new TradeResources()
-                    {
-                        Cloth = 3
-                    };
-                    break;
-                case Entitlement.TradeUpgradeFour:
-                    cost = new TradeResources()
-                    {
-                        Cloth = 4
-                    };
-                    break;
-                case Entitlement.TradeUpgradeFive:
-                    cost = new TradeResources()
-                    {
-                        Cloth = 5
-                    };
-                    break;
-                case Entitlement.ScienceUpgradeOne:
-                    cost = new TradeResources()
-                    {
-                        Paper = 1
-                    };
-                    break;
-                case Entitlement.ScienceUpgradeTwo:
-                    cost = new TradeResources()
-                    {
-                        Paper = 2
-                    };
-                    break;
-                case Entitlement.ScienceUpgradeThree:
-                    cost = new TradeResources()
-                    {
-                        Paper = 3
-                    };
-                    break;
-                case Entitlement.ScienceUpgradeFour:
-                    cost = new TradeResources()
-                    {
-                        Paper = 4
-                    };
-                    break;
-                case Entitlement.ScienceUpgradeFive:
-                    cost = new TradeResources()
-                    {
-                        Paper = 5
+                        Paper = player.GameData.ScienceRank
                     };
                     break;
                 case Entitlement.Wall:
@@ -672,9 +603,9 @@ namespace Catan10
             return true;
         }
 
-        public bool CanAfford(Entitlement entitlement)
+        public bool CanAfford(PlayerModel player, Entitlement entitlement)
         {
-            TradeResources cost = TradeResources.GetEntitlementCost(entitlement);
+            TradeResources cost = TradeResources.GetEntitlementCost(player, entitlement);
             Contract.Assert(cost != null);
             foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
             {

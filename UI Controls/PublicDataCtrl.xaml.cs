@@ -84,6 +84,7 @@ namespace Catan10
         public PublicDataCtrl()
         {
             this.InitializeComponent();
+            this.DataContext = this;
         }
 
         /// <summary>

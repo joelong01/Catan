@@ -69,15 +69,30 @@ namespace Catan10
 
         public static SolidColorBrush GetBackgroundBrush(string colorName)
         {
-            Color color = NameToColorDictionary[colorName];
-            return GetResourceBrush(colorName, color);
+            try
+            {
+                Color color = NameToColorDictionary[colorName];
+                return GetResourceBrush(colorName, color);
+            }
+            catch
+            {
+                return new SolidColorBrush(Colors.HotPink);
+            }
         }
 
         public static SolidColorBrush GetForegroundBrush(SolidColorBrush background)
         {
-            var fgColor = GetForegroundColor(background.Color);
+            try
+            {
+                var fgColor = GetForegroundColor(background.Color);
 
-            return GetResourceBrush(fgColor.Name, fgColor.Color);
+                return GetResourceBrush(fgColor.Name, fgColor.Color);
+            }
+            catch
+            {
+                return new SolidColorBrush(Colors.White);
+            }
+
         }
 
         public static SolidColorBrush GetForegroundBrush(Color background)

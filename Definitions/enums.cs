@@ -99,9 +99,9 @@ namespace Catan10
         Undefined, DevCard, Settlement, City, Road,
         Ship,
         BuyOrUpgradeKnight, ActivateKnight, MoveKnight,
-        PoliticsUpgradeOne, PoliticsUpgradeTwo, PoliticsUpgradeThree, PoliticsUpgradeFour, PoliticsUpgradeFive,
-        ScienceUpgradeOne, ScienceUpgradeTwo, ScienceUpgradeThree, ScienceUpgradeFour, ScienceUpgradeFive,
-        TradeUpgradeOne, TradeUpgradeTwo, TradeUpgradeThree, TradeUpgradeFour, TradeUpgradeFive,
+        PoliticsUpgrade,
+        ScienceUpgrade,
+        TradeUpgrade,
         Wall,
         DestroyCity,
     }

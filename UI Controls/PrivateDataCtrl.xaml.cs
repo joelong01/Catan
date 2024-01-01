@@ -250,7 +250,7 @@ namespace Catan10
             }
             Contract.Assert(tradeResources != null);
 
-            bool ret = tradeResources.CanAfford(entitlement);
+            bool ret = tradeResources.CanAfford(MainPage.Current.CurrentPlayer, entitlement);
             return ret;
         }
 
@@ -312,7 +312,7 @@ namespace Catan10
         {
             GameState state = MainPage.Current.MainPageModel.GameState;
             if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
-            if (!Player.GameData.Resources.CanAfford(Entitlement.City)) return;
+            if (!Player.GameData.Resources.CanAfford(MainPage.Current.CurrentPlayer, Entitlement.City)) return;
             if (AtMaxEntitlement(Player, Entitlement.City))
             {
                 await MainPage.Current.ShowErrorMessage($"You have purchased all available cities.\n\n", "Catan", "");
@@ -327,7 +327,7 @@ namespace Catan10
         {
             GameState state = MainPage.Current.MainPageModel.GameState;
             if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
-            if (!Player.GameData.Resources.CanAfford(Entitlement.DevCard)) return;
+            if (!Player.GameData.Resources.CanAfford(MainPage.Current.CurrentPlayer, Entitlement.DevCard)) return;
             await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.DevCard);
         }
 
@@ -335,7 +335,7 @@ namespace Catan10
         {
             GameState state = MainPage.Current.MainPageModel.GameState;
             if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
-            if (!Player.GameData.Resources.CanAfford(Entitlement.Road)) return;
+            if (!Player.GameData.Resources.CanAfford(MainPage.Current.CurrentPlayer, Entitlement.Road)) return;
             if (AtMaxEntitlement(Player, Entitlement.Road))
             {
                 await MainPage.Current.ShowErrorMessage($"You have purchased all available roads.", "Catan", "");
@@ -350,7 +350,7 @@ namespace Catan10
         {
             GameState state = MainPage.Current.MainPageModel.GameState;
             if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
-            if (Player.GameData.Resources.CanAfford(Entitlement.Settlement))
+            if (Player.GameData.Resources.CanAfford(MainPage.Current.CurrentPlayer, Entitlement.Settlement))
             {
                 if (AtMaxEntitlement(Player, Entitlement.Settlement))
                 {

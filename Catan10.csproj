@@ -266,6 +266,9 @@
     <Compile Include="UI Controls\PrivateDataCtrl.xaml.cs">
       <DependentUpon>PrivateDataCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\PurchaseCtrl.xaml.cs">
+      <DependentUpon>PurchaseCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\ResourceCardCtrl.xaml.cs">
       <DependentUpon>ResourceCardCtrl.xaml</DependentUpon>
     </Compile>
@@ -550,6 +553,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\PrivateDataCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\PurchaseCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

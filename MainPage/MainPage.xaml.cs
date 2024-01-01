@@ -35,7 +35,7 @@ namespace Catan10
     {
         // 12/30/2023 - Create a static MainPageModel for all the controls to use as their default when they are created
 
-    
+
         #region Delegates + Fields + Events + Enums
 
         public const string PlayerDataFile = "catansettings.json";
@@ -618,7 +618,7 @@ namespace Catan10
         /// <param name="roll"></param>
         /// <returns></returns>
         private async Task OnRolledNumber(RollModel roll)
-        { 
+        {
             if (!MainPageModel.EnableRolls)
             {
                 this.TraceMessage("Warning: OnRolled called but EnableRolls is false!");
@@ -635,13 +635,14 @@ namespace Catan10
                 await WaitingForRollToPirateRoll.PostRollMessage(this, roll);
                 this.TraceMessage("PIRATE   End Pirate roll");
 
-            } else
+            }
+            else
             {
                 this.TraceMessage("ROLL start roll processing");
                 await WaitingForRollToWaitingForNext.PostRollMessage(this, roll);
                 this.TraceMessage("ROLL end roll processing");
             }
-       
+
 
         }
 
@@ -885,7 +886,7 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.RemoveAt(0); // the clear doesn't trigger the unsubscribe because the NewItems and the OldItems are both null
             }
 
-           MainPageModel.Log = new Log(this);
+            MainPageModel.Log = new Log(this);
 
             await ResetTiles(true);
 
@@ -929,10 +930,17 @@ namespace Catan10
 
         private async Task SaveGameState()
         {
-            if (SaveSettingsTimer == null) await Task.Delay(0);
-            if (SaveSettingsTimer.IsEnabled) await Task.Delay(0);
-            SaveSettingsTimer.Start();
-            await Task.Delay(0);
+            try
+            {
+                if (SaveSettingsTimer == null) { return; }
+                if (SaveSettingsTimer.IsEnabled) await Task.Delay(0);
+                SaveSettingsTimer.Start();
+                await Task.Delay(0);
+            }
+            catch
+            {
+                // eat it
+            }
         }
 
         /// <summary>
@@ -1274,26 +1282,57 @@ namespace Catan10
             await appWindow.TryShowAsync();
         }
 
-        private async void OnLocalBuySettlement(object sender, RoutedEventArgs e)
+        private async void OnPurchaseEntitlement(Entitlement entitlement)
         {
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.Settlement);
+            switch (entitlement)
+            {
+                case Entitlement.Undefined:
+                    break;
+                case Entitlement.DevCard:
+                case Entitlement.Settlement:
+                case Entitlement.City:
+                case Entitlement.Road:
+                case Entitlement.Ship:
+                case Entitlement.BuyOrUpgradeKnight:
+                    await PurchaseEntitlement(CurrentPlayer, entitlement);
+                    break;
+                case Entitlement.ActivateKnight:
+                    await TryBuyKnightEntitlement();
+                    break;
+                case Entitlement.MoveKnight:
+                    foreach (var knight in CurrentPlayer.GameData.Knights)
+                    {
+                        if (knight.Activated)
+                        {
+                            await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight);
+                            return;
+                        }
+                    }
+                    break;
+                case Entitlement.PoliticsUpgrade:
+                    break;
+
+                case Entitlement.ScienceUpgrade:
+                    break;
+                case Entitlement.TradeUpgrade:
+                    break;
+                case Entitlement.Wall:
+                    break;
+                case Entitlement.DestroyCity:
+                    break;
+                default:
+                    break;
+            }
         }
 
-        private async void OnLocalBuyCity(object sender, RoutedEventArgs e)
-        {
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.City);
-        }
-        private async void OnBuyKnight(object sender, RoutedEventArgs e)
-        {
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight);
-        }
+
         /// <summary>
         ///     make sure that the current user has a knight that is not activated, and if so, let them
         ///     buy an entitlement to activate the knight
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void OnActivateKnight(object sender, RoutedEventArgs e)
+        private async Task TryBuyKnightEntitlement()
         {
             bool found = false;
 
@@ -1396,21 +1435,6 @@ namespace Catan10
             if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll) return true;
 
             return false;
-        }
-
-        private string UnplayedResourceCount(ObservableCollection<Entitlement> entitlements, Entitlement toCheck)
-        {
-            int count = 0;
-
-            foreach (Entitlement entitlement in entitlements)
-            {
-                if (entitlement.Equals(toCheck))
-                {
-                    count++;
-                }
-            }
-
-            return count.ToString();
         }
 
 

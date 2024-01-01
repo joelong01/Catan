@@ -27,8 +27,11 @@ namespace Catan10
             }
             catch
             {
-                var gradientStopCollection = new GradientStopCollection();
-                gradientStopCollection.Add(new GradientStop() { Color = Colors.Black }); ;
+                var gradientStopCollection = new GradientStopCollection
+                {
+                    new GradientStop() { Color = Colors.Black }
+                };
+;
                 gradientStopCollection.Add(new GradientStop() { Color = Colors.White });
                 var brush = new LinearGradientBrush(gradientStopCollection, 45);
                 brush.StartPoint = new Windows.Foundation.Point(0.5, 0);
