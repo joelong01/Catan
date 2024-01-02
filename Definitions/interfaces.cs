@@ -267,7 +267,7 @@ namespace Catan10
 
         Task ResetRollControl();
 
-        (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll, RollAction action);
+        (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, RollModel roll, RollAction action);
 
         void SetHighlightedTiles(int roll);
 

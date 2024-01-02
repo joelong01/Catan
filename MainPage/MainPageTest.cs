@@ -324,7 +324,11 @@ namespace Catan10
                 await NextState();
             }
 
-           // await NextState();
+            PlayingPlayers[0].GameData.TradeRank = 1;
+            PlayingPlayers[1].GameData.ScienceRank = 2;
+            PlayingPlayers[2].GameData.PoliticsRank = 3;
+
+            // await NextState();
         }
 
         private async void OnTestRollSeven(object sender, RoutedEventArgs e)

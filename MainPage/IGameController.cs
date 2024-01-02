@@ -294,7 +294,7 @@ namespace Catan10
             CurrentPlayer = NameToPlayer(changePlayerLog.NewCurrentPlayer);
 
             //
-            // always stop highlighted the roll when the player changes
+            // always stop highlighted the rollModel when the player changes
             GameContainer.AllTiles.ForEach((tile) => tile.StopHighlightingTile());
 
             //
@@ -339,7 +339,7 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     this is where we do the work to synchronize a roll across devices.
+        ///     this is where we do the work to synchronize a rollModel across devices.
         ///
         ///     General Algorythm:
         ///
@@ -358,7 +358,7 @@ namespace Catan10
             try
             {
                 //
-                // need to update the state first because data binding is used to show/hide roll UI and it is driven off of
+                // need to update the state first because data binding is used to show/hide rollModel UI and it is driven off of
                 // GameState.  the end of this function changes the state to GameState.WaitingForRollForOrder as well
 
                 Contract.Assert(logEntry.NewState == GameState.WaitingForRollForOrder);
@@ -379,7 +379,7 @@ namespace Catan10
 
                 //
                 //  7/4/2020: has everybody rolled? -- don't make any decisions until the rolls are in
-                //            we check to see if we are waiting for a roll by looking a flag
+                //            we check to see if we are waiting for a rollModel by looking a flag
                 //
                 List<PlayerModel> waiting = new List<PlayerModel>();
                 foreach (var p in MainPageModel.PlayingPlayers)
@@ -407,7 +407,7 @@ namespace Catan10
 
 
                 //
-                //  7/29/2020: be sure and loop over *all* the players and set which ones are in a tie and need to roll again.
+                //  7/29/2020: be sure and loop over *all* the players and set which ones are in a tie and need to rollModel again.
                 //  
                 List<PlayerModel> playersInTie = new List<PlayerModel>();
                 foreach (var p in PlayingPlayers)
@@ -436,7 +436,7 @@ namespace Catan10
                 if (showDialog && VisualTreeHelper.GetOpenPopups(Window.Current).Count == 0) // if the dialog is already shown, don't show it again
                 {
                     //
-                    //  waiting for a roll from p...                            
+                    //  waiting for a rollModel from p...                            
                     ContentDialog dlg = new ContentDialog()
                     {
                         Title = "Catan - Roll For Order",
@@ -493,8 +493,8 @@ namespace Catan10
 
         /// <summary>
         ///     We store Rolls as RollModels which have both the GoldTiles (set before RollModel) and the RollModel (set after RollModel).
-        ///     Once you are assigned a RollModel, that is your roll.  you can undo it, but when Redo (or even Next) happens,
-        ///     you get the same Gold Tiles and the same value of the roll.
+        ///     Once you are assigned a RollModel, that is your rollModel.  you can undo it, but when Redo (or even Next) happens,
+        ///     you get the same Gold Tiles and the same value of the rollModel.
         /// </summary>
         /// <returns>the rollState object to use for this turn</returns>
         public RollState GetNextRollState()
@@ -704,8 +704,8 @@ namespace Catan10
         }
 
         //
-        //  find all the tiles with building for this roll where the owner == Player
-        public (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, int roll, RollAction action)
+        //  find all the tiles with building for this rollModel where the owner == Player
+        public (TradeResources Granted, TradeResources Baroned) ResourcesForRoll(PlayerModel player, RollModel rollModel, RollAction action)
         {
             TradeResources tr = new TradeResources();
             TradeResources baron = new TradeResources();
@@ -715,7 +715,7 @@ namespace Catan10
                 if (building.Owner != player) continue;
                 foreach (var kvp in building.BuildingToTileDictionary)
                 {
-                    if (kvp.Value.Number == roll)
+                    if (kvp.Value.Number == rollModel.Roll)
                     {
                         if (kvp.Value.HasBaron == false)
                         {
@@ -759,6 +759,38 @@ namespace Catan10
                     }
                 }
             }
+
+            switch (rollModel.SpecialDice)
+            {
+                // if a player is *Rank=1, then a roll of 1 or 2 on the Red Dice pays
+
+                case SpecialDice.Trade:
+                    if (player.GameData.TradeRank > 0 && player.GameData.TradeRank + 1 >= rollModel.RedDie)
+                    {
+                        tr.AddResource(ResourceType.Trade, 1);
+                    }
+                    break;
+                case SpecialDice.Politics:
+                    if (player.GameData.PoliticsRank > 0 && player.GameData.PoliticsRank + 1 >= rollModel.RedDie)
+                    {
+                        tr.AddResource(ResourceType.Politics, 1);
+                    }
+                    break;
+                case SpecialDice.Science:
+                    if (player.GameData.ScienceRank > 0 && player.GameData.ScienceRank + 1 >= rollModel.RedDie)
+                    {
+                        tr.AddResource(ResourceType.Science, 1);
+                    }
+                    break;
+                case SpecialDice.Pirate:
+                    break;
+                case SpecialDice.None:
+                    break;
+                default:
+                    break;
+            }
+
+
 
             if (action == RollAction.Undo)
             {
@@ -1089,7 +1121,7 @@ namespace Catan10
         ///     in pirates, the red die is special (possible grants dev cards)
         ///     if the special die is a pirate, we increment the journey.
         ///     if the journey is done, we have an invasion.
-        ///     the normal roll to allocate resources is handled outside (prior) to this function.
+        ///     the normal rollModel to allocate resources is handled outside (prior) to this function.
         /// </summary>
         /// <param name="rollModel"></param>
         /// <param name="action"></param>
@@ -1107,7 +1139,7 @@ namespace Catan10
                     if (count < CTRL_Invasion.StepsBeforeInvasion)
                     {
                         //
-                        //  we've moved the ship and now we just deal with the roll
+                        //  we've moved the ship and now we just deal with the rollModel
 
                         await WaitingForRollToWaitingForNext.PostRollMessage(this, rollModel);
                         return;
@@ -1278,7 +1310,7 @@ namespace Catan10
                 _showPipGroupIndex = 0;
             }
             BuildingState oldState = updateBuildingLog.OldBuildingState;
-            
+
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
                 if (( building.BuildingState == BuildingState.Settlement && !MainPageModel.GameInfo.Pirates ) || ( building.BuildingState == BuildingState.City && MainPageModel.GameInfo.Pirates ))
@@ -1381,7 +1413,7 @@ namespace Catan10
         }
 
         /// <summary>
-        ///     checks to see if the player is in a tie roll with any other players
+        ///     checks to see if the player is in a tie rollModel with any other players
         /// </summary>
         /// <param name="player"></param>
         /// <returns>The list of players in the tie</returns>
@@ -1390,7 +1422,7 @@ namespace Catan10
             List<PlayerModel> list = new List<PlayerModel>();
 
             //
-            //  look at all the rolls and see if the current player needs to roll again
+            //  look at all the rolls and see if the current player needs to rollModel again
             foreach (var p in MainPageModel.PlayingPlayers)
             {
                 if (p == player) continue; // don't compare yourself to yourself

@@ -7,9 +7,9 @@ namespace Catan10
 {
     //public class ColorChoices
     //{
-    //    public Color Background { get; set; } = Colors.Blue;
+    //    public Color Background { get; set; } = Colors.Politics;
     //    public Color Foreground { get; set; } = Colors.White;
-    //    public string Name { get; set; } = "Blue";
+    //    public string Name { get; set; } = "Politics";
 
     //    public ColorChoices(string name, Color background, Color foreground)
     //    {
@@ -42,14 +42,14 @@ namespace Catan10
 
         {
             {"Red", Colors.Red },
-            {"Yellow", Colors.Yellow},
-            {"Green", Colors.Green},
+            {"Trade", Colors.Yellow},
+            {"Science", Colors.Green},
             {"White", Colors.White},
             {"Brown", Colors.Brown},
             {"DarkGray", Colors.DarkGray},
             {"Black", Colors.Black},
             {"Purple", Colors.Purple},
-            {"Blue", Colors.Blue }
+            {"Politics", Colors.Blue }
         };
 
         public static List<SolidColorBrush> AllAvailableBrushes()

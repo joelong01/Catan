@@ -159,11 +159,11 @@ namespace Catan10
                 if (Coin != 0) list.Add(ResourceType.Coin);
                 if (Cloth != 0) list.Add(ResourceType.Cloth);
                 if (Paper != 0) list.Add(ResourceType.Paper);
-                if (Paper != 0) list.Add(ResourceType.Science);
-                if (Paper != 0) list.Add(ResourceType.Trade);
-                if (Paper != 0) list.Add(ResourceType.Politics);
-                if (Paper != 0) list.Add(ResourceType.VictoryPoint);
-                if (Paper != 0) list.Add(ResourceType.AnyDevCard);
+                if (Science != 0) list.Add(ResourceType.Science);
+                if (Trade != 0) list.Add(ResourceType.Trade);
+                if (Politics != 0) list.Add(ResourceType.Politics);
+                if (VictoryPoint != 0) list.Add(ResourceType.VictoryPoint);
+                if (AnyDevCard != 0) list.Add(ResourceType.AnyDevCard);
                 return list;
             }
         }
@@ -381,15 +381,15 @@ namespace Catan10
                         Coin = player.GameData.PoliticsRank
                     };
                     break;
-               
-               
+
+
                 case Entitlement.TradeUpgrade:
                     cost = new TradeResources()
                     {
                         Cloth = player.GameData.TradeRank
                     };
                     break;
-                
+
                 case Entitlement.ScienceUpgrade:
                     cost = new TradeResources()
                     {
@@ -470,13 +470,13 @@ namespace Catan10
             TradeResources tr = new TradeResources();
             switch (roll)
             {
-                case SpecialDice.Yellow:
+                case SpecialDice.Trade:
                     tr.Trade++;
                     break;
-                case SpecialDice.Blue:
+                case SpecialDice.Politics:
                     tr.Science++;
                     break;
-                case SpecialDice.Green:
+                case SpecialDice.Science:
                     tr.Politics++;
                     break;
                 case SpecialDice.Pirate:
@@ -577,7 +577,21 @@ namespace Catan10
                     break;
                 case ResourceType.Desert:
                     break;
-
+                case ResourceType.Politics:
+                    Politics += toAdd;
+                    break;
+                case ResourceType.Science:
+                    Science += toAdd;
+                    break;
+                case ResourceType.Trade:
+                    Trade += toAdd;
+                    break;
+                case ResourceType.VictoryPoint:
+                    VictoryPoint += toAdd;
+                    break;
+                case ResourceType.AnyDevCard:
+                    AnyDevCard += toAdd;
+                    break;
                 case ResourceType.Back:
 
                 case ResourceType.None:

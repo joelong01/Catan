@@ -133,26 +133,26 @@
                 </ToggleButton.Content>
             </ToggleButton>
 
-            <ToggleButton Name="SpecialGreen" Grid.Row="1" Grid.Column="2" Background="Black" Padding="2"
-                    Click="OnSpecialClick" Tag="Green">
+            <ToggleButton Name="SpecialScience" Grid.Row="1" Grid.Column="2" Background="Black" Padding="2"
+                    Click="OnSpecialClick" Tag="Science">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
-                        <Border BorderBrush="Purple" BorderThickness="2" CornerRadius="5">
+                        <Border BorderBrush="White" BorderThickness="2" CornerRadius="5">
                             <local:EntryGateCtrl StrokeColor="LightGreen" StrokeThickness="30" FillColor="Transparent" />
                         </Border>
                     </Viewbox>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Name="SpecialYellow" Grid.Row="2" Grid.Column="2" Background="Black" Padding="2"
-                    Click="OnSpecialClick" Tag="Yellow">
+            <ToggleButton Name="SpecialTrade" Grid.Row="2" Grid.Column="2" Background="Black" Padding="2"
+                    Click="OnSpecialClick" Tag="Trade">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
                         <local:EntryGateCtrl StrokeColor="Yellow" StrokeThickness="30" FillColor="Transparent" />
                     </Viewbox>
                 </ToggleButton.Content>
             </ToggleButton>
-            <ToggleButton Name="SpecialBlue" Grid.Row="3" Grid.Column="2" Background="Black" Padding="2"
-                    Click="OnSpecialClick" Tag="Blue">
+            <ToggleButton Name="SpecialPolitics" Grid.Row="3" Grid.Column="2" Background="Black" Padding="2"
+                    Click="OnSpecialClick" Tag="Politics">
                 <ToggleButton.Content>
                     <Viewbox Stretch="Uniform">
                         <local:EntryGateCtrl StrokeColor="Blue" StrokeThickness="30" FillColor="Transparent" />

@@ -33,9 +33,9 @@ namespace Catan10
             WhiteDice.Add(WhiteFour);
             WhiteDice.Add(WhiteFive);
             WhiteDice.Add(WhiteSix);
-            Specials.Add(SpecialBlue);
-            Specials.Add(SpecialGreen);
-            Specials.Add(SpecialYellow);
+            Specials.Add(SpecialPolitics);
+            Specials.Add(SpecialTrade);
+            Specials.Add(SpecialScience);
             Specials.Add(SpecialPirate);
 
 

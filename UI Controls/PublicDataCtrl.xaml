@@ -78,7 +78,7 @@
                     </Viewbox>
                 </Grid>
                 <!--  Top Row with resource tracking  -->
-                <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Height="45" Margin="0,0,0,0"
+                <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Height="50" Margin="1"
                         VerticalAlignment="Stretch"
                         BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White, TargetNullValue=White}"
                         BorderThickness="1" CornerRadius="6" Orientation="Horizontal">

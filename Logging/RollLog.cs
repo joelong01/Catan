@@ -168,7 +168,7 @@ namespace Catan10
             //  get the resources for the rollModel
             foreach (var player in GameController.PlayingPlayers)
             {
-                (TradeResources Granted, TradeResources Baroned) = GameController.ResourcesForRoll(player, rollModel.Roll, action);
+                (TradeResources Granted, TradeResources Baroned) = GameController.ResourcesForRoll(player, rollModel, action);
 
                 //12/20/2023: we pushed the action into ResourcesForRoll to make this work always
                 player.GameData.Resources.ResourcesLostToBaron += Baroned;
