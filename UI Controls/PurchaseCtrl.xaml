@@ -54,8 +54,8 @@
                     <Button Background="Transparent" Click="OnBuyEntitlement" Tag="City"
                             ToolTipService.ToolTip="Buy City">
                         <StackPanel>
-                            <!--Need to give CityCtrl width&height because of the way it was converted from SVG-->
-                            <local:CityCtrl Width="70" Height="70" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                           
+                            <local:CityCtrl HasWall="False" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
                             <TextBlock Margin="0,-2,0,0" HorizontalAlignment="Center"
                                     Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Red}"
                                     Style="{StaticResource ButtonTextStyle}" Text="City" />
@@ -99,8 +99,9 @@
                     Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <Grid Style="{StaticResource PurchaseGridStyle}"
                         Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Button Background="Transparent" Click="OnBuyEntitlement" Tag="BuyOrUpgradeKnight" HorizontalAlignment="Center"
-                            VerticalAlignment="Center" ToolTipService.ToolTip="Buy Or Upgrade Knight">
+                    <Button Background="Transparent" Click="OnBuyEntitlement" Tag="BuyOrUpgradeKnight"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            ToolTipService.ToolTip="Buy Or Upgrade Knight">
 
                         <local:KnightCtrl Activated="True" KnightRank="Unset" Width="70" Height="70"
                                 Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />

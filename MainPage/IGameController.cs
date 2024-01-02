@@ -17,6 +17,19 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
+        public bool IsPirates
+        {
+            get
+            {
+                if (GameInfo != null)
+                {
+                    return GameInfo.Pirates;
+                }
+
+                return false;
+            }
+        }
+
         #region Methods
 
         private async Task UpdateUiForState(GameState currentState)
@@ -1265,7 +1278,7 @@ namespace Catan10
                 _showPipGroupIndex = 0;
             }
             BuildingState oldState = updateBuildingLog.OldBuildingState;
-
+            
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
                 if (( building.BuildingState == BuildingState.Settlement && !MainPageModel.GameInfo.Pirates ) || ( building.BuildingState == BuildingState.City && MainPageModel.GameInfo.Pirates ))
@@ -1297,6 +1310,7 @@ namespace Catan10
 
 
             }
+
 
             CalculateAndSetLongestRoad();
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
@@ -1398,5 +1412,7 @@ namespace Catan10
                 await MustMoveBaronLog.PostLog(this, MoveBaronReason.Rolled7);
             }
         }
+
+
     }
 }

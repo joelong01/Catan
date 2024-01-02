@@ -324,7 +324,7 @@ namespace Catan10
                 await NextState();
             }
 
-            await NextState();
+           // await NextState();
         }
 
         private async void OnTestRollSeven(object sender, RoutedEventArgs e)

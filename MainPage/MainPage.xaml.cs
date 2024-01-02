@@ -1317,6 +1317,7 @@ namespace Catan10
                 case Entitlement.TradeUpgrade:
                     break;
                 case Entitlement.Wall:
+                    await TryBallWall();
                     break;
                 case Entitlement.DestroyCity:
                     break;
@@ -1375,7 +1376,7 @@ namespace Catan10
 
         }
 
-        private async void OnBuyCityWall(object sender, RoutedEventArgs e)
+        private async Task TryBallWall()
         {
             bool foundUnprotectedCity = false;
             foreach (var building in CurrentPlayer.GameData.Cities)
@@ -1416,6 +1417,9 @@ namespace Catan10
             if (MainPageModel.Settings.IsServiceGame) return Visibility.Collapsed;
             if (state == GameState.WaitingForNext ||
                 MainPageModel.GameState == GameState.Supplemental)
+                return Visibility.Visible;
+
+            if (state == GameState.AllocateResourceReverse || state == GameState.AllocateResourceForward)
                 return Visibility.Visible;
             return Visibility.Collapsed;
         }

@@ -10,10 +10,10 @@ namespace Catan10
 {
     public delegate void BroadcastMessageReceivedHandler(CatanMessage message);
 
-   
+
     public delegate void DeleteGameHandler(GameInfo gameInfo, string by);
 
-  
+
     public delegate void GameLifeTimeHandler(GameInfo gameInfo, string gameName);
 
     public delegate void PrivateMessageReceivedHandler(CatanMessage message);
@@ -150,7 +150,7 @@ namespace Catan10
 
     public interface IGameCallback
     {
- 
+
         #region Methods
 
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
@@ -174,11 +174,14 @@ namespace Catan10
         bool HasEntitlement(Entitlement entitlement);
         Task DestroyCity(BuildingCtrl buildingCtrl);
 
+
+
         #endregion Methods
     }
 
     public interface IGameController
     {
+        bool IsPirates { get; }
 
         BuildingCtrl GetBuilding(int index);
         #region Properties + Fields
@@ -242,7 +245,7 @@ namespace Catan10
 
         RandomBoardSettings GetRandomBoard();
 
-         Task CreateGame(GameInfo gameInfo);
+        Task CreateGame(GameInfo gameInfo);
 
         /// <summary>
         ///     Given a playerName, return the Model by looking up in the AllPlayers collection
@@ -310,7 +313,7 @@ namespace Catan10
 
         #endregion Methods
 
-        string PlayerListToCsv (List<PlayerModel> playersWithTooManyCards);
+        string PlayerListToCsv(List<PlayerModel> playersWithTooManyCards);
         void SetCurrentPlayer(PlayerModel playerModel);
 
         Task RolledSeven();
@@ -342,7 +345,7 @@ namespace Catan10
 
         Task Undo(IGameController gameController);
 
-        Task Replay (IGameController gameController);
+        Task Replay(IGameController gameController);
 
         #endregion Methods
     }

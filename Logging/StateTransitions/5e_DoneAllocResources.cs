@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -19,7 +20,7 @@ namespace Catan10
             {
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
-                OldState = GameState.AllocateResourceReverse,   
+                OldState = GameState.AllocateResourceReverse,
                 NewState = GameState.DoneResourceAllocation,
             };
 
@@ -38,26 +39,42 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            gameController.PlayingPlayers.ForEach((p) =>
+            Debug.Assert(gameController.CurrentGameState == GameState.DoneResourceAllocation);
+
+
+            // show all the resources the players got during the allocation phase
+
+
+            foreach (var p in gameController.PlayingPlayers)
             {
-                p.GameData.Resources.ResourcesThisTurn.Reset();
-                p.GameData.Resources.ResourcesThisTurn.AddResources(p.GameData.Resources.CurrentResources);
-            });
-             await Task.Delay(0);
+
+
+                var tr =  p.GameData.Resources.TotalResourcesForGame;
+                p.GameData.Resources.GrantResources(tr.GetNegated(), true);
+                p.GameData.Resources.ResourcesThisTurn.Reset(); 
+                Debug.Assert(p.GameData.Resources.TotalResourcesCollection.ResourceCount == 0);
+                p.GameData.Resources.GrantResources(tr, true);
+                await Task.Delay(10);
+
+            }
+
         }
-        public Task Replay (IGameController gameController)
+
+
+
+        public Task Replay(IGameController gameController)
         {
             return Do(gameController);
         }
 
         public async Task Redo(IGameController gameController)
         {
-             await Task.Delay(0);
+            await Task.Delay(0);
         }
 
         public async Task Undo(IGameController gameController)
         {
-             await Task.Delay(0);
+            await Task.Delay(0);
         }
     }
 }

@@ -421,7 +421,7 @@ namespace Catan10
         // the list of cards that have been played.  this is public information!
         public override string ToString()
         {
-            return $"[Total={CurrentResources}][Ore={CurrentResources.Ore}][Brick={CurrentResources.Brick}][Wheat={CurrentResources.Wheat}][Wood={CurrentResources.Wood}][Sheep={CurrentResources.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
+            return $"[Total={CurrentResources.Count}][Ore={CurrentResources.Ore}][Brick={CurrentResources.Brick}][Wheat={CurrentResources.Wheat}][Wood={CurrentResources.Wood}][Sheep={CurrentResources.Sheep}] [DevCards={PlayedDevCards?.Count}][Stuff={Settlements + Roads + Cities}]";
         }
 
         /// <summary>

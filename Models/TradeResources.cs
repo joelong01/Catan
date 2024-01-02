@@ -159,7 +159,6 @@ namespace Catan10
                 if (Coin != 0) list.Add(ResourceType.Coin);
                 if (Cloth != 0) list.Add(ResourceType.Cloth);
                 if (Paper != 0) list.Add(ResourceType.Paper);
-
                 if (Paper != 0) list.Add(ResourceType.Science);
                 if (Paper != 0) list.Add(ResourceType.Trade);
                 if (Paper != 0) list.Add(ResourceType.Politics);
