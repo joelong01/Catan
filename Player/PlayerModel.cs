@@ -52,7 +52,7 @@ namespace Catan10
         };
 
         private Color _Foreground = Colors.White;
-        private Color _primaryBackgroundColor = Colors.Purple;
+        private Color _primaryBackgroundColor = Colors.Blue;
         private string _ImageFileName = "ms-appx:///Assets/guest.jpg";
         private Color _secondaryBackgroundColor = Colors.Black;
         private string _playerName = "Nameless";
@@ -62,7 +62,7 @@ namespace Catan10
 
         private PlayerGameModel _playerGameData = null;
 
-        private Guid _PlayerIdentifier;
+        private Guid _PlayerIdentifier = Guid.Empty;
 
 
 
@@ -147,9 +147,16 @@ namespace Catan10
         {
             get
             {
-                var brush = ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
+                try
+                {
+                    var brush = ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
 
-                return brush;
+                    return brush;
+                }
+                catch
+                {
+                    return ConverterGlobals.CreateLinearGradiantBrush(PrimaryBackgroundColor, SecondaryBackgroundColor);
+                }
             }
         }
 
@@ -158,7 +165,16 @@ namespace Catan10
         {
             get
             {
-                return ConverterGlobals.GetBrush(this.ForegroundColor);
+                return new SolidColorBrush(Colors.White);
+                //try
+                //{
+
+                //    return ConverterGlobals.GetBrush(this.ForegroundColor);
+                //}
+                //catch
+                //{
+                //    return new SolidColorBrush(Colors.White);
+                //}
             }
         }
 
@@ -349,7 +365,9 @@ namespace Catan10
                 ImageSource = bitmapImage
             };
             ImageBrush = brush;
-            _imageBrush = new ImageBrush();
+            //  1/2/2024:  found this -- how did this ever work?
+
+            //_imageBrush = new ImageBrush();
 
 
             GameData = new PlayerGameModel(this);

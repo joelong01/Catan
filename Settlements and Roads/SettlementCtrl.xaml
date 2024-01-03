@@ -9,13 +9,13 @@
     <Viewbox Stretch="Fill">
         <Grid Width="100" Height="100">
             <Ellipse Width="95" Height="95" StrokeThickness="2"
-                    Stroke="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay, TargetNullValue=Red, FallbackValue=White}"
-                    Fill="{x:Bind GetBackgroundBrush(CurrentPlayer, Owner), Mode=OneWay, TargetNullValue=Blue, FallbackValue=Green}"
+                    Stroke="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay}"
+                    Fill="{x:Bind GetBackgroundBrush(CurrentPlayer, Owner), Mode=OneWay}"
                     Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <Viewbox Stretch="Uniform">
                 <TextBlock Text="&#x2656;" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Margin="0,-2, 0, 0"
-                        Foreground="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay, TargetNullValue=Black, FallbackValue=Red}"
+                        Foreground="{x:Bind GetForegroundBrush(CurrentPlayer, Owner), Mode=OneWay}"
                         FontFamily="Segoe UI Symbol" />
             </Viewbox>
 

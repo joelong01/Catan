@@ -94,17 +94,53 @@ namespace Catan10
         Back
     };
 
-    public enum Entitlement
+
+
+public enum Entitlement
     {
-        Undefined, DevCard, Settlement, City, Road,
+        [Description("Undefined")]
+        Undefined,
+
+        [Description("Dev Card")]
+        DevCard,
+
+        [Description("Settlement")]
+        Settlement,
+
+        [Description("City")]
+        City,
+
+        [Description("Road")]
+        Road,
+
+        [Description("Ship")]
         Ship,
-        BuyOrUpgradeKnight, ActivateKnight, MoveKnight,
+
+        [Description("Buy Or Upgrade")]
+        BuyOrUpgradeKnight,
+
+        [Description("Activate")]
+        ActivateKnight,
+
+        [Description("Move")]
+        MoveKnight,
+
+        [Description("Politics")]
         PoliticsUpgrade,
+
+        [Description("Science")]
         ScienceUpgrade,
+
+        [Description("Trade")]
         TradeUpgrade,
+
+        [Description("Wall")]
         Wall,
+
+        [Description("Destroy City")]
         DestroyCity,
     }
+
 
     public enum GameState
     {

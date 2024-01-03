@@ -1310,14 +1310,25 @@ namespace Catan10
                     }
                     break;
                 case Entitlement.PoliticsUpgrade:
+                    if (CurrentPlayer.GameData.EntitlementsLeft(entitlement) > 0)
+                    {
+                        await ImprovementLog.PostLog(this, entitlement, CurrentPlayer.GameData.PoliticsRank);
+                    }
                     break;
-
                 case Entitlement.ScienceUpgrade:
+                    if (CurrentPlayer.GameData.EntitlementsLeft(entitlement) > 0)
+                    {
+                        await ImprovementLog.PostLog(this, entitlement, CurrentPlayer.GameData.ScienceRank);
+                    }
                     break;
                 case Entitlement.TradeUpgrade:
+                    if (CurrentPlayer.GameData.EntitlementsLeft(entitlement) > 0)
+                    {
+                        await ImprovementLog.PostLog(this, entitlement, CurrentPlayer.GameData.TradeRank);
+                    }
                     break;
                 case Entitlement.Wall:
-                    await TryBallWall();
+                    await TryBuyWall();
                     break;
                 case Entitlement.DestroyCity:
                     break;
@@ -1376,7 +1387,7 @@ namespace Catan10
 
         }
 
-        private async Task TryBallWall()
+        private async Task TryBuyWall()
         {
             bool foundUnprotectedCity = false;
             foreach (var building in CurrentPlayer.GameData.Cities)

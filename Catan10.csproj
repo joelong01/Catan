@@ -149,6 +149,7 @@
     <Compile Include="GameView\TileGroup.cs" />
     <Compile Include="Logging\Actions\CreateGameModel.cs" />
     <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
+    <Compile Include="Logging\Actions\ImprovementLog.cs" />
     <Compile Include="Logging\StateTransitions\6b_DestroyNextCity.cs" />
     <Compile Include="Logging\StateTransitions\6b_ToMustDesroyCity.cs" />
     <Compile Include="Logging\StateTransitions\6_WaitingForRollToPirateRoll.cs" />
@@ -269,6 +270,9 @@
     <Compile Include="UI Controls\PurchaseCtrl.xaml.cs">
       <DependentUpon>PurchaseCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\PurchaseItemCtrl.xaml.cs">
+      <DependentUpon>PurchaseItemCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\ResourceCardCtrl.xaml.cs">
       <DependentUpon>ResourceCardCtrl.xaml</DependentUpon>
     </Compile>
@@ -286,6 +290,9 @@
     </Compile>
     <Compile Include="UI Controls\ResourceCardSlimCtrl.xaml.cs">
       <DependentUpon>ResourceCardSlimCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\RoadButtonCtrl.xaml.cs">
+      <DependentUpon>RoadButtonCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\RollCtrl.xaml.cs">
       <DependentUpon>RollCtrl.xaml</DependentUpon>
@@ -560,6 +567,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI Controls\PurchaseItemCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\ResourceCardCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -581,6 +592,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\ResourceCardSlimCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\RoadButtonCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

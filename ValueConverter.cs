@@ -19,35 +19,53 @@ namespace Catan10
 
         public static SolidColorBrush GetBrush(Color color)
         {
-          
-
-            if (ConverterGlobals.SolidColorBrushCache.TryGetValue(color, out SolidColorBrush brush))
+            try
             {
+
+                if (ConverterGlobals.SolidColorBrushCache.TryGetValue(color, out SolidColorBrush brush))
+                {
+                    return brush;
+                }
+
+                brush = new SolidColorBrush(color);
+                ConverterGlobals.SolidColorBrushCache[color] = brush;
                 return brush;
             }
-
-            brush = new SolidColorBrush(color);
-            ConverterGlobals.SolidColorBrushCache[color] = brush;
-            return brush;
+            catch
+            {
+                return new SolidColorBrush(color);
+            }
         }
-
-        public static LinearGradientBrush GetLinearGradientBrush(Color color1, Color color2)
+        public static LinearGradientBrush CreateLinearGradiantBrush(Color color1, Color color2)
         {
-           
-            if (ConverterGlobals.LinearGradientBrushCache.TryGetValue((color1, color2), out LinearGradientBrush brush))
-            {
-                return brush;
-            }
             var gradientStopCollection = new GradientStopCollection
             {
                 new GradientStop() { Color = color1, Offset = 0 },
                 new GradientStop() { Color = color2, Offset = 1 }
             };
-            brush = new LinearGradientBrush(gradientStopCollection, 45);
+            var brush = new LinearGradientBrush(gradientStopCollection, 45);
             brush.StartPoint = new Windows.Foundation.Point(0, 0);
             brush.EndPoint = new Windows.Foundation.Point(1.0, 1.0);
-            ConverterGlobals.LinearGradientBrushCache[(color1, color2)] = brush;
             return brush;
+
+        }
+
+        public static LinearGradientBrush GetLinearGradientBrush(Color color1, Color color2)
+        {
+            try
+            {
+                if (ConverterGlobals.LinearGradientBrushCache.TryGetValue((color1, color2), out LinearGradientBrush found))
+                {
+                    return found;
+                }
+                var brush = CreateLinearGradiantBrush(color1, color2);
+                ConverterGlobals.LinearGradientBrushCache[(color1, color2)] = brush;
+                return brush;
+            }
+            catch
+            {
+                return CreateLinearGradiantBrush(color1, color2);
+            }
         }
     }
 

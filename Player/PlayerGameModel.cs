@@ -406,7 +406,14 @@ namespace Catan10
                     return 1; // checked previously
                 case Entitlement.MoveKnight:
                     return 1; // no restrictions on how many times a knight can move
+                case Entitlement.TradeUpgrade:
+                    return 5 - TradeRank;
+                case Entitlement.PoliticsUpgrade:
+                    return 5- PoliticsRank;
+                case Entitlement.ScienceUpgrade:
+                    return 5 - ScienceRank;
                 default:
+                    Debug.Assert(false, "Fill out the switch statement!");
                     break;
             }
 

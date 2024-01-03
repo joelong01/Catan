@@ -22,14 +22,15 @@ namespace Catan10
     public sealed partial class PurchaseCtrl : UserControl
     {
 
-        public event PurchaseEntitlementDelegate OnPurchaseEntitlement;
+      
 
         public PurchaseCtrl()
         {
             this.InitializeComponent();
+            this.DataContext = this;
         }
 
-
+        public event PurchaseEntitlementDelegate OnPurchaseEntitlement;
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(PurchaseCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public PlayerModel CurrentPlayer
         {
@@ -43,6 +44,7 @@ namespace Catan10
             get => ( MainPageModel )GetValue(MainPageModelProperty);
             set => SetValue(MainPageModelProperty, value);
         }
+
 
 
         public string UnplayedResourceCount(ObservableCollection<Entitlement> entitlements, Entitlement toCheck)
@@ -60,9 +62,9 @@ namespace Catan10
             return count.ToString();
         }
 
-        private void OnBuyEntitlement(object sender, RoutedEventArgs e)
+
+        private void OnBuyEntitlement(Entitlement entitlement)
         {
-            Entitlement entitlement = StaticHelpers.ParseEnum<Entitlement>(((Button)sender).Tag as String);
             OnPurchaseEntitlement?.Invoke(entitlement);
         }
     }

@@ -32,12 +32,7 @@
                 <SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="-90" />
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
-        <Style x:Key="RollCtrl_GridStyle" TargetType="Grid">
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="BorderBrush" Value="{StaticResource bmCherry}" />
-            <Setter Property="BorderThickness" Value="2" />
-            <Setter Property="CornerRadius" Value="10" />
-        </Style>
+
     </Control.Resources>
     <!--<Border.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

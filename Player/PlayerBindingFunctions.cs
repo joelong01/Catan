@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 
 namespace Catan10
@@ -31,8 +32,8 @@ namespace Catan10
                 {
                     new GradientStop() { Color = Colors.Black }
                 };
-;
-                gradientStopCollection.Add(new GradientStop() { Color = Colors.White });
+                ;
+                gradientStopCollection.Add(new GradientStop() { Color = Colors.Blue });
                 var brush = new LinearGradientBrush(gradientStopCollection, 45);
                 brush.StartPoint = new Windows.Foundation.Point(0.5, 0);
                 brush.EndPoint = new Windows.Foundation.Point(0.5, 1.0);
@@ -42,27 +43,31 @@ namespace Catan10
 
         public static Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
         {
-            //if (StaticHelpers.IsInVisualStudioDesignMode)
-            //{
-            //    return new SolidColorBrush(Colors.White);
-            //}
-
-            if (owner != null)
+            try
             {
-                return owner.ForegroundBrush;
+
+                if (owner != null)
+                {
+                    return owner.ForegroundBrush;
+                }
+
+                if (current != null)
+                {
+                    return current.ForegroundBrush;
+                }
+
+                return ConverterGlobals.GetBrush(Colors.White);
             }
-
-            if (current != null)
+            catch
             {
-                return current.ForegroundBrush;
+                return new SolidColorBrush(Colors.White);
             }
           
-            return ConverterGlobals.GetBrush(Colors.White);
         }
 
         public static int PerceivedBrightness(Color c)
         {
-            return (int)Math.Sqrt(
+            return ( int )Math.Sqrt(
             c.R * c.R * .299 +
             c.G * c.G * .587 +
             c.B * c.B * .114);
