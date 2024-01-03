@@ -1,7 +1,8 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -21,7 +22,10 @@ namespace Catan10
         {
             try
             {
-              
+                if (DesignMode.DesignModeEnabled)
+                {
+                    return new SolidColorBrush(color);
+                }
 
                 if (ConverterGlobals.SolidColorBrushCache.TryGetValue(color, out SolidColorBrush brush))
                 {
@@ -55,6 +59,10 @@ namespace Catan10
         {
             try
             {
+                if (DesignMode.DesignModeEnabled)
+                {
+                    return CreateLinearGradiantBrush(Colors.Green, Colors.White);
+                }
                 if (ConverterGlobals.LinearGradientBrushCache.TryGetValue((color1, color2), out LinearGradientBrush found))
                 {
                     return found;

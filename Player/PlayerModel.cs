@@ -150,6 +150,12 @@ namespace Catan10
             {
                 try
                 {
+                    if (DesignMode.DesignModeEnabled)
+                    {
+
+                        return ConverterGlobals.CreateLinearGradiantBrush(Colors.Green, Colors.White);
+
+                    }
                     var brush = ConverterGlobals.GetLinearGradientBrush(this.PrimaryBackgroundColor, this.SecondaryBackgroundColor);
 
                     return brush;

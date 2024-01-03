@@ -272,7 +272,7 @@
                                             Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
                                 </StackPanel>
                                 <StackPanel Name="SP_NextButton">
-                                    <Button x:Name="_btnNextStep" Margin="0,0,0,0" HorizontalAlignment="Center"
+                                    <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"
                                             Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                                             Click="OnNextStep" Content="&#xE101;"
                                             Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
@@ -295,8 +295,8 @@
                                             Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
                                 </StackPanel>
 
-                                <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1" Width="100"
-                                        Height="100" Margin="30,0,0,0" HorizontalAlignment="Left"
+                                <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1" 
+                                        Height="40" Margin="30,0,10,40" 
                                         VerticalAlignment="Center" ColorCodeTimer="True" />
 
                             </StackPanel>
