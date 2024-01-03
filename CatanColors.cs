@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using Windows.ApplicationModel;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
 
@@ -69,6 +69,10 @@ namespace Catan10
 
         public static SolidColorBrush GetBackgroundBrush(string colorName)
         {
+            if (DesignMode.DesignModeEnabled)
+            {
+                return new SolidColorBrush(Colors.Green);
+            }
             try
             {
                 Color color = NameToColorDictionary[colorName];
@@ -82,6 +86,10 @@ namespace Catan10
 
         public static SolidColorBrush GetForegroundBrush(SolidColorBrush background)
         {
+            if (DesignMode.DesignModeEnabled)
+            {
+                return new SolidColorBrush(Colors.White);
+            }
             try
             {
                 var fgColor = GetForegroundColor(background.Color);
@@ -123,7 +131,7 @@ namespace Catan10
             App.Current.Resources.TryGetValue(resourceName, out object ret);
             if (ret != null)
             {
-                return (SolidColorBrush)ret;
+                return ( SolidColorBrush )ret;
             }
             App.Current.TraceMessage($"did NOT find {resourceName} brush in resources. Color={color}");
             SolidColorBrush brush = new SolidColorBrush(color);

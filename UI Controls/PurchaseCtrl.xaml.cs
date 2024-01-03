@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -66,6 +68,15 @@ namespace Catan10
         private void OnBuyEntitlement(Entitlement entitlement)
         {
             OnPurchaseEntitlement?.Invoke(entitlement);
+        }
+
+        public Brush GetForegroundBrush(PlayerModel current)
+        {
+            if (DesignMode.DesignModeEnabled)
+            {
+                return new SolidColorBrush(Colors.White);
+            }
+            return PlayerBindingFunctions.GetForegroundBrush(current, current);
         }
     }
 }

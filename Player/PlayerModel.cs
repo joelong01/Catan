@@ -12,6 +12,7 @@ using Windows.UI;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Catan10.CatanService;
+using Windows.ApplicationModel;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -165,16 +166,20 @@ namespace Catan10
         {
             get
             {
-                return new SolidColorBrush(Colors.White);
-                //try
-                //{
 
-                //    return ConverterGlobals.GetBrush(this.ForegroundColor);
-                //}
-                //catch
-                //{
-                //    return new SolidColorBrush(Colors.White);
-                //}
+                try
+                {
+                    if (DesignMode.DesignModeEnabled)
+                    {
+                        return new SolidColorBrush(Colors.White);
+                    }
+
+                    return ConverterGlobals.GetBrush(this.ForegroundColor);
+                }
+                catch
+                {
+                    return new SolidColorBrush(Colors.HotPink);
+                }
             }
         }
 

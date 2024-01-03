@@ -81,7 +81,7 @@ namespace Catan10
 
         public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner, bool activated)
         {
-            if (DesignMode.DesignMode2Enabled)
+            if (DesignMode.DesignModeEnabled)
             {
                 return new SolidColorBrush(Colors.White);
             }

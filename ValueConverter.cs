@@ -21,6 +21,7 @@ namespace Catan10
         {
             try
             {
+              
 
                 if (ConverterGlobals.SolidColorBrushCache.TryGetValue(color, out SolidColorBrush brush))
                 {

@@ -62,7 +62,7 @@
 
                             <Viewbox Stretch="Uniform" Margin="0,0,0,0">
                                 <TextBlock Padding="0"
-                                        Foreground="{x:Bind CurrentPlayer.ForegroundColor, Mode=OneWay, Converter={StaticResource CachedColorToBrushConverter}, TargetNullValue=White}"
+                                        Foreground="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
                                         Text="&#xE83D;" FontFamily="Segoe MDL2 Assets" />
 
                             </Viewbox>

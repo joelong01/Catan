@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Windows.ApplicationModel;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
@@ -10,6 +10,10 @@ namespace Catan10
     {
         public static LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
+            if (DesignMode.DesignModeEnabled)
+            {
+                return ConverterGlobals.CreateLinearGradiantBrush(Colors.Green, Colors.Black);
+            }
             try
             {
 
@@ -24,27 +28,24 @@ namespace Catan10
                     return current.BackgroundBrush;
                 }
 
-                return ConverterGlobals.GetLinearGradientBrush(Colors.Black, Colors.Red);
+                return ConverterGlobals.GetLinearGradientBrush(owner.PrimaryBackgroundColor, owner.SecondaryBackgroundColor);
             }
             catch
             {
-                var gradientStopCollection = new GradientStopCollection
-                {
-                    new GradientStop() { Color = Colors.Black }
-                };
-                ;
-                gradientStopCollection.Add(new GradientStop() { Color = Colors.Blue });
-                var brush = new LinearGradientBrush(gradientStopCollection, 45);
-                brush.StartPoint = new Windows.Foundation.Point(0.5, 0);
-                brush.EndPoint = new Windows.Foundation.Point(0.5, 1.0);
-                return brush;
+                return ConverterGlobals.CreateLinearGradiantBrush(Colors.Black, Colors.HotPink);
             }
         }
+
+      
 
         public static Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
         {
             try
             {
+                if (DesignMode.DesignModeEnabled)
+                {
+                    return new SolidColorBrush(Colors.White);
+                }
 
                 if (owner != null)
                 {
@@ -62,7 +63,7 @@ namespace Catan10
             {
                 return new SolidColorBrush(Colors.White);
             }
-          
+
         }
 
         public static int PerceivedBrightness(Color c)
