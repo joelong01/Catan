@@ -328,7 +328,16 @@ namespace Catan10
             PlayingPlayers[1].GameData.ScienceRank = 2;
             PlayingPlayers[2].GameData.PoliticsRank = 3;
 
-            // await NextState();
+             await NextState();
+
+            RollModel roll = new RollModel()
+            {
+                WhiteDie = 2,
+                RedDie = 1,
+                Roll = 3
+            };
+
+            await OnRolledNumber(roll);
         }
 
         private async void OnTestRollSeven(object sender, RoutedEventArgs e)

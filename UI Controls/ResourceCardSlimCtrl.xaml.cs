@@ -1,6 +1,7 @@
 ﻿using Windows.Media.Streaming.Adaptive;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -8,7 +9,7 @@ using Windows.UI.Xaml.Media;
 namespace Catan10
 {
     public delegate void ResourceCountChangedHandler(ResourceType resourceType, int newValue);
-
+    [ContentProperty(Name = "Child")]
     public sealed partial class ResourceCardSlimCtrl : UserControl
     {
 
@@ -26,14 +27,20 @@ namespace Catan10
         public static readonly DependencyProperty ShowButtonsProperty = DependencyProperty.Register("ShowButtons", typeof(bool), typeof(ResourceCardSlimCtrl), new PropertyMetadata(false));
         public static readonly DependencyProperty TopCountProperty = DependencyProperty.Register("TopCount", typeof(int), typeof(ResourceCardSlimCtrl), new PropertyMetadata(0));
         public static readonly DependencyProperty ShowTopCountProperty = DependencyProperty.Register("ShowTopCount", typeof(bool), typeof(ResourceCardSlimCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty ChildProperty = DependencyProperty.Register(nameof(Child), typeof(UIElement), typeof(ResourceCardSlimCtrl), new PropertyMetadata(null));
+        public UIElement Child
+        {
+            get { return ( UIElement )GetValue(ChildProperty); }
+            set { SetValue(ChildProperty, value); }
+        }
         public bool ShowTopCount
         {
-            get => (bool)GetValue(ShowTopCountProperty);
+            get => ( bool )GetValue(ShowTopCountProperty);
             set => SetValue(ShowTopCountProperty, value);
         }
         public int TopCount
         {
-            get => (int)GetValue(TopCountProperty);
+            get => ( int )GetValue(TopCountProperty);
             set => SetValue(TopCountProperty, value);
         }
 
@@ -41,52 +48,52 @@ namespace Catan10
         {
             if (count < available)
             {
-                return (Brush)App.Current.Resources["GreenBrush"];
+                return ( Brush )App.Current.Resources["GreenBrush"];
             }
             if (count == available)
             {
-                return (Brush)App.Current.Resources["YellowBrush"];
+                return ( Brush )App.Current.Resources["YellowBrush"];
             }
             if (count > available)
             {
-                return (Brush)App.Current.Resources["RedBrush"];
+                return ( Brush )App.Current.Resources["RedBrush"];
             }
-            
-            return (Brush)App.Current.Resources["WhiteBrush"];
-            
+
+            return ( Brush )App.Current.Resources["WhiteBrush"];
+
         }
 
         private Visibility ShowCount(int count)
         {
-            return (count > 0) ? Visibility.Visible : Visibility.Collapsed;
+            return ( count > 0 ) ? Visibility.Visible : Visibility.Collapsed;
         }
         public bool ShowButtons
         {
-            get => (bool)GetValue(ShowButtonsProperty);
+            get => ( bool )GetValue(ShowButtonsProperty);
             set => SetValue(ShowButtonsProperty, value);
         }
 
         public int Count
         {
-            get => (int)GetValue(CountProperty);
+            get => ( int )GetValue(CountProperty);
             set => SetValue(CountProperty, value);
         }
 
         public bool CountVisible
         {
-            get => (bool)GetValue(CountVisibleProperty);
+            get => ( bool )GetValue(CountVisibleProperty);
             set => SetValue(CountVisibleProperty, value);
         }
 
         public Brush Image
         {
-            get => (Brush)GetValue(ImageProperty);
+            get => ( Brush )GetValue(ImageProperty);
             set => SetValue(ImageProperty, value);
         }
 
         public ResourceType ResourceType
         {
-            get => (ResourceType)GetValue(ResourceTypeProperty);
+            get => ( ResourceType )GetValue(ResourceTypeProperty);
             set => SetValue(ResourceTypeProperty, value);
         }
 
@@ -99,11 +106,37 @@ namespace Catan10
 
         private void SetResourceType(ResourceType resourceType)
         {
-           // if (ResourceType != ResourceType.None)
+            switch (resourceType)
             {
-                string key = "ResourceType." + resourceType.ToString();
-                Image = (Brush)App.Current.Resources[key];
+                case ResourceType.Science:
+                    Child = new ScienceCtrl()
+                    {
+                        Stroke = new SolidColorBrush(Windows.UI.Colors.White),
+                        StrokeThickness = 10.0
+                    };
+                    break;
+                case ResourceType.Trade:
+                    Child = new ScienceCtrl()
+                    {
+                        Stroke = new SolidColorBrush(Windows.UI.Colors.White),
+                        StrokeThickness = 10.0
+                    };
+                    break;
+                case ResourceType.Politics:
+                    Child = new PoliticsCtrl()
+                    {
+                        Stroke = new SolidColorBrush(Windows.UI.Colors.White),
+                        StrokeThickness = 10.0
+                    };
+                    break;
+                default:
+                    Child = null;
+                    string key = "ResourceType." + resourceType.ToString();
+                    Image = ( Brush )App.Current.Resources[key];
+                    break;
+
             }
+
         }
 
         #endregion Properties + Fields

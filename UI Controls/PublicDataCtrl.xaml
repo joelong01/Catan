@@ -77,20 +77,48 @@
                         VerticalAlignment="Stretch"
                         BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White, TargetNullValue=White}"
                         BorderThickness="1" CornerRadius="6" Orientation="Horizontal">
-                    <StackPanel Height="45" Background="Beige" Orientation="Horizontal"
+                    <StackPanel Orientation="Horizontal"
                             Visibility="{x:Bind local:MainPage.Current.MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
 
-                        <local:ResourceCardSlimCtrl Margin="5,0,5,0"
-                                Count="{x:Bind Player.GameData.PoliticsRank, Mode=OneWay, FallbackValue=0}"
-                                Image="{StaticResource ResourceType.Politics}" />
+                        <Grid Background="Blue" CornerRadius="5" Width="33.5" Margin="5,0,5,0" Height="50" BorderBrush="Red" BorderThickness="0">
+                        
+                                <local:PoliticsCtrl Stroke="White" StrokeThickness="10" Margin="0"/>
+                 
+                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="18"
+                                    Text="{x:Bind Player.GameData.PoliticsRank, Mode=OneWay}" Padding="0" Margin="0"
+                                    Foreground="White">
+                                <TextBlock.RenderTransform>
+                                    <TranslateTransform X="-2" Y="-2" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
 
-                        <local:ResourceCardSlimCtrl Margin="0,0,5,0"
-                                Count="{x:Bind Player.GameData.TradeRank, Mode=OneWay, FallbackValue=0}"
-                                Image="{StaticResource ResourceType.Trade}" />
+                        <Grid Background="Yellow" CornerRadius="5" Width="33.5">
 
-                        <local:ResourceCardSlimCtrl Margin="0,0,5,0"
-                                Count="{x:Bind Player.GameData.ScienceRank, Mode=OneWay, FallbackValue=0}"
-                                Image="{StaticResource ResourceType.Science}" />
+                            <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0,2,0,0">
+                                <TextBlock Text="&#x2696;" FontFamily="Segoe UI Symbol" Foreground="Black" Padding="0" />
+                            </Viewbox>
+
+                            <TextBlock Text="{x:Bind Player.GameData.TradeRank, Mode=OneWay}" Foreground="Black"
+                                    Padding="0" Margin="0" FontSize="18" HorizontalAlignment="Right"
+                                    VerticalAlignment="Top">
+                                <TextBlock.RenderTransform>
+                                    <TranslateTransform X="-2" Y="-2" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+
+                        </Grid>
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Green" Width="33.5"
+                                CornerRadius="5">
+                            <local:ScienceCtrl Stroke="White" StrokeThickness="10" Margin="6" />
+                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="18"
+                                    Text="{x:Bind Player.GameData.ScienceRank, Mode=OneWay}" Padding="0"
+                                    Foreground="White">
+                                <TextBlock.RenderTransform>
+                                    <TranslateTransform X="-2" Y="-3" />
+                                </TextBlock.RenderTransform>
+                            </TextBlock>
+                        </Grid>
 
                         <local:ResourceCardSlimCtrl Margin="0,0,5,0"
                                 Count="{x:Bind Player.GameData.VictoryPoints, Mode=OneWay, FallbackValue=0}"

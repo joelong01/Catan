@@ -7,101 +7,206 @@
 
     </Control.Resources>
     <Viewbox Stretch="Uniform">
-        <StackPanel Name="SP_UniversalPurchase" Margin="5">
-            <StackPanel Orientation="Horizontal">
+        <ListView Name="LV_UniversalPurchase" Margin="5"
+                Height="{x:Bind GetHeight(MainPageModel.GameInfo.Pirates), Mode=OneWay}">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Height" Value="100" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <local:PurchaseItemCtrl Entitlement="Settlement" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <local:SettlementCtrl CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="City" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <local:CityCtrl HasWall="False" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="Road" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <Viewbox Stretch="Uniform" Width="100" Height="100">
+                        <local:RoadButtonCtrl />
+                    </Viewbox>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
 
-                <local:PurchaseItemCtrl Entitlement="Settlement" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        OnPurchaseEntitlement="OnBuyEntitlement">
-                    <local:PurchaseItemCtrl.Child>
-                        <local:SettlementCtrl CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-                <local:PurchaseItemCtrl Entitlement="City" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        OnPurchaseEntitlement="OnBuyEntitlement">
-                    <local:PurchaseItemCtrl.Child>
-                        <local:CityCtrl HasWall="False" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-                <local:PurchaseItemCtrl Entitlement="Road" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        OnPurchaseEntitlement="OnBuyEntitlement">
-                    <local:PurchaseItemCtrl.Child>
-                        <Viewbox Stretch="Uniform" Width="100" Height="100">
-                            <local:RoadButtonCtrl />
+            <local:PurchaseItemCtrl Entitlement="BuyOrUpgradeKnight" Decoration="&#xE7BF;"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="ActivateKnight" Decoration="&#xE7E8;"
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <local:PurchaseItemCtrl.Child>
+                    <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="MoveKnight" Decoration="&#xE811;"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+
+            <local:PurchaseItemCtrl Entitlement="PoliticsUpgrade" ShowCount="False"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+
+                    <Grid CornerRadius="10">
+                        <local:PoliticsCtrl Stroke="White" StrokeThickness="10" />
+
+                        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="33"
+                                Text="{x:Bind CurrentPlayer.GameData.PoliticsRank, Mode=OneWay}" Padding="0"
+                                Margin="0,-5,5,0" Foreground="White" />
+                    </Grid>
+
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="TradeUpgrade" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
+                <local:PurchaseItemCtrl.Child>
+
+                    <Grid Background="Yellow" CornerRadius="10" Width="100">
+                        <local:TradeCtrl Width="75" Height="100" />
+
+                        <TextBlock Text="{x:Bind CurrentPlayer.GameData.TradeRank, Mode=OneWay}" Foreground="Black"
+                                Padding="0" Margin="0,-5,5,0" FontSize="33" HorizontalAlignment="Right"
+                                VerticalAlignment="Top" />
+
+                    </Grid>
+
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="ScienceUpgrade" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
+                <local:PurchaseItemCtrl.Child>
+                    <Grid HorizontalAlignment="Stretch" Background="Green" VerticalAlignment="Stretch"  Width="100"
+                            CornerRadius="10">
+                        <local:ScienceCtrl Stroke="White" StrokeThickness="10" />
+                        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="33"
+                                Text="{x:Bind CurrentPlayer.GameData.ScienceRank, Mode=OneWay}" Padding="0"
+                                Margin="0,-5,5,0" Foreground="White" />
+                    </Grid>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+
+            <local:PurchaseItemCtrl Entitlement="Wall" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                        <Viewbox Stretch="Uniform" Margin="0,0,0,0">
+                            <TextBlock Padding="1" Foreground="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
+                                    Text="&#xE83D;" FontFamily="Segoe MDL2 Assets" />
+
                         </Viewbox>
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
+                    </Grid>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
 
-            </StackPanel>
-            <StackPanel Orientation="Horizontal"
-                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                <local:PurchaseItemCtrl Entitlement="BuyOrUpgradeKnight" Decoration="&#xE7BF;"
-                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
-                    <local:PurchaseItemCtrl.Child>
-                        <local:KnightCtrl Activated="True" KnightRank="Unset"
-                                Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-                <local:PurchaseItemCtrl Entitlement="ActivateKnight" Decoration="&#xE7E8;"
-                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
-                    <local:PurchaseItemCtrl.Child>
-                        <local:KnightCtrl Activated="True" KnightRank="Unset"
-                                Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-                <local:PurchaseItemCtrl Entitlement="MoveKnight" Decoration="&#xE811;"
-                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
-                    <local:PurchaseItemCtrl.Child>
-                        <local:KnightCtrl Activated="True" KnightRank="Unset"
-                                Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-                <local:PurchaseItemCtrl Entitlement="Wall" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        OnPurchaseEntitlement="OnBuyEntitlement">
-                    <local:PurchaseItemCtrl.Child>
-                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <local:PurchaseItemCtrl Entitlement="Bishop" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-                            <Viewbox Stretch="Uniform" Margin="0,0,0,0">
-                                <TextBlock Padding="0"
-                                        Foreground="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
-                                        Text="&#xE83D;" FontFamily="Segoe MDL2 Assets" />
+                        <Viewbox Stretch="Uniform" Margin="0,0,0,0">
+                            <TextBlock Padding="0" Foreground="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
+                                    Text="&#x265D;" FontFamily="Segoe UI Symbol" />
 
-                            </Viewbox>
-                        </Grid>
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal"
-                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        </Viewbox>
+                    </Grid>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
 
-                <local:PurchaseItemCtrl Entitlement="PoliticsUpgrade" ShowCount="False"
-                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
-                    <local:PurchaseItemCtrl.Child>
-                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Politics}"
-                                    Count="{x:Bind CurrentPlayer.GameData.PoliticsRank, Mode=OneWay, FallbackValue=0}" />
-                        </Grid>
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-                <local:PurchaseItemCtrl Entitlement="TradeUpgrade" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
-                    <local:PurchaseItemCtrl.Child>
-                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Trade}"
-                                    Count="{x:Bind CurrentPlayer.GameData.TradeRank, Mode=OneWay, FallbackValue=0}" />
-                        </Grid>
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-                <local:PurchaseItemCtrl Entitlement="ScienceUpgrade" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
-                    <local:PurchaseItemCtrl.Child>
-                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <local:ResourceCardSlimCtrl Image="{StaticResource ResourceType.Science}"
-                                    Count="{x:Bind CurrentPlayer.GameData.ScienceRank, Mode=OneWay, FallbackValue=0}" />
-                        </Grid>
-                    </local:PurchaseItemCtrl.Child>
-                </local:PurchaseItemCtrl>
-            </StackPanel>
-        </StackPanel>
+            <local:PurchaseItemCtrl Entitlement="Deserter" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                        <Viewbox Stretch="Uniform" Margin="0,0,0,0">
+                            <local:DeserterCtrl Stroke="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
+                                    StrokeThickness="125" />
+                        </Viewbox>
+                    </Grid>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+
+            <local:PurchaseItemCtrl Entitlement="Diplomat" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                        <Viewbox Stretch="Uniform" Margin="0,0,0,0">
+                            <local:DiplomatCtrl Stroke="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
+                                    StrokeThickness="30" />
+                        </Viewbox>
+                    </Grid>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+
+            <local:PurchaseItemCtrl Entitlement="Intrigue" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                        <Viewbox Stretch="Uniform" Margin="0,0,0,0">
+                            <local:IntrigueCtrl Stroke="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
+                                    StrokeThickness="80" />
+                        </Viewbox>
+                    </Grid>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="Inventor" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                        <Viewbox Stretch="Uniform" Margin="0,0,0,0">
+                            <local:InventorCtrl Stroke="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
+                                    StrokeThickness="40" />
+                        </Viewbox>
+                    </Grid>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="Merchant" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                        <Viewbox Stretch="Uniform" Margin="0,0,0,0">
+                            <local:MerchantCtrl Stroke="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
+                                    StrokeThickness="7" />
+                        </Viewbox>
+                    </Grid>
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+        </ListView>
 
     </Viewbox>
 

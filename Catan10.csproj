@@ -246,14 +246,38 @@
     <Compile Include="UI Controls\OfferCtrl.xaml.cs">
       <DependentUpon>OfferCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\Pirates\DeserterCtrl.xaml.cs">
+      <DependentUpon>DeserterCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Pirates\DiplomatCtrl.xaml.cs">
+      <DependentUpon>DiplomatCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\Pirates\EntryGateCtrl.xaml.cs">
       <DependentUpon>EntryGateCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Pirates\IntrigueCtrl.xaml.cs">
+      <DependentUpon>IntrigueCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\Pirates\Invasion.xaml.cs">
       <DependentUpon>Invasion.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\Pirates\InventorCtrl.xaml.cs">
+      <DependentUpon>InventorCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\Pirates\KnightCtrl.xaml.cs">
       <DependentUpon>KnightCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Pirates\MerchantCtrl.xaml.cs">
+      <DependentUpon>MerchantCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Pirates\PoliticsCtrl.xaml.cs">
+      <DependentUpon>PoliticsCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Pirates\ScienceCtrl.xaml.cs">
+      <DependentUpon>ScienceCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\Pirates\TradeCtrl.xaml.cs">
+      <DependentUpon>TradeCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\PotentialTradesCtrl.xaml.cs">
       <DependentUpon>PotentialTradesCtrl.xaml</DependentUpon>
@@ -374,8 +398,8 @@
     <Compile Include="UI Controls\TileCtrl.xaml.cs">
       <DependentUpon>TileCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\TradeCtrl.xaml.cs">
-      <DependentUpon>TradeCtrl.xaml</DependentUpon>
+    <Compile Include="UI Controls\UserTradeCtrl.xaml.cs">
+      <DependentUpon>UserTradeCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\TradeResourcesCtrl.xaml.cs">
       <DependentUpon>TradeResourcesCtrl.xaml</DependentUpon>
@@ -535,7 +559,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI Controls\Pirates\DeserterCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Pirates\DiplomatCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\Pirates\EntryGateCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Pirates\IntrigueCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -543,7 +579,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI Controls\Pirates\InventorCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI Controls\Pirates\KnightCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Pirates\MerchantCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Pirates\PoliticsCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Pirates\ScienceCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\Pirates\TradeCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -691,7 +747,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\TradeCtrl.xaml">
+    <Page Include="UI Controls\UserTradeCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

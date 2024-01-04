@@ -96,7 +96,7 @@ namespace Catan10
 
 
 
-public enum Entitlement
+    public enum Entitlement
     {
         [Description("Undefined")]
         Undefined,
@@ -139,6 +139,24 @@ public enum Entitlement
 
         [Description("Destroy City")]
         DestroyCity,
+        [Description("Bishop")]
+        Bishop,
+        [Description("Deserter")]
+        Deserter,
+
+
+        [Description("Inventor")]
+        Inventor,
+        [Description("Intrigue")]
+        Intrigue,
+        [Description("Diplomat")]
+        Diplomat,
+
+        [Description("Merchant")]
+        Merchant,
+
+
+
     }
 
 

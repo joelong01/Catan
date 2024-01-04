@@ -38,7 +38,7 @@ namespace Catan10
 
       
 
-        public static Brush GetForegroundBrush(PlayerModel current, PlayerModel owner)
+        public static SolidColorBrush GetForegroundBrush(PlayerModel current, PlayerModel owner)
         {
             try
             {

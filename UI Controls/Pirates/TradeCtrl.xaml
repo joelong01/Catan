@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="Catan10.TradeCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Catan10"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignHeight="100"
+        d:DesignWidth="75">
+
+    <Grid Background="Yellow" CornerRadius="10" Width="75">
+        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform">
+            <TextBlock Text="&#x2696;" FontFamily="Segoe UI Symbol" Foreground="Black" Padding="2" />
+        </Viewbox>
+
+    </Grid>
+</UserControl>

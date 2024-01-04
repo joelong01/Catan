@@ -8,15 +8,15 @@ using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
-    public sealed partial class TradeCtrl : UserControl
+    public sealed partial class UserTradeCtrl : UserControl
     {
         #region Delegates + Fields + Events + Enums
 
-        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
-        public static readonly DependencyProperty MyOffersOnlyProperty = DependencyProperty.Register("MyOffersOnly", typeof(bool), typeof(TradeCtrl), new PropertyMetadata(false));
-        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(TradeCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
-        public static readonly DependencyProperty SelectedTradeProperty = DependencyProperty.Register("SelectedOffer", typeof(TradeOffer), typeof(TradeCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(TradeCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(UserTradeCtrl), new PropertyMetadata(null, CurrentPlayerChanged));
+        public static readonly DependencyProperty MyOffersOnlyProperty = DependencyProperty.Register("MyOffersOnly", typeof(bool), typeof(UserTradeCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(UserTradeCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
+        public static readonly DependencyProperty SelectedTradeProperty = DependencyProperty.Register("SelectedOffer", typeof(TradeOffer), typeof(UserTradeCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(UserTradeCtrl), new PropertyMetadata(null));
         private ObservableCollection<PlayerModel> PossibleTradePartners = new ObservableCollection<PlayerModel>();
 
         public PlayerModel CurrentPlayer
@@ -45,14 +45,14 @@ namespace Catan10
 
         private static void CurrentPlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var depPropClass = d as TradeCtrl;
+            var depPropClass = d as UserTradeCtrl;
             var depPropValue = (PlayerModel)e.NewValue;
             depPropClass?.SetCurrentPlayer(depPropValue);
         }
 
         private static void PlayingPlayersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var depPropClass = d as TradeCtrl;
+            var depPropClass = d as UserTradeCtrl;
             var depPropValue = (ObservableCollection<PlayerModel>)e.NewValue;
             depPropClass?.SetPlayingPlayers(depPropValue);
         }
@@ -82,7 +82,7 @@ namespace Catan10
 
         #region Constructors + Destructors
 
-        public TradeCtrl()
+        public UserTradeCtrl()
         {
             this.InitializeComponent();
         }

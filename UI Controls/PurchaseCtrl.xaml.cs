@@ -70,13 +70,25 @@ namespace Catan10
             OnPurchaseEntitlement?.Invoke(entitlement);
         }
 
-        public Brush GetForegroundBrush(PlayerModel current)
+        public SolidColorBrush GetForegroundBrush(PlayerModel current)
         {
             if (DesignMode.DesignModeEnabled)
             {
                 return new SolidColorBrush(Colors.White);
             }
             return PlayerBindingFunctions.GetForegroundBrush(current, current);
+        }
+
+        public double GetHeight(bool pirates)
+        {
+            if (!pirates)
+            {
+                return 100;
+            }
+            else
+            {
+                return 300;
+            }
         }
     }
 }
