@@ -5,9 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="265" d:DesignWidth="605"
         mc:Ignorable="d">
     <Control.Resources>
-        <!--<Style TargetType="Grid" x:Key="FlippableGridStyle">
-            <Style.
-        </Style>-->
+       
         <Storyboard x:Name="ShowStats">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Grid_Roll"
                     Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)">
@@ -34,13 +32,7 @@
         </Storyboard>
 
     </Control.Resources>
-    <!--<Border.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black" />
-                <GradientStop Color="CadetBlue" Offset="1" />
-            </LinearGradientBrush>
-        </Border.Background>
-        <Grid Width="605" >-->
+ 
     <Viewbox>
         <Viewbox.RenderTransform>
             <ScaleTransform ScaleX="1" ScaleY="1" />

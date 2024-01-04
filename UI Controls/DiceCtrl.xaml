@@ -7,8 +7,6 @@
         <!--<Ellipse Width="50" Height="50" Margin="25,25,0,0" HorizontalAlignment="Left"
                 VerticalAlignment="Top" Fill="{Binding Path=FillColor, Mode=OneWay, FallbackValue=White}" />-->
         <Style x:Key="Dice_EllipseStyle" TargetType="Ellipse">
-            <Setter Property="Fill"
-                    Value="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}" />
             <Setter Property="Height" Value="50" />
             <Setter Property="Width" Value="50" />
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -22,44 +20,45 @@
             <Grid Name="one"
                     Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=1, Mode=OneWay, FallbackValue=Visible}">
                 <Ellipse HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"
                         Style="{StaticResource Dice_EllipseStyle}" />
             </Grid>
             <Grid Name="two"
                     Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=2, Mode=OneWay, FallbackValue=Collapsed}">
-                <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
+                <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
             </Grid>
             <Grid Name="three"
                     Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=3, Mode=OneWay, FallbackValue=Collapsed}">
-                <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
+                <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
                 <Ellipse Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Style="{StaticResource Dice_EllipseStyle}" />
+                        Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
             </Grid>
             <Grid Name="four"
                     Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=4, Mode=OneWay, FallbackValue=Collapsed}">
-                <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="25,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="150,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
+                <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="25,150,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="150,25,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
             </Grid>
             <Grid Name="five"
                     Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=5, Mode=OneWay, FallbackValue=Collapsed}">
-                <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="25,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="150,25,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" />
+                <Ellipse Margin="25,25,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="25,150,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="150,25,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="150,150,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
                 <Ellipse Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Style="{StaticResource Dice_EllipseStyle}" />
+                        Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
             </Grid>
             <Grid Name="six"
                     Visibility="{Binding Path=Number, Converter={StaticResource DiceRollToVisibilityConverter}, ConverterParameter=6, Mode=OneWay, FallbackValue=Collapsed}">
-                <Ellipse Margin="25,20,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="25,90,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="25,155,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="150,20,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="150,90,0,0" Style="{StaticResource Dice_EllipseStyle}" />
-                <Ellipse Margin="150,155,0,0" Style="{StaticResource Dice_EllipseStyle}" />
+                <Ellipse Margin="25,20,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="25,90,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="25,155,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="150,20,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="150,90,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
+                <Ellipse Margin="150,155,0,0" Style="{StaticResource Dice_EllipseStyle}" Fill="{x:Bind Path=FillColor, Mode=OneWay, FallbackValue=Red, TargetNullValue=Blue}"/>
             </Grid>
         </Grid>
     </Viewbox>

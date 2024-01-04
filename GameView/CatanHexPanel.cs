@@ -1905,7 +1905,13 @@ namespace Catan10
             CalculateAdjacentBuildings();
             return finalSize;
         }
-
+        public bool BaronShown
+        {
+            get
+            {
+                return ( _baron.Opacity == 100 && _baron.Visibility == Visibility.Visible );
+            }
+        }
         public void HideBaron()
         {
             _baron.HideAsync();

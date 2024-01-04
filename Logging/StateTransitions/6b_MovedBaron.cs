@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ namespace Catan10
 
         #region Methods
 
-        public static async Task PostLog(IGameController gameController, PlayerModel victim, int targetTileIndex, int previousIndex, TargetWeapon weapon, MoveBaronReason reason, ResourceType stolenResource)
+        public static async Task PostLog(IGameController gameController, List<string> victims, int targetTileIndex, int previousIndex, TargetWeapon weapon, MoveBaronReason reason, ResourceType stolenResource)
         {
             Contract.Assert(gameController.CurrentGameState == GameState.MustMoveBaron);
             GameState newState = gameController.MainPageModel.Log.PeekAction.OldState;
@@ -50,12 +51,13 @@ namespace Catan10
                 NewState = newState,
                 BaronModel = new BaronModel()
                 {
-                    Victim = (victim == null) ? "" : victim.PlayerName,
+                    Victims = victims,
                     Weapon = weapon,
                     PreviousTile = previousIndex,
                     TargetTile = targetTileIndex,
                     StolenResource = stolenResource,
-                    Reason = reason
+                    Reason = reason,
+                    MainBaronHidden = gameController.BaronVisibility
                 }
             };
 
@@ -65,66 +67,63 @@ namespace Catan10
         public async Task Do(IGameController gameController)
         {
             PlayerModel targetPlayer = null;
-            if (this.BaronModel.Victim != null && this.BaronModel.Victim != "")
-            {
-                targetPlayer = gameController.NameToPlayer(this.BaronModel.Victim);
-            }
-
-            var targetTile = gameController.TileFromIndex(this.BaronModel.TargetTile);
             var weapon = this.BaronModel.Weapon;
+            var targetTile = gameController.TileFromIndex(this.BaronModel.TargetTile);
 
-            if (targetPlayer != null)
+            foreach (var victim in this.BaronModel.Victims)
             {
-                targetPlayer.GameData.TimesTargeted++;
-                if (BaronModel.StolenResource != ResourceType.None)
+                targetPlayer = gameController.NameToPlayer(victim);
+
+
+
+                if (targetPlayer != null)
                 {
-                    TradeResources tr = new TradeResources();
-                    tr.AddResource(BaronModel.StolenResource, 1);
-                    //
-                    //  this needs to be face down and not show up in the Turn Resources, but it should count towards Total Resource
-                    targetPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);        // I Taketh
-                    gameController.CurrentPlayer.GameData.Resources.GrantResources(tr, false);     // I Giveth
+                    targetPlayer.GameData.TimesTargeted++;
+                    if (BaronModel.StolenResource != ResourceType.None)
+                    {
+                        TradeResources tr = new TradeResources();
+                        tr.AddResource(BaronModel.StolenResource, 1);
+                        //
+                        //  this needs to be face down and not show up in the Turn Resources, but it should count towards Total Resource
+                        targetPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);        // I Taketh
+                        gameController.CurrentPlayer.GameData.Resources.GrantResources(tr, false);     // I Giveth
 
-                    targetPlayer.GameData.Resources.StolenResource = BaronModel.StolenResource;
-                    gameController.CurrentPlayer.GameData.Resources.StolenResource = BaronModel.StolenResource;
+                        targetPlayer.GameData.Resources.StolenResource = BaronModel.StolenResource;
+                        gameController.CurrentPlayer.GameData.Resources.StolenResource = BaronModel.StolenResource;
 
+                    }
                 }
-            }
 
-            // if they played a dev card, consume it
-            // 10/23/2023: we weren't counting knights played this fix will says "if it is a local game,
-            //             give them a knight and then let them play it.
-            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
-            {
-                if (!gameController.IsServiceGame)
+                // if they played a dev card, consume it
+                // 10/23/2023: we weren't counting knights played this fix will says "if it is a local game,
+                //             give them a knight and then let them play it.
+                if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
                 {
-                    DevCardModel model = new DevCardModel() { DevCardType = DevCardType.Knight };
-                    gameController.CurrentPlayer.GameData.Resources.AvailableDevCards.Add(model);
+                    if (!gameController.IsServiceGame)
+                    {
+                        DevCardModel model = new DevCardModel() { DevCardType = DevCardType.Knight };
+                        gameController.CurrentPlayer.GameData.Resources.AvailableDevCards.Add(model);
+                    }
+                    var ret = gameController.CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
+                    Contract.Assert(ret, "A knight was not found in AvailableDevCards");
+                    gameController.CurrentPlayer.GameData.Resources.KnightsPlayed++;
+                    gameController.AssignLargestArmy();
                 }
-                var ret = gameController.CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
-                Contract.Assert(ret, "A knight was not found in AvailableDevCards");
-                gameController.CurrentPlayer.GameData.Resources.KnightsPlayed++;
-                gameController.AssignLargestArmy();
+
             }
-
-
 
 
             //
             //  this will move the weapon in the UI
-            if (weapon == TargetWeapon.PirateShip)
-            {
-                gameController.GameContainer.PirateShipTile = targetTile;
-            }
-            else
-            {
-                gameController.GameContainer.BaronTile = targetTile;
-            }
+
+            gameController.SetBaronTile(weapon, targetTile, true);
+
+
 
             //
             //  Show the card taken in the UI - but only for the Victim and the player that took the card
 
-             await Task.Delay(0);
+            await Task.Delay(0);
         }
 
         public Task Replay(IGameController gameController)
@@ -139,18 +138,22 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
-            PlayerModel targetPlayer = gameController.NameToPlayer(this.BaronModel.Victim);
+
             var previousTile = gameController.TileFromIndex(this.BaronModel.PreviousTile);
             var weapon = this.BaronModel.Weapon;
 
-            if (targetPlayer != null)
+            foreach (var victim in this.BaronModel.Victims)
             {
-                targetPlayer.GameData.TimesTargeted--;
-            }
 
-            if (weapon == TargetWeapon.PirateShip)
-            {
-                gameController.GameContainer.PirateShipTile = previousTile;
+                PlayerModel targetPlayer = gameController.NameToPlayer(victim);
+                if (targetPlayer != null)
+                {
+                    targetPlayer.GameData.TimesTargeted--;
+                }
+
+
+
+                gameController.SetBaronTile(weapon, previousTile, this.BaronModel.MainBaronHidden);
                 if (BaronModel.StolenResource != ResourceType.None)
                 {
                     TradeResources tr = new TradeResources();
@@ -158,33 +161,25 @@ namespace Catan10
                     targetPlayer.GameData.Resources.GrantResources(tr, false);                                  // I giveth back
                     gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);     // I taketh away
                 }
-            }
-            else
-            {
-                gameController.GameContainer.BaronTile = previousTile;
-                if (BaronModel.StolenResource != ResourceType.None)
+
+
+                // if they played a dev card, undo it if it is a service game (local games don't track resources)
+                if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
                 {
-                    TradeResources tr = new TradeResources();
-                    tr.AddResource(BaronModel.StolenResource, 1);
-                    targetPlayer.GameData.Resources.GrantResources(tr, false);                                  // I giveth back
-                    gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);     // I taketh away
+
+                    gameController.CurrentPlayer.GameData.Resources.UndoPlayDevCard(DevCardType.Knight);
+
+                }
+
+                // 10/23/2023: this was the corresponding fix to bug above -- we need to decrement knight count on undo, for all game types
+                if (this.BaronModel.Reason != MoveBaronReason.Bishop)
+                {
+                    gameController.CurrentPlayer.GameData.Resources.KnightsPlayed--;
+                    gameController.AssignLargestArmy();
                 }
             }
 
-            // if they played a dev card, undo it if it is a service game (local games don't track resources)
-            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
-            {
-
-                gameController.CurrentPlayer.GameData.Resources.UndoPlayDevCard(DevCardType.Knight);
-
-            }
-
-            // 10/23/2023: this was the corresponding fix to bug above -- we need to decrement knight count on undo, for all game types
-            gameController.CurrentPlayer.GameData.Resources.KnightsPlayed--;
-            gameController.AssignLargestArmy();
-
-
-             await Task.Delay(0);
+            await Task.Delay(0);
         }
 
         #endregion Methods

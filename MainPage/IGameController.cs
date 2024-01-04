@@ -1288,6 +1288,37 @@ namespace Catan10
 
             await Task.Delay(0);
         }
+        public void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron)
+        {
+            if (showBaron)
+            {
+                // hide it in the invasion control, show it on th emain board
+                CTRL_Invasion.HideBaron();
+                this.GameContainer.CurrentGame.HexPanel.ShowBaron();
+            }
+            else
+            {
+                CTRL_Invasion.ShowBaron();
+                this.GameContainer.CurrentGame.HexPanel.HideBaron();
+            }
+            if (weapon == TargetWeapon.PirateShip)
+            {
+                GameContainer.PirateShipTile = targetTile;
+            }
+            else
+            {
+                GameContainer.BaronTile = targetTile;
+            }
+
+        }
+
+        public bool BaronVisibility
+        {
+            get
+            {
+                return GameContainer.CurrentGame.HexPanel.BaronShown;
+            }
+        }
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType actionType)
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);

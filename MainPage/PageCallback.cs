@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Catan10.Logging.StateTransitions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 
 namespace Catan10
@@ -406,7 +407,7 @@ namespace Catan10
 
         public async Task OnNewGame()
         {
-             await Task.Delay(0);
+            await Task.Delay(0);
             //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
             //{
             //    if (State.GameState != GameState.WaitingForNewGame)
@@ -558,11 +559,11 @@ namespace Catan10
         //
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
-         //   this.TraceMessage($"Tile={targetTile} CurrentPlayer={CurrentPlayer.PlayerName} Owners={targetTile.OwnedBuildings.FlattenProperty("Owner", ",")}" );
+            //   this.TraceMessage($"Tile={targetTile} CurrentPlayer={CurrentPlayer.PlayerName} Owners={targetTile.OwnedBuildings.FlattenProperty("Owner", ",")}" );
             if (CurrentGameState != GameState.MustMoveBaron) return;
 
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
-            //if (log == null) return; // probably the wrong state
+
 
             //this.TraceMessage($"Reason = {log.Reason}");
 
@@ -577,13 +578,13 @@ namespace Catan10
                 //
                 //  pop the dialog to pick a card
                 //
-                PlayerModel victim = (PlayerModel)((MenuFlyoutItem)s).Tag;
+                var victims = (List<string>)((MenuFlyoutItem)s).Tag;
                 ResourceType stolenResource = ResourceType.None;
-             
+
                 //
                 //  log to tell the other clients what we did
                 await MovedBaronLog.PostLog(this,
-                                            victim,
+                                            victims,
                                             targetTile.Index,
                                             weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index,  // the previous index
                                             weapon,
@@ -595,6 +596,7 @@ namespace Catan10
             MenuFlyoutItem item = null;
             if (targetTile.ResourceType == ResourceType.Sea) // we move pirate instead of Baron
             { // this means we are moving the pirate ship
+                Debug.Assert(false, "I didn't try to make this work yet.");
                 weapon = TargetWeapon.PirateShip;
                 List<RoadCtrl> roads = new List<RoadCtrl>();
                 foreach (RoadLocation location in Enum.GetValues(typeof(RoadLocation)))
@@ -663,40 +665,58 @@ namespace Catan10
             }
             else
             {
-                foreach (BuildingCtrl settlement in targetTile.OwnedBuildings)
-                {
-                    string s = "";
 
-                    bool found = false;
-                    // is it already there?
-                    foreach (MenuFlyoutItem mnuItem in _menuBaron.Items)
+                var targets = PotentialTargets(targetTile, CurrentPlayer);
+                if (targets.Count > 0)
+                {
+                    if (log.Reason == MoveBaronReason.Bishop)
                     {
-                        if (mnuItem.Tag == ( object )settlement.Owner)
+                        // when a Bishop is played, you collect from everybody
+
+                        string message = "Collect one card from ";
+                        foreach (var target in targets)
                         {
-                            found = true;
-                            break;
+                            message += target + ", ";
                         }
-                    }
-                    if (!found)  // this is so we only add each person once in case they have multiple settlements on the same tile
-                    {
-                        // create it
-                        item = new MenuFlyoutItem();
-                        if (log != null && log.Reason == MoveBaronReason.PlayedDevCard)
+                        message = message.Substring(0, message.Length - 1) + ".";
+                        item = new MenuFlyoutItem()
                         {
-                            s = "Playing Knight to Target: " + settlement.Owner.PlayerName;
-                        }
-                        else
-                        {
-                            s = "Targetting " + settlement.Owner.PlayerName; ;
-                        }
-                        item.Text = s;
-                        item.Tag = settlement.Owner;
+                            Text = message,
+                            Tag = targets
+
+                        };
                         item.Click += Baron_MenuClicked;
                         _menuBaron.Items.Add(item);
+
+                    }
+                    else
+
+                    {
+                        string message;
+                        foreach (var target in targets)
+                        {
+                            if (log != null && log.Reason == MoveBaronReason.PlayedDevCard)
+                            {
+                                message = "Knight Targets: " + target;
+                            }
+                            else
+                            {
+                                message = "Targetting " + target;
+                            }
+                            item = new MenuFlyoutItem()
+                            {
+                                Text = message,
+                                Tag = new List<string>
+                                {
+                                    target
+                                }
+                            };
+                            item.Click += Baron_MenuClicked;
+                            _menuBaron.Items.Add(item);
+                        }
                     }
                 }
-
-                if (targetTile.OwnedBuildings.Count == 0)
+                else // No targets!
                 {
                     item = new MenuFlyoutItem
                     {
@@ -705,6 +725,7 @@ namespace Catan10
                     item.Click += Baron_MenuClicked;
                     _menuBaron.Items.Add(item);
                 }
+
                 item = new MenuFlyoutItem
                 {
                     Text = "Cancel"
@@ -714,11 +735,27 @@ namespace Catan10
             }
         }
 
+        private List<string> PotentialTargets(TileCtrl tile, PlayerModel owner)
+        {
+            HashSet<string> targets = new HashSet<string>();
+
+            foreach (BuildingCtrl settlement in tile.OwnedBuildings)
+            {
+                if (settlement.Owner != owner)
+                {
+                    targets.Add(settlement.Owner.PlayerName);
+                }
+            }
+
+            return new List<string>(targets);
+        }
+
+
         public async Task UpgradeKnight(BuildingCtrl building)
         {
             if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight))
             {
-                 await Task.Delay(0); //ignoring the requrst
+                await Task.Delay(0); //ignoring the requrst
             }
             int newRank = (int) building.Knight.KnightRank + 1;
             await KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, ( KnightRank )newRank, building.Knight.Activated);
@@ -728,7 +765,7 @@ namespace Catan10
         {
             if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.ActivateKnight))
             {
-                 await Task.Delay(0); //ignoring the request
+                await Task.Delay(0); //ignoring the request
             }
 
             await KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, building.Knight.KnightRank, activated);
@@ -737,7 +774,7 @@ namespace Catan10
         {
             if (knight.Activated == false)
             {
-                 await Task.Delay(0);
+                await Task.Delay(0);
             }
 
             await MoveKnightLog.PostLog(this, knight);
@@ -750,7 +787,7 @@ namespace Catan10
         {
             if (newState == oldState)
             {
-                 await Task.Delay(0);
+                await Task.Delay(0);
             }
 
             road.RoadState = newState;
@@ -786,7 +823,7 @@ namespace Catan10
             }
 
             CalculateAndSetLongestRoad();
-             await Task.Delay(0);
+            await Task.Delay(0);
         }
 
         public bool HasEntitlement(Entitlement entitlement)
@@ -919,7 +956,7 @@ namespace Catan10
                 if (player.PlayerName == name)
                     return player;
             }
-            throw new Exception("bad name passed PlayerNameToPlayer");
+            throw new Exception("bad targetList passed PlayerNameToPlayer");
         }
 
         //
@@ -987,7 +1024,7 @@ namespace Catan10
                     MustMoveBaron = false;
                 }
             }
-             await Task.Delay(0);
+            await Task.Delay(0);
         }
 
         //

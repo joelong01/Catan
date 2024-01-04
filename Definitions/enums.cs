@@ -236,7 +236,7 @@ namespace Catan10
 
     public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo, Redo };
 
-    public enum MoveBaronReason { PlayedDevCard, Rolled7 };
+    public enum MoveBaronReason { PlayedDevCard, Rolled7, Bishop };
 
     public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea, Coin, Cloth, Paper, Politics, Trade, Science, AnyDevCard, VictoryPoint, Invasion };
 

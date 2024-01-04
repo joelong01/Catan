@@ -66,7 +66,7 @@ namespace Catan10
 
         private void SetResourceCardModel(ResourceCardModel resourceCard)
         {
-            this.TraceMessage($"{resourceCard}");
+            
             switch (resourceCard.ResourceType)
             {
                 case ResourceType.Science:

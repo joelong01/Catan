@@ -1,4 +1,6 @@
-﻿namespace Catan10
+﻿using System.Collections.Generic;
+
+namespace Catan10
 {
     public class BaronModel
     {
@@ -9,8 +11,9 @@
         public GameState StartingState { get; set; }
         public ResourceType StolenResource { get; set; }
         public int TargetTile { get; set; }
-        public string Victim { get; set; }
+        public List<string> Victims { get; set; }
         public TargetWeapon Weapon { get; set; }
+        public bool MainBaronHidden { get; set; }
 
         #endregion Properties
     }

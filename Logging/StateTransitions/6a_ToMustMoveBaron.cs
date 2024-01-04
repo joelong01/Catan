@@ -55,7 +55,7 @@ namespace Catan10
         {
             //
             //   nothing to do -- we just want the state and state message set
-            //   the code to move the Baron isin PageCallback.cs in the TileRightTapped method
+            //   the code to move the Baron is in PageCallback.cs in the TileRightTapped method
             //
 
              await Task.Delay(0);

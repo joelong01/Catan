@@ -175,13 +175,13 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="140" />
                 <RowDefinition Height="140" />
-                <RowDefinition Height="140" />
+                <RowDefinition Height="140" MaxHeight="140" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100" />
                 <ColumnDefinition Width="100" />
                 <ColumnDefinition Width="100" />
-                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="100" MaxWidth="100" />
             </Grid.ColumnDefinitions>
 
             <local:SingleRollCtrl Grid.Row="0" Grid.Column="0" Number="2"
@@ -219,15 +219,17 @@
                             <TextBlock Text="{x:Bind MainPageModel.Log.RollLog.TotalRolls, Mode=OneWay}"
                                     HorizontalAlignment="Left" Style="{StaticResource RollGridTextStyle}" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal"
-                                Visibility="{x:Bind ShowLastRoll(MainPageModel.GameState), Mode=OneWay}">
-                            <TextBlock Text="Last:" Style="{StaticResource RollGridTextStyle}"
-                                    HorizontalAlignment="Left" />
+                        <Viewbox Stretch="Uniform" VerticalAlignment="Center" >
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10"
+                                    Visibility="{x:Bind ShowLastRoll(MainPageModel.GameState), Mode=OneWay}">
+                                <TextBlock Text="Last:" Style="{StaticResource RollGridTextStyle}"
+                                        HorizontalAlignment="Left" />
 
-                            <TextBlock
-                                    Text="{x:Bind MainPageModel.Log.RollLog.LastRoll.Roll, FallbackValue=?, Mode=OneWay}"
-                                    HorizontalAlignment="Left" Style="{StaticResource RollGridTextStyle}" />
-                        </StackPanel>
+                                <TextBlock
+                                        Text="{x:Bind MainPageModel.Log.RollLog.LastRoll.Roll, FallbackValue=?, Mode=OneWay}"
+                                        HorizontalAlignment="Left" Style="{StaticResource RollGridTextStyle}" />
+                            </StackPanel>
+                        </Viewbox>
                     </StackPanel>
                 </Viewbox>
             </Border>

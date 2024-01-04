@@ -218,6 +218,7 @@ namespace Catan10
         IRollLog RollLog { get; }
         PlayerModel TheHuman { get; }
         ICatanService Proxy { get; }
+        bool BaronVisibility { get; }
         #endregion Properties + Fields
 
 
@@ -318,6 +319,7 @@ namespace Catan10
 
         Task RolledSeven();
         Task ProtectCity(ProtectCityLog protectCityLog, ActionType normal);
+        void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron);
     }
 
     public interface IGameViewCallback

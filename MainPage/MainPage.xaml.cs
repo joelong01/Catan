@@ -1332,6 +1332,9 @@ namespace Catan10
                     break;
                 case Entitlement.DestroyCity:
                     break;
+                case Entitlement.Bishop:
+                    await MustMoveBaronLog.PostLog(this, MoveBaronReason.Bishop);
+                    break;
                 default:
                     break;
             }
