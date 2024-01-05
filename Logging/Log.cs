@@ -124,6 +124,7 @@ namespace Catan10
 
         public void ClearUndo()
         {
+            this.TraceMessage("");
             UndoneStack.Clear();
         }
 
@@ -133,7 +134,6 @@ namespace Catan10
 
             LogHeader lh = DoneStack.Pop();
             NotifyPropertyChanged("GameState");
-            //   NotifyPropertyChanged("ActionStack");
             return lh;
         }
 
@@ -403,6 +403,11 @@ namespace Catan10
             try
             {
                 var logHeader = Stacks.PopUndo();
+                if (logHeader == null)
+                {
+                    Debug.Assert(false, "how did we get a redo with nothing in the Undo stack?");
+                    return;
+                }
                 Contract.Assert(logHeader.LogType == LogType.Undo);
                 Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
                 logHeader.LogType = LogType.Redo;  // 5/21/2020:  We need this so that we know to know clear the undo stack on the push

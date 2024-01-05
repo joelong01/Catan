@@ -17,7 +17,7 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
-        public bool IsPirates
+        public bool IsCitiesAndKnights
         {
             get
             {
@@ -1479,6 +1479,17 @@ namespace Catan10
         public void MoveMerchant(Point to)
         {
             GameContainer.CurrentGame.HexPanel.MoveMerchantAsync(to);
+        }
+
+        public PlayerModel PlayerFromId(Guid id)
+        {
+            foreach (var player in PlayingPlayers)
+            {
+                if (player.PlayerIdentifier == id)
+                    return player;
+            }
+
+            return null;
         }
     }
 }

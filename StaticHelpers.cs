@@ -243,10 +243,6 @@ namespace Catan10
                 localControl.PointerReleased -= pointerReleasedHandler;
                 localControl.ReleasePointerCapture(origE.Pointer);
                 Point exitPoint = e.GetCurrentPoint(mousePositionWindow).Position;
-                if (progress != null)
-                {
-                    progress.PointerUp(exitPoint);
-                }
                 taskCompletionSource.SetResult(exitPoint);
             };
 
@@ -589,7 +585,6 @@ namespace Catan10
         {
             #region Methods
 
-            void PointerUp(Point value);
 
             void Report(PointerRoutedEventArgs e, Point value);
 

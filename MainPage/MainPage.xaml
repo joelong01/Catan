@@ -255,7 +255,7 @@
                                     <StackPanel Name="SP_BaronButton" Margin="0,0,30,0" HorizontalAlignment="Stretch">
 
                                         <Button Width="100"
-                                                Visibility="{x:Bind IsPirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                Visibility="{x:Bind IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                                 IsEnabled="{x:Bind PlayBaronButtonEnabled(MainPageModel.Log.GameState), Mode=OneWay}"
                                                 Click="EnableMoveBaron">
 
@@ -273,7 +273,7 @@
                                                 Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                                 Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
                                     </StackPanel>
-                                    <StackPanel Name="SP_NextButton">
+                                    <StackPanel Name="SP_NextButton" Width="220">
                                         <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"
                                                 Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                                                 Click="OnNextStep" Content="&#xE101;"

@@ -637,9 +637,9 @@ namespace Catan10
             }
             else
             {
-                this.TraceMessage("ROLL start roll processing");
+              //  this.TraceMessage("ROLL start roll processing");
                 await WaitingForRollToWaitingForNext.PostRollMessage(this, roll);
-                this.TraceMessage("ROLL end roll processing");
+              //  this.TraceMessage("ROLL end roll processing");
             }
 
 
@@ -1430,16 +1430,18 @@ namespace Catan10
 
         public Visibility ShowLocalPurchase(GameState state)
         {
-            if (state == GameState.WaitingForNewGame) return Visibility.Visible;
-
-            if (MainPageModel.Settings.IsServiceGame) return Visibility.Collapsed;
-            if (state == GameState.WaitingForNext ||
-                MainPageModel.GameState == GameState.Supplemental)
-                return Visibility.Visible;
-
-            if (state == GameState.AllocateResourceReverse || state == GameState.AllocateResourceForward)
-                return Visibility.Visible;
-            return Visibility.Collapsed;
+            switch (state)
+            {
+                case GameState.AllocateResourceForward:
+                case GameState.MustMoveMerchant:
+                case GameState.AllocateResourceReverse:
+                case GameState.WaitingForNewGame:
+                case GameState.Supplemental:
+                case GameState.WaitingForNext:
+                    return Visibility.Visible;
+                default:
+                    return Visibility.Collapsed;
+            } 
         }
 
         private async void EnableMoveBaron(object sender, RoutedEventArgs e)

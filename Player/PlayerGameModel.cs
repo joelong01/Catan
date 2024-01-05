@@ -62,9 +62,10 @@ namespace Catan10
         private int _PoliticsRank = 0;
         private int _ScienceRanks = 0;
         private int _VictoryPoints = 0;
+        bool _playedMerchantLast = false;
+      
 
 
-    
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -184,6 +185,22 @@ namespace Catan10
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("LongestRoadVisible");
                     UpdateScore();
+                }
+            }
+        }
+        public bool PlayedMerchantLast
+        {
+            get
+            {
+                return _playedMerchantLast;
+            }
+            set
+            {
+                if (_playedMerchantLast != value)
+                {
+                    _playedMerchantLast = value;
+                    UpdateScore();
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -754,6 +771,7 @@ namespace Catan10
             ScienceRank = 0;
             TradeRank = 0;
             VictoryPoints = 0;
+            PlayedMerchantLast = false;
 
 
             for (int i = 0; i < _RoadTie.Count(); i++)
@@ -860,6 +878,8 @@ namespace Catan10
             IslandsPlayed = _islands.Count;
 
             score += _islands.Count;
+
+            score += PlayedMerchantLast ? 1 : 0;
 
             Score = score;
         }

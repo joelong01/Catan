@@ -51,7 +51,7 @@ namespace Catan10
             }
             if (state != GameState.WaitingForRollForOrder && state != GameState.WaitingForRoll && state != GameState.BeginResourceAllocation)
             {
-                this.TraceMessage($"rejecting call to SetOrientation for state={MainPage.Current.CurrentGameState}");
+               // this.TraceMessage($"rejecting call to SetOrientation for state={MainPage.Current.CurrentGameState}");
                 return;
             }
 

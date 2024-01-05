@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -14,6 +15,10 @@ namespace Catan10
     public sealed partial class MerchantCtrl : UserControl, IDragAndDropProgress
     {
         public bool EnableMove { get; set; } = false;
+        private TileCtrl StartingTile { get; set; } = null;
+        private TileCtrl PreviousTile { get; set; } = null;
+        private TileCtrl CurrentTile { get; set; } = null;
+        private Point StartPoint { get; set; }
 
         public MerchantCtrl()
         {
@@ -61,21 +66,21 @@ namespace Catan10
 
         private async void OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (!EnableMove) return;
+            if (!EnableMove) return; // this is off, for example, in the Purchase control
 
-            if (!GameController.CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Merchant))
-            {
-                this.TraceMessage($"{GameController.CurrentPlayer.PlayerName} does not have Entitlement.Merchant");
-                return;
-            }
+
             var xform = ((Border)sender).RenderTransform as CompositeTransform;
 
-            Point startPoint = new Point (xform.TranslateX, xform.TranslateY);
+            StartPoint = new Point(xform.TranslateX, xform.TranslateY);  // need this to deal with PointUp
 
+
+            // when dragging we stop highlighting any tile and when we are done, we put it back the way it was
             var highlightedTiles = new List<TileCtrl>();
             foreach (var tileIndex in GameController.HighlightedTiles)
             {
-                highlightedTiles.Add(GameController.TileFromIndex(tileIndex));
+                var tile = GameController.TileFromIndex(tileIndex);
+                highlightedTiles.Add(tile);
+                tile.StopHighlightingTile();
             }
             Border border = sender as Border;
             int zIndex = Canvas.GetZIndex(border);
@@ -89,26 +94,45 @@ namespace Catan10
             highlightedTiles.ForEach(t => t.HighlightTile());
 
             var endPoint = new Point (xform.TranslateX, xform.TranslateY);
-          
-            //  log the change we made
-            await MoveMerchantLog.PostLogMessage(GameController, startPoint, endPoint);
-        }
+
+            if (PreviousTile != null)
+            {
+                PreviousTile.StopHighlightingTile();
+            }
+            if (CurrentTile != null)
+            {
+                CurrentTile.StopHighlightingTile();
+            }
+            //
+            //  if they don't have the entitlement, let them move inside the same tile, but return
+            //  to starting Tile if it is not where they started
+            if (!GameController.CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Merchant))
+            {
+                if (CurrentTile != StartingTile)
+                {
+                    MoveAsync(StartPoint); // this action is not logged
+                    PreviousTile = StartingTile;
+                    StartingTile = CurrentTile;
+                }
+            }
+            else
+            {
+                //  log the change we made
+                await MoveMerchantLog.PostLogMessage(GameController, StartPoint, endPoint);
+                PreviousTile = CurrentTile;
+                StartingTile = CurrentTile;
+            }
 
 
-        public void PointerUp(Point value)
-        {
-            if (_previousTile != null)
-            {
-                _previousTile.StopHighlightingTile();
-            }
-            if (_currentTile != null)
-            {
-                _currentTile.StopHighlightingTile();
-            }
-            _previousTile = null;
         }
-        TileCtrl _previousTile = null;
-        TileCtrl _currentTile = null;
+
+        /// <summary>
+        ///     looks for the TileCtrl underneath the moust and then highlights the tile that the control is moving through.
+        ///     does booking to keep track of the tiles the control is dragged through
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="mousePosition"></param>
+
         public void Report(PointerRoutedEventArgs e, Point mousePosition)
         {
             //    this.TraceMessage($"Point {mousePosition}");
@@ -125,16 +149,16 @@ namespace Catan10
                 {
 
                     var tile = (TileCtrl)element;
-                    if (tile != _previousTile)
+                    if (tile != PreviousTile)
                     {
-                        if (_previousTile != null)
+                        if (PreviousTile != null)
                         {
-                            _previousTile.StopHighlightingTile();
+                            PreviousTile.StopHighlightingTile();
                         }
                         if (tile != null)
                         {
-                            _previousTile = tile;
-                            _currentTile = tile;
+                            PreviousTile = tile;
+                            CurrentTile = tile;
                             tile.HighlightTile();
                         }
                     }

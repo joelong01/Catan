@@ -21,7 +21,7 @@ namespace Catan10
 
     public interface ICatanService
     {
-        #region Delegates  + Events + Enums
+       
 
         /// <summary>
         ///     a message is recieved that was sent to all clients
@@ -53,9 +53,6 @@ namespace Catan10
         /// </summary>
         event PrivateMessageReceivedHandler OnPrivateMessage;
 
-        #endregion Delegates  + Events + Enums
-
-        #region Methods
 
         Task CreateGame(GameInfo gameInfo);
         Task DisposeAsync();
@@ -96,20 +93,18 @@ namespace Catan10
 
         Task StartConnection(GameInfo info, string playerName);
 
-        #endregion Methods
 
-        #region Properties
+
+
 
         int UnprocessedMessages { get; set; }
 
-        #endregion Properties
 
         Task<bool> KeepAlive();
     }
 
     public interface ICatanSettings
     {
-        #region Properties + Fields
 
         bool AnimateFade { get; set; }
         int AnimationSpeedBase { get; set; }
@@ -121,12 +116,6 @@ namespace Catan10
         bool UseRandomNumbers { get; set; }
         bool ValidateBuilding { get; set; }
         double Zoom { get; set; }
-
-        #endregion Properties + Fields
-
-
-
-        #region Methods
 
         void Close();
 
@@ -146,13 +135,13 @@ namespace Catan10
 
         Task Winner();
 
-        #endregion Methods
+
     }
 
     public interface IGameCallback
     {
 
-        #region Methods
+
 
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
 
@@ -177,27 +166,21 @@ namespace Catan10
 
 
 
-        #endregion Methods
+
     }
 
     public interface IGameController
     {
-        bool IsPirates { get; }
+        bool IsCitiesAndKnights { get; }
 
         BuildingCtrl GetBuilding(int index);
-        #region Properties + Fields
+
 
         bool AutoRespondAndTheHuman { get; }
         CatanGames CatanGame { get; set; }
 
-        /// <summary>
-        ///     The current state of the game
-        /// </summary>
         GameState CurrentGameState { get; }
 
-        /// <summary>
-        ///     The current player in the game
-        /// </summary>
         PlayerModel CurrentPlayer { get; set; }
         PlayerModel LastPlayerToRoll { get; set; } //used in Supplemental builds
         PlayerModel NextPlayer { get; }
@@ -220,17 +203,7 @@ namespace Catan10
         PlayerModel TheHuman { get; }
         ICatanService Proxy { get; }
         bool BaronVisibility { get; }
-        #endregion Properties + Fields
 
-
-
-        #region Methods
-
-        /// <summary>
-        ///     Adds a player to the game.  if the Player is already in the game, return false.
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns></returns>
         Task AddPlayer(string playerToAdd);
 
         Task ChangePlayer(ChangePlayerLog log);
@@ -249,11 +222,6 @@ namespace Catan10
 
         Task CreateGame(GameInfo gameInfo);
 
-        /// <summary>
-        ///     Given a playerName, return the Model by looking up in the AllPlayers collection
-        /// </summary>
-        /// <param name="playerName"></param>
-        /// <returns></returns>
         PlayerModel NameToPlayer(string playerName);
         PlayerModel NameToPlayer(PlayerModel player);
         Task PickSettlementsAndRoads();
@@ -313,8 +281,6 @@ namespace Catan10
 
         Task HandlePirateRoll(RollModel rollModel, ActionType action);
 
-        #endregion Methods
-
         string PlayerListToCsv(List<PlayerModel> playersWithTooManyCards);
         void SetCurrentPlayer(PlayerModel playerModel);
 
@@ -322,11 +288,12 @@ namespace Catan10
         Task ProtectCity(ProtectCityLog protectCityLog, ActionType normal);
         void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron);
         void MoveMerchant(Point to);
+        PlayerModel PlayerFromId(Guid id);
     }
 
     public interface IGameViewCallback
     {
-        #region Methods
+
 
         void OnGridLeftTapped(TileCtrl tile, TappedRoutedEventArgs e);
 
@@ -336,12 +303,11 @@ namespace Catan10
 
         void OnTileDoubleTapped(object sender, DoubleTappedRoutedEventArgs e);
 
-        #endregion Methods
+
     }
 
     public interface ILogController
     {
-        #region Methods
 
         Task Do(IGameController gameController);
 
@@ -351,25 +317,24 @@ namespace Catan10
 
         Task Replay(IGameController gameController);
 
-        #endregion Methods
     }
 
     public interface IMessageDeserializer
     {
-        #region Methods
+
 
         LogHeader Deserialize(string json);
 
-        #endregion Methods
+
     }
 
     public interface ITileControlCallback
     {
-        #region Methods
+
 
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
 
-        #endregion Methods
+
     }
 
     //
@@ -377,7 +342,7 @@ namespace Catan10
     //  and exposes the data needed by the Views/Pages
     internal interface ICatanGameData
     {
-        #region Properties + Fields
+
 
         CatanGames CatanGame { get; }
         string Description { get; }
@@ -389,7 +354,7 @@ namespace Catan10
 
         List<TileCtrl> Tiles { get; }
 
-        #endregion Properties + Fields
+
 
     }
 }
