@@ -44,7 +44,7 @@
     </Control.Resources>
     <StackPanel Orientation="Horizontal">
         <Grid
-                Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="70" />
                 <ColumnDefinition Width="70" />

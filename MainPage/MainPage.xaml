@@ -164,7 +164,7 @@
             <local:DragableGridCtrl x:Name="DGC_PirateInvasion" Caption="Invasion Status" Width="500" Height="500"
                     HorizontalAlignment="Left" VerticalAlignment="Center"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2" CornerRadius="5"
                     OnGridPositionChanged="OnGridPositionChanged" PointerPressed="Draggable_PointerPressed">
                 <Viewbox Stretch="UniformToFill">
@@ -243,12 +243,12 @@
                
                         <StackPanel Orientation="Vertical" Canvas.ZIndex="99999" 
                                 Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
-                        <Viewbox Stretch="UniformToFill">
+                        <Viewbox Stretch="Uniform" Margin="0">
                                 <local:TraditionalRollCtrl x:Name="CTRL_RollControl"  
                                         MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
                                         OnRoll="OnNumberRolled" />
                             </Viewbox>
-                            <Rectangle Height="3" Fill="{StaticResource bmMaple}" Margin="0,0, 0, 0" />
+                            <Rectangle Height="3" Fill="{StaticResource bmMaple}" Margin="5" />
                             <Viewbox Stretch="Fill">
                                 <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
                                     Height="130">

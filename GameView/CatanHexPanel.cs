@@ -14,7 +14,12 @@ namespace Catan10
     {
         private Canvas HarborLayer { get; set; } = new Canvas();
         private Canvas RoadLayer { get; set; } = new Canvas();
+
         private readonly BaronCtrl _baron = new BaronCtrl();
+        private TileCtrl _baronTile = null;
+
+        private readonly MerchantCtrl _merchant = new MerchantCtrl();
+        private  TileCtrl _merchantTile = null;
 
         private readonly List<TileCtrl> _desertTiles = new List<TileCtrl>();
 
@@ -30,7 +35,7 @@ namespace Catan10
 
         private bool _arrangeRoadsDone = false;
 
-        private TileCtrl _baronTile = null;
+
 
         private int _colCount = 0;
 
@@ -64,6 +69,20 @@ namespace Catan10
             CatanHexPanel depPropClass = d as CatanHexPanel;
             Visibility depPropValue = (Visibility)e.NewValue;
             depPropClass.SetBaronVisibility(depPropValue);
+        }
+
+        private static void MerchantTileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            CatanHexPanel panel = d as CatanHexPanel;
+            TileCtrl newTile = e.NewValue as TileCtrl;
+            panel.SetMerchantTile(newTile);
+        }
+
+        private static void MerchantVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            CatanHexPanel depPropClass = d as CatanHexPanel;
+            Visibility depPropValue = (Visibility)e.NewValue;
+            depPropClass.SetMerchantVisibility(depPropValue);
         }
 
         private static void BuildingIndexToHarborIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -624,6 +643,30 @@ namespace Catan10
             _baron.MoveAsync(to);
         }
 
+        private void SetMerchantTile(TileCtrl tile)
+        {
+
+
+            if (tile == null)
+            {
+                HideMerchant();
+                return;
+            }
+
+
+            _merchantTile = tile;
+            GeneralTransform gt = tile.TransformToVisual(HarborLayer);
+
+            Point to = new Point((tile.Width - _merchant.Width) * .5, (tile.Height - _merchant.Height - tile.HexThickness));
+            to = gt.TransformPoint(to);
+            ShowMerchant();
+            _merchant.MoveAsync(to);
+        }
+
+        private void SetMerchantVisibility(Visibility visibility)
+        {
+            _baron.Visibility = visibility;
+        }
         private void SetBaronVisibility(Visibility visibility)
         {
             _baron.Visibility = visibility;
@@ -1223,9 +1266,10 @@ namespace Catan10
 
         public static readonly DependencyProperty AllowShipsProperty = DependencyProperty.Register("AllowShips", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false));
         public static readonly DependencyProperty BaronTileProperty = DependencyProperty.Register("BaronTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, BaronTileChanged));
+        public static readonly DependencyProperty MerchantTileProperty = DependencyProperty.Register("MerchantTile", typeof(TileCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, MerchantTileChanged));
 
-        // RowCounts[0] tells you how many rows there are in the 0th Column
         public static readonly DependencyProperty BaronVisibilityProperty = DependencyProperty.Register("BaronVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, BaronVisibilityChanged));
+        public static readonly DependencyProperty MerchantVisibilityProperty = DependencyProperty.Register("MerchantVisibility", typeof(Visibility), typeof(CatanHexPanel), new PropertyMetadata(Visibility.Collapsed, MerchantVisibilityChanged));
 
         public static readonly DependencyProperty BuildingIndexToHarborIndexProperty = DependencyProperty.Register("BuildingIndexToHarborIndex", typeof(string), typeof(CatanHexPanel), new PropertyMetadata(null, BuildingIndexToHarborIndexChanged));
         public static readonly DependencyProperty CatanGameProperty = DependencyProperty.Register("CatanGame", typeof(CatanGames), typeof(CatanHexPanel), new PropertyMetadata(CatanGames.Regular));
@@ -1253,7 +1297,34 @@ namespace Catan10
         public static readonly DependencyProperty UniformMarginProperty = DependencyProperty.Register("UniformMargin", typeof(Thickness), typeof(CatanHexPanel), new PropertyMetadata(new Thickness(0,0,0,0)));
         public static readonly DependencyProperty VictoryPointsProperty = DependencyProperty.Register("VictoryPoints", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(5));
         public static readonly DependencyProperty YearOfPlentyProperty = DependencyProperty.Register("YearOfPlenty", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(2));
+        public static readonly DependencyProperty CitiesAndKnightsProperty = DependencyProperty.Register("CitiesAndKnights", typeof(bool), typeof(CatanHexPanel), new PropertyMetadata(false, CitiesAndKnightsChanged));
+        public bool CitiesAndKnights
+        {
+            get => ( bool )GetValue(CitiesAndKnightsProperty);
+            set => SetValue(CitiesAndKnightsProperty, value);
+        }
+        private static void CitiesAndKnightsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as CatanHexPanel;
+            var depPropValue = (bool)e.NewValue;
+            depPropClass?.SetCitiesAndKnights(depPropValue);
+        }
+        private void SetCitiesAndKnights(bool value)
+        {
+            if (value)
+            {
+                ShowMerchant();
+            }
+            else
+            {
+                HideMerchant();
+            }
+        }
+
+
+
         public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
+
 
         public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
 
@@ -1263,6 +1334,17 @@ namespace Catan10
             _baron.Visibility = Visibility.Collapsed;
             _baron.Width = 50;
             _baron.Height = 60;
+
+            HideMerchant();
+            _merchant.Width = 40;
+            _merchant.Height = 50;
+            _merchant.StrokeThickness = 5;
+            _merchant.Background = new SolidColorBrush(Windows.UI.Colors.Blue);
+            _merchant.Stroke = new SolidColorBrush(Windows.UI.Colors.Black);
+            _merchant.HorizontalAlignment = HorizontalAlignment.Left;
+            _merchant.VerticalAlignment = VerticalAlignment.Top;
+            _merchant.GameController = MainPage.GameController;
+            _merchant.EnableMove = true;
 
             HarborLayer.HorizontalAlignment = HorizontalAlignment.Stretch;
             HarborLayer.VerticalAlignment = VerticalAlignment.Stretch;
@@ -1294,10 +1376,12 @@ namespace Catan10
             TopLayer.IsTapEnabled = true;
 
             Canvas.SetZIndex(_baron, 5);
+            Canvas.SetZIndex(_merchant, 5);
             Canvas.SetZIndex(_pirateShip, 5);
 
             HarborLayer.Children.Add(_pirateShip);
             HarborLayer.Children.Add(_baron);
+            HarborLayer.Children.Add(_merchant);
 
             this.SizeChanged += SimpleHexPanel_SizeChanged;
             this.Children.Add(HarborLayer);
@@ -1922,7 +2006,28 @@ namespace Catan10
             _baron.ShowAsync();
         }
 
+        public bool MerchantShown
+        {
+            get
+            {
+                return ( _merchant.Opacity == 100 );
+            }
+        }
+        public void HideMerchant()
+        {
+            _merchant.HideAsync();
 
+        }
+
+        public void ShowMerchant()
+        {
+            _merchant.ShowAsync();
+        }
+
+        internal void MoveMerchantAsync(Point to)
+        {
+            _merchant.MoveAsync(to);
+        }
     } // End CatanHexPanel
 
     public class HarborLayoutData

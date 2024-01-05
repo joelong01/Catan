@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -23,7 +23,7 @@ namespace Catan10
             {
                 if (GameInfo != null)
                 {
-                    return GameInfo.Pirates;
+                    return GameInfo.CitiesAndKnights;
                 }
 
                 return false;
@@ -567,7 +567,7 @@ namespace Catan10
         ///     We do keep track of who created the game as they are the ones that have to click "Start" to stop the addition
         ///     of new players.
         ///     
-        ///     if we are playing a Pirates game, the Baron starts out hidden
+        ///     if we are playing a CitiesAndKnights game, the Baron starts out hidden
         /// 
         /// </summary>
         /// <param name="logHeader"></param>
@@ -578,7 +578,7 @@ namespace Catan10
             MainPageModel.GameInfo = gameInfo;
             _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
             MainPageModel.IsGameStarted = true;
-            if (gameInfo.Pirates)
+            if (gameInfo.CitiesAndKnights)
             { _gameView.CurrentGame.HexPanel.HideBaron(); }
             await Task.Delay(0);
         }
@@ -719,7 +719,7 @@ namespace Catan10
                     {
                         if (kvp.Value.HasBaron == false)
                         {
-                            if (MainPageModel.GameInfo.Pirates && ( building.BuildingState == BuildingState.City || building.BuildingState == BuildingState.Metropolis ))
+                            if (MainPageModel.GameInfo.CitiesAndKnights && ( building.BuildingState == BuildingState.City || building.BuildingState == BuildingState.Metropolis ))
                             {
                                 //
                                 //  in pirates - you get one of the resource types plus one commodity when you have a City or Metropolis
@@ -1128,7 +1128,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task HandlePirateRoll(RollModel rollModel, ActionType action)
         {
-            Debug.Assert(MainPageModel.GameInfo.Pirates);
+            Debug.Assert(MainPageModel.GameInfo.CitiesAndKnights);
 
             if (action != ActionType.Undo)
             {
@@ -1344,13 +1344,13 @@ namespace Catan10
 
             if (CurrentGameState == GameState.AllocateResourceReverse)
             {
-                if (( building.BuildingState == BuildingState.Settlement && !MainPageModel.GameInfo.Pirates ) || ( building.BuildingState == BuildingState.City && MainPageModel.GameInfo.Pirates ))
+                if (( building.BuildingState == BuildingState.Settlement && !MainPageModel.GameInfo.CitiesAndKnights ) || ( building.BuildingState == BuildingState.City && MainPageModel.GameInfo.CitiesAndKnights ))
                 {
 
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
-                        tr += TradeResources.TradeResourcesForBuilding(building.BuildingState, kvp.Value.ResourceType, MainPageModel.GameInfo.Pirates);
+                        tr += TradeResources.TradeResourcesForBuilding(building.BuildingState, kvp.Value.ResourceType, MainPageModel.GameInfo.CitiesAndKnights);
                     }
                     switch (actionType)
                     {
@@ -1470,12 +1470,15 @@ namespace Catan10
         public async Task RolledSeven()
         {
 
-            if (GameInfo.Pirates && CTRL_Invasion.InvasionCount > 0)
+            if (GameInfo.CitiesAndKnights && CTRL_Invasion.InvasionCount > 0)
             {
                 await MustMoveBaronLog.PostLog(this, MoveBaronReason.Rolled7);
             }
         }
 
-
+        public void MoveMerchant(Point to)
+        {
+            GameContainer.CurrentGame.HexPanel.MoveMerchantAsync(to);
+        }
     }
 }

@@ -49,13 +49,13 @@
                     Image="{StaticResource ResourceType.GoldMine}" />
             <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Paper, Mode=OneWay}"
                     Margin="5,0,0,0"
-                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                     Image="{StaticResource ResourceType.Coin}" />
             <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Coin, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                     Image="{StaticResource ResourceType.Paper}" />
             <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Cloth, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.Pirates, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                     Image="{StaticResource ResourceType.Cloth}" />
 
         </StackPanel>

@@ -10,7 +10,6 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
-
 using Catan10.Spy;
 
 using Windows.Storage;
@@ -1248,10 +1247,10 @@ namespace Catan10
                     GameIndex = dlg.SelectedIndex,
                     Id = Guid.NewGuid(),
                     Started = false,
-                    Pirates = dlg.Pirates
+                    CitiesAndKnights = dlg.CitiesAndKnights
                 };
                 await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
-
+                GameContainer.CurrentGame.HexPanel.CitiesAndKnights = dlg.CitiesAndKnights;
                 MainPageModel.PlayingPlayers.Clear();
 
                 dlg.PlayingPlayers.ForEach(async (p) =>
@@ -1335,6 +1334,11 @@ namespace Catan10
                 case Entitlement.Bishop:
                     await MustMoveBaronLog.PostLog(this, MoveBaronReason.Bishop);
                     break;
+                case Entitlement.Merchant:
+                    await PurchaseMerchantEntitlement.PostLogMessage(this);
+
+
+                    return;
                 default:
                     break;
             }

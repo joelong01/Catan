@@ -302,12 +302,12 @@ namespace Catan10
 
 
         /// <summary>
-        ///    Indicates usage of Pirates extensions
+        ///    Indicates usage of CitiesAndKnights extensions
         /// </summary>
         /// <returns></returns>
         /// 
         private bool _pirates = false;
-        public bool Pirates
+        public bool CitiesAndKnights
         {
             get
             {

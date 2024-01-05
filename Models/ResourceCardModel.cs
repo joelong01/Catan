@@ -166,7 +166,7 @@ namespace Catan10
             this.Add(ResourceType.GoldMine);
             if (MainPage.Current != null)
             {
-                if (MainPage.Current.MainPageModel.GameInfo != null && MainPage.Current.MainPageModel.GameInfo.Pirates)
+                if (MainPage.Current.MainPageModel.GameInfo != null && MainPage.Current.MainPageModel.GameInfo.CitiesAndKnights)
                
                 {
                     this.Add(ResourceType.Paper);

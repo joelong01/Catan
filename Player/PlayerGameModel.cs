@@ -412,6 +412,8 @@ namespace Catan10
                     return 5- PoliticsRank;
                 case Entitlement.ScienceUpgrade:
                     return 5 - ScienceRank;
+                case Entitlement.Merchant:
+                    return 1;
                 default:
                     Debug.Assert(false, "Fill out the switch statement!");
                     break;

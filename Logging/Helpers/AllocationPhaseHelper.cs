@@ -9,7 +9,7 @@
             var player = gameController.NameToPlayer(to);
             player.GameData.Resources.GrantEntitlement(Entitlement.Road);
             player.GameData.Resources.GrantEntitlement(Entitlement.Settlement);
-            if (gameController.CurrentGameState == GameState.AllocateResourceReverse && gameController.MainPageModel.GameInfo.Pirates)
+            if (gameController.CurrentGameState == GameState.AllocateResourceReverse && gameController.MainPageModel.GameInfo.CitiesAndKnights)
             {
                 player.GameData.Resources.GrantEntitlement(Entitlement.City);
             }
@@ -20,7 +20,7 @@
             var player = gameController.NameToPlayer(to);
             player.GameData.Resources.RevokeEntitlement(Entitlement.Road);
             player.GameData.Resources.RevokeEntitlement(Entitlement.Settlement);
-            if (gameController.CurrentGameState == GameState.AllocateResourceReverse && gameController.MainPageModel.GameInfo.Pirates)
+            if (gameController.CurrentGameState == GameState.AllocateResourceReverse && gameController.MainPageModel.GameInfo.CitiesAndKnights)
             {
                 player.GameData.Resources.RevokeEntitlement(Entitlement.City);
             }

@@ -407,6 +407,7 @@ namespace Catan10
 
         public async Task OnNewGame()
         {
+           // you are looking for OnNewLocalGame!
             await Task.Delay(0);
             //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
             //{
@@ -897,12 +898,12 @@ namespace Catan10
 
             // 12/24/2023
             //              You can build a BuyOrUpgradeKnight if:
-            //              1. you are running Pirates
+            //              1. you are running CitiesAndKnights
             //              2. you have the entitlement
             //              3. you are next to a road
             //
             //     this logic means you *must* spend your knights before you build any other kind of settlements.
-            if (MainPageModel.GameInfo.Pirates && CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight) && OwnedAdjacentRoad(CurrentPlayer, building))
+            if (MainPageModel.GameInfo.CitiesAndKnights && CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight) && OwnedAdjacentRoad(CurrentPlayer, building))
             {
                 return BuildingState.Knight;
             }

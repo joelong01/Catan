@@ -150,8 +150,7 @@ namespace Catan10
         // int toggle = 0;
         private void OnTest1(object sdr, RoutedEventArgs rea)
         {
-            MainPageModel.GameInfo.Pirates = true;
-            CTRL_Invasion.Next();
+            GameContainer.CurrentGame.HexPanel.CitiesAndKnights = true;
         }
 
         /// <summary>
@@ -299,9 +298,10 @@ namespace Catan10
                 GameIndex = 0,
                 Id = Guid.NewGuid(),
                 Started = false,
-                Pirates=true
+                CitiesAndKnights=true
             };
             await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
+            GameContainer.CurrentGame.HexPanel.CitiesAndKnights = true;
 
             MainPageModel.PlayingPlayers.Clear();
 
@@ -328,7 +328,7 @@ namespace Catan10
             PlayingPlayers[1].GameData.ScienceRank = 2;
             PlayingPlayers[2].GameData.PoliticsRank = 3;
 
-             await NextState();
+            await NextState();
 
             RollModel roll = new RollModel()
             {

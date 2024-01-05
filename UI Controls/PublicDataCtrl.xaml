@@ -70,7 +70,7 @@
                         BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White, TargetNullValue=White}"
                         BorderThickness="1" CornerRadius="6" Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal"
-                            Visibility="{x:Bind local:MainPage.Current.MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            Visibility="{x:Bind local:MainPage.Current.MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
 
                         <Grid Background="Blue" CornerRadius="5" Width="33.5" Margin="5,0,5,0" Height="50" BorderBrush="Red" BorderThickness="0">
                         
@@ -324,7 +324,7 @@
                             Text="&#x2714;"
                             Visibility="{x:Bind Player.GameData.IsCurrentPlayer, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}" />
                     <StackPanel Orientation="Horizontal"
-                            Visibility="{x:Bind local:MainPage.Current.MainPageModel.GameInfo.Pirates, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=true}">
+                            Visibility="{x:Bind local:MainPage.Current.MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=true}">
                         <!--  Largest Army  -->
                         <Viewbox Stretch="UniformToFill">
                             <TextBlock FontFamily="Segoe UI Symbol"

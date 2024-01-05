@@ -75,8 +75,8 @@
                     SelectedItem="{x:Bind SelectedGame, Mode=TwoWay, Converter={StaticResource ObjectToObjectValueConverter}}"
                     SelectionChanged="OnGameChanged" />
 
-            <CheckBox Grid.Row="3" Grid.Column="3" Content="Pirates" FontSize="22" Foreground="White" 
-                      IsChecked="{x:Bind Pirates, Mode=TwoWay}"/>
+            <CheckBox Grid.Row="3" Grid.Column="3" Content="Cities And Knights" FontSize="22" Foreground="White" 
+                      IsChecked="{x:Bind CitiesAndKnights, Mode=TwoWay}"/>
         </Grid>
     </Viewbox>
 </ContentDialog>

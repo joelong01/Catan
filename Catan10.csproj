@@ -150,6 +150,8 @@
     <Compile Include="Logging\Actions\CreateGameModel.cs" />
     <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
     <Compile Include="Logging\Actions\ImprovementLog.cs" />
+    <Compile Include="Logging\Actions\MoveMerchantLog.cs" />
+    <Compile Include="Logging\Actions\PurchaseMerchantEntitlement.cs" />
     <Compile Include="Logging\StateTransitions\6b_DestroyNextCity.cs" />
     <Compile Include="Logging\StateTransitions\6b_ToMustDesroyCity.cs" />
     <Compile Include="Logging\StateTransitions\6_WaitingForRollToPirateRoll.cs" />
@@ -246,37 +248,37 @@
     <Compile Include="UI Controls\OfferCtrl.xaml.cs">
       <DependentUpon>OfferCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\DeserterCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\DeserterCtrl.xaml.cs">
       <DependentUpon>DeserterCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\DiplomatCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\DiplomatCtrl.xaml.cs">
       <DependentUpon>DiplomatCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\EntryGateCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\EntryGateCtrl.xaml.cs">
       <DependentUpon>EntryGateCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\IntrigueCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\IntrigueCtrl.xaml.cs">
       <DependentUpon>IntrigueCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\Invasion.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\Invasion.xaml.cs">
       <DependentUpon>Invasion.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\InventorCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\InventorCtrl.xaml.cs">
       <DependentUpon>InventorCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\KnightCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\KnightCtrl.xaml.cs">
       <DependentUpon>KnightCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\MerchantCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\MerchantCtrl.xaml.cs">
       <DependentUpon>MerchantCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\PoliticsCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\PoliticsCtrl.xaml.cs">
       <DependentUpon>PoliticsCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\ScienceCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\ScienceCtrl.xaml.cs">
       <DependentUpon>ScienceCtrl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI Controls\Pirates\TradeCtrl.xaml.cs">
+    <Compile Include="UI Controls\CitiesAndKnights\TradeCtrl.xaml.cs">
       <DependentUpon>TradeCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\PotentialTradesCtrl.xaml.cs">
@@ -559,47 +561,47 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\DeserterCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\DeserterCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\DiplomatCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\DiplomatCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\EntryGateCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\EntryGateCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\IntrigueCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\IntrigueCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\Invasion.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\Invasion.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\InventorCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\InventorCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\KnightCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\KnightCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\MerchantCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\MerchantCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\PoliticsCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\PoliticsCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\ScienceCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\ScienceCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI Controls\Pirates\TradeCtrl.xaml">
+    <Page Include="UI Controls\CitiesAndKnights\TradeCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

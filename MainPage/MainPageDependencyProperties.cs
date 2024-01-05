@@ -59,7 +59,7 @@ namespace Catan10
                 _showPipGroupIndex = 0;
             }
 
-            if (GameInfo != null && GameInfo.Pirates)
+            if (GameInfo != null && GameInfo.CitiesAndKnights)
             {
                 CTRL_RollControl.NewTurn();
             }

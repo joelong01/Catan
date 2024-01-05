@@ -90,7 +90,7 @@ namespace Catan10
         {
             get
             {
-                if (MainPage.Current.GameInfo.Pirates)
+                if (MainPage.Current.GameInfo.CitiesAndKnights)
                 {
                     if (_whiteDie == -1 || _redDie == -1 || _specialDice == SpecialDice.None)
                     {

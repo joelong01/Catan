@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 using Catan.Proxy;
 using Catan10.CatanService;
+using Windows.Foundation;
 using Windows.UI.Xaml.Input;
 
 namespace Catan10
@@ -320,6 +321,7 @@ namespace Catan10
         Task RolledSeven();
         Task ProtectCity(ProtectCityLog protectCityLog, ActionType normal);
         void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron);
+        void MoveMerchant(Point to);
     }
 
     public interface IGameViewCallback

@@ -213,11 +213,14 @@ namespace Catan10
         [Description("Picking Random Gold Cards")]
         PickingRandomGoldTiles,
 
-        [Description("Handling Pirates")]
+        [Description("Handling CitiesAndKnights")]
         HandlePirates,
 
         [Description("Done Destroying Cities")]
-        DoneDestroyingCities
+        DoneDestroyingCities,
+
+        [Description("Move Merchant")]
+        MustMoveMerchant
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };
