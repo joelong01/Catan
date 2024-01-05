@@ -46,7 +46,6 @@ namespace Catan10
             set => SetValue(DecorationProperty, value);
         }
 
-
         public UIElement Child
         {
             get { return ( UIElement )GetValue(ChildProperty); }

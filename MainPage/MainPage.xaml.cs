@@ -33,8 +33,6 @@ namespace Catan10
     public sealed partial class MainPage : Page
     {
         // 12/30/2023 - Create a static MainPageModel for all the controls to use as their default when they are created
-
-
         #region Delegates + Fields + Events + Enums
 
         public const string PlayerDataFile = "catansettings.json";
@@ -591,8 +589,6 @@ namespace Catan10
             await SaveGameState();
         }
 
-
-
         private async void OnManagePlayers(object sender, RoutedEventArgs e)
         {
             PlayerManagementDlg dlg = new PlayerManagementDlg(MainPageModel.AllPlayers);
@@ -641,8 +637,6 @@ namespace Catan10
                 await WaitingForRollToWaitingForNext.PostRollMessage(this, roll);
               //  this.TraceMessage("ROLL end roll processing");
             }
-
-
         }
 
         private async Task OnOpenSavedGame()
@@ -663,8 +657,6 @@ namespace Catan10
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
         }
-
-
 
         private async void OnScrollMouseWheel(object sender, PointerRoutedEventArgs e)
         {
@@ -1336,14 +1328,11 @@ namespace Catan10
                     break;
                 case Entitlement.Merchant:
                     await PurchaseMerchantEntitlement.PostLogMessage(this);
-
-
                     return;
                 default:
                     break;
             }
         }
-
 
         /// <summary>
         ///     make sure that the current user has a knight that is not activated, and if so, let them
@@ -1363,7 +1352,6 @@ namespace Catan10
                     break;
                 }
             }
-
             if (!found)
             {
                 //
@@ -1379,21 +1367,16 @@ namespace Catan10
 
                 if (knightCount > activateCount) found = true;
             }
-
             if (found)
             {
                 await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight);
             }
         }
-
         private async void OnMoveKnight(object sender, RoutedEventArgs e)
         {
             if (CurrentPlayer.GameData.Knights.Count == 0) return;
-
             await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight);
-
         }
-
         private async Task TryBuyWall()
         {
             bool foundUnprotectedCity = false;
@@ -1405,21 +1388,16 @@ namespace Catan10
                     break;
                 }
             }
-
             if (!foundUnprotectedCity) return;
-
             await PurchaseEntitlement(CurrentPlayer, Entitlement.Wall);
         }
-
         private async void OnLocalBuyRoad(object sender, RoutedEventArgs e)
         {
             await PurchaseEntitlement(CurrentPlayer, Entitlement.Road);
         }
-
         private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement)
         {
             if (MainPageModel.GameState != GameState.WaitingForNext && MainPageModel.GameState != GameState.Supplemental) return;
-
             if (player.GameData.EntitlementsLeft(entitlement) == 0)
             {
                 await ShowErrorMessage($"You have purchased all available {entitlement}.", "Catan", "");
@@ -1427,7 +1405,6 @@ namespace Catan10
             }
             await PurchaseLog.PostLog(this, player, entitlement);
         }
-
         public Visibility ShowLocalPurchase(GameState state)
         {
             switch (state)
@@ -1443,7 +1420,6 @@ namespace Catan10
                     return Visibility.Collapsed;
             } 
         }
-
         private async void EnableMoveBaron(object sender, RoutedEventArgs e)
         {
             //  10/23/2023
@@ -1453,14 +1429,11 @@ namespace Catan10
             if (CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType != DevCardType.None) return;
             await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
         }
-
         private bool PlayBaronButtonEnabled(GameState state)
         {
             if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll) return true;
 
             return false;
         }
-
-
     }
 }

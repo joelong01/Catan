@@ -14,12 +14,9 @@ namespace Catan10
     public sealed partial class RollCtrl : UserControl
     {
 
-
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(TileOrientation), typeof(RollCtrl), new PropertyMetadata(TileOrientation.FaceDown, OrientationChanged));
 
         public static readonly DependencyProperty RollProperty = DependencyProperty.Register("Roll", typeof(RollModel), typeof(RollCtrl), new PropertyMetadata(new RollModel()));
-
-
 
         public TileOrientation Orientation
         {
@@ -32,8 +29,6 @@ namespace Catan10
             get => (RollModel)GetValue(RollProperty);
             set => SetValue(RollProperty, value);
         }
-
-
 
         public RollCtrl()
         {
@@ -76,7 +71,6 @@ namespace Catan10
 
     public class RollModel : INotifyPropertyChanged
     {
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -215,8 +209,6 @@ namespace Catan10
 
         static private MersenneTwister Twist { get; } = new MersenneTwister((int)DateTime.Now.Ticks);
 
-
-
         public RollModel()
         {
         }
@@ -230,7 +222,6 @@ namespace Catan10
                 SpecialDice = this.SpecialDice
             };
         }
-
 
         public void Randomize()
         {

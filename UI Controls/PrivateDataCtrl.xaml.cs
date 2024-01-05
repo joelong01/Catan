@@ -381,7 +381,6 @@ namespace Catan10
             }
         }
 
-
         private void OnTrade4For1(object sender, RoutedEventArgs e)
         {
             TradeMenu.Items.Clear();

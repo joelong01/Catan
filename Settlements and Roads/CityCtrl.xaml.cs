@@ -38,7 +38,6 @@ namespace Catan10
             set => SetValue(HasWallProperty, value);
         }
 
-
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner)
         {
             return PlayerBindingFunctions.GetBackgroundBrush(current, owner);

@@ -15,7 +15,6 @@ namespace Catan10
         DateTime _start;
         TimeSpan _totalTime;
 
-
         readonly SolidColorBrush _green = CatanColors.GetResourceBrush("Green", Colors.Green);
         readonly SolidColorBrush _red = CatanColors.GetResourceBrush("Red", Colors.Red);
         readonly SolidColorBrush _yellow = CatanColors.GetResourceBrush("Yellow", Colors.Yellow);
@@ -28,7 +27,6 @@ namespace Catan10
             get => (bool)GetValue(ColorCodeTimerProperty);
             set => SetValue(ColorCodeTimerProperty, value);
         }
-
 
         new public Color Foreground
         {
@@ -62,7 +60,6 @@ namespace Catan10
             LayoutRoot.Background = new SolidColorBrush(value);
         }
 
-
         public StopWatchCtrl()
         {
             this.InitializeComponent();
@@ -94,9 +91,6 @@ namespace Catan10
             }
 
         }
-
-
-
 
         public TimeSpan TotalTime
         {

@@ -565,7 +565,6 @@ namespace Catan10
 
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
 
-
             //this.TraceMessage($"Reason = {log.Reason}");
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
@@ -751,7 +750,6 @@ namespace Catan10
             return new List<string>(targets);
         }
 
-
         public async Task UpgradeKnight(BuildingCtrl building)
         {
             if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight))
@@ -865,8 +863,6 @@ namespace Catan10
                 allocationPhase = true;
             }
 
-
-
             if (CurrentGameState == GameState.AllocateResourceForward || CurrentGameState == GameState.AllocateResourceReverse)
             {
                 if (building.BuildingToTileDictionary.Count > 0)
@@ -922,7 +918,6 @@ namespace Catan10
                     return BuildingState.Error;
                 }
             }
-
 
             //
             //  if we get here, we have a valid place to build (or we've bypassed the business logic)...make sure there is an entitlement

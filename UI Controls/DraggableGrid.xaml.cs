@@ -227,7 +227,6 @@ namespace Catan10
 
             GridPosition.ScaleY = GridPosition.ScaleX;
 
-
             NotifyPositionChanged();
         }
 

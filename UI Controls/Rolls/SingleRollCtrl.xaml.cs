@@ -4,8 +4,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
-
-
 namespace Catan10
 {
     public delegate void RollSelectedHandler(RollModel roll);
@@ -20,7 +18,6 @@ namespace Catan10
     {
         public event RollSelectedHandler RollSelected;
 
-
         public SingleRollCtrl()
         {
             this.InitializeComponent();
@@ -34,13 +31,11 @@ namespace Catan10
             set => SetValue(NumberProperty, value);
         }
 
-
         public MainPageModel MainPageModel
         {
             get => ( MainPageModel )GetValue(MainPageModelProperty);
             set => SetValue(MainPageModelProperty, value);
         }
-
 
         private void OnNumberTapped(object sender, TappedRoutedEventArgs e)
         {

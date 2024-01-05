@@ -585,7 +585,6 @@ namespace Catan10
         {
             #region Methods
 
-
             void Report(PointerRoutedEventArgs e, Point value);
 
             #endregion Methods
@@ -617,7 +616,6 @@ namespace Catan10
         }
 
         #endregion Classes
-
 
     }
 

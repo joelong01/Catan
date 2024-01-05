@@ -94,8 +94,6 @@ namespace Catan10
         Back
     };
 
-
-
     public enum Entitlement
     {
         [Description("Undefined")]
@@ -144,7 +142,6 @@ namespace Catan10
         [Description("Deserter")]
         Deserter,
 
-
         [Description("Inventor")]
         Inventor,
         [Description("Intrigue")]
@@ -155,10 +152,7 @@ namespace Catan10
         [Description("Merchant")]
         Merchant,
 
-
-
     }
-
 
     public enum GameState
     {

@@ -12,7 +12,6 @@ using Windows.UI.Xaml.Media;
 using Catan10.CatanService;
 using CatanMessage = Catan.Proxy.CatanMessage;
 
-
 namespace Catan10
 {
     public sealed partial class MainPage : Page
@@ -39,7 +38,6 @@ namespace Catan10
                     //
                     //  10/23/2023
                     //  this comments out the start of a network game since we aren't using that.  before this it would assert.
-
 
                     //MainPageModel.IsServiceGame = true;
 
@@ -83,8 +81,6 @@ namespace Catan10
                 await this.ShowErrorMessage(Message, Title, ExtendedMessage);
                 this.MainPageModel.Settings.IsLocalGame = true;
             }
-
-
 
         }
 
@@ -201,7 +197,6 @@ namespace Catan10
             };
             MainPageModel.Settings.IsLocalGame = false;
 
-
             List<GameInfo> games = await MainPageModel.CatanService.GetAllGames();
             ServiceGameDlg dlg = new ServiceGameDlg(TheHuman, MainPageModel.AllPlayers, games, MainPageModel.CatanService)
             {
@@ -313,7 +308,6 @@ namespace Catan10
                     await Log.Undo(logHeader);
                     break;
 
-
                 case ActionType.Redo:
                     await logController.Redo(this);
                     await Log.Redo(logHeader);
@@ -322,9 +316,7 @@ namespace Catan10
                     break;
             }
 
-
             MainPageModel.ChangeUnprocessMessage(-1);
-
 
         }
 
@@ -385,7 +377,6 @@ namespace Catan10
             // this.TraceMessage($"{gameInfo.Id} playerName={by}");
             if (MainPageModel == null || MainPageModel.GameInfo == null) return;
 
-
             if (MainPageModel.GameInfo.Id != gameInfo.Id) return;
 
             // uh oh -- deleting my game
@@ -412,7 +403,6 @@ namespace Catan10
             }
 
             if (CurrentGameState != GameState.WaitingForNewGame && CurrentGameState != GameState.WaitingForPlayers) return;
-
 
             foreach (var player in MainPageModel.PlayingPlayers)
             {
@@ -441,7 +431,6 @@ namespace Catan10
                 return;
             }
 
-
             //
             //  ask the service for who has joined -- this will now include the current player because of the previous call
             List<string> players = await MainPageModel.CatanService.GetAllPlayerNames(gameInfo.Id);
@@ -455,7 +444,6 @@ namespace Catan10
                     await AddPlayerLog.AddPlayer(this, name);
                 }
             }
-
 
         }
 

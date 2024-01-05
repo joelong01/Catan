@@ -52,7 +52,6 @@ namespace Catan10
             }
             MainPageModel mainPageModel = gameController.MainPageModel;
 
-
             if (mainPageModel.Settings.AutoRespond)
             {
                 //

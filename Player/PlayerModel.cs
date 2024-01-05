@@ -59,14 +59,9 @@ namespace Catan10
         private string _playerName = "Nameless";
         private ImageBrush _imageBrush = null;
 
-
-
         private PlayerGameModel _playerGameData = null;
 
         private Guid _PlayerIdentifier = Guid.Empty;
-
-
-
 
         double _serviceLatency = 0;
         public double ServiceLatency
@@ -363,7 +358,6 @@ namespace Catan10
             }
         }
 
-
         public PlayerModel()
         {
 
@@ -379,7 +373,6 @@ namespace Catan10
             //  1/2/2024:  found this -- how did this ever work?
 
             //_imageBrush = new ImageBrush();
-
 
             GameData = new PlayerGameModel(this);
         }

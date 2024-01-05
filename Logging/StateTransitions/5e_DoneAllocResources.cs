@@ -41,13 +41,10 @@ namespace Catan10
         {
             Debug.Assert(gameController.CurrentGameState == GameState.DoneResourceAllocation);
 
-
             // show all the resources the players got during the allocation phase
-
 
             foreach (var p in gameController.PlayingPlayers)
             {
-
 
                 var tr =  p.GameData.Resources.TotalResourcesForGame;
                 p.GameData.Resources.GrantResources(tr.GetNegated(), true);
@@ -59,8 +56,6 @@ namespace Catan10
             }
 
         }
-
-
 
         public Task Replay(IGameController gameController)
         {

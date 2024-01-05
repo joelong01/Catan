@@ -35,8 +35,6 @@ namespace Catan10
 
         private bool _arrangeRoadsDone = false;
 
-
-
         private int _colCount = 0;
 
         //
@@ -646,13 +644,11 @@ namespace Catan10
         private void SetMerchantTile(TileCtrl tile)
         {
 
-
             if (tile == null)
             {
                 HideMerchant();
                 return;
             }
-
 
             _merchantTile = tile;
             GeneralTransform gt = tile.TransformToVisual(HarborLayer);
@@ -1009,7 +1005,6 @@ namespace Catan10
             set => SetValue(MaxRoadsProperty, value);
         }
 
-
         public int MaxKnights
         {
             get => ( int )GetValue(MaxKnightsProperty);
@@ -1321,10 +1316,7 @@ namespace Catan10
             }
         }
 
-
-
         public Dictionary<BuildingKey, BuildingCtrl> BuildingKeyToBuildingCtrlDictionary = new Dictionary<BuildingKey, BuildingCtrl>(new KeyComparer());
-
 
         public Dictionary<HarborLocation, HarborLayoutData> HarborLayoutDataDictionary = new Dictionary<HarborLocation, HarborLayoutData>();
 
@@ -1388,8 +1380,6 @@ namespace Catan10
             this.Children.Add(RoadLayer);
             this.Children.Add(TopLayer);
         }
-
-
 
         public void ArrangeRoads()
         {

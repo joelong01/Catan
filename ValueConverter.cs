@@ -78,7 +78,6 @@ namespace Catan10
         }
     }
 
-
     public class AnimationSpeedValueConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter,
@@ -476,7 +475,6 @@ namespace Catan10
             {
                 return -intVal;
             }
-
 
             return value;
         }

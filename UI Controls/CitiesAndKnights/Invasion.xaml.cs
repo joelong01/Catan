@@ -48,7 +48,6 @@ namespace Catan10
             set => SetValue(InvasionCountProperty, value);
         }
 
-
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(MainPageModel.Default));
         public MainPageModel MainPageModel
         {
@@ -61,7 +60,6 @@ namespace Catan10
             get => ( PlayerModel )GetValue(CurrentPlayerProperty);
             set => SetValue(CurrentPlayerProperty, value);
         }
-
 
         public static readonly DependencyProperty AngleProperty = DependencyProperty.Register("Angle", typeof(double), typeof(InvasionCtrl), new PropertyMetadata(0.0, AngleChanged));
         public double Angle

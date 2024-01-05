@@ -74,8 +74,6 @@ namespace Catan10
             {
                 targetPlayer = gameController.NameToPlayer(victim);
 
-
-
                 if (targetPlayer != null)
                 {
                     targetPlayer.GameData.TimesTargeted++;
@@ -112,13 +110,10 @@ namespace Catan10
 
             }
 
-
             //
             //  this will move the weapon in the UI
 
             gameController.SetBaronTile(weapon, targetTile, true);
-
-
 
             //
             //  Show the card taken in the UI - but only for the Victim and the player that took the card
@@ -151,8 +146,6 @@ namespace Catan10
                     targetPlayer.GameData.TimesTargeted--;
                 }
 
-
-
                 gameController.SetBaronTile(weapon, previousTile, this.BaronModel.MainBaronHidden);
                 if (BaronModel.StolenResource != ResourceType.None)
                 {
@@ -161,7 +154,6 @@ namespace Catan10
                     targetPlayer.GameData.Resources.GrantResources(tr, false);                                  // I giveth back
                     gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);     // I taketh away
                 }
-
 
                 // if they played a dev card, undo it if it is a service game (local games don't track resources)
                 if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)

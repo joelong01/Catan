@@ -16,8 +16,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-
-
 namespace Catan10
 {
     public delegate void PurchaseEntitlementDelegate(Entitlement entitlement);
@@ -47,8 +45,6 @@ namespace Catan10
             set => SetValue(MainPageModelProperty, value);
         }
 
-
-
         public string UnplayedResourceCount(ObservableCollection<Entitlement> entitlements, Entitlement toCheck)
         {
             int count = 0;
@@ -63,7 +59,6 @@ namespace Catan10
 
             return count.ToString();
         }
-
 
         private void OnBuyEntitlement(Entitlement entitlement)
         {

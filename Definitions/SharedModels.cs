@@ -300,7 +300,6 @@ namespace Catan10
         /// 
         public int GameIndex { get; set; }
 
-
         /// <summary>
         ///    Indicates usage of CitiesAndKnights extensions
         /// </summary>
@@ -328,7 +327,6 @@ namespace Catan10
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
 
         #endregion Properties
 

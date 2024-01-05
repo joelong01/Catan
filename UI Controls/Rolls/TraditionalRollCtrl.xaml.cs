@@ -6,8 +6,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 
-
-
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Catan10
@@ -38,11 +36,9 @@ namespace Catan10
             Specials.Add(SpecialScience);
             Specials.Add(SpecialPirate);
 
-
         }
 
         public event RollSelectedHandler OnRoll;
-
 
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(MainPageModel.Default, GameChanged));
 
@@ -57,8 +53,6 @@ namespace Catan10
             set => SetValue(MainPageModelProperty, value);
         }
 
-
-
         private void RollSelected(RollModel rollModel)
         {
             OnRoll?.Invoke(rollModel);
@@ -71,7 +65,6 @@ namespace Catan10
             return Visibility.Collapsed;
         }
 
-
         private RollModel BuildRollModel()
         {
             RollModel rollModel = new RollModel()
@@ -82,7 +75,6 @@ namespace Catan10
                 Roll = -2,
             };
 
-
             foreach (ToggleButton d in RedDice)
             {
                 if (d.IsChecked == true)
@@ -91,7 +83,6 @@ namespace Catan10
                     break;
                 }
             }
-
 
             foreach (ToggleButton d in WhiteDice)
             {

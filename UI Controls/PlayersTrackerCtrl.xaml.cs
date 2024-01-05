@@ -27,7 +27,6 @@ namespace Catan10
         }
     }
 
-
     public sealed partial class PlayersTrackerCtrl : UserControl
     {
         /// <summary>
@@ -112,7 +111,6 @@ namespace Catan10
                 return 175.0;
             }
         }
-
 
     }
 }

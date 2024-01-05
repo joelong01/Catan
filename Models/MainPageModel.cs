@@ -27,8 +27,6 @@ namespace Catan10
         private string[] DynamicProperties { get; } = new string[] { "TotalCitiesBinding", "TotalKnightRanksBinding",  "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
         #endregion Properties + Fields
 
-
-
         #region Methods
 
         internal void FinishedAddingPlayers()
@@ -206,7 +204,6 @@ namespace Catan10
             }
         }
 
-
         [JsonIgnore]
         public bool EnableUiInteraction
         {
@@ -332,7 +329,6 @@ namespace Catan10
             }
         }
 
-
         [JsonIgnore]
         public GameState GameState
         {
@@ -355,8 +351,6 @@ namespace Catan10
                 Settings.IsLocalGame = !value;
             }
         }
-
-
 
         [JsonIgnore]
         public Log Log

@@ -85,7 +85,6 @@
                             Value="{x:Bind Settings.Zoom, Mode=TwoWay, FallbackValue=1.0}" />
                     </StackPanel>
 
-
                     <StackPanel Margin="10,10,10,0">
                         <TextBlock Style="{StaticResource SettingsTextBlockStyle}" Text="Animation Speed: " />
                         <Slider Name="_sliderAnimationSpeed"

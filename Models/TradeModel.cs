@@ -83,11 +83,8 @@ namespace Catan10
         #endregion Properties
     }
 
-
-
     public class OldTradeOffer : INotifyPropertyChanged
     {
-
 
         #region Constructors + Destructors
 
@@ -164,8 +161,6 @@ namespace Catan10
                 }
             }
         }
-
-
 
         public ObservableCollection<PlayerTradeTracker> TradePartners
         {

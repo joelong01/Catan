@@ -368,7 +368,6 @@ namespace Catan10.CatanService
                 //  twice for each message
                 UnsubscribeAll();
 
-
                 string serviceUrl;
                 serviceUrl = "https://" + host + "/CatanHub";
 

@@ -42,15 +42,12 @@ namespace Catan10
                 toMove = GetPlayerDistance(players, gameController.CurrentPlayer, nextVictim);
             }
 
-
-
             var logHeader = new DestroyCity_Next()
             {
                 Count = toMove,
                 NewState = newState,
                 UndoNext = true,
                 CanUndo = true
-
 
             };
 

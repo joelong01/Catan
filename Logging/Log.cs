@@ -54,8 +54,6 @@ namespace Catan10
             return sb.ToString();
         }
 
-
-
         internal void PrintLog([CallerMemberName] string caller = "")
         {
             if (!PrintLogFlag) return;
@@ -124,7 +122,7 @@ namespace Catan10
 
         public void ClearUndo()
         {
-            this.TraceMessage("");
+         //   this.TraceMessage("");
             UndoneStack.Clear();
         }
 

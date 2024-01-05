@@ -141,8 +141,6 @@ namespace Catan10
 
         #endregion Properties + Fields
 
-
-
         #region Constructors
 
         public ResourceCardSlimCtrl()

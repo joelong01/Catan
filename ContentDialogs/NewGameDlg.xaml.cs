@@ -35,7 +35,6 @@ namespace Catan10
             }
         }
 
-
         private void OnCancel(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
         }
@@ -67,10 +66,6 @@ namespace Catan10
             }
         }
         
-
-
-
-
 
         public string SaveFileName
         {

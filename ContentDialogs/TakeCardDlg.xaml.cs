@@ -55,7 +55,6 @@ namespace Catan10
             }
         }
 
-
         public bool CountVisible
         {
             get => (bool)GetValue(CountVisibleProperty);
@@ -233,7 +232,6 @@ namespace Catan10
         //                target.Add(targetCard);
         //            }
         //            targetCard.Count++;
-
 
         //        }
         //    }

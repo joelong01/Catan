@@ -26,7 +26,6 @@ namespace Catan10
             this.DataContext = this;
         }
 
-
         public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register("Stroke", typeof(SolidColorBrush), typeof(DeserterCtrl), new PropertyMetadata(new SolidColorBrush(Colors.White)));
         public SolidColorBrush Stroke
         {

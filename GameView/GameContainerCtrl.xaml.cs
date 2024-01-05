@@ -1079,7 +1079,6 @@ namespace Catan10
                 // get a random list of numbers
                 randomNumberSequence = GetRandomList(tileGroup.StartingTileNumbers.Count - 1); // this is the index *into* TileGroup.StartingTileNumbers
 
-
                 //// assign them to tiles
                 for (int i = 0; i < tileGroup.TilesToRandomize.Count; i++)
                 {
@@ -1120,7 +1119,6 @@ namespace Catan10
             //  this.TraceMessage($"Tiles: {DumpTileList(tileGroup.TilesToRandomize)} Numbers: {CatanSignalRClient.Serialize(randomNumberSequence)}");
             return randomNumberSequence;
         }
-
 
     //
     // 1. the dependency property SetGame gets called

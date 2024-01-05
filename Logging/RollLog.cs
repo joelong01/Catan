@@ -134,10 +134,7 @@ namespace Catan10
         private void UpdatePlayerStats(RollAction action)
         {
 
-
             RollModel rollModel;
-
-
 
             int toAddForNoResourceCount = 1;
             if (action == RollAction.Undo)
@@ -162,7 +159,6 @@ namespace Catan10
                 }
                 return;
             }
-
 
             //
             //  get the resources for the rollModel
@@ -201,7 +197,6 @@ namespace Catan10
         private int _tenCount = 0;
         private int _elevenCount = 0;
         private int _twelveCount = 0;
-
 
         public int TwoCount
         {
@@ -425,8 +420,6 @@ namespace Catan10
                 NinePercent = string.Format(percentFormat, Percent[7] * 100);
                 TenPercent = string.Format(percentFormat, Percent[8] * 100);
                 ElevenPercent = string.Format(percentFormat, Percent[9] * 100);
-
-
 
             }
             else // 12/20/2023 - if you undo the first rollModel, you don't want to see NaN, you want empty strings
@@ -717,7 +710,6 @@ namespace Catan10
             return Undone.Pop();
         }
 
-
         /// <summary>
         ///     We have a RollState on the Undone stack that has the rollModel and we have a RollState on the Done stack
         ///     that has a 0 for the rollModel. we pop the Undone and throw it away after setting the rollModel in the Done stack
@@ -776,7 +768,6 @@ namespace Catan10
     {
         public string PlayerName { get; set; } = MainPage.Current.CurrentPlayer.PlayerName;
         public RollModel RollModel { get; set; }
-
 
         // I want to use this for debugging...you should never apply a rollModel to a different player
         public override string ToString()

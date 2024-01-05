@@ -11,9 +11,7 @@ namespace Catan10
 {
     public delegate void BroadcastMessageReceivedHandler(CatanMessage message);
 
-
     public delegate void DeleteGameHandler(GameInfo gameInfo, string by);
-
 
     public delegate void GameLifeTimeHandler(GameInfo gameInfo, string gameName);
 
@@ -52,7 +50,6 @@ namespace Catan10
         ///     a message was sent to only this client
         /// </summary>
         event PrivateMessageReceivedHandler OnPrivateMessage;
-
 
         Task CreateGame(GameInfo gameInfo);
         Task DisposeAsync();
@@ -93,12 +90,7 @@ namespace Catan10
 
         Task StartConnection(GameInfo info, string playerName);
 
-
-
-
-
         int UnprocessedMessages { get; set; }
-
 
         Task<bool> KeepAlive();
     }
@@ -135,13 +127,10 @@ namespace Catan10
 
         Task Winner();
 
-
     }
 
     public interface IGameCallback
     {
-
-
 
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
 
@@ -164,9 +153,6 @@ namespace Catan10
         bool HasEntitlement(Entitlement entitlement);
         Task DestroyCity(BuildingCtrl buildingCtrl);
 
-
-
-
     }
 
     public interface IGameController
@@ -174,7 +160,6 @@ namespace Catan10
         bool IsCitiesAndKnights { get; }
 
         BuildingCtrl GetBuilding(int index);
-
 
         bool AutoRespondAndTheHuman { get; }
         CatanGames CatanGame { get; set; }
@@ -294,7 +279,6 @@ namespace Catan10
     public interface IGameViewCallback
     {
 
-
         void OnGridLeftTapped(TileCtrl tile, TappedRoutedEventArgs e);
 
         void OnGridRightTapped(TileCtrl tile, RightTappedRoutedEventArgs e);
@@ -302,7 +286,6 @@ namespace Catan10
         void OnHarborRightTapped(TileCtrl tileCtrl, HarborLocation location, RightTappedRoutedEventArgs e);
 
         void OnTileDoubleTapped(object sender, DoubleTappedRoutedEventArgs e);
-
 
     }
 
@@ -322,18 +305,14 @@ namespace Catan10
     public interface IMessageDeserializer
     {
 
-
         LogHeader Deserialize(string json);
-
 
     }
 
     public interface ITileControlCallback
     {
 
-
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
-
 
     }
 
@@ -342,7 +321,6 @@ namespace Catan10
     //  and exposes the data needed by the Views/Pages
     internal interface ICatanGameData
     {
-
 
         CatanGames CatanGame { get; }
         string Description { get; }
@@ -353,8 +331,6 @@ namespace Catan10
         int Index { get; }
 
         List<TileCtrl> Tiles { get; }
-
-
 
     }
 }

@@ -51,8 +51,6 @@ namespace Catan10
 
         #endregion Properties + Fields
 
-
-
         #region Constructors
 
         public LogHeader()
@@ -114,8 +112,6 @@ namespace Catan10
 
         #endregion Properties + Fields
 
-
-
         #region Constructors
 
         public RandomBoardSettings()
@@ -159,8 +155,6 @@ namespace Catan10
         public List<int> TileList { get; set; } = null;
 
         #endregion Properties + Fields
-
-
 
         #region Constructors
 

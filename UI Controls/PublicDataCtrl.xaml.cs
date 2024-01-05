@@ -26,7 +26,6 @@ namespace Catan10
             depPropClass?.SetRollOrientation((TileOrientation)e.OldValue, (TileOrientation)e.NewValue);
         }
 
-
         private void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             //

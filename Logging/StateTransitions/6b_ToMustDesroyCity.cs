@@ -15,7 +15,6 @@ namespace Catan10
     public class ChangeStateToMustDestroyCity : LogHeader, ILogController
     {
 
-
         public static async Task PostLog(IGameController gameController)
         {
 
@@ -23,7 +22,6 @@ namespace Catan10
             {
                 NewState = GameState.MustDestroyCity,
                 CanUndo = true,
-
 
             };
 
@@ -51,7 +49,6 @@ namespace Catan10
         {
              await Task.Delay(0);
         }
-
 
     }
 }

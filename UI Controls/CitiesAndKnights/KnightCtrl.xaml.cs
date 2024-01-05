@@ -71,7 +71,6 @@ namespace Catan10
             return 0.5;
         }
 
-
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner, bool activated)
         {
 
@@ -97,7 +96,6 @@ namespace Catan10
             return Visibility.Collapsed;
 
         }
-
 
     }
 }

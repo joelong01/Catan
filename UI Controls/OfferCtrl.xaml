@@ -150,7 +150,6 @@
                         </Button.Content>
                     </Button>
 
-
                     <Button Grid.Row="3" Grid.Column="0" Width="100" Height="75" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Click="OnClickNone" CornerRadius="10" Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}">
                         <Button.Content>
 

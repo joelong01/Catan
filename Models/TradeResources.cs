@@ -307,7 +307,6 @@ namespace Catan10
             AnyDevCard = tradeResources.AnyDevCard;
         }
 
-
         public static TradeResources GetEntitlementCost(PlayerModel player, Entitlement entitlement)
         {
             TradeResources cost = null;
@@ -381,7 +380,6 @@ namespace Catan10
                         Coin = player.GameData.PoliticsRank
                     };
                     break;
-
 
                 case Entitlement.TradeUpgrade:
                     cost = new TradeResources()
@@ -918,7 +916,6 @@ namespace Catan10
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
 
     }
 }

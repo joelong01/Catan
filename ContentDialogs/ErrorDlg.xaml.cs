@@ -44,7 +44,6 @@ namespace Catan10
             set => SetValue(CaptionProperty, value);
         }
 
-
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
         }

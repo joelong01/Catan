@@ -17,7 +17,6 @@ namespace Catan10
     public sealed partial class ServiceGameDlg : ContentDialog
     {
 
-
         #region Delegates + Fields + Events + Enums
 
         public static readonly DependencyProperty ErrorMessageProperty = DependencyProperty.Register("ErrorMessage", typeof(string), typeof(ServiceGameDlg), new PropertyMetadata(""));
@@ -173,7 +172,6 @@ namespace Catan10
         {
             IsCanceled = true;
             UnscribeFromGameEvents();
-
 
         }
         private void UnscribeFromGameEvents()
@@ -336,8 +334,6 @@ namespace Catan10
 
         #endregion Methods
 
-
-
         #region Constructors
 
         #endregion Constructors
@@ -345,7 +341,6 @@ namespace Catan10
 
     public class ServiceGameDlgModel : INotifyPropertyChanged
     {
-
 
         #region Delegates + Fields + Events + Enums
 

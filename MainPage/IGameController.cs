@@ -63,7 +63,6 @@ namespace Catan10
 
                 case GameState.PickingBoard:
 
-
                     if (MainPageModel.GameInfo.Creator == TheHuman.PlayerName)
                     {
                         //
@@ -405,7 +404,6 @@ namespace Catan10
                 bool somebodyIsTied = false;
                 bool showDialog = false;
 
-
                 //
                 //  7/29/2020: be sure and loop over *all* the players and set which ones are in a tie and need to rollModel again.
                 //  
@@ -524,8 +522,6 @@ namespace Catan10
             return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
         }
 
-
-
         /// <summary>
         ///     starting back as early as possible -- load MainPageModel from disk and recreate all the players.
         /// </summary>
@@ -539,7 +535,6 @@ namespace Catan10
             UpdateGridLocations();
             _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             _progress.IsActive = false;
-
 
             CurrentPlayer = TheHuman;
             //
@@ -676,8 +671,6 @@ namespace Catan10
             return _gameView.CurrentGame.GetNextDevCard();
         }
 
-
-
         public async Task<bool> RedoAsync()
         {
             LogHeader logHeader = Log.PeekUndo;
@@ -789,8 +782,6 @@ namespace Catan10
                 default:
                     break;
             }
-
-
 
             if (action == RollAction.Undo)
             {
@@ -1081,9 +1072,6 @@ namespace Catan10
                     knight.Activated = logEntry.NewActivated;
                 }
 
-
-
-
             }
 
             await Task.Delay(0);
@@ -1209,7 +1197,6 @@ namespace Catan10
 
                             }
 
-
                             if (foundAtLeastOneVictim)
                             {
                                 this.TraceMessage("DESTROY CITY: Start");
@@ -1223,9 +1210,6 @@ namespace Catan10
                             }
                         }
 
-
-
-
                         /**
                          * after the invastion, all knights go inactive
                          */
@@ -1233,14 +1217,12 @@ namespace Catan10
                         foreach (var player in PlayingPlayers)
                         {
 
-
                             foreach (var knight in player.GameData.Knights)
                             {
                                 knight.Activated = false;
                             }
 
                         }
-
 
                     }
                 }
@@ -1284,7 +1266,6 @@ namespace Catan10
                 building.City.HasWall = true;
                 player.GameData.Resources.ConsumeEntitlement(Entitlement.Wall);
             }
-
 
             await Task.Delay(0);
         }
@@ -1370,10 +1351,7 @@ namespace Catan10
 
                 }
 
-
-
             }
-
 
             CalculateAndSetLongestRoad();
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
@@ -1429,7 +1407,6 @@ namespace Catan10
 
             CalculateAndSetLongestRoad(raceTracking);
         }
-
 
         private void DumpAllRolls()
         {

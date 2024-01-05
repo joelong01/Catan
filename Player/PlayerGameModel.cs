@@ -56,16 +56,12 @@ namespace Catan10
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         private Trades _trades = new Trades();
 
-
-
         private int _TradeRank = 0;
         private int _PoliticsRank = 0;
         private int _ScienceRanks = 0;
         private int _VictoryPoints = 0;
         bool _playedMerchantLast = false;
       
-
-
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -313,8 +309,6 @@ namespace Catan10
                 }
             }
         }
-
-
 
         public int NoResourceCount
         {
@@ -667,7 +661,6 @@ namespace Catan10
 
      
 
-
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
         {
             int pips = 0;
@@ -772,7 +765,6 @@ namespace Catan10
             TradeRank = 0;
             VictoryPoints = 0;
             PlayedMerchantLast = false;
-
 
             for (int i = 0; i < _RoadTie.Count(); i++)
             {
@@ -892,14 +884,11 @@ namespace Catan10
     public class Trades : INotifyPropertyChanged
     {
 
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         private ObservableCollection<TradeOffer> _potentialTrades = new ObservableCollection<TradeOffer>();
 
         private TradeOffer _tradeRequest = new TradeOffer();
-
-
 
         public ObservableCollection<TradeOffer> PotentialTrades
         {
@@ -952,12 +941,10 @@ namespace Catan10
             return null;
         }
 
-
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
 
     }
 }

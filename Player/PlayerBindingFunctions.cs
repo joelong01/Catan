@@ -17,7 +17,6 @@ namespace Catan10
             try
             {
 
-
                 if (owner != null)
                 {
                     return owner.BackgroundBrush;

@@ -12,7 +12,6 @@ namespace Catan10
         public int Index { get; set; }
         public KnightRank KnightRank { get; set; }
 
-
         public static async Task PostLog(IGameController gameController, KnightCtrl knight)
         {
             MoveKnightLog logHeader = new MoveKnightLog()

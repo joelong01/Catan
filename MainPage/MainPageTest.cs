@@ -54,7 +54,6 @@ namespace Catan10
                 CurrentPlayer.GameData.Resources.GrantResources(tr);
             }
 
-
             loss = ( int )CurrentPlayer.GameData.Resources.CurrentResources.Count / 2;
             if (loss >= 4)
             {
@@ -85,8 +84,6 @@ namespace Catan10
 
             await CreateAndConfigureProxy();
 
-
-
         }
         private async void OnGrantEntitlements(object sender, RoutedEventArgs e)
         {
@@ -107,7 +104,6 @@ namespace Catan10
                 Paper = 6,
                 Cloth = 7,
                 Coin = 8,
-
 
                 VictoryPoint= 7,
                 Trade=6,
@@ -249,7 +245,6 @@ namespace Catan10
             await this.Reset();
             _gameView.Reset();
 
-
             _gameView.CurrentGame = _gameView.Games[1];
             MainPageModel.PlayingPlayers.Clear();
             GameInfo info = new GameInfo()
@@ -288,7 +283,6 @@ namespace Catan10
             RandomGoldTileCount = 1;
             await this.Reset();
             _gameView.Reset();
-
 
             _gameView.CurrentGame = _gameView.Games[1];
             MainPageModel.PlayingPlayers.Clear();
@@ -438,16 +432,12 @@ namespace Catan10
                 Wood = 3
             };
 
-
             MainPageModel.PlayingPlayers.ForEach((p) => p.Reset());
             MainPageModel.PlayingPlayers.Clear();
 
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[0]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[1]);
             MainPageModel.PlayingPlayers.Add(MainPageModel.AllPlayers[2]);
-
-
-
 
             var player1 = MainPageModel.AllPlayers[1];
             var player2 = MainPageModel.AllPlayers[0];
@@ -499,7 +489,6 @@ namespace Catan10
 
             //});
 
-
         }
 
         private void TestTrades2()
@@ -511,7 +500,6 @@ namespace Catan10
                 Id = Guid.NewGuid(),
                 Started = false
             };
-
 
             MainPageModel.PlayingPlayers.Clear();
 
@@ -689,6 +677,5 @@ namespace Catan10
 
         #endregion Methods
     }
-
 
 }

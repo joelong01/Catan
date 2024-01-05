@@ -17,7 +17,6 @@ namespace Catan10
         public static async Task ProtectCity(IGameController gameController, BuildingCtrl building)
         {
 
-
             Contract.Assert(gameController.CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.Wall));
 
             ProtectCityLog logHeader = new ProtectCityLog()

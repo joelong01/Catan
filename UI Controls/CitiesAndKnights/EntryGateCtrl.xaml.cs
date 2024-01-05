@@ -26,7 +26,6 @@ namespace Catan10
             this.DataContext = this;
         }
 
-
         public static readonly DependencyProperty StrokeColorProperty = DependencyProperty.Register("StrokeColor", typeof(SolidColorBrush), typeof(EntryGateCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty FillColorProperty = DependencyProperty.Register("FillColor", typeof(SolidColorBrush), typeof(DiceCtrl), new PropertyMetadata(null));
          public static readonly DependencyProperty StrokeThicknessProperty = DependencyProperty.Register("StrokeThickness", typeof(double), typeof(EntryGateCtrl), new PropertyMetadata(3.0));
@@ -46,7 +45,6 @@ namespace Catan10
             set => SetValue(StrokeColorProperty, value);
         }
  
-
 
     }
 }

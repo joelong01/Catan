@@ -17,10 +17,7 @@ namespace Catan10
     public class WaitingForRollToWaitingForNext : LogHeader, ILogController
     {
 
-
         public RollState RollState { get; set; } = null;
-
-
 
         public WaitingForRollToWaitingForNext() : base()
         {
@@ -51,7 +48,6 @@ namespace Catan10
                 UndoNext = undoNext
             };
 
-
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
@@ -69,18 +65,12 @@ namespace Catan10
             // if the state is wrong, there is a big bug someplace
             Contract.Assert(this.NewState == GameState.WaitingForNext); // log gets pushed *after* this call
 
-
             IRollLog rollLog = gameController.RollLog;
-
-
 
             //
             //  this pushes the rolls onto the roll stack and updates all the data for the roll
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
-
-
-
 
             //
             //  7/14/2021:  only count # cards in a hand on service games.  by not filling in the card count, the list will be length 0 for the check below
@@ -100,7 +90,6 @@ namespace Catan10
             //
             await gameController.Log.RollLog.UpdateUiForRoll(this.RollState);
 
-
             //
             //  TODO: This also needs to do somethign different if it is the last message -- e.g. call Do();
         }
@@ -110,7 +99,6 @@ namespace Catan10
             await gameController.Log.RollLog.RedoRoll();
             //
             //   if this is a pirate game, handle the pirate roll
-
 
         }
 

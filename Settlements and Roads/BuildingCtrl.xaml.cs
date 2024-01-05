@@ -393,7 +393,6 @@ namespace Catan10
             }
         }
 
-
         public override string ToString()
         {
             return String.Format($"Index={Index};State={BuildingState};Owner={Owner};Pips={Pips};PipGroup={PipGroup}");
@@ -521,7 +520,6 @@ namespace Catan10
                     await Callback.UpgradeKnight(this);
                 }
             }
-
 
         }
     }

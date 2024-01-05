@@ -35,7 +35,6 @@ namespace Catan10
                 Contract.Assert(PlayersInOrder[i].PlayerIdentifier == gameController.PlayingPlayers[i].PlayerIdentifier);
             }
 
-
             await Task.Delay(0);
         }
         /// <summary>

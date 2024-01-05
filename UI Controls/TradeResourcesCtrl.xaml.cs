@@ -55,7 +55,6 @@ namespace Catan10
             set => SetValue(OrientationProperty, value);
         }
 
-
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties

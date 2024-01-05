@@ -18,7 +18,6 @@ namespace Catan10
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-
         public async Task Do(IGameController gameController)
         {
             ChangePlayerHelper.ChangePlayer(gameController, 2);

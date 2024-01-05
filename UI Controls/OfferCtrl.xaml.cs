@@ -51,7 +51,6 @@ namespace Catan10
             set => SetValue(PlayingPlayersProperty, value);
         }
 
-
         public PlayerModel CurrentPlayer
         {
             get => (PlayerModel)GetValue(CurrentPlayerProperty);
@@ -130,10 +129,7 @@ namespace Catan10
 
         #endregion Properties
 
-
-
         #region Methods
-
 
         
         /// <summary>
@@ -266,10 +262,8 @@ namespace Catan10
                 }
             }
 
-
             return ret;
         }
-
 
         //
         //  this is Binding converter function for the OfferCtrl.xaml UI for showing whow we are going to trade with

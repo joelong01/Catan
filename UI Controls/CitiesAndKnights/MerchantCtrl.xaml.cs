@@ -68,11 +68,9 @@ namespace Catan10
         {
             if (!EnableMove) return; // this is off, for example, in the Purchase control
 
-
             var xform = ((Border)sender).RenderTransform as CompositeTransform;
 
             StartPoint = new Point(xform.TranslateX, xform.TranslateY);  // need this to deal with PointUp
-
 
             // when dragging we stop highlighting any tile and when we are done, we put it back the way it was
             var highlightedTiles = new List<TileCtrl>();
@@ -123,7 +121,6 @@ namespace Catan10
                 StartingTile = CurrentTile;
             }
 
-
         }
 
         /// <summary>
@@ -138,7 +135,6 @@ namespace Catan10
             //    this.TraceMessage($"Point {mousePosition}");
 
             Point mousePositionRelativeToMainPage = e.GetCurrentPoint(MainPage.Current).Position;
-
 
             var elementsUnderMouse = VisualTreeHelper.FindElementsInHostCoordinates(mousePositionRelativeToMainPage, MainPage.Current);
 
