@@ -12,14 +12,16 @@ namespace Catan10
     {
         public Entitlement PurchasedEntitlement { get; set; }
 
-        public static async Task PostLog(IGameController gameController, PlayerModel player, Entitlement entitlement)
+        public static async Task PostLog(IGameController gameController, PlayerModel player, Entitlement entitlement, GameState newState)
         {
             PurchaseLog logHeader = new PurchaseLog()
             {
                 CanUndo = entitlement != Entitlement.DevCard,
                 SentBy = player,
                 Action = CatanAction.Purchased,
-                PurchasedEntitlement = entitlement
+                PurchasedEntitlement = entitlement,
+                NewState = newState
+                
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

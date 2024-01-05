@@ -402,7 +402,7 @@ namespace Catan10
                     break;
                 case Entitlement.Undefined:
                 default:
-                    Contract.Assert(false, "Bad Entitlement");
+                    cost = new TradeResources() { };
                     break;
             }
 

@@ -200,7 +200,7 @@ namespace Catan10
 
             try
             {
-                _raceTracking.BeginChanges();
+                RaceTracking.BeginChanges();
                 //
                 //  first loop over the players and find the set of players that have the longest road
                 //
@@ -219,7 +219,7 @@ namespace Catan10
                     //  entries that said they had built roads of length 5+
                     for (int i = p.GameData.LongestRoad + 1; i < _gameView.CurrentGame.GameData.MaxRoads; i++)
                     {
-                        _raceTracking.RemovePlayer(p, i);
+                        RaceTracking.RemovePlayer(p, i);
                     }
 
                     if (p.GameData.LongestRoad >= 5)
@@ -227,7 +227,7 @@ namespace Catan10
                         //
                         //  Now we add everybody who has more than 5 rows to the "race" tracking --
                         //  this has a Dictionary<int, List> where the list is ordered by road count
-                        _raceTracking.AddPlayer(p, p.GameData.LongestRoad); // throws away duplicates
+                        RaceTracking.AddPlayer(p, p.GameData.LongestRoad); // throws away duplicates
                     }
                     if (p.GameData.LongestRoad > maxRoads)
                     {
@@ -279,14 +279,14 @@ namespace Catan10
                 }
                 //
                 //  now turn it on for the winner!
-                _raceTracking.GetRaceWinner(maxRoads).GameData.HasLongestRoad = true;
+                RaceTracking.GetRaceWinner(maxRoads).GameData.HasLongestRoad = true;
             }
             finally
             {
                 //
                 //  this pattern makes it so we can change race tracking multiple times but only end up with
                 //  one log write
-                _raceTracking.EndChanges(CurrentPlayer, this.CurrentGameState);
+                RaceTracking.EndChanges(CurrentPlayer, this.CurrentGameState);
             }
         }
 
@@ -526,6 +526,12 @@ namespace Catan10
 
         public async void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e)
         {
+            if (CurrentGameState == GameState.DestroyRoad)
+            {
+                await DiplomatLog.PostLogEntry(this, road);
+                return;
+            }
+
             if (!CanBuildRoad())
             {
                 return;
@@ -543,7 +549,7 @@ namespace Catan10
                     return;
                 }
             }
-            await UpdateRoadLog.SetRoadState(this, road, NextRoadState(road), _raceTracking);
+            await UpdateRoadLog.PostLogEntry(this, road, NextRoadState(road), RaceTracking);
             //
             //  UpdateRoad state will be done in the IGameController
         }

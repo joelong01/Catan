@@ -231,6 +231,7 @@ namespace Catan10
         Task SetRandomTileToGold(List<int> goldTiles);
 
         Task SetRoadState(UpdateRoadLog updateRoadModel);
+        void UpdateRoadState(PlayerModel player, RoadCtrl road, RoadState oldState, RoadState newState, RoadRaceTracking raceTracking);
 
         void SetSpyInfo(string sentBy, bool spyOn);
 
@@ -274,6 +275,8 @@ namespace Catan10
         void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron);
         void MoveMerchant(Point to);
         PlayerModel PlayerFromId(Guid id);
+        RoadCtrl GetRoad(int destroyedRoadIndex);
+        RoadRaceTracking RaceTracking { get; }
     }
 
     public interface IGameViewCallback

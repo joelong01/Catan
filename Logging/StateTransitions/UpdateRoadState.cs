@@ -25,7 +25,7 @@ namespace Catan10
         {
         }
 
-        public static async Task SetRoadState(IGameController gameController, RoadCtrl road, RoadState newRoadState, RoadRaceTracking raceTracker)
+        public static async Task PostLogEntry(IGameController gameController, RoadCtrl road, RoadState newRoadState, RoadRaceTracking raceTracker)
         {
             RoadState oldState = road.RoadState;
 

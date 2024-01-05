@@ -45,7 +45,7 @@ namespace Catan10
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(PlayerModel.DefaultPlayer));
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
-        private readonly RoadRaceTracking _raceTracking = null;
+        public   RoadRaceTracking RaceTracking { get; private set; } 
         private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
         private bool _doDragDrop = false;
         private DateTime _dt = DateTime.Now;
@@ -110,7 +110,7 @@ namespace Catan10
             Current = this;
             GameController = this;
             this.DataContext = this;
-            _raceTracking = new RoadRaceTracking(this);
+            RaceTracking = new RoadRaceTracking(this);
         }
 
         #endregion Constructors + Destructors
@@ -287,7 +287,7 @@ namespace Catan10
             }
             while (road.Owner != null);
 
-            await UpdateRoadLog.SetRoadState(this, road, RoadState.Road, _raceTracking);
+            await UpdateRoadLog.PostLogEntry(this, road, RoadState.Road, RaceTracking);
         }
 
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -887,7 +887,7 @@ namespace Catan10
             }
 
             _gameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
-            _raceTracking.Reset();
+            RaceTracking.Reset();
 
             CTRL_Invasion.Reset();
 
@@ -1285,7 +1285,7 @@ namespace Catan10
                 case Entitlement.Road:
                 case Entitlement.Ship:
                 case Entitlement.BuyOrUpgradeKnight:
-                    await PurchaseEntitlement(CurrentPlayer, entitlement);
+                    await PurchaseEntitlement(CurrentPlayer, entitlement, CurrentGameState);
                     break;
                 case Entitlement.ActivateKnight:
                     await TryBuyKnightEntitlement();
@@ -1295,7 +1295,7 @@ namespace Catan10
                     {
                         if (knight.Activated)
                         {
-                            await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight);
+                            await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight, CurrentGameState);
                             return;
                         }
                     }
@@ -1329,6 +1329,9 @@ namespace Catan10
                 case Entitlement.Merchant:
                     await PurchaseMerchantEntitlement.PostLogMessage(this);
                     return;
+                case Entitlement.Diplomat:
+                    await PurchaseEntitlement(CurrentPlayer, Entitlement.Diplomat, GameState.DestroyRoad);
+                    break;
                 default:
                     break;
             }
@@ -1369,13 +1372,13 @@ namespace Catan10
             }
             if (found)
             {
-                await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight);
+                await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
             }
         }
         private async void OnMoveKnight(object sender, RoutedEventArgs e)
         {
             if (CurrentPlayer.GameData.Knights.Count == 0) return;
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight, CurrentGameState);
         }
         private async Task TryBuyWall()
         {
@@ -1389,13 +1392,13 @@ namespace Catan10
                 }
             }
             if (!foundUnprotectedCity) return;
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.Wall);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Wall, CurrentGameState);
         }
         private async void OnLocalBuyRoad(object sender, RoutedEventArgs e)
         {
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.Road);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Road, CurrentGameState);
         }
-        private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement)
+        private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement, GameState newState)
         {
             if (MainPageModel.GameState != GameState.WaitingForNext && MainPageModel.GameState != GameState.Supplemental) return;
             if (player.GameData.EntitlementsLeft(entitlement) == 0)
@@ -1403,7 +1406,7 @@ namespace Catan10
                 await ShowErrorMessage($"You have purchased all available {entitlement}.", "Catan", "");
                 return;
             }
-            await PurchaseLog.PostLog(this, player, entitlement);
+            await PurchaseLog.PostLog(this, player, entitlement, newState);
         }
         public Visibility ShowLocalPurchase(GameState state)
         {

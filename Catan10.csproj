@@ -149,6 +149,7 @@
     <Compile Include="GameView\TileGroup.cs" />
     <Compile Include="Logging\Actions\CreateGameModel.cs" />
     <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
+    <Compile Include="Logging\Actions\DiplomatLog.cs" />
     <Compile Include="Logging\Actions\ImprovementLog.cs" />
     <Compile Include="Logging\Actions\MoveMerchantLog.cs" />
     <Compile Include="Logging\Actions\PurchaseMerchantEntitlement.cs" />

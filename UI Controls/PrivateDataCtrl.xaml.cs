@@ -319,7 +319,7 @@ namespace Catan10
             }
             else
             {
-                await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.City);
+                await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.City, MainPage.Current.CurrentGameState);
             }
         }
 
@@ -328,7 +328,7 @@ namespace Catan10
             GameState state = MainPage.Current.MainPageModel.GameState;
             if (state != GameState.WaitingForNext && state != GameState.Supplemental) return;
             if (!Player.GameData.Resources.CanAfford(MainPage.Current.CurrentPlayer, Entitlement.DevCard)) return;
-            await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.DevCard);
+            await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.DevCard, MainPage.Current.CurrentGameState);
         }
 
         private async void OnBuyRoad(object sender, RoutedEventArgs e)
@@ -342,7 +342,7 @@ namespace Catan10
             }
             else
             {
-                await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Road);
+                await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Road, MainPage.Current.CurrentGameState);
             }
         }
 
@@ -358,7 +358,7 @@ namespace Catan10
                 }
                 else
                 {
-                    await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement);
+                    await PurchaseLog.PostLog(MainPage.Current, Player, Entitlement.Settlement, MainPage.Current.CurrentGameState);
                 }
             }
         }
