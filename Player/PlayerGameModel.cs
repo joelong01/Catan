@@ -427,6 +427,8 @@ namespace Catan10
                     return 1;
                 case Entitlement.Diplomat:
                     return 1;
+                case Entitlement.Inventor:
+                    return 1;
                 default:
                     Debug.Assert(false, "Fill out the switch statement!");
                     break;

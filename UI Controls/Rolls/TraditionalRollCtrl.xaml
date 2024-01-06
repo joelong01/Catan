@@ -185,30 +185,40 @@
             </Grid.ColumnDefinitions>
 
             <local:SingleRollCtrl Grid.Row="0" Grid.Column="0" Number="2"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
             <local:SingleRollCtrl Grid.Row="0" Grid.Column="1" Number="3"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
 
             <local:SingleRollCtrl Grid.Row="0" Grid.Column="2" Number="4"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
 
             <local:SingleRollCtrl Grid.Row="0" Grid.Column="3" Number="5"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
 
             <local:SingleRollCtrl Grid.Row="1" Grid.Column="0" Number="6"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
 
             <local:SingleRollCtrl Grid.Row="1" Grid.Column="1" Number="7"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
             <local:SingleRollCtrl Grid.Row="1" Grid.Column="2" Number="8"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
             <local:SingleRollCtrl Grid.Row="1" Grid.Column="3" Number="9"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
             <local:SingleRollCtrl Grid.Row="2" Grid.Column="0" Number="10"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
             <local:SingleRollCtrl Grid.Row="2" Grid.Column="1" Number="11"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
             <local:SingleRollCtrl Grid.Row="2" Grid.Column="2" Number="12"
+                    IsEnabled="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
                     MainPageModel="{x:Bind Path=MainPageModel, Mode=OneWay}" RollSelected="RollSelected" />
             <Border Grid.Row="3" Grid.Column="3" BorderBrush="White" BorderThickness="1">
                 <Viewbox Stretch="Uniform">
@@ -219,7 +229,7 @@
                             <TextBlock Text="{x:Bind MainPageModel.Log.RollLog.TotalRolls, Mode=OneWay}"
                                     HorizontalAlignment="Left" Style="{StaticResource RollGridTextStyle}" />
                         </StackPanel>
-                        <Viewbox Stretch="Uniform" VerticalAlignment="Center" >
+                        <Viewbox Stretch="Uniform" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10"
                                     Visibility="{x:Bind ShowLastRoll(MainPageModel.GameState), Mode=OneWay}">
                                 <TextBlock Text="Last:" Style="{StaticResource RollGridTextStyle}"

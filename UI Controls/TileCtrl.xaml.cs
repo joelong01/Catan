@@ -230,6 +230,13 @@ namespace Catan10
                 }
             }
         }
+        public CatanNumber CatanNumber
+        {
+            get
+            {
+                return _number;
+            }
+        }
 
         public NumberStyle NumberStyle
         {

@@ -476,6 +476,8 @@ namespace Catan10
                 return -intVal;
             }
 
+            if (value is bool v) return !v;
+
             return value;
         }
 
@@ -491,6 +493,8 @@ namespace Catan10
             {
                 return -intVal;
             }
+
+            if (value is bool v) return !v;
 
             return value;
         }

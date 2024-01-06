@@ -216,7 +216,9 @@ namespace Catan10
         [Description("Move Merchant")]
         MustMoveMerchant,
         [Description("Destroy Road")]
-        DestroyRoad
+        DestroyRoad,
+        [Description("Swap Numbers")]
+        SwapNumbers
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

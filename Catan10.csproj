@@ -151,6 +151,7 @@
     <Compile Include="Logging\Actions\DeleteTradeOffer.cs" />
     <Compile Include="Logging\Actions\DiplomatLog.cs" />
     <Compile Include="Logging\Actions\ImprovementLog.cs" />
+    <Compile Include="Logging\Actions\InventorLog.cs" />
     <Compile Include="Logging\Actions\MoveMerchantLog.cs" />
     <Compile Include="Logging\Actions\PurchaseMerchantEntitlement.cs" />
     <Compile Include="Logging\StateTransitions\6b_DestroyNextCity.cs" />

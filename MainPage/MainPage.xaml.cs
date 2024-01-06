@@ -1332,6 +1332,9 @@ namespace Catan10
                 case Entitlement.Diplomat:
                     await PurchaseEntitlement(CurrentPlayer, Entitlement.Diplomat, GameState.DestroyRoad);
                     break;
+                case Entitlement.Inventor:
+                    await PurchaseEntitlement(CurrentPlayer, Entitlement.Inventor, GameState.SwapNumbers);
+                    break;
                 default:
                     break;
             }
