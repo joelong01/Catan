@@ -101,9 +101,9 @@ namespace Catan10
 
             //
             //  if you have a City and the Wall entitlment, you can click on a city to protect it.
-            if (this.BuildingState == BuildingState.City && 
-                Callback.HasEntitlement(Entitlement.Wall)  && 
-                ((IGameController)Callback).CurrentPlayer == Owner)
+            if (this.BuildingState == BuildingState.City &&
+                Callback.HasEntitlement(Entitlement.Wall) &&
+                ( ( IGameController )Callback ).CurrentPlayer == Owner)
             {
                 await ProtectCityLog.ProtectCity(Callback as IGameController, this);
                 return;
@@ -129,12 +129,12 @@ namespace Catan10
                     return;
                 }
                 this.BuildingState = BuildingState.None;
-                await UpdateBuildingLog.UpdateBuildingState(Callback as IGameController, this, BuildingState.Knight);
+                await UpdateBuildingLog.UpdateBuildingState(Callback as IGameController, this, BuildingState.Knight, GameState.WaitingForNext);
                 return;
 
             }
 
-            
+
 
             BuildingState oldState = this.BuildingState;
             BuildingState newState = BuildingState.None;
@@ -163,7 +163,7 @@ namespace Catan10
             }
 
             var gameController = Callback as IGameController;
-            await UpdateBuildingLog.UpdateBuildingState(gameController, this, newState);
+            await UpdateBuildingLog.UpdateBuildingState(gameController, this, newState, Callback.CurrentGameState);
         }
 
         private void OutputKeyInfo()
@@ -259,14 +259,14 @@ namespace Catan10
                 {
                     case BuildingState.None:
                         return 0;
-
                     case BuildingState.Settlement:
                         return 1;
-
                     case BuildingState.City:
                         return 2;
-
+                    case BuildingState.Knight:
+                        return 0;
                     default:
+                        this.TraceMessage($"You need to set a ScoreValue for BuildingState={BuildingState}.");
                         return 999;
                 }
             }
@@ -467,7 +467,7 @@ namespace Catan10
                 AdjacentHarbor.Owner = Owner;
             }
 
-             await Task.Delay(0);
+            await Task.Delay(0);
         }
 
         private bool GeneratesResources()
@@ -509,18 +509,25 @@ namespace Catan10
 
         private async void OnKnightLeftClick(object sender, PointerRoutedEventArgs e)
         {
-            if (this.BuildingState == BuildingState.Knight && this.Owner != null)
-            {
-                if (this.Knight.Activated == false && Callback.HasEntitlement(Entitlement.ActivateKnight))
-                {
-                    await Callback.ActivateKnight(this, true);
-                }
-                else if (Callback.HasEntitlement(Entitlement.BuyOrUpgradeKnight) && this.Knight.KnightRank < KnightRank.Mighty)
-                {
-                    await Callback.UpgradeKnight(this);
-                }
-            }
+            if (this.BuildingState != BuildingState.Knight) return;
 
+            //
+            //  the BuildingState.Knight is overloaded - it shows the Knight that can be built
+            //  and it is the state when it is actually built.  So in PointerEnter, if it is 
+            //  a valid place for a knight, we set the state to Knight so the user knows there
+            //  is something to click on.  When you leave it goes away -- but when you click on
+            //  it, we need to reset the state so that the state machine is correct.
+
+
+            await Callback.KnightLeftPointerPressed(this);
+            e.Handled = true;
+
+
+
+            if (this.Owner == null)
+            {
+                this.BuildingState = BuildingState.None;
+            }
         }
     }
 

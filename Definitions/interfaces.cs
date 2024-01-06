@@ -131,7 +131,7 @@ namespace Catan10
 
     public interface IGameCallback
     {
-
+        GameState CurrentGameState { get; }
         Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
 
         bool BuildingStateChangeOk(BuildingCtrl building);
@@ -145,14 +145,15 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
-        Task UpgradeKnight(BuildingCtrl building);
+     
         Task ActivateKnight(BuildingCtrl building, bool activate);
         Task MoveKnight(KnightCtrl Knight);
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
 
         bool HasEntitlement(Entitlement entitlement);
         Task DestroyCity(BuildingCtrl buildingCtrl);
-
+        Task KnightLeftPointerPressed(BuildingCtrl buildingCtrl);
+        Task UpgradeKnight(BuildingCtrl buildingCtrl);
     }
 
     public interface IGameController

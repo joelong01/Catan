@@ -271,11 +271,11 @@ namespace Catan10
             {
                 this.TraceMessage("got null building)");
             }
-            await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
+            await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement, CurrentGameState);
             if (CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.City))
             {
                 // you get a city the second time around with pirates
-                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.City);
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.City, CurrentGameState);
             }
 
             // pick a Random Road
@@ -502,7 +502,7 @@ namespace Catan10
                 if (MainPageModel.TheHuman == "")
                 {
                     await PickDefaultUser();
-                    CurrentPlayer = TheHuman; // this means each client will start with CurrentPlayer being themselves so that all UI binding to current player will give decent colors
+                //    CurrentPlayer = TheHuman; // this means each client will start with CurrentPlayer being themselves so that all UI binding to current player will give decent colors
                 }
             }
             catch (FileLoadException fle)
@@ -1334,6 +1334,11 @@ namespace Catan10
                     break;
                 case Entitlement.Inventor:
                     await PurchaseEntitlement(CurrentPlayer, Entitlement.Inventor, GameState.SwapNumbers);
+                    break;
+                case Entitlement.Deserter:
+                    //
+                    //  the state transitions are PickDeserter -> PlaceDeserter -> DoneWithDeserter -> WaitingForNext
+                    await PurchaseEntitlement(CurrentPlayer, Entitlement.Deserter, GameState.PickDeserter);
                     break;
                 default:
                     break;

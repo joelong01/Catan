@@ -13,7 +13,7 @@ namespace Catan10
         {
         }
 
-        public static async Task SetState(IGameController gameController, GameState newState)
+        public static async Task SetState(IGameController gameController, GameState newState, bool undoNext=false)
         {
             GameState oldState = gameController.CurrentGameState;
             bool canUndo = true;
@@ -27,7 +27,8 @@ namespace Catan10
                 Action = CatanAction.ChangedState,
                 OldState = oldState,
                 NewState = newState,
-                RandomGoldTiles = gameController.CurrentRandomGoldTiles
+                RandomGoldTiles = gameController.CurrentRandomGoldTiles,
+                UndoNext = undoNext
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

@@ -61,7 +61,7 @@ namespace Catan10
             }
             else
             {
-                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement);
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement, CurrentGameState);
             }
 
             await DestroyCity_Next.PostLog(this);
@@ -407,7 +407,7 @@ namespace Catan10
 
         public async Task OnNewGame()
         {
-           // you are looking for OnNewLocalGame!
+            // you are looking for OnNewLocalGame!
             await Task.Delay(0);
             //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
             //{
@@ -903,9 +903,11 @@ namespace Catan10
             //              1. you are running CitiesAndKnights
             //              2. you have the entitlement
             //              3. you are next to a road
+            //              4. (1/5/2024):  You don't have the BuyOrUpgradeKnight entitlement, but you are in the PlaceDeserterKnight GameState
             //
             //     this logic means you *must* spend your knights before you build any other kind of settlements.
-            if (MainPageModel.GameInfo.CitiesAndKnights && CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight) && OwnedAdjacentRoad(CurrentPlayer, building))
+            if (MainPageModel.GameInfo.CitiesAndKnights && ( CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight) || CurrentGameState == GameState.PlaceDeserterKnight )
+                && OwnedAdjacentRoad(CurrentPlayer, building))
             {
                 return BuildingState.Knight;
             }
@@ -1460,6 +1462,42 @@ namespace Catan10
             }
 
             CurrentPlayer.GameData.IsCurrentPlayer = true; // this should start the timer for this view
+        }
+
+        public async Task KnightLeftPointerPressed(BuildingCtrl building)
+        {
+
+
+            var knight = building.Knight;
+            Debug.Assert(knight != null);
+
+
+            if (CurrentGameState == GameState.PickDeserter)
+            {
+                if (knight.Owner == CurrentPlayer) return; // don't destroy your own knight
+
+                await DeserterLog.PickDeserterLog(this, building);
+            }
+            else if (CurrentGameState == GameState.PlaceDeserterKnight)
+            {
+                await DeserterLog.PlaceDeserterLog(this, building);
+            }
+
+
+            if (building.Owner == null && HasEntitlement(Entitlement.BuyOrUpgradeKnight))
+            {
+
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Knight, GameState.WaitingForNext);
+
+            }
+            else if (knight.Activated == false && HasEntitlement(Entitlement.ActivateKnight))
+            {
+                await ActivateKnight(building, true);
+            }
+            else if (HasEntitlement(Entitlement.BuyOrUpgradeKnight) && knight.KnightRank < KnightRank.Mighty)
+            {
+                await UpgradeKnight(building);
+            }
         }
 
         #endregion Methods

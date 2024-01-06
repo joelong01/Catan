@@ -45,7 +45,7 @@ namespace Catan10
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty KnightRankProperty = DependencyProperty.Register("KnightRank", typeof(KnightRank), typeof(KnightCtrl), new PropertyMetadata(KnightRank.Basic));
         public static readonly DependencyProperty ActivatedProperty = DependencyProperty.Register("Activated", typeof(bool), typeof(KnightCtrl), new PropertyMetadata(false));
-        public static readonly DependencyProperty BuildingIndexProperty = DependencyProperty.Register("BuildingIndex", typeof(int), typeof(KnightCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty BuildingIndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(KnightCtrl), new PropertyMetadata(false));
         public int BuildingIndex
         {
             get => ( int )GetValue(BuildingIndexProperty);
@@ -73,7 +73,10 @@ namespace Catan10
 
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner, bool activated)
         {
-
+            if (DesignMode.DesignModeEnabled)
+            {
+                return ConverterGlobals.CreateLinearGradiantBrush(Colors.Green, Colors.Black);
+            }
             return PlayerBindingFunctions.GetBackgroundBrush(current, owner);
 
         }
@@ -82,7 +85,7 @@ namespace Catan10
         {
             if (DesignMode.DesignModeEnabled)
             {
-                return new SolidColorBrush(Colors.White);
+                return new SolidColorBrush(Colors.Green);
             }
             return PlayerBindingFunctions.GetForegroundBrush(current, owner);
         }

@@ -536,25 +536,9 @@ namespace Catan10
             _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             _progress.IsActive = false;
 
-            CurrentPlayer = TheHuman;
-            //
-            //  start the connection to the SignalR servi0ce
-            //
-            if (serviceReference == null)
-            {
-                try
-                {
-                    await CreateAndConfigureProxy();
-                }
-                catch (Exception e)
-                {
-                    await MainPage.Current.ShowErrorMessage($"Error Connecting to the Catan Servvice", "Catan", e.ToString());
-                }
-            }
-            else
-            {
-                MainPageModel.CatanService = serviceReference;
-            }
+            //    CurrentPlayer = TheHuman;
+            this.TraceMessage("If you want to set the CurrentPlayer to startup, do it here");
+            
         }
 
         /// <summary>
@@ -1006,6 +990,13 @@ namespace Catan10
             {
                 player.GameData.Resources.UnspentEntitlements.Add(Entitlement.BuyOrUpgradeKnight);
             }
+            else if (updateBuildingLog.OldBuildingState == BuildingState.Knight && updateBuildingLog.NewBuildingState == BuildingState.None) // destroyed a knight
+            {
+                //
+                //  put the building back the way it was - this removes it from the collection of buildings owned by the current player
+                await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
+
+            }
             else
             {
                 Contract.Assert(false, "should be city, settlement, or knight");
@@ -1311,9 +1302,17 @@ namespace Catan10
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
             if (updateBuildingLog.NewBuildingState == BuildingState.Knight) entitlement = Entitlement.BuyOrUpgradeKnight;
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement && updateBuildingLog.OldBuildingState == BuildingState.City) entitlement = Entitlement.DestroyCity;
+            if (updateBuildingLog.NewBuildingState == BuildingState.None && updateBuildingLog.OldBuildingState == BuildingState.Knight) entitlement = Entitlement.Deserter;
 
-            Contract.Assert(entitlement != Entitlement.Undefined);
-            player.GameData.Resources.ConsumeEntitlement(entitlement);
+            if (CurrentGameState != GameState.DoneWithDeserter && CurrentGameState != GameState.PlaceDeserterKnight)
+            {
+                Contract.Assert(entitlement != Entitlement.Undefined);
+                player.GameData.Resources.ConsumeEntitlement(entitlement);
+            }
+            else
+            {
+                this.TraceMessage($"Skipping ConsumeEntitlement for GameState.{CurrentGameState} and Entitlement.{entitlement}");
+            }
 
             await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
             if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"

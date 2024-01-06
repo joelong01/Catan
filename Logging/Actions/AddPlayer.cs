@@ -35,7 +35,7 @@ namespace Catan10
         public static async Task AddPlayer(IGameController gameController, string playerToAdd)
         {
             //  5/20/2020:  The state *after* the CreateGame logEntry is pused is WaitingForPlayers.  But
-            //              NewGameLog.Do() calls AddPlayerLog.PostLog *before* it gets pushed to the stack.
+            //              NewGameLog.Do() calls AddPlayerLog.PickDeserterLog *before* it gets pushed to the stack.
             //              so we have to hard code the new state because by the time we get to the log, the
             //              state will change
 

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 using Catan.Proxy;
 
@@ -11,12 +12,12 @@ namespace Catan10
         public BuildingState NewBuildingState { get; set; } = BuildingState.None;
 
         public BuildingState OldBuildingState { get; set; } = BuildingState.None;
-
+        public Guid OriginalOwnerId { get; set; } = Guid.Empty;
         public UpdateBuildingLog() : base()
         {
         }
 
-        public static async Task UpdateBuildingState(IGameController gameController, BuildingCtrl building, BuildingState newState)
+        public static async Task UpdateBuildingState(IGameController gameController, BuildingCtrl building, BuildingState newState, GameState newGameState)
         {
             Entitlement entitlement = Entitlement.Undefined;
             if (newState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
@@ -35,7 +36,8 @@ namespace Catan10
                 OldBuildingState = building.BuildingState,
                 NewBuildingState = newState,
                 BuildingIndex = building.Index,
-                Action=CatanAction.UpdateBuildingState
+                Action=CatanAction.UpdateBuildingState,
+                NewState = newGameState
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

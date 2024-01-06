@@ -18,7 +18,7 @@ namespace Catan10
 {
     public class PlayerGameModel : INotifyPropertyChanged
     {
-  
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -61,7 +61,7 @@ namespace Catan10
         private int _ScienceRanks = 0;
         private int _VictoryPoints = 0;
         bool _playedMerchantLast = false;
-      
+
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -84,7 +84,7 @@ namespace Catan10
                 }
             }
         }
-       
+
         public int KnightsPlayed
         {
             get => _KnightsPlayed;
@@ -404,7 +404,7 @@ namespace Catan10
                 case Entitlement.Settlement:
                     return SettlementsLeft - _resources.GetUnspentEntitlements(entitlement);
                 case Entitlement.City:
-                    return CitiesLeft  - _resources.GetUnspentEntitlements(entitlement); ;
+                    return CitiesLeft - _resources.GetUnspentEntitlements(entitlement); ;
                 case Entitlement.Road:
                     return RoadsLeft - _resources.GetUnspentEntitlements(entitlement); ;
                 case Entitlement.Ship:
@@ -420,7 +420,7 @@ namespace Catan10
                 case Entitlement.TradeUpgrade:
                     return 5 - TradeRank;
                 case Entitlement.PoliticsUpgrade:
-                    return 5- PoliticsRank;
+                    return 5 - PoliticsRank;
                 case Entitlement.ScienceUpgrade:
                     return 5 - ScienceRank;
                 case Entitlement.Merchant:
@@ -428,6 +428,8 @@ namespace Catan10
                 case Entitlement.Diplomat:
                     return 1;
                 case Entitlement.Inventor:
+                    return 1;
+                case Entitlement.Deserter:
                     return 1;
                 default:
                     Debug.Assert(false, "Fill out the switch statement!");
@@ -663,7 +665,7 @@ namespace Catan10
             PlayerModel = pData;
         }
 
-     
+
 
         public static int CalculatePips(IEnumerable<BuildingCtrl> Settlements, IEnumerable<BuildingCtrl> Cities)
         {
@@ -811,7 +813,9 @@ namespace Catan10
         private void Knights_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             KnightsPlayed = Knights.Count;
-
+            NotifyPropertyChanged("KnightsLeft");
+            NotifyPropertyChanged("TotalKnightRanks");
+            NotifyPropertyChanged("TotalKnightRanksBinding");
         }
 
         private void LogPropertyChanged(string oldVal, string newVal, bool stopUndo = false, [CallerMemberName] string propertyName = "")

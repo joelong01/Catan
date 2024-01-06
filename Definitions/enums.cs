@@ -139,7 +139,7 @@ namespace Catan10
         DestroyCity,
         [Description("Bishop")]
         Bishop,
-        [Description("Deserter")]
+        [Description("PickDeserter")]
         Deserter,
 
         [Description("Inventor")]
@@ -218,7 +218,12 @@ namespace Catan10
         [Description("Destroy Road")]
         DestroyRoad,
         [Description("Swap Numbers")]
-        SwapNumbers
+        SwapNumbers,
+        [Description("Pick a Deserter")]
+        PickDeserter,
+        [Description("Place Deserter")]
+        PlaceDeserterKnight,
+        DoneWithDeserter
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };
