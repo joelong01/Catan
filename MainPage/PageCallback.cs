@@ -1469,6 +1469,7 @@ namespace Catan10
             Debug.Assert(building.BuildingState == BuildingState.None || building.BuildingState == BuildingState.Knight);
             if (building.Owner == null && HasEntitlement(Entitlement.BuyOrUpgradeKnight))
             {
+                building.ResetTempBuildingState(); // this was set "out of band" in mouse enter, putting it back.
 
                 await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Knight, GameState.WaitingForNext);
                 return;

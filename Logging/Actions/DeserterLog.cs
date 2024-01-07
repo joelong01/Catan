@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace Catan10
                 {
                     OldBuildingState = BuildingState.Knight,
                     NewBuildingState = BuildingState.None,
-                    BuildingIndex = building.Index,
+                    BuildingIndex = building.Index, 
                     OriginalOwnerId = building.Owner.PlayerIdentifier
                 },
             };
@@ -72,24 +73,26 @@ namespace Catan10
         }
         public async Task Do(IGameController gameController)
         {
-            //
-            //  this works for both log entries -- the first DeserterLog will delete the knight
-            //  the second will build a new knight
-            await gameController.UpdateBuilding(this.UpdateBuildingLog, ActionType.Normal);
+            var building = gameController.GetBuilding(UpdateBuildingLog.BuildingIndex);
+
+            if (gameController.CurrentGameState == GameState.PlaceDeserterKnight)
+            {
+                //
+                //  remove the other players knight
+                await building.UpdateBuildingState(gameController.PlayerFromId(this.UpdateBuildingLog.OriginalOwnerId), BuildingState.Knight, BuildingState.None);
+                return;
+            }
 
             if (gameController.CurrentGameState == GameState.DoneWithDeserter)
             {
-                // the knight is already in the right spot - just update its rank and set the activated flag correctly
-                var building = gameController.GetBuilding(UpdateBuildingLog.BuildingIndex);
-                Debug.Assert(building != null);
-                Debug.Assert(building.Owner != null);
-
+                await building.UpdateBuildingState(gameController.CurrentPlayer, BuildingState.None, BuildingState.Knight);
                 building.Knight.KnightRank = this.DestroyedKnightRank;
                 building.Knight.Activated = false;
                 gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.Deserter);
                 // Set the state to WaitingForNext, but when the user clicks undo continue past the set state call
                 // to Undo the PlaceDeserterKnight
                 await SetStateLog.SetState(gameController, GameState.WaitingForNext, true);
+                return;
             }
         }
 
@@ -107,27 +110,44 @@ namespace Catan10
         {
             //
             //  the LogEntry should work correctly for both PickDeserter and PlaceDeserterKnight
-            await gameController.UndoUpdateBuilding(this.UpdateBuildingLog);
 
+            var building = gameController.GetBuilding(UpdateBuildingLog.BuildingIndex);
+      
             if (this.OldState == GameState.PlaceDeserterKnight)
             {
+                Debug.Assert(building != null);
+                Debug.Assert(building.Owner == gameController.CurrentPlayer);
+                Debug.Assert(building.BuildingState == BuildingState.Knight);
+
                 //
+                //  get rid of the knight
+                await building.UpdateBuildingState(gameController.CurrentPlayer, BuildingState.Knight, BuildingState.None);
+
                 //   make sure they have the entitlement they got with the Deserter card
                 gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Deserter);
 
+
+            }
+            else if (this.OldState == GameState.PickDeserter)
+            {
+
+                //
+                //   put the old knight back
+                Debug.Assert(building != null);
+                Debug.Assert(building.Owner == null);
+                Debug.Assert(building.BuildingState == BuildingState.None);
+
+
+                var victim = gameController.PlayerFromId(this.UpdateBuildingLog.OriginalOwnerId);
+                await building.UpdateBuildingState(victim, BuildingState.None, BuildingState.Knight);
+             
+ 
+                building.Knight.KnightRank = this.DestroyedKnightRank;
+                building.Knight.Activated = this.Activated;
             }
             else
             {
-                // put the destroyed knight back into its orginal state -- the UndoUpdateBuilding above will set teh bulding state to Knight, but 
-                // we need to fix Rank and Actived
-                Debug.Assert(this.OldState == GameState.PickDeserter);
-                var building = gameController.GetBuilding(UpdateBuildingLog.BuildingIndex);
-                Debug.Assert(building != null);
-                Debug.Assert(building.Owner != null);
-                Debug.Assert(building.Owner != gameController.CurrentPlayer);
-
-                building.Knight.KnightRank = this.DestroyedKnightRank;
-                building.Knight.Activated = this.Activated;
+                Debug.Assert(false, $"Bad state! {this.OldState}");
             }
 
 

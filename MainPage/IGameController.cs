@@ -955,56 +955,50 @@ namespace Catan10
 
             PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
 
-            if (updateBuildingLog.OldState == GameState.PickDeserter)
-            {
-                Debug.Assert(updateBuildingLog.OriginalOwnerId != Guid.Empty);
-                Debug.Assert(updateBuildingLog.OriginalOwnerId != player.PlayerIdentifier);
-
-                player = PlayerFromId(updateBuildingLog.OriginalOwnerId);
-            }
 
             Contract.Assert(player != null);
             //
             //  5/26/2020: when we undo, we don't want to see the pips (which is the same as "Building")
-            var newState = updateBuildingLog.OldBuildingState;
-            if (updateBuildingLog.OldBuildingState == BuildingState.Pips || updateBuildingLog.OldBuildingState == BuildingState.Build) newState = BuildingState.None;
+            var oldState = updateBuildingLog.OldBuildingState;
+            if (updateBuildingLog.OldBuildingState == BuildingState.Pips || updateBuildingLog.OldBuildingState == BuildingState.Build) oldState = BuildingState.None;
+
+            //
+            //  first set the building state correctly.
+            await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, oldState);
+
+            // now fix any side effects of changing the state
+            switch (updateBuildingLog.NewBuildingState) // this is the transition that originally was changed TO
+            {
+                case BuildingState.Metropolis:
+                case BuildingState.None:
+
+                    break;
+
+                case BuildingState.Settlement:
+                    if (updateBuildingLog.OldBuildingState == BuildingState.City) // Destoying a City
+                    {
+                        player.GameData.Resources.UnspentEntitlements.Add(Entitlement.DestroyCity);
+                    }
+                    else
+                    {
+                        player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Settlement);
+                    }
+                    break;
+                case BuildingState.City:
+                    player.GameData.Resources.UnspentEntitlements.Add(Entitlement.City);
+                    break;
+                case BuildingState.NoEntitlement:
+                    break;
+                case BuildingState.Knight:
+                    player.GameData.Resources.UnspentEntitlements.Add(Entitlement.BuyOrUpgradeKnight);
+                    break;
+
+                default:
+                    Contract.Assert(false, $"should be city, settlement, or knight, got {updateBuildingLog.NewBuildingState}");
+                    break;
+            }
 
 
-            await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, newState);
-
-            if (CurrentGameState == GameState.PlaceDeserterKnight) return;
-            if (CurrentGameState == GameState.DoneWithDeserter) return;
-
-            if (updateBuildingLog.NewBuildingState == BuildingState.City)
-            {
-                player.GameData.Resources.UnspentEntitlements.Add(Entitlement.City);
-            }
-            else if (updateBuildingLog.NewBuildingState == BuildingState.Settlement)
-            {
-                if (updateBuildingLog.OldBuildingState == BuildingState.City) // Destoying a City
-                {
-                    player.GameData.Resources.UnspentEntitlements.Add(Entitlement.DestroyCity);
-                }
-                else
-                {
-                    player.GameData.Resources.UnspentEntitlements.Add(Entitlement.Settlement);
-                }
-            }
-            else if (updateBuildingLog.NewBuildingState == BuildingState.Knight)
-            {
-                player.GameData.Resources.UnspentEntitlements.Add(Entitlement.BuyOrUpgradeKnight);
-            }
-            else if (updateBuildingLog.OldBuildingState == BuildingState.Knight && updateBuildingLog.NewBuildingState == BuildingState.None) // destroyed a knight
-            {
-                //
-                //  put the building back the way it was - this removes it from the collection of buildings owned by the current player
-                await building.UpdateBuildingState(PlayerFromId(updateBuildingLog.OriginalOwnerId), updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
-
-            }
-            else
-            {
-                Contract.Assert(false, "should be city, settlement, or knight");
-            }
 
             if (updateBuildingLog.OldState == GameState.AllocateResourceReverse)
             {
@@ -1017,60 +1011,7 @@ namespace Catan10
             }
         }
 
-        /// <summary>
-        ///     when the building state goes from None to knight, it goes through the UpgradeBuilding Path
-        ///     when it changes Rank or changes Activation, it goes through this path.  so this needs to 
-        ///     take care of the entitlement
-        /// </summary>
-        /// <param name="logEntry"></param>
-        /// <param name="actionType"></param>
-        /// <returns></returns>
-        public async Task UpdateKnight(KnightStateChangeLog logEntry, ActionType actionType)
-        {
-            var knight = GetBuilding(logEntry.BuildingIndex)?.Knight;
-            Contract.Assert(knight != null);
-            PlayerModel player = NameToPlayer(logEntry.SentBy);
-
-            if (actionType == ActionType.Undo)
-            {
-                if (logEntry.OldRank != logEntry.NewRank)
-                {
-                    player.GameData.Resources.GrantEntitlement(Entitlement.BuyOrUpgradeKnight);
-                    knight.KnightRank = logEntry.OldRank;
-                }
-                if (logEntry.OldActivated != logEntry.NewActivated)
-                {
-                    player.GameData.Resources.GrantEntitlement(Entitlement.ActivateKnight);
-                    knight.Activated = logEntry.OldActivated;
-                }
-            }
-            else
-            {
-                if (logEntry.OldRank != logEntry.NewRank)
-                {
-                    Contract.Assert(player.GameData.Resources.HasUnusedEntitlment(Entitlement.BuyOrUpgradeKnight));
-                    knight.KnightRank = logEntry.NewRank;
-                    player.GameData.Resources.ConsumeEntitlement(Entitlement.BuyOrUpgradeKnight);
-
-                }
-
-                if (logEntry.OldActivated != logEntry.NewActivated)
-                {
-                    //
-                    //  the only way to go from not activated to activated is to buy an entitlement
-                    //  but you go to not activated via game mechanics such as moving or attacking baron
-                    if (logEntry.NewActivated)
-                    {
-                        Contract.Assert(player.GameData.Resources.HasUnusedEntitlment(Entitlement.ActivateKnight));
-                        player.GameData.Resources.ConsumeEntitlement(Entitlement.ActivateKnight);
-                    }
-                    knight.Activated = logEntry.NewActivated;
-                }
-
-            }
-
-            await Task.Delay(0);
-        }
+       
 
         public async Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType)
         {
@@ -1300,36 +1241,42 @@ namespace Catan10
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
             Contract.Assert(building != null);
-            //PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
             PlayerModel player = CurrentPlayer;
             Contract.Assert(player != null);
             Entitlement entitlement = Entitlement.Undefined;
-            if (updateBuildingLog.NewBuildingState == BuildingState.City) entitlement = Entitlement.City;
-            if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
-            if (updateBuildingLog.NewBuildingState == BuildingState.Knight) entitlement = Entitlement.BuyOrUpgradeKnight;
-            if (updateBuildingLog.NewBuildingState == BuildingState.Settlement && updateBuildingLog.OldBuildingState == BuildingState.City) entitlement = Entitlement.DestroyCity;
-            if (updateBuildingLog.NewBuildingState == BuildingState.None && updateBuildingLog.OldBuildingState == BuildingState.Knight)
+            switch (updateBuildingLog.NewBuildingState)
             {
-                entitlement = Entitlement.Deserter;
-                player = PlayerFromId(updateBuildingLog.OriginalOwnerId);
-            }
 
-            if (CurrentGameState != GameState.DoneWithDeserter && CurrentGameState != GameState.PlaceDeserterKnight)
-            {
-                Contract.Assert(entitlement != Entitlement.Undefined);
-                CurrentPlayer.GameData.Resources.ConsumeEntitlement(entitlement);
-            }
-            else
-            {
-                this.TraceMessage($"Skipping ConsumeEntitlement for GameState.{CurrentGameState} and Entitlement.{entitlement}");
-            }
+                case BuildingState.Settlement:
+                    if (updateBuildingLog.OldBuildingState == BuildingState.City)
+                    {
+                        entitlement = Entitlement.DestroyCity;
+                    }
+                    else
+                    {
+                        entitlement = Entitlement.Settlement;
+                    }
+                    break;
+                case BuildingState.City:
+                    entitlement = Entitlement.City;
+                    break;
 
+                case BuildingState.Knight:
+                    entitlement = Entitlement.BuyOrUpgradeKnight;
+                    break;
 
+                default:
+                    Contract.Assert(false, $"Should not call update building with oldState=BuildingState.{updateBuildingLog.NewBuildingState}");
+                    break;
+            }
+            Debug.Assert(CurrentPlayer.GameData.Resources.HasEntitlement(entitlement));
+            CurrentPlayer.GameData.Resources.ConsumeEntitlement(entitlement);
             await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
 
 
-
-            if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
+            //
+            // whenever we update a building, hide the pips
+            if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) 
             {
                 await HideAllPipEllipses();
                 _showPipGroupIndex = 0;

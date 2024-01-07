@@ -261,8 +261,7 @@ namespace Catan10
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType action);
 
-        Task UpdateKnight(KnightStateChangeLog knightStateChangeLog, ActionType actionType);
-        Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType);
+         Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType);
         void AssignLargestArmy();
 
         Task HandlePirateRoll(RollModel rollModel, ActionType action);

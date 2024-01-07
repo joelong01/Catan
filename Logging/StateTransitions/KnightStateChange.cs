@@ -6,10 +6,12 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 using Catan.Proxy;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Graphics.Canvas.Effects;
 
 namespace Catan10
 {
-    public class KnightStateChangeLog: LogHeader, ILogController
+    public class KnightStateChangeLog : LogHeader, ILogController
     {
         public int BuildingIndex { get; set; } = -1;
         public KnightRank NewRank { get; set; } = KnightRank.Unset;
@@ -18,14 +20,15 @@ namespace Catan10
         public bool NewActivated { get; set; }
         public static async Task ToggleActiveState(IGameController gameController, int index, KnightCtrl knight, KnightRank newRank, bool activated)
         {
-           
+
             var logHeader = new KnightStateChangeLog
             {
                 BuildingIndex= index,
                 NewRank= newRank,
                 OldRank = knight.KnightRank,
                 OldActivated= knight.Activated,
-                NewActivated= activated
+                NewActivated= activated,
+                UndoNext = false,
 
             };
 
@@ -34,22 +37,49 @@ namespace Catan10
 
         public Task Do(IGameController gameController)
         {
-            return gameController.UpdateKnight(this, ActionType.Normal);
+            var building = gameController.GetBuilding(this.BuildingIndex);
+            if (NewActivated && NewActivated != OldActivated) // we activated the knight
+            {
+                Contract.Assert(gameController.CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.ActivateKnight));
+                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.ActivateKnight);
+
+            }
+            building.Knight.Activated = NewActivated;
+
+            if (NewRank != OldRank)
+            {
+                building.Knight.KnightRank = NewRank;
+                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.BuyOrUpgradeKnight);
+            }
+
+            return Task.Delay(0);
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            return gameController.UpdateKnight(this, ActionType.Redo);
+            await Do(gameController);
         }
 
-        public Task Replay(IGameController gameController)
+        public async Task Replay(IGameController gameController)
         {
-            return gameController.UpdateKnight(this, ActionType.Replay);
+            await Do(gameController);
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return gameController.UpdateKnight(this, ActionType.Undo);
+            var building = gameController.GetBuilding(this.BuildingIndex);
+            if (this.OldRank != this.NewRank)
+            {
+                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.BuyOrUpgradeKnight);
+                building.Knight.KnightRank = this.OldRank;
+            }
+            if (this.OldActivated != this.NewActivated)
+            {
+                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.ActivateKnight);
+                building.Knight.Activated = this.OldActivated;
+            }
+
+            await Task.Delay(0);
         }
     }
 }

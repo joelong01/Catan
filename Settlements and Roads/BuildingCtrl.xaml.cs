@@ -212,6 +212,11 @@ namespace Catan10
             private set => SetValue(BuildingStateProperty, value);  // call ProtectCity instead
         }
 
+        public void ResetTempBuildingState()
+        {
+            this.BuildingState = BuildingState.None;
+        }
+
         public Dictionary<BuildingLocation, TileCtrl> BuildingToTileDictionary { get; set; } = new Dictionary<BuildingLocation, TileCtrl>();
         public IGameCallback Callback { get; internal set; }
 
@@ -424,8 +429,8 @@ namespace Catan10
                     Contract.Assert(ret, "a settlement needs to be in the Settlements Collection");
                     break;
                 case BuildingState.Knight: // remove it and if we are supposed to, we'll add it later.  this means that the knight shows up in the collection and then leaves the collection when the mouse leaves
-                    player.GameData.Knights.Remove(this.Knight);
-
+                    bool removed = player.GameData.Knights.Remove(this.Knight);
+                    System.Diagnostics.Debug.Assert(removed, "if this fales, you probably have the player wrong.");
                     break;
                 default:
                     break;
@@ -466,7 +471,7 @@ namespace Catan10
             {
                 AdjacentHarbor.Owner = Owner;
             }
-            this.TraceMessage($"TotalKnightCount: {MainPage.Current.MainPageModel.TotalKnightRanks}");
+            // this.TraceMessage($"TotalKnightCount: {MainPage.Current.MainPageModel.TotalKnightRanks}");
             await Task.Delay(0);
         }
 
@@ -526,7 +531,7 @@ namespace Catan10
 
             if (this.Owner == null)
             {
-                this.BuildingState = BuildingState.None;
+                ResetTempBuildingState();
             }
         }
     }
