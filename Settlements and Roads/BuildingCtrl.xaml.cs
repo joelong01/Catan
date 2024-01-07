@@ -466,7 +466,7 @@ namespace Catan10
             {
                 AdjacentHarbor.Owner = Owner;
             }
-
+            this.TraceMessage($"TotalKnightCount: {MainPage.Current.MainPageModel.TotalKnightRanks}");
             await Task.Delay(0);
         }
 

@@ -24,7 +24,7 @@ namespace Catan10
         private int _ThreeStarPosition = 0;
         private int _TwoStarPosition = 0;
         private bool _WebSocketConnected = false;
-        private string[] DynamicProperties { get; } = new string[] { "TotalCitiesBinding", "TotalKnightRanksBinding",  "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
+        private string[] DynamicProperties { get; } = new string[] { "TotalCitiesBinding", "TotalKnightRanksBinding", "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
         #endregion Properties + Fields
 
         #region Methods
@@ -308,7 +308,21 @@ namespace Catan10
                 {
                     _gameInfo = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("IsCitiesAndKnights");
                 }
+            }
+        }
+        [JsonIgnore]
+        public bool IsCitiesAndKnights
+        {
+            get
+            {
+                if (GameInfo != null)
+                {
+                    return GameInfo.CitiesAndKnights;
+                }
+
+                return true;
             }
         }
 

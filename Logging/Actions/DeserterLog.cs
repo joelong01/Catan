@@ -63,7 +63,8 @@ namespace Catan10
                     OldBuildingState = BuildingState.None,
                     NewBuildingState = BuildingState.Knight,
                     BuildingIndex = building.Index,
-                    OriginalOwnerId =  prevLogEntry.UpdateBuildingLog.OriginalOwnerId
+                    OriginalOwnerId =  prevLogEntry.UpdateBuildingLog.OriginalOwnerId,
+                    NewOwnerId = gameController.CurrentPlayer.PlayerIdentifier
                 },
             };
 
@@ -82,13 +83,13 @@ namespace Catan10
                 var building = gameController.GetBuilding(UpdateBuildingLog.BuildingIndex);
                 Debug.Assert(building != null);
                 Debug.Assert(building.Owner != null);
-        
+
                 building.Knight.KnightRank = this.DestroyedKnightRank;
                 building.Knight.Activated = false;
                 gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.Deserter);
                 // Set the state to WaitingForNext, but when the user clicks undo continue past the set state call
                 // to Undo the PlaceDeserterKnight
-                await SetStateLog.SetState(gameController, GameState.WaitingForNext, true); 
+                await SetStateLog.SetState(gameController, GameState.WaitingForNext, true);
             }
         }
 
@@ -108,7 +109,7 @@ namespace Catan10
             //  the LogEntry should work correctly for both PickDeserter and PlaceDeserterKnight
             await gameController.UndoUpdateBuilding(this.UpdateBuildingLog);
 
-            if (this.NewState == GameState.PlaceDeserterKnight)
+            if (this.OldState == GameState.PlaceDeserterKnight)
             {
                 //
                 //   make sure they have the entitlement they got with the Deserter card
@@ -119,7 +120,7 @@ namespace Catan10
             {
                 // put the destroyed knight back into its orginal state -- the UndoUpdateBuilding above will set teh bulding state to Knight, but 
                 // we need to fix Rank and Actived
-                Debug.Assert(this.NewState == GameState.PickDeserter);
+                Debug.Assert(this.OldState == GameState.PickDeserter);
                 var building = gameController.GetBuilding(UpdateBuildingLog.BuildingIndex);
                 Debug.Assert(building != null);
                 Debug.Assert(building.Owner != null);

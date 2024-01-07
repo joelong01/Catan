@@ -13,6 +13,8 @@ namespace Catan10
 
         public BuildingState OldBuildingState { get; set; } = BuildingState.None;
         public Guid OriginalOwnerId { get; set; } = Guid.Empty;
+        public Guid NewOwnerId { get; set; } = Guid.Empty;
+
         public UpdateBuildingLog() : base()
         {
         }
@@ -37,7 +39,8 @@ namespace Catan10
                 NewBuildingState = newState,
                 BuildingIndex = building.Index,
                 Action=CatanAction.UpdateBuildingState,
-                NewState = newGameState
+                NewState = newGameState,
+                OriginalOwnerId = gameController.CurrentPlayer.PlayerIdentifier
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

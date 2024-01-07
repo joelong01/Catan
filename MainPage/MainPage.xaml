@@ -64,6 +64,33 @@
                 </Button.Content>
                 <Button.Flyout>
                     <MenuFlyout x:Name="_contextMenu" Closed="OnMenuClosed" Opened="OnMenuOpened" Placement="Bottom">
+
+                        <MenuFlyoutSubItem Text="Development">
+                            <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Regular Game" />
+                            <MenuFlyoutItem Click="OnTestDeserter" Text="Test Deserter" />
+                            <MenuFlyoutItem Click="OnTestRollSeven" Text="Test Roll 7" />
+                            <MenuFlyoutItem Click="OnTestExpansionGame" Text="Test Game (Expansion)" />
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Click="OnSaveSettings" Text="Save Settings" />
+
+                            <MenuFlyoutItem Click="DumpLogRecords" Text="Dump Log Records" />
+
+                            <MenuFlyoutItem Click="OnGrantResources" Text="Grant Resources" />
+                            <MenuFlyoutItem Click="OnGrantEntitlements" Text="Grant Entitlements" />
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Click="PickSettlementsAndRoads" Text="Pick Settlements and Road" />
+                            <MenuFlyoutSeparator />
+                            <ToggleMenuFlyoutItem Click="ToggleShowTile" IsChecked="False" Text="Show Tile Index" />
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Click="Menu_OnNewGame" Text="New Game" />
+                            <MenuFlyoutItem Click="Menu_OnResetService" Text="Reset Service" />
+                            <MenuFlyoutItem Click="OnStartDefaultNetworkGame" Text="Start Default Network Game" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}"
+                                    Text="Auto Respond Mode" />
+                            <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}"
+                                    Text="Auto Join Network Game" />
+                        </MenuFlyoutSubItem>
+                        <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Game">
                             <!--<MenuFlyoutItem Click="OnNewNetworkGame" Text="New Network Game" />-->
                             <MenuFlyoutItem Click="OnNewLocalGame" Text="New Local Game" />
@@ -83,6 +110,7 @@
                             <MenuFlyoutItem Click="OnChangeRandomGoldTileCount" Text="Change Count" />
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
+                        <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Resource Tests">
                             <MenuFlyoutSubItem Text="Resource Cards">
                                 <MenuFlyoutItem Click="OnGrantDevCard" Tag="All" Text="All" />
@@ -95,43 +123,7 @@
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Click="OnGrantResources" Text="Grant Resources" />
                         </MenuFlyoutSubItem>
-                        <MenuFlyoutSubItem Text="Development">
-                            <MenuFlyoutItem Click="OnShowCatanSpy" Text="Show Catan Spy" />
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutSubItem Text="Game Type">
-                                <ToggleMenuFlyoutItem
-                                        IsChecked="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=TwoWay}"
-                                        Text="Local Game" />
-                                <ToggleMenuFlyoutItem
-                                        IsChecked="{x:Bind MainPageModel.Settings.IsServiceGame, Mode=TwoWay}"
-                                        Text="Service Game" />
-                            </MenuFlyoutSubItem>
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Click="OnSaveSettings" Text="Save Settings" />
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Click="OnTest1" Text="Test Journey" />
-                            <MenuFlyoutItem Click="OnTest2" Text="Dump Log Records" />
-                            <MenuFlyoutItem Click="OnTest3" Text="Test 3" />
-                            <MenuFlyoutItem Click="OnGrantResources" Text="Grant Resources" />
-                            <MenuFlyoutItem Click="OnGrantEntitlements" Text="Grant Entitlements" />
-                            <MenuFlyoutItem Click="OnTestRollSeven" Text="Test Roll 7" />
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Game (Regular)" />
-                            <MenuFlyoutItem Click="OnTestExpansionGame" Text="Test Game (Expansion)" />
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Click="PickSettlementsAndRoads" Text="Pick Settlements and Road" />
-                            <MenuFlyoutSeparator />
-                            <ToggleMenuFlyoutItem Click="ToggleShowTile" IsChecked="False" Text="Show Tile Index" />
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Click="Menu_OnNewGame" Text="New Game" />
-                            <MenuFlyoutItem Click="Menu_OnResetService" Text="Reset Service" />
-                            <MenuFlyoutItem Click="OnStartDefaultNetworkGame" Text="Start Default Network Game" />
-                            <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.AutoRespond, Mode=TwoWay}"
-                                    Text="Auto Respond Mode" />
-                            <ToggleMenuFlyoutItem IsChecked="{x:Bind MainPageModel.Settings.AutoJoinGames, Mode=TwoWay}"
-                                    Text="Auto Join Network Game" />
-                        </MenuFlyoutSubItem>
-                        <MenuFlyoutSeparator />
+
                         <MenuFlyoutSubItem Text="Baron">
                             <MenuFlyoutItem Click="OnPickOptimalBaron" Text="Optimal" />
                             <MenuFlyoutItem Click="OnPickRandomBaron" Text="Random" />
@@ -161,10 +153,10 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-            <local:DragableGridCtrl x:Name="DGC_PirateInvasion" Caption="Invasion Status" Width="500" Height="500"
+            <local:DragableGridCtrl x:Name="DGC_PirateInvasion" Caption="Invasion" Width="500" Height="500"
                     HorizontalAlignment="Left" VerticalAlignment="Center"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2" CornerRadius="5"
                     OnGridPositionChanged="OnGridPositionChanged" PointerPressed="Draggable_PointerPressed">
                 <Viewbox Stretch="UniformToFill">
@@ -240,71 +232,70 @@
                     Player="{x:Bind TheHuman, Mode=OneWay}" PointerPressed="Draggable_PointerPressed">
 
                 <local:DragableGridCtrl.Child>
-               
-                        <StackPanel Orientation="Vertical" Canvas.ZIndex="99999" 
-                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
+
+                    <StackPanel Orientation="Vertical" Canvas.ZIndex="99999"
+                            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}">
                         <Viewbox Stretch="Uniform" Margin="0">
-                                <local:TraditionalRollCtrl x:Name="CTRL_RollControl"  
-                                        MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
-                                        OnRoll="OnNumberRolled" />
-                            </Viewbox>
-                            <Rectangle Height="3" Fill="{StaticResource bmMaple}" Margin="5" />
-                            <Viewbox Stretch="Fill">
-                                <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
+                            <local:TraditionalRollCtrl x:Name="CTRL_RollControl"
+                                    MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
+                                    OnRoll="OnNumberRolled" />
+                        </Viewbox>
+                        <Rectangle Height="3" Fill="{StaticResource bmMaple}" Margin="5" />
+                        <Viewbox Stretch="Fill">
+                            <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
                                     Height="130">
-                                    <StackPanel Name="SP_BaronButton" Margin="0,0,30,0" HorizontalAlignment="Stretch">
+                                <StackPanel Name="SP_BaronButton" Margin="0,0,30,0" HorizontalAlignment="Stretch">
 
-                                        <Button Width="100"
-                                                Visibility="{x:Bind IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                IsEnabled="{x:Bind PlayBaronButtonEnabled(MainPageModel.Log.GameState), Mode=OneWay}"
-                                                Click="EnableMoveBaron">
+                                    <Button Width="100"
+                                            Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=true}"
+                                            IsEnabled="{x:Bind PlayBaronButtonEnabled(MainPageModel.Log.GameState), Mode=OneWay}"
+                                            Click="EnableMoveBaron">
 
-                                            <local:BaronCtrl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                                        </Button>
-                                    </StackPanel>
-                                    <StackPanel Name="SP_UndoButton" Orientation="Vertical">
-                                        <Button x:Name="_btnUndo"
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Click="OnUndo" Content="&#xE10E;"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}"
-                                                Style="{StaticResource GameControllerStyle}" />
-                                        <TextBlock
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
-                                    </StackPanel>
-                                    <StackPanel Name="SP_NextButton" Width="220">
-                                        <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                                                Click="OnNextStep" Content="&#xE101;"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}"
-                                                Style="{StaticResource GameControllerStyle}" />
-                                        <TextBlock Margin="5,0,5,0"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Style="{StaticResource ControlGridTextStyle}"
-                                                Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" />
-                                    </StackPanel>
-                                    <StackPanel Name="SP_RedoButton" HorizontalAlignment="Center" Orientation="Vertical">
-                                        <Button
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Click="OnRedo" Content="&#xE10D;"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}"
-                                                Style="{StaticResource GameControllerStyle}" />
-                                        <TextBlock
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
-                                    </StackPanel>
-
-                                    <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1"
-                                            Height="40" Margin="30,0,10,40" VerticalAlignment="Center"
-                                            ColorCodeTimer="True" />
-
+                                        <local:BaronCtrl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                    </Button>
                                 </StackPanel>
-                            </Viewbox>
-                        </StackPanel>
-              
+                                <StackPanel Name="SP_UndoButton" Orientation="Vertical">
+                                    <Button x:Name="_btnUndo"
+                                            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                            Click="OnUndo" Content="&#xE10E;"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                            IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}"
+                                            Style="{StaticResource GameControllerStyle}" />
+                                    <TextBlock
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                            Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
+                                </StackPanel>
+                                <StackPanel Name="SP_NextButton" Width="220">
+                                    <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"
+                                            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                                            Click="OnNextStep" Content="&#xE101;"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                            IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}"
+                                            Style="{StaticResource GameControllerStyle}" />
+                                    <TextBlock Margin="5,0,5,0"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                            Style="{StaticResource ControlGridTextStyle}"
+                                            Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" />
+                                </StackPanel>
+                                <StackPanel Name="SP_RedoButton" HorizontalAlignment="Center" Orientation="Vertical">
+                                    <Button
+                                            Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                            Click="OnRedo" Content="&#xE10D;"
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                            IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}"
+                                            Style="{StaticResource GameControllerStyle}" />
+                                    <TextBlock
+                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                            Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
+                                </StackPanel>
+
+                                <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1" Height="40"
+                                        Margin="30,0,10,40" VerticalAlignment="Center" ColorCodeTimer="True" />
+
+                            </StackPanel>
+                        </Viewbox>
+                    </StackPanel>
+
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
 

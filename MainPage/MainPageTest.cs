@@ -227,7 +227,7 @@ namespace Catan10
 
         }
 
-        private void OnTest2(object sdr, RoutedEventArgs rea)
+        private void DumpLogRecords(object sdr, RoutedEventArgs rea)
         {
             Log.DumpActionStack();
         }
@@ -276,8 +276,163 @@ namespace Catan10
 
             await NextState();
         }
+        /// <summary>
+        ///     This starts in WaitingForNext or it will create a new game.
+        ///     it then
+        ///     
+        ///     1. places a Knight, Upgrades, then Activates it
+        ///     2. Moves to next player
+        ///     3. that player rolls
+        ///     4. then buys the Deserter Entitlement
+        ///     5. picks the Knight that was built by the previous player
+        ///     6. picks a spot to place it.
+        ///     7. Undo it all
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnTestDeserter(object sender, RoutedEventArgs e)
+        {
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                GameInfo info = new GameInfo()
+                {
+                    Creator = TheHuman.PlayerName,
+                    GameIndex = 0,
+                    Id = Guid.NewGuid(),
+                    Started = false,
+                    CitiesAndKnights=true
+                };
 
-        private async void OnTestRegularGame(object sender, RoutedEventArgs e)
+                await StartGame(info);
+            }
+
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
+            }
+
+
+            //
+            //  get some knight entitlements
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+
+            //
+            //  figure out where to build it
+
+            var originalKnightBuilding = Test_FindBuildingPlacement(BuildingState.Knight);
+            await KnightLeftPointerPressed(originalKnightBuilding); // builds it
+            await KnightLeftPointerPressed(originalKnightBuilding); // activate it
+            await KnightLeftPointerPressed(originalKnightBuilding); // upgrade it
+
+            Debug.Assert(originalKnightBuilding.IsKnight);
+            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
+            Debug.Assert(originalKnightBuilding.Knight.Activated == true);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
+            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+
+            // move to Player2
+            await NextState();
+
+            // roll
+            await Test_DoRoll(1, 2, SpecialDice.Pirate);
+
+            // get the Deserter Entitlement
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Deserter, GameState.PickDeserter);
+
+            Debug.Assert(CurrentGameState == GameState.PickDeserter);
+
+            await KnightLeftPointerPressed(originalKnightBuilding); // this is the knight we just built
+            Debug.Assert(originalKnightBuilding.BuildingState == BuildingState.None);
+
+            var newKnight = Test_FindBuildingPlacement(BuildingState.Knight);
+
+            Debug.Assert(newKnight.BuildingState == BuildingState.None);
+            await KnightLeftPointerPressed(newKnight);
+
+            Debug.Assert(newKnight.IsKnight);
+            Debug.Assert(newKnight.Knight.KnightRank == KnightRank.Strong);
+            Debug.Assert(newKnight.Knight.Activated == false);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 0);
+            Debug.Assert(MainPageModel.TotalKnightRanks == 0); // not activated yet
+            Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+            await KnightLeftPointerPressed(newKnight); // Activate it
+            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+            await Task.Delay(10); // in case you want to look at it...
+            await DoUndo(); // Activate
+            await Task.Delay(10);
+            await DoUndo(); // Buy activate entitlement
+            await Task.Delay(100);
+            await DoUndo(); // undoes the DoneWithDeserter and the placement
+            await Task.Delay(100);
+            Debug.Assert(CurrentGameState == GameState.PlaceDeserterKnight);
+
+            Debug.Assert(MainPageModel.TotalKnightRanks == 0);
+
+            await DoUndo(); // undoes the Pick
+            await Task.Delay(100);
+            Debug.Assert(CurrentGameState == GameState.PickDeserter);
+            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+            Debug.Assert(originalKnightBuilding.IsKnight);
+            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
+            Debug.Assert(originalKnightBuilding.Knight.Activated);
+
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 1);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements[0] == Entitlement.Deserter);
+            await DoUndo(); // undoes the buy entitlement
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+
+            await DoUndo(); // back to roll
+            await Task.Delay(10);
+            await DoUndo(); // back to player[0]
+            await Task.Delay(10);
+            await DoUndo(); // Activate knight
+            await Task.Delay(10);
+            await DoUndo(); // Upgrade Knight
+            await Task.Delay(10);
+            await DoUndo(); // Place Knight
+
+            await Task.Delay(10);
+            await DoUndo(); // Buy entitlement
+
+            await Task.Delay(10);
+            await DoUndo(); //  Buy entitlement
+
+            await Task.Delay(10);
+            await DoUndo(); //  Buy entitlement
+
+        }
+        //
+        //  find a place the Current User can place a Building
+        private BuildingCtrl Test_FindBuildingPlacement(BuildingState buildingState)
+        {
+            foreach (BuildingCtrl building in _gameView.AllBuildings)
+            {
+                if (ValidateBuildingLocation(building) == buildingState)
+                {
+                    return building;
+                }
+            }
+            return null;
+        }
+        private async Task Test_DoRoll(int redRoll, int whiteRoll, SpecialDice special)
+        {
+            var rollModel = new RollModel()
+            {
+                RedDie = redRoll,
+                WhiteDie = whiteRoll,
+                Roll = redRoll + whiteRoll,
+                SpecialDice = special
+            };
+            await OnRolledNumber(rollModel);
+        }
+        private async Task StartGame(GameInfo info)
         {
             AnimationSpeedBase = 10; // speed up the animations
             RandomGoldTileCount = 1;
@@ -286,16 +441,9 @@ namespace Catan10
 
             _gameView.CurrentGame = _gameView.Games[1];
             MainPageModel.PlayingPlayers.Clear();
-            GameInfo info = new GameInfo()
-            {
-                Creator = TheHuman.PlayerName,
-                GameIndex = 0,
-                Id = Guid.NewGuid(),
-                Started = false,
-                CitiesAndKnights=true
-            };
             await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
-            GameContainer.CurrentGame.HexPanel.CitiesAndKnights = true;
+            UpdateGridLocations();
+            await Task.Delay(10);
 
             MainPageModel.PlayingPlayers.Clear();
 
@@ -323,15 +471,25 @@ namespace Catan10
             PlayingPlayers[2].GameData.PoliticsRank = 3;
 
             await NextState();
+            await Test_DoRoll(1, 2, SpecialDice.Pirate);
 
-            RollModel roll = new RollModel()
+        }
+
+        private async void OnTestRegularGame(object sender, RoutedEventArgs e)
+        {
+
+
+            GameInfo info = new GameInfo()
             {
-                WhiteDie = 2,
-                RedDie = 1,
-                Roll = 3
+                Creator = TheHuman.PlayerName,
+                GameIndex = 0,
+                Id = Guid.NewGuid(),
+                Started = false,
+                CitiesAndKnights=true
             };
 
-            await OnRolledNumber(roll);
+            await StartGame(info);
+
         }
 
         private async void OnTestRollSeven(object sender, RoutedEventArgs e)

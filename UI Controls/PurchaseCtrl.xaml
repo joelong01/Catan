@@ -8,7 +8,7 @@
     </Control.Resources>
     <Viewbox Stretch="Uniform">
         <ListView Name="LV_UniversalPurchase" Margin="5"
-                Height="{x:Bind GetHeight(MainPageModel.GameInfo.CitiesAndKnights), Mode=OneWay}">
+                Height="{x:Bind GetHeight(MainPageModel.IsCitiesAndKnights), Mode=OneWay}">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3" />
@@ -43,7 +43,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="BuyOrUpgradeKnight" Decoration="&#xE7BF;"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
@@ -51,13 +51,13 @@
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="ActivateKnight" Decoration="&#xE7E8;"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <local:PurchaseItemCtrl.Child>
                     <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="MoveKnight" Decoration="&#xE811;"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
@@ -65,7 +65,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="PoliticsUpgrade" ShowCount="False"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
 
@@ -80,7 +80,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="TradeUpgrade" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
                 <local:PurchaseItemCtrl.Child>
 
@@ -96,7 +96,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="ScienceUpgrade" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" Background="Green" VerticalAlignment="Stretch"  Width="100"
@@ -110,7 +110,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Wall" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -125,7 +125,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Bishop" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -140,7 +140,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Deserter" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -154,7 +154,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Diplomat" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -168,7 +168,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Intrigue" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -181,7 +181,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="Inventor" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -194,7 +194,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="Merchant" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

@@ -907,7 +907,7 @@ namespace Catan10
             //
             //     this logic means you *must* spend your knights before you build any other kind of settlements.
             if (MainPageModel.GameInfo.CitiesAndKnights && ( CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight) || CurrentGameState == GameState.PlaceDeserterKnight )
-                && OwnedAdjacentRoad(CurrentPlayer, building))
+                && OwnedAdjacentRoad(CurrentPlayer, building) && building.BuildingState == BuildingState.None)
             {
                 return BuildingState.Knight;
             }
@@ -1466,35 +1466,46 @@ namespace Catan10
 
         public async Task KnightLeftPointerPressed(BuildingCtrl building)
         {
-
-
-            var knight = building.Knight;
-            Debug.Assert(knight != null);
-
-
-            if (CurrentGameState == GameState.PickDeserter)
+            Debug.Assert(building.BuildingState == BuildingState.None || building.BuildingState == BuildingState.Knight);
+            if (building.Owner == null && HasEntitlement(Entitlement.BuyOrUpgradeKnight))
             {
-                if (knight.Owner == CurrentPlayer) return; // don't destroy your own knight
 
-                await DeserterLog.PickDeserterLog(this, building);
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Knight, GameState.WaitingForNext);
+                return;
+
             }
-            else if (CurrentGameState == GameState.PlaceDeserterKnight)
+            if (CurrentGameState == GameState.PlaceDeserterKnight)
             {
                 await DeserterLog.PlaceDeserterLog(this, building);
+                return;
             }
+
+
+           if (CurrentGameState == GameState.PickDeserter)
+            {
+               
+                if (building.Owner == CurrentPlayer) return; // don't destroy your own knight
+
+                await DeserterLog.PickDeserterLog(this, building);
+                return;
+            }
+
 
 
             if (building.Owner == null && HasEntitlement(Entitlement.BuyOrUpgradeKnight))
             {
 
                 await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Knight, GameState.WaitingForNext);
+                return;
 
             }
-            else if (knight.Activated == false && HasEntitlement(Entitlement.ActivateKnight))
+            if (building.IsKnight && building.Knight.Activated == false && HasEntitlement(Entitlement.ActivateKnight))
             {
                 await ActivateKnight(building, true);
+                return;
             }
-            else if (HasEntitlement(Entitlement.BuyOrUpgradeKnight) && knight.KnightRank < KnightRank.Mighty)
+            
+            if (HasEntitlement(Entitlement.BuyOrUpgradeKnight) && building.Knight.KnightRank < KnightRank.Mighty)
             {
                 await UpgradeKnight(building);
             }

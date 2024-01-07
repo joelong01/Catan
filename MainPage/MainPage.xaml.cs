@@ -45,7 +45,7 @@ namespace Catan10
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(PlayerModel.DefaultPlayer));
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
-        public   RoadRaceTracking RaceTracking { get; private set; } 
+        public RoadRaceTracking RaceTracking { get; private set; }
         private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
         private bool _doDragDrop = false;
         private DateTime _dt = DateTime.Now;
@@ -502,7 +502,7 @@ namespace Catan10
                 if (MainPageModel.TheHuman == "")
                 {
                     await PickDefaultUser();
-                //    CurrentPlayer = TheHuman; // this means each client will start with CurrentPlayer being themselves so that all UI binding to current player will give decent colors
+                    //    CurrentPlayer = TheHuman; // this means each client will start with CurrentPlayer being themselves so that all UI binding to current player will give decent colors
                 }
             }
             catch (FileLoadException fle)
@@ -633,9 +633,9 @@ namespace Catan10
             }
             else
             {
-              //  this.TraceMessage("ROLL start roll processing");
+                //  this.TraceMessage("ROLL start roll processing");
                 await WaitingForRollToWaitingForNext.PostRollMessage(this, roll);
-              //  this.TraceMessage("ROLL end roll processing");
+                //  this.TraceMessage("ROLL end roll processing");
             }
         }
 
@@ -1402,10 +1402,6 @@ namespace Catan10
             if (!foundUnprotectedCity) return;
             await PurchaseEntitlement(CurrentPlayer, Entitlement.Wall, CurrentGameState);
         }
-        private async void OnLocalBuyRoad(object sender, RoutedEventArgs e)
-        {
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.Road, CurrentGameState);
-        }
         private async Task PurchaseEntitlement(PlayerModel player, Entitlement entitlement, GameState newState)
         {
             if (MainPageModel.GameState != GameState.WaitingForNext && MainPageModel.GameState != GameState.Supplemental) return;
@@ -1429,7 +1425,7 @@ namespace Catan10
                     return Visibility.Visible;
                 default:
                     return Visibility.Collapsed;
-            } 
+            }
         }
         private async void EnableMoveBaron(object sender, RoutedEventArgs e)
         {
@@ -1446,5 +1442,6 @@ namespace Catan10
 
             return false;
         }
+
     }
 }

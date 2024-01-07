@@ -305,19 +305,20 @@ namespace Catan10
         /// </summary>
         /// <returns></returns>
         /// 
-        private bool _pirates = false;
+        private bool _citiesAndKnights = false;
         public bool CitiesAndKnights
         {
             get
             {
-                return _pirates;
+                return _citiesAndKnights;
             }
             set
             {
-                if (value != _pirates)
+                if (value != _citiesAndKnights)
                 {
-                    _pirates = value;
+                    _citiesAndKnights = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged("IsCitiesAndKnights");
                 }
             }
         }

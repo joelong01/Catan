@@ -17,18 +17,6 @@ namespace Catan10
 {
     public sealed partial class MainPage : Page, IGameController
     {
-        public bool IsCitiesAndKnights
-        {
-            get
-            {
-                if (GameInfo != null)
-                {
-                    return GameInfo.CitiesAndKnights;
-                }
-
-                return false;
-            }
-        }
 
         #region Methods
 
@@ -538,7 +526,7 @@ namespace Catan10
 
             //    CurrentPlayer = TheHuman;
             this.TraceMessage("If you want to set the CurrentPlayer to startup, do it here");
-            
+
         }
 
         /// <summary>
@@ -964,13 +952,29 @@ namespace Catan10
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
             Contract.Assert(building != null);
+
             PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
+
+            if (updateBuildingLog.OldState == GameState.PickDeserter)
+            {
+                Debug.Assert(updateBuildingLog.OriginalOwnerId != Guid.Empty);
+                Debug.Assert(updateBuildingLog.OriginalOwnerId != player.PlayerIdentifier);
+
+                player = PlayerFromId(updateBuildingLog.OriginalOwnerId);
+            }
+
             Contract.Assert(player != null);
             //
             //  5/26/2020: when we undo, we don't want to see the pips (which is the same as "Building")
             var newState = updateBuildingLog.OldBuildingState;
             if (updateBuildingLog.OldBuildingState == BuildingState.Pips || updateBuildingLog.OldBuildingState == BuildingState.Build) newState = BuildingState.None;
+
+
             await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, newState);
+
+            if (CurrentGameState == GameState.PlaceDeserterKnight) return;
+            if (CurrentGameState == GameState.DoneWithDeserter) return;
+
             if (updateBuildingLog.NewBuildingState == BuildingState.City)
             {
                 player.GameData.Resources.UnspentEntitlements.Add(Entitlement.City);
@@ -994,7 +998,7 @@ namespace Catan10
             {
                 //
                 //  put the building back the way it was - this removes it from the collection of buildings owned by the current player
-                await building.UpdateBuildingState(player, updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
+                await building.UpdateBuildingState(PlayerFromId(updateBuildingLog.OriginalOwnerId), updateBuildingLog.NewBuildingState, updateBuildingLog.OldBuildingState);
 
             }
             else
@@ -1121,6 +1125,7 @@ namespace Catan10
                         //  we've moved the ship and now we just deal with the rollModel
 
                         await WaitingForRollToWaitingForNext.PostRollMessage(this, rollModel);
+                        await Task.Delay(10);
                         return;
                     }
                     if (count == CTRL_Invasion.StepsBeforeInvasion)
@@ -1233,7 +1238,7 @@ namespace Catan10
                 }
             }
 
-            await Task.Delay(0);
+            await Task.Delay(10);
 
         }
         /**
@@ -1295,26 +1300,35 @@ namespace Catan10
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);
             Contract.Assert(building != null);
-            PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
+            //PlayerModel player = NameToPlayer(updateBuildingLog.SentBy);
+            PlayerModel player = CurrentPlayer;
             Contract.Assert(player != null);
             Entitlement entitlement = Entitlement.Undefined;
             if (updateBuildingLog.NewBuildingState == BuildingState.City) entitlement = Entitlement.City;
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
             if (updateBuildingLog.NewBuildingState == BuildingState.Knight) entitlement = Entitlement.BuyOrUpgradeKnight;
             if (updateBuildingLog.NewBuildingState == BuildingState.Settlement && updateBuildingLog.OldBuildingState == BuildingState.City) entitlement = Entitlement.DestroyCity;
-            if (updateBuildingLog.NewBuildingState == BuildingState.None && updateBuildingLog.OldBuildingState == BuildingState.Knight) entitlement = Entitlement.Deserter;
+            if (updateBuildingLog.NewBuildingState == BuildingState.None && updateBuildingLog.OldBuildingState == BuildingState.Knight)
+            {
+                entitlement = Entitlement.Deserter;
+                player = PlayerFromId(updateBuildingLog.OriginalOwnerId);
+            }
 
             if (CurrentGameState != GameState.DoneWithDeserter && CurrentGameState != GameState.PlaceDeserterKnight)
             {
                 Contract.Assert(entitlement != Entitlement.Undefined);
-                player.GameData.Resources.ConsumeEntitlement(entitlement);
+                CurrentPlayer.GameData.Resources.ConsumeEntitlement(entitlement);
             }
             else
             {
                 this.TraceMessage($"Skipping ConsumeEntitlement for GameState.{CurrentGameState} and Entitlement.{entitlement}");
             }
 
+
             await building.UpdateBuildingState(player, updateBuildingLog.OldBuildingState, updateBuildingLog.NewBuildingState);
+
+
+
             if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) // but NOT if if is transitioning to the Pips state - only happens from the Menu "Show Highest Pip Count"
             {
                 await HideAllPipEllipses();

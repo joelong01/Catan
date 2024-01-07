@@ -158,8 +158,7 @@ namespace Catan10
 
     public interface IGameController
     {
-        bool IsCitiesAndKnights { get; }
-
+      
         BuildingCtrl GetBuilding(int index);
 
         bool AutoRespondAndTheHuman { get; }
