@@ -22,12 +22,20 @@ namespace Catan10
     ///         
     ///         Undo should put the system back into the exact state prior to Destroying/Placing the knight (including Activation State)
     /// </summary>
+    /// 
+
+    //
+    // this enum disabiguates the CurrentGameState for both Do and Undo, which can be confusing when debugging because of when the 
+    // log record is pushed to the stack.  this just makes it explicit of the action.
+
+    public enum DeserterAction { Undefined, PickVictim, PlaceKnight }
+
     internal class DeserterLog : LogHeader, ILogController
     {
         public UpdateBuildingLog UpdateBuildingLog { get; set; }
         public KnightRank DestroyedKnightRank { get; set; }
         public bool Activated { get; set; }
-
+        public DeserterAction DeserterAction { get; set; }
         public static async Task PickDeserterLog(IGameController controller, BuildingCtrl building)
         {
             Debug.Assert(building.IsKnight);
@@ -37,11 +45,12 @@ namespace Catan10
                 NewState = GameState.PlaceDeserterKnight,
                 DestroyedKnightRank = building.Knight.KnightRank,
                 Activated = building.Knight.Activated,
+                DeserterAction = DeserterAction.PickVictim,
                 UpdateBuildingLog = new UpdateBuildingLog()
                 {
                     OldBuildingState = BuildingState.Knight,
                     NewBuildingState = BuildingState.None,
-                    BuildingIndex = building.Index, 
+                    BuildingIndex = building.Index,
                     OriginalOwnerId = building.Owner.PlayerIdentifier
                 },
             };
@@ -56,9 +65,10 @@ namespace Catan10
             var log = new DeserterLog()
             {
 
-                NewState = GameState.DoneWithDeserter,
+                NewState = GameState.WaitingForNext,
                 DestroyedKnightRank =prevLogEntry.DestroyedKnightRank,
                 Activated = prevLogEntry.Activated,
+                DeserterAction = DeserterAction.PlaceKnight,
                 UpdateBuildingLog = new UpdateBuildingLog()
                 {
                     OldBuildingState = BuildingState.None,
@@ -75,23 +85,25 @@ namespace Catan10
         {
             var building = gameController.GetBuilding(UpdateBuildingLog.BuildingIndex);
 
-            if (gameController.CurrentGameState == GameState.PlaceDeserterKnight)
+            if (DeserterAction == DeserterAction.PickVictim)
             {
+                Debug.Assert(gameController.CurrentGameState == GameState.PlaceDeserterKnight);
                 //
                 //  remove the other players knight
                 await building.UpdateBuildingState(gameController.PlayerFromId(this.UpdateBuildingLog.OriginalOwnerId), BuildingState.Knight, BuildingState.None);
                 return;
             }
 
-            if (gameController.CurrentGameState == GameState.DoneWithDeserter)
+            if (DeserterAction == DeserterAction.PlaceKnight)
             {
+              //  Debug.Assert(gameController.CurrentGameState == GameState.DoneWithDeserter);
                 await building.UpdateBuildingState(gameController.CurrentPlayer, BuildingState.None, BuildingState.Knight);
                 building.Knight.KnightRank = this.DestroyedKnightRank;
                 building.Knight.Activated = false;
                 gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.Deserter);
                 // Set the state to WaitingForNext, but when the user clicks undo continue past the set state call
                 // to Undo the PlaceDeserterKnight
-                await SetStateLog.SetState(gameController, GameState.WaitingForNext, true);
+             //   await SetStateLog.SetState(gameController, GameState.WaitingForNext, true);
                 return;
             }
         }
@@ -112,9 +124,10 @@ namespace Catan10
             //  the LogEntry should work correctly for both PickDeserter and PlaceDeserterKnight
 
             var building = gameController.GetBuilding(UpdateBuildingLog.BuildingIndex);
-      
-            if (this.OldState == GameState.PlaceDeserterKnight)
+
+            if (DeserterAction == DeserterAction.PlaceKnight) 
             {
+                Debug.Assert(this.OldState == GameState.PlaceDeserterKnight);
                 Debug.Assert(building != null);
                 Debug.Assert(building.Owner == gameController.CurrentPlayer);
                 Debug.Assert(building.BuildingState == BuildingState.Knight);
@@ -128,9 +141,9 @@ namespace Catan10
 
 
             }
-            else if (this.OldState == GameState.PickDeserter)
+            else if (DeserterAction == DeserterAction.PickVictim)
             {
-
+                Debug.Assert(this.OldState == GameState.PickDeserter);
                 //
                 //   put the old knight back
                 Debug.Assert(building != null);
@@ -140,8 +153,8 @@ namespace Catan10
 
                 var victim = gameController.PlayerFromId(this.UpdateBuildingLog.OriginalOwnerId);
                 await building.UpdateBuildingState(victim, BuildingState.None, BuildingState.Knight);
-             
- 
+
+
                 building.Knight.KnightRank = this.DestroyedKnightRank;
                 building.Knight.Activated = this.Activated;
             }

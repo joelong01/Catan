@@ -32,9 +32,9 @@ namespace Catan10
             await gameController.HandlePirateRoll(RollModel, ActionType.Normal);
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            throw new NotImplementedException();
+            await Do(gameController);
         }
 
         public Task Replay(IGameController gameController)

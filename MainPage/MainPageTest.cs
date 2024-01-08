@@ -292,122 +292,15 @@ namespace Catan10
         /// <param name="e"></param>
         private async void OnTestDeserter(object sender, RoutedEventArgs e)
         {
-            if (CurrentGameState != GameState.WaitingForNext)
-            {
-                GameInfo info = new GameInfo()
-                {
-                    Creator = TheHuman.PlayerName,
-                    GameIndex = 0,
-                    Id = Guid.NewGuid(),
-                    Started = false,
-                    CitiesAndKnights=true
-                };
-
-                await StartGame(info);
-            }
-
-            if (CurrentGameState != GameState.WaitingForNext)
-            {
-                this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
-            }
-
-
-            //
-            //  get some knight entitlements
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
-
-            //
-            //  figure out where to build it
-
-            var originalKnightBuilding = Test_FindBuildingPlacement(BuildingState.Knight);
-            await KnightLeftPointerPressed(originalKnightBuilding); // builds it
-            await KnightLeftPointerPressed(originalKnightBuilding); // activate it
-            await KnightLeftPointerPressed(originalKnightBuilding); // upgrade it
-
-            Debug.Assert(originalKnightBuilding.IsKnight);
-            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
-            Debug.Assert(originalKnightBuilding.Knight.Activated == true);
-            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
-            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
-            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
-
-            // move to Player2
-            await NextState();
-
-            // roll
-            await Test_DoRoll(1, 2, SpecialDice.Pirate);
-
-            // get the Deserter Entitlement
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.Deserter, GameState.PickDeserter);
-
-            Debug.Assert(CurrentGameState == GameState.PickDeserter);
-
-            await KnightLeftPointerPressed(originalKnightBuilding); // this is the knight we just built
-            Debug.Assert(originalKnightBuilding.BuildingState == BuildingState.None);
-
-            var newKnight = Test_FindBuildingPlacement(BuildingState.Knight);
-
-            Debug.Assert(newKnight.BuildingState == BuildingState.None);
-            await KnightLeftPointerPressed(newKnight);
-
-            Debug.Assert(newKnight.IsKnight);
-            Debug.Assert(newKnight.Knight.KnightRank == KnightRank.Strong);
-            Debug.Assert(newKnight.Knight.Activated == false);
-            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
-            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 0);
-            Debug.Assert(MainPageModel.TotalKnightRanks == 0); // not activated yet
-            Debug.Assert(CurrentGameState == GameState.WaitingForNext);
-
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
-            await KnightLeftPointerPressed(newKnight); // Activate it
-            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
-            await Task.Delay(10); // in case you want to look at it...
-            await DoUndo(); // Activate
-            await Task.Delay(10);
-            await DoUndo(); // Buy activate entitlement
-            await Task.Delay(100);
-            await DoUndo(); // undoes the DoneWithDeserter and the placement
-            await Task.Delay(100);
-            Debug.Assert(CurrentGameState == GameState.PlaceDeserterKnight);
-
-            Debug.Assert(MainPageModel.TotalKnightRanks == 0);
-
-            await DoUndo(); // undoes the Pick
-            await Task.Delay(100);
-            Debug.Assert(CurrentGameState == GameState.PickDeserter);
-            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
-            Debug.Assert(originalKnightBuilding.IsKnight);
-            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
-            Debug.Assert(originalKnightBuilding.Knight.Activated);
-
-            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 1);
-            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements[0] == Entitlement.Deserter);
-            await DoUndo(); // undoes the buy entitlement
-            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
-            Debug.Assert(CurrentGameState == GameState.WaitingForNext);
-
-            await DoUndo(); // back to roll
-            await Task.Delay(10);
-            await DoUndo(); // back to player[0]
-            await Task.Delay(10);
-            await DoUndo(); // Activate knight
-            await Task.Delay(10);
-            await DoUndo(); // Upgrade Knight
-            await Task.Delay(10);
-            await DoUndo(); // Place Knight
-
-            await Task.Delay(10);
-            await DoUndo(); // Buy entitlement
-
-            await Task.Delay(10);
-            await DoUndo(); //  Buy entitlement
-
-            await Task.Delay(10);
-            await DoUndo(); //  Buy entitlement
+            await TestDeserter();
 
         }
+        private async void OnUndoToWaitingForNext(object sender, RoutedEventArgs e)
+        {
+            await UndoToState(GameState.WaitingForNext, 0);
+
+        }
+
         //
         //  find a place the Current User can place a Building
         private BuildingCtrl Test_FindBuildingPlacement(BuildingState buildingState)
@@ -822,17 +715,142 @@ namespace Catan10
             var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
             this.TraceMessage("trade gold: " + picked.ToString());
         }
-        private void VerifyRoundTrip<T>(T model)
+        private async Task TestDeserter()
         {
-            //var options = new JsonSerializerOptions() { WriteIndented = true };
-            //options.Converters.Add(new JsonStringEnumConverter());
-            //var jsonString = JsonSerializer.Serialize<T>(model, options);
-            //T newModel = JsonSerializer.Deserialize<T>(jsonString, options);
-            //var newJsonString = JsonSerializer.Serialize<T>(newModel, options);
-            ////   this.TraceMessage(newJsonString);
-            //Debug.Assert(newJsonString == jsonString);
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                GameInfo info = new GameInfo()
+                {
+                    Creator = TheHuman.PlayerName,
+                    GameIndex = 0,
+                    Id = Guid.NewGuid(),
+                    Started = false,
+                    CitiesAndKnights=true
+                };
+
+                await StartGame(info);
+            }
+
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
+            }
+
+
+            //
+            //  get some knight entitlements
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+
+            //
+            //  figure out where to build it
+
+            var originalKnightBuilding = Test_FindBuildingPlacement(BuildingState.Knight);
+            await KnightLeftPointerPressed(originalKnightBuilding); // builds it
+            await KnightLeftPointerPressed(originalKnightBuilding); // activate it
+            await KnightLeftPointerPressed(originalKnightBuilding); // upgrade it
+
+            Debug.Assert(originalKnightBuilding.IsKnight);
+            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
+            Debug.Assert(originalKnightBuilding.Knight.Activated == true);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
+            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+
+            // move to Player
+            await NextState();
+
+            // roll
+            await Test_DoRoll(1, 2, SpecialDice.Pirate);
+
+            // get the Deserter Entitlement
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Deserter, GameState.PickDeserter);
+
+            Debug.Assert(CurrentGameState == GameState.PickDeserter);
+
+            await KnightLeftPointerPressed(originalKnightBuilding); // this is the knight we just built
+            Debug.Assert(originalKnightBuilding.BuildingState == BuildingState.None);
+
+            var newKnight = Test_FindBuildingPlacement(BuildingState.Knight);
+
+            Debug.Assert(newKnight.BuildingState == BuildingState.None);
+            await KnightLeftPointerPressed(newKnight);
+
+            Debug.Assert(newKnight.IsKnight);
+            Debug.Assert(newKnight.Knight.KnightRank == KnightRank.Strong);
+            Debug.Assert(newKnight.Knight.Activated == false);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 0);
+            Debug.Assert(MainPageModel.TotalKnightRanks == 0); // not activated yet
+            Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+            await KnightLeftPointerPressed(newKnight); // Activate it
+            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+            //  await UndoToState(GameState.WaitingForNext);
+            //  await UndoKnightWithAsserts(originalKnightBuilding);
+
+        }
+        private async Task UndoKnightWithAsserts(BuildingCtrl originalKnightBuilding)
+        {
+            await Task.Delay(10); // in case you want to look at it...
+            await DoUndo(); // Activate
+            await Task.Delay(10);
+            await DoUndo(); // Buy activate entitlement
+            await Task.Delay(100);
+            await DoUndo(); // undoes the DoneWithDeserter and the placement
+            await Task.Delay(100);
+            Debug.Assert(CurrentGameState == GameState.PlaceDeserterKnight);
+
+            Debug.Assert(MainPageModel.TotalKnightRanks == 0);
+
+            await DoUndo(); // undoes the Pick
+            await Task.Delay(100);
+            Debug.Assert(CurrentGameState == GameState.PickDeserter);
+            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+            Debug.Assert(originalKnightBuilding.IsKnight);
+            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
+            Debug.Assert(originalKnightBuilding.Knight.Activated);
+
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 1);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements[0] == Entitlement.Deserter);
+            await DoUndo(); // undoes the buy entitlement
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+
+            await DoUndo(); // back to roll
+            await Task.Delay(10);
+            await DoUndo(); // back to player[0]
+            await Task.Delay(10);
+            await DoUndo(); // Activate knight
+            await Task.Delay(10);
+            await DoUndo(); // Upgrade Knight
+            await Task.Delay(10);
+            await DoUndo(); // Place Knight
+
+            await Task.Delay(10);
+            await DoUndo(); // Buy entitlement
+
+            await Task.Delay(10);
+            await DoUndo(); //  Buy entitlement
+
+            await Task.Delay(10);
+            await DoUndo(); //  Buy entitlement
         }
 
+        private async Task UndoToState(GameState state, int millisecsDelay = 0)
+        {
+
+            do
+            {
+                this.TraceMessage($"Undoing: {this.Log.PeekAction}");
+                await DoUndo();
+                await Task.Delay(millisecsDelay);
+            } while (CurrentGameState != state);
+
+
+        }
         #endregion Methods
     }
 
