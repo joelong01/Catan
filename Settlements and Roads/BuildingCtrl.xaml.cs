@@ -503,7 +503,10 @@ namespace Catan10
             {
 
                 var target =  await DragAndDropKnight(sender, origE);
-                await MoveKnightLog.PostLog(Callback as IGameController, this, target);
+                if (target != null)
+                {
+                    await MoveKnightLog.PostLog(Callback as IGameController, this, target);
+                }
             }
 
 
@@ -624,7 +627,7 @@ namespace Catan10
 
         private async void OnKnightPointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            this.TraceMessage("");
+            
             if (Callback.HasEntitlement(Entitlement.MoveKnight)) return;
 
             if (this.BuildingState != BuildingState.Knight) return;

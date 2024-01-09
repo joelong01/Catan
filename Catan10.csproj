@@ -242,6 +242,9 @@
     <Compile Include="UI Controls\BoardMeasurementCtrl.xaml.cs">
       <DependentUpon>BoardMeasurementCtrl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI Controls\CitiesAndKnights\LaurelCtrl.xaml.cs">
+      <DependentUpon>LaurelCtrl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI Controls\DiceCtrl.xaml.cs">
       <DependentUpon>DiceCtrl.xaml</DependentUpon>
     </Compile>
@@ -508,7 +511,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Assets\Pirates\PirateShip.xaml">
+    <Page Include="Assets\Knights And Barbarians\PirateShip.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -549,6 +552,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\BoardMeasurementCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\CitiesAndKnights\LaurelCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

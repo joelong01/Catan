@@ -1484,13 +1484,6 @@ namespace Catan10
 
 
 
-            if (building.Owner == null && HasEntitlement(Entitlement.BuyOrUpgradeKnight))
-            {
-
-                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Knight, GameState.WaitingForNext);
-                return;
-
-            }
             if (building.IsKnight && building.Knight.Activated == false && HasEntitlement(Entitlement.ActivateKnight))
             {
                 await ActivateKnight(building, true);

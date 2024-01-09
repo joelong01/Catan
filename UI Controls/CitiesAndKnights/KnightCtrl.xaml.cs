@@ -81,7 +81,7 @@ namespace Catan10
 
         }
 
-        public Brush GetForegroundBrush(PlayerModel current, PlayerModel owner, bool activated)
+        public SolidColorBrush GetForegroundBrush(PlayerModel current, PlayerModel owner, bool activated)
         {
             if (DesignMode.DesignModeEnabled)
             {
@@ -92,10 +92,7 @@ namespace Catan10
 
         public Visibility RankVisibility(KnightRank currentRank, KnightRank rankToShow)
         {
-            int current =(int)currentRank;
-            int show = (int) rankToShow;
-
-            if (show <= current) return Visibility.Visible;
+            if (currentRank == rankToShow) return Visibility.Visible;
             return Visibility.Collapsed;
 
         }
