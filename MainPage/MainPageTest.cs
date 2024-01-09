@@ -2,22 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-
-using Catan.Proxy;
-
-using System.Text.Json;
-using Windows.Services.Maps;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.Storage;
 using Catan10.CatanService;
-using System.Diagnostics.Contracts;
 using System.Diagnostics;
-using Windows.System;
-using Windows.Storage.Streams;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Media;
-using Windows.Foundation.Collections;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -293,6 +281,11 @@ namespace Catan10
         private async void OnTestDeserter(object sender, RoutedEventArgs e)
         {
             await TestDeserter();
+
+        }
+        private async void OnTestMoveKnight(object sender, RoutedEventArgs e)
+        {
+            await TestMoveKnight();
 
         }
         private async void OnUndoToWaitingForNext(object sender, RoutedEventArgs e)
@@ -715,6 +708,67 @@ namespace Catan10
             var picked = ResourceCardCollection.ToTradeResources(dlg.Destination);
             this.TraceMessage("trade gold: " + picked.ToString());
         }
+
+        private async Task TestMoveKnight()
+        {
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                GameInfo info = new GameInfo()
+                {
+                    Creator = TheHuman.PlayerName,
+                    GameIndex = 0,
+                    Id = Guid.NewGuid(),
+                    Started = false,
+                    CitiesAndKnights=true
+                };
+
+                await StartGame(info);
+            }
+
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
+            }
+
+            //
+            //  get some knight entitlements
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+
+            //
+            //  figure out where to build it
+
+            var originalKnightBuilding = Test_FindBuildingPlacement(BuildingState.Knight);
+            await KnightLeftPointerPressed(originalKnightBuilding); // builds it
+            await KnightLeftPointerPressed(originalKnightBuilding); // activate it
+            await KnightLeftPointerPressed(originalKnightBuilding); // upgrade it
+
+            Debug.Assert(originalKnightBuilding.IsKnight);
+            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
+            Debug.Assert(originalKnightBuilding.Knight.Activated == true);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
+            Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+
+            // guy a couple of roads
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Road, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.Road, CurrentGameState);
+
+            foreach (var road in originalKnightBuilding.AdjacentRoads)
+            {
+                if (road.Owner == null)
+                {
+                    await UpdateRoadLog.PostLogEntry(this, road, NextRoadState(road), RaceTracking);
+                }
+            }
+
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight, CurrentGameState);
+
+
+
+        }
+
         private async Task TestDeserter()
         {
             if (CurrentGameState != GameState.WaitingForNext)

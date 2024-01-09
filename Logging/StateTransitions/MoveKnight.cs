@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,30 +9,51 @@ using Catan.Proxy;
 
 namespace Catan10
 {
-    public  class MoveKnightLog : LogHeader, ILogController
+    public class MoveKnightLog : LogHeader, ILogController
     {
-        public int Index { get; set; }
+        public int FromIndex { get; set; }
+        public int ToIndex { get; set; }
         public KnightRank KnightRank { get; set; }
 
-        public static async Task PostLog(IGameController gameController, KnightCtrl knight)
+        public static async Task PostLog(IGameController gameController, BuildingCtrl from, BuildingCtrl to)
         {
+            Debug.Assert(from.IsKnight);
+            Debug.Assert(!to.IsKnight);
+            Debug.Assert(to.BuildingState == BuildingState.None);
             MoveKnightLog logHeader = new MoveKnightLog()
             {
-                Index = knight.BuildingIndex,
-                KnightRank = knight.KnightRank
+                FromIndex = from.Index,
+                ToIndex = to.Index,
+                KnightRank = from.Knight.KnightRank
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
 
-        public Task Do(IGameController gameController)
+        public async Task Do(IGameController gameController)
         {
-           return gameController.MoveKnight(this, ActionType.Normal);
+
+            BuildingCtrl fromBuilding = gameController.GetBuilding(this.FromIndex);
+            BuildingCtrl toBuilding = gameController.GetBuilding(this.ToIndex);
+            Contract.Assert(fromBuilding != null);
+            Contract.Assert(toBuilding != null);
+            PlayerModel player = gameController.NameToPlayer(this.SentBy);
+            Contract.Assert(player != null);
+
+
+
+            await fromBuilding.UpdateBuildingState(player, BuildingState.Knight, BuildingState.None);
+            await toBuilding.UpdateBuildingState(player, BuildingState.None, BuildingState.Knight);
+            toBuilding.Knight.KnightRank = this.KnightRank;
+            toBuilding.Knight.Activated = false;
+            player.GameData.Resources.ConsumeEntitlement(Entitlement.MoveKnight);
+
+
         }
 
-        public Task Redo(IGameController gameController)
+        public async Task Redo(IGameController gameController)
         {
-            throw new NotImplementedException();
+            await Do(gameController);
         }
 
         public Task Replay(IGameController gameController)
@@ -38,9 +61,22 @@ namespace Catan10
             throw new NotImplementedException();
         }
 
-        public Task Undo(IGameController gameController)
+        public async Task Undo(IGameController gameController)
         {
-            return gameController.MoveKnight(this, ActionType.Undo);
+
+            BuildingCtrl to = gameController.GetBuilding(this.ToIndex); 
+            BuildingCtrl from = gameController.GetBuilding(this.FromIndex);
+            Contract.Assert(to != null);
+            Contract.Assert(from != null);
+            PlayerModel player = gameController.NameToPlayer(this.SentBy);
+            Contract.Assert(player != null);
+
+
+            await to.UpdateBuildingState(player, BuildingState.Knight, BuildingState.None);
+            await from.UpdateBuildingState(player, BuildingState.None, BuildingState.Knight);
+            from.Knight.KnightRank = this.KnightRank;
+            from.Knight.Activated = true; // all knights that are moved start activated
+            player.GameData.Resources.GrantEntitlement(Entitlement.MoveKnight);
         }
     }
 }

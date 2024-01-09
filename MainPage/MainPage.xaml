@@ -68,6 +68,8 @@
                         <MenuFlyoutSubItem Text="Development">
                             <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Regular Game" />
                             <MenuFlyoutItem Click="OnTestDeserter" Text="Test Deserter" />
+                            <MenuFlyoutItem Click="OnTestMoveKnight" Text="Move Knight" />
+                            
                             <MenuFlyoutItem Click="OnUndoToWaitingForNext" Text="Undo to Waiting For Next" />
                             <MenuFlyoutItem Click="OnTestRollSeven" Text="Test Roll 7" />
                             <MenuFlyoutItem Click="OnTestExpansionGame" Text="Test Game (Expansion)" />

@@ -1011,36 +1011,6 @@ namespace Catan10
             }
         }
 
-       
-
-        public async Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType)
-        {
-            BuildingCtrl building = GetBuilding(moveKnightLog.Index);
-            Contract.Assert(building != null);
-            PlayerModel player = NameToPlayer(moveKnightLog.SentBy);
-            Contract.Assert(player != null);
-            if (actionType == ActionType.Undo)
-            {
-                // Undo means that we put the knight back in the location
-                await building.UpdateBuildingState(player, BuildingState.None, BuildingState.Knight);
-                building.Knight.KnightRank = moveKnightLog.KnightRank;
-                building.Knight.Activated = true;
-                player.GameData.Resources.GrantEntitlement(Entitlement.MoveKnight);
-            }
-            else
-            {
-                // refund the whole knight -- rely on the players to enforce the fules
-                for (int i = 0; i < ( int )moveKnightLog.KnightRank; i++)
-                {
-                    player.GameData.Resources.GrantEntitlement(Entitlement.BuyOrUpgradeKnight);
-
-                }
-
-                await building.UpdateBuildingState(player, BuildingState.Knight, BuildingState.None);
-                player.GameData.Resources.ConsumeEntitlement(Entitlement.MoveKnight);
-
-            }
-        }
         /// <summary>
         ///     in pirates, the red die is special (possible grants dev cards)
         ///     if the special die is a pirate, we increment the journey.
@@ -1059,7 +1029,6 @@ namespace Catan10
                 if (rollModel.SpecialDice == SpecialDice.Pirate)
                 {
                     int count =  CTRL_Invasion.Next();
-                    this.TraceMessage($"PIRATE      [Count={count}] [steps={CTRL_Invasion.StepsBeforeInvasion}]");
                     if (count < CTRL_Invasion.StepsBeforeInvasion)
                     {
                         //

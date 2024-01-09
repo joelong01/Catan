@@ -147,7 +147,6 @@ namespace Catan10
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
      
         Task ActivateKnight(BuildingCtrl building, bool activate);
-        Task MoveKnight(KnightCtrl Knight);
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
 
         bool HasEntitlement(Entitlement entitlement);
@@ -261,7 +260,6 @@ namespace Catan10
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType action);
 
-         Task MoveKnight(MoveKnightLog moveKnightLog, ActionType actionType);
         void AssignLargestArmy();
 
         Task HandlePirateRoll(RollModel rollModel, ActionType action);

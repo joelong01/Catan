@@ -252,6 +252,175 @@ namespace Catan10
             return taskCompletionSource.Task;
         }
 
+
+        public delegate void MouseEnterHandler(UIElement control);
+        public delegate void MouseLeaveHandler(UIElement control);
+        public class DragHelper
+        {
+            public event MouseEnterHandler MouseEnter;
+            public event MouseLeaveHandler  MouseLeave;
+            private UIElement currentHoverTarget = null;
+
+            public Task<Point> DragAsync<T>(FrameworkElement toDrag, FrameworkElement knight, PointerRoutedEventArgs origE, List<T> targets) where T : UIElement
+            {
+                TaskCompletionSource<Point> taskCompletionSource = new TaskCompletionSource<Point>();
+                UIElement mousePositionWindow = Window.Current.Content;
+                GeneralTransform gt = Window.Current.Content.TransformToVisual(toDrag);
+                UIElement root = MainPage.Current;
+
+                Point pointMouseDown = gt.TransformPoint(origE.GetCurrentPoint(mousePositionWindow).Position);
+
+                PointerEventHandler pointerMovedHandler = null;
+                PointerEventHandler pointerReleasedHandler = null;
+                PointerEventHandler pointerEnterHandler = null;
+                PointerEventHandler pointerExitedHandler = null;
+
+                CompositeTransform compositeTransform = toDrag.RenderTransform as CompositeTransform;
+
+                pointerEnterHandler = (object s, PointerRoutedEventArgs e) =>
+                {
+                    MouseEnter?.Invoke(( UIElement )s);
+
+                };
+
+                pointerExitedHandler = (object s, PointerRoutedEventArgs e) =>
+                {
+                    MouseLeave?.Invoke(( UIElement )s);
+                };
+
+                pointerMovedHandler = (object s, PointerRoutedEventArgs e) =>
+                {
+
+                    Point pt = e.GetCurrentPoint(mousePositionWindow).Position;
+                    pt = gt.TransformPoint(pt);
+                    Point delta = new Point
+                    {
+                        X = pt.X - pointMouseDown.X,
+                        Y = pt.Y - pointMouseDown.Y
+                    };
+                   
+                   
+                    compositeTransform.TranslateX += delta.X;
+                    compositeTransform.TranslateY += delta.Y;
+                    pointMouseDown = pt;
+
+
+                    var newHoverTarget = GetControlUnderMouse<T>(e, MainPage.Current, targets, knight);
+
+
+                    // Raise events if necessary
+                    if (newHoverTarget != currentHoverTarget)
+                    {
+                        if (currentHoverTarget != null)
+                        {
+                            MouseLeave?.Invoke(currentHoverTarget);
+                        }
+                        if (newHoverTarget != null)
+                        {
+                            MouseEnter?.Invoke(newHoverTarget);
+                        }
+                        currentHoverTarget = newHoverTarget;
+                    }
+
+                };
+
+
+                pointerReleasedHandler = (object s, PointerRoutedEventArgs e) =>
+                {
+                    UIElement localControl = (UIElement)s;
+                    localControl.PointerMoved -= pointerMovedHandler;
+                    localControl.PointerReleased -= pointerReleasedHandler;
+                    foreach (var t in targets)
+                    {
+                        t.PointerEntered -= pointerEnterHandler;
+                        t.PointerExited -= pointerExitedHandler;
+                    }
+                    localControl.ReleasePointerCapture(origE.Pointer);
+                    Point exitPoint = e.GetCurrentPoint(mousePositionWindow).Position;
+                
+                    taskCompletionSource.SetResult(exitPoint);
+                };
+
+                toDrag.CapturePointer(origE.Pointer);
+                toDrag.PointerMoved += pointerMovedHandler;
+                toDrag.PointerReleased += pointerReleasedHandler;
+                foreach (var t in targets)
+                {
+                    t.PointerEntered += pointerEnterHandler;
+                    t.PointerExited += pointerExitedHandler;
+                }
+                return taskCompletionSource.Task;
+            }
+
+            private UIElement GetControlUnderMouse<T>(PointerRoutedEventArgs e, UIElement start, List<T> targets, FrameworkElement skip) where T : UIElement
+            {
+                Point mousePositionRelativeToMainPage = e.GetCurrentPoint(start).Position;
+
+                var elementsUnderMouse = VisualTreeHelper.FindElementsInHostCoordinates(mousePositionRelativeToMainPage, start);
+
+                foreach (var element in elementsUnderMouse)
+                {
+                    if (element == skip) continue;
+                    if (element == skip.Parent) continue;
+                   
+                    //if (element.GetType() == typeof(BuildingCtrl))
+                    //{
+                    //    this.TraceMessage($"BUILDING: {element as BuildingCtrl}");
+                    //}
+                    bool contains =  targets.Contains(element);
+                    if (contains)
+                    {
+                        return element;
+
+                    }
+                }
+                return null;
+            }
+
+        }
+
+        public static FrameworkElement GetFirstParent(FrameworkElement start, Type stopElementType)
+        {
+            if (start == null || stopElementType == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            FrameworkElement parent = start;
+
+            while (parent != null)
+            {
+                parent = ( FrameworkElement )VisualTreeHelper.GetParent(parent);
+
+                if (parent != null && stopElementType.IsInstanceOfType(parent))
+                {
+                    return parent;
+                }
+            }
+
+            return null; // Return null if no parent of the specified type is found
+        }
+        public static UIElement GetNextControlFromVisualStack(UIElement topWindow, Type lookFor, PointerRoutedEventArgs e, Point mousePosition)
+        {
+            //    this.TraceMessage($"Point {mousePosition}");
+
+            Point mousePositionRelativeToMainPage = e.GetCurrentPoint(MainPage.Current).Position;
+
+            var elementsUnderMouse = VisualTreeHelper.FindElementsInHostCoordinates(mousePositionRelativeToMainPage, topWindow);
+
+            foreach (var element in elementsUnderMouse)
+            {
+
+                if (element.GetType() == lookFor)
+                {
+
+                    return element;
+
+                }
+            }
+            return null;
+        }
+
         public static async Task<StorageFolder> GetSaveFolder([CallerMemberName] string cmb = "", [CallerLineNumber] int cln = 0, [CallerFilePath] string cfp = "")
         {
             // System.Diagnostics.Debug.WriteLine($"GetSaveFolder called.  File: {cfp}, Method: {cmb}, Line Number: {cln}");

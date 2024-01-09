@@ -3,8 +3,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="30" d:DesignWidth="30"
         IsHitTestVisible="True" mc:Ignorable="d">
+    <UserControl.Resources>
+        <Storyboard x:Name="AnimateMove">
+            <DoubleAnimation Storyboard.TargetName="Grid_Knight" x:Name="DA_X"
+                    Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
+                    Duration="00:00:0.250" />
+            <DoubleAnimation Storyboard.TargetName="Grid_Knight" x:Name="DA_Y"
+                    Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
+                    Duration="00:00:0.250" />
+        </Storyboard>
+    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="Transparent" Opacity="1.0" PointerEntered="Building_PointerEntered"
-            PointerExited="Building_PointerExited" PointerPressed="Building_PointerPressed">
+            IsHitTestVisible="True" PointerExited="Building_PointerExited" PointerPressed="Building_PointerPressed">
         <!--  Used for debugging the layout and number of Buildings.  Left here for easy uncommenting  -->
         <!--<TextBlock Text="{x:Bind Index, Mode=OneWay, FallbackValue=1}" HorizontalAlignment="Center" FontSize="24" Visibility="Collapsed" />-->
         <!--  Fill="{x:Bind Path=CurrentPlayer.BackgroundBrush, Mode=OneWay}"  -->
@@ -81,8 +91,8 @@
                 Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent"
                 Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'City'), Mode=OneWay}">
             <Viewbox Name="_vbCity" Width="30" Height="30" Stretch="Uniform">
-                <local:CityCtrl x:Name="CTRL_City" Width="30" Height="30" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        Owner="{x:Bind Owner, Mode=OneWay}" />
+                <local:CityCtrl x:Name="CTRL_City" Width="30" Height="30"
+                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
         </Grid>
         <Canvas Name="CANVAS_Settlement" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
@@ -106,23 +116,18 @@
                     Stroke="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}"
                     StrokeThickness="2" X1="6" X2="25" Y1="6" Y2="25" />
         </Grid>
-        <Grid Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
+        <Grid Name="Grid_Knight" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
                 Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent"
                 Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'Knight'), Mode=OneWay}"
-                RightTapped="OnRightTapped" PointerPressed="OnKnightLeftClick">
+                PointerPressed="OnKnightLeftPointerDown" PointerReleased="OnKnightPointerReleased">
+            <Grid.RenderTransform>
+                <CompositeTransform x:Name="XFORM_Knight" />
+            </Grid.RenderTransform>
             <Viewbox Name="_vbKnight" Width="30" Height="30" Stretch="Uniform">
-                <local:KnightCtrl x:Name="CTRL_Knight" Width="30" Height="30" BuildingIndex="{x:Bind Index, Mode=OneWay}"
-                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" Owner="{x:Bind Owner, Mode=OneWay}" />
+                <local:KnightCtrl x:Name="CTRL_Knight" Width="30" Height="30"
+                        BuildingIndex="{x:Bind Index, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                        Owner="{x:Bind Owner, Mode=OneWay}" />
             </Viewbox>
-            <Button Visibility="Collapsed">
-                <Button.Flyout>
-                    <MenuFlyout x:Name="Menu_Knight" Placement="Right">
-                        <MenuFlyoutItem x:Name="MNU_Upgrade" Text="Upgrade" Click="OnUpgrade"/>
-                        <MenuFlyoutItem x:Name="MNU_Activate" Text="Activate" Click="OnActivate" />
-                        <MenuFlyoutItem x:Name="MNU_Move" Text="Move" Click="OnMove" />
-                    </MenuFlyout>
-                </Button.Flyout>
-            </Button>
         </Grid>
     </Grid>
 </UserControl>

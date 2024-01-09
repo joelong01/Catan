@@ -626,9 +626,7 @@ namespace Catan10
             {
                 //
                 //  do all pirate work before doing roll work
-                this.TraceMessage("PIRATE   Start");
                 await WaitingForRollToPirateRoll.PostRollMessage(this, roll);
-                this.TraceMessage("PIRATE   End Pirate roll");
 
             }
             else
