@@ -54,7 +54,7 @@ namespace Catan10
         public async Task Undo(IGameController gameController)
         {
             ChangePlayerHelper.ChangePlayer(gameController, 1);
-            AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
+            AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
              await Task.Delay(0);
         }
     }

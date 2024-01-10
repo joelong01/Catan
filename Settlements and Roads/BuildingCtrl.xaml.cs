@@ -117,7 +117,7 @@ namespace Catan10
                 return;
             }
 
-            if (this.BuildingState == BuildingState.City && Callback.HasEntitlement(Entitlement.UpgradeToMetro))
+            if (this.BuildingState == BuildingState.City && Callback.HasEntitlement(Entitlement.UpgradeToMetro) && !City.Metropolis)
             {
                 await MetroTransitionLog.UpgradeCityLog(Callback as IGameController, this.Index);
                 return;

@@ -102,7 +102,14 @@ namespace Catan10
 
             // peek into the Done stack and set the random gold to what we find there
             var gold = GoldStack.Peek();
-            await gameController.GameContainer.SetRandomTilesToGold(gold);
+            if (gold != null)
+            {
+                await gameController.GameContainer.SetRandomTilesToGold(gold);
+            }
+            else
+            {
+                this.TraceMessage($"No gold tiles to undo in GameState.{gameController.CurrentGameState}");
+            }
         }
     }
 }

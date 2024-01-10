@@ -31,7 +31,7 @@ namespace Catan10
 
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(new PlayerModel()));
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(null));
-        public static readonly DependencyProperty HasWallProperty = DependencyProperty.Register("HasWall", typeof(bool), typeof(TileCtrl), new PropertyMetadata(false));
+        public static readonly DependencyProperty HasWallProperty = DependencyProperty.Register("HasWall", typeof(bool), typeof(CityCtrl), new PropertyMetadata(false));
         public static readonly DependencyProperty MetropolisProperty = DependencyProperty.Register("Metropolis", typeof(bool), typeof(CityCtrl), new PropertyMetadata(false));
         public bool Metropolis
         {

@@ -293,10 +293,12 @@ namespace Catan10
         {
             await TestMetro();
         }
-        private async void OnUndoToWaitingForNext(object sender, RoutedEventArgs e)
+        private async void OnUndoToPreviousPlayer(object sender, RoutedEventArgs e)
         {
-            await UndoToState(GameState.WaitingForNext, 0);
-
+            int index = PlayingPlayers.IndexOf(CurrentPlayer);
+            index--;
+            index = (index + PlayingPlayers.Count) % PlayingPlayers.Count;
+            await UndoToPlayer(PlayingPlayers[index]);
         }
 
         //
@@ -975,6 +977,19 @@ namespace Catan10
                 await DoUndo();
                 await Task.Delay(millisecsDelay);
             } while (CurrentGameState != state);
+
+
+        }
+
+        private async Task UndoToPlayer(PlayerModel player, int millisecsDelay = 0)
+        {
+
+            while (CurrentPlayer != player)
+            {
+                this.TraceMessage($"Undoing: {this.Log.PeekAction}");
+                await DoUndo();
+                await Task.Delay(millisecsDelay);
+            } 
 
 
         }

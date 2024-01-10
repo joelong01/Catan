@@ -70,7 +70,7 @@
                             <MenuFlyoutItem Click="OnTestDeserter" Text="Test Deserter" />
                             <MenuFlyoutItem Click="OnTestMoveKnight" Text="Move Knight" />
                             <MenuFlyoutItem Click="OnTestMetro" Text="Metropolis" />
-                            <MenuFlyoutItem Click="OnUndoToWaitingForNext" Text="Undo to Waiting For Next" />
+                            <MenuFlyoutItem Click="OnUndoToPreviousPlayer" Text="Undo to Previous Player" />
                             <MenuFlyoutItem Click="OnTestRollSeven" Text="Test Roll 7" />
                             <MenuFlyoutItem Click="OnTestExpansionGame" Text="Test Game (Expansion)" />
                             <MenuFlyoutSeparator />

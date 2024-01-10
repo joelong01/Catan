@@ -1298,23 +1298,10 @@ namespace Catan10
                         }
                     }
                     break;
-                case Entitlement.PoliticsUpgrade:
-                    if (CurrentPlayer.GameData.EntitlementsLeft(entitlement) > 0)
-                    {
-                        await ImprovementLog.PostLog(this, entitlement, CurrentPlayer.GameData.PoliticsRank);
-                    }
-                    break;
                 case Entitlement.ScienceUpgrade:
-                    if (CurrentPlayer.GameData.EntitlementsLeft(entitlement) > 0)
-                    {
-                        await ImprovementLog.PostLog(this, entitlement, CurrentPlayer.GameData.ScienceRank);
-                    }
-                    break;
+                case Entitlement.PoliticsUpgrade:
                 case Entitlement.TradeUpgrade:
-                    if (CurrentPlayer.GameData.EntitlementsLeft(entitlement) > 0)
-                    {
-                        await ImprovementLog.PostLog(this, entitlement, CurrentPlayer.GameData.TradeRank);
-                    }
+                    await PurchaseCityImprovement(entitlement);
                     break;
                 case Entitlement.Wall:
                     await TryBuyWall();
@@ -1341,6 +1328,84 @@ namespace Catan10
                 default:
                     break;
             }
+        }
+        /// <summary>
+        ///     Determines if a city improvement can be purchased based on the given rank and conditions:
+        ///     1. The rank is less than 4.
+        ///     2. If the rank is 4, and a metro exists for this entitlement, or the player has a non-metro city.
+        ///     3. If the rank is 5, and the player either owns the metro or has a non-metro city.
+        /// </summary>
+        /// <param name="improvementEntitlement"></param>
+        /// <returns></returns>
+        private async Task PurchaseCityImprovement(Entitlement improvementEntitlement)
+        {
+            (int rank, int currentUpgradedCity) = CurrentPlayer.GameData.GetImprovementRank(improvementEntitlement);
+
+            // Consolidate the conditions for clarity and efficiency
+            bool canPurchase = rank < 4 || await CanPurchaseForRankFourOrFive(rank, currentUpgradedCity, improvementEntitlement);
+
+            if (canPurchase)
+            {
+                await ImprovementLog.PostLog(this, improvementEntitlement, rank);
+            }
+        }
+
+        /// <summary>
+        ///     Helper method to determine if purchase is possible for rank 4 or 5.
+        /// </summary>
+        private async Task<bool> CanPurchaseForRankFourOrFive(int rank, int currentUpgradedCity, Entitlement improvementEntitlement)
+        {
+            if (rank == 4)
+            {
+                return  MetroExistsForEntitlement(improvementEntitlement) || await CheckForNonMetroCities();
+            }
+            if (rank == 5)
+            {
+                return currentUpgradedCity == -1 ? await CheckForNonMetroCities() : IsBuildingOwnedByCurrentPlayer(currentUpgradedCity);
+            }
+            return false;
+        }
+
+        /// <summary>
+        ///     Checks if a metro exists for the given entitlement.
+        /// </summary>
+        private bool MetroExistsForEntitlement(Entitlement improvementEntitlement)
+        {
+            foreach (var player in PlayingPlayers)
+            {
+                (int _, int buildingId) = player.GameData.GetImprovementRank(improvementEntitlement);
+                if (buildingId != -1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        ///     Checks if the building is owned by the current player.
+        /// </summary>
+        private bool IsBuildingOwnedByCurrentPlayer(int buildingId)
+        {
+            var building = GetBuilding(buildingId);
+            return building.Owner == CurrentPlayer;
+        }
+
+
+        private async Task<bool> CheckForNonMetroCities()
+        {
+            int count = 0;
+            CurrentPlayer.GameData.Cities.ForEach((c) =>
+            {
+                if (!c.City.Metropolis) count++;
+            });
+
+            if (count == 0)
+            {
+                await ShowErrorMessage($"You can't improve this until you build another City.", "Catan", "");
+                return false;
+            }
+            return true;
         }
 
         /// <summary>

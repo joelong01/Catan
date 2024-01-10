@@ -54,31 +54,52 @@ namespace Catan10
         }
         public async Task Do(IGameController gameController)
         {
-            if (MetroLogAction == MetroLogAction.PickCity)
+            try
             {
-                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.UpgradeToMetro);
-                await Task.Delay(0);
-                return;
-            }
+                if (MetroLogAction == MetroLogAction.PickCity)
+                {
+                    gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.UpgradeToMetro);
+                    List<BuildingCtrl> nonMetroCities = new List<BuildingCtrl>();
+                    foreach (var b in gameController.CurrentPlayer.GameData.Cities)
+                    {
+                        if (!b.City.Metropolis)
+                        {
+                            nonMetroCities.Add(b);
+                        }
 
-            var building = gameController.GetBuilding(this.NewMetroId);
-            if (building.BuildingState != BuildingState.City)
+                    }
+
+                    if (nonMetroCities.Count == 1)
+                    {
+                        await MetroTransitionLog.UpgradeCityLog(gameController, nonMetroCities[0].Index);
+
+                    }
+
+                    return;
+                }
+
+                var building = gameController.GetBuilding(this.NewMetroId);
+                if (building.BuildingState != BuildingState.City)
+                {
+                    Debug.Assert(false, "This should be a city!");
+                    return;
+                }
+                building.City.Metropolis = true;
+                (int rank, int buildingId) = gameController.CurrentPlayer.GameData.GetImprovementRank(this.Entitlement);
+                Debug.Assert(buildingId == -1); // can't already be a metro
+                gameController.CurrentPlayer.GameData.SetImprovementRank(this.Entitlement, rank, building.Index); // same rank, new building id
+                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.UpgradeToMetro);
+                if (PreviousMetro != -1)
+                {
+                    var previous = gameController.GetBuilding(this.PreviousMetro);
+                    Debug.Assert(previous.IsCity);
+                    previous.City.Metropolis = false;
+                }
+            }
+            finally
             {
-                Debug.Assert(false, "This should be a city!");
                 await Task.Delay(0);
-                return;
             }
-            building.City.Metropolis = true;
-            (int rank, int buildingId) = gameController.CurrentPlayer.GameData.GetImprovementRank(this.Entitlement);
-            gameController.CurrentPlayer.GameData.SetImprovementRank(this.Entitlement, rank, building.Index); // same rank, new building id
-            gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.UpgradeToMetro);
-            if (PreviousMetro != -1)
-            {
-                var previous = gameController.GetBuilding(this.PreviousMetro);
-                Debug.Assert(previous.IsCity);
-                previous.City.Metropolis = false;
-            }
-            await Task.Delay(0);
         }
 
         public async Task Redo(IGameController gameController)
@@ -103,7 +124,10 @@ namespace Catan10
                 var building = gameController.GetBuilding(this.NewMetroId);
                 Debug.Assert(building.IsCity);
                 building.City.Metropolis = false;
-
+                (int rank, int improvedBuildingId) = gameController.CurrentPlayer.GameData.GetImprovementRank(this.Entitlement);
+                Debug.Assert(rank > 0);
+                Debug.Assert(improvedBuildingId != -1);
+                gameController.CurrentPlayer.GameData.SetImprovementRank(this.Entitlement, rank, -1);
                 if (PreviousMetro != -1)
                 {
                     var previous = gameController.GetBuilding(this.PreviousMetro);
