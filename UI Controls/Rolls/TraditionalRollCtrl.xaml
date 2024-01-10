@@ -42,6 +42,7 @@
             <Setter Property="Margin" Value="5, 0, 0, 0" />
         </Style>
     </Control.Resources>
+    
     <StackPanel Orientation="Horizontal">
         <Grid
                 Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">

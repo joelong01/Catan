@@ -297,7 +297,7 @@ namespace Catan10
         {
             int index = PlayingPlayers.IndexOf(CurrentPlayer);
             index--;
-            index = (index + PlayingPlayers.Count) % PlayingPlayers.Count;
+            index = ( index + PlayingPlayers.Count ) % PlayingPlayers.Count;
             await UndoToPlayer(PlayingPlayers[index]);
         }
 
@@ -740,7 +740,7 @@ namespace Catan10
             {
                 await ImprovementLog.PostLog(this, Entitlement.PoliticsUpgrade, CurrentPlayer.GameData.PoliticsRank);
             }
-      
+
             Debug.Assert(CurrentGameState == GameState.UpgradeToMetro);
 
             await MetroTransitionLog.UpgradeCityLog(this, this.CurrentPlayer.GameData.Cities[0].Index);
@@ -989,7 +989,7 @@ namespace Catan10
                 this.TraceMessage($"Undoing: {this.Log.PeekAction}");
                 await DoUndo();
                 await Task.Delay(millisecsDelay);
-            } 
+            }
 
 
         }
