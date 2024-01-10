@@ -33,11 +33,11 @@
                     </TextBlock>
                 </Grid>
             </Viewbox>
-            <local:LaurelCtrl Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeThickness="100"
+            <local:LaurelCtrl Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeThickness="1"
                     RenderTransformOrigin=".5 .5"
                     Visibility="{x:Bind Metropolis, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <local:LaurelCtrl.RenderTransform>
-                    <CompositeTransform ScaleX="1" ScaleY="1.2" TranslateY="-5" />
+                    <CompositeTransform ScaleX="1" ScaleY="1" TranslateY="0" />
                 </local:LaurelCtrl.RenderTransform>
             </local:LaurelCtrl>
 

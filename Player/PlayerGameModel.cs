@@ -76,7 +76,7 @@ namespace Catan10
 
         public void SetImprovementRank(Entitlement entitlement, int rank, int buildingId)
         {
-            Metros[entitlement] = (rank, buildingId);
+           
             switch (entitlement)
             {
                 case Entitlement.PoliticsUpgrade:
@@ -92,6 +92,8 @@ namespace Catan10
                     Debug.Assert(false, $"Bad entitlement: {entitlement}");
                     break;
             }
+
+            Metros[entitlement] = (rank, buildingId); // do it last so that the prop sets fire the change notification
         }
 
         [JsonIgnore]
@@ -449,11 +451,11 @@ namespace Catan10
                 case Entitlement.MoveKnight:
                     return 1; // no restrictions on how many times a knight can move
                 case Entitlement.TradeUpgrade:
-                    return 5 - TradeRank;
+                    return 6 - TradeRank;
                 case Entitlement.PoliticsUpgrade:
-                    return 5 - PoliticsRank;
+                    return 6 - PoliticsRank;
                 case Entitlement.ScienceUpgrade:
-                    return 5 - ScienceRank;
+                    return 6 - ScienceRank;
                 case Entitlement.Merchant:
                     return 1;
                 case Entitlement.Diplomat:

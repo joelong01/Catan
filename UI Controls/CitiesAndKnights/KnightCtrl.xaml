@@ -29,7 +29,7 @@
             <Ellipse Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}"
                     Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}" Margin="4" Fill="Transparent"
                     Visibility="{x:Bind RankVisibility(KnightRank, local:KnightRank.Strong), Mode=OneWay}"
-                    Stroke="White" StrokeThickness="6" StrokeDashArray=".2" />
+                    Stroke="{x:Bind GetForegroundBrush(CurrentPlayer, Owner, Activated), Mode=OneWay}" StrokeThickness="6" StrokeDashArray=".2" />
 
             <Viewbox Stretch="Uniform">
                 <Path StrokeThickness="1"
