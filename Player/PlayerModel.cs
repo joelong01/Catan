@@ -64,6 +64,8 @@ namespace Catan10
         private Guid _PlayerIdentifier = Guid.Empty;
 
         double _serviceLatency = 0;
+
+       
         public double ServiceLatency
         {
             get

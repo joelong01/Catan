@@ -288,6 +288,11 @@ namespace Catan10
             await TestMoveKnight();
 
         }
+
+        private async void OnTestMetro(object sender, RoutedEventArgs e)
+        {
+            await TestMetro();
+        }
         private async void OnUndoToWaitingForNext(object sender, RoutedEventArgs e)
         {
             await UndoToState(GameState.WaitingForNext, 0);
@@ -709,6 +714,74 @@ namespace Catan10
             this.TraceMessage("trade gold: " + picked.ToString());
         }
 
+        private async Task TestMetro()
+        {
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                GameInfo info = new GameInfo()
+                {
+                    Creator = TheHuman.PlayerName,
+                    GameIndex = 0,
+                    Id = Guid.NewGuid(),
+                    Started = false,
+                    CitiesAndKnights=true
+                };
+
+                await StartGame(info);
+            }
+
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
+            }
+            while (CurrentPlayer.GameData.PoliticsRank < 5)
+            {
+                await ImprovementLog.PostLog(this, Entitlement.PoliticsUpgrade, CurrentPlayer.GameData.PoliticsRank);
+            }
+      
+            Debug.Assert(CurrentGameState == GameState.UpgradeToMetro);
+
+            await MetroTransitionLog.UpgradeCityLog(this, this.CurrentPlayer.GameData.Cities[0].Index);
+            Debug.Assert(CurrentPlayer.GameData.Score == 5);
+
+
+            // move to Player
+            await NextState();
+
+            // roll
+            await Test_DoRoll(1, 2, SpecialDice.Pirate);
+            while (CurrentPlayer.GameData.PoliticsRank < 5)
+            {
+                await ImprovementLog.PostLog(this, Entitlement.PoliticsUpgrade, CurrentPlayer.GameData.PoliticsRank);
+                await Task.Delay(0); // force UI to update
+
+            }
+            await Task.Delay(0); // force UI to update
+            Debug.Assert(CurrentGameState == GameState.WaitingForNext); // Tie does not get the win!
+                                                                        // move to Player
+            await NextState();
+            await Task.Delay(0); // force UI to update
+            // roll
+            await Test_DoRoll(1, 2, SpecialDice.Pirate);
+            while (CurrentPlayer.GameData.PoliticsRank < 6)
+            {
+                await ImprovementLog.PostLog(this, Entitlement.PoliticsUpgrade, CurrentPlayer.GameData.PoliticsRank);
+                await Task.Delay(0); // force UI to update
+            }
+
+            Debug.Assert(CurrentPlayer.GameData.PoliticsRank == 6);
+
+            Debug.Assert(CurrentGameState == GameState.UpgradeToMetro);
+            await Task.Delay(0); // force UI to update
+            await MetroTransitionLog.UpgradeCityLog(this, this.CurrentPlayer.GameData.Cities[0].Index);
+
+            Debug.Assert(CurrentPlayer.GameData.Score == 5);
+
+            Debug.Assert(PlayingPlayers[0].GameData.Score == 3);
+
+            Debug.Assert(PlayingPlayers[0].GameData.Cities[0].City.Metropolis = false);
+
+        }
         private async Task TestMoveKnight()
         {
             if (CurrentGameState != GameState.WaitingForNext)

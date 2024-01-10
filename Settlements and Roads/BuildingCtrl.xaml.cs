@@ -117,6 +117,12 @@ namespace Catan10
                 return;
             }
 
+            if (this.BuildingState == BuildingState.City && Callback.HasEntitlement(Entitlement.UpgradeToMetro))
+            {
+                await MetroTransitionLog.UpgradeCityLog(Callback as IGameController, this.Index);
+                return;
+            }
+
             if (this.BuildingState == BuildingState.Knight) // this is handled in KnightPointerUp so that we can do D&D
             {
 

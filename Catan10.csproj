@@ -178,6 +178,7 @@
     <Compile Include="Logging\StateTransitions\6c_MustTradeGold.cs" />
     <Compile Include="Logging\StateTransitions\6d_TradeGoldToWaitingForNext.cs" />
     <Compile Include="Logging\StateTransitions\7b_NextToSupplementatl.cs" />
+    <Compile Include="Logging\StateTransitions\MetroTransitionLog.cs" />
     <Compile Include="Logging\StateTransitions\MoveKnight.cs" />
     <Compile Include="Logging\StateTransitions\ProtectCity.cs" />
     <Compile Include="Logging\StateTransitions\ToPickGold.cs" />

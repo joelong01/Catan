@@ -16,6 +16,8 @@ using Windows.UI.Xaml;
 
 namespace Catan10
 {
+
+
     public class PlayerGameModel : INotifyPropertyChanged
     {
 
@@ -56,12 +58,41 @@ namespace Catan10
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         private Trades _trades = new Trades();
 
-        private int _TradeRank = 0;
-        private int _PoliticsRank = 0;
-        private int _ScienceRanks = 0;
+      
         private int _VictoryPoints = 0;
         bool _playedMerchantLast = false;
+        private readonly Dictionary<Entitlement, (int rank, int BuildingId)> Metros = new Dictionary<Entitlement, (int rank, int BuildingId)>
+            {
+                { Entitlement.PoliticsUpgrade, (0, -1) },
+                { Entitlement.TradeUpgrade, (0, -1) },
+                { Entitlement.ScienceUpgrade, (0, -1) }
+            };
+        //
+        //  put access to Dictionary behind Get/Set functions so that we can update the *Rank counters because they are bound
+        public (int rank, int BuildingId) GetImprovementRank(Entitlement entitlement)
+        {
+            return Metros[entitlement];
+        }
 
+        public void SetImprovementRank(Entitlement entitlement, int rank, int buildingId)
+        {
+            Metros[entitlement] = (rank, buildingId);
+            switch (entitlement)
+            {
+                case Entitlement.PoliticsUpgrade:
+                    PoliticsRank = rank;
+                    break;
+                case Entitlement.TradeUpgrade:
+                    TradeRank = rank;
+                    break;
+                case Entitlement.ScienceUpgrade:
+                    ScienceRank = rank;
+                    break;
+                default:
+                    Debug.Assert(false, $"Bad entitlement: {entitlement}");
+                    break;
+            }
+        }
 
         [JsonIgnore]
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
@@ -500,13 +531,15 @@ namespace Catan10
         {
             get
             {
-                return _TradeRank;
+                return Metros[Entitlement.TradeUpgrade].rank;
             }
             set
             {
-                if (value != _TradeRank)
+                (int rank, int id) = Metros[Entitlement.TradeUpgrade];
+                if (value != rank)
                 {
-                    _TradeRank = value;
+                   
+                    Metros[Entitlement.TradeUpgrade] = (value, id);
                     NotifyPropertyChanged();
                 }
             }
@@ -516,13 +549,15 @@ namespace Catan10
         {
             get
             {
-                return _PoliticsRank;
+                return Metros[Entitlement.PoliticsUpgrade].rank;
             }
             set
             {
-                if (value != _PoliticsRank)
+                (int rank, int id) = Metros[Entitlement.PoliticsUpgrade];
+                if (value != rank)
                 {
-                    _PoliticsRank = value;
+
+                    Metros[Entitlement.PoliticsUpgrade] = (value, id);
                     NotifyPropertyChanged();
                 }
             }
@@ -532,13 +567,15 @@ namespace Catan10
         {
             get
             {
-                return _ScienceRanks;
+                return Metros[Entitlement.ScienceUpgrade].rank;
             }
             set
             {
-                if (value != _ScienceRanks)
+                (int rank, int id) = Metros[Entitlement.ScienceUpgrade];
+                if (value != rank)
                 {
-                    _ScienceRanks = value;
+
+                    Metros[Entitlement.ScienceUpgrade] = (value, id);
                     NotifyPropertyChanged();
                 }
             }
@@ -868,7 +905,7 @@ namespace Catan10
             ShipsPlayed = Ships.Count;
         }
 
-        private void UpdateScore()
+        public void UpdateScore()
         {
             int score = CitiesPlayed * 2 + SettlementsPlayed;
 
@@ -880,6 +917,11 @@ namespace Catan10
             score += _islands.Count;
 
             score += PlayedMerchantLast ? 1 : 0;
+
+            foreach (var building in Cities)
+            {
+                if (building.City.Metropolis) score += 2;
+            }
 
             Score = score;
         }

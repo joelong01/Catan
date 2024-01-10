@@ -151,7 +151,7 @@ namespace Catan10
 
         [Description("Merchant")]
         Merchant,
-
+        UpgradeToMetro,
     }
 
     public enum GameState
@@ -223,7 +223,9 @@ namespace Catan10
         PickDeserter,
         [Description("Place Deserter")]
         PlaceDeserterKnight,
-        DoneWithDeserter
+        DoneWithDeserter,
+        [Description("Pick City")]
+        UpgradeToMetro
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

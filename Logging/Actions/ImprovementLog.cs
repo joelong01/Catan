@@ -26,29 +26,64 @@ namespace Catan10
             await gameController.PostMessage(logEntry, ActionType.Normal);
 
         }
+
+        /// <summary>
+        ///     the rules are
+        ///     1. first to 5 gets a metro (they have to pick a city to upgrade)
+        ///     2. if somebody else goes to 6, the first to 5 palyer looses he metro and the first to 6 picks a city
+        /// </summary>
+        /// <param name="gameController"></param>
+        /// <returns></returns>
         public async Task Do(IGameController gameController)
         {
-            switch (Entitlement)
+
+
+            (int maxRank, PlayerModel maxPlayer) = HighestImprovement(gameController, this.Entitlement);
+            (int rank, int metroCityId) = gameController.CurrentPlayer.GameData.GetImprovementRank(this.Entitlement);
+            gameController.CurrentPlayer.GameData.SetImprovementRank(this.Entitlement, rank + 1, metroCityId);
+            if (rank == 4 && maxRank == 4 || ( rank == 5 && maxRank == 5 && maxPlayer != gameController.CurrentPlayer ))
             {
-
-                case Entitlement.PoliticsUpgrade:
-                    gameController.CurrentPlayer.GameData.PoliticsRank++;
-                    break;
-                case Entitlement.ScienceUpgrade:
-                    gameController.CurrentPlayer.GameData.ScienceRank++;
-                    break;
-                case Entitlement.TradeUpgrade:
-                    gameController.CurrentPlayer.GameData.TradeRank++;
-                    break;
-
-                default:
-                    Debug.Assert(false, "Entitlement should be one of the above!");
-                    break;
+                Debug.Assert(metroCityId == -1);
+                await MetroTransitionLog.PickCityLog(gameController, this.Entitlement);
             }
 
-            await Task.Delay(1);
+
+
 
         }
+
+        (int, PlayerModel) HighestImprovement(IGameController gameController, Entitlement improvement)
+        {
+            int max = 0;
+            PlayerModel maxPlayer = null;
+            foreach (var player in gameController.PlayingPlayers)
+            {
+
+                (int r, int id) = player.GameData.GetImprovementRank(this.Entitlement);
+                {
+                    if (r > max)
+                    {
+                        max = r;
+                        maxPlayer = player;
+                    }
+                }
+            }
+
+            if (max == 5) // make sure that is more than 1 person has rank=5, we pick the one that got there first, which will have a CityId set
+            {
+                foreach (var player in gameController.PlayingPlayers)
+                {
+                    if (player.GameData.GetImprovementRank(this.Entitlement).BuildingId != -1)
+                    {
+                        maxPlayer = player;
+                        break;
+                    }
+                }
+            }
+
+            return (max, maxPlayer);
+        }
+
 
         public async Task Redo(IGameController gameController)
         {
@@ -62,26 +97,8 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
-            switch (Entitlement)
-            {
-
-                case Entitlement.PoliticsUpgrade:
-                    gameController.CurrentPlayer.GameData.PoliticsRank--;
-                    Debug.Assert(CurrentRank == gameController.CurrentPlayer.GameData.PoliticsRank);
-                    break;
-                case Entitlement.ScienceUpgrade:
-                    gameController.CurrentPlayer.GameData.ScienceRank--;
-                    Debug.Assert(CurrentRank == gameController.CurrentPlayer.GameData.ScienceRank);
-                    break;
-                case Entitlement.TradeUpgrade:
-                    gameController.CurrentPlayer.GameData.TradeRank--;
-                    Debug.Assert(CurrentRank == gameController.CurrentPlayer.GameData.TradeRank);
-                    break;
-
-                default:
-                    Debug.Assert(false, "Entitlement should be one of the above!");
-                    break;
-            }
+            (int rank, int metroCityId) = gameController.CurrentPlayer.GameData.GetImprovementRank(this.Entitlement);
+            gameController.CurrentPlayer.GameData.SetImprovementRank(this.Entitlement, rank - 1, metroCityId);
 
             await Task.Delay(1);
         }

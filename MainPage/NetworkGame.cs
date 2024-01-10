@@ -317,6 +317,12 @@ namespace Catan10
             }
 
             MainPageModel.ChangeUnprocessMessage(-1);
+            //
+            //1/9/2024:  this is a bit of a hack, but i'm in a hurry right now.
+            foreach(var player in PlayingPlayers)
+            {
+                player.GameData.UpdateScore();
+            }
 
         }
 
