@@ -45,6 +45,7 @@ namespace Catan10
             await fromBuilding.UpdateBuildingState(player, BuildingState.Knight, BuildingState.None);
             await toBuilding.UpdateBuildingState(player, BuildingState.None, BuildingState.Knight);
             toBuilding.Knight.KnightRank = this.KnightRank;
+            fromBuilding.Knight.KnightRank = KnightRank.Basic;
             toBuilding.Knight.Activated = false;
             player.GameData.Resources.ConsumeEntitlement(Entitlement.MoveKnight);
 
@@ -75,6 +76,7 @@ namespace Catan10
             await to.UpdateBuildingState(player, BuildingState.Knight, BuildingState.None);
             await from.UpdateBuildingState(player, BuildingState.None, BuildingState.Knight);
             from.Knight.KnightRank = this.KnightRank;
+            to.Knight.KnightRank = KnightRank.Basic;
             from.Knight.Activated = true; // all knights that are moved start activated
             player.GameData.Resources.GrantEntitlement(Entitlement.MoveKnight);
         }

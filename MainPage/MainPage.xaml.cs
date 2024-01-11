@@ -834,12 +834,12 @@ namespace Catan10
 
             if (String.IsNullOrEmpty(content))
             {
-                return null;
+                return MainPageModel.Default;
             }
             try
             {
                 mainPageModel = JsonSerializer.Deserialize<MainPageModel>(content);
-                if (mainPageModel == null) mainPageModel = new MainPageModel();
+                if (mainPageModel == null) mainPageModel = MainPageModel.Default;// new MainPageModel();
                 mainPageModel.GameController = this;
                 mainPageModel.Log = new Log(this);
 

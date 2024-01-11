@@ -216,7 +216,7 @@ namespace Catan10
         {
             fullSize = 1 - fullSize;
 
-            if (GridPosition.ScaleX == 1.0)
+            if (GridPosition.ScaleX > 0.6)
             {
                 GridPosition.ScaleX = 0.5;
             }

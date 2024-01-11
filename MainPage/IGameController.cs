@@ -1028,7 +1028,7 @@ namespace Catan10
             {
                 if (rollModel.SpecialDice == SpecialDice.Pirate)
                 {
-                    int count =  CTRL_Invasion.Next();
+                    int count = CTRL_Invasion.Next();
                     if (count < CTRL_Invasion.StepsBeforeInvasion)
                     {
                         //

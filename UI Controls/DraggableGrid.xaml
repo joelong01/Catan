@@ -45,8 +45,8 @@
                     Style="{StaticResource HeaderTextBlockStyle}" Text="{x:Bind Caption, Mode=OneWay}" />
         </Viewbox>
         <Viewbox Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
-            <Button Background="Transparent" Click="OnGrowOrShrinkControls" Content="&#xE740;"
-                    FontFamily="Segoe MDL2 Assets" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+            <Button Background="Black" Click="OnGrowOrShrinkControls" Content="&#xE740;"
+                    FontFamily="Segoe MDL2 Assets" Foreground="White" />
         </Viewbox>
         <Viewbox Name="ViewBox_Parent" Grid.Row="1">
             <ContentPresenter Content="{x:Bind Child}" />
