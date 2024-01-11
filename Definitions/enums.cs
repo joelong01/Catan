@@ -3,6 +3,7 @@
 namespace Catan10
 {
     public enum AnimationSpeed { Ultra = 5, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 };
+    
 
     public enum BodyType
     {
@@ -225,7 +226,9 @@ namespace Catan10
         PlaceDeserterKnight,
         DoneWithDeserter,
         [Description("Pick City")]
-        UpgradeToMetro
+        UpgradeToMetro,
+        [Description("Test Checkpoint")]
+        TestCheckpoint
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

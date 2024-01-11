@@ -321,8 +321,8 @@ namespace Catan10
                 {
                     return GameInfo.CitiesAndKnights;
                 }
-                this.TraceMessage("if you want to change the default startup view, here is where you do it.");
-                return false;
+              
+                return true;
             }
         }
 

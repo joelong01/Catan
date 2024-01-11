@@ -384,6 +384,81 @@ namespace Catan10
             await StartGame(info);
 
         }
+        private async void OnTestInvasion(object sender, RoutedEventArgs e)
+        {
+
+            await TestInvasion();
+
+        }
+        private async Task TestInvasion()
+        {
+            this.Testing = true;
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                GameInfo info = new GameInfo()
+                {
+                    Creator = TheHuman.PlayerName,
+                    GameIndex = 0,
+                    Id = Guid.NewGuid(),
+                    Started = false,
+                    CitiesAndKnights=true
+                };
+
+                await StartGame(info);
+            }
+
+            if (CurrentGameState != GameState.WaitingForNext)
+            {
+                this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
+            }
+
+            await TestCheckpointLog.AddTestCheckpoint(this);
+            
+            for (int i = 0; i < 7; i++)
+            {
+
+                RollModel roll = new RollModel()
+                {
+                    RedDie = 6,
+                    WhiteDie = 6,
+                    SpecialDice = SpecialDice.Pirate
+                };
+                await this.OnRolledNumber(roll);
+                await NextState();
+            }
+
+            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
+            
+            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
+            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
+            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
+            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
+            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
+            Debug.Assert(this.CurrentGameState == GameState.DoneDestroyingCities);
+            await NextState();
+            Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
+            await RollbackToCheckpoint();
+            Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
+
+        }
+
+        private async Task RollbackToCheckpoint()
+        {
+            int i= 0;
+            while (Log.PeekAction.NewState != GameState.TestCheckpoint)
+            {
+                i++;
+                if (i == 30)
+                {
+                    this.TraceMessage("");
+                }
+                await DoUndo();
+                this.TraceMessage(Log.PeekAction.ToString());
+            }
+
+            await DoUndo();
+     
+        }
 
         private async void OnTestRollSeven(object sender, RoutedEventArgs e)
         {

@@ -1,7 +1,7 @@
 ﻿<UserControl Name="userControl" x:Class="Catan10.RoadCtrl"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" HorizontalAlignment="Left"
         VerticalAlignment="Top" d:DesignHeight="16" d:DesignWidth="68" Background="Green"
         PointerEntered="Road_PointerEntered" PointerExited="Road_PointerExited" PointerPressed="Road_PointerPressed"
@@ -19,21 +19,21 @@
         <Storyboard x:Name="_sbMove">
             <DoubleAnimation x:Name="_daToX" d:IsOptimized="True" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
-                    Duration="0:0:1" />
+                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daToY" d:IsOptimized="True" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                    Duration="0:0:1" />
+                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbRotate">
             <DoubleAnimation x:Name="_daRotate" d:IsOptimized="True" BeginTime="0:0:1"
                     Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0"
-                    Duration="0:0:1" />
+                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbAnimateOpacity">
             <DoubleAnimation x:Name="_daAnimateOpacity" AutoReverse="False" BeginTime="0:0:2"
                     Storyboard.TargetName="userControl" Storyboard.TargetProperty="(UIElement.Opacity)" To="0.5"
-                    Duration="0:0:1" />
+                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.Testing), Mode=OneWay}" />
         </Storyboard>
     </Control.Resources>
     <Grid Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"

@@ -7,16 +7,16 @@
         <Storyboard x:Name="AnimateMove">
             <DoubleAnimation Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
-                    To="{x:Bind GridPosition.TranslateX, Mode=TwoWay}" Duration="00:00:0.250" />
+                    To="{x:Bind GridPosition.TranslateX, Mode=TwoWay}" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
-                    To="{x:Bind GridPosition.TranslateY, Mode=TwoWay}" Duration="00:00:0.250" />
+                    To="{x:Bind GridPosition.TranslateY, Mode=TwoWay}" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleX)"
-                    To="{x:Bind GridPosition.ScaleX, Mode=TwoWay}" Duration="00:00:0.250" />
+                    To="{x:Bind GridPosition.ScaleX, Mode=TwoWay}" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleY)"
-                    To="{x:Bind GridPosition.ScaleY, Mode=TwoWay}" Duration="00:00:0.250" />
+                    To="{x:Bind GridPosition.ScaleY, Mode=TwoWay}" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
         </Storyboard>
     </UserControl.Resources>
     <!--<CompositeTransform x:Name="CTGrid"

@@ -7,7 +7,7 @@ using Windows.UI.Xaml.Markup;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace Catan10.Sliders
+namespace Catan10
 {
     public enum SlideDirection { Up, Down, Right, Left };
 

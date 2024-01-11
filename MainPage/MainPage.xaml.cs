@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -132,19 +133,21 @@ namespace Catan10
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
         {
-            double baseSpeed = 2;
-            if (Current != null)
-            {
-                baseSpeed = Current.AnimationSpeedBase;
-            }
+           return MainPage.Current.GetAnimationDuration(speed, MainPage.Current.Testing).TimeSpan.TotalMilliseconds;
+        }
 
-            if (speed == AnimationSpeed.Ultra)
-            {
-                return ( double )speed;
-            }
-            // AnimationSpeedFactor is a value of 1...4
-            double d = (double)speed / (baseSpeed + 2);
-            return d;
+        public static readonly DependencyProperty TestingProperty = DependencyProperty.Register("Testing", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
+        public bool Testing
+        {
+            get => ( bool )GetValue(TestingProperty);
+            set => SetValue(TestingProperty, value);
+        }
+
+        public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
+        {
+            if (testing) return  new Duration(TimeSpan.FromMilliseconds((double)AnimationSpeed.Ultra));
+
+            return new Duration(TimeSpan.FromMilliseconds(( double )requestedSpeed));
         }
 
         /// <summary>

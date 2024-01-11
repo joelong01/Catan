@@ -9,24 +9,24 @@
         <Storyboard x:Name="_sbMove">
             <DoubleAnimation x:Name="_daX" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="110"
-                    Duration="0:0:1.00" />
+                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daY" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="110"
-                    Duration="0:0:1.00" />
+                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="SB_AnimateOpacity">
             <DoubleAnimation x:Name="DA_Opacity" Storyboard.TargetName="userControl" Storyboard.TargetProperty="Opacity"
-                    To="0" Duration="0:0:1.00" />
+                    To="0" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.Testing), Mode=OneWay}" />
 
         </Storyboard>
 
         <Storyboard x:Name="AnimateMove">
             <DoubleAnimation Storyboard.TargetName="LayoutRoot" x:Name="DA_X"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
-                    Duration="00:00:0.250" />
+                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="LayoutRoot" x:Name="DA_Y"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                    Duration="00:00:0.250" />
+                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
         </Storyboard>
     </UserControl.Resources>
     <Control.RenderTransform>

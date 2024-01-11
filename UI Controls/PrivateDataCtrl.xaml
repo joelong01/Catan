@@ -6,7 +6,7 @@
     xmlns:local="using:Catan10"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:proxy="using:Catan.Proxy"
-    xmlns:s="using:Catan10.Sliders"
+    xmlns:s="using:Catan10"
     d:DesignHeight="400" d:DesignWidth="520"
     mc:Ignorable="d">
     <Control.Resources>

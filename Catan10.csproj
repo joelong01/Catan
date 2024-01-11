@@ -155,6 +155,7 @@
     <Compile Include="Logging\Actions\InventorLog.cs" />
     <Compile Include="Logging\Actions\MoveMerchantLog.cs" />
     <Compile Include="Logging\Actions\PurchaseMerchantEntitlement.cs" />
+    <Compile Include="Logging\Actions\TestCheckpointLog.cs" />
     <Compile Include="Logging\StateTransitions\6b_DestroyNextCity.cs" />
     <Compile Include="Logging\StateTransitions\6b_ToMustDesroyCity.cs" />
     <Compile Include="Logging\StateTransitions\6_WaitingForRollToPirateRoll.cs" />

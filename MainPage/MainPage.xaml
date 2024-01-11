@@ -1,27 +1,27 @@
 ﻿<Page x:Name="_page" x:Class="Catan10.MainPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="using:Catan10.Sliders"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="using:Catan10"
         d:DesignHeight="1440" d:DesignWidth="2560" IsTabStop="False" NavigationCacheMode="Required"
         RequestedTheme="Dark" RightTapped="OnRightTapped" UseLayoutRounding="True" mc:Ignorable="d">
     <Page.Resources>
         <Storyboard x:Name="_sbShowHideSettings">
             <DoubleAnimation x:Name="_daShowHideSettings" d:IsOptimized="True" Storyboard.TargetName="_ctrlSettings"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                    Duration="0:0:0.250" />
+                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.VeryFast, Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbNumberOpacity">
             <DoubleAnimation x:Name="_daNumberOpacity" d:IsOptimized="True" AutoReverse="False"
                     Storyboard.TargetName="RollGrid" Storyboard.TargetProperty="(UIElement.Opacity)" To="0"
-                    Duration="0:0:1.00" />
+                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.Normal, Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbRotatePlayerAndRolls">
             <DoubleAnimation x:Name="_daRotatePlayers" d:IsOptimized="True" Storyboard.TargetName="_gameTracker"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0"
-                    Duration="0:0:1" />
+                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.Normal, Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daRotateRolls" d:IsOptimized="True" Storyboard.TargetName="_rollHistoryChart"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0"
-                    Duration="0:0:1" />
+                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.Normal, Testing), Mode=OneWay}" />
         </Storyboard>
         <Style x:Key="RollGridTextStyle" TargetType="TextBlock">
             <Setter Property="Margin" Value="10" />
@@ -67,6 +67,7 @@
 
                         <MenuFlyoutSubItem Text="Development">
                             <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Regular Game" />
+                            <MenuFlyoutItem Click="OnTestInvasion" Text="Test Invasion" />
                             <MenuFlyoutItem Click="OnTestDeserter" Text="Test Deserter" />
                             <MenuFlyoutItem Click="OnTestMoveKnight" Text="Move Knight" />
                             <MenuFlyoutItem Click="OnTestMetro" Text="Metropolis" />
@@ -291,8 +292,9 @@
                                             Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
                                 </StackPanel>
 
-                                <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1" Height="40" Visibility="Collapsed"
-                                        Margin="30,0,10,40" VerticalAlignment="Center" ColorCodeTimer="True" />
+                                <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1" Height="40"
+                                        Visibility="Collapsed" Margin="30,0,10,40" VerticalAlignment="Center"
+                                        ColorCodeTimer="True" />
 
                             </StackPanel>
                         </Viewbox>
