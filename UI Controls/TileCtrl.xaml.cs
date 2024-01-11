@@ -526,7 +526,7 @@ namespace Catan10
             }
             else
             {
-                animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+                animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast);
             }
             TileOrientation = orientation;
 
@@ -544,14 +544,13 @@ namespace Catan10
         {
             //   if (ActualOrientTation == orientation) return;
 
-            StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.Normal), 0);
+            StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast), 0);
 
             taskList.Add(_sbFlipTile.ToTask());
         }
 
         public void SetTileOrientationAsync(TileOrientation orientation, double animationDuration = double.MaxValue, double startAfter = 0)
         {
-            //  if (ActualOrientTation == orientation) return;
             _sbFlipTile.SkipToFill();
 
             if (animationDuration == double.MaxValue)
@@ -560,7 +559,7 @@ namespace Catan10
             }
             else
             {
-                animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+                animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast);
             }
 
             StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, animationDuration, 0);

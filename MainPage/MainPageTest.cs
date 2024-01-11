@@ -364,7 +364,7 @@ namespace Catan10
             PlayingPlayers[2].GameData.PoliticsRank = 3;
 
             await NextState();
-            await Test_DoRoll(1, 2, SpecialDice.Pirate);
+      
 
         }
 
@@ -382,6 +382,7 @@ namespace Catan10
             };
 
             await StartGame(info);
+            await Test_DoRoll(1, 2, SpecialDice.Pirate);
 
         }
         private async void OnTestInvasion(object sender, RoutedEventArgs e)
@@ -407,7 +408,7 @@ namespace Catan10
                 await StartGame(info);
             }
 
-            if (CurrentGameState != GameState.WaitingForNext)
+            if (CurrentGameState != GameState.WaitingForRoll)
             {
                 this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
             }
@@ -417,18 +418,11 @@ namespace Catan10
             for (int i = 0; i < 7; i++)
             {
 
-                RollModel roll = new RollModel()
-                {
-                    RedDie = 6,
-                    WhiteDie = 6,
-                    SpecialDice = SpecialDice.Pirate
-                };
-                await this.OnRolledNumber(roll);
+                await Test_DoRoll(6, 6, SpecialDice.Pirate);
                 await NextState();
             }
 
-            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
-            
+            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity); 
             await DestroyCity(CurrentPlayer.GameData.Cities[0]);
             Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
             await DestroyCity(CurrentPlayer.GameData.Cities[0]);
@@ -438,14 +432,68 @@ namespace Catan10
             await NextState();
             Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
             await RollbackToCheckpoint();
-            Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
+            Debug.Assert(this.CurrentGameState == GameState.WaitingForRoll);
+            Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
 
+
+            await TestCheckpointLog.AddTestCheckpoint(this);
+            //
+            //  now lets give one person a knight
+
+            //
+            //  get some knight entitlements
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+
+
+            //
+            //  figure out where to build it
+
+            var originalKnightBuilding = Test_FindBuildingPlacement(BuildingState.Knight);
+            await KnightLeftPointerPressed(originalKnightBuilding); // builds it
+            await KnightLeftPointerPressed(originalKnightBuilding); // activate it
+     
+
+            Debug.Assert(originalKnightBuilding.IsKnight);
+            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
+            Debug.Assert(originalKnightBuilding.Knight.Activated == true);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
+            Debug.Assert(MainPageModel.TotalKnightRanks == 1);
+            
+
+            for (int i = 0; i < 7; i++)
+            {
+
+                await Test_DoRoll(6, 6, SpecialDice.Pirate);
+                await NextState();
+            
+            }
+            
+            await NextState();
+            Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
+            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
+            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
+
+            Debug.Assert(CurrentPlayer == PlayingPlayers[2]);
+            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
+            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
+
+            Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
+            Debug.Assert(CurrentPlayer.GameData.VictoryPoints == 1);
+
+            Debug.Assert(this.CurrentGameState == GameState.DoneDestroyingCities);
+            await NextState();
+            Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
+            await RollbackToCheckpoint();
+            Debug.Assert(this.CurrentGameState == GameState.WaitingForRoll);
+            Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
         }
 
-        private async Task RollbackToCheckpoint()
+        private async Task RollbackToState(GameState state)
         {
             int i= 0;
-            while (Log.PeekAction.NewState != GameState.TestCheckpoint)
+            while (Log.PeekAction.NewState != state)
             {
                 i++;
                 if (i == 30)
@@ -455,6 +503,11 @@ namespace Catan10
                 await DoUndo();
                 this.TraceMessage(Log.PeekAction.ToString());
             }
+        }
+
+        private async Task RollbackToCheckpoint()
+        {
+            await RollbackToState(GameState.TestCheckpoint);
 
             await DoUndo();
      
@@ -805,6 +858,7 @@ namespace Catan10
                 };
 
                 await StartGame(info);
+                await Test_DoRoll(1, 2, SpecialDice.Pirate);
             }
 
             if (CurrentGameState != GameState.WaitingForNext)
@@ -873,6 +927,7 @@ namespace Catan10
                 };
 
                 await StartGame(info);
+                await Test_DoRoll(1, 2, SpecialDice.Pirate);
             }
 
             if (CurrentGameState != GameState.WaitingForNext)
@@ -933,6 +988,7 @@ namespace Catan10
                 };
 
                 await StartGame(info);
+                await Test_DoRoll(1, 2, SpecialDice.Pirate);
             }
 
             if (CurrentGameState != GameState.WaitingForNext)

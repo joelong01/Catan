@@ -1138,7 +1138,7 @@ namespace Catan10
             {
                 if (rollModel.SpecialDice == SpecialDice.Pirate)
                 {
-                    CTRL_Invasion.Previous();
+                    int step = CTRL_Invasion.Previous();
                     if (CTRL_Invasion.InvasionCount == 0)
                     {
                         CTRL_Invasion.ShowBaron();
@@ -1148,7 +1148,7 @@ namespace Catan10
                 }
             }
 
-            await Task.Delay(10);
+            await Task.Delay(0);
 
         }
         /**

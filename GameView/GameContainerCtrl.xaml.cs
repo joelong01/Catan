@@ -810,7 +810,7 @@ namespace Catan10
             List<Task> taskList = new List<Task>();
             foreach (var idx in indeces)
             {
-                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast));
             }
 
             await Task.WhenAll(taskList);
@@ -818,7 +818,7 @@ namespace Catan10
             foreach (var idx in indeces)
             {
                 TilesInIndexOrder[idx].TemporarilyGold = true;
-                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceUp, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Normal));
+                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceUp, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast));
             }
 
             await Task.WhenAll(taskList);
