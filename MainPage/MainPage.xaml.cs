@@ -111,6 +111,7 @@ namespace Catan10
             GameController = this;
             this.DataContext = this;
             RaceTracking = new RoadRaceTracking(this);
+            MainPageModel = MainPageModel.Default;
         }
 
         #endregion Constructors + Destructors
