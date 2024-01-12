@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -136,9 +137,9 @@ namespace Catan10
         {
 
             var previousTile = gameController.TileFromIndex(this.BaronModel.PreviousTile);
+            Debug.Assert(previousTile != null);
             var weapon = this.BaronModel.Weapon;
-
-            foreach (var victim in this.BaronModel.Victims)
+            foreach (var victim in this.BaronModel?.Victims ?? Enumerable.Empty<string>())
             {
 
                 PlayerModel targetPlayer = gameController.NameToPlayer(victim);
@@ -147,7 +148,7 @@ namespace Catan10
                     targetPlayer.GameData.TimesTargeted--;
                 }
 
-                gameController.SetBaronTile(weapon, previousTile, this.BaronModel.MainBaronHidden);
+
                 if (BaronModel.StolenResource != ResourceType.None)
                 {
                     TradeResources tr = new TradeResources();
@@ -155,22 +156,25 @@ namespace Catan10
                     targetPlayer.GameData.Resources.GrantResources(tr, false);                                  // I giveth back
                     gameController.CurrentPlayer.GameData.Resources.GrantResources(tr.GetNegated(), false);     // I taketh away
                 }
-
-                // if they played a dev card, undo it if it is a service game (local games don't track resources)
-                if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
-                {
-
-                    gameController.CurrentPlayer.GameData.Resources.UndoPlayDevCard(DevCardType.Knight);
-
-                }
-
-                // 10/23/2023: this was the corresponding fix to bug above -- we need to decrement knight count on undo, for all game types
-                if (this.BaronModel.Reason != MoveBaronReason.Bishop)
-                {
-                    gameController.CurrentPlayer.GameData.Resources.KnightsPlayed--;
-                    gameController.AssignLargestArmy();
-                }
             }
+
+            gameController.SetBaronTile(weapon, previousTile, BaronModel.MainBaronHidden);
+
+            // if they played a dev card, undo it if it is a service game (local games don't track resources)
+            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
+            {
+
+                gameController.CurrentPlayer.GameData.Resources.UndoPlayDevCard(DevCardType.Knight);
+
+            }
+
+            // 10/23/2023: this was the corresponding fix to bug above -- we need to decrement knight count on undo, for all game types
+            if (this.BaronModel.Reason != MoveBaronReason.Bishop)
+            {
+                gameController.CurrentPlayer.GameData.Resources.KnightsPlayed--;
+                gameController.AssignLargestArmy();
+            }
+
 
             await Task.Delay(0);
         }
