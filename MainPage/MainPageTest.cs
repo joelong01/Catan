@@ -6,6 +6,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Catan10.CatanService;
 using System.Diagnostics;
+using Windows.UI.WindowManagement;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -364,7 +365,7 @@ namespace Catan10
             PlayingPlayers[2].GameData.PoliticsRank = 3;
 
             await NextState();
-      
+
 
         }
 
@@ -393,115 +394,267 @@ namespace Catan10
         }
         private async Task TestInvasion()
         {
-            this.Testing = true;
-            if (CurrentGameState != GameState.WaitingForNext)
+            try
             {
-                GameInfo info = new GameInfo()
+               
+                this.Testing = true;
+                if (CurrentGameState != GameState.WaitingForNext)
                 {
-                    Creator = TheHuman.PlayerName,
-                    GameIndex = 0,
-                    Id = Guid.NewGuid(),
-                    Started = false,
-                    CitiesAndKnights=true
-                };
+                    GameInfo info = new GameInfo()
+                    {
+                        Creator = TheHuman.PlayerName,
+                        GameIndex = 0,
+                        Id = Guid.NewGuid(),
+                        Started = false,
+                        CitiesAndKnights=true
+                    };
 
-                await StartGame(info);
-            }
+                    await StartGame(info);
+                }
+                await TestCheckpointLog.AddTestCheckpoint(this);
+                if (CurrentGameState != GameState.WaitingForRoll)
+                {
+                    this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
+                }
 
-            if (CurrentGameState != GameState.WaitingForRoll)
-            {
-                this.TraceMessage($"can't continue with GameState.{CurrentGameState}");
-            }
+                var knights = new List<BuildingCtrl>();
 
-            await TestCheckpointLog.AddTestCheckpoint(this);
-            
-            for (int i = 0; i < 7; i++)
-            {
 
+                for (int i = 0; i < PlayingPlayers.Count; i++)
+                {
+                    Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
+                    await Test_DoRoll(6, 6, SpecialDice.Pirate);
+                    //  get some knight entitlements
+                    await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+
+                    //
+                    //  figure out where to build it
+
+                    var knight = Test_FindBuildingPlacement(BuildingState.Knight);
+                    await KnightLeftPointerPressed(knight); // builds it
+                    knights.Add(knight);
+                    await MoveToNextPlayer();
+
+                }
+                Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
+                await TestCheckpointLog.AddTestCheckpoint(this);
+                Debug.Assert(MainPageModel.TotalKnightRanks == 0);
+                //
+                //  Scenario 1: Invasion loss with no winners
+                bool playerLost = await RollUntilInvasion();
+                Debug.Assert(playerLost);
+                int count = await HandleInvasion();
+                Debug.Assert(count == 3, "3 people should have lost Cities");
+
+                //
+                //  Nobody should have any entitlements yet, as they have to resolve the invasion before buying anything
+                PlayingPlayers.ForEach(p => Debug.Assert(p.GameData.Resources.UnspentEntitlements.Count == 0));
+                // all cities should be destroyed
+                PlayingPlayers.ForEach(p => Debug.Assert(p.GameData.Cities.Count == 0));
+                await RollbackToCheckpoint();
+                Debug.Assert(this.CurrentGameState == GameState.WaitingForRoll);
+                Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
+                Debug.Assert(MainPageModel.TotalKnightRanks == 0);
+
+
+                //
+                //  Scenario 2: Invasion with one winner.  they should get a victory point and 2 people should lose cities
+                //  our initial conditions are that playe[0] has rolled, built a knight, and activated it.
+                //  we expect player[1] and player[2] to lose a city and player[0] to get a Victory Point
+                //
                 await Test_DoRoll(6, 6, SpecialDice.Pirate);
-                await NextState();
-            }
-
-            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity); 
-            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
-            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
-            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
-            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
-            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
-            Debug.Assert(this.CurrentGameState == GameState.DoneDestroyingCities);
-            await NextState();
-            Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
-            await RollbackToCheckpoint();
-            Debug.Assert(this.CurrentGameState == GameState.WaitingForRoll);
-            Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
+                Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+                //  activate one knight
+                Debug.Assert(knights[0].IsKnight);
+                Debug.Assert(knights[0].Knight.KnightRank == KnightRank.Basic);
+                Debug.Assert(knights[0].Knight.Activated == false);
+                await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+                await KnightLeftPointerPressed(knights[0]); // activate it
 
 
-            await TestCheckpointLog.AddTestCheckpoint(this);
-            //
-            //  now lets give one person a knight
 
-            //
-            //  get some knight entitlements
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+                Debug.Assert(knights[0].Knight.Activated == true);
+                Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+                Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
+                Debug.Assert(MainPageModel.TotalKnightRanks == 1);
 
 
-            //
-            //  figure out where to build it
+                //
+                //  we will roll back to player[0] having a activated a knight
+                await TestCheckpointLog.AddTestCheckpoint(this);
 
-            var originalKnightBuilding = Test_FindBuildingPlacement(BuildingState.Knight);
-            await KnightLeftPointerPressed(originalKnightBuilding); // builds it
-            await KnightLeftPointerPressed(originalKnightBuilding); // activate it
-     
+                bool playersLost = await RollUntilInvasion();
+                Debug.Assert(playersLost);
+                count = await HandleInvasion();
+                Debug.Assert(count == 2, "2 people should have lost Cities");
 
-            Debug.Assert(originalKnightBuilding.IsKnight);
-            Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
-            Debug.Assert(originalKnightBuilding.Knight.Activated == true);
-            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
-            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
-            Debug.Assert(MainPageModel.TotalKnightRanks == 1);
-            
+                Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
+                Debug.Assert(PlayingPlayers[0].GameData.Resources.VictoryPoints == 1);
+                Debug.Assert(MainPageModel.TotalKnightRanks == 0);
 
-            for (int i = 0; i < 7; i++)
-            {
+                // Roll back to 1 player with an Active Knight, no invasion yet
+                await RollbackToCheckpoint();
+                Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
+                Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
+                Debug.Assert(PlayingPlayers[0].GameData.TotalKnightRank == 1); // should get the rank back after the rollback
 
+                // Scenairio 3: Players lose the invasion, but 2 people have the most knights
+                //              Initial conditions are Players[0] and Players[1] have knights that are active.
+                //              Player[3] has a Knight, but it is not active
+                //              Player[2] is the victim, loses a city.  Players 0 & 1 get DevCard.Any
+
+
+                await MoveToNextPlayer();
+                Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
                 await Test_DoRoll(6, 6, SpecialDice.Pirate);
-                await NextState();
-            
+                Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+                Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
+
+
+                //  activate one knight
+                Debug.Assert(knights[1].IsKnight);
+                Debug.Assert(knights[1].Knight.KnightRank == KnightRank.Basic);
+                Debug.Assert(knights[1].Knight.Activated == false);
+                await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+                await KnightLeftPointerPressed(knights[1]); // activate it
+                Debug.Assert(knights[1].Knight.Activated == true);
+
+
+                Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+                Debug.Assert(PlayingPlayers[0].GameData.TotalKnightRank == 1);
+                Debug.Assert(PlayingPlayers[1].GameData.TotalKnightRank == 1);
+                Debug.Assert(PlayingPlayers[2].GameData.TotalKnightRank == 0);
+                Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+                //
+                //  we will roll back to player[0] and players[1] having a activated a knight
+                await TestCheckpointLog.AddTestCheckpoint(this);
+
+                await RollUntilInvasion();
+                count = await HandleInvasion();
+                Debug.Assert(count == 1, "1 person should have lost Cities");
+                // the CurrentPlayer is based on how many rools.  with 3 starting players, this is where we end up
+                Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
+                PlayingPlayers.ForEach(player => Debug.Assert(player.GameData.Resources.VictoryPoints == 0));
+                Debug.Assert(PlayingPlayers[0].GameData.Resources.CurrentResources.AnyDevCard == 1);
+                Debug.Assert(PlayingPlayers[1].GameData.Resources.CurrentResources.AnyDevCard == 1);
+
+                // Roll back to 2 players with an Active Knight, no invasion yet
+                await RollbackToCheckpoint();
+                await TestCheckpointLog.AddTestCheckpoint(this);
+                Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
+                Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
+                Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+                Debug.Assert(PlayingPlayers[0].GameData.TotalKnightRank == 1);
+                Debug.Assert(PlayingPlayers[1].GameData.TotalKnightRank == 1);
+                Debug.Assert(PlayingPlayers[2].GameData.TotalKnightRank == 0);
+                Debug.Assert(MainPageModel.TotalKnightRanks == 2);
+
+                //
+                //  Scenario 4: everybody has an active knight and the players win the invasion
+                await MoveToNextPlayer();
+                Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
+                await Test_DoRoll(6, 6, SpecialDice.Pirate);
+                Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+                Debug.Assert(CurrentPlayer == PlayingPlayers[2]);
+                //  activate one knight
+                Debug.Assert(knights[2].IsKnight);
+                Debug.Assert(knights[2].Knight.KnightRank == KnightRank.Basic);
+                Debug.Assert(knights[2].Knight.Activated == false);
+                await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
+                await KnightLeftPointerPressed(knights[2]); // activate it
+                Debug.Assert(knights[2].Knight.Activated == true);
+                Debug.Assert(MainPageModel.TotalKnightRanks >= MainPageModel.TotalCities);
+                playersLost = await RollUntilInvasion();
+                Debug.Assert(!playersLost);
+                await HandleInvasion();
+                Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
+                await RollbackToCheckpoint();
+                Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+                await RollbackToCheckpoint();
+                Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
             }
-            
-            await NextState();
-            Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
-            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
-            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
+            finally
+            {
+                this.Testing = false;
+              
+            }
 
-            Debug.Assert(CurrentPlayer == PlayingPlayers[2]);
-            Debug.Assert(this.CurrentGameState == GameState.MustDestroyCity);
-            await DestroyCity(CurrentPlayer.GameData.Cities[0]);
-
-            Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
-            Debug.Assert(CurrentPlayer.GameData.VictoryPoints == 1);
-
-            Debug.Assert(this.CurrentGameState == GameState.DoneDestroyingCities);
-            await NextState();
-            Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
-            await RollbackToCheckpoint();
-            Debug.Assert(this.CurrentGameState == GameState.WaitingForRoll);
-            Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
         }
+
+        private async Task MoveToNextPlayer()
+        {
+            while (CurrentGameState != GameState.WaitingForRoll)
+            {
+                await NextState();
+            }
+        }
+
+        //
+        //  Enter with GameState == GameState.MustDestroyCity and Leave with GameState.WaitingForNext
+        private async Task<int> HandleInvasion()
+        {
+            int count = 0;
+            while (this.CurrentGameState == GameState.MustDestroyCity)
+            {
+                count++;
+                Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 1);
+                await DestroyCity(CurrentPlayer.GameData.Cities[0]);
+                Debug.Assert(PlayingPlayers[0].GameData.Resources.UnspentEntitlements.Count == 0);
+            }
+            if (count > 0)
+            {
+                Debug.Assert(this.CurrentGameState == GameState.DoneDestroyingCities);
+                await MoveToNextPlayer();
+            }
+            else
+            {
+   
+                Debug.Assert(this.CurrentGameState == GameState.WaitingForRoll);
+            }
+            
+
+            PlayingPlayers.ForEach(p => Debug.Assert(p.GameData.Resources.UnspentEntitlements.Count == 0));
+            return count;
+        }
+
+        // keep rolling until the invasion count is incremented.  this works for both winning and losing an invasion
+        // returns true if the players LOST the invasion
+        private async Task<bool> RollUntilInvasion()
+        {
+            Debug.Assert(CurrentGameState == GameState.WaitingForRoll || CurrentGameState == GameState.WaitingForNext);
+
+            if (CurrentGameState == GameState.WaitingForNext)
+            {
+                await MoveToNextPlayer();
+            }
+          
+            while (CTRL_Invasion.InvasionData.CurrentStep != CTRL_Invasion.InvasionData.INVASION_STEPS)
+            {
+
+                await Test_DoRoll(6, 6, SpecialDice.Pirate);
+                if (CurrentGameState == GameState.WaitingForNext)
+                {
+                    await MoveToNextPlayer(); // as apposed to starting the invasion
+                }
+
+            }
+            
+            return CurrentGameState == GameState.MustDestroyCity;
+        }
+
 
         private async Task RollbackToState(GameState state)
         {
-            int i= 0;
             while (Log.PeekAction.NewState != state)
             {
-                i++;
-                if (i == 30)
+                if (Log.PeekAction.CanUndo)
                 {
-                    this.TraceMessage("");
+                    await DoUndo();
                 }
-                await DoUndo();
-                this.TraceMessage(Log.PeekAction.ToString());
+                else
+                {
+                    Debug.Assert(false, "Did you forget to set a test checkpoint?");
+                }
             }
         }
 
@@ -510,7 +663,7 @@ namespace Catan10
             await RollbackToState(GameState.TestCheckpoint);
 
             await DoUndo();
-     
+
         }
 
         private async void OnTestRollSeven(object sender, RoutedEventArgs e)

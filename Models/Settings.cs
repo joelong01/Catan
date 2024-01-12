@@ -32,6 +32,22 @@ namespace Catan10
         private bool _useRandomNumbers = true;
         private bool _validateBuilding = true;
         private double _zoom = 1.0;
+        bool _wallProtectsCity = true;
+        public bool WallProtectsCity
+        {
+            get
+            {
+                return _wallProtectsCity;
+            }
+            set
+            {
+                if (_wallProtectsCity != value)
+                {
+                    _wallProtectsCity = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         #endregion Delegates + Fields + Events + Enums
 

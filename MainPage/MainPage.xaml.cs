@@ -145,7 +145,7 @@ namespace Catan10
 
         public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
         {
-            if (testing) return  new Duration(TimeSpan.FromMilliseconds((double)AnimationSpeed.Ultra));
+            if (testing) return  new Duration(TimeSpan.FromMilliseconds((double)AnimationSpeed.Testing));
 
             return new Duration(TimeSpan.FromMilliseconds(( double )requestedSpeed));
         }

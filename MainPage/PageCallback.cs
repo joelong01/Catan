@@ -52,12 +52,17 @@ namespace Catan10
 
         public async Task DestroyCity(BuildingCtrl building)
         {
+
+            Debug.Assert(CurrentGameState == GameState.MustDestroyCity);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.DestroyCity));
+            Debug.Assert(building.Owner == CurrentPlayer);
+
             if (building.Owner != CurrentPlayer) return;
 
-            if (building.City.HasWall)
+            
+            if (building.City.HasWall  && this.MainPageModel.Settings.WallProtectsCity)
             {
                 await DestroyWall.PostDestroyWall(this, building);
-
             }
             else
             {

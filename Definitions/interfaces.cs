@@ -157,7 +157,8 @@ namespace Catan10
 
     public interface IGameController
     {
-      
+
+        InvasionData InvasionData { get; }
         BuildingCtrl GetBuilding(int index);
 
         bool AutoRespondAndTheHuman { get; }
@@ -261,8 +262,6 @@ namespace Catan10
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType action);
 
         void AssignLargestArmy();
-
-        Task HandlePirateRoll(RollModel rollModel, ActionType action);
 
         string PlayerListToCsv(List<PlayerModel> playersWithTooManyCards);
         void SetCurrentPlayer(PlayerModel playerModel);

@@ -2,7 +2,7 @@
 
 namespace Catan10
 {
-    public enum AnimationSpeed { Ultra = 5, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 };
+    public enum AnimationSpeed { Testing = 0, Ultra = 5, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 };
     
 
     public enum BodyType

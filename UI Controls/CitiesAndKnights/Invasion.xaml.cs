@@ -1,51 +1,152 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.Runtime.CompilerServices;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace Catan10
 {
+    public class InvasionData : INotifyPropertyChanged
+    {
+        public int INVASION_STEPS { get; } = 7;
+        int _totalInvasions = 0;
+        int _currentStep = 0;
+        bool _showBaron = true;
+        public bool ShowBaron
+        {
+            get
+            {
+                return _showBaron;
+            }
+            set
+            {
+                if (_showBaron != value)
+                {
+                    _showBaron = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public int CurrentStep
+        {
+            get
+            {
+                return _currentStep;
+            }
+        }
+
+        public int NextStep()
+        {
+            _currentStep++;
+
+            if (_currentStep > INVASION_STEPS)
+            {
+                _currentStep = 0;
+            }
+            NotifyPropertyChanged("CurrentStep");
+            return _currentStep;
+        }
+
+        public int PreviousStep()
+        {
+            _currentStep--;
+            if (_currentStep == INVASION_STEPS)
+            {
+                if (_totalInvasions > 0)
+                {
+                    _totalInvasions--;
+                }
+            }
+            if (_currentStep < 0) _currentStep = 0;
+            NotifyPropertyChanged("CurrentStep");
+            return _currentStep;
+        }
+
+        public int TotalInvasions
+        {
+            get
+            {
+                return _totalInvasions;
+            }
+            set
+            {
+                if (_totalInvasions != value)
+                {
+                    _totalInvasions = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
     public sealed partial class InvasionCtrl : UserControl
     {
-        public int StepsBeforeInvasion { get; } = 7;
 
-        private int currentCount = 0; // this is the count of steps it goes from 0 - StepsBeforeInvasion
 
         public InvasionCtrl()
         {
             this.InitializeComponent();
-            Reset();
+            Angle = 0;
         }
 
         public void Reset()
         {
-            currentCount = 0;
-            InvasionCount = 0;
+            InvasionData = new InvasionData();
             Angle = 0;
         }
 
-        //
-        //  this is the number of invastions.
-        public static readonly DependencyProperty InvasionCountProperty = DependencyProperty.Register("InvasionCount", typeof(int), typeof(InvasionCtrl), new PropertyMetadata(0));
-        public int InvasionCount
+        public static readonly DependencyProperty InvasionDataProperty = DependencyProperty.Register("InvasionData", typeof(InvasionData), typeof(InvasionCtrl), new PropertyMetadata(new InvasionData(), InvasionDataChanged));
+        public InvasionData InvasionData
         {
-            get => ( int )GetValue(InvasionCountProperty);
-            set => SetValue(InvasionCountProperty, value);
+            get => ( InvasionData )GetValue(InvasionDataProperty);
+            set => SetValue(InvasionDataProperty, value);
+        }
+        private static void InvasionDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as InvasionCtrl;
+            var depPropValue = (InvasionData)e.NewValue;
+            depPropClass?.SetInvasionData(depPropValue);
+        }
+        private void SetInvasionData(InvasionData model)
+        {
+            model.PropertyChanged += Model_PropertyChanged;
+        }
+
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "CurrentStep")
+            {
+                InvasionData model = sender as InvasionData;
+                Debug.Assert(model != null);
+                double angle =  model.CurrentStep % (model.INVASION_STEPS + 1 ) * 45;
+                Angle = angle;
+                return;
+            }
+
+            if (e.PropertyName == "ShowBaron")
+            {
+                InvasionData model = sender as InvasionData;
+                Debug.Assert(model != null);
+                if (model.ShowBaron)
+                {
+                    CTRL_Baron.ShowAsync();
+                }
+                else
+
+                {
+                    CTRL_Baron.HideAsync();
+                }
+
+            }
         }
 
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TraditionalRollCtrl), new PropertyMetadata(MainPageModel.Default));
@@ -79,50 +180,9 @@ namespace Catan10
         {
             SB_RotateShip.Begin();
         }
-        public void StartOver()
-        {
-            this.TraceMessage("Starting Over");
-            Angle = 0;
-            
-        }
+    
 
-        public int Next()
-        {
-            currentCount++;
-            double angle =  ( double )( currentCount % 8 ) * 45;
-            if (angle > 0)
-            {
-                Angle = angle;
-            }
-            if (currentCount % StepsBeforeInvasion == 0)
-            {
-                InvasionCount++;
-            }
-            return currentCount % 8;
-        }
 
-        public int Previous()
-        {
-            Debug.Assert(currentCount > 0);
-            currentCount--;
 
-            if (currentCount == 0 && InvasionCount > 0)
-            {
-                InvasionCount--;
-            }
-
-            Angle = ( double )( currentCount % 8 ) * 45;
-            return currentCount % 8;
-        }
-
-        public void HideBaron()
-        {
-            CTRL_Baron.HideAsync();
-        }
-
-        internal void ShowBaron()
-        {
-            CTRL_Baron.ShowAsync();
-        }
     }
 }

@@ -183,8 +183,7 @@ namespace Catan10
                         break;
 
                     case GameState.DoneDestroyingCities:
-                        // after the invasion, we return the pirate ship back to the starting position
-                        CTRL_Invasion.StartOver();
+                        // find the previous RollModl
                         var logEntry = Current.Log.FindLatestLogEntry(typeof(WaitingForRollToPirateRoll)) as WaitingForRollToPirateRoll;
 
                         Debug.Assert(logEntry != null);

@@ -77,7 +77,6 @@ namespace Catan10
         /// <returns></returns>
         public async Task Do(IGameController gameController)
         {
-            this.TraceMessage("Destroy Cit:: Do");
 
             List<PlayerModel> playingPlayers = gameController.PlayingPlayers;
 

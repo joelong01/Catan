@@ -38,7 +38,7 @@
     </Control.Resources>
 
     <Grid Background="Transparent">
-        <TextBlock x:Name="TXT_InvasionCount" Text="{x:Bind InvasionCount, Mode=OneWay}" Foreground="Red"
+        <TextBlock x:Name="TXT_InvasionCount" Text="{x:Bind InvasionData.TotalInvasions, Mode=OneWay}" Foreground="Red" 
                 Canvas.ZIndex="999" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="30"
                 FontFamily="Segoe UI" FontWeight="ExtraBold">
             <TextBlock.RenderTransform>

@@ -18,6 +18,14 @@ namespace Catan10
     public sealed partial class MainPage : Page, IGameController
     {
 
+        public InvasionData InvasionData
+        {
+            get
+            {
+                return CTRL_Invasion.InvasionData;
+            }
+        }
+
         #region Methods
 
         private async Task UpdateUiForState(GameState currentState)
@@ -1011,146 +1019,7 @@ namespace Catan10
             }
         }
 
-        /// <summary>
-        ///     in pirates, the red die is special (possible grants dev cards)
-        ///     if the special die is a pirate, we increment the journey.
-        ///     if the journey is done, we have an invasion.
-        ///     the normal rollModel to allocate resources is handled outside (prior) to this function.
-        /// </summary>
-        /// <param name="rollModel"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public async Task HandlePirateRoll(RollModel rollModel, ActionType action)
-        {
-            Debug.Assert(MainPageModel.GameInfo.CitiesAndKnights);
 
-            if (action != ActionType.Undo)
-            {
-                if (rollModel.SpecialDice == SpecialDice.Pirate)
-                {
-                    int count = CTRL_Invasion.Next();
-                    if (count < CTRL_Invasion.StepsBeforeInvasion)
-                    {
-                        //
-                        //  we've moved the ship and now we just deal with the rollModel
-
-                        await WaitingForRollToWaitingForNext.PostRollMessage(this, rollModel);
-                        await Task.Delay(10);
-                        return;
-                    }
-                    if (count == CTRL_Invasion.StepsBeforeInvasion)
-                    {
-                        CTRL_Invasion.HideBaron();
-                        this.GameContainer.CurrentGame.HexPanel.ShowBaron();
-
-                        if (MainPageModel.TotalCities > MainPageModel.TotalKnightRanks)
-                        {
-                            // find lowest knight rank
-                            int lowestKnightRank = 100; // arbitrary big number
-                            int highestKnightRank = 0;
-                            foreach (var player in PlayingPlayers)
-                            {
-                                int rank=0;
-
-                                foreach (var knight in player.GameData.Knights)
-                                {
-                                    if (knight.Activated)
-                                    {
-                                        rank += ( int )knight.KnightRank;
-                                    }
-                                }
-
-                                if (rank < lowestKnightRank)
-                                {
-                                    lowestKnightRank = rank;
-                                }
-                                if (rank > highestKnightRank)
-                                {
-                                    highestKnightRank = rank;
-                                }
-                            }
-
-                            var playersWithHighestKnightRank = new List<PlayerModel>();
-
-                            // go through and find all the victims
-                            bool foundAtLeastOneVictim = false;
-                            foreach (var player in PlayingPlayers)
-                            {
-                                int rank=0;
-
-                                foreach (var knight in player.GameData.Knights)
-                                {
-                                    if (knight.Activated)
-                                    {
-                                        rank += ( int )knight.KnightRank;
-                                    }
-                                }
-
-                                if (rank == lowestKnightRank)
-                                {
-                                    if (player.GameData.Cities.Count > 0)
-                                    {
-                                        player.GameData.Resources.GrantEntitlement(Entitlement.DestroyCity);
-                                        foundAtLeastOneVictim = true;
-                                    }
-
-                                }
-
-                                if (rank == highestKnightRank)
-                                {
-                                    playersWithHighestKnightRank.Add(player);
-                                }
-
-                            }
-
-                            if (foundAtLeastOneVictim)
-                            {
-                                this.TraceMessage("DESTROY CITY: Start");
-                                await DestroyCity_Next.PostLog(this);
-                                this.TraceMessage("DESTROY CITY: End");
-                            }
-
-                            if (playersWithHighestKnightRank.Count == 1)
-                            {
-                                playersWithHighestKnightRank[0].GameData.Resources.VictoryPoints++;
-                            }
-                        }
-
-                        /**
-                         * after the invastion, all knights go inactive
-                         */
-
-                        foreach (var player in PlayingPlayers)
-                        {
-
-                            foreach (var knight in player.GameData.Knights)
-                            {
-                                knight.Activated = false;
-                            }
-
-                        }
-
-                    }
-                }
-            }
-
-            else
-            {
-                if (rollModel.SpecialDice == SpecialDice.Pirate)
-                {
-                    int step = CTRL_Invasion.Previous();
-                    if (CTRL_Invasion.InvasionCount == 0)
-                    {
-                        CTRL_Invasion.ShowBaron();
-                        this.GameContainer.CurrentGame.HexPanel.HideBaron();
-
-                    }
-                }
-            }
-
-            await Task.Delay(0);
-
-        }
         /**
          * find the city and the player, update the city.Wall property and consume or refund the entitlement
          */
@@ -1180,12 +1049,12 @@ namespace Catan10
             if (showBaron)
             {
                 // hide it in the invasion control, show it on th emain board
-                CTRL_Invasion.HideBaron();
+                CTRL_Invasion.InvasionData.ShowBaron = false;
                 this.GameContainer.CurrentGame.HexPanel.ShowBaron();
             }
             else
             {
-                CTRL_Invasion.ShowBaron();
+                CTRL_Invasion.InvasionData.ShowBaron = true;
                 this.GameContainer.CurrentGame.HexPanel.HideBaron();
             }
             if (weapon == TargetWeapon.PirateShip)
@@ -1245,7 +1114,7 @@ namespace Catan10
 
             //
             // whenever we update a building, hide the pips
-            if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None) 
+            if (building.BuildingState != BuildingState.Pips && building.BuildingState != BuildingState.None)
             {
                 await HideAllPipEllipses();
                 _showPipGroupIndex = 0;
@@ -1376,10 +1245,10 @@ namespace Catan10
         public async Task RolledSeven()
         {
 
-            if (GameInfo.CitiesAndKnights && CTRL_Invasion.InvasionCount > 0)
-            {
-                await MustMoveBaronLog.PostLog(this, MoveBaronReason.Rolled7);
-            }
+            if (GameInfo.CitiesAndKnights && CTRL_Invasion.InvasionData.TotalInvasions == 0) return;
+
+            await MustMoveBaronLog.PostLog(this, MoveBaronReason.Rolled7);
+
         }
 
         public void MoveMerchant(Point to)

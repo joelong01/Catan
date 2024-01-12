@@ -74,6 +74,23 @@ namespace Catan10
             return Metros[entitlement];
         }
 
+        public int TotalKnightRank
+        {
+            get
+            {
+                int rank = 0;
+                foreach (var knight in Knights)
+                {
+                    if (knight.Activated)
+                    {
+                        rank += (int)knight.KnightRank;
+                    }
+                }
+                return rank;
+            }
+
+        }
+
         public void SetImprovementRank(Entitlement entitlement, int rank, int buildingId)
         {
            

@@ -636,13 +636,7 @@ namespace Catan10
                 if (PlayingPlayers == null) return -1;
                 foreach (var player in PlayingPlayers)
                 {
-                    foreach (var knight in player.GameData.Knights)
-                    {
-                        if (knight.Activated)
-                        {
-                            rank += ( int )knight.KnightRank;
-                        }
-                    }
+                    rank += player.GameData.TotalKnightRank;
                 }
 
                 return rank;
