@@ -661,7 +661,7 @@ namespace Catan10
 
         private void SetMerchantVisibility(Visibility visibility)
         {
-            _baron.Visibility = visibility;
+            _merchant.Visibility = visibility;
         }
         private void SetBaronVisibility(Visibility visibility)
         {

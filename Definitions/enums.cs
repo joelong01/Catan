@@ -121,8 +121,11 @@ namespace Catan10
         [Description("Activate")]
         ActivateKnight,
 
-        [Description("Move")]
+        [Description("Move Knight")]
         MoveKnight,
+
+        [Description("Move Baron")]
+        MoveBaron,
 
         [Description("Politics")]
         PoliticsUpgrade,
@@ -166,7 +169,7 @@ namespace Catan10
         [Description("Start Pick Resources")]
         BeginResourceAllocation,
 
-        [Description("Done Adding Players.  Pick Board...")]
+        [Description("Pick Board...")]
         WaitingForPlayers,
 
         [Description("Accept Board")]
@@ -178,10 +181,10 @@ namespace Catan10
         [Description("Order Done")]
         FinishedRollOrder,
 
-        [Description("Finished Building...")]
+        [Description("Next")]
         AllocateResourceForward,
 
-        [Description("Finished Building...")]
+        [Description("Next")]
         AllocateResourceReverse,
 
         [Description("Start Game...")]
@@ -190,10 +193,10 @@ namespace Catan10
         [Description("Select Roll...")]
         WaitingForRoll,
 
-        [Description("Done - Next Player")]
+        [Description("Next")]
         WaitingForNext,
 
-        [Description("Done - Next Player")]
+        [Description("Next")]
         Supplemental,
 
         [Description("Move Baron")]
@@ -208,10 +211,10 @@ namespace Catan10
         [Description("Picking Random Gold Cards")]
         PickingRandomGoldTiles,
 
-        [Description("Handling CitiesAndKnights")]
+        [Description("Handling Pirate")]
         HandlePirates,
 
-        [Description("Done Destroying Cities")]
+        [Description("Done")]
         DoneDestroyingCities,
 
         [Description("Move Merchant")]

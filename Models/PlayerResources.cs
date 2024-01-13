@@ -435,7 +435,7 @@ namespace Catan10
             ThisTurnsDevCard.Played = false;
             PlayedDevCards.Remove(ThisTurnsDevCard);
             AvailableDevCards.Add(ThisTurnsDevCard);
-            ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None }; ;
+            ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None }; 
             return true;
         }
 

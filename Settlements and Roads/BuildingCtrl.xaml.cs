@@ -19,7 +19,7 @@ namespace Catan10
     /// <summary>
     ///     The states that a building can be in
     /// </summary>
-    public enum BuildingState { None, Build, Error, Pips, Settlement, City, NoEntitlement, Knight, Metropolis };
+    public enum BuildingState { None, Build, Error, Pips, Settlement, City, NoEntitlement, Knight };
 
     public sealed partial class BuildingCtrl : UserControl
     {

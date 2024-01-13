@@ -53,27 +53,26 @@ namespace Catan10
 
         public async Task Do (IGameController gameController)
         {
-            //
-            //   nothing to do -- we just want the state and state message set
-            //   the code to move the Baron is in PageCallback.cs in the TileRightTapped method
-            //
+            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.MoveBaron);
 
              await Task.Delay(0);
         }
 
         public async Task Redo (IGameController gameController)
         {
-             await Task.Delay(0);
+            await Do(gameController);
         }
 
         public async Task Replay (IGameController gameController)
         {
-             await Task.Delay(0);
+       
+            await Task.Delay(0);
         }
 
         public async Task Undo (IGameController gameController)
         {
-             await Task.Delay(0);
+            gameController.CurrentPlayer.GameData.Resources.RevokeEntitlement(Entitlement.MoveBaron);
+            await Task.Delay(0);
         }
 
         #endregion Methods

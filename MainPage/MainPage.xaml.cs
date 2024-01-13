@@ -137,6 +137,12 @@ namespace Catan10
         }
 
         public static readonly DependencyProperty TestingProperty = DependencyProperty.Register("Testing", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
+        public static readonly DependencyProperty TestCitiesAndKnightsProperty = DependencyProperty.Register("TestCitiesAndKnights", typeof(bool), typeof(MainPage), new PropertyMetadata(true));
+        public bool TestCitiesAndKnights
+        {
+            get => ( bool )GetValue(TestCitiesAndKnightsProperty);
+            set => SetValue(TestCitiesAndKnightsProperty, value);
+        }
         public bool Testing
         {
             get => ( bool )GetValue(TestingProperty);
@@ -626,7 +632,7 @@ namespace Catan10
 
             LastPlayerToRoll = CurrentPlayer; // need this to know which player to skip in supplemental builds
 
-            if (roll.SpecialDice == SpecialDice.Pirate)
+            if (roll.SpecialDice == SpecialDice.Pirate && MainPageModel.GameInfo.CitiesAndKnights)
             {
                 //
                 //  do all pirate work before doing roll work
@@ -1099,6 +1105,7 @@ namespace Catan10
             _randomBoardList.Clear();
             _randomBoardList.Add(_gameView.RandomBoardSettings);
             _randomBoardListIndex = 0;
+            await Task.Delay(0);
         }
 
         #endregion Methods
@@ -1329,6 +1336,9 @@ namespace Catan10
                     //  the state transitions are PickDeserter -> PlaceDeserter -> DoneWithDeserter -> WaitingForNext
                     await PurchaseEntitlement(CurrentPlayer, Entitlement.Deserter, GameState.PickDeserter);
                     break;
+                case Entitlement.MoveBaron:
+                    await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
+                    break;
                 default:
                     break;
             }
@@ -1503,12 +1513,24 @@ namespace Catan10
             if (CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType != DevCardType.None) return;
             await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
         }
-        private bool PlayBaronButtonEnabled(GameState state)
+        //
+        //  show the ability to move the baron with a dev card if
+        //  1. we are playing a game that uses dev cards
+        //  2. the game state is WaitingForNext or WaitingForRoll
+        //  3. we haven't played a dev card yt.
+        private Visibility BaronButtonVisible(GameState state, bool isCitiesAndKnights)
         {
-            if (state == GameState.WaitingForNext || state == GameState.WaitingForRoll) return true;
+            if (isCitiesAndKnights) return Visibility.Collapsed;
+            this.TraceMessage($"GameState.{state} PlayedDevCard = {CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType}");
+            if ((state == GameState.WaitingForNext || state == GameState.WaitingForRoll)  &&
+                CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None)
+            {
+                return Visibility.Visible;
+            }
 
-            return false;
+            return Visibility.Collapsed;
         }
 
+       
     }
 }

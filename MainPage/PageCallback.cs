@@ -572,7 +572,8 @@ namespace Catan10
         public void TileRightTapped(TileCtrl targetTile, RightTappedRoutedEventArgs rte)
         {
             //   this.TraceMessage($"Tile={targetTile} CurrentPlayer={CurrentPlayer.PlayerName} Owners={targetTile.OwnedBuildings.FlattenProperty("Owner", ",")}" );
-            if (CurrentGameState != GameState.MustMoveBaron) return;
+
+            if (!CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.MoveBaron)) return;
 
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
 

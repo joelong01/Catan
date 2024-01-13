@@ -5,8 +5,7 @@
         d:DesignWidth="128">
     <Control.Resources>
         <Style x:Key="PurchaseGridStyle" TargetType="Grid">
-            <Setter Property="BorderBrush"
-                    Value="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Red}" />
+
             <Setter Property="Margin" Value="5,5" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="5" />
@@ -18,14 +17,13 @@
         <Style x:Key="PurchaseItemTextStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="22" />
-            <Setter Property="Foreground"
-                    Value="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Blue}" />
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
     </Control.Resources>
     <Viewbox Stretch="Fill">
-        <Grid Style="{StaticResource PurchaseGridStyle}">
+        <Grid Style="{StaticResource PurchaseGridStyle}"
+                BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Red}">
 
             <Button Background="Transparent" Click="OnBuyEntitlement" Tag="Settlement" Width="100" Height="100"
                     Padding="0" Margin="0" VerticalAlignment="Top" HorizontalAlignment="Center">
@@ -37,7 +35,8 @@
             <TextBlock Style="{StaticResource PurchaseItemTextStyle}" VerticalAlignment="Top" HorizontalAlignment="Left"
                     Margin="4,-4,0,0"
                     Visibility="{x:Bind ShowCount, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                    Text="{x:Bind UnplayedResourceCount(CurrentPlayer.GameData.Resources.UnspentEntitlements, Entitlement), Mode=OneWay}" />
+                    Text="{x:Bind UnplayedResourceCount(CurrentPlayer.GameData.Resources.UnspentEntitlements, Entitlement), Mode=OneWay}"
+                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Blue}" />
             <Viewbox HorizontalAlignment="Center" VerticalAlignment="Bottom" Stretch="Uniform" Width="100" Height="30">
                 <TextBlock Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                         FontSize="22" Style="{StaticResource PurchaseItemTextStyle}"

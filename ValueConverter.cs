@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.UI;
@@ -13,6 +14,38 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
+    public class VisibilityToHeightConverter : IValueConverter
+    {
+
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            // Default height value
+            double height = 100;
+
+            // If a parameter is provided, try to parse it as a double
+            if (parameter != null && double.TryParse(parameter.ToString(), out double parsedHeight))
+            {
+                height = parsedHeight;
+            }
+
+            // Adjust the height based on the visibility value
+            if (value is bool visibility)
+            {
+                return visibility  ? 0 : height;
+            }
+
+            // Default return value if the value is not a Visibility type
+            return 0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
     public static class ConverterGlobals
     {
         public static Dictionary<(Color, Color), LinearGradientBrush> LinearGradientBrushCache { get; } = new Dictionary<(Color, Color), LinearGradientBrush>();
@@ -41,6 +74,9 @@ namespace Catan10
                 return new SolidColorBrush(color);
             }
         }
+
+        
+
         public static LinearGradientBrush CreateLinearGradiantBrush(Color color1, Color color2)
         {
             var gradientStopCollection = new GradientStopCollection

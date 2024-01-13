@@ -43,6 +43,16 @@ namespace Catan10
                 newState = GameState.WaitingForNext;
             }
 
+            bool showBaron = true;
+
+            if (gameController.MainPageModel.GameInfo.CitiesAndKnights)
+            {
+                if (gameController.InvasionData.TotalInvasions == 0)
+                {
+                    showBaron = false;
+                }
+            }
+
             // Debug.Assert(((MustMoveBaronLog)gameController.MainPageModel.Log.PeekAction).StartingState == previousState);
 
             MovedBaronLog logHeader = new MovedBaronLog()
@@ -58,7 +68,7 @@ namespace Catan10
                     TargetTile = targetTileIndex,
                     StolenResource = stolenResource,
                     Reason = reason,
-                    MainBaronHidden = gameController.BaronVisibility
+                    MainBaronHidden = showBaron
                 }
             };
 
@@ -118,7 +128,11 @@ namespace Catan10
             gameController.SetBaronTile(weapon, targetTile, true);
 
             //
-            //  Show the card taken in the UI - but only for the Victim and the player that took the card
+            //    consume the entitlement
+
+            gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.MoveBaron);
+        
+            gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.Knight };
 
             await Task.Delay(0);
         }
@@ -175,6 +189,8 @@ namespace Catan10
                 gameController.AssignLargestArmy();
             }
 
+            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.MoveBaron);
+            gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None };
 
             await Task.Delay(0);
         }

@@ -530,7 +530,6 @@ namespace Catan10
                     tr.AddResource(resourceType, 1);
                     break;
                 case BuildingState.City:
-                case BuildingState.Metropolis:
                     return TradeResources.TradeResourcesForCity(resourceType, pirates);
             }
 

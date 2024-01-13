@@ -22,6 +22,7 @@
             <SolidColorBrush x:Key="PurpleBrush" Color="Purple" />
             <SolidColorBrush x:Key="HotPinkBrush" Color="HotPink" />
             <SolidColorBrush x:Key="TransparentBrush" Color="Transparent" />
+            <local:VisibilityToHeightConverter x:Key="VisibilityToHeightConverter" />
             <local:GameStateToBooleanConverter x:Key="GameStateToBooleanConverter" />
             <local:AnimationSpeedValueConverter x:Key="AnimationSpeedValueConverter" />
             <local:TileOrientationToObjectConverter x:Key="TileOrientationToObjectConverter" />

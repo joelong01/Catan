@@ -692,7 +692,9 @@ namespace Catan10
                     {
                         if (kvp.Value.HasBaron == false)
                         {
-                            if (MainPageModel.GameInfo.CitiesAndKnights && ( building.BuildingState == BuildingState.City || building.BuildingState == BuildingState.Metropolis ))
+                            if (MainPageModel.GameInfo.CitiesAndKnights
+                                && CurrentGameState != GameState.AllocateResourceReverse
+                                && building.BuildingState == BuildingState.City )
                             {
                                 //
                                 //  in pirates - you get one of the resource types plus one commodity when you have a City or Metropolis
@@ -977,7 +979,6 @@ namespace Catan10
             // now fix any side effects of changing the state
             switch (updateBuildingLog.NewBuildingState) // this is the transition that originally was changed TO
             {
-                case BuildingState.Metropolis:
                 case BuildingState.None:
 
                     break;
@@ -1046,25 +1047,26 @@ namespace Catan10
         }
         public void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron)
         {
+            GameContainer.BaronTile = targetTile;
+
             if (showBaron)
             {
                 // hide it in the invasion control, show it on th emain board
                 CTRL_Invasion.InvasionData.ShowBaron = false;
                 this.GameContainer.CurrentGame.HexPanel.ShowBaron();
+                this.GameContainer.CurrentGame.HexPanel.BaronVisibility = Visibility.Visible; 
             }
             else
             {
                 CTRL_Invasion.InvasionData.ShowBaron = true;
                 this.GameContainer.CurrentGame.HexPanel.HideBaron();
+                this.GameContainer.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
             }
             if (weapon == TargetWeapon.PirateShip)
             {
                 GameContainer.PirateShipTile = targetTile;
             }
-            else
-            {
-                GameContainer.BaronTile = targetTile;
-            }
+           
 
         }
 
@@ -1072,7 +1074,7 @@ namespace Catan10
         {
             get
             {
-                return GameContainer.CurrentGame.HexPanel.BaronShown;
+                return GameContainer.CurrentGame.HexPanel.BaronVisibility == Visibility.Visible;
             }
         }
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType actionType)
@@ -1129,7 +1131,9 @@ namespace Catan10
                     TradeResources tr = new TradeResources();
                     foreach (var kvp in building.BuildingToTileDictionary)
                     {
-                        tr += TradeResources.TradeResourcesForBuilding(building.BuildingState, kvp.Value.ResourceType, MainPageModel.GameInfo.CitiesAndKnights);
+                        BuildingState buildingState = building.BuildingState;
+                        if (CurrentGameState == GameState.AllocateResourceReverse) buildingState = BuildingState.Settlement;
+                        tr += TradeResources.TradeResourcesForBuilding(buildingState, kvp.Value.ResourceType, MainPageModel.GameInfo.CitiesAndKnights);
                     }
                     switch (actionType)
                     {

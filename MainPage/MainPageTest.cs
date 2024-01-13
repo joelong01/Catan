@@ -365,6 +365,9 @@ namespace Catan10
             PlayingPlayers[2].GameData.PoliticsRank = 3;
 
             await NextState();
+            TileCtrl tile = GameContainer.CurrentGame.HexPanel.BaronTile;
+            GameContainer.CurrentGame.HexPanel.BaronTile = GameContainer.TilesInIndexOrder[0];
+            GameContainer.CurrentGame.HexPanel.BaronTile = tile;
 
 
         }
@@ -379,7 +382,7 @@ namespace Catan10
                 GameIndex = 0,
                 Id = Guid.NewGuid(),
                 Started = false,
-                CitiesAndKnights=true
+                CitiesAndKnights=this.TestCitiesAndKnights
             };
 
             await StartGame(info);
@@ -396,7 +399,7 @@ namespace Catan10
         {
             try
             {
-               
+
                 this.Testing = true;
                 if (CurrentGameState != GameState.WaitingForNext)
                 {
@@ -576,7 +579,7 @@ namespace Catan10
             finally
             {
                 this.Testing = false;
-              
+
             }
 
         }
@@ -608,10 +611,10 @@ namespace Catan10
             }
             else
             {
-   
+
                 Debug.Assert(this.CurrentGameState == GameState.WaitingForRoll);
             }
-            
+
 
             PlayingPlayers.ForEach(p => Debug.Assert(p.GameData.Resources.UnspentEntitlements.Count == 0));
             return count;
@@ -627,7 +630,7 @@ namespace Catan10
             {
                 await MoveToNextPlayer();
             }
-          
+
             while (CTRL_Invasion.InvasionData.CurrentStep != CTRL_Invasion.InvasionData.INVASION_STEPS)
             {
 
@@ -638,7 +641,7 @@ namespace Catan10
                 }
 
             }
-            
+
             return CurrentGameState == GameState.MustDestroyCity;
         }
 

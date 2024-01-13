@@ -58,7 +58,7 @@ namespace Catan10
         private TimeSpan _TotalTime = TimeSpan.FromSeconds(0);
         private Trades _trades = new Trades();
 
-      
+
         private int _VictoryPoints = 0;
         bool _playedMerchantLast = false;
         private readonly Dictionary<Entitlement, (int rank, int BuildingId)> Metros = new Dictionary<Entitlement, (int rank, int BuildingId)>
@@ -83,7 +83,7 @@ namespace Catan10
                 {
                     if (knight.Activated)
                     {
-                        rank += (int)knight.KnightRank;
+                        rank += ( int )knight.KnightRank;
                     }
                 }
                 return rank;
@@ -93,7 +93,7 @@ namespace Catan10
 
         public void SetImprovementRank(Entitlement entitlement, int rank, int buildingId)
         {
-           
+
             switch (entitlement)
             {
                 case Entitlement.PoliticsUpgrade:
@@ -481,6 +481,10 @@ namespace Catan10
                     return 1;
                 case Entitlement.Deserter:
                     return 1;
+                case Entitlement.MoveBaron:
+                    if (this.Resources.ThisTurnsDevCard.DevCardType != DevCardType.None)
+                        return 0;
+                    return 1;
                 default:
                     Debug.Assert(false, "Fill out the switch statement!");
                     break;
@@ -557,7 +561,7 @@ namespace Catan10
                 (int rank, int id) = Metros[Entitlement.TradeUpgrade];
                 if (value != rank)
                 {
-                   
+
                     Metros[Entitlement.TradeUpgrade] = (value, id);
                     NotifyPropertyChanged();
                 }

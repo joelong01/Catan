@@ -41,7 +41,7 @@
                     </Viewbox>
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
-
+           
             <local:PurchaseItemCtrl Entitlement="BuyOrUpgradeKnight" Decoration="&#xE7BF;"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
@@ -99,7 +99,7 @@
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
                 <local:PurchaseItemCtrl.Child>
-                    <Grid HorizontalAlignment="Stretch" Background="Green" VerticalAlignment="Stretch"  Width="100"
+                    <Grid HorizontalAlignment="Stretch" Background="Green" VerticalAlignment="Stretch" Width="100"
                             CornerRadius="10">
                         <local:ScienceCtrl Stroke="White" StrokeThickness="10" />
                         <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="33"
