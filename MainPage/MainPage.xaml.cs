@@ -73,7 +73,7 @@ namespace Catan10
 
         public GameType GameType
         {
-            get => _gameView.CurrentGame.GameType;
+            get => CTRL_GameView.CurrentGame.GameType;
             set
             {
             }
@@ -181,7 +181,7 @@ namespace Catan10
             if (gameInfo == null || state == GameState.WaitingForNewGame) return "Catan";
             if (MainPageModel.Settings.IsServiceGame)
             {
-                return $"Playing {_gameView.Games[gameInfo.GameIndex].CatanGame} in channel \"{gameInfo.Name}\".  {player.PlayerName}'s Turn.";
+                return $"Playing {CTRL_GameView.Games[gameInfo.GameIndex].CatanGame} in channel \"{gameInfo.Name}\".  {player.PlayerName}'s Turn.";
             }
             else
             {
@@ -201,7 +201,7 @@ namespace Catan10
         public void UpdateBoardMeasurements()
         {
             PipCount = GetPipCount();
-            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
+            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(CTRL_GameView.CurrentGame.HexPanel.Buildings);
             buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
             Dictionary<int, int> pipCountDictionary = new Dictionary<int, int>();
             int[] pipCount = new int[4] { 0, 0, 0, 0 };
@@ -227,7 +227,7 @@ namespace Catan10
                     _progress.IsActive = true;
                     _progress.Visibility = Visibility.Visible;
 
-                    _gameView.Init(this, this);
+                    CTRL_GameView.Init(this, this);
                     CreateMenuItems();
                 }
 
@@ -261,11 +261,11 @@ namespace Catan10
             pData.Reset();
             //
             //  need to give the players some data about the game
-            pData.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
-            pData.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
-            pData.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
-            pData.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
-            pData.GameData.MaxKnights = _gameView.CurrentGame.GameData.MaxKnights;
+            pData.GameData.MaxCities = CTRL_GameView.CurrentGame.GameData.MaxCities;
+            pData.GameData.MaxRoads = CTRL_GameView.CurrentGame.GameData.MaxRoads;
+            pData.GameData.MaxSettlements = CTRL_GameView.CurrentGame.GameData.MaxSettlements;
+            pData.GameData.MaxShips = CTRL_GameView.CurrentGame.GameData.MaxShips;
+            pData.GameData.MaxKnights = CTRL_GameView.CurrentGame.GameData.MaxKnights;
             await Task.Delay(0);
         }
 
@@ -310,7 +310,7 @@ namespace Catan10
             //if (_doDragDrop)
             //{
             //    await StaticHelpers.DragAsync((UIElement)sender, pRoutedEvents);
-            //    OnGridPositionChanged("_gameView", new GridPosition(_transformGameView));
+            //    OnGridPositionChanged("CTRL_GameView", new GridPosition(_transformGameView));
             //}
         }
 
@@ -320,7 +320,7 @@ namespace Catan10
         /// <returns></returns>
         private Dictionary<int, List<BuildingCtrl>> GetBuildingByPips()
         {
-            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(_gameView.CurrentGame.HexPanel.Buildings);
+            List<BuildingCtrl> buildingsOrderedByPips = new List<BuildingCtrl>(CTRL_GameView.CurrentGame.HexPanel.Buildings);
             buildingsOrderedByPips.Sort((s1, s2) => s2.Pips - s1.Pips);
             Dictionary<int, List<BuildingCtrl>> dictPipsToBuildings = new Dictionary<int, List<BuildingCtrl>>();
             //
@@ -375,7 +375,7 @@ namespace Catan10
         private TradeResources GetPipCount()
         {
             TradeResources tr = new TradeResources();
-            foreach (var tile in _gameView.AllTiles)
+            foreach (var tile in CTRL_GameView.AllTiles)
             {
                 switch (tile.ResourceType)
                 {
@@ -425,7 +425,7 @@ namespace Catan10
         private List<TileCtrl> GetTilesWithNumber(int number)
         {
             List<TileCtrl> tilesWithNumber = new List<TileCtrl>();
-            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
+            foreach (TileCtrl t in CTRL_GameView.CurrentGame.Tiles)
             {
                 if (t.Number == number)
 
@@ -455,7 +455,7 @@ namespace Catan10
 
         private async Task HideAllPipEllipses()
         {
-            foreach (BuildingCtrl s in _gameView.CurrentGame.HexPanel.Buildings)
+            foreach (BuildingCtrl s in CTRL_GameView.CurrentGame.HexPanel.Buildings)
             {
                 if (s.BuildingState == BuildingState.Pips)
                 {
@@ -564,8 +564,8 @@ namespace Catan10
                 return;
             }
 
-            await _gameView.SetRandomCatanBoard(true);
-            _randomBoardList.Add(_gameView.RandomBoardSettings);
+            await CTRL_GameView.SetRandomCatanBoard(true);
+            _randomBoardList.Add(CTRL_GameView.RandomBoardSettings);
         }
 
         private async void OnClearPips(object sender, RoutedEventArgs e)
@@ -805,11 +805,11 @@ namespace Catan10
                 {
                     //
                     //  get new ones
-                    await _gameView.SetRandomCatanBoard(true);
+                    await CTRL_GameView.SetRandomCatanBoard(true);
 
                     //
                     //  save the existing settings
-                    _randomBoardList.Add(_gameView.RandomBoardSettings);
+                    _randomBoardList.Add(CTRL_GameView.RandomBoardSettings);
                     _randomBoardListIndex = _randomBoardList.Count - 1;
                 }
             }
@@ -823,7 +823,7 @@ namespace Catan10
                 }
             }
 
-            await _gameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
+            await CTRL_GameView.SetRandomCatanBoard(true, _randomBoardList[_randomBoardListIndex]);
         }
 
         private async void PickSettlementsAndRoads(object sender, RoutedEventArgs e)
@@ -894,7 +894,7 @@ namespace Catan10
                 player.Reset();
             }
 
-            _gameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
+            CTRL_GameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
             RaceTracking.Reset();
 
             CTRL_Invasion.Reset();
@@ -905,19 +905,19 @@ namespace Catan10
         {
             //
             //  this should mean that we are launching for the first time
-            if (_gameView.CurrentGame.Tiles[0].TileOrientation == TileOrientation.FaceDown)
+            if (CTRL_GameView.CurrentGame.Tiles[0].TileOrientation == TileOrientation.FaceDown)
             {
                 return;
             }
 
             List<Task> tasks = new List<Task>();
-            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
+            foreach (TileCtrl t in CTRL_GameView.CurrentGame.Tiles)
             {
                 t.AnimateFadeAsync(1.0);
                 t.Rotate(0, tasks, false);
             }
             await Task.WhenAll(tasks.ToArray());
-            foreach (TileCtrl t in _gameView.CurrentGame.Tiles)
+            foreach (TileCtrl t in CTRL_GameView.CurrentGame.Tiles)
             {
                 if (bMakeFaceDown)
                 {
@@ -1030,7 +1030,7 @@ namespace Catan10
             {
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
                 {
-                    _gameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
+                    CTRL_GameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
                     if (MainPageModel.Log.CanRedo && ( MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard ))
                     {
                         await RedoAsync();
@@ -1101,9 +1101,9 @@ namespace Catan10
 
         private async Task VisualShuffle(RandomBoardSettings rbs = null)
         {
-            await _gameView.VisualShuffle(rbs);
+            await CTRL_GameView.VisualShuffle(rbs);
             _randomBoardList.Clear();
-            _randomBoardList.Add(_gameView.RandomBoardSettings);
+            _randomBoardList.Add(CTRL_GameView.RandomBoardSettings);
             _randomBoardListIndex = 0;
             await Task.Delay(0);
         }
@@ -1216,7 +1216,7 @@ namespace Catan10
                 }
             }
 
-            NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
+            NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, CTRL_GameView.Games);
 
             ContentDialogResult result = await dlg.ShowAsync();
             if (( dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6 ) && result == ContentDialogResult.Primary)
@@ -1237,10 +1237,10 @@ namespace Catan10
 
             if (result != ContentDialogResult.Secondary)
             {
-                _gameView.Reset();
+                CTRL_GameView.Reset();
                 await this.Reset();
 
-                _gameView.CurrentGame = dlg.SelectedGame;
+                CTRL_GameView.CurrentGame = dlg.SelectedGame;
                 MainPageModel.PlayingPlayers.Clear();
                 GameInfo info = new GameInfo()
                 {
@@ -1281,8 +1281,7 @@ namespace Catan10
             };
             await appWindow.TryShowAsync();
         }
-
-        private async void OnPurchaseEntitlement(Entitlement entitlement)
+        private async Task PurchaseEntitlement(Entitlement entitlement)
         {
             switch (entitlement)
             {
@@ -1300,7 +1299,7 @@ namespace Catan10
                     await TryBuyKnightEntitlement();
                     break;
                 case Entitlement.MoveKnight:
-                    foreach (var knight in CurrentPlayer.GameData.Knights)
+                    foreach (var knight in CurrentPlayer.GameData.CK_Knights)
                     {
                         if (knight.Activated)
                         {
@@ -1337,11 +1336,20 @@ namespace Catan10
                     await PurchaseEntitlement(CurrentPlayer, Entitlement.Deserter, GameState.PickDeserter);
                     break;
                 case Entitlement.MoveBaron:
-                    await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
+                    // since you can only play one dev card per turn...
+                    if (CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None &&
+                        !CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.MoveBaron))
+                    {
+                        await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
+                    }
                     break;
                 default:
                     break;
             }
+        }
+        private async void OnPurchaseEntitlement(Entitlement entitlement)
+        {
+            await PurchaseEntitlement(entitlement);
         }
         /// <summary>
         ///     Determines if a city improvement can be purchased based on the given rank and conditions:
@@ -1432,7 +1440,7 @@ namespace Catan10
         {
             bool found = false;
 
-            foreach (var knight in CurrentPlayer.GameData.Knights)
+            foreach (var knight in CurrentPlayer.GameData.CK_Knights)
             {
                 if (!knight.Activated)
                 {
@@ -1462,7 +1470,7 @@ namespace Catan10
         }
         private async void OnMoveKnight(object sender, RoutedEventArgs e)
         {
-            if (CurrentPlayer.GameData.Knights.Count == 0) return;
+            if (CurrentPlayer.GameData.CK_Knights.Count == 0) return;
             await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight, CurrentGameState);
         }
         private async Task TryBuyWall()
@@ -1521,7 +1529,7 @@ namespace Catan10
         private Visibility BaronButtonVisible(GameState state, bool isCitiesAndKnights)
         {
             if (isCitiesAndKnights) return Visibility.Collapsed;
-            this.TraceMessage($"GameState.{state} PlayedDevCard = {CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType}");
+       //     this.TraceMessage($"GameState.{state} PlayedDevCard = {CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType}");
             if ((state == GameState.WaitingForNext || state == GameState.WaitingForRoll)  &&
                 CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None)
             {

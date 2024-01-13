@@ -26,7 +26,7 @@ namespace Catan10
         {
             get
             {
-                return _gameView;
+                return CTRL_GameView;
             }
         }
 
@@ -114,7 +114,7 @@ namespace Catan10
 
             //
             //  NOTE:  these have to be called in this order so that the undo works correctly
-            //  await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.ProtectCity, true, logType, building.Index, new LogBuildingUpdate(_gameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
+            //  await AddLogEntry(CurrentPlayer, GameStateFromOldLog, CatanAction.ProtectCity, true, logType, building.Index, new LogBuildingUpdate(CTRL_GameView.CurrentGame.Index, null, building, oldState, building.BuildingState));
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
             CalculateAndSetLongestRoad();
         }
@@ -222,7 +222,7 @@ namespace Catan10
                     //  remove any tracking for roads greater than their current longest road
                     //  e.g. if they had a road of length 7 and somebody broke it, remove the
                     //  entries that said they had built roads of length 5+
-                    for (int i = p.GameData.LongestRoad + 1; i < _gameView.CurrentGame.GameData.MaxRoads; i++)
+                    for (int i = p.GameData.LongestRoad + 1; i < CTRL_GameView.CurrentGame.GameData.MaxRoads; i++)
                     {
                         RaceTracking.RemovePlayer(p, i);
                     }
@@ -350,20 +350,20 @@ namespace Catan10
 
         public async Task ChangeGame(CatanGameCtrl game)
         {
-            if (game == _gameView.CurrentGame)
+            if (game == CTRL_GameView.CurrentGame)
             {
                 return;
             }
 
             if (CurrentGameState == GameState.WaitingForNewGame)
             {
-                _gameView.CurrentGame = game;
+                CTRL_GameView.CurrentGame = game;
 
                 return;
             }
             if (await StaticHelpers.AskUserYesNoQuestion("Are you sure you want to change the game?  The board will reshuffle and you won't be able to get back to this game.", "Yes", "No"))
             {
-                _gameView.CurrentGame = game;
+                CTRL_GameView.CurrentGame = game;
 
                 await VisualShuffle();
             }
@@ -384,7 +384,7 @@ namespace Catan10
             }
 
             // tell all the Buildings that the CurrentPlayer has changed
-            foreach (BuildingCtrl building in _gameView.AllBuildings)
+            foreach (BuildingCtrl building in CTRL_GameView.AllBuildings)
             {
                 building.CurrentPlayer = CurrentPlayer;
             }
@@ -392,7 +392,7 @@ namespace Catan10
 
         public BuildingCtrl GetBuilding(int settlementIndex)
         {
-            return _gameView.GetBuilding(settlementIndex);
+            return CTRL_GameView.GetBuilding(settlementIndex);
         }
 
         public PlayerModel GetPlayerData(int playerIndex)
@@ -402,12 +402,12 @@ namespace Catan10
 
         public RoadCtrl GetRoad(int roadIndex)
         {
-            return _gameView.GetRoad(roadIndex);
+            return CTRL_GameView.GetRoad(roadIndex);
         }
 
         public TileCtrl GetTile(int tileIndex)
         {
-            return _gameView.GetTile(tileIndex);
+            return CTRL_GameView.GetTile(tileIndex);
         }
 
         public async Task OnNewGame()
@@ -434,7 +434,7 @@ namespace Catan10
 
             //    Debug.Assert(MainPageModel.AllPlayers.Count > 0);
 
-            //    NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, _gameView.Games);
+            //    NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, CTRL_GameView.Games);
 
             //    ContentDialogResult result = await dlg.ShowAsync();
             //    if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
@@ -455,11 +455,11 @@ namespace Catan10
 
             //    if (result != ContentDialogResult.Secondary)
             //    {
-            //        _gameView.Reset();
+            //        CTRL_GameView.Reset();
             //        await this.Reset();
             //        await MainPageModel.Log.Init(dlg.SaveFileName);
             //        await SetStateAsync(null, GameState.WaitingForNewGame, true);
-            //        _gameView.CurrentGame = dlg.SelectedGame;
+            //        CTRL_GameView.CurrentGame = dlg.SelectedGame;
 
             //        SavedGames.Insert(0, MainPageModel.Log);
             //        await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
@@ -598,7 +598,7 @@ namespace Catan10
                 await MovedBaronLog.PostLog(this,
                                             victims,
                                             targetTile.Index,
-                                            weapon == TargetWeapon.Baron ? _gameView.BaronTile.Index : _gameView.PirateShipTile.Index,  // the previous index
+                                            weapon == TargetWeapon.Baron ? CTRL_GameView.BaronTile.Index : CTRL_GameView.PirateShipTile.Index,  // the previous index
                                             weapon,
                                             log == null ? MoveBaronReason.Rolled7 : log.Reason,
                                             stolenResource);
@@ -618,7 +618,7 @@ namespace Catan10
                         continue;
                     }
 
-                    RoadCtrl r = _gameView.GetRoadAt(targetTile, location);
+                    RoadCtrl r = CTRL_GameView.GetRoadAt(targetTile, location);
                     if (r.IsOwned && r.RoadState == RoadState.Ship)
                     {
                         roads.Add(r);
@@ -870,7 +870,7 @@ namespace Catan10
             {
                 if (building.BuildingToTileDictionary.Count > 0)
                 {
-                    if (_gameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
+                    if (CTRL_GameView.GetIsland(building.BuildingToTileDictionary.First().Value) != null)
                     {
                         //  we are on an island - you can't build on an island when you are allocating resources
                         return BuildingState.Error;
@@ -965,7 +965,7 @@ namespace Catan10
         //      1. Increment the target's TimesTargetted
         //      2. Move the ship or baron to the target tile
         //      3. set the flag that says a BuyOrUpgradeKnight has been played this turn or that the Robber has been moved because of a 7
-        //      4. If BuyOrUpgradeKnight Played Increment the source player (which is always the current player) Knights played
+        //      4. If BuyOrUpgradeKnight Played Increment the source player (which is always the current player) CK_Knights played
         //      5. Log that it happened.
         //      6. check to see if we should update the Largest Army
         private async Task AssignBaronOrKnight(PlayerModel targetPlayer, TileCtrl targetTile, TargetWeapon weapon, CatanAction action, LogType logType)
@@ -987,13 +987,13 @@ namespace Catan10
 
             if (weapon == TargetWeapon.PirateShip)
             {
-                startTile = _gameView.PirateShipTile;
-                _gameView.PirateShipTile = targetTile;
+                startTile = CTRL_GameView.PirateShipTile;
+                CTRL_GameView.PirateShipTile = targetTile;
             }
             else
             {
-                startTile = _gameView.BaronTile;
-                _gameView.BaronTile = targetTile;
+                startTile = CTRL_GameView.BaronTile;
+                CTRL_GameView.BaronTile = targetTile;
             }
 
             if (action == CatanAction.PlayedKnight)
@@ -1003,7 +1003,7 @@ namespace Catan10
                 AssignLargestArmy();
             }
 
-            //  await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(_gameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
+            //  await AddLogEntry(CurrentPlayer, CurrentGameState, action, true, logType, 1, new LogBaronOrPirate(CTRL_GameView.CurrentGame.Index, targetPlayer, CurrentPlayer, startTile, targetTile, weapon, action));
 
             if (CurrentGameState == GameState.MustMoveBaron && logType != LogType.Undo)
             {
@@ -1300,7 +1300,7 @@ namespace Catan10
         private RoadState NextRoadState(RoadCtrl road)
         {
             bool nextToSea = false;
-            if (road.Keys.Count == 1 && _gameView.CurrentGame.GameData.MaxShips > 0)
+            if (road.Keys.Count == 1 && CTRL_GameView.CurrentGame.GameData.MaxShips > 0)
             {
                 // this means we are on an outer edge
                 nextToSea = true;
@@ -1417,9 +1417,9 @@ namespace Catan10
                 {
                     // tell the tile that this settlement is no longer owned
                     key.Tile.OwnedBuildings.Remove(building);
-                    if (_gameView.HasIslands)
+                    if (CTRL_GameView.HasIslands)
                     {
-                        Island island = _gameView.GetIsland(key.Tile);
+                        Island island = CTRL_GameView.GetIsland(key.Tile);
                         if (island != null)
                         {
                             if (island.BonusPoint)
@@ -1436,9 +1436,9 @@ namespace Catan10
                     {
                         key.Tile.OwnedBuildings.Add(building);
                     }
-                    if (_gameView.HasIslands)
+                    if (CTRL_GameView.HasIslands)
                     {
-                        Island island = _gameView.GetIsland(key.Tile);
+                        Island island = CTRL_GameView.GetIsland(key.Tile);
                         if (island != null)
                         {
                             if (island.BonusPoint && oldState == BuildingState.None) // only addref when you go from none

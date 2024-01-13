@@ -161,7 +161,7 @@ namespace Catan10
                     break;
 
                 case Entitlement.BuyOrUpgradeKnight:
-                    if (player.GameData.Knights.Count -1 == MainPage.Current.GameData.MaxKnights)
+                    if (player.GameData.CK_Knights.Count -1 == MainPage.Current.GameData.MaxKnights)
                         return true;
                     break;
 

@@ -24,6 +24,11 @@ namespace Catan10
             _sbMove.Begin();
         }
 
+        public void SkipAnimationToEnd()
+        {
+            _sbMove.SkipToFill();
+        }
+
         public void ShowAsync()
         {
             DA_Opacity.To = 1.0;

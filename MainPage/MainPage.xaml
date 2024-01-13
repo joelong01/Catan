@@ -68,6 +68,8 @@
                         <MenuFlyoutSubItem Text="Development">
                             <ToggleMenuFlyoutItem Text="Cities and Knights"
                                     IsChecked="{x:Bind TestCitiesAndKnights, Mode=TwoWay}" />
+                            <MenuFlyoutItem Click="OnTestBaron" Text="Test Baron" />
+                            
                             <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Regular Game" />
                             <MenuFlyoutItem Click="OnTestInvasion" Text="Test Invasion" />
                             <MenuFlyoutItem Click="OnTestDeserter" Text="Test Deserter" />
@@ -184,7 +186,7 @@
                 <Viewbox Stretch="UniformToFill">
                     <Grid>
 
-                        <local:GameContainerCtrl x:Name="_gameView" Margin="0" Canvas.ZIndex="2" CornerRadius="0"
+                        <local:GameContainerCtrl x:Name="CTRL_GameView" Margin="0" Canvas.ZIndex="2" CornerRadius="0"
                                 DoubleTapped="GameViewControlDoubleTapped" IsEnabled="True"
                                 PointerPressed="GameViewControlPointerPressed" RenderTransformOrigin="0.5,0.5">
                             <local:GameContainerCtrl.RenderTransform>

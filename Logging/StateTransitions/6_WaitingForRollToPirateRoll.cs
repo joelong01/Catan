@@ -22,7 +22,7 @@ namespace Catan10
             // if there is an invasion, we also need to know the active knights
             foreach (var player in gameController.PlayingPlayers)
             {
-                player.GameData.Knights.ForEach(knight =>
+                player.GameData.CK_Knights.ForEach(knight =>
                 {
                     if (knight.Activated) activeKnights.Add(knight);
                 });

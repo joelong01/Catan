@@ -77,7 +77,7 @@ namespace Catan10
                     //
                     //  turn off pips
 
-                    _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
+                    CTRL_GameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
 
                     if (MainPageModel.Settings.AutoRespond)
                     {
@@ -149,7 +149,7 @@ namespace Catan10
             }
         }
 
-        public List<int> CurrentRandomGoldTiles => _gameView.CurrentRandomGoldTiles;
+        public List<int> CurrentRandomGoldTiles => CTRL_GameView.CurrentRandomGoldTiles;
 
         public CatanGameData GameData => this.GameContainer.CurrentGame.GameData;
 
@@ -234,11 +234,11 @@ namespace Catan10
 
                 //
                 //  need to give the players some data about the game
-                newPlayer.GameData.MaxCities = _gameView.CurrentGame.GameData.MaxCities;
-                newPlayer.GameData.MaxRoads = _gameView.CurrentGame.GameData.MaxRoads;
-                newPlayer.GameData.MaxSettlements = _gameView.CurrentGame.GameData.MaxSettlements;
-                newPlayer.GameData.MaxShips = _gameView.CurrentGame.GameData.MaxShips;
-                newPlayer.GameData.MaxKnights = _gameView.CurrentGame.GameData.MaxKnights;
+                newPlayer.GameData.MaxCities = CTRL_GameView.CurrentGame.GameData.MaxCities;
+                newPlayer.GameData.MaxRoads = CTRL_GameView.CurrentGame.GameData.MaxRoads;
+                newPlayer.GameData.MaxSettlements = CTRL_GameView.CurrentGame.GameData.MaxSettlements;
+                newPlayer.GameData.MaxShips = CTRL_GameView.CurrentGame.GameData.MaxShips;
+                newPlayer.GameData.MaxKnights = CTRL_GameView.CurrentGame.GameData.MaxKnights;
                 newPlayer.GameData.NotificationsEnabled = true;
                 newPlayer.AddedTime = DateTime.Now;
                 newPlayer.GameData.Trades.TradeRequest.Owner.Player = newPlayer;
@@ -330,7 +330,7 @@ namespace Catan10
 
         public RandomBoardSettings CurrentRandomBoard()
         {
-            return _gameView.RandomBoardSettings;
+            return CTRL_GameView.RandomBoardSettings;
         }
 
         /// <summary>
@@ -508,14 +508,14 @@ namespace Catan10
 
         public RandomBoardSettings GetRandomBoard()
         {
-            return _gameView.GetRandomBoard();
+            return CTRL_GameView.GetRandomBoard();
         }
 
         public List<int> GetRandomGoldTiles()
         {
             if (!this.RandomGold || this.RandomGoldTileCount < 1) return new List<int>();
-            var currentRandomGoldTiles = _gameView.CurrentRandomGoldTiles;
-            return _gameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
+            var currentRandomGoldTiles = CTRL_GameView.CurrentRandomGoldTiles;
+            return CTRL_GameView.PickRandomTilesToBeGold(RandomGoldTileCount, currentRandomGoldTiles);
         }
 
         /// <summary>
@@ -525,8 +525,8 @@ namespace Catan10
         public async Task InitializeMainPageModel()
         {
             var serviceReference = MainPageModel?.CatanService;
-            _gameView.Reset();
-            _gameView.SetCallbacks(this, this);
+            CTRL_GameView.Reset();
+            CTRL_GameView.SetCallbacks(this, this);
             await LoadMainPageModel();
             UpdateGridLocations();
             _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
@@ -551,10 +551,10 @@ namespace Catan10
         {
 
             MainPageModel.GameInfo = gameInfo;
-            _gameView.CurrentGame = _gameView.Games[gameInfo.GameIndex];
+            CTRL_GameView.CurrentGame = CTRL_GameView.Games[gameInfo.GameIndex];
             MainPageModel.IsGameStarted = true;
             if (gameInfo.CitiesAndKnights)
-            { _gameView.CurrentGame.HexPanel.HideBaron(); }
+            { CTRL_GameView.CurrentGame.HexPanel.HideBaron(); }
             await Task.Delay(0);
         }
 
@@ -648,7 +648,7 @@ namespace Catan10
 
         public DevCardType PurchaseNextDevCard()
         {
-            return _gameView.CurrentGame.GetNextDevCard();
+            return CTRL_GameView.CurrentGame.GetNextDevCard();
         }
 
         public async Task<bool> RedoAsync()
@@ -663,12 +663,12 @@ namespace Catan10
 
         public void ResetAllBuildings()
         {
-            _gameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
+            CTRL_GameView.AllBuildings.ForEach((building) => building.Reset()); // turn off pips on the local machine
         }
 
         public async Task ResetRandomGoldTiles()
         {
-            await _gameView.ResetRandomGoldTiles();
+            await CTRL_GameView.ResetRandomGoldTiles();
         }
 
         public async Task ResetRollControl()
@@ -682,7 +682,7 @@ namespace Catan10
         {
             TradeResources tr = new TradeResources();
             TradeResources baron = new TradeResources();
-            foreach (BuildingCtrl building in _gameView.CurrentGame.HexPanel.Buildings)
+            foreach (BuildingCtrl building in CTRL_GameView.CurrentGame.HexPanel.Buildings)
             {
                 if (building == null) continue;
                 if (building.Owner != player) continue;
@@ -775,7 +775,7 @@ namespace Catan10
 
         public void SetHighlightedTiles(int roll)
         {
-            foreach (var tile in _gameView.AllTiles)
+            foreach (var tile in CTRL_GameView.AllTiles)
             {
                 if (tile.Number != roll)
                 {
@@ -807,7 +807,7 @@ namespace Catan10
             }
             else
             {
-                await _gameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
+                await CTRL_GameView.SetRandomCatanBoard(true, randomBoard.NewRandomBoard);
             }
 
             UpdateBoardMeasurements();
@@ -818,7 +818,7 @@ namespace Catan10
             await ResetRandomGoldTiles();
             if (this.RandomGold && this.RandomGoldTileCount > 0)
             {
-                await _gameView.SetRandomTilesToGold(goldTilesIndices);
+                await CTRL_GameView.SetRandomTilesToGold(goldTilesIndices);
             }
         }
 
@@ -932,7 +932,7 @@ namespace Catan10
             }
             else
             {
-                await _gameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
+                await CTRL_GameView.SetRandomCatanBoard(true, logHeader.PreviousRandomBoard);
                 UpdateBoardMeasurements();
             }
         }

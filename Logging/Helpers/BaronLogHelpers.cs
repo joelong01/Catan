@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Catan10
 {
@@ -14,7 +15,11 @@ namespace Catan10
         public List<string> Victims { get; set; }
         public TargetWeapon Weapon { get; set; }
         public bool MainBaronHidden { get; set; }
-
+        public Guid PreviousLargestArmyPlayerId { get; set; } = Guid.Empty;
+        public override string ToString()
+        {
+            return $"{Weapon}-{base.ToString()}";
+        }
         #endregion Properties
     }
 }

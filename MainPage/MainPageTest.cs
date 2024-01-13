@@ -7,6 +7,8 @@ using Windows.UI.Xaml.Controls;
 using Catan10.CatanService;
 using System.Diagnostics;
 using Windows.UI.WindowManagement;
+using System.Linq;
+using Windows.ApplicationModel.Activation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -232,9 +234,9 @@ namespace Catan10
             AnimationSpeedBase = 10; // speed up the animations
             RandomGoldTileCount = 3;
             await this.Reset();
-            _gameView.Reset();
+            CTRL_GameView.Reset();
 
-            _gameView.CurrentGame = _gameView.Games[1];
+            CTRL_GameView.CurrentGame = CTRL_GameView.Games[1];
             MainPageModel.PlayingPlayers.Clear();
             GameInfo info = new GameInfo()
             {
@@ -306,7 +308,7 @@ namespace Catan10
         //  find a place the Current User can place a Building
         private BuildingCtrl Test_FindBuildingPlacement(BuildingState buildingState)
         {
-            foreach (BuildingCtrl building in _gameView.AllBuildings)
+            foreach (BuildingCtrl building in CTRL_GameView.AllBuildings)
             {
                 if (ValidateBuildingLocation(building) == buildingState)
                 {
@@ -317,6 +319,8 @@ namespace Catan10
         }
         private async Task Test_DoRoll(int redRoll, int whiteRoll, SpecialDice special)
         {
+            Debug.Assert(redRoll > 0 && redRoll < 7);
+            Debug.Assert(whiteRoll > 0 && whiteRoll < 7);
             var rollModel = new RollModel()
             {
                 RedDie = redRoll,
@@ -331,9 +335,9 @@ namespace Catan10
             AnimationSpeedBase = 10; // speed up the animations
             RandomGoldTileCount = 1;
             await this.Reset();
-            _gameView.Reset();
+            CTRL_GameView.Reset();
 
-            _gameView.CurrentGame = _gameView.Games[1];
+            CTRL_GameView.CurrentGame = CTRL_GameView.Games[1];
             MainPageModel.PlayingPlayers.Clear();
             await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
             UpdateGridLocations();
@@ -389,6 +393,201 @@ namespace Catan10
             await Test_DoRoll(1, 2, SpecialDice.Pirate);
 
         }
+        private async void OnTestBaron(object sender, RoutedEventArgs e)
+        {
+            await TestBaron();
+        }
+        private async Task TestBaron()
+        {
+            try
+            {
+
+                this.Testing = true;
+                if (CurrentGameState != GameState.WaitingForNext)
+                {
+                    GameInfo info = new GameInfo()
+                    {
+                        Creator = TheHuman.PlayerName,
+                        GameIndex = 0,
+                        Id = Guid.NewGuid(),
+                        Started = false,
+                        CitiesAndKnights=false
+                    };
+
+                    await StartGame(info);
+                }
+                var desertTile = CTRL_GameView.CurrentGame.HexPanel.DesertTiles[0];
+                Debug.Assert(desertTile != null);
+                await TestCheckpointLog.AddTestCheckpoint(this);
+                //
+                //  scenario 1: roll a 7
+                await RollSevenAndMoveBaron(PlayingPlayers[1]);
+                Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+                Debug.Assert(PlayingPlayers[1].GameData.TimesTargeted == 1);
+                await RollbackToCheckpoint();
+
+                Debug.Assert(PlayingPlayers[1].GameData.TimesTargeted == 0);
+
+                await TestCheckpointLog.AddTestCheckpoint(this);
+                GameContainer.CurrentGame.HexPanel.BaronnAnimationSkipToEnd();
+                Debug.Assert(this.CurrentGameState == GameState.WaitingForRoll);
+                Debug.Assert(CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None);
+                Debug.Assert(CTRL_GameView.CurrentGame.HexPanel.BaronTile == desertTile);
+
+                for (int i = 0; i < PlayingPlayers.Count * 2; i++)
+                {
+                    var targetPlayer = PlayingPlayers.ElementAt(i % PlayingPlayers.Count);
+                    await BuyAndPlayKnightDevCard(targetPlayer);
+                    Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
+                    await Test_DoRoll(6, 6, SpecialDice.None); // just rolling a 12
+                    Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+                    await NextState();
+                    Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
+                }
+                Debug.Assert(PlayingPlayers[0].GameData.Resources.KnightsPlayed == 2);
+                Debug.Assert(PlayingPlayers[1].GameData.Resources.KnightsPlayed == 2);
+                Debug.Assert(PlayingPlayers[1].GameData.Resources.KnightsPlayed == 2);
+                Debug.Assert(PlayingPlayers[0].GameData.TimesTargeted == 2);
+                Debug.Assert(PlayingPlayers[1].GameData.TimesTargeted == 2);
+                Debug.Assert(PlayingPlayers[2].GameData.TimesTargeted == 2);
+                Debug.Assert(!PlayingPlayers[0].GameData.LargestArmy);
+                Debug.Assert(!PlayingPlayers[1].GameData.LargestArmy);
+                Debug.Assert(!PlayingPlayers[2].GameData.LargestArmy);
+
+                await BuyAndPlayKnightDevCard(PlayingPlayers[1]);
+                Debug.Assert(PlayingPlayers[0].GameData.Resources.KnightsPlayed == 3);
+                Debug.Assert(PlayingPlayers[1].GameData.TimesTargeted == 3);
+                Debug.Assert(PlayingPlayers[0].GameData.LargestArmy);
+                await Test_DoRoll(6, 6, SpecialDice.None); // just rolling a 12
+                await NextState();
+
+                //
+                //  player 2 ties player 1 for most knights, but doesn't get largest army
+                await BuyAndPlayKnightDevCard(PlayingPlayers[2]);
+                Debug.Assert(PlayingPlayers[0].GameData.Resources.KnightsPlayed == 3);
+                Debug.Assert(PlayingPlayers[2].GameData.TimesTargeted == 3);
+                Debug.Assert(PlayingPlayers[0].GameData.LargestArmy == true);
+                Debug.Assert(PlayingPlayers[1].GameData.LargestArmy == false);
+
+
+                Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
+                // I want to get around to the same player so they can buy a knight again -- 
+                // so just roll/nextstate
+
+                for (int i=0; i<PlayingPlayers.Count; i++)
+                {
+                    await Test_DoRoll(i+1, i+3, SpecialDice.None); // just rolling a 12
+                    await NextState();
+                }
+                Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
+                //
+                //  player 2 passes player 1 for most knights, gets largest army
+                await BuyAndPlayKnightDevCard(PlayingPlayers[2]);
+                Debug.Assert(PlayingPlayers[0].GameData.Resources.KnightsPlayed == 3);
+                Debug.Assert(PlayingPlayers[1].GameData.Resources.KnightsPlayed == 4);
+                Debug.Assert(PlayingPlayers[2].GameData.TimesTargeted == 4);
+                Debug.Assert(!PlayingPlayers[0].GameData.LargestArmy);
+                Debug.Assert(PlayingPlayers[1].GameData.LargestArmy);
+
+                // player 2 changes their mind...
+                await DoUndo();
+                Debug.Assert(PlayingPlayers[0].GameData.Resources.KnightsPlayed == 3);
+                Debug.Assert(PlayingPlayers[1].GameData.Resources.KnightsPlayed == 3);
+                Debug.Assert(PlayingPlayers[2].GameData.TimesTargeted == 3);
+                Debug.Assert(PlayingPlayers[0].GameData.LargestArmy);
+                Debug.Assert(!PlayingPlayers[1].GameData.LargestArmy);
+                await RollbackToCheckpoint();
+
+                foreach (var player in PlayingPlayers)
+                {
+                    Debug.Assert(player.GameData.LargestArmy == false);
+                    Debug.Assert(player.GameData.Resources.KnightsPlayed == 0);
+                    Debug.Assert(player.GameData.TimesTargeted == 0);
+                }
+              
+                this.TraceMessage($"ended on {CTRL_GameView.CurrentGame.HexPanel.BaronTile}");
+                
+
+            }
+            finally
+            { this.Testing = false; }
+        }
+
+        private async Task BuyAndPlayKnightDevCard(PlayerModel target)
+        {
+            var currentTile = CTRL_GameView.CurrentGame.HexPanel.BaronTile;
+            int knightsPlayed = CurrentPlayer.GameData.Resources.KnightsPlayed;
+            int timesTargetted = target.GameData.TimesTargeted;
+            TileCtrl targetTile = null;
+            foreach (var kvp in target.GameData.Settlements[0].BuildingToTileDictionary)
+            {
+                if (kvp.Value != currentTile)
+                {
+                    targetTile = kvp.Value;
+                    break;
+                }
+            }
+            Debug.Assert(targetTile != null);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+            await PurchaseEntitlement(Entitlement.MoveBaron);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.MoveBaron));
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 1);
+            Debug.Assert(CurrentPlayer.GameData.Resources.KnightsPlayed == knightsPlayed);
+            var victims = new List<string>()  {target.PlayerName};
+
+            int startingBaronIndex = CTRL_GameView.BaronTile.Index;
+            await MovedBaronLog.PostLog(this,
+                                          victims,
+                                          targetTile.Index,
+                                          startingBaronIndex,
+                                          TargetWeapon.Baron,
+                                           MoveBaronReason.PlayedDevCard,
+                                            ResourceType.None);
+            GameContainer.CurrentGame.HexPanel.BaronnAnimationSkipToEnd();
+            Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
+            Debug.Assert(CurrentPlayer.GameData.Resources.KnightsPlayed == knightsPlayed + 1);
+            Debug.Assert(CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.Knight);
+            Debug.Assert(target.GameData.TimesTargeted == timesTargetted + 1);
+
+        }
+
+        private async Task RollSevenAndMoveBaron(PlayerModel target)
+        {
+            var currentTile = CTRL_GameView.CurrentGame.HexPanel.BaronTile;
+            int knightsPlayed = CurrentPlayer.GameData.Resources.KnightsPlayed;
+            int timesTargetted = target.GameData.TimesTargeted;
+            TileCtrl targetTile = null;
+            foreach (var kvp in target.GameData.Settlements[0].BuildingToTileDictionary)
+            {
+                if (kvp.Value != currentTile)
+                {
+                    targetTile = kvp.Value;
+                    break;
+                }
+            }
+            Debug.Assert(targetTile != null);
+            Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
+
+            await Test_DoRoll(4, 3, SpecialDice.None);
+            Debug.Assert(CurrentGameState == GameState.MustMoveBaron);
+
+            var victims = new List<string>()  {target.PlayerName};
+
+            int startingBaronIndex = CTRL_GameView.BaronTile.Index;
+            await MovedBaronLog.PostLog(this,
+                                          victims,
+                                          targetTile.Index,
+                                          startingBaronIndex,
+                                          TargetWeapon.Baron,
+                                           MoveBaronReason.Rolled7,
+                                            ResourceType.None);
+            GameContainer.CurrentGame.HexPanel.BaronnAnimationSkipToEnd();
+            Debug.Assert(CurrentGameState == GameState.WaitingForNext);
+            Debug.Assert(CurrentPlayer.GameData.Resources.KnightsPlayed == knightsPlayed);
+            Debug.Assert(target.GameData.TimesTargeted == timesTargetted + 1);
+
+        }
+
         private async void OnTestInvasion(object sender, RoutedEventArgs e)
         {
 
@@ -478,7 +677,7 @@ namespace Catan10
 
                 Debug.Assert(knights[0].Knight.Activated == true);
                 Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
-                Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
+                Debug.Assert(PlayingPlayers[0].GameData.CK_Knights.Count == 1);
                 Debug.Assert(MainPageModel.TotalKnightRanks == 1);
 
 
@@ -645,14 +844,28 @@ namespace Catan10
             return CurrentGameState == GameState.MustDestroyCity;
         }
 
+        private void ForceBaronToRealTile()
+        {
+            var tile = CTRL_GameView.CurrentGame.HexPanel.BaronTile;
+            int idx = tile.Index + 1 % CTRL_GameView.CurrentGame.Tiles.Count;
+            var tempTile = CTRL_GameView.CurrentGame.Tiles.ElementAt(idx);
+            CTRL_GameView.CurrentGame.HexPanel.BaronTile = tempTile;
+            CTRL_GameView.CurrentGame.HexPanel.BaronnAnimationSkipToEnd();
+            CTRL_GameView.CurrentGame.HexPanel.BaronTile = tile;
+            CTRL_GameView.CurrentGame.HexPanel.BaronnAnimationSkipToEnd();
+
+        }
 
         private async Task RollbackToState(GameState state)
         {
+            int count = 0;
             while (Log.PeekAction.NewState != state)
             {
                 if (Log.PeekAction.CanUndo)
                 {
+                    count++;
                     await DoUndo();
+                   
                 }
                 else
                 {
@@ -1109,7 +1322,7 @@ namespace Catan10
             Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
             Debug.Assert(originalKnightBuilding.Knight.Activated == true);
             Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
-            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
+            Debug.Assert(PlayingPlayers[0].GameData.CK_Knights.Count == 1);
             Debug.Assert(MainPageModel.TotalKnightRanks == 2);
 
             // guy a couple of roads
@@ -1171,7 +1384,7 @@ namespace Catan10
             Debug.Assert(originalKnightBuilding.Knight.KnightRank == KnightRank.Strong);
             Debug.Assert(originalKnightBuilding.Knight.Activated == true);
             Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
-            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 1);
+            Debug.Assert(PlayingPlayers[0].GameData.CK_Knights.Count == 1);
             Debug.Assert(MainPageModel.TotalKnightRanks == 2);
 
             // move to Player
@@ -1197,7 +1410,7 @@ namespace Catan10
             Debug.Assert(newKnight.Knight.KnightRank == KnightRank.Strong);
             Debug.Assert(newKnight.Knight.Activated == false);
             Debug.Assert(CurrentPlayer.GameData.Resources.UnspentEntitlements.Count == 0);
-            Debug.Assert(PlayingPlayers[0].GameData.Knights.Count == 0);
+            Debug.Assert(PlayingPlayers[0].GameData.CK_Knights.Count == 0);
             Debug.Assert(MainPageModel.TotalKnightRanks == 0); // not activated yet
             Debug.Assert(CurrentGameState == GameState.WaitingForNext);
 

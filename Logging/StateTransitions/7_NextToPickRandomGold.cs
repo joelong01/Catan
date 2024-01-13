@@ -16,6 +16,7 @@ namespace Catan10
     public class WaitingForNextToPickingRandomGoldTiles : LogHeader, ILogController
     {
         public TradeResources ResourcesThisTurn { get; set; }
+        public DevCardModel DevCardPlayedThisTurn { get; set; }
 
         public static async Task PostLog(IGameController gameController)
         {
@@ -24,8 +25,9 @@ namespace Catan10
             {
                 ResourcesThisTurn = ResourceCardCollection.ToTradeResources(gameController.CurrentPlayer.GameData.Resources.ResourcesThisTurn),
                 Action = CatanAction.ChangedState,
-                NewState = GameState.PickingRandomGoldTiles
-               
+                NewState = GameState.PickingRandomGoldTiles,
+                DevCardPlayedThisTurn = gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard
+
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -56,6 +58,7 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
+
             ChangePlayerHelper.ChangePlayer(gameController, -1);
 
             //
@@ -65,9 +68,9 @@ namespace Catan10
                 p.GameData.Resources.ResourcesThisTurn.Reset();
             });
 
-         
+            gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard = this.DevCardPlayedThisTurn;
 
-             await Task.Delay(0);
+            await Task.Delay(0);
         }
     }
 }

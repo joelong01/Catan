@@ -44,13 +44,26 @@ namespace Catan10
             }
 
             bool showBaron = true;
-
+            var previousLargestArmyId = Guid.Empty;
             if (gameController.MainPageModel.GameInfo.CitiesAndKnights)
             {
                 if (gameController.InvasionData.TotalInvasions == 0)
                 {
                     showBaron = false;
                 }
+            }
+            else
+            {
+                var playerWithLargestArmy = GetLargestArmyPlayer(gameController);
+                if (playerWithLargestArmy != null)
+                {
+                    var currentLargestArmy = playerWithLargestArmy.GameData.Resources.KnightsPlayed;
+                    if (gameController.CurrentPlayer.GameData.Resources.KnightsPlayed == currentLargestArmy) // goint to exceed and get LA!
+                    {
+                        previousLargestArmyId = playerWithLargestArmy.PlayerIdentifier;
+                    }
+                }
+
             }
 
             // Debug.Assert(((MustMoveBaronLog)gameController.MainPageModel.Log.PeekAction).StartingState == previousState);
@@ -68,11 +81,58 @@ namespace Catan10
                     TargetTile = targetTileIndex,
                     StolenResource = stolenResource,
                     Reason = reason,
-                    MainBaronHidden = showBaron
+                    MainBaronHidden = showBaron,
+                    PreviousLargestArmyPlayerId = previousLargestArmyId,
                 }
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
+        }
+
+        public static PlayerModel GetLargestArmyPlayer(IGameController gameController)
+        {
+
+            var playerWithLargestArmy = gameController.PlayingPlayers
+                    .FirstOrDefault(player => player.GameData.LargestArmy);
+
+            return playerWithLargestArmy;
+
+        }
+
+        public void SetLargestArmy(IGameController controller)
+        {
+            var playerWithLargestArmy = controller.PlayingPlayers
+                    .FirstOrDefault(player => player.GameData.LargestArmy);
+
+            var armySize = controller.CurrentPlayer.GameData.Resources.KnightsPlayed;
+            if (armySize < 3) return;
+
+            if (armySize == 3 && playerWithLargestArmy == null)
+            {
+                controller.CurrentPlayer.GameData.LargestArmy = true;
+                return;
+            }
+
+            if (armySize > playerWithLargestArmy.GameData.Resources.KnightsPlayed)
+            {
+                playerWithLargestArmy.GameData.LargestArmy = false;
+                controller.CurrentPlayer.GameData.LargestArmy = true;
+            }
+        }
+        public void UndoSetLargestArmy(IGameController controller)
+        {
+            if (controller.CurrentPlayer.GameData.LargestArmy &&  controller.CurrentPlayer.GameData.Resources.KnightsPlayed < 3)
+            {
+                controller.CurrentPlayer.GameData.LargestArmy = false;
+                return;
+            }
+
+            if (this.BaronModel.PreviousLargestArmyPlayerId == Guid.Empty)
+                return;
+            var previous = controller.PlayerFromId(this.BaronModel.PreviousLargestArmyPlayerId);
+            var current = GetLargestArmyPlayer(controller);
+            current.GameData.LargestArmy = false;  //current might be previous, but that is ok
+            previous.GameData.LargestArmy = true;
         }
 
         public async Task Do(IGameController gameController)
@@ -103,24 +163,25 @@ namespace Catan10
 
                         }
                     }
-
-                    // if they played a dev card, consume it
-                    // 10/23/2023: we weren't counting knights played this fix will says "if it is a local game,
-                    //             give them a knight and then let them play it.
-                    if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
-                    {
-                        if (!gameController.IsServiceGame)
-                        {
-                            DevCardModel model = new DevCardModel() { DevCardType = DevCardType.Knight };
-                            gameController.CurrentPlayer.GameData.Resources.AvailableDevCards.Add(model);
-                        }
-                        var ret = gameController.CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
-                        Contract.Assert(ret, "A knight was not found in AvailableDevCards");
-                        gameController.CurrentPlayer.GameData.Resources.KnightsPlayed++;
-                        gameController.AssignLargestArmy();
-                    }
-
                 }
+            }
+
+
+            // if they played a dev card, consume it
+            // 10/23/2023: we weren't counting knights played this fix will says "if it is a local game,
+            //             give them a knight and then let them play it.
+            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
+            {
+                if (!gameController.IsServiceGame)
+                {
+                    DevCardModel model = new DevCardModel() { DevCardType = DevCardType.Knight };
+                    gameController.CurrentPlayer.GameData.Resources.AvailableDevCards.Add(model);
+                }
+                var ret = gameController.CurrentPlayer.GameData.Resources.PlayDevCard(DevCardType.Knight);
+                Contract.Assert(ret, "A knight was not found in AvailableDevCards");
+                gameController.CurrentPlayer.GameData.Resources.KnightsPlayed++;
+                SetLargestArmy(gameController);
+
             }
             //
             //  this will move the weapon in the UI
@@ -128,11 +189,10 @@ namespace Catan10
             gameController.SetBaronTile(weapon, targetTile, true);
 
             //
-            //    consume the entitlement
+            //    consume the entitlement - this is there for both rolling 7 and playing a Baron Dev Card
 
             gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.MoveBaron);
-        
-            gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.Knight };
+
 
             await Task.Delay(0);
         }
@@ -174,23 +234,19 @@ namespace Catan10
 
             gameController.SetBaronTile(weapon, previousTile, BaronModel.MainBaronHidden);
 
-            // if they played a dev card, undo it if it is a service game (local games don't track resources)
-            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard && gameController.IsServiceGame)
+
+            if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
             {
 
                 gameController.CurrentPlayer.GameData.Resources.UndoPlayDevCard(DevCardType.Knight);
-
-            }
-
-            // 10/23/2023: this was the corresponding fix to bug above -- we need to decrement knight count on undo, for all game types
-            if (this.BaronModel.Reason != MoveBaronReason.Bishop)
-            {
                 gameController.CurrentPlayer.GameData.Resources.KnightsPlayed--;
-                gameController.AssignLargestArmy();
             }
+
+            UndoSetLargestArmy(gameController);
+
 
             gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.MoveBaron);
-            gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard = new DevCardModel() { DevCardType = DevCardType.None };
+
 
             await Task.Delay(0);
         }

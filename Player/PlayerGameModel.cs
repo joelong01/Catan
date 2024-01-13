@@ -39,7 +39,7 @@ namespace Catan10
         private bool _LargestArmy = false;
         private int _LongestRoad = 0;
         private int _MaxCities = 0;
-        private int _MaxKnights = 0;
+        private int _MaxKnights = 6;
         private int _maxNoResourceRolls = 0;
         private int _MaxRoads = 0;
         private int _MaxSettlements = 0;
@@ -79,7 +79,7 @@ namespace Catan10
             get
             {
                 int rank = 0;
-                foreach (var knight in Knights)
+                foreach (var knight in CK_Knights)
                 {
                     if (knight.Activated)
                     {
@@ -117,10 +117,10 @@ namespace Catan10
         public ObservableCollection<BuildingCtrl> Cities { get; } = new ObservableCollection<BuildingCtrl>();
 
         [JsonIgnore]
-        public ObservableCollection<KnightCtrl> Knights { get; } = new ObservableCollection<KnightCtrl>();
+        public ObservableCollection<KnightCtrl> CK_Knights { get; } = new ObservableCollection<KnightCtrl>();
 
         public int CitiesLeft => MaxCities - CitiesPlayed;
-        public int KnightsLeft => MaxKnights - KnightsPlayed;
+        public int KnightsLeft => MaxKnights - CK_KnightsCreated;
         public int CitiesPlayed
         {
             get => _CitiesPlayed;
@@ -135,7 +135,7 @@ namespace Catan10
             }
         }
 
-        public int KnightsPlayed
+        public int CK_KnightsCreated
         {
             get => _KnightsPlayed;
             set
@@ -721,7 +721,7 @@ namespace Catan10
             Settlements.CollectionChanged += Settlements_CollectionChanged;
             Cities.CollectionChanged += Cities_CollectionChanged;
             Ships.CollectionChanged += Ships_CollectionChanged;
-            Knights.CollectionChanged += Knights_CollectionChanged;
+            CK_Knights.CollectionChanged += Knights_CollectionChanged;
             PlayerModel = pData;
         }
 
@@ -817,7 +817,7 @@ namespace Catan10
             Roads.Clear();
             Settlements.Clear();
             Cities.Clear();
-            Knights.Clear();
+            CK_Knights.Clear();
             Ships.Clear();
             IsCurrentPlayer = false;
             MaxShips = 0;
@@ -872,7 +872,7 @@ namespace Catan10
 
         private void Knights_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            KnightsPlayed = Knights.Count;
+            CK_KnightsCreated = CK_Knights.Count;
             NotifyPropertyChanged("KnightsLeft");
             NotifyPropertyChanged("TotalKnightRanks");
             NotifyPropertyChanged("TotalKnightRanksBinding");

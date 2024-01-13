@@ -1275,7 +1275,7 @@ namespace Catan10
         public static readonly DependencyProperty GameTypeProperty = DependencyProperty.Register("GameType", typeof(GameType), typeof(CatanHexPanel), new PropertyMetadata(GameType.Regular));
         public static readonly DependencyProperty HarborCountProperty = DependencyProperty.Register("HarborCount", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(9));
         public static readonly DependencyProperty IslandsProperty = DependencyProperty.Register("Islands", typeof(string), typeof(CatanHexPanel), new PropertyMetadata("", IslandsChanged));
-        public static readonly DependencyProperty KnightsProperty = DependencyProperty.Register("Knights", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(14));
+        public static readonly DependencyProperty KnightsProperty = DependencyProperty.Register("CK_Knights", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(14));
         public static readonly DependencyProperty MaxCitiesProperty = DependencyProperty.Register("MaxCities", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(4));
         public static readonly DependencyProperty MaxResourceAllocatedProperty = DependencyProperty.Register("MaxResourceAllocated", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(19));
         public static readonly DependencyProperty MaxRoadsProperty = DependencyProperty.Register("MaxRoads", typeof(int), typeof(CatanHexPanel), new PropertyMetadata(15));
@@ -2017,6 +2017,11 @@ namespace Catan10
         internal void MoveMerchantAsync(Point to)
         {
             _merchant.MoveAsync(to);
+        }
+
+        internal void BaronnAnimationSkipToEnd()
+        {
+            _baron.SkipAnimationToEnd();
         }
     } // End CatanHexPanel
 

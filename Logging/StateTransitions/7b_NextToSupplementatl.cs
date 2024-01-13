@@ -9,6 +9,8 @@ namespace Catan10
     /// </summary>
     public class WaitingForNextToSupplemental : LogHeader, ILogController
     {
+        public DevCardModel DevCardPlayedThisTurn { get; private set; }
+
         public static async Task PostLog(IGameController gameController)
         {
 
@@ -17,6 +19,7 @@ namespace Catan10
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
                 NewState = GameState.Supplemental,
+                DevCardPlayedThisTurn = gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -42,9 +45,11 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
+            gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard = this.DevCardPlayedThisTurn;
             await gameController.ResetRollControl();
             gameController.StopHighlightingTiles();
             ChangePlayerHelper.ChangePlayer(gameController, -1);
+            
         }
     }
 }

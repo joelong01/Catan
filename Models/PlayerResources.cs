@@ -123,6 +123,7 @@ namespace Catan10
             get => _knightsPlayed;
             set
             {
+                Debug.Assert(value >= 0);
                 if (_knightsPlayed != value)
                 {
                     _knightsPlayed = value;

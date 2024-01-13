@@ -19,7 +19,7 @@ namespace Catan10
 
     public interface ICatanService
     {
-       
+
 
         /// <summary>
         ///     a message is recieved that was sent to all clients
@@ -145,7 +145,7 @@ namespace Catan10
         void RoadPressed(RoadCtrl road, PointerRoutedEventArgs e);
 
         void TileRightTapped(TileCtrl tile, RightTappedRoutedEventArgs rte);
-     
+
         Task ActivateKnight(BuildingCtrl building, bool activate);
         BuildingState ValidateBuildingLocation(BuildingCtrl sender);
 
@@ -260,8 +260,6 @@ namespace Catan10
         Task UndoUpdateBuilding(UpdateBuildingLog updateBuildingLog);
 
         Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType action);
-
-        void AssignLargestArmy();
 
         string PlayerListToCsv(List<PlayerModel> playersWithTooManyCards);
         void SetCurrentPlayer(PlayerModel playerModel);

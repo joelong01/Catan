@@ -252,7 +252,7 @@ namespace Catan10
             //  The Games Menu has the Description as the menu text ("Regular" should be checked)
             //  and the CatanGameCtrl object in the tag.  this is used to manipulate CurrentGame in the GameContainer
             //
-            List<CatanGameCtrl> availableGames = _gameView.Games;
+            List<CatanGameCtrl> availableGames = CTRL_GameView.Games;
             foreach (CatanGameCtrl game in availableGames)
             {
                 ToggleMenuFlyoutItem item = new ToggleMenuFlyoutItem
@@ -674,9 +674,9 @@ namespace Catan10
         private List<Target> PickBaronVictim(bool weighCities)
         {
             var r = new Random((int)DateTime.Now.Ticks);
-            int tileCount = _gameView.TilesInIndexOrder.Length;
+            int tileCount = CTRL_GameView.TilesInIndexOrder.Length;
             List<Target> targetList = new List<Target>();
-            foreach (var targetTile in _gameView.TilesInIndexOrder)
+            foreach (var targetTile in CTRL_GameView.TilesInIndexOrder)
             {
                 if (targetTile.HasBaron)
                 {
@@ -805,7 +805,7 @@ namespace Catan10
         {
             ToggleMenuFlyoutItem menu = sender as ToggleMenuFlyoutItem;
 
-            foreach (var tile in _gameView.TilesInIndexOrder)
+            foreach (var tile in CTRL_GameView.TilesInIndexOrder)
             {
                 tile.ShowIndex = menu.IsChecked;
             }
@@ -833,7 +833,7 @@ namespace Catan10
 
         private void OnShowPips(int pipCount)
         {
-            _gameView.AllBuildings.ForEach(async (b) =>
+            CTRL_GameView.AllBuildings.ForEach(async (b) =>
             {
                 if (b.BuildingState == BuildingState.Pips)
                 {
