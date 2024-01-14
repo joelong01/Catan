@@ -292,7 +292,7 @@ namespace Catan10
             }
         }
 
-        private async Task DoRedo()
+        public async Task DoRedo()
         {
             if (CurrentGameState == GameState.WaitingForNewGame || !MainPageModel.EnableUiInteraction)
             {

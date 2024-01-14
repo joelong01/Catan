@@ -831,10 +831,10 @@ namespace Catan10
             string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
             RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
             Contract.Assert(newRaceTracker != null);
-            if (road.Owner != null)
-            {
-                this.TraceMessage("Owner changing!");
-            }
+            //if (road.Owner != null)
+            //{
+            //    this.TraceMessage("Owner changing!");
+            //}
 
             UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 

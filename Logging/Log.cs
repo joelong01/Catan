@@ -323,6 +323,13 @@ namespace Catan10
         public LogHeader PeekUndo => Stacks.PeekUndo;
 
         public RollLog RollLog { get; private set; }
+        public object ActionCount
+        {
+            get
+            {
+                return Stacks.ActionCount;
+            }
+        }
 
         public Log(IGameController gameController)
         {

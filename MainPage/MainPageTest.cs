@@ -142,7 +142,7 @@ namespace Catan10
 
         /// <summary>
         ///     the game goes through these basic steps
-        ///     1. Create the "game" ... this is the communication channel the game uses to send messages to all the players
+        ///     1. Create the "game" ... this is the communication channel the game uses to send messages to all the playerIndex
         ///     2. Join the "game"
         ///     3. Send Broadcast Messages to the clients 
         ///         => each of these are processed via ProcessMessage()
@@ -231,7 +231,13 @@ namespace Catan10
 
         private async void OnTestExpansionGame(object sender, RoutedEventArgs e)
         {
-            AnimationSpeedBase = 10; // speed up the animations
+            await StartExpansionTestGame(true, TestCitiesAndKnights, 5);
+
+        }
+
+        public async Task StartExpansionTestGame(bool assignResources, bool useCitiesAndKnights, int playerCount)
+        {
+            this.Testing = true;
             RandomGoldTileCount = 3;
             await this.Reset();
             CTRL_GameView.Reset();
@@ -243,13 +249,14 @@ namespace Catan10
                 Creator = TheHuman.PlayerName,
                 GameIndex = 1,
                 Id = Guid.NewGuid(),
-                Started = false
+                Started = false,
+                CitiesAndKnights = useCitiesAndKnights
             };
             await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
 
             MainPageModel.PlayingPlayers.Clear();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < playerCount; i++)
             {
                 await AddPlayerLog.AddPlayer(this, MainPageModel.AllPlayers[i].PlayerName);
             };
@@ -259,23 +266,110 @@ namespace Catan10
             await NextState(); // Start Game
             await NextState(); // Start Pick Resources
 
-            while (Log.GameState != GameState.DoneResourceAllocation)
+            if (assignResources)
             {
-                await AutoSetBuildingAndRoad();
+                while (Log.GameState != GameState.DoneResourceAllocation)
+                {
+                    await AutoSetBuildingAndRoad();
+                    await NextState();
+                }
+
                 await NextState();
             }
-
-            await NextState();
         }
+
+        private async Task TestLongestRoad()
+        {
+            LongestRoadTest test = new LongestRoadTest(this);
+            await test.TestLongestRoad();
+        }
+
+        public async Task Test_MoveToPlayer(int playerIndex, GameState desiredState)
+        {
+            int count = 0;
+            PlayerModel desiredPlayer = PlayingPlayers[playerIndex];
+            while (CurrentPlayer != desiredPlayer || CurrentGameState != desiredState)
+            {
+
+                if (CurrentGameState == GameState.WaitingForRoll)
+                {
+                    await Test_DoRoll(3, 5, SpecialDice.Science);
+                    Debug.Assert(count < PlayingPlayers.Count); // we should never have to roll twice...
+                    count++;
+
+                }
+                else
+                {
+                    await NextState();
+                }
+            }
+          //  this.TraceMessage($"Rolled {count} times");
+        }
+
+        public async Task PurchaseAndPlaceKnight(int knightIndex, bool activate, KnightRank rank)
+        {
+            var knight = GetBuilding(knightIndex);
+            await PurchaseEntitlement(Entitlement.BuyOrUpgradeKnight);
+            await KnightLeftPointerPressed(knight); // build it
+            if (activate)
+            {
+                await PurchaseEntitlement(Entitlement.ActivateKnight);
+                await KnightLeftPointerPressed(knight); // activate it
+            }
+
+            while (knight.Knight.KnightRank < rank)
+            {
+                await PurchaseEntitlement(Entitlement.ActivateKnight);
+                await KnightLeftPointerPressed(knight);  // upgrade
+            }
+        }
+
+        public async Task PurchaseAndPlaceRoad(int roadIndex)
+        {
+            var road = CTRL_GameView.GetRoad(roadIndex);
+            await PurchaseEntitlement(Entitlement.Road);
+            await UpdateRoadLog.PostLogEntry(this, road, RoadState.Road, RaceTracking);
+        }
+        /// <summary>
+        ///     build a building. can start with None and build a City directly buy buying both entitlements
+        /// </summary>
+        /// <param name="buildingIndex"></param>
+        /// <param name="entitlement"></param>
+        /// <returns></returns>
+        public async Task PurchaseAndPlaceBuilding(int buildingIndex, Entitlement entitlement)
+        {
+            var building = CTRL_GameView.GetBuilding(buildingIndex);
+            if (building.BuildingState == BuildingState.None && entitlement == Entitlement.Settlement)
+            {
+                await PurchaseEntitlement(Entitlement.Settlement);
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Settlement, CurrentGameState);
+                return;
+            }
+
+            if (building.BuildingState == BuildingState.None && entitlement == Entitlement.City)
+            {
+                await PurchaseAndPlaceBuilding(buildingIndex, Entitlement.Settlement);
+            }
+
+            if (building.BuildingState == BuildingState.Settlement && entitlement == Entitlement.City)
+            {
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.City, CurrentGameState);
+            }
+            else
+            {
+                Debug.Assert(false, "Bad entitlement or building");
+            }
+        }
+
         /// <summary>
         ///     This starts in WaitingForNext or it will create a new game.
         ///     it then
         ///     
         ///     1. places a Knight, Upgrades, then Activates it
-        ///     2. Moves to next player
-        ///     3. that player rolls
+        ///     2. Moves to next desiredPlayer
+        ///     3. that desiredPlayer rolls
         ///     4. then buys the Deserter Entitlement
-        ///     5. picks the Knight that was built by the previous player
+        ///     5. picks the Knight that was built by the previous desiredPlayer
         ///     6. picks a spot to place it.
         ///     7. Undo it all
         /// </summary>
@@ -317,7 +411,7 @@ namespace Catan10
             }
             return null;
         }
-        private async Task Test_DoRoll(int redRoll, int whiteRoll, SpecialDice special)
+        public async Task Test_DoRoll(int redRoll, int whiteRoll, SpecialDice special)
         {
             Debug.Assert(redRoll > 0 && redRoll < 7);
             Debug.Assert(whiteRoll > 0 && whiteRoll < 7);
@@ -328,6 +422,7 @@ namespace Catan10
                 Roll = redRoll + whiteRoll,
                 SpecialDice = special
             };
+           // this.TraceMessage($"{CurrentPlayer.PlayerName} rolls {rollModel.Roll} Stack Entry: {Log.ActionCount}");
             await OnRolledNumber(rollModel);
         }
         private async Task StartGame(GameInfo info)
@@ -462,7 +557,7 @@ namespace Catan10
                 await NextState();
 
                 //
-                //  player 2 ties player 1 for most knights, but doesn't get largest army
+                //  desiredPlayer 2 ties desiredPlayer 1 for most knights, but doesn't get largest army
                 await BuyAndPlayKnightDevCard(PlayingPlayers[2]);
                 Debug.Assert(PlayingPlayers[0].GameData.Resources.KnightsPlayed == 3);
                 Debug.Assert(PlayingPlayers[2].GameData.TimesTargeted == 3);
@@ -471,17 +566,17 @@ namespace Catan10
 
 
                 Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
-                // I want to get around to the same player so they can buy a knight again -- 
+                // I want to get around to the same desiredPlayer so they can buy a knight again -- 
                 // so just roll/nextstate
 
-                for (int i=0; i<PlayingPlayers.Count; i++)
+                for (int i = 0; i < PlayingPlayers.Count; i++)
                 {
-                    await Test_DoRoll(i+1, i+3, SpecialDice.None); // just rolling a 12
+                    await Test_DoRoll(i + 1, i + 3, SpecialDice.None); // just rolling a 12
                     await NextState();
                 }
                 Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
                 //
-                //  player 2 passes player 1 for most knights, gets largest army
+                //  desiredPlayer 2 passes desiredPlayer 1 for most knights, gets largest army
                 await BuyAndPlayKnightDevCard(PlayingPlayers[2]);
                 Debug.Assert(PlayingPlayers[0].GameData.Resources.KnightsPlayed == 3);
                 Debug.Assert(PlayingPlayers[1].GameData.Resources.KnightsPlayed == 4);
@@ -489,7 +584,7 @@ namespace Catan10
                 Debug.Assert(!PlayingPlayers[0].GameData.LargestArmy);
                 Debug.Assert(PlayingPlayers[1].GameData.LargestArmy);
 
-                // player 2 changes their mind...
+                // desiredPlayer 2 changes their mind...
                 await DoUndo();
                 Debug.Assert(PlayingPlayers[0].GameData.Resources.KnightsPlayed == 3);
                 Debug.Assert(PlayingPlayers[1].GameData.Resources.KnightsPlayed == 3);
@@ -504,9 +599,9 @@ namespace Catan10
                     Debug.Assert(player.GameData.Resources.KnightsPlayed == 0);
                     Debug.Assert(player.GameData.TimesTargeted == 0);
                 }
-              
+
                 this.TraceMessage($"ended on {CTRL_GameView.CurrentGame.HexPanel.BaronTile}");
-                
+
 
             }
             finally
@@ -662,7 +757,7 @@ namespace Catan10
                 //
                 //  Scenario 2: Invasion with one winner.  they should get a victory point and 2 people should lose cities
                 //  our initial conditions are that playe[0] has rolled, built a knight, and activated it.
-                //  we expect player[1] and player[2] to lose a city and player[0] to get a Victory Point
+                //  we expect desiredPlayer[1] and desiredPlayer[2] to lose a city and desiredPlayer[0] to get a Victory Point
                 //
                 await Test_DoRoll(6, 6, SpecialDice.Pirate);
                 Debug.Assert(CurrentGameState == GameState.WaitingForNext);
@@ -682,7 +777,7 @@ namespace Catan10
 
 
                 //
-                //  we will roll back to player[0] having a activated a knight
+                //  we will roll back to desiredPlayer[0] having a activated a knight
                 await TestCheckpointLog.AddTestCheckpoint(this);
 
                 bool playersLost = await RollUntilInvasion();
@@ -694,7 +789,7 @@ namespace Catan10
                 Debug.Assert(PlayingPlayers[0].GameData.Resources.VictoryPoints == 1);
                 Debug.Assert(MainPageModel.TotalKnightRanks == 0);
 
-                // Roll back to 1 player with an Active Knight, no invasion yet
+                // Roll back to 1 desiredPlayer with an Active Knight, no invasion yet
                 await RollbackToCheckpoint();
                 Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
                 Debug.Assert(CurrentPlayer == PlayingPlayers[0]);
@@ -728,19 +823,19 @@ namespace Catan10
                 Debug.Assert(PlayingPlayers[2].GameData.TotalKnightRank == 0);
                 Debug.Assert(MainPageModel.TotalKnightRanks == 2);
                 //
-                //  we will roll back to player[0] and players[1] having a activated a knight
+                //  we will roll back to desiredPlayer[0] and playerIndex[1] having a activated a knight
                 await TestCheckpointLog.AddTestCheckpoint(this);
 
                 await RollUntilInvasion();
                 count = await HandleInvasion();
                 Debug.Assert(count == 1, "1 person should have lost Cities");
-                // the CurrentPlayer is based on how many rools.  with 3 starting players, this is where we end up
+                // the CurrentPlayer is based on how many rools.  with 3 starting playerIndex, this is where we end up
                 Debug.Assert(CurrentPlayer == PlayingPlayers[1]);
                 PlayingPlayers.ForEach(player => Debug.Assert(player.GameData.Resources.VictoryPoints == 0));
                 Debug.Assert(PlayingPlayers[0].GameData.Resources.CurrentResources.AnyDevCard == 1);
                 Debug.Assert(PlayingPlayers[1].GameData.Resources.CurrentResources.AnyDevCard == 1);
 
-                // Roll back to 2 players with an Active Knight, no invasion yet
+                // Roll back to 2 playerIndex with an Active Knight, no invasion yet
                 await RollbackToCheckpoint();
                 await TestCheckpointLog.AddTestCheckpoint(this);
                 Debug.Assert(this.CurrentGameState == GameState.WaitingForNext);
@@ -752,7 +847,7 @@ namespace Catan10
                 Debug.Assert(MainPageModel.TotalKnightRanks == 2);
 
                 //
-                //  Scenario 4: everybody has an active knight and the players win the invasion
+                //  Scenario 4: everybody has an active knight and the playerIndex win the invasion
                 await MoveToNextPlayer();
                 Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
                 await Test_DoRoll(6, 6, SpecialDice.Pirate);
@@ -820,7 +915,7 @@ namespace Catan10
         }
 
         // keep rolling until the invasion count is incremented.  this works for both winning and losing an invasion
-        // returns true if the players LOST the invasion
+        // returns true if the playerIndex LOST the invasion
         private async Task<bool> RollUntilInvasion()
         {
             Debug.Assert(CurrentGameState == GameState.WaitingForRoll || CurrentGameState == GameState.WaitingForNext);
@@ -865,7 +960,7 @@ namespace Catan10
                 {
                     count++;
                     await DoUndo();
-                   
+
                 }
                 else
                 {
@@ -997,9 +1092,9 @@ namespace Catan10
             //  CurrentPlayer.GameData.Trades.TradeRequest.AddPotentialTradingPartners(MainPageModel.PlayingPlayers);
             TheHuman = CurrentPlayer;
             CurrentPlayer.GameData.Trades.TradeRequest.Owner.Player = TheHuman;
-            //foreach (var player in MainPageModel.PlayingPlayers)
+            //foreach (var desiredPlayer in MainPageModel.PlayingPlayers)
             //{
-            //    if (player == CurrentPlayer) continue;
+            //    if (desiredPlayer == CurrentPlayer) continue;
 
             //    CurrentPlayer.GameData.Trades.PotentialTrades.Add(new TradeOffer()
             //    {
@@ -1012,7 +1107,7 @@ namespace Catan10
             //            Brick = 1
             //        },
             //        Owner = CurrentPlayer,
-            //        TradePartner = player,
+            //        TradePartner = desiredPlayer,
             //        OwnerApproved = true,
             //        PartnerApproved = false,
 
@@ -1450,7 +1545,7 @@ namespace Catan10
 
             await DoUndo(); // back to roll
             await Task.Delay(10);
-            await DoUndo(); // back to player[0]
+            await DoUndo(); // back to desiredPlayer[0]
             await Task.Delay(10);
             await DoUndo(); // Activate knight
             await Task.Delay(10);

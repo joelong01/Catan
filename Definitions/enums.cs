@@ -196,7 +196,7 @@ namespace Catan10
         [Description("Next")]
         WaitingForNext,
 
-        [Description("Next")]
+        [Description("Supplemental")]
         Supplemental,
 
         [Description("Move Baron")]

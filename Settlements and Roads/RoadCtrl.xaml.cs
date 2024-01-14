@@ -209,6 +209,7 @@ namespace Catan10
             _sbMove.Begin();
 
             _daRotate.To = data.Angle;
+            CT_RoadIndex.Rotation = -data.Angle;
             _sbRotate.Begin();
 
             _daAnimateOpacity.To = 0;
@@ -366,7 +367,6 @@ namespace Catan10
             set => SetValue(CurrentPlayerProperty, value);
         }
 
-        public int Index { get; set; } = -1;
         public bool IsOwned => (RoadState != RoadState.Unowned);
         public List<RoadKey> Keys { get; set; } = new List<RoadKey>();
 
@@ -410,7 +410,12 @@ namespace Catan10
         public static readonly DependencyProperty RoadTypeProperty = DependencyProperty.Register("RoadType", typeof(RoadType), typeof(RoadCtrl), new PropertyMetadata(RoadType.Single, RoadTypeChanged));
         public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty TileZeroZeroProperty = DependencyProperty.Register("TileZeroZero", typeof(Point), typeof(RoadCtrl), new PropertyMetadata(new Point(double.NaN, double.NaN), TileZeroZeroChanged));
-
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(RoadCtrl), new PropertyMetadata(-1));
+        public int Index
+        {
+            get => ( int )GetValue(IndexProperty);
+            set => SetValue(IndexProperty, value);
+        }
         public RoadCtrl()
         {
             this.InitializeComponent();

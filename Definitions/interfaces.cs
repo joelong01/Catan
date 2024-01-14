@@ -154,17 +154,29 @@ namespace Catan10
         Task KnightLeftPointerPressed(BuildingCtrl buildingCtrl);
         Task UpgradeKnight(BuildingCtrl buildingCtrl);
     }
-
-    public interface IGameController
+    // APIs that I want to expose from MainPage to be used by tests
+    public interface IGameTest
     {
-
+        Task StartExpansionTestGame(bool assignResources, bool useCitiesAndKnights, int playerCount);
+        bool TestCitiesAndKnights { get; }
+        Task<bool> NextState();
+        Task Test_DoRoll(int redRoll, int whiteRoll, SpecialDice special);
+        Task DoRedo();
+        Task DoUndo();
+        Task PurchaseEntitlement(Entitlement entitlement);
+        Task Test_MoveToPlayer(int playerIndex, GameState desiredState);
+        Task PurchaseAndPlaceKnight(int knightIndex, bool activate, KnightRank rank);
+        Task PurchaseAndPlaceRoad(int roadIndex);
+        Task PurchaseAndPlaceBuilding(int buildingIndex, Entitlement entitlement);
+        PlayerModel LastPlayerToRoll { get; }
+    }
+    public interface IGameController : IGameTest, IGameCallback
+    {
         InvasionData InvasionData { get; }
         BuildingCtrl GetBuilding(int index);
 
         bool AutoRespondAndTheHuman { get; }
         CatanGames CatanGame { get; set; }
-
-        GameState CurrentGameState { get; }
 
         PlayerModel CurrentPlayer { get; set; }
         PlayerModel LastPlayerToRoll { get; set; } //used in Supplemental builds

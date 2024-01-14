@@ -31,35 +31,36 @@
 
     <StackPanel Name="Grid_PlayerResourceCount" HorizontalAlignment="Left" VerticalAlignment="Top"
             Background="Transparent" CornerRadius="10">
+        <Viewbox>
+            <StackPanel Name="StackPanel_TotalResourceCount" Grid.Row="0" Grid.RowSpan="1" Grid.Column="1"
+                    Margin="0,5,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Background="Transparent"
+                    Height="90" BorderBrush="{StaticResource bmMaple}" BorderThickness="1" CornerRadius="10"
+                    Orientation="Horizontal">
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.Wood}" />
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Sheep, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.Sheep}" />
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Brick, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.Brick}" />
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wheat, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.Wheat}" />
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Ore, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.Ore}" />
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.GoldMine}" />
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Paper, Mode=OneWay}"
+                        Margin="5,0,0,0"
+                        Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.Coin}" />
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Coin, Mode=OneWay}"
+                        Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.Paper}" />
+                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Cloth, Mode=OneWay}"
+                        Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                        Image="{StaticResource ResourceType.Cloth}" />
 
-        <StackPanel Name="StackPanel_TotalResourceCount" Grid.Row="0" Grid.RowSpan="1" Grid.Column="1" Margin="0,5,0,0"
-                HorizontalAlignment="Center" VerticalAlignment="Top" Background="Transparent" Height="90"
-                BorderBrush="{StaticResource bmMaple}" BorderThickness="1" CornerRadius="10" Orientation="Horizontal">
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.Wood}" />
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Sheep, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.Sheep}" />
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Brick, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.Brick}" />
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wheat, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.Wheat}" />
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Ore, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.Ore}" />
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.GoldMine}" />
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Paper, Mode=OneWay}"
-                    Margin="5,0,0,0"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.Coin}" />
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Coin, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.Paper}" />
-            <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Cloth, Mode=OneWay}"
-                    Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                    Image="{StaticResource ResourceType.Cloth}" />
-
-        </StackPanel>
-
+            </StackPanel>
+        </Viewbox>
         <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="2" Margin="0,5,0,0" Fill="{StaticResource bmMaple}" />
         <ListView x:Name="ListBox_PlayerResourceCountList" Margin="0,5,0,0" HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch" AllowDrop="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
@@ -69,7 +70,7 @@
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Margin" Value="0" />
-                    <Setter Property="Padding" Value="5" />
+                    <Setter Property="Padding" Value="0" />
                     <Setter Property="HorizontalAlignment" Value="Left" />
                 </Style>
             </ListView.ItemContainerStyle>

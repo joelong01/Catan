@@ -241,6 +241,7 @@
     <Compile Include="State\GridPosition.cs" />
     <Compile Include="State\TargetTracking.cs" />
     <Compile Include="Logging\StateTransitions\UpdateRoadState.cs" />
+    <Compile Include="Tests\LongestRoadTest.cs" />
     <Compile Include="UI Controls\BoardMeasurementCtrl.xaml.cs">
       <DependentUpon>BoardMeasurementCtrl.xaml</DependentUpon>
     </Compile>

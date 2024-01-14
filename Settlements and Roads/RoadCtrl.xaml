@@ -68,5 +68,13 @@
                     Grid.Column="1" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top"
                     Points="1,8 4.6,1 63.4,1 67,8 63.4,15 4.5,15" StrokeThickness="1" />
         </Grid>
+        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="{x:Bind Index, Mode=OneWay}" RenderTransformOrigin=".5 .5"
+                    Foreground="{x:Bind GetForegroundBrush(Owner, CurrentPlayer), Mode=OneWay, TargetNullValue=Purple, FallbackValue=Purple}">
+            <TextBlock.RenderTransform>
+                    <CompositeTransform x:Name="CT_RoadIndex"/>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Viewbox>
     </Grid>
 </UserControl>

@@ -631,7 +631,7 @@ namespace Catan10
             }
 
             LastPlayerToRoll = CurrentPlayer; // need this to know which player to skip in supplemental builds
-
+           // this.TraceMessage($"GameState.{CurrentGameState} Player={CurrentPlayer} Roll={roll}");
             if (roll.SpecialDice == SpecialDice.Pirate && MainPageModel.GameInfo.CitiesAndKnights)
             {
                 //
@@ -1281,7 +1281,7 @@ namespace Catan10
             };
             await appWindow.TryShowAsync();
         }
-        private async Task PurchaseEntitlement(Entitlement entitlement)
+        public async Task PurchaseEntitlement(Entitlement entitlement)
         {
             switch (entitlement)
             {
@@ -1538,7 +1538,16 @@ namespace Catan10
 
             return Visibility.Collapsed;
         }
+        private double GetPlayerTrackerWidth(ObservableCollection<PlayerModel> players)
+        {
+            if (players.Count < 4) return 500;
 
-       
+            return 400;
+        }
+
+        private async void OnTestLongestRoad(object sender, RoutedEventArgs e)
+        {
+            await TestLongestRoad();
+        }
     }
 }

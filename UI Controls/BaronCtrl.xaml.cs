@@ -14,7 +14,7 @@ namespace Catan10
 
         public void MoveAsync(Point to)
         {
-            var animationDuration = System.TimeSpan.FromMilliseconds(MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+            var animationDuration = System.TimeSpan.FromMilliseconds(MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast));
 
             _sbMove.Duration = animationDuration;
             _daX.Duration = animationDuration;

@@ -97,6 +97,7 @@ namespace Catan10
         /// <param name="e"></param>
         private async void Building_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            this.TraceMessage($"Building index: {this.Index}");
             //
             //  need to validate that the GameState is a valid state to change the state of a adjacent
             if (Callback == null) return;

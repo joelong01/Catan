@@ -1468,7 +1468,7 @@ namespace Catan10
             {
                 building.ResetTempBuildingState(); // this was set "out of band" in mouse enter, putting it back.
 
-                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Knight, GameState.WaitingForNext);
+                await UpdateBuildingLog.UpdateBuildingState(this, building, BuildingState.Knight, CurrentGameState);
                 return;
 
             }

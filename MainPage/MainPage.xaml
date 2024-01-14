@@ -68,6 +68,8 @@
                         <MenuFlyoutSubItem Text="Development">
                             <ToggleMenuFlyoutItem Text="Cities and Knights"
                                     IsChecked="{x:Bind TestCitiesAndKnights, Mode=TwoWay}" />
+                            
+                             <MenuFlyoutItem Click="OnTestLongestRoad" Text="Test Longest road (expansion)" />
                             <MenuFlyoutItem Click="OnTestBaron" Text="Test Baron" />
                             
                             <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Regular Game" />
@@ -224,14 +226,14 @@
 
             </s:SliderCtrl>
 
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="0,0,12,0"
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="0,0,12,0" Width="{x:Bind GetPlayerTrackerWidth(MainPageModel.PlayingPlayers), Mode=OneWay}"
                     HorizontalAlignment="Right" Canvas.ZIndex="5"
                     GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
                     GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}"
                     MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
 
-            <local:DragableGridCtrl x:Name="LocalPurchase" Width="300" Margin="0,500,0,0" CornerRadius="10"
+            <local:DragableGridCtrl x:Name="LocalPurchase" Width="285" Margin="0,500,0,0" CornerRadius="10"
                     OnGridPositionChanged="OnGridPositionChanged" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{x:Bind CurrentPlayer.SolidPrimaryBrush, Mode=OneWay}" Caption="Purchase and Play"
@@ -264,7 +266,7 @@
                         <Rectangle Height="3" Fill="{StaticResource bmMaple}" Margin="5" />
                         <Viewbox Stretch="Uniform">
                             <StackPanel>
-                                <StackPanel Name="SP_NextButton" Width="200">
+                                <StackPanel Name="SP_NextButton">
                                     <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"
                                             Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                                             Click="OnNextStep" Content="&#xE101;"
