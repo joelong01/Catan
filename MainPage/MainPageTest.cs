@@ -231,13 +231,13 @@ namespace Catan10
 
         private async void OnTestExpansionGame(object sender, RoutedEventArgs e)
         {
-            await StartExpansionTestGame(true, TestCitiesAndKnights, 5);
+            await StartExpansionTestGame(true, MainPageModel.TestingCitiesAndKnights, 5);
 
         }
 
         public async Task StartExpansionTestGame(bool assignResources, bool useCitiesAndKnights, int playerCount)
         {
-            this.Testing = true;
+            this.MainPageModel.Testing = true;
             RandomGoldTileCount = 3;
             await this.Reset();
             CTRL_GameView.Reset();
@@ -303,7 +303,7 @@ namespace Catan10
                     await NextState();
                 }
             }
-          //  this.TraceMessage($"Rolled {count} times");
+            //  this.TraceMessage($"Rolled {count} times");
         }
 
         public async Task PurchaseAndPlaceKnight(int knightIndex, bool activate, KnightRank rank)
@@ -422,13 +422,13 @@ namespace Catan10
                 Roll = redRoll + whiteRoll,
                 SpecialDice = special
             };
-           // this.TraceMessage($"{CurrentPlayer.PlayerName} rolls {rollModel.Roll} Stack Entry: {Log.ActionCount}");
+            // this.TraceMessage($"{CurrentPlayer.PlayerName} rolls {rollModel.Roll} Stack Entry: {Log.ActionCount}");
             await OnRolledNumber(rollModel);
         }
-        public  async Task StartTestGame(GameInfo info, bool autoSetResources)
+        public async Task StartTestGame(GameInfo info, bool autoSetResources)
         {
             AnimationSpeedBase = 10; // speed up the animations
-            Testing = true;
+            MainPageModel.Testing = true;
             RandomGoldTileCount = 1;
             await this.Reset();
             CTRL_GameView.Reset();
@@ -456,7 +456,7 @@ namespace Catan10
             while (Log.GameState != GameState.DoneResourceAllocation)
             {
                 await Task.Delay(10);
-                
+
                 await AutoSetBuildingAndRoad();
                 await NextState();
             }
@@ -483,7 +483,7 @@ namespace Catan10
                 GameIndex = 0,
                 Id = Guid.NewGuid(),
                 Started = false,
-                CitiesAndKnights=this.TestCitiesAndKnights
+                CitiesAndKnights=MainPageModel.TestingCitiesAndKnights
             };
 
             await StartTestGame(info, true);
@@ -499,8 +499,8 @@ namespace Catan10
             try
             {
 
-                this.Testing = true;
-                this.TestCitiesAndKnights = false;
+                MainPageModel.Testing = true;
+                MainPageModel.TestingCitiesAndKnights = false;
                 if (CurrentGameState != GameState.WaitingForNext)
                 {
                     GameInfo info = new GameInfo()
@@ -608,7 +608,7 @@ namespace Catan10
 
             }
             finally
-            { this.Testing = false; }
+            { MainPageModel.Testing = false; }
         }
 
         private async Task BuyAndPlayKnightDevCard(PlayerModel target)
@@ -697,7 +697,7 @@ namespace Catan10
             try
             {
 
-                this.Testing = true;
+                MainPageModel.Testing = true;
                 if (CurrentGameState != GameState.WaitingForNext)
                 {
                     GameInfo info = new GameInfo()
@@ -875,7 +875,7 @@ namespace Catan10
             }
             finally
             {
-                this.Testing = false;
+                MainPageModel.Testing = false;
 
             }
 

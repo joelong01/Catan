@@ -370,7 +370,7 @@ namespace Catan10
             bool flipToFaceUp = (_orientation == TileOrientation.FaceDown) ? true : false;
             _orientation = orientation;
 
-            StaticHelpers.SetupFlipAnimation(flipToFaceUp, _daFlipBack, _daFlipFront, MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast), 0);
+            StaticHelpers.SetupFlipAnimation(flipToFaceUp, _daFlipBack, _daFlipFront, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.VeryFast), 0);
 
             await _sbFlip.ToTask();
         }
@@ -386,7 +386,7 @@ namespace Catan10
             }
             else
             {
-                animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast);
+                animationDuration = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.VeryFast);
             }
 
             bool flipToFaceUp = (_orientation == TileOrientation.FaceDown) ? true : false;

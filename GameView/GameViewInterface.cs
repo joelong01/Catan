@@ -123,7 +123,7 @@ namespace Catan10
                     t.Reset();
                     t.AnimateFade(1.0, tasks);
                     t.Rotate(0, tasks, false);
-                    t.SetTileOrientation(TileOrientation.FaceDown, true, tasks, MainPage.GetAnimationSpeed(AnimationSpeed.SuperFast));
+                    t.SetTileOrientation(TileOrientation.FaceDown, true, tasks, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.SuperFast));
 
                 }
             }

@@ -699,7 +699,7 @@ namespace Catan10
         public async Task FancyHarborDistribution()
         {
             List<Task> list = new List<Task>();
-            double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            double ms = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Normal);
             int i = 0;
 
 
@@ -723,7 +723,7 @@ namespace Catan10
             list.Clear();
             i = 0;
             Random r = new Random(DateTime.Now.Millisecond);
-            ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            ms = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Normal);
             foreach (TileGroup tileGroup in _currentGame.TileGroups)
             {
                 foreach (var h in tileGroup.Harbors)
@@ -735,7 +735,7 @@ namespace Catan10
             await Task.WhenAll(list);
             list.Clear();
             i = 0;
-            ms = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
+            ms = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast);
             foreach (TileGroup tileGroup in _currentGame.TileGroups)
             {
                 foreach (var h in tileGroup.Harbors)
@@ -748,7 +748,7 @@ namespace Catan10
             await Task.WhenAll(list);
             list.Clear();
             i = 0;
-            ms = ms = MainPage.GetAnimationSpeed(AnimationSpeed.Normal);
+            ms = ms = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Normal);
             foreach (TileGroup tileGroup in _currentGame.TileGroups)
             {
                 foreach (var h in tileGroup.Harbors)
@@ -767,7 +767,7 @@ namespace Catan10
 
 
             List<Task> list = new List<Task>();
-            double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Fast); ;
+            double ms = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast); ;
             int i = 0;
             foreach (TileGroup tileGroup in _currentGame.TileGroups)
             {
@@ -792,7 +792,7 @@ namespace Catan10
                 if (tileGroup.Randomize == false) continue;
                 foreach (TileCtrl t in tileGroup.Tiles)
                 {
-                    Task task = t.RotateTask(r.Next(1, 5) * 360, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                    Task task = t.RotateTask(r.Next(1, 5) * 360, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast));
                     list.Add(task);
                 }
             }
@@ -830,7 +830,7 @@ namespace Catan10
 
                 foreach (TileCtrl t in tileGroup.Tiles)
                 {
-                    Task task = t.SetTileOrientation(TileOrientation.FaceUp, false, MainPage.GetAnimationSpeed(AnimationSpeed.Fast), i * MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                    Task task = t.SetTileOrientation(TileOrientation.FaceUp, false, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast), i * MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast));
                     i++;
                     list.Add(task);
                 }
@@ -849,7 +849,7 @@ namespace Catan10
 
         public async Task FlipTiles(TileOrientation orientation, bool harborsToo = true)
         {
-            double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
+            double ms = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast);
             List<Task> list = new List<Task>();
             int i = 0;
             foreach (TileCtrl t in Tiles)
@@ -866,7 +866,7 @@ namespace Catan10
         }
         public void FlipAllTilesAsync(TileOrientation orientation, bool harborsToo = true)
         {
-            double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
+            double ms = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast);
 
             foreach (TileCtrl t in Tiles)
             {

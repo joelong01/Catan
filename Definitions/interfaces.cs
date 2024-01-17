@@ -161,7 +161,6 @@ namespace Catan10
     {
         Task StartExpansionTestGame(bool assignResources, bool useCitiesAndKnights, int playerCount);
         Task StartTestGame(GameInfo info, bool autoSetResources);
-        bool TestCitiesAndKnights { get; }
         Task<bool> NextState();
         Task Test_DoRoll(int redRoll, int whiteRoll, SpecialDice special);
         Task DoRedo();

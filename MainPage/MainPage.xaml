@@ -8,20 +8,20 @@
         <Storyboard x:Name="_sbShowHideSettings">
             <DoubleAnimation x:Name="_daShowHideSettings" d:IsOptimized="True" Storyboard.TargetName="_ctrlSettings"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.VeryFast, Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbNumberOpacity">
             <DoubleAnimation x:Name="_daNumberOpacity" d:IsOptimized="True" AutoReverse="False"
                     Storyboard.TargetName="RollGrid" Storyboard.TargetProperty="(UIElement.Opacity)" To="0"
-                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.Normal, Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbRotatePlayerAndRolls">
             <DoubleAnimation x:Name="_daRotatePlayers" d:IsOptimized="True" Storyboard.TargetName="_gameTracker"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0"
-                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.Normal, Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daRotateRolls" d:IsOptimized="True" Storyboard.TargetName="_rollHistoryChart"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0"
-                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.Normal, Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Style x:Key="RollGridTextStyle" TargetType="TextBlock">
             <Setter Property="Margin" Value="10" />
@@ -67,7 +67,7 @@
 
                         <MenuFlyoutSubItem Text="Development">
                             <ToggleMenuFlyoutItem Text="Cities and Knights"
-                                    IsChecked="{x:Bind TestCitiesAndKnights, Mode=TwoWay}" />
+                                    IsChecked="{x:Bind MainPageModel.TestingCitiesAndKnights, Mode=TwoWay}" />
                             <MenuFlyoutItem Click="OnTestKnightDisplacement" Text="Test Knight Displacement" />
                             <MenuFlyoutItem Click="OnTestLongestRoad" Text="Test Longest road (expansion)" />
                             <MenuFlyoutItem Click="OnTestBaron" Text="Test Baron" />

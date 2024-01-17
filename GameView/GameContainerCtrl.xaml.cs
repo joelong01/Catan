@@ -313,7 +313,7 @@ namespace Catan10
         {
             List<Task> list = new List<Task>();
             AnimationSpeed harborAnimationSpeed = AnimationSpeed.Ultra;
-            double ms = MainPage.GetAnimationSpeed(harborAnimationSpeed);
+            double ms = MainPage.Current.MainPageModel.GetAnimationSpeed(harborAnimationSpeed);
             int i = 0;
             int middleIndex = _currentHexPanel.Tiles.Count / 2;
             TileCtrl animationMiddle = _currentHexPanel.TilesInIndexOrder[middleIndex];
@@ -329,7 +329,7 @@ namespace Catan10
             list.Clear();
             i = 0;
             Random r = new Random(DateTime.Now.Millisecond);
-            ms = MainPage.GetAnimationSpeed(harborAnimationSpeed);
+            ms = MainPage.Current.MainPageModel.GetAnimationSpeed(harborAnimationSpeed);
 
             foreach (Harbor h in _currentHexPanel.Harbors)
             {
@@ -340,7 +340,7 @@ namespace Catan10
             await Task.WhenAll(list);
             list.Clear();
             i = 0;
-            ms = MainPage.GetAnimationSpeed(harborAnimationSpeed);
+            ms = MainPage.Current.MainPageModel.GetAnimationSpeed(harborAnimationSpeed);
             foreach (Harbor h in _currentHexPanel.Harbors)
             {
                 Task task = h.AnimateMoveTask(new Point(0, 0), ms, i * ms);
@@ -350,7 +350,7 @@ namespace Catan10
             await Task.WhenAll(list);
             list.Clear();
             i = 0;
-            ms = ms = MainPage.GetAnimationSpeed(harborAnimationSpeed);
+            ms = ms = MainPage.Current.MainPageModel.GetAnimationSpeed(harborAnimationSpeed);
 
             foreach (Harbor h in _currentHexPanel.Harbors)
             {
@@ -365,7 +365,7 @@ namespace Catan10
         public async Task FancyTileDistribution()
         {
             List<Task> list = new List<Task>();
-            double ms = MainPage.GetAnimationSpeed(AnimationSpeed.Ultra);
+            double ms = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Ultra);
             int i = 0;
             foreach (TileGroup tileGroup in _currentHexPanel.TileSets)
             {
@@ -416,7 +416,7 @@ namespace Catan10
 
                 foreach (TileCtrl t in tileGroup.TilesToRandomize)
                 {
-                    Task task = t.RotateTask(r.Next(1, 5) * 360, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                    Task task = t.RotateTask(r.Next(1, 5) * 360, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast));
                     list.Add(task);
                 }
             }
@@ -463,7 +463,7 @@ namespace Catan10
                 }
 
                 TileOrientation orientation = TileOrientation.FaceUp;
-                Task task = t.SetTileOrientation(orientation, MainPage.GetAnimationSpeed(AnimationSpeed.Fast), i * MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                Task task = t.SetTileOrientation(orientation, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast), i * MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast));
                 i++;
                 list.Add(task);
             }
@@ -716,7 +716,7 @@ namespace Catan10
             {
                 if (tile.TemporarilyGold)
                 {
-                    tile.SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                    tile.SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast));
                 }
             }
             if (!taskList.Any()) return;
@@ -728,7 +728,7 @@ namespace Catan10
                 if (tile.TemporarilyGold)
                 {
                     tile.TemporarilyGold = false;
-                    tile.SetTileOrientation(TileOrientation.FaceUp, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.Fast));
+                    tile.SetTileOrientation(TileOrientation.FaceUp, taskList, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast));
                 }
             }
 
@@ -810,7 +810,7 @@ namespace Catan10
             List<Task> taskList = new List<Task>();
             foreach (var idx in indeces)
             {
-                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast));
+                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceDown, taskList, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.VeryFast));
             }
 
             await Task.WhenAll(taskList);
@@ -818,7 +818,7 @@ namespace Catan10
             foreach (var idx in indeces)
             {
                 TilesInIndexOrder[idx].TemporarilyGold = true;
-                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceUp, taskList, MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast));
+                TilesInIndexOrder[idx].SetTileOrientation(TileOrientation.FaceUp, taskList, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.VeryFast));
             }
 
             await Task.WhenAll(taskList);

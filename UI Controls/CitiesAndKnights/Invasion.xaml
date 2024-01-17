@@ -29,10 +29,10 @@
         <Storyboard x:Key="RotatePirateShip" x:Name="SB_RotateShip" AutoReverse="False">
             <DoubleAnimation Storyboard.TargetName="FirstRotateTransform" Storyboard.TargetProperty="Angle"
                     To="{x:Bind Angle, Mode=OneWay, Converter={StaticResource NegativeValueConverter}}"
-                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="SecondRotateTransform" Storyboard.TargetProperty="Angle"
                     To="{x:Bind Angle, Mode=OneWay}"
-                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
     </Control.Resources>
 

@@ -390,8 +390,8 @@ namespace Catan10
 
         public void AnimateFade(double opacity, List<Task> tasks)
         {
-            double fast = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
-            double slow = fast + MainPage.GetAnimationSpeed(AnimationSpeed.Slow);
+            double fast = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast);
+            double slow = fast + MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Slow);
             _daAnimateOpacity.Duration = TimeSpan.FromMilliseconds(fast); // this is how long you take to fade, not how long you stay faded
             _daAnimateOpacity.To = opacity;
             tasks.Add(_sbAnimateOpacity.ToTask());
@@ -404,8 +404,8 @@ namespace Catan10
         public void AnimateFadeAsync(double opacity)
         {
             // CancelFade();
-            //double fast = 100; //MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
-            //double slow = 1000; // fast + MainPage.GetAnimationSpeed(AnimationSpeed.Slow);
+            //double fast = 100; //MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast);
+            //double slow = 1000; // fast + MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Slow);
             //_sbAnimateOpacity.Duration = TimeSpan.FromMilliseconds(fast);
             //_sbAnimateOpacityReverse.Duration = TimeSpan.FromMilliseconds(fast);
 
@@ -476,7 +476,7 @@ namespace Catan10
         public void ResetTileRotation()
         {
             _daRotateTile.To = 0;
-            _daRotateTile.Duration = TimeSpan.FromMilliseconds(MainPage.GetAnimationSpeed(AnimationSpeed.SuperFast));
+            _daRotateTile.Duration = TimeSpan.FromMilliseconds(MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.SuperFast));
             _sbRotate.Begin();
         }
 
@@ -484,7 +484,7 @@ namespace Catan10
         {
             if (duration == double.MaxValue)
             {
-                duration = MainPage.GetAnimationSpeed(AnimationSpeed.Fast);
+                duration = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast);
             }
 
             if (reletive)
@@ -526,7 +526,7 @@ namespace Catan10
             }
             else
             {
-                animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast);
+                animationDuration = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.VeryFast);
             }
             TileOrientation = orientation;
 
@@ -544,7 +544,7 @@ namespace Catan10
         {
             //   if (ActualOrientTation == orientation) return;
 
-            StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast), 0);
+            StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.VeryFast), 0);
 
             taskList.Add(_sbFlipTile.ToTask());
         }
@@ -559,7 +559,7 @@ namespace Catan10
             }
             else
             {
-                animationDuration = MainPage.GetAnimationSpeed(AnimationSpeed.VeryFast);
+                animationDuration = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.VeryFast);
             }
 
             StaticHelpers.SetupFlipAnimation(orientation == TileOrientation.FaceUp, _daFlipBackTile, _daFlipFrontTile, animationDuration, 0);

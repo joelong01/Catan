@@ -131,23 +131,7 @@ namespace Catan10
 
         private DispatcherTimer KeepAliveTimer { get; set; }
 
-        public static double GetAnimationSpeed(AnimationSpeed speed)
-        {
-            return MainPage.Current.GetAnimationDuration(speed, MainPage.Current.Testing).TimeSpan.TotalMilliseconds;
-        }
-
-        public static readonly DependencyProperty TestingProperty = DependencyProperty.Register("Testing", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
-        public static readonly DependencyProperty TestCitiesAndKnightsProperty = DependencyProperty.Register("TestCitiesAndKnights", typeof(bool), typeof(MainPage), new PropertyMetadata(true));
-        public bool TestCitiesAndKnights
-        {
-            get => ( bool )GetValue(TestCitiesAndKnightsProperty);
-            set => SetValue(TestCitiesAndKnightsProperty, value);
-        }
-        public bool Testing
-        {
-            get => ( bool )GetValue(TestingProperty);
-            set => SetValue(TestingProperty, value);
-        }
+      
 
         public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
         {
@@ -921,7 +905,7 @@ namespace Catan10
             {
                 if (bMakeFaceDown)
                 {
-                    t.SetTileOrientation(TileOrientation.FaceDown, tasks, MainPage.GetAnimationSpeed(AnimationSpeed.SuperFast));
+                    t.SetTileOrientation(TileOrientation.FaceDown, tasks, MainPageModel.GetAnimationSpeed(AnimationSpeed.SuperFast));
                 }
             }
             await Task.WhenAll(tasks.ToArray());

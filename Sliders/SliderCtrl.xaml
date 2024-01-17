@@ -8,24 +8,24 @@
         <Storyboard x:Name="SbOpenRightLeft">
             <DoubleAnimation d:IsOptimized="True" Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
-                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="SbCloseRightLeft">
             <DoubleAnimation d:IsOptimized="True" Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
                     To="{x:Bind ClosedPosition(userControl.Width), Mode=OneWay}"
-                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="SbOpenUpDown">
             <DoubleAnimation d:IsOptimized="True" Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="SbCloseUpDown">
             <DoubleAnimation d:IsOptimized="True" Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
                     To="{x:Bind ClosedPosition(userControl.Height), Mode=OneWay}"
-                    Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
     </UserControl.Resources>
     <Grid Name="LayoutRoot" Background="{x:Bind userControl.Background, Mode=OneWay}"

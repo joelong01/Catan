@@ -24,7 +24,51 @@ namespace Catan10
         private int _ThreeStarPosition = 0;
         private int _TwoStarPosition = 0;
         private bool _WebSocketConnected = false;
+        bool _testing = false;
+        bool _testingCitiesAndKnights = false;
+        public bool TestingCitiesAndKnights
+        {
+            get
+            {
+                return _testingCitiesAndKnights;
+            }
+            set
+            {
+                if (_testingCitiesAndKnights != value)
+                {
+                    _testingCitiesAndKnights = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool Testing
+        {
+            get
+            {
+                return _testing;
+            }
+            set
+            {
+                if (_testing != value)
+                {
+                    _testing = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         private string[] DynamicProperties { get; } = new string[] { "TotalCitiesBinding", "TotalKnightRanksBinding", "EnableNextButton", "EnableRedo", "StateMessage", "ShowBoardMeasurements", "ShowRolls", "EnableUndo", "GameState" };
+
+        public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
+        {
+            if (testing) return new Duration(TimeSpan.FromMilliseconds(( double )AnimationSpeed.Testing));
+
+            return new Duration(TimeSpan.FromMilliseconds(( double )requestedSpeed));
+        }
+
+        public double GetAnimationSpeed(AnimationSpeed requestedSpeed)
+        {
+            return GetAnimationDuration(requestedSpeed, this.Testing).TimeSpan.TotalMilliseconds;
+        }
         #endregion Properties + Fields
 
         #region Methods
@@ -321,7 +365,7 @@ namespace Catan10
                 {
                     return GameInfo.CitiesAndKnights;
                 }
-              
+
                 return true;
             }
         }

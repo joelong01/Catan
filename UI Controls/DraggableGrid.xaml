@@ -7,16 +7,20 @@
         <Storyboard x:Name="AnimateMove">
             <DoubleAnimation Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
-                    To="{x:Bind GridPosition.TranslateX, Mode=TwoWay}" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    To="{x:Bind GridPosition.TranslateX, Mode=TwoWay}"
+                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)"
-                    To="{x:Bind GridPosition.TranslateY, Mode=TwoWay}" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    To="{x:Bind GridPosition.TranslateY, Mode=TwoWay}"
+                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleX)"
-                    To="{x:Bind GridPosition.ScaleX, Mode=TwoWay}" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    To="{x:Bind GridPosition.ScaleX, Mode=TwoWay}"
+                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="LayoutRoot"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleY)"
-                    To="{x:Bind GridPosition.ScaleY, Mode=TwoWay}" Duration="{x:Bind local:MainPage.Current.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.Testing), Mode=OneWay}" />
+                    To="{x:Bind GridPosition.ScaleY, Mode=TwoWay}"
+                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
     </UserControl.Resources>
     <!--<CompositeTransform x:Name="CTGrid"
@@ -45,8 +49,8 @@
                     Style="{StaticResource HeaderTextBlockStyle}" Text="{x:Bind Caption, Mode=OneWay}" />
         </Viewbox>
         <Viewbox Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
-            <Button Background="Black" Click="OnGrowOrShrinkControls" Content="&#xE740;"
-                    FontFamily="Segoe MDL2 Assets" Foreground="White" />
+            <Button Background="Black" Click="OnGrowOrShrinkControls" Content="&#xE740;" FontFamily="Segoe MDL2 Assets"
+                    Foreground="White" />
         </Viewbox>
         <Viewbox Name="ViewBox_Parent" Grid.Row="1">
             <ContentPresenter Content="{x:Bind Child}" />
