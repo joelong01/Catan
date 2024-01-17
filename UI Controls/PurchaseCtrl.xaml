@@ -11,7 +11,7 @@
                 Height="{x:Bind GetHeight(MainPageModel.IsCitiesAndKnights), Mode=OneWay}">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3" />
+                    <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4" />
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
             <ListView.ItemContainerStyle>
@@ -41,7 +41,13 @@
                     </Viewbox>
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
-           
+            <local:PurchaseItemCtrl x:Name="CTRL_Baron" Entitlement="MoveBaron" ShowCount="False" 
+                    HorizontalAlignment="Left" VerticalAlignment="Top" 
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnPurchaseEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <local:BaronCtrl />
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="BuyOrUpgradeKnight" Decoration="&#xE7BF;"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
@@ -57,6 +63,13 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="MoveKnight" Decoration="&#xE811;"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="KnightDisplacement" Decoration=""
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>

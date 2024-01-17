@@ -3,7 +3,7 @@
 namespace Catan10
 {
     public enum AnimationSpeed { Testing = 0, Ultra = 5, SuperFast = 100, VeryFast = 250, Fast = 500, Normal = 1000, Slow = 3000 };
-    
+
 
     public enum BodyType
     {
@@ -155,7 +155,11 @@ namespace Catan10
 
         [Description("Merchant")]
         Merchant,
+        [Description("Displace")]
+        KnightDisplacement,
+        [Description("Metropolis")]
         UpgradeToMetro,
+        KnightDisplacementMoveKnightOutOfTheWay,
     }
 
     public enum GameState
@@ -231,7 +235,13 @@ namespace Catan10
         [Description("Pick City")]
         UpgradeToMetro,
         [Description("Test Checkpoint")]
-        TestCheckpoint
+        TestCheckpoint,
+        [Description("Move Knight")]
+        MustMoveKnight,
+        [Description("DnD Agressor on Victim")]
+        DisplaceVictimKnight,
+        [Description("Move Target Knight")]
+        DisplaceKnightMoveVictim
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

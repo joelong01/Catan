@@ -36,6 +36,9 @@ namespace Catan10
         /// <param name="player"></param>
         public async void SetCurrentPlayer(PlayerModel player)
         {
+            // these are temporary and we go back to the starting player, no need to reset everything
+            if (CurrentGameState == GameState.MustDestroyCity || CurrentGameState == GameState.MustMoveKnight) return; 
+
             if (player == null) return;
 
             if (!IsServiceGame)

@@ -319,7 +319,7 @@ namespace Catan10
 
             while (knight.Knight.KnightRank < rank)
             {
-                await PurchaseEntitlement(Entitlement.ActivateKnight);
+                await PurchaseEntitlement(Entitlement.BuyOrUpgradeKnight);
                 await KnightLeftPointerPressed(knight);  // upgrade
             }
         }
@@ -425,9 +425,10 @@ namespace Catan10
            // this.TraceMessage($"{CurrentPlayer.PlayerName} rolls {rollModel.Roll} Stack Entry: {Log.ActionCount}");
             await OnRolledNumber(rollModel);
         }
-        private async Task StartGame(GameInfo info)
+        public  async Task StartTestGame(GameInfo info, bool autoSetResources)
         {
             AnimationSpeedBase = 10; // speed up the animations
+            Testing = true;
             RandomGoldTileCount = 1;
             await this.Reset();
             CTRL_GameView.Reset();
@@ -450,11 +451,12 @@ namespace Catan10
             await NextState(); // Board Accepted
             await NextState(); // Start Game
             await NextState(); // Start Pick Resources
-            await Task.Delay(10);
+            if (!autoSetResources) return;
 
             while (Log.GameState != GameState.DoneResourceAllocation)
             {
                 await Task.Delay(10);
+                
                 await AutoSetBuildingAndRoad();
                 await NextState();
             }
@@ -484,7 +486,7 @@ namespace Catan10
                 CitiesAndKnights=this.TestCitiesAndKnights
             };
 
-            await StartGame(info);
+            await StartTestGame(info, true);
             await Test_DoRoll(1, 2, SpecialDice.Pirate);
 
         }
@@ -498,6 +500,7 @@ namespace Catan10
             {
 
                 this.Testing = true;
+                this.TestCitiesAndKnights = false;
                 if (CurrentGameState != GameState.WaitingForNext)
                 {
                     GameInfo info = new GameInfo()
@@ -509,7 +512,7 @@ namespace Catan10
                         CitiesAndKnights=false
                     };
 
-                    await StartGame(info);
+                    await StartTestGame(info, true);
                 }
                 var desertTile = CTRL_GameView.CurrentGame.HexPanel.DesertTiles[0];
                 Debug.Assert(desertTile != null);
@@ -706,7 +709,7 @@ namespace Catan10
                         CitiesAndKnights=true
                     };
 
-                    await StartGame(info);
+                    await StartTestGame(info, true);
                 }
                 await TestCheckpointLog.AddTestCheckpoint(this);
                 if (CurrentGameState != GameState.WaitingForRoll)
@@ -1321,7 +1324,7 @@ namespace Catan10
                     CitiesAndKnights=true
                 };
 
-                await StartGame(info);
+                await StartTestGame(info, true);
                 await Test_DoRoll(1, 2, SpecialDice.Pirate);
             }
 
@@ -1390,7 +1393,7 @@ namespace Catan10
                     CitiesAndKnights=true
                 };
 
-                await StartGame(info);
+                await StartTestGame(info, true);
                 await Test_DoRoll(1, 2, SpecialDice.Pirate);
             }
 
@@ -1451,7 +1454,7 @@ namespace Catan10
                     CitiesAndKnights=true
                 };
 
-                await StartGame(info);
+                await StartTestGame(info, true);
                 await Test_DoRoll(1, 2, SpecialDice.Pirate);
             }
 

@@ -876,7 +876,7 @@ namespace Catan10
         {
             if (MainPageModel.CatanService == null) await Task.Delay(0);
             this.TraceMessage("you took this out.  put it back or delete it.");
-            // await MainPageModel.CatanService.StartGame(MainPageModel.GameInfo);
+            // await MainPageModel.CatanService.StartTestGame(MainPageModel.GameInfo);
             await Task.Delay(0);
         }
 

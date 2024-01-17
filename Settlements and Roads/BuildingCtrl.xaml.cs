@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +12,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using static Catan10.StaticHelpers;
+
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -20,7 +22,7 @@ namespace Catan10
     ///     The states that a building can be in
     /// </summary>
     public enum BuildingState { None, Build, Error, Pips, Settlement, City, NoEntitlement, Knight };
-
+    public enum DropTargetOptions { Knights, OpenBuildings };
     public sealed partial class BuildingCtrl : UserControl
     {
         private static void BuildingStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -97,7 +99,7 @@ namespace Catan10
         /// <param name="e"></param>
         private async void Building_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            this.TraceMessage($"Building index: {this.Index}");
+            this.TraceMessage($"Building: {this}");
             //
             //  need to validate that the GameState is a valid state to change the state of a adjacent
             if (Callback == null) return;
@@ -120,6 +122,7 @@ namespace Catan10
 
             if (this.BuildingState == BuildingState.City && Callback.HasEntitlement(Entitlement.UpgradeToMetro) && !City.Metropolis)
             {
+
                 await MetroTransitionLog.UpgradeCityLog(Callback as IGameController, this.Index);
                 return;
             }
@@ -295,6 +298,12 @@ namespace Catan10
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(BuildingCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
         public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
+        public static readonly DependencyProperty HighlightProperty = DependencyProperty.Register("Highlight", typeof(bool), typeof(BuildingCtrl), new PropertyMetadata(false));
+        public bool Highlight
+        {
+            get => ( bool )GetValue(HighlightProperty);
+            set => SetValue(HighlightProperty, value);
+        }
 
         //
         //  this the list of Tile/SettlmentLocations that are the same for this settlement
@@ -421,6 +430,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task UpdateBuildingState(PlayerModel player, BuildingState oldState, BuildingState newState)
         {
+            this.TraceMessage($"Updating Building State for {this} to BuildingState.{newState}");
             bool ret = false;
             switch (oldState)
             {
@@ -441,7 +451,8 @@ namespace Catan10
                     break;
                 case BuildingState.Knight: // remove it and if we are supposed to, we'll add it later.  this means that the knight shows up in the collection and then leaves the collection when the mouse leaves
                     bool removed = player.GameData.CK_Knights.Remove(this.Knight);
-                    System.Diagnostics.Debug.Assert(removed, "if this fales, you probably have the player wrong.");
+                    this.Knight.KnightRank = KnightRank.Basic;
+                    System.Diagnostics.Debug.Assert(removed, "if this fails, you probably have the player wrong.");
                     break;
                 default:
                     break;
@@ -491,7 +502,7 @@ namespace Catan10
             return ( this.BuildingState == BuildingState.Settlement || this.BuildingState == BuildingState.City );
         }
 
-    
+
 
         private async void OnUpgrade(object sender, RoutedEventArgs e)
         {
@@ -504,58 +515,142 @@ namespace Catan10
         }
 
 
-        private async void OnKnightLeftPointerDown(object sender, PointerRoutedEventArgs origE)
+        private async void OnKnightGridPointerDown(object sender, PointerRoutedEventArgs e)
         {
-            if (Callback.HasEntitlement(Entitlement.MoveKnight) && this.BuildingState == BuildingState.Knight && this.Knight.Activated)
+            this.TraceMessage("START OnKnightGridPointerDown");
+            if (this.BuildingState != BuildingState.Knight)
             {
+                Debug.Assert(false, "How can we get this event from a non-knight?");
+                return;
+            }
 
-                var target =  await DragAndDropKnight(sender, origE);
-                if (target != null)
+            //
+            //  the grid is the one that clicks, but we need to know the actual knight inside the Grid
+            var knightClicked =  StaticHelpers.FindChildControl<KnightCtrl> ( ( Grid )sender );
+
+            //
+            //  if you clicked on somebody else's kight, you need to be in the DisplaceKnightMoveVictim state
+            if (knightClicked.Owner != CurrentPlayer && Callback.CurrentGameState != GameState.DisplaceKnightMoveVictim)
+            {
+                this.TraceMessage($"Early return {this.Knight.Activated} {this.Owner} {Callback.CurrentGameState}");
+                return;
+            }
+
+            //
+            // return early if the knight isn't activated or if it is somebody else's night.
+            // the exception is if we are displacing a knight, then we can move the displaced knight
+            // we rely on the players to make sure that the right knight is moved
+            if (!knightClicked.Activated && Callback.CurrentGameState != GameState.DisplaceKnightMoveVictim)
+            {
+                if (knightClicked.Owner == CurrentPlayer) // you should be clicking on somebody else's knight
                 {
-                    await MoveKnightLog.PostLog(Callback as IGameController, this, target);
+                    this.TraceMessage($"Early return {this.Knight.Activated} {this.Owner} {Callback.CurrentGameState}");
+                    return;
+                }
+
+            }
+            DropTargetOptions toLookFor = DropTargetOptions.Knights;
+
+            bool moveKnightEntitlement = Callback.HasEntitlement(Entitlement.MoveKnight );
+            bool displaceKnightEntitlement = Callback.HasEntitlement(Entitlement.KnightDisplacement);
+
+            if (moveKnightEntitlement || Callback.CurrentGameState != GameState.DisplaceVictimKnight)
+            {
+                toLookFor = DropTargetOptions.OpenBuildings;
+            }
+            else if (displaceKnightEntitlement)
+            {
+                toLookFor = DropTargetOptions.Knights;
+            }
+            else
+            {
+                this.TraceMessage($"bad state here? moveKnightEntitlement={moveKnightEntitlement} displaceKnightEntitlement={displaceKnightEntitlement} state = {Callback.CurrentGameState}");
+                return;
+            }
+
+            if (moveKnightEntitlement || displaceKnightEntitlement)
+            {
+                try
+                {
+                    this.TraceMessage("DragAndDropKnight started");
+                    var targets =  GetConnectedBuildings(toLookFor); // 
+                    var target =  await DragAndDropKnight(sender, e, targets);
+                    // in either case, you return here and the original knight is back where you started
+                    this.TraceMessage("DragAndDropKnight ended");
+                    if (target != null)
+
+                    {
+                        if (moveKnightEntitlement)
+                        {
+                            await MoveKnightLog.PostLog(Callback as IGameController, this, target);
+                        }
+
+                        else
+                        {
+                            Debug.Assert(displaceKnightEntitlement);
+                            if (( ( IGameController )Callback ).CurrentPlayer == this.Owner)
+                            {
+                                await DisplaceKnightLog.DisplaceKnightPhaseOne(Callback as IGameController, this, target);
+                            }
+                            else
+                            {
+                                // it was somebody else's knight -- go to the end of phase 2
+                                await DisplaceKnightLog.DisplaceKnightPhaseTwo(Callback as IGameController, this, target);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    e.Handled = true;
+                    this.TraceMessage("END OnKnightGridPointerDown");
                 }
             }
+            else
+            {
+                this.TraceMessage($"no entitlement for player {this.Owner}");
+            }
+
 
 
         }
 
-        private async Task<BuildingCtrl> DragAndDropKnight(object sender, PointerRoutedEventArgs origE)
+        private async Task<BuildingCtrl> DragAndDropKnight(object sender, PointerRoutedEventArgs e, List<BuildingCtrl> targets)
         {
 
             BuildingCtrl target = null;
 
-            void mouseEnterHandler(UIElement control)
+            void dragEnterHandler(UIElement control)
             {
                 target = control as BuildingCtrl;
-                target.BuildingState = BuildingState.Knight;
-                this.TraceMessage($"target: {target}");
+                target.Highlight = true;
+
 
             }
-            void mouseLeaveHandler(UIElement control)
+            void dragLeaveHandler(UIElement control)
             {
                 target = control as BuildingCtrl;
-                target.BuildingState = BuildingState.None;
-                target = null;
-                this.TraceMessage("Tareget is null");
+                target.Highlight = false;
             }
 
             var dragHelper = new StaticHelpers.DragHelper();
-            var list =  GetConnectedBuildings(this);
+            var zIndex = Canvas.GetZIndex(this);
             try
             {
-
-                origE.Handled = true;
-                dragHelper.MouseEnter += mouseEnterHandler;
-                dragHelper.MouseLeave += mouseLeaveHandler;
-                var exitPoint =   await dragHelper.DragAsync<BuildingCtrl>((FrameworkElement)sender, CTRL_Knight, origE, list);
+                Canvas.SetZIndex(this, zIndex + 9999);
+                e.Handled = true;
+                dragHelper.DragEnter += dragEnterHandler;
+                dragHelper.DragLeave += dragLeaveHandler;
+                var exitPoint =   await dragHelper.DragAsync<BuildingCtrl>((FrameworkElement)sender, CTRL_Knight, e, targets);
                 this.TraceMessage($"{exitPoint}");
             }
             finally
             {
-                dragHelper.MouseEnter -= mouseEnterHandler;
-                dragHelper.MouseLeave -= mouseLeaveHandler;
+                dragHelper.DragEnter -= dragEnterHandler;
+                dragHelper.DragLeave -= dragLeaveHandler;
                 MoveAsync(new Point(0, 0));
-                list.ForEach((i) => i.BuildingState = BuildingState.None);
+                targets.ForEach((b) => b.Highlight = false);
+                Canvas.SetZIndex(this, zIndex);
             }
 
 
@@ -564,12 +659,13 @@ namespace Catan10
 
 
 
-        public List<BuildingCtrl> GetConnectedBuildings(BuildingCtrl startKnight)
+        public List<BuildingCtrl> GetConnectedBuildings(DropTargetOptions toLookFor)
         {
             var connectedBuildings = new HashSet<BuildingCtrl>(); // Holds buildings with no owner
             var exploredRoads = new HashSet<RoadCtrl>(); // Keeps track of explored roads to avoid loops
             var roadsToExplore = new Queue<RoadCtrl>(); // Queue to hold roads that are to be explored
-
+            var startKnight = this;
+            this.TraceMessage($"startKnight: {startKnight}");
             // Enqueue the adjacent roads of the starting building that have the same owner
             foreach (var road in startKnight.AdjacentRoads)
             {
@@ -594,12 +690,23 @@ namespace Catan10
                 {
                     // If the building has an owner that is not the startKnight's owner, skip this building and its roads
                     if (building.Owner != null && building.Owner != startKnight.Owner)
-                        continue;
+                    {
+                        if (toLookFor == DropTargetOptions.OpenBuildings) continue;
+
+                        if (building.BuildingState == BuildingState.Knight && Owner != null)
+                        {
+                            if (connectedBuildings.Contains(building) == false)
+                                connectedBuildings.Add(building);
+                            continue;
+                        }
+
+                    }
 
                     // If the building has no owner, add it to the list of connected buildings
                     if (building.Owner == null)
                     {
-                        connectedBuildings.Add(building);
+                        if (toLookFor == DropTargetOptions.OpenBuildings)
+                            connectedBuildings.Add(building);
                     }
 
                     // Enqueue the connected roads for further exploration
@@ -632,10 +739,24 @@ namespace Catan10
         }
 
 
-        private async void OnKnightPointerReleased(object sender, PointerRoutedEventArgs e)
+
+        public void MoveAsync(Point to)
         {
-            
+            // Transform the point to the appropriate coordinate system
+
+            DA_X.To = to.X;
+            DA_Y.To = to.Y;
+            AnimateMove.Begin();
+        }
+
+        private async void OnKnighClicked(object sender, PointerRoutedEventArgs e)
+        {
+            this.TraceMessage("Knight clicked");
+            //
+            //  because of the way events have been subscribed to, we need to return when
+            //  we are doing drag and drop, which is driven by entitlements.
             if (Callback.HasEntitlement(Entitlement.MoveKnight)) return;
+            if (Callback.HasEntitlement(Entitlement.KnightDisplacement)) return;
 
             if (this.BuildingState != BuildingState.Knight) return;
 
@@ -657,16 +778,6 @@ namespace Catan10
                 ResetTempBuildingState();
             }
         }
-
-        public void MoveAsync(Point to)
-        {
-            // Transform the point to the appropriate coordinate system
-
-            DA_X.To = to.X;
-            DA_Y.To = to.Y;
-            AnimateMove.Begin();
-        }
-
     }
 
     /// <summary>

@@ -160,6 +160,7 @@
     <Compile Include="Logging\StateTransitions\6b_ToMustDesroyCity.cs" />
     <Compile Include="Logging\StateTransitions\6_WaitingForRollToPirateRoll.cs" />
     <Compile Include="Logging\StateTransitions\DestroyWall.cs" />
+    <Compile Include="Logging\StateTransitions\DisplaceKnightLog.cs" />
     <Compile Include="Logging\StateTransitions\KnightStateChange.cs" />
     <Compile Include="Logging\Actions\PlayerTradesLog.cs" />
     <Compile Include="Logging\Actions\ResourceExchangeLog.cs" />
@@ -241,7 +242,10 @@
     <Compile Include="State\GridPosition.cs" />
     <Compile Include="State\TargetTracking.cs" />
     <Compile Include="Logging\StateTransitions\UpdateRoadState.cs" />
+    <Compile Include="Tests\Expectations.cs" />
+    <Compile Include="Tests\KnightDisplacementTest.cs" />
     <Compile Include="Tests\LongestRoadTest.cs" />
+    <Compile Include="Tests\TestHelper.cs" />
     <Compile Include="UI Controls\BoardMeasurementCtrl.xaml.cs">
       <DependentUpon>BoardMeasurementCtrl.xaml</DependentUpon>
     </Compile>

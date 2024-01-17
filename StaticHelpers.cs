@@ -257,8 +257,8 @@ namespace Catan10
         public delegate void MouseLeaveHandler(UIElement control);
         public class DragHelper
         {
-            public event MouseEnterHandler MouseEnter;
-            public event MouseLeaveHandler  MouseLeave;
+            public event MouseEnterHandler DragEnter;
+            public event MouseLeaveHandler  DragLeave;
             private UIElement currentHoverTarget = null;
 
             public Task<Point> DragAsync<T>(FrameworkElement toDrag, FrameworkElement knight, PointerRoutedEventArgs origE, List<T> targets) where T : UIElement
@@ -279,13 +279,13 @@ namespace Catan10
 
                 pointerEnterHandler = (object s, PointerRoutedEventArgs e) =>
                 {
-                    MouseEnter?.Invoke(( UIElement )s);
+                    DragEnter?.Invoke(( UIElement )s);
 
                 };
 
                 pointerExitedHandler = (object s, PointerRoutedEventArgs e) =>
                 {
-                    MouseLeave?.Invoke(( UIElement )s);
+                    DragLeave?.Invoke(( UIElement )s);
                 };
 
                 pointerMovedHandler = (object s, PointerRoutedEventArgs e) =>
@@ -298,8 +298,8 @@ namespace Catan10
                         X = pt.X - pointMouseDown.X,
                         Y = pt.Y - pointMouseDown.Y
                     };
-                   
-                   
+
+
                     compositeTransform.TranslateX += delta.X;
                     compositeTransform.TranslateY += delta.Y;
                     pointMouseDown = pt;
@@ -313,11 +313,11 @@ namespace Catan10
                     {
                         if (currentHoverTarget != null)
                         {
-                            MouseLeave?.Invoke(currentHoverTarget);
+                            DragLeave?.Invoke(currentHoverTarget);
                         }
                         if (newHoverTarget != null)
                         {
-                            MouseEnter?.Invoke(newHoverTarget);
+                            DragEnter?.Invoke(newHoverTarget);
                         }
                         currentHoverTarget = newHoverTarget;
                     }
@@ -337,7 +337,7 @@ namespace Catan10
                     }
                     localControl.ReleasePointerCapture(origE.Pointer);
                     Point exitPoint = e.GetCurrentPoint(mousePositionWindow).Position;
-                
+
                     taskCompletionSource.SetResult(exitPoint);
                 };
 
@@ -362,7 +362,7 @@ namespace Catan10
                 {
                     if (element == skip) continue;
                     if (element == skip.Parent) continue;
-                   
+
                     //if (element.GetType() == typeof(BuildingCtrl))
                     //{
                     //    this.TraceMessage($"BUILDING: {element as BuildingCtrl}");
@@ -377,6 +377,28 @@ namespace Catan10
                 return null;
             }
 
+        }
+
+        public static T FindChildControl<T>(DependencyObject control) where T : DependencyObject
+        {
+            int childCount = VisualTreeHelper.GetChildrenCount(control);
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(control, i);
+                if (child != null && child is T)
+                {
+                    return ( T )child;
+                }
+                else
+                {
+                    T childOfChild = FindChildControl<T>(child);
+                    if (childOfChild != null)
+                    {
+                        return childOfChild;
+                    }
+                }
+            }
+            return null;
         }
 
         public static FrameworkElement GetFirstParent(FrameworkElement start, Type stopElementType)
@@ -758,6 +780,8 @@ namespace Catan10
 
             #endregion Methods
         }
+
+
 
         #endregion Interfaces
 

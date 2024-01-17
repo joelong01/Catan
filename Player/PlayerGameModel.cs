@@ -485,8 +485,10 @@ namespace Catan10
                     if (this.Resources.ThisTurnsDevCard.DevCardType != DevCardType.None)
                         return 0;
                     return 1;
+                case Entitlement.KnightDisplacement:
+                    return 1;
                 default:
-                    Debug.Assert(false, "Fill out the switch statement!");
+                    Debug.Assert(false, $"Fill out the switch statement for Entitlement.{entitlement}");
                     break;
             }
 

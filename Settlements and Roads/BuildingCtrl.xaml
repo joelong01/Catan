@@ -119,15 +119,18 @@
         <Grid Name="Grid_Knight" Width="{Binding ElementName=LayoutRoot, Path=ActualWidth, Mode=TwoWay}"
                 Height="{Binding ElementName=LayoutRoot, Path=ActualHeight}" Background="Transparent"
                 Visibility="{x:Bind BuildingStateToVisibility(BuildingState, 'Knight'), Mode=OneWay}"
-                PointerPressed="OnKnightLeftPointerDown" PointerReleased="OnKnightPointerReleased">
+                PointerPressed="OnKnightGridPointerDown" >
             <Grid.RenderTransform>
                 <CompositeTransform x:Name="XFORM_Knight" />
             </Grid.RenderTransform>
             <Viewbox Name="_vbKnight" Width="30" Height="30" Stretch="Uniform">
                 <local:KnightCtrl x:Name="CTRL_Knight" Width="30" Height="30"
                         BuildingIndex="{x:Bind Index, Mode=OneWay}" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                        Owner="{x:Bind Owner, Mode=OneWay}" />
+                        Owner="{x:Bind Owner, Mode=OneWay}" PointerClicked="OnKnighClicked" />
             </Viewbox>
         </Grid>
+        <Ellipse Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, TargetNullValue=White, FallbackValue=White}"
+                 Visibility="{x:Bind Highlight, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                 StrokeThickness="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
     </Grid>
 </UserControl>

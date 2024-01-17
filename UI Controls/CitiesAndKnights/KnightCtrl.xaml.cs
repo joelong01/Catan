@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using Windows.UI.Composition;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -23,6 +25,8 @@ namespace Catan10
 
     public sealed partial class KnightCtrl : UserControl
     {
+        private Point _lastPressedPosition;
+        public event PointerEventHandler PointerClicked;
 
         public KnightCtrl()
         {
@@ -71,6 +75,25 @@ namespace Catan10
             return 0.5;
         }
 
+        public BuildingCtrl GetParentBuilding()
+        {
+            DependencyObject parentObj = VisualTreeHelper.GetParent(this);
+
+            while (parentObj != null)
+            {
+                if (parentObj is BuildingCtrl parentBuilding)
+                {
+                    return parentBuilding;
+                }
+
+                parentObj = VisualTreeHelper.GetParent(parentObj);
+            }
+
+            return null; // Return null if no BuildingCtrl parent is found
+        }
+
+
+
         public LinearGradientBrush GetBackgroundBrush(PlayerModel current, PlayerModel owner, bool activated)
         {
             if (DesignMode.DesignModeEnabled)
@@ -97,5 +120,23 @@ namespace Catan10
 
         }
 
+        private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            _lastPressedPosition = e.GetCurrentPoint(this).Position;
+        }
+
+        private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            Point releasedPosition = e.GetCurrentPoint(this).Position;
+
+            // Check if the pointer is released at approximately the same position where it was pressed
+            // You can adjust the threshold as needed
+            if (Math.Abs(releasedPosition.X - _lastPressedPosition.X) < 5 &&
+                Math.Abs(releasedPosition.Y - _lastPressedPosition.Y) < 5)
+            {
+                PointerClicked?.Invoke(sender, e);
+                e.Handled = true;
+            }
+        }
     }
 }

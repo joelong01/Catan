@@ -7,43 +7,7 @@ using System.Threading.Tasks;
 
 namespace Catan10
 {
-    class Expectations
-    {
-        public int Roads { get; set; }
-        public int LongestRoad { get; set; }
-        public bool HasLongestRoad { get; set; }
-        public int Score { get; set; }
-        public IGameController Controller { get; set; }
-
-        // Constructor
-        public Expectations(IGameController controller, int roads, int longestRoad, bool hasLongestRoad, int score)
-        {
-            Roads = roads;
-            LongestRoad = longestRoad;
-            HasLongestRoad = hasLongestRoad;
-            Score = score;
-            Controller = controller;
-        }
-
-        public void Check(int playerIndex)
-        {
-            var player = Controller.PlayingPlayers[playerIndex];
-            Debug.Assert(this.Roads == player.GameData.Roads.Count);
-            Debug.Assert(this.LongestRoad == player.GameData.LongestRoad);
-            Debug.Assert(this.HasLongestRoad == player.GameData.HasLongestRoad);
-            Debug.Assert(this.Score == player.GameData.Score);
-
-        }
-        public static void Check(IGameController controller, int playerIndex, int roads, int longestRoad, bool hasLongestRoad, int score)
-        {
-            var player = controller.PlayingPlayers[playerIndex];
-            Debug.Assert(roads == player.GameData.Roads.Count);
-            Debug.Assert(longestRoad == player.GameData.LongestRoad);
-            Debug.Assert(hasLongestRoad == player.GameData.HasLongestRoad);
-            Debug.Assert(score == player.GameData.Score);
-        }
-    }
-
+  
 
     internal class LongestRoadTest
     {
@@ -78,49 +42,17 @@ namespace Catan10
                 (new Stack<int>(player4Buildings), new Stack<int>(player4Roads)),
             };
 
-            await Controller.StartExpansionTestGame(false, true, 5); // this test uses Knights
+            await Controller.StartExpansionTestGame(assignResources: false, useCitiesAndKnights: true, playerCount: 5); // this test uses Knights
 
-            Debug.Assert(Controller.CurrentGameState == GameState.AllocateResourceForward);
+            var testHelper = new TestHelper(Controller);
+            await testHelper.StartGame(roadAndBuildings);
 
+       
             bool success;
             int playerIndex;
             int roadIndex;
-            int buildingIndex;
-            BuildingCtrl building;
-            RoadCtrl road;
-            while (Controller.CurrentGameState == GameState.AllocateResourceForward || Controller.CurrentGameState == GameState.AllocateResourceReverse)
-            {
-                var state = Controller.CurrentGameState;
-                while (Controller.CurrentGameState == state)
-                {
-                    playerIndex = Controller.PlayingPlayers.IndexOf(Controller.CurrentPlayer);
-                    buildingIndex = roadAndBuildings[playerIndex].buildings.Pop();
-                    building = Controller.GetBuilding(buildingIndex);
-                    roadIndex = roadAndBuildings[playerIndex].roads.Pop();
-                    road = Controller.GetRoad(roadIndex);
-                    Debug.Assert(road != null);
-                    //
-                    //  we don't use the PurchaseAndPlaceBuiding because the entitlement is already granted in the allocation phase
-                    await UpdateBuildingLog.UpdateBuildingState(Controller, building, BuildingState.Settlement, Controller.CurrentGameState);
-                    if (Controller.CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.City))
-                    {
-                        await UpdateBuildingLog.UpdateBuildingState(Controller, building, BuildingState.City, Controller.CurrentGameState);
-                    }
-                    await UpdateRoadLog.PostLogEntry(Controller, road, RoadState.Road, Controller.RaceTracking);
-                    success = await Controller.NextState();
-                    Debug.Assert(success);
-
-                }
-
-            }
-
-            for (int i = 0; i < Controller.PlayingPlayers.Count; i++)
-            {
-                Expectations.Check(Controller, playerIndex: i, roads: 2, longestRoad: 1, hasLongestRoad: false, score: 3);
-            }
-
-            success = await Controller.NextState(); // start
-            Debug.Assert(success);
+    
+            
             Debug.Assert(Controller.CurrentGameState == GameState.WaitingForRoll);
             await Controller.Test_DoRoll(3, 5, SpecialDice.Science);
             playerIndex = Controller.PlayingPlayers.IndexOf(Controller.CurrentPlayer);

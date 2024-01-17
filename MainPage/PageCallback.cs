@@ -463,7 +463,7 @@ namespace Catan10
 
             //        SavedGames.Insert(0, MainPageModel.Log);
             //        await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
-            //        await StartGame(dlg.PlayingPlayers, dlg.SelectedIndex);
+            //        await StartTestGame(dlg.PlayingPlayers, dlg.SelectedIndex);
             //    }
 
             //}
@@ -1463,7 +1463,11 @@ namespace Catan10
 
         public async Task KnightLeftPointerPressed(BuildingCtrl building)
         {
+            if (building == null) return;
+            
             Debug.Assert(building.BuildingState == BuildingState.None || building.BuildingState == BuildingState.Knight);
+
+    
             if (building.Owner == null && HasEntitlement(Entitlement.BuyOrUpgradeKnight))
             {
                 building.ResetTempBuildingState(); // this was set "out of band" in mouse enter, putting it back.
@@ -1472,6 +1476,8 @@ namespace Catan10
                 return;
 
             }
+
+          
             if (CurrentGameState == GameState.PlaceDeserterKnight)
             {
                 await DeserterLog.PlaceDeserterLog(this, building);
@@ -1479,7 +1485,7 @@ namespace Catan10
             }
 
 
-           if (CurrentGameState == GameState.PickDeserter)
+            if (CurrentGameState == GameState.PickDeserter)
             {
                
                 if (building.Owner == CurrentPlayer) return; // don't destroy your own knight

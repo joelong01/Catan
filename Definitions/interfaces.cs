@@ -17,6 +17,8 @@ namespace Catan10
 
     public delegate void PrivateMessageReceivedHandler(CatanMessage message);
 
+
+
     public interface ICatanService
     {
 
@@ -158,6 +160,7 @@ namespace Catan10
     public interface IGameTest
     {
         Task StartExpansionTestGame(bool assignResources, bool useCitiesAndKnights, int playerCount);
+        Task StartTestGame(GameInfo info, bool autoSetResources);
         bool TestCitiesAndKnights { get; }
         Task<bool> NextState();
         Task Test_DoRoll(int redRoll, int whiteRoll, SpecialDice special);
@@ -169,6 +172,7 @@ namespace Catan10
         Task PurchaseAndPlaceRoad(int roadIndex);
         Task PurchaseAndPlaceBuilding(int buildingIndex, Entitlement entitlement);
         PlayerModel LastPlayerToRoll { get; }
+
     }
     public interface IGameController : IGameTest, IGameCallback
     {
@@ -179,7 +183,6 @@ namespace Catan10
         CatanGames CatanGame { get; set; }
 
         PlayerModel CurrentPlayer { get; set; }
-        PlayerModel LastPlayerToRoll { get; set; } //used in Supplemental builds
         PlayerModel NextPlayer { get; }
 
         List<int> CurrentRandomGoldTiles { get; }

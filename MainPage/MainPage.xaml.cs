@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 using Catan.Proxy;
 using Catan10.Spy;
-
+using Catan10.Tests;
 using Windows.Storage;
 using Windows.Storage.Search;
 using Windows.System;
@@ -133,7 +133,7 @@ namespace Catan10
 
         public static double GetAnimationSpeed(AnimationSpeed speed)
         {
-           return MainPage.Current.GetAnimationDuration(speed, MainPage.Current.Testing).TimeSpan.TotalMilliseconds;
+            return MainPage.Current.GetAnimationDuration(speed, MainPage.Current.Testing).TimeSpan.TotalMilliseconds;
         }
 
         public static readonly DependencyProperty TestingProperty = DependencyProperty.Register("Testing", typeof(bool), typeof(MainPage), new PropertyMetadata(false));
@@ -151,7 +151,7 @@ namespace Catan10
 
         public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
         {
-            if (testing) return  new Duration(TimeSpan.FromMilliseconds((double)AnimationSpeed.Testing));
+            if (testing) return new Duration(TimeSpan.FromMilliseconds(( double )AnimationSpeed.Testing));
 
             return new Duration(TimeSpan.FromMilliseconds(( double )requestedSpeed));
         }
@@ -631,7 +631,7 @@ namespace Catan10
             }
 
             LastPlayerToRoll = CurrentPlayer; // need this to know which player to skip in supplemental builds
-           // this.TraceMessage($"GameState.{CurrentGameState} Player={CurrentPlayer} Roll={roll}");
+                                              // this.TraceMessage($"GameState.{CurrentGameState} Player={CurrentPlayer} Roll={roll}");
             if (roll.SpecialDice == SpecialDice.Pirate && MainPageModel.GameInfo.CitiesAndKnights)
             {
                 //
@@ -1307,6 +1307,7 @@ namespace Catan10
                             return;
                         }
                     }
+                    await ShowErrorMessage($"You need an activated Knight to move.", "Catan", "");
                     break;
                 case Entitlement.ScienceUpgrade:
                 case Entitlement.PoliticsUpgrade:
@@ -1342,6 +1343,39 @@ namespace Catan10
                     {
                         await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
                     }
+                    break;
+                case Entitlement.KnightDisplacement:
+                    // check to see if the current user has a knight that can be displaced
+                    bool foundConnection = false;
+                    foreach (var knight in CurrentPlayer.GameData.CK_Knights)
+                    {
+                        var connectedKnights = knight.GetParentBuilding().GetConnectedBuildings(DropTargetOptions.Knights);
+                        for (int i = connectedKnights.Count - 1; i >= 0; i--)
+                        {
+                            Debug.Assert(connectedKnights[i].IsKnight);
+                            if (connectedKnights[i].Knight.KnightRank >= knight.KnightRank)
+                            {
+                                connectedKnights.RemoveAt(i);
+                            }
+                        }
+                        if (connectedKnights.Count > 0)
+                        {
+                            foundConnection = true;
+                        }
+                    }
+                    if (foundConnection)
+                    {
+                        //
+                        // this allows you to move somebody else's knight to where the human player asks you to move it
+                        await PurchaseEntitlement(CurrentPlayer, Entitlement.KnightDisplacement, GameState.DisplaceVictimKnight);
+                    }
+                    else
+                    {
+                        await ShowErrorMessage($"You need a connected knight with a Knight Rank higher than the target.", "Catan", "");
+                    }
+
+
+
                     break;
                 default:
                     break;
@@ -1379,7 +1413,7 @@ namespace Catan10
         {
             if (rank == 4)
             {
-                return  MetroExistsForEntitlement(improvementEntitlement) || await CheckForNonMetroCities();
+                return MetroExistsForEntitlement(improvementEntitlement) || await CheckForNonMetroCities();
             }
             if (rank == 5)
             {
@@ -1529,8 +1563,8 @@ namespace Catan10
         private Visibility BaronButtonVisible(GameState state, bool isCitiesAndKnights)
         {
             if (isCitiesAndKnights) return Visibility.Collapsed;
-       //     this.TraceMessage($"GameState.{state} PlayedDevCard = {CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType}");
-            if ((state == GameState.WaitingForNext || state == GameState.WaitingForRoll)  &&
+            //     this.TraceMessage($"GameState.{state} PlayedDevCard = {CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType}");
+            if (( state == GameState.WaitingForNext || state == GameState.WaitingForRoll ) &&
                 CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None)
             {
                 return Visibility.Visible;
@@ -1548,6 +1582,12 @@ namespace Catan10
         private async void OnTestLongestRoad(object sender, RoutedEventArgs e)
         {
             await TestLongestRoad();
+        }
+
+        private async void OnTestKnightDisplacement(object sender, RoutedEventArgs e)
+        {
+            var test = new KnightDisplacementTest(this);
+            await test.TestKnightDisplacement();
         }
     }
 }
