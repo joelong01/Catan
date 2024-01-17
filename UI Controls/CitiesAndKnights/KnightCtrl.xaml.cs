@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.Foundation;
@@ -22,6 +24,7 @@ using Windows.UI.Xaml.Navigation;
 namespace Catan10
 {
     public enum KnightRank { Unset = -1, Basic=1, Strong=2, Mighty=3 };
+
 
     public sealed partial class KnightCtrl : UserControl
     {
@@ -47,13 +50,23 @@ namespace Catan10
 
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
         public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(CityCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
-        public static readonly DependencyProperty KnightRankProperty = DependencyProperty.Register("KnightRank", typeof(KnightRank), typeof(KnightCtrl), new PropertyMetadata(KnightRank.Basic));
-        public static readonly DependencyProperty ActivatedProperty = DependencyProperty.Register("Activated", typeof(bool), typeof(KnightCtrl), new PropertyMetadata(false));
         public static readonly DependencyProperty BuildingIndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(KnightCtrl), new PropertyMetadata(false));
-        public int BuildingIndex
+        public static readonly DependencyProperty ActivatedProperty = DependencyProperty.Register("Activated", typeof(bool), typeof(KnightCtrl), new PropertyMetadata(false, ActivatedChanged));
+        public static readonly DependencyProperty KnightRankProperty = DependencyProperty.Register("KnightRank", typeof(KnightRank), typeof(KnightCtrl), new PropertyMetadata(KnightRank.Basic, KnightRankChanged));
+        public KnightRank KnightRank
         {
-            get => ( int )GetValue(BuildingIndexProperty);
-            set => SetValue(BuildingIndexProperty, value);
+            get => ( KnightRank )GetValue(KnightRankProperty);
+            set => SetValue(KnightRankProperty, value);
+        }
+        private static void KnightRankChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as KnightCtrl;
+            var depPropValue = (KnightRank)e.NewValue;
+            depPropClass?.SetKnightRank(depPropValue);
+        }
+        private void SetKnightRank(KnightRank value)
+        {
+            CurrentPlayer.GameData.UpdateTotalKnightRank();
         }
 
         public bool Activated
@@ -61,12 +74,30 @@ namespace Catan10
             get => ( bool )GetValue(ActivatedProperty);
             set => SetValue(ActivatedProperty, value);
         }
-
-        public KnightRank KnightRank
+        private static void ActivatedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            get => ( KnightRank )GetValue(KnightRankProperty);
-            set => SetValue(KnightRankProperty, value);
+            var depPropClass = d as KnightCtrl;
+            var depPropValue = (bool)e.NewValue;
+            depPropClass?.SetActivated(depPropValue);
         }
+        private void SetActivated(bool value)
+        {
+            //
+            // because we aren't using a good separation between model and view, we don't have a way to fire change notifications to the player model when a knight is activated.  so 
+            // we are going to do it in a hacky way...
+            CurrentPlayer.GameData.UpdateTotalKnightRank();
+
+        }
+
+        public int BuildingIndex
+        {
+            get => ( int )GetValue(BuildingIndexProperty);
+            set => SetValue(BuildingIndexProperty, value);
+        }
+
+       
+
+      
 
         public double ActivatedOpacity(bool activated)
         {
@@ -137,6 +168,13 @@ namespace Catan10
                 PointerClicked?.Invoke(sender, e);
                 e.Handled = true;
             }
+        }
+
+        public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
+        {
+            if (testing) return new Duration(TimeSpan.FromMilliseconds(( double )AnimationSpeed.Testing));
+
+            return new Duration(TimeSpan.FromMilliseconds(( double )requestedSpeed));
         }
     }
 }

@@ -68,10 +68,10 @@
                         <MenuFlyoutSubItem Text="Development">
                             <ToggleMenuFlyoutItem Text="Cities and Knights"
                                     IsChecked="{x:Bind TestCitiesAndKnights, Mode=TwoWay}" />
-                             <MenuFlyoutItem Click="OnTestKnightDisplacement" Text="Test Knight Displacement" />
-                             <MenuFlyoutItem Click="OnTestLongestRoad" Text="Test Longest road (expansion)" />
+                            <MenuFlyoutItem Click="OnTestKnightDisplacement" Text="Test Knight Displacement" />
+                            <MenuFlyoutItem Click="OnTestLongestRoad" Text="Test Longest road (expansion)" />
                             <MenuFlyoutItem Click="OnTestBaron" Text="Test Baron" />
-                            
+
                             <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Regular Game" />
                             <MenuFlyoutItem Click="OnTestInvasion" Text="Test Invasion" />
                             <MenuFlyoutItem Click="OnTestDeserter" Text="Test Deserter" />
@@ -157,6 +157,12 @@
                         <MenuFlyoutSubItem x:Name="Menu_Colors" Text="Color">
                             <MenuFlyoutSubItem x:Name="Menu_Primary_Color" Text="Primary" />
                             <MenuFlyoutSubItem x:Name="Menu_Secondary_Color" Text="Secondary" />
+                            <MenuFlyoutSubItem Text="Foreground">
+                                <ToggleMenuFlyoutItem Text="White"
+                                        IsChecked="{x:Bind CurrentPlayer.IsWhite, Mode=TwoWay}" />
+                                <ToggleMenuFlyoutItem Text="Black"
+                                        IsChecked="{x:Bind CurrentPlayer.IsBlack, Mode=TwoWay}" />
+                            </MenuFlyoutSubItem>
                         </MenuFlyoutSubItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem Click="OnCancelClicked" Text="Cancel" />
@@ -170,7 +176,7 @@
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2" CornerRadius="5"
                     OnGridPositionChanged="OnGridPositionChanged" PointerPressed="Draggable_PointerPressed">
                 <Viewbox Stretch="UniformToFill">
-                    <local:InvasionCtrl x:Name="CTRL_Invasion" Width="400" Height="400"
+                    <local:InvasionCtrl x:Name="CTRL_Invasion" Width="400" Height="400"  CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
                             MainPageModel="{x:Bind MainPageModel, Mode=OneWay}">
                         <local:InvasionCtrl.RenderTransform>
                             <CompositeTransform />
@@ -198,7 +204,6 @@
                             </local:GameContainerCtrl.RenderTransform>
                         </local:GameContainerCtrl>
 
-                        
                     </Grid>
                 </Viewbox>
             </local:DragableGridCtrl>
@@ -218,7 +223,8 @@
 
             </s:SliderCtrl>
 
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="0,0,12,0" Width="{x:Bind GetPlayerTrackerWidth(MainPageModel.PlayingPlayers), Mode=OneWay}"
+            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="0,0,12,0"
+                    Width="{x:Bind GetPlayerTrackerWidth(MainPageModel.PlayingPlayers), Mode=OneWay}"
                     HorizontalAlignment="Right" Canvas.ZIndex="5"
                     GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
                     GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}"

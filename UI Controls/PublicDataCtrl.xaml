@@ -321,10 +321,12 @@
                 <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" Margin="0,0,0,0"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Orientation="Horizontal">
                     <!--  Current Turn Checkbox  -->
+                     <!--Visibility="{x:Bind Player.GameData.IsCurrentPlayer, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}" />-->
                     <TextBlock Margin="0" HorizontalAlignment="Left" FontSize="35"
                             Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                             Text="&#x2714;"
-                            Visibility="{x:Bind Player.GameData.IsCurrentPlayer, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}" />
+
+                        Visibility = "Collapsed" />
 
                     <!--  Largest Army  -->
                     <StackPanel Orientation="Horizontal"
@@ -352,9 +354,9 @@
                             Visibility="{x:Bind Player.GameData.PlayedMerchantLast, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=false}">
 
                         <Viewbox Stretch="UniformToFill">
-                            <local:MerchantCtrl Stroke="Gold" StrokeThickness="4"/>
+                            <local:MerchantCtrl Stroke="Gold" StrokeThickness="4" />
                         </Viewbox>
-                       
+
                     </StackPanel>
                     <!--  Longest Road  -->
                     <Viewbox>
@@ -428,6 +430,21 @@
                             FontFamily="Century Schoolbook" FontSize="35"
                             Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                             Text="{x:Bind Player.GameData.Pips, Mode=OneWay, FallbackValue=0}" />
+                    <!-- Knight Rank -->
+                    <Viewbox>
+                    <Grid HorizontalAlignment="Left" VerticalAlignment="Center" Background="Transparent" Width="60"
+                            Height="60" Margin="10,0,0,0">
+
+                        <local:KnightCtrl Activated="True" KnightRank="Unset"
+                                Owner="{x:Bind Player, Mode=OneWay}" />
+                            <Rectangle Fill="Black" Width="20" Height="20" HorizontalAlignment="Right" Visibility="Collapsed"
+                                    VerticalAlignment="Top" />
+                            <TextBlock x:Name="TB_KnightCount" FontSize="22" HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Text="{x:Bind Player.GameData.TotalKnightRank, Mode=OneWay}"
+                                Foreground="White" />
+                    </Grid>
+                    </Viewbox>
                 </StackPanel>
             </Grid>
         </Border>

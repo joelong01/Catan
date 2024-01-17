@@ -951,6 +951,10 @@ namespace Catan10
             Score = score;
         }
 
+        internal void UpdateTotalKnightRank()
+        {
+            NotifyPropertyChanged("TotalKnightRank");
+        }
     }
 
     /// <summary>

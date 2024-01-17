@@ -237,6 +237,42 @@ namespace Catan10
         }
     }
 
+    public class ColorToBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is Color colorValue && parameter is string colorName)
+            {
+                var targetColor = GetColorFromString(colorName);
+                return colorValue == targetColor;
+            }
+            return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            if (value is bool boolValue && boolValue && parameter is string colorName)
+            {
+                return GetColorFromString(colorName);
+            }
+            return Colors.HotPink; // or any default color
+        }
+
+        private Color GetColorFromString(string colorName)
+        {
+            switch (colorName.ToLower())
+            {
+                case "white":
+                    return Colors.White;
+                case "black":
+                    return Colors.Black;
+                // Add more colors as needed
+                default:
+                    return Colors.HotPink;
+            }
+        }
+    }
+
     public class CountToOrientationConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)

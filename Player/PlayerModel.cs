@@ -360,6 +360,42 @@ namespace Catan10
             }
         }
 
+        public bool IsWhite
+        {
+            get => ForegroundColor == Colors.White;
+            set
+            {
+                if (value)
+                {
+                    ForegroundColor = Colors.White;
+                }
+                else
+                {
+                    ForegroundColor = Colors.Black; // Or other default color
+                }
+                NotifyPropertyChanged("IsWhite");
+                NotifyPropertyChanged("IsBlack");
+            }
+        }
+
+        public bool IsBlack
+        {
+            get => ForegroundColor == Colors.Black;
+            set
+            {
+                if (value)
+                {
+                    ForegroundColor = Colors.Black;
+                }
+                else
+                {
+                    ForegroundColor = Colors.White; 
+                }
+                NotifyPropertyChanged("IsWhite");
+                NotifyPropertyChanged("IsBlack");
+            }
+        }
+
         public PlayerModel()
         {
 

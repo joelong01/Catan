@@ -42,14 +42,14 @@ namespace Catan10
 
         {
             {"Red", Colors.Red },
-            {"Trade", Colors.Yellow},
-            {"Science", Colors.Green},
+            {"Yellow", Colors.Yellow},
+            {"Green", Colors.Green},
             {"White", Colors.White},
             {"Brown", Colors.Brown},
             {"DarkGray", Colors.DarkGray},
             {"Black", Colors.Black},
             {"Purple", Colors.Purple},
-            {"Politics", Colors.Blue }
+            {"Blue", Colors.Blue }
         };
 
         public static List<SolidColorBrush> AllAvailableBrushes()

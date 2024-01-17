@@ -13,7 +13,6 @@
             <Setter Property="Margin" Value="0" />
             <Setter Property="Fill" Value="White" />
             <Setter Property="Opacity" Value="1" />
-            <!--<Setter Property="Stroke" Value="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Black}" />-->
             <Setter Property="Stroke" Value="Black" />
             <Setter Property="StrokeThickness" Value="4" />
         </Style>
@@ -38,7 +37,7 @@
     </Control.Resources>
 
     <Grid Background="Transparent">
-        <TextBlock x:Name="TXT_InvasionCount" Text="{x:Bind InvasionData.TotalInvasions, Mode=OneWay}" Foreground="Red" 
+        <TextBlock x:Name="TXT_InvasionCount" Text="{x:Bind InvasionData.TotalInvasions, Mode=OneWay}" Foreground="Red"
                 Canvas.ZIndex="999" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="30"
                 FontFamily="Segoe UI" FontWeight="ExtraBold">
             <TextBlock.RenderTransform>
@@ -140,22 +139,22 @@
         <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent" Width="60" Height="60"
                 Margin="0,0,0,0">
 
-            <local:CityCtrl Width="60" Height="60" Background="Black" />
+            <local:CityCtrl Width="60" Height="60"
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" />
             <TextBlock x:Name="TB_CityCount" FontSize="22"
-                    Text="{x:Bind MainPageModel.TotalCitiesBinding(), Mode=OneWay}" Foreground="White"
-                    HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    Text="{x:Bind MainPageModel.TotalCitiesBinding(), Mode=OneWay}"
+                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" HorizontalAlignment="Left"
+                    VerticalAlignment="Top" />
 
         </Grid>
 
         <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Transparent" Width="60" Height="60"
                 Margin="0,0,0,0">
 
-            <local:KnightCtrl CurrentPlayer="{x:Bind local:MainPage.Current.CurrentPlayer, Mode=OneWay}"
-                    Activated="true" />
-
+            <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
             <TextBlock x:Name="TB_KnightCount" FontSize="22" HorizontalAlignment="Right" VerticalAlignment="Top"
                     Text="{x:Bind MainPageModel.TotalKnightRanksBinding(), Mode=OneWay}"
-                    Foreground="{x:Bind local:MainPage.Current.CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
+                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
         </Grid>
     </Grid>
 </UserControl>
