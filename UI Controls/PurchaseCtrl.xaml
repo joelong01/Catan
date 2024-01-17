@@ -144,7 +144,7 @@
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
                         <Viewbox Stretch="Uniform" Margin="0,0,0,0">
-                            <TextBlock Padding="0" Foreground="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay}"
+                            <TextBlock Padding="0" Foreground="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay, FallbackValue=White}"
                                     Text="&#x265D;" FontFamily="Segoe UI Symbol" />
 
                         </Viewbox>

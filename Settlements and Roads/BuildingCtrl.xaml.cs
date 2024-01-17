@@ -22,7 +22,7 @@ namespace Catan10
     ///     The states that a building can be in
     /// </summary>
     public enum BuildingState { None, Build, Error, Pips, Settlement, City, NoEntitlement, Knight };
-    public enum DropTargetOptions { Knights, OpenBuildings };
+
     public sealed partial class BuildingCtrl : UserControl
     {
         private static void BuildingStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -548,67 +548,74 @@ namespace Catan10
                 }
 
             }
-            DropTargetOptions toLookFor = DropTargetOptions.Knights;
-
-            bool moveKnightEntitlement = Callback.HasEntitlement(Entitlement.MoveKnight );
-            bool displaceKnightEntitlement = Callback.HasEntitlement(Entitlement.KnightDisplacement);
-
-            if (moveKnightEntitlement || Callback.CurrentGameState != GameState.DisplaceVictimKnight)
+            bool displacePhaseOne = false;
+            Entitlement grantedEntitlement = Entitlement.Undefined;
+            Entitlement[] entitlementToCheckFor = new Entitlement[] { Entitlement.MoveKnight, Entitlement.Intrigue, Entitlement.KnightDisplacement };
+            foreach (var entitlement in entitlementToCheckFor)
             {
-                toLookFor = DropTargetOptions.OpenBuildings;
+                if (Callback.HasEntitlement(entitlement))
+                {
+                    grantedEntitlement = entitlement;
+                    break;
+                }
             }
-            else if (displaceKnightEntitlement)
+
+            if (grantedEntitlement == Entitlement.Undefined)
             {
-                toLookFor = DropTargetOptions.Knights;
-            }
-            else
-            {
-                this.TraceMessage($"bad state here? moveKnightEntitlement={moveKnightEntitlement} displaceKnightEntitlement={displaceKnightEntitlement} state = {Callback.CurrentGameState}");
+                this.TraceMessage($"no appropriate entitlement for player {this.Owner}");
                 return;
             }
 
-            if (moveKnightEntitlement || displaceKnightEntitlement)
+            if (grantedEntitlement != Entitlement.MoveBaron)
             {
-                try
+                if (( ( IGameController )Callback ).CurrentPlayer == this.Owner)
                 {
-                    this.TraceMessage("DragAndDropKnight started");
-                    var targets =  GetConnectedBuildings(toLookFor); // 
-                    var target =  await DragAndDropKnight(sender, e, targets);
-                    // in either case, you return here and the original knight is back where you started
-                    this.TraceMessage("DragAndDropKnight ended");
-                    if (target != null)
+                    displacePhaseOne = true;
+                }
+            }
+            this.TraceMessage($"phase one?  {displacePhaseOne}");
+            try
+            {
+                List<BuildingCtrl> targets;
+                if (!displacePhaseOne) // only phase one looks for knights
+                {
+                    targets = GetConnectedBuildings(Entitlement.MoveKnight);
+                } else
+                {
+                    targets = GetConnectedBuildings(grantedEntitlement);
+                }
+                
+                var target =  await DragAndDropKnight(sender, e, targets);
+                // in either case, you return here and the original knight is back where you started
+                if (target != null)
 
+                {
+                    if (grantedEntitlement == Entitlement.MoveKnight)
                     {
-                        if (moveKnightEntitlement)
-                        {
-                            await MoveKnightLog.PostLog(Callback as IGameController, this, target);
-                        }
+                        await MoveKnightLog.PostLog(Callback as IGameController, this, target);
+                    }
 
+                    else
+                    {
+                        if (displacePhaseOne)
+                        {
+                            await DisplaceKnightLog.DisplaceKnightPhaseOne(Callback as IGameController, this, target, grantedEntitlement);
+                        }
                         else
                         {
-                            Debug.Assert(displaceKnightEntitlement);
-                            if (( ( IGameController )Callback ).CurrentPlayer == this.Owner)
-                            {
-                                await DisplaceKnightLog.DisplaceKnightPhaseOne(Callback as IGameController, this, target);
-                            }
-                            else
-                            {
-                                // it was somebody else's knight -- go to the end of phase 2
-                                await DisplaceKnightLog.DisplaceKnightPhaseTwo(Callback as IGameController, this, target);
-                            }
+                            // it was somebody else's knight -- go to the end of phase 2
+                            await DisplaceKnightLog.DisplaceKnightPhaseTwo(Callback as IGameController, this, target, grantedEntitlement);
                         }
                     }
                 }
-                finally
-                {
-                    e.Handled = true;
-                    this.TraceMessage("END OnKnightGridPointerDown");
-                }
             }
-            else
+            finally
             {
-                this.TraceMessage($"no entitlement for player {this.Owner}");
+                e.Handled = true;
+                this.TraceMessage("END OnKnightGridPointerDown");
             }
+
+
 
 
 
@@ -657,13 +664,17 @@ namespace Catan10
         }
 
 
-
-        public List<BuildingCtrl> GetConnectedBuildings(DropTargetOptions toLookFor)
+        //
+        //  Gets all of the connected buildings to serve the "entitlement" purpose:
+        //  
+        public List<BuildingCtrl> GetConnectedBuildings(Entitlement entitlement)
         {
             var connectedBuildings = new HashSet<BuildingCtrl>(); // Holds buildings with no owner
             var exploredRoads = new HashSet<RoadCtrl>(); // Keeps track of explored roads to avoid loops
             var roadsToExplore = new Queue<RoadCtrl>(); // Queue to hold roads that are to be explored
             var startKnight = this;
+            Debug.Assert(entitlement == Entitlement.MoveKnight || entitlement == Entitlement.KnightDisplacement || entitlement == Entitlement.Intrigue);
+
             // Enqueue the adjacent roads of the starting building that have the same owner
             foreach (var road in startKnight.AdjacentRoads)
             {
@@ -689,7 +700,7 @@ namespace Catan10
                     // If the building has an owner that is not the startKnight's owner, skip this building and its roads
                     if (building.Owner != null && building.Owner != startKnight.Owner)
                     {
-                        if (toLookFor == DropTargetOptions.OpenBuildings) continue;
+                        if (entitlement == Entitlement.MoveKnight) continue;
 
                         if (building.BuildingState == BuildingState.Knight && Owner != null)
                         {
@@ -703,7 +714,7 @@ namespace Catan10
                     // If the building has no owner, add it to the list of connected buildings
                     if (building.Owner == null)
                     {
-                        if (toLookFor == DropTargetOptions.OpenBuildings)
+                        if (entitlement == Entitlement.MoveKnight)
                             connectedBuildings.Add(building);
                     }
 
@@ -733,7 +744,13 @@ namespace Catan10
             }
 
             // Convert the hash set to a list before returning
-            return connectedBuildings.ToList();
+            var buildings =  connectedBuildings.ToList();
+            if (entitlement == Entitlement.KnightDisplacement) // e.g. if it is intrigue, do not filter
+            {
+                buildings = buildings.Where(k => k.IsKnight && k.Knight.KnightRank < startKnight.Knight.KnightRank)
+                        .ToList();
+            }
+            return buildings;
         }
 
 

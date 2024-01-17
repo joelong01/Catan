@@ -34,19 +34,23 @@ namespace Catan10
         KnightRank VictimKnightRank { get; set; }
         bool VictimKnightActivated { get; set; }
         Guid VictimPlayerId { get; set; }
+        Entitlement EntitlementUsed { get; set; }
 
         //
         //  this happens after the user buys the entitlement.  Should be called from PurchaseEntitlement.
         //  key thing that happens is unlocking the ability startKnight drag and drop one knight on top of another
-        public static async Task DisplaceKnightPhaseOne(IGameController gameController, BuildingCtrl aggressor, BuildingCtrl victim)
+        public static async Task DisplaceKnightPhaseOne(IGameController gameController, BuildingCtrl aggressor, BuildingCtrl victim, Entitlement entitlementUsed)
         {
             Debug.Assert(aggressor.IsKnight);
             Debug.Assert(victim.IsKnight);
             Debug.Assert(victim.BuildingState == BuildingState.Knight);
             Debug.Assert(aggressor.Owner != null);
             Debug.Assert(victim.Owner != null);
-            var victimMoveOptions = victim.GetConnectedBuildings(DropTargetOptions.OpenBuildings).Select(building => building.Index).ToList();
-
+            // I'm not using MoveKnight, but I need to know where I can move the knight out of the way
+            var victimMoveOptions = victim.GetConnectedBuildings(Entitlement.MoveKnight).Select(building => building.Index).ToList(); 
+      
+            
+            Debug.Assert(gameController.CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(entitlementUsed)); // make sure that at least one of the two is there.
             DisplaceKnightLog logHeader = new DisplaceKnightLog()
             {
                 AggressorKnightIndex = aggressor.Index,
@@ -57,13 +61,14 @@ namespace Catan10
                 VictimKnightRank = victim.Knight.KnightRank,
                 VictimPlayerId = victim.Owner.PlayerIdentifier,
                 VictimKnightActivated = victim.Knight.Activated,
+                EntitlementUsed = entitlementUsed
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
         }
         //    this is called when the user has startKnight make a choice on where startKnight move their displaced knight
         //
-        public static async Task DisplaceKnightPhaseTwo(IGameController gameController, BuildingCtrl victim, BuildingCtrl newBuilding)
+        public static async Task DisplaceKnightPhaseTwo(IGameController gameController, BuildingCtrl victim, BuildingCtrl newBuilding, Entitlement entitlementUsed)
         {
             //
             //  look in the log for the startKnight
@@ -72,7 +77,7 @@ namespace Catan10
 
             var aggressor = gameController.GetBuilding(previousLog.AggressorKnightIndex);
 
-
+            
             Debug.Assert(aggressor.IsKnight);
             Debug.Assert(victim.IsKnight);
             Debug.Assert(victim.BuildingState == BuildingState.Knight);
@@ -88,7 +93,8 @@ namespace Catan10
                 DisplaceAction = DisplaceKnightAction.PhaseTwo,
                 VictimMoveOptions = victimMoveOptions,
                 VictimKnightRank = victim.Knight.KnightRank,
-                VictimKnightActivated = victim.Knight.Activated
+                VictimKnightActivated = victim.Knight.Activated,
+                EntitlementUsed = entitlementUsed
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -110,14 +116,14 @@ namespace Catan10
                 await aggressor.UpdateBuildingState(aggressor.Owner, BuildingState.Knight, BuildingState.None);
                 victim.Knight.KnightRank = oldKnightRank; // this now belongs startKnight the startKnight
                 victim.Knight.Activated = false;
-                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.KnightDisplacement);
+                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(EntitlementUsed);
 
             }
             else if (VictimMoveOptions.Count == 1)
             {
                 var landing = gameController.GetBuilding(VictimMoveOptions[0]);
                 await Displace(A: aggressor, B: victim, C: landing);
-                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.KnightDisplacement);
+                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(EntitlementUsed);
 
 
             }
@@ -167,7 +173,7 @@ namespace Catan10
                 startKnight.Knight.KnightRank = agressorKnightRank;
                 startKnight.Knight.Activated = true; // can't displace unless you are activated
 
-                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.KnightDisplacement);
+                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(EntitlementUsed);
 
             }
             else if (VictimMoveOptions.Count == 1)
@@ -176,7 +182,7 @@ namespace Catan10
                 await Displace(A: landing, B: originalVictim, C: startKnight);
                 startKnight.Knight.Activated = true;
                 originalVictim.Knight.Activated = this.VictimKnightActivated;
-                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.KnightDisplacement);
+                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(EntitlementUsed);
 
 
             }
@@ -200,7 +206,7 @@ namespace Catan10
             var aggressor = gameController.GetBuilding(AggressorKnightIndex);
             var landed = gameController.GetBuilding(VictimMoveOptions[0]);
             await Displace(A: aggressor, B: victim, C: landed);
-            gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.KnightDisplacement);
+            gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(EntitlementUsed);
 
 
 
@@ -208,14 +214,14 @@ namespace Catan10
         }
         public async Task UndoPhaseTwo(IGameController gameController)
         {
-            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.KnightDisplacement);
+            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(EntitlementUsed);
             var victimKnight = gameController.GetBuilding(VictimKnightIndex);
             var aggressor = gameController.GetBuilding(AggressorKnightIndex);
             var landed = gameController.GetBuilding(VictimMoveOptions[0]);
             await Displace(A: landed, B: victimKnight, C: aggressor);
             aggressor.Knight.Activated = true;
             victimKnight.Knight.Activated = this.VictimKnightActivated;
-            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.KnightDisplacement);
+            gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(EntitlementUsed);
 
         }
         /// <summary>

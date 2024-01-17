@@ -96,10 +96,10 @@ namespace Catan10.Tests
             await Controller.PurchaseEntitlement(Entitlement.KnightDisplacement); // if you have a bug, this shows UI...
             Debug.Assert(Controller.CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.KnightDisplacement));
             var aggressor = Controller.GetBuilding(29);
-            var targets =  aggressor.GetConnectedBuildings(DropTargetOptions.Knights);
+            var targets =  aggressor.GetConnectedBuildings(Entitlement.KnightDisplacement);
             Debug.Assert(targets.Count == 1);
             Debug.Assert(targets[0].Owner == Controller.PlayingPlayers[2]);
-            await DisplaceKnightLog.DisplaceKnightPhaseOne(Controller, aggressor, targets[0]);
+            await DisplaceKnightLog.DisplaceKnightPhaseOne(Controller, aggressor, targets[0], Entitlement.KnightDisplacement);
             Debug.Assert(targets[0].BuildingState == BuildingState.Knight);
             Debug.Assert(targets[0].Owner == Controller.CurrentPlayer);
             Debug.Assert(targets[0].Knight.Activated == false);
@@ -117,10 +117,10 @@ namespace Catan10.Tests
             Debug.Assert(Controller.CurrentGameState == GameState.WaitingForNext);
             await Controller.PurchaseEntitlement(Entitlement.KnightDisplacement);
             aggressor = Controller.GetBuilding(14);
-            targets = aggressor.GetConnectedBuildings(DropTargetOptions.Knights);
+            targets = aggressor.GetConnectedBuildings(Entitlement.KnightDisplacement);
             Debug.Assert(targets.Count == 1);
             Debug.Assert(targets[0].Index == 18);
-            await DisplaceKnightLog.DisplaceKnightPhaseOne(Controller, aggressor, targets[0]);
+            await DisplaceKnightLog.DisplaceKnightPhaseOne(Controller, aggressor, targets[0], Entitlement.KnightDisplacement);
             Debug.Assert(Controller.GetBuilding(19).Knight.Owner == Controller.PlayingPlayers[0]);
             Debug.Assert(Controller.GetBuilding(19).Knight.Activated);
             Debug.Assert(Controller.GetBuilding(18).Knight.Owner == Controller.PlayingPlayers[1]);
@@ -146,14 +146,14 @@ namespace Catan10.Tests
 
             await Controller.PurchaseEntitlement(Entitlement.KnightDisplacement);
             aggressor = Controller.GetBuilding(14);
-            targets = aggressor.GetConnectedBuildings(DropTargetOptions.Knights);
+            targets = aggressor.GetConnectedBuildings(Entitlement.KnightDisplacement);
             Debug.Assert(targets.Count == 1);
             Debug.Assert(targets[0].Index == 18);
-            await DisplaceKnightLog.DisplaceKnightPhaseOne(Controller, aggressor, targets[0]);
-            var openSpots = targets[0].GetConnectedBuildings(DropTargetOptions.OpenBuildings);
+            await DisplaceKnightLog.DisplaceKnightPhaseOne(Controller, aggressor, targets[0], Entitlement.KnightDisplacement);
+            var openSpots = targets[0].GetConnectedBuildings(Entitlement.MoveKnight);
             Debug.Assert(openSpots.Contains(Controller.GetBuilding(20)));
             Debug.Assert(openSpots.Count == 2);
-            await DisplaceKnightLog.DisplaceKnightPhaseTwo(Controller, targets[0], Controller.GetBuilding(20));
+            await DisplaceKnightLog.DisplaceKnightPhaseTwo(Controller, targets[0], Controller.GetBuilding(20), Entitlement.KnightDisplacement);
             Debug.Assert(Controller.GetBuilding(20).Knight.Owner == Controller.PlayingPlayers[0]);
             Debug.Assert(Controller.GetBuilding(20).Knight.Activated);
             Debug.Assert(Controller.GetBuilding(18).Knight.Owner == Controller.PlayingPlayers[1]);

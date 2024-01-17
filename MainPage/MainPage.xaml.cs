@@ -131,7 +131,7 @@ namespace Catan10
 
         private DispatcherTimer KeepAliveTimer { get; set; }
 
-      
+
 
         public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
         {
@@ -1283,15 +1283,25 @@ namespace Catan10
                     await TryBuyKnightEntitlement();
                     break;
                 case Entitlement.MoveKnight:
+                    bool movableKnight = false;
                     foreach (var knight in CurrentPlayer.GameData.CK_Knights)
                     {
-                        if (knight.Activated)
+                        if (!knight.Activated) continue;
+                        var connectedKnights = knight.GetParentBuilding().GetConnectedBuildings(entitlement);
+                        if (connectedKnights.Count > 0)
                         {
-                            await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight, CurrentGameState);
-                            return;
+                            movableKnight = true;
+                            break;
                         }
                     }
-                    await ShowErrorMessage($"You need an activated Knight to move.", "Catan", "");
+
+                    if (movableKnight)
+                    {
+                        await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveKnight, CurrentGameState);
+                        return;
+                    }
+
+                    await ShowErrorMessage($"You need an activated Knight with space to move.", "Catan", "");
                     break;
                 case Entitlement.ScienceUpgrade:
                 case Entitlement.PoliticsUpgrade:
@@ -1329,38 +1339,34 @@ namespace Catan10
                     }
                     break;
                 case Entitlement.KnightDisplacement:
+                case Entitlement.Intrigue: // "displace any knight, no matter the rank
                     // check to see if the current user has a knight that can be displaced
                     bool foundConnection = false;
                     foreach (var knight in CurrentPlayer.GameData.CK_Knights)
                     {
-                        var connectedKnights = knight.GetParentBuilding().GetConnectedBuildings(DropTargetOptions.Knights);
-                        for (int i = connectedKnights.Count - 1; i >= 0; i--)
-                        {
-                            Debug.Assert(connectedKnights[i].IsKnight);
-                            if (connectedKnights[i].Knight.KnightRank >= knight.KnightRank)
-                            {
-                                connectedKnights.RemoveAt(i);
-                            }
-                        }
+                        var connectedKnights = knight.GetParentBuilding().GetConnectedBuildings(entitlement);
                         if (connectedKnights.Count > 0)
                         {
                             foundConnection = true;
+                            break;
                         }
                     }
                     if (foundConnection)
                     {
                         //
                         // this allows you to move somebody else's knight to where the human player asks you to move it
-                        await PurchaseEntitlement(CurrentPlayer, Entitlement.KnightDisplacement, GameState.DisplaceVictimKnight);
+
+                        await PurchaseEntitlement(CurrentPlayer, entitlement, GameState.DisplaceVictimKnight);
+
+
                     }
                     else
                     {
                         await ShowErrorMessage($"You need a connected knight with a Knight Rank higher than the target.", "Catan", "");
                     }
-
-
-
                     break;
+
+
                 default:
                     break;
             }
