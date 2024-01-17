@@ -27,7 +27,7 @@ namespace Catan10
 
         #region Methods
 
-        public static async Task PostLog (IGameController gameController, MoveBaronReason reason)
+        public static async Task PostLog (IGameController gameController, MoveBaronReason reason, bool undoNext = false)
         {
             if (gameController.CurrentGameState != GameState.WaitingForNext &&
                             gameController.CurrentGameState != GameState.WaitingForRoll)
@@ -46,6 +46,7 @@ namespace Catan10
                 CanUndo = true,
                 Reason = reason,
                 StartingState = gameController.CurrentGameState,
+                UndoNext = undoNext
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);

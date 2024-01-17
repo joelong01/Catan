@@ -489,6 +489,8 @@ namespace Catan10
                     return 1;
                 case Entitlement.Intrigue:
                     return 1;
+                case Entitlement.MoveBaronWithKnight:
+                    return 1;
                 default:
                     Debug.Assert(false, $"Fill out the switch statement for Entitlement.{entitlement}");
                     break;

@@ -160,6 +160,7 @@ namespace Catan10
         [Description("Metropolis")]
         UpgradeToMetro,
         KnightDisplacementMoveKnightOutOfTheWay,
+        MoveBaronWithKnight,
     }
 
     public enum GameState
@@ -197,7 +198,7 @@ namespace Catan10
         [Description("Select Roll...")]
         WaitingForRoll,
 
-        [Description("Next")]
+        [Description("Turn Over.  Next Player.")]
         WaitingForNext,
 
         [Description("Supplemental")]
@@ -241,7 +242,9 @@ namespace Catan10
         [Description("DnD Agressor on Victim")]
         DisplaceVictimKnight,
         [Description("Move Target Knight")]
-        DisplaceKnightMoveVictim
+        DisplaceKnightMoveVictim,
+        [Description("Select Knight")]
+        ClickOnKnight
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };
@@ -260,7 +263,7 @@ namespace Catan10
 
     public enum LogType { Normal, Undo, Replay, DoNotLog, DoNotUndo, Redo };
 
-    public enum MoveBaronReason { PlayedDevCard, Rolled7, Bishop };
+    public enum MoveBaronReason { PlayedDevCard, Rolled7, Bishop, Knight };
 
     public enum ResourceType { Sheep, Wood, Ore, Wheat, Brick, GoldMine, Desert, Back, None, Sea, Coin, Cloth, Paper, Politics, Trade, Science, AnyDevCard, VictoryPoint, Invasion };
 

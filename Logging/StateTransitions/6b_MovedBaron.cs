@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Catan.Proxy;
@@ -33,15 +34,20 @@ namespace Catan10
         #endregion Properties
 
         #region Methods
+        /// <summary>
 
+        /// <returns></returns>
         public static async Task PostLog(IGameController gameController, List<string> victims, int targetTileIndex, int previousIndex, TargetWeapon weapon, MoveBaronReason reason, ResourceType stolenResource)
         {
-            Contract.Assert(gameController.CurrentGameState == GameState.MustMoveBaron);
-            GameState newState = gameController.MainPageModel.Log.PeekAction.OldState;
-            if (newState == GameState.TooManyCards)
-            {
-                newState = GameState.WaitingForNext;
-            }
+            Debug.Assert(gameController.CurrentGameState == GameState.MustMoveBaron);
+
+            // if we are running Knights and Cities, then we can get here via a call to MoveBaronWithKnight and the state we transition to is stored 
+            // there.  so here we examine the log to see find the last LogHeader that set the NewState to WaitingForRoll or WaitingForNext and set
+            // the new state to that.  it will be the first or second log entry.
+
+            List<GameState> previousStates = new List<GameState>() {GameState.WaitingForNext, GameState.WaitingForRoll };
+            var previousLogHeader = gameController.Log.FindLatestLogEntry(previousStates);
+            Debug.Assert(previousLogHeader != null);
 
             bool showBaron = true;
             var previousLargestArmyId = Guid.Empty;
@@ -72,7 +78,7 @@ namespace Catan10
             {
                 CanUndo = true,
                 Action = CatanAction.MovingBaron,
-                NewState = newState,
+                NewState = previousLogHeader.NewState,
                 BaronModel = new BaronModel()
                 {
                     Victims = victims,
@@ -121,7 +127,7 @@ namespace Catan10
         }
         public void UndoSetLargestArmy(IGameController controller)
         {
-            if (controller.CurrentPlayer.GameData.LargestArmy &&  controller.CurrentPlayer.GameData.Resources.KnightsPlayed < 3)
+            if (controller.CurrentPlayer.GameData.LargestArmy && controller.CurrentPlayer.GameData.Resources.KnightsPlayed < 3)
             {
                 controller.CurrentPlayer.GameData.LargestArmy = false;
                 return;

@@ -192,6 +192,18 @@ namespace Catan10
             }
             return null;
         }
+
+        internal LogHeader FindLatestLogEntry(List<GameState> gameStates)
+        {
+            foreach (LogHeader logHeader in DoneStack)
+            {
+                if (gameStates.Contains(logHeader.NewState))
+                {
+                    return logHeader;
+                }
+            }
+            return null;
+        }
     }
 
     public class Log : INotifyPropertyChanged, IDisposable
@@ -467,6 +479,12 @@ namespace Catan10
         internal LogHeader FindLatestLogEntry(Type type)
         {
             return Stacks.FindLatestEntry(type);
+        }
+        //
+        //  find the first instance of any state in gameStates in the log
+        internal LogHeader FindLatestLogEntry(List<GameState> gameStates)
+        {
+            return Stacks.FindLatestLogEntry(gameStates);
         }
     }
 }

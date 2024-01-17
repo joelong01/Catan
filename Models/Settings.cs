@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 using Catan.Proxy;
 using Catan10.CatanService;
+using Windows.UI.Xaml.Controls;
 
 namespace Catan10
 {
@@ -32,22 +34,23 @@ namespace Catan10
         private bool _useRandomNumbers = true;
         private bool _validateBuilding = true;
         private double _zoom = 1.0;
-        bool _wallProtectsCity = true;
-        public bool WallProtectsCity
+        HouseRules _houseRules = new HouseRules();
+        public HouseRules HouseRules
         {
             get
             {
-                return _wallProtectsCity;
+                return _houseRules;
             }
             set
             {
-                if (_wallProtectsCity != value)
+                if (_houseRules != value)
                 {
-                    _wallProtectsCity = value;
+                    _houseRules = value;
                     NotifyPropertyChanged();
                 }
             }
         }
+       
 
         #endregion Delegates + Fields + Events + Enums
 
@@ -404,6 +407,13 @@ namespace Catan10
 
         public Settings()
         {
+            _houseRules.PropertyChanged += HouseRules_PropertyChanged;
+        }
+        //
+        //  bubbled up HouseRule changes to any listeners
+        private void HouseRules_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            NotifyPropertyChanged(e.PropertyName);
         }
 
         #endregion Constructors + Destructors
@@ -423,6 +433,12 @@ namespace Catan10
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        internal void Init()
+        {
+            _houseRules.PropertyChanged -= HouseRules_PropertyChanged;
+            _houseRules.PropertyChanged += HouseRules_PropertyChanged;
         }
 
         #endregion Methods

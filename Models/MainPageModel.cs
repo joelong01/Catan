@@ -25,7 +25,7 @@ namespace Catan10
         private int _TwoStarPosition = 0;
         private bool _WebSocketConnected = false;
         bool _testing = false;
-        bool _testingCitiesAndKnights = false;
+        bool _testingCitiesAndKnights = true;
         public bool TestingCitiesAndKnights
         {
             get

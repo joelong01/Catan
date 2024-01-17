@@ -835,7 +835,7 @@ namespace Catan10
                 if (mainPageModel == null) mainPageModel = MainPageModel.Default;// new MainPageModel();
                 mainPageModel.GameController = this;
                 mainPageModel.Log = new Log(this);
-
+                mainPageModel.Settings.Init();
                 if (mainPageModel.Settings.GridPositions.Count == 0)
                 {
                     foreach (FrameworkElement child in ContentRoot.Children)
@@ -1080,6 +1080,19 @@ namespace Catan10
             if (e.PropertyName == "HostName")
             {
                 await CreateAndConfigureProxy();
+            }
+
+            if (e.PropertyName == "HideBaronBeforeFirstInvasion" && this.MainPageModel.IsCitiesAndKnights && CTRL_GameView.BaronTile != null && InvasionData.TotalInvasions == 0)
+            {
+                if (MainPageModel.Settings.HouseRules.HideBaronBeforeFirstInvasion)
+                {
+                    GameContainer.CurrentGame.HexPanel.HideBaron();
+                }
+                else
+                {
+                    GameContainer.CurrentGame.HexPanel.ShowBaron();
+                }
+
             }
         }
 
@@ -1331,12 +1344,35 @@ namespace Catan10
                     await PurchaseEntitlement(CurrentPlayer, Entitlement.Deserter, GameState.PickDeserter);
                     break;
                 case Entitlement.MoveBaron:
-                    // since you can only play one dev card per turn...
-                    if (CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None &&
-                        !CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.MoveBaron))
+                    if (MainPageModel.IsCitiesAndKnights)
                     {
-                        await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
+                        foreach (var knight in CurrentPlayer.GameData.CK_Knights)
+                        {
+                            if (!knight.Activated) continue;
+                            foreach (var tile in knight.GetParentBuilding().BuildingToTileDictionary.Values)
+                            {
+                                if (tile.HasBaron)
+                                {
+                                    //
+                                    // this entitlement allows the user to click on a knight that will transition to 
+                                    // MustMoveBaron.  
+                                    await PurchaseEntitlement(CurrentPlayer, Entitlement.MoveBaronWithKnight, GameState.ClickOnKnight);
+                                    return;
+                                }
+                            }
+                        }
+                        await ShowErrorMessage("You must have at least one active knight next to the baron.", "Move Baron Error", "");
                     }
+                    else
+                    {
+                        if (CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None &&
+                       !CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.MoveBaron))
+                        {
+                            await MustMoveBaronLog.PostLog(this, MoveBaronReason.PlayedDevCard);
+                        }
+                    }
+                    // since you can only play one dev card per turn...
+
                     break;
                 case Entitlement.KnightDisplacement:
                 case Entitlement.Intrigue: // "displace any knight, no matter the rank

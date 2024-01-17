@@ -43,7 +43,7 @@
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl x:Name="CTRL_Baron" Entitlement="MoveBaron" ShowCount="False" 
                     HorizontalAlignment="Left" VerticalAlignment="Top" 
-                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnPurchaseEntitlement">
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <local:BaronCtrl />
                 </local:PurchaseItemCtrl.Child>

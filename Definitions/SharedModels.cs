@@ -265,6 +265,63 @@ namespace Catan10
         #endregion Properties
     }
 
+    public class HouseRules : INotifyPropertyChanged
+    {
+        bool _beforeFirstInvasion = true;
+        bool _wallProtectsCity = true;
+        bool _moveBaronBeforeRoll = true;
+        public bool MoveBaronBeforeRoll
+        {
+            get
+            {
+                return _moveBaronBeforeRoll;
+            }
+            set
+            {
+                if (_moveBaronBeforeRoll != value)
+                {
+                    _moveBaronBeforeRoll = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool WallProtectsCity
+        {
+            get
+            {
+                return _wallProtectsCity;
+            }
+            set
+            {
+                if (_wallProtectsCity != value)
+                {
+                    _wallProtectsCity = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public bool HideBaronBeforeFirstInvasion
+        {
+            get
+            {
+                return _beforeFirstInvasion;
+            }
+            set
+            {
+                if (_beforeFirstInvasion != value)
+                {
+                    _beforeFirstInvasion = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
     public class GameInfo : INotifyPropertyChanged
     {
         #region Properties

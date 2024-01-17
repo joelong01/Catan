@@ -553,7 +553,7 @@ namespace Catan10
             MainPageModel.GameInfo = gameInfo;
             CTRL_GameView.CurrentGame = CTRL_GameView.Games[gameInfo.GameIndex];
             MainPageModel.IsGameStarted = true;
-            if (gameInfo.CitiesAndKnights)
+            if (gameInfo.CitiesAndKnights && MainPageModel.Settings.HouseRules.HideBaronBeforeFirstInvasion)
             { CTRL_GameView.CurrentGame.HexPanel.HideBaron(); }
             await Task.Delay(0);
         }
@@ -1049,7 +1049,7 @@ namespace Catan10
         {
             GameContainer.BaronTile = targetTile;
 
-            if (showBaron)
+            if (showBaron || !MainPageModel.Settings.HouseRules.HideBaronBeforeFirstInvasion)
             {
                 // hide it in the invasion control, show it on th emain board
                 CTRL_Invasion.InvasionData.ShowBaron = false;
@@ -1249,7 +1249,7 @@ namespace Catan10
         public async Task RolledSeven()
         {
 
-            if (GameInfo.CitiesAndKnights && CTRL_Invasion.InvasionData.TotalInvasions == 0) return;
+            if (MainPageModel.Settings.HouseRules.HideBaronBeforeFirstInvasion && GameInfo.CitiesAndKnights && CTRL_Invasion.InvasionData.TotalInvasions == 0) return;
 
             await MustMoveBaronLog.PostLog(this, MoveBaronReason.Rolled7);
 

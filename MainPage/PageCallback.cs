@@ -59,8 +59,8 @@ namespace Catan10
 
             if (building.Owner != CurrentPlayer) return;
 
-            
-            if (building.City.HasWall  && this.MainPageModel.Settings.WallProtectsCity)
+
+            if (building.City.HasWall && this.MainPageModel.Settings.HouseRules.WallProtectsCity)
             {
                 await DestroyWall.PostDestroyWall(this, building);
             }
@@ -574,10 +574,13 @@ namespace Catan10
             //   this.TraceMessage($"Tile={targetTile} CurrentPlayer={CurrentPlayer.PlayerName} Owners={targetTile.OwnedBuildings.FlattenProperty("Owner", ",")}" );
 
             if (!CurrentPlayer.GameData.Resources.UnspentEntitlements.Contains(Entitlement.MoveBaron)) return;
-
+            //
+            //  need the reason for moving the baron for booking and UI message
+            MoveBaronReason reason = MoveBaronReason.Rolled7;
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
-
-            //this.TraceMessage($"Reason = {log.Reason}");
+            if (log != null) reason = log.Reason;
+            
+            this.TraceMessage($"Reason = {reason}");
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
 
@@ -600,7 +603,7 @@ namespace Catan10
                                             targetTile.Index,
                                             weapon == TargetWeapon.Baron ? CTRL_GameView.BaronTile.Index : CTRL_GameView.PirateShipTile.Index,  // the previous index
                                             weapon,
-                                            log == null ? MoveBaronReason.Rolled7 : log.Reason,
+                                            reason,
                                             stolenResource);
             }
 
@@ -640,7 +643,7 @@ namespace Catan10
                     }
                     if (!found)
                     {
-                        if (log.Reason == MoveBaronReason.PlayedDevCard)
+                        if (reason == MoveBaronReason.PlayedDevCard)
                         {
                             s = "Playing Knight to Target: " + s;
                         }
@@ -681,7 +684,7 @@ namespace Catan10
                 var targets = PotentialTargets(targetTile, CurrentPlayer);
                 if (targets.Count > 0)
                 {
-                    if (log.Reason == MoveBaronReason.Bishop)
+                    if (reason == MoveBaronReason.Bishop)
                     {
                         // when a Bishop is played, you collect from everybody
 
@@ -707,7 +710,7 @@ namespace Catan10
                         string message;
                         foreach (var target in targets)
                         {
-                            if (log != null && log.Reason == MoveBaronReason.PlayedDevCard)
+                            if (reason == MoveBaronReason.PlayedDevCard)
                             {
                                 message = "Knight Targets: " + target;
                             }
@@ -1463,11 +1466,13 @@ namespace Catan10
 
         public async Task KnightLeftPointerPressed(BuildingCtrl building)
         {
-            if (building == null) return;
             
+
+            if (building == null) return;
+
             Debug.Assert(building.BuildingState == BuildingState.None || building.BuildingState == BuildingState.Knight);
 
-    
+
             if (building.Owner == null && HasEntitlement(Entitlement.BuyOrUpgradeKnight))
             {
                 building.ResetTempBuildingState(); // this was set "out of band" in mouse enter, putting it back.
@@ -1477,7 +1482,23 @@ namespace Catan10
 
             }
 
-          
+            if (building.Owner == CurrentPlayer && HasEntitlement(Entitlement.MoveBaronWithKnight) && building.Knight.Activated)
+            {
+                
+                // make sure that this knight is next to the 
+                foreach (var tile in building.BuildingToTileDictionary.Values)
+                {
+                    if (tile.HasBaron)
+                    {
+                        //
+                        // this entitlement allows the user to click on a knight that will transition to 
+                        // MustMoveBaron.  
+                        await MoveBaronWithKnightLog.PostLog(this, building);
+                        break;
+                    }
+                }
+            }
+
             if (CurrentGameState == GameState.PlaceDeserterKnight)
             {
                 await DeserterLog.PlaceDeserterLog(this, building);
@@ -1487,7 +1508,7 @@ namespace Catan10
 
             if (CurrentGameState == GameState.PickDeserter)
             {
-               
+
                 if (building.Owner == CurrentPlayer) return; // don't destroy your own knight
 
                 await DeserterLog.PickDeserterLog(this, building);
@@ -1501,10 +1522,24 @@ namespace Catan10
                 await ActivateKnight(building, true);
                 return;
             }
-            
+
             if (HasEntitlement(Entitlement.BuyOrUpgradeKnight) && building.Knight.KnightRank < KnightRank.Mighty)
             {
                 await UpgradeKnight(building);
+            }
+            //
+            // last check -- is there a knight they are trying to kick out?
+            if (CurrentGameState == GameState.WaitingForRoll && building.IsKnight && building.Knight.Activated && MainPageModel.Settings.HouseRules.MoveBaronBeforeRoll)
+            {
+                foreach (var tile in building.BuildingToTileDictionary.Values)
+                {
+                    if (tile == CTRL_GameView.BaronTile)
+                    {
+                        CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.MoveBaronWithKnight);
+                        await MoveBaronWithKnightLog.PostLog(this, building);
+                        return;
+                    }
+                }
             }
         }
 
