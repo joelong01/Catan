@@ -171,6 +171,8 @@ namespace Catan10
         Task PurchaseAndPlaceKnight(int knightIndex, bool activate, KnightRank rank);
         Task PurchaseAndPlaceRoad(int roadIndex);
         Task PurchaseAndPlaceBuilding(int buildingIndex, Entitlement entitlement);
+
+        Task RollbackToCheckpoint();
         PlayerModel LastPlayerToRoll { get; }
 
     }

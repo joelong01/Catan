@@ -972,7 +972,7 @@ namespace Catan10
             }
         }
 
-        private async Task RollbackToCheckpoint()
+        public async Task RollbackToCheckpoint()
         {
             await RollbackToState(GameState.TestCheckpoint);
 

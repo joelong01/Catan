@@ -430,8 +430,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task UpdateBuildingState(PlayerModel player, BuildingState oldState, BuildingState newState)
         {
-            this.TraceMessage($"Updating Building State for {this} to BuildingState.{newState}");
-            bool ret = false;
+            bool ret;
             switch (oldState)
             {
                 case BuildingState.None:
@@ -665,7 +664,6 @@ namespace Catan10
             var exploredRoads = new HashSet<RoadCtrl>(); // Keeps track of explored roads to avoid loops
             var roadsToExplore = new Queue<RoadCtrl>(); // Queue to hold roads that are to be explored
             var startKnight = this;
-            this.TraceMessage($"startKnight: {startKnight}");
             // Enqueue the adjacent roads of the starting building that have the same owner
             foreach (var road in startKnight.AdjacentRoads)
             {
@@ -751,7 +749,7 @@ namespace Catan10
 
         private async void OnKnighClicked(object sender, PointerRoutedEventArgs e)
         {
-            this.TraceMessage("Knight clicked");
+            //this.TraceMessage("Knight clicked");
             //
             //  because of the way events have been subscribed to, we need to return when
             //  we are doing drag and drop, which is driven by entitlements.
