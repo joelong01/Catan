@@ -767,7 +767,7 @@ namespace Catan10
 
         public async Task UpgradeKnight(BuildingCtrl building)
         {
-            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight))
+            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyKnight))
             {
                 await Task.Delay(0); //ignoring the requrst
             }
