@@ -32,12 +32,12 @@ namespace Catan10
             newDevCards.ForEach((c) => { if (c.DevCardType == DevCardType.VictoryPoint) victoryPoints++; });
             available.ForEach((c) => { if (c.DevCardType == DevCardType.VictoryPoint) victoryPoints++; });
 
-            return $"{publicScore + victoryPoints }";
+            return $"{publicScore + victoryPoints}";
         }
 
         public ResourceType StolenResource
         {
-            get => (ResourceType)GetValue(StolenResourceProperty);
+            get => ( ResourceType )GetValue(StolenResourceProperty);
             set => SetValue(StolenResourceProperty, value);
         }
 
@@ -51,7 +51,7 @@ namespace Catan10
         private void SetStolenResource(ResourceType resourceType)
         {
         }
-        
+
         private bool StolenResourceEmpty(ResourceType resourceType)
         {
             return resourceType != ResourceType.None;
@@ -63,31 +63,31 @@ namespace Catan10
 
         public int AvailableDevCardIndex
         {
-            get => (int)GetValue(AvailableDevCardIndexProperty);
+            get => ( int )GetValue(AvailableDevCardIndexProperty);
             set => SetValue(AvailableDevCardIndexProperty, value);
         }
 
         public int NewDevCardsIndex
         {
-            get => (int)GetValue(NewDevCardsIndexProperty);
+            get => ( int )GetValue(NewDevCardsIndexProperty);
             set => SetValue(NewDevCardsIndexProperty, value);
         }
 
         public int PlayedDevCardIndex
         {
-            get => (int)GetValue(PlayedDevCardIndexProperty);
+            get => ( int )GetValue(PlayedDevCardIndexProperty);
             set => SetValue(PlayedDevCardIndexProperty, value);
         }
 
         public PlayerModel Player
         {
-            get => (PlayerModel)GetValue(PlayerProperty);
+            get => ( PlayerModel )GetValue(PlayerProperty);
             set => SetValue(PlayerProperty, value);
         }
 
         public DevCardModel SelectedAvailableDevCard
         {
-            get => (DevCardModel)GetValue(SelectedAvailableDevCardProperty);
+            get => ( DevCardModel )GetValue(SelectedAvailableDevCardProperty);
             set => SetValue(SelectedAvailableDevCardProperty, value);
         }
 
@@ -114,7 +114,7 @@ namespace Catan10
                 return true;
             }
 
-            return (state == GameState.WaitingForNext);
+            return ( state == GameState.WaitingForNext );
         }
 
         public static string MenuPlayString(DevCardType devCardType)
@@ -160,8 +160,8 @@ namespace Catan10
                         return true; ;
                     break;
 
-                case Entitlement.BuyOrUpgradeKnight:
-                    if (player.GameData.CK_Knights.Count -1 == MainPage.Current.GameData.MaxKnights)
+                case Entitlement.BuyKnight:
+                    if (player.GameData.CK_Knights.Count - 1 == MainPage.Current.GameData.MaxKnights)
                         return true;
                     break;
 
@@ -220,7 +220,7 @@ namespace Catan10
                 Source = rc,
                 CountVisible = true,
                 Instructions = "Take 2 cards from the bank.",
-                Destination = new ObservableCollection<ResourceCardModel>(),                
+                Destination = new ObservableCollection<ResourceCardModel>(),
             };
 
             var ret = await dlg.ShowAsync();
@@ -267,7 +267,7 @@ namespace Catan10
                 {
                     Title = "Play Dev Card",
                     Content = $"You can only play one dev card per turn and you've already played a {Player.GameData.Resources.ThisTurnsDevCard.DevCardType}.",
-                    CloseButtonText = "Ok",                    
+                    CloseButtonText = "Ok",
                 };
                 await dlg.ShowAsync();
                 return; // you can only play one dev card per turn
@@ -302,7 +302,7 @@ namespace Catan10
                 await PlayDevCardLog.PostLog(MainPage.Current, DevCardType.RoadBuilding, null);
                 return;
             }
-            if (devCardType == DevCardType.Knight && (state == GameState.WaitingForNext || state == GameState.WaitingForRoll))
+            if (devCardType == DevCardType.Knight && ( state == GameState.WaitingForNext || state == GameState.WaitingForRoll ))
             {
                 await MustMoveBaronLog.PostLog(MainPage.Current, MoveBaronReason.PlayedDevCard);
             }

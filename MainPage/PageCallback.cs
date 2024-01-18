@@ -579,7 +579,7 @@ namespace Catan10
             MoveBaronReason reason = MoveBaronReason.Rolled7;
             MustMoveBaronLog log = MainPageModel.Log.PeekAction as MustMoveBaronLog;
             if (log != null) reason = log.Reason;
-            
+
             this.TraceMessage($"Reason = {reason}");
 
             PlayerGameModel playerGameData = CurrentPlayer.GameData;
@@ -767,13 +767,14 @@ namespace Catan10
 
         public async Task UpgradeKnight(BuildingCtrl building)
         {
-            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyKnight))
+            if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.UpgradeKnight))
             {
-                await Task.Delay(0); //ignoring the requrst
+                
+                return;
             }
             int newRank = (int) building.Knight.KnightRank + 1;
             await KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, ( KnightRank )newRank, building.Knight.Activated);
-
+            await Task.Delay(0); 
         }
         public async Task ActivateKnight(BuildingCtrl building, bool activated)
         {
@@ -899,14 +900,14 @@ namespace Catan10
             }
 
             // 12/24/2023
-            //              You can build a BuyOrUpgradeKnight if:
+            //              You can build a BuyKnight if:
             //              1. you are running CitiesAndKnights
             //              2. you have the entitlement
             //              3. you are next to a road
-            //              4. (1/5/2024):  You don't have the BuyOrUpgradeKnight entitlement, but you are in the PlaceDeserterKnight GameState
+            //              4. (1/5/2024):  You don't have the BuyKnight entitlement, but you are in the PlaceDeserterKnight GameState
             //
             //     this logic means you *must* spend your knights before you build any other kind of settlements.
-            if (MainPageModel.GameInfo.CitiesAndKnights && ( CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyOrUpgradeKnight) || CurrentGameState == GameState.PlaceDeserterKnight )
+            if (MainPageModel.GameInfo.CitiesAndKnights && ( CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.BuyKnight) || CurrentGameState == GameState.PlaceDeserterKnight )
                 && OwnedAdjacentRoad(CurrentPlayer, building) && building.BuildingState == BuildingState.None)
             {
                 return BuildingState.Knight;
@@ -1466,14 +1467,14 @@ namespace Catan10
 
         public async Task KnightLeftPointerPressed(BuildingCtrl building)
         {
-            
+
 
             if (building == null) return;
 
             Debug.Assert(building.BuildingState == BuildingState.None || building.BuildingState == BuildingState.Knight);
 
 
-            if (building.Owner == null && HasEntitlement(Entitlement.BuyOrUpgradeKnight))
+            if (building.Owner == null && HasEntitlement(Entitlement.BuyKnight))
             {
                 building.ResetTempBuildingState(); // this was set "out of band" in mouse enter, putting it back.
 
@@ -1481,10 +1482,11 @@ namespace Catan10
                 return;
 
             }
+   
 
             if (building.Owner == CurrentPlayer && HasEntitlement(Entitlement.MoveBaronWithKnight) && building.Knight.Activated)
             {
-                
+
                 // make sure that this knight is next to the 
                 foreach (var tile in building.BuildingToTileDictionary.Values)
                 {
@@ -1523,7 +1525,7 @@ namespace Catan10
                 return;
             }
 
-            if (HasEntitlement(Entitlement.BuyOrUpgradeKnight) && building.Knight.KnightRank < KnightRank.Mighty)
+            if (HasEntitlement(Entitlement.UpgradeKnight) && building.Knight.KnightRank < KnightRank.Mighty && building.Owner == CurrentPlayer)
             {
                 await UpgradeKnight(building);
             }

@@ -48,8 +48,8 @@ namespace Catan10
 
             if (NewRank != OldRank)
             {
-                building.Knight.KnightRank = NewRank;
-                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.BuyOrUpgradeKnight);
+                building.Knight.KnightRank = NewRank; 
+                gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.UpgradeKnight);
             }
 
             return Task.Delay(0);
@@ -70,7 +70,7 @@ namespace Catan10
             var building = gameController.GetBuilding(this.BuildingIndex);
             if (this.OldRank != this.NewRank)
             {
-                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.BuyOrUpgradeKnight);
+                gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.UpgradeKnight);
                 building.Knight.KnightRank = this.OldRank;
             }
             if (this.OldActivated != this.NewActivated)

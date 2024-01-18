@@ -24,7 +24,7 @@ namespace Catan10
             Entitlement entitlement = Entitlement.Undefined;
             if (newState == BuildingState.Settlement) entitlement = Entitlement.Settlement;
             if (newState == BuildingState.City) entitlement = Entitlement.City;
-            if (newState == BuildingState.Knight) entitlement = Entitlement.BuyOrUpgradeKnight;
+            if (newState == BuildingState.Knight) entitlement = Entitlement.BuyKnight;
 
             if (newState == BuildingState.Settlement && building.BuildingState == BuildingState.City) entitlement = Entitlement.DestroyCity;
 

@@ -354,8 +354,8 @@ namespace Catan10
                         Wood = 1,
                     };
                     break;
-
-                case Entitlement.BuyOrUpgradeKnight:
+                case Entitlement.UpgradeKnight:
+                case Entitlement.BuyKnight:
                     cost = new TradeResources()
                     {
                         Ore = 1,

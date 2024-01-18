@@ -43,7 +43,7 @@
                         Text="{x:Bind GetEntitlementDescription(Entitlement), Mode=OneWay }" />
             </Viewbox>
 
-            <TextBlock Text="{x:Bind Decoration, Mode=OneWay}" FontFamily="Segoe MDL2 Assets" FontSize="22"
+            <TextBlock Text="{x:Bind Decoration, Mode=OneWay}" FontSize="33" Margin="0,0,4,0" FontWeight="SemiBold"
                     VerticalAlignment="Top" HorizontalAlignment="Right"
                     Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=White}" />
 

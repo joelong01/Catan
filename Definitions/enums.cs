@@ -115,13 +115,16 @@ namespace Catan10
         [Description("Ship")]
         Ship,
 
-        [Description("Buy Or Upgrade")]
-        BuyOrUpgradeKnight,
+        [Description("Buy")]
+        BuyKnight,
+
+        [Description("Upgrade")]
+        UpgradeKnight,
 
         [Description("Activate")]
         ActivateKnight,
 
-        [Description("Move Knight")]
+        [Description("Move")]
         MoveKnight,
 
         [Description("Move Baron")]

@@ -299,6 +299,25 @@ namespace Catan10
         public static readonly DependencyProperty PipGroupProperty = DependencyProperty.Register("PipGroup", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(0, PipGroupChanged));
         public static readonly DependencyProperty PipsProperty = DependencyProperty.Register("Pips", typeof(int), typeof(BuildingCtrl), new PropertyMetadata(27, PipsChanged));
         public static readonly DependencyProperty HighlightProperty = DependencyProperty.Register("Highlight", typeof(bool), typeof(BuildingCtrl), new PropertyMetadata(false));
+
+        //
+        //  this is bound in the HexPanel to MainPageModel.Current.MainPage via code behing
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(BuildingCtrl), new PropertyMetadata(MainPageModel.Default, MainPageModelChanged));
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
+        private static void MainPageModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as BuildingCtrl;
+            var depPropValue = (MainPageModel)e.NewValue;
+            depPropClass?.SetMainPageModel(depPropValue);
+        }
+        private void SetMainPageModel(MainPageModel value)
+        {
+           // this.TraceMessage("MainPageModel updated in buildingctrl");
+        }
         public bool Highlight
         {
             get => ( bool )GetValue(HighlightProperty);
@@ -580,11 +599,12 @@ namespace Catan10
                 if (!displacePhaseOne) // only phase one looks for knights
                 {
                     targets = GetConnectedBuildings(Entitlement.MoveKnight);
-                } else
+                }
+                else
                 {
                     targets = GetConnectedBuildings(grantedEntitlement);
                 }
-                
+
                 var target =  await DragAndDropKnight(sender, e, targets);
                 // in either case, you return here and the original knight is back where you started
                 if (target != null)

@@ -1289,7 +1289,8 @@ namespace Catan10
                 case Entitlement.City:
                 case Entitlement.Road:
                 case Entitlement.Ship:
-                case Entitlement.BuyOrUpgradeKnight:
+                case Entitlement.UpgradeKnight:
+                case Entitlement.BuyKnight:
                     await PurchaseEntitlement(CurrentPlayer, entitlement, CurrentGameState);
                     break;
                 case Entitlement.ActivateKnight:
@@ -1517,7 +1518,7 @@ namespace Catan10
                 int activateCount = 0;
                 foreach (var entitlement in CurrentPlayer.GameData.Resources.UnspentEntitlements)
                 {
-                    if (entitlement == Entitlement.BuyOrUpgradeKnight) knightCount++;
+                    if (entitlement == Entitlement.BuyKnight) knightCount++;
                     if (entitlement == Entitlement.ActivateKnight) activateCount++;
                 }
 

@@ -41,35 +41,42 @@
                     </Viewbox>
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
-            <local:PurchaseItemCtrl x:Name="CTRL_Baron" Entitlement="MoveBaron" ShowCount="False" 
-                    HorizontalAlignment="Left" VerticalAlignment="Top" 
+            <local:PurchaseItemCtrl x:Name="CTRL_Baron" Entitlement="MoveBaron" ShowCount="False"
+                    FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Left" VerticalAlignment="Top"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <local:BaronCtrl />
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
-            <local:PurchaseItemCtrl Entitlement="BuyOrUpgradeKnight" Decoration="&#xE7BF;"
+            <local:PurchaseItemCtrl Entitlement="BuyKnight" Decoration="&#xE7BF;" FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
-            <local:PurchaseItemCtrl Entitlement="ActivateKnight" Decoration="&#xE7E8;"
+            <local:PurchaseItemCtrl Entitlement="UpgradeKnight" Decoration="&#x21EA;" FontFamily="MS Gothic"
+                    Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
+                <local:PurchaseItemCtrl.Child>
+                    <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                </local:PurchaseItemCtrl.Child>
+            </local:PurchaseItemCtrl>
+            <local:PurchaseItemCtrl Entitlement="ActivateKnight" Decoration="&#xE7E8;" FontFamily="Segoe MDL2 Assets"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                 <local:PurchaseItemCtrl.Child>
                     <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
-            <local:PurchaseItemCtrl Entitlement="MoveKnight" Decoration="&#xE811;"
+            <local:PurchaseItemCtrl Entitlement="MoveKnight" Decoration="&#xE811;" FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
-            <local:PurchaseItemCtrl Entitlement="KnightDisplacement" Decoration=""
+            <local:PurchaseItemCtrl Entitlement="KnightDisplacement" Decoration="&#x2620;" FontFamily="MS Gothic"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
@@ -77,7 +84,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
 
-            <local:PurchaseItemCtrl Entitlement="PoliticsUpgrade" ShowCount="False"
+            <local:PurchaseItemCtrl Entitlement="PoliticsUpgrade" ShowCount="False" FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
@@ -93,6 +100,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="TradeUpgrade" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
                 <local:PurchaseItemCtrl.Child>
@@ -109,6 +117,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="ScienceUpgrade" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement" ShowCount="False">
                 <local:PurchaseItemCtrl.Child>
@@ -123,6 +132,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Wall" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
@@ -138,13 +148,15 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Bishop" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
                         <Viewbox Stretch="Uniform" Margin="0,0,0,0">
-                            <TextBlock Padding="0" Foreground="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay, FallbackValue=White}"
+                            <TextBlock Padding="0"
+                                    Foreground="{x:Bind GetForegroundBrush(CurrentPlayer), Mode=OneWay, FallbackValue=White}"
                                     Text="&#x265D;" FontFamily="Segoe UI Symbol" />
 
                         </Viewbox>
@@ -153,6 +165,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Deserter" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
@@ -167,6 +180,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Diplomat" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
@@ -181,6 +195,7 @@
             </local:PurchaseItemCtrl>
 
             <local:PurchaseItemCtrl Entitlement="Intrigue" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
@@ -194,6 +209,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="Inventor" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>
@@ -207,6 +223,7 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
             <local:PurchaseItemCtrl Entitlement="Merchant" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                    FontFamily="Segoe MDL2 Assets"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     OnPurchaseEntitlement="OnBuyEntitlement">
                 <local:PurchaseItemCtrl.Child>

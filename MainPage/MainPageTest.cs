@@ -309,7 +309,7 @@ namespace Catan10
         public async Task PurchaseAndPlaceKnight(int knightIndex, bool activate, KnightRank rank)
         {
             var knight = GetBuilding(knightIndex);
-            await PurchaseEntitlement(Entitlement.BuyOrUpgradeKnight);
+            await PurchaseEntitlement(Entitlement.BuyKnight);
             await KnightLeftPointerPressed(knight); // build it
             if (activate)
             {
@@ -319,7 +319,7 @@ namespace Catan10
 
             while (knight.Knight.KnightRank < rank)
             {
-                await PurchaseEntitlement(Entitlement.BuyOrUpgradeKnight);
+                await PurchaseEntitlement(Entitlement.UpgradeKnight);
                 await KnightLeftPointerPressed(knight);  // upgrade
             }
         }
@@ -725,7 +725,7 @@ namespace Catan10
                     Debug.Assert(CurrentGameState == GameState.WaitingForRoll);
                     await Test_DoRoll(6, 6, SpecialDice.Pirate);
                     //  get some knight entitlements
-                    await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+                    await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyKnight, CurrentGameState);
 
                     //
                     //  figure out where to build it
@@ -1404,8 +1404,8 @@ namespace Catan10
 
             //
             //  get some knight entitlements
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.UpgradeKnight, CurrentGameState);
             await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
 
             //
@@ -1466,8 +1466,8 @@ namespace Catan10
 
             //
             //  get some knight entitlements
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
-            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyOrUpgradeKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.BuyKnight, CurrentGameState);
+            await PurchaseEntitlement(CurrentPlayer, Entitlement.UpgradeKnight, CurrentGameState);
             await PurchaseEntitlement(CurrentPlayer, Entitlement.ActivateKnight, CurrentGameState);
 
             //

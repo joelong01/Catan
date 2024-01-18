@@ -7,10 +7,10 @@
         <Storyboard x:Name="AnimateMove">
             <DoubleAnimation Storyboard.TargetName="Grid_Knight" x:Name="DA_X"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
-                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="Grid_Knight" x:Name="DA_Y"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="Transparent" Opacity="1.0" PointerEntered="Building_PointerEntered"

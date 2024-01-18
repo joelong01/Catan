@@ -459,8 +459,48 @@ namespace Catan10
                     return RoadsLeft - _resources.GetUnspentEntitlements(entitlement); ;
                 case Entitlement.Ship:
                     return MaxShips - ShipsLeft;
-                case Entitlement.BuyOrUpgradeKnight:
-                    return KnightsLeft - _resources.GetUnspentEntitlements(entitlement); ;
+                case Entitlement.BuyKnight:
+                    var knightRankCounts  = Enum.GetValues(typeof(KnightRank))
+                               .Cast<KnightRank>()
+                               .ToDictionary(kr => kr, kr => 0);
+                    CK_Knights
+                                .GroupBy(knight => knight.KnightRank)
+                                .ToList()
+                                .ForEach(group => knightRankCounts[group.Key] = group.Count());
+                    if (knightRankCounts[KnightRank.Basic] < 2) return 1; // you can't upgrade, but you can build a new one
+                    return 0;
+                case Entitlement.UpgradeKnight:
+                    // the rule is no more than 2 knights at the same rank
+                    knightRankCounts = Enum.GetValues(typeof(KnightRank))
+                               .Cast<KnightRank>()
+                               .ToDictionary(kr => kr, kr => 0);
+                    CK_Knights
+                                .GroupBy(knight => knight.KnightRank)
+                                .ToList()
+                                .ForEach(group => knightRankCounts[group.Key] = group.Count());
+                    foreach (var knight in CK_Knights)
+                    {
+                        switch (knight.KnightRank)
+                        {
+
+                            case KnightRank.Basic:
+                                //
+                                //  to upgrade a basic, you need <2 Strong knights
+                                if (knightRankCounts[KnightRank.Strong] < 2) return 1;
+                                break;
+                            case KnightRank.Strong:
+                                //
+                                //  to upgrade a basic, you need <2 Strong knights
+                                if (knightRankCounts[KnightRank.Mighty] < 2) return 1;
+                                break;
+                            case KnightRank.Mighty:
+                                break;
+                            default:
+                                Debug.Assert(false, "Bad Knight Rank in CK_Knights");
+                                break;
+                        }
+                    }
+                    return 0;
                 case Entitlement.ActivateKnight:
                     return 1; // we have already checked to make sure that there is a knight to activate
                 case Entitlement.Wall:

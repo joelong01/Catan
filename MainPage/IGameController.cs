@@ -999,7 +999,7 @@ namespace Catan10
                 case BuildingState.NoEntitlement:
                     break;
                 case BuildingState.Knight:
-                    player.GameData.Resources.UnspentEntitlements.Add(Entitlement.BuyOrUpgradeKnight);
+                    player.GameData.Resources.UnspentEntitlements.Add(Entitlement.BuyKnight);
                     break;
 
                 default:
@@ -1102,7 +1102,7 @@ namespace Catan10
                     break;
 
                 case BuildingState.Knight:
-                    entitlement = Entitlement.BuyOrUpgradeKnight;
+                    entitlement = Entitlement.BuyKnight;
                     break;
 
                 default:

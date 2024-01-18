@@ -444,6 +444,16 @@ namespace Catan10
 
                 building.SetBinding(BuildingCtrl.CurrentPlayerProperty, binding);
 
+                binding = new Binding()
+                {
+                    Path = new PropertyPath("MainPageModel"),
+                    Mode = BindingMode.OneWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                    Source = MainPage.Current
+                };
+
+                building.SetBinding(BuildingCtrl.MainPageModelProperty, binding);
+
                 building.Index = Buildings.Count;
                 Buildings.Add(building);
 
