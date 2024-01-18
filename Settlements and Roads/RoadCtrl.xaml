@@ -19,21 +19,21 @@
         <Storyboard x:Name="_sbMove">
             <DoubleAnimation x:Name="_daToX" d:IsOptimized="True" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
-                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daToY" d:IsOptimized="True" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbRotate">
             <DoubleAnimation x:Name="_daRotate" d:IsOptimized="True" BeginTime="0:0:1"
                     Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0"
-                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbAnimateOpacity">
             <DoubleAnimation x:Name="_daAnimateOpacity" AutoReverse="False" BeginTime="0:0:2"
                     Storyboard.TargetName="userControl" Storyboard.TargetProperty="(UIElement.Opacity)" To="0.5"
-                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
     </Control.Resources>
     <Grid Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"

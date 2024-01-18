@@ -1209,6 +1209,17 @@ namespace Catan10
                                 };
 
                                 tile.SetBinding(BuildingCtrl.CurrentPlayerProperty, binding);
+
+                                // Bind to MainPageModel
+                                binding = new Binding()
+                                {
+                                    Path = new PropertyPath("MainPageModel"),
+                                    Mode = BindingMode.OneWay,
+                                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                                    Source = MainPage.Current
+                                };
+
+                                tile.SetBinding(TileCtrl.MainPageModelProperty, binding);
                             }
                             _tileSets.Add(tg);
                         }
@@ -1592,6 +1603,15 @@ namespace Catan10
                             };
 
                             road.SetBinding(RoadCtrl.CurrentPlayerProperty, binding);
+                            binding = new Binding()
+                            {
+                                Path = new PropertyPath("MainPageModel"),
+                                Mode = BindingMode.OneWay,
+                                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                                Source = MainPage.Current
+                            };
+
+                            road.SetBinding(RoadCtrl.MainPageModelProperty, binding);
 
                             road.TileZeroZero = tileZeroZero;
                             road.Callback = _gameCallback;

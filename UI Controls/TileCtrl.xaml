@@ -15,35 +15,35 @@
         <Storyboard x:Name="_sbFlipTile">
             <DoubleAnimation x:Name="_daFlipBackTile" Storyboard.TargetName="_hexBackGrid"
                     Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" To="-90"
-                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daFlipFrontTile" Storyboard.TargetName="_hexFrontGrid"
                     Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" To="0"
-                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbMoveTile">
             <DoubleAnimation x:Name="_daToX" d:IsOptimized="True" Storyboard.TargetName="ResourceTileGrid"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
-                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daToY" d:IsOptimized="True" Storyboard.TargetName="ResourceTileGrid"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbRotate">
             <DoubleAnimation x:Name="_daRotateTile" d:IsOptimized="True" Storyboard.TargetName="ResourceTileGrid"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0"
-                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbAnimateOpacity">
             <DoubleAnimation x:Name="_daAnimateOpacity" AutoReverse="False" Completed="AnimateFadeCompleted"
                     Storyboard.TargetName="_hexFrontGrid" Storyboard.TargetProperty="(UIElement.Opacity)" From="1.0"
                     To="0.25"
-                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbAnimateOpacityReverse">
             <DoubleAnimation x:Name="_daAnimateOpacityReverse" AutoReverse="False" BeginTime="0:0:3"
                     Storyboard.TargetName="_hexFrontGrid" Storyboard.TargetProperty="(UIElement.Opacity)" From=".25"
                     To="1.0"
-                    Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Fast, MainPageModel.Testing), Mode=OneWay}" />
             <!--    -->
         </Storyboard>
     </Control.Resources>

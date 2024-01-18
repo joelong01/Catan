@@ -411,6 +411,14 @@ namespace Catan10
         public static readonly DependencyProperty SelfProperty = DependencyProperty.Register("Self", typeof(RoadCtrl), typeof(RoadCtrl), new PropertyMetadata(null));
         public static readonly DependencyProperty TileZeroZeroProperty = DependencyProperty.Register("TileZeroZero", typeof(Point), typeof(RoadCtrl), new PropertyMetadata(new Point(double.NaN, double.NaN), TileZeroZeroChanged));
         public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(RoadCtrl), new PropertyMetadata(-1));
+        
+        // bound with code behind in CatnHexPanel.cs
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(RoadCtrl), new PropertyMetadata(MainPageModel.Default));
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
         public int Index
         {
             get => ( int )GetValue(IndexProperty);

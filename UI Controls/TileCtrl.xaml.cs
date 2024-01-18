@@ -387,7 +387,15 @@ namespace Catan10
         public static readonly DependencyProperty TileDataProperty = DependencyProperty.Register("TileData", typeof(TileData), typeof(TileCtrl), new PropertyMetadata(new TileData(), TileDataChanged));
 
         public static readonly DependencyProperty TileOrientationProperty = DependencyProperty.Register("TileOrientation", typeof(TileOrientation), typeof(TileCtrl), new PropertyMetadata(TileOrientation.FaceUp, TileOrientationChanged));
-
+        
+        //
+        // bound with code behind in CatanHexPanel.cs to MainPage.MainPageModel
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(TileCtrl), new PropertyMetadata(MainPageModel.Default));
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
         public void AnimateFade(double opacity, List<Task> tasks)
         {
             double fast = MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.Fast);
