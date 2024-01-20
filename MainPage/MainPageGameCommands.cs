@@ -374,32 +374,7 @@ namespace Catan10
             await ChangeGame(item.Tag as CatanGameCtrl);
         }
 
-        private void Menu_ShowSavedGames(object sender, RoutedEventArgs e)
-        {
-            //await LoadSavedGames(); // this will load the saved games into the UI control
-            //_savedGameGrid.Visibility = Visibility.Visible;
-
-            //var folder = await StaticHelpers.GetSaveFolder();
-            //var picker = new FileOpenPicker()
-            //{
-            //    ViewMode = PickerViewMode.List,
-            //    SuggestedStartLocation = PickerLocationId.DocumentsLibrary
-            //};
-            //picker.FileTypeFilter.Add(".SavedCatanGame");
-            //var file = await picker.PickSingleFileAsync();
-            //if (file != null)
-            //{
-            //   Log newLog = new Log();
-            //   newLog =  await newLog.LoadLog(file.Name, this);
-            //   _log = await ReplayLog(newLog);
-
-            //    UpdateUiForState(_log.Last().GameState);
-            //}
-
-            //OpenGameDlg dlg = new OpenGameDlg();
-            //await dlg.LoadGames();
-            //await dlg.ShowAsync();
-        }
+        
 
         private void OnCancelClicked(object sender, RoutedEventArgs e)
         {

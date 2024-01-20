@@ -53,6 +53,13 @@ namespace Catan10
         public static readonly DependencyProperty BuildingIndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(KnightCtrl), new PropertyMetadata(false));
         public static readonly DependencyProperty ActivatedProperty = DependencyProperty.Register("Activated", typeof(bool), typeof(KnightCtrl), new PropertyMetadata(false, ActivatedChanged));
         public static readonly DependencyProperty KnightRankProperty = DependencyProperty.Register("KnightRank", typeof(KnightRank), typeof(KnightCtrl), new PropertyMetadata(KnightRank.Basic, KnightRankChanged));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(KnightCtrl), new PropertyMetadata(MainPageModel.Default));
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
+
         public KnightRank KnightRank
         {
             get => ( KnightRank )GetValue(KnightRankProperty);
@@ -170,11 +177,5 @@ namespace Catan10
             }
         }
 
-        public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
-        {
-            if (testing) return new Duration(TimeSpan.FromMilliseconds(( double )AnimationSpeed.Testing));
-
-            return new Duration(TimeSpan.FromMilliseconds(( double )requestedSpeed));
-        }
     }
 }

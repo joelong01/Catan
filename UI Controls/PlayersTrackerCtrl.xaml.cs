@@ -11,17 +11,27 @@ namespace Catan10
     public class GameTemplateSelector : DataTemplateSelector
     {
         public DataTemplate Expansion { get; set; }
+        public DataTemplate Expansion_CitesAndKnights { get; set; }
         public DataTemplate Regular { get; set; }
-        public ObservableCollection<PlayerModel> SourceCollection { get; set; }  
+        public DataTemplate Regular_CitiesAndKnights { get; set; }
+        public bool CitiesAndKnights { get; set; }
+        public ObservableCollection<PlayerModel> SourceCollection { get; set; }
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
         {
-            if (SourceCollection.Count >=5)
+            if (SourceCollection.Count >= 5)
             {
+                if (CitiesAndKnights)
+                {
+                    return Expansion_CitesAndKnights;
+                }
                 return Expansion;
             }
             else
             {
+                if (CitiesAndKnights)
+                    return Regular_CitiesAndKnights;
+
                 return Regular;
             }
         }
@@ -68,12 +78,6 @@ namespace Catan10
             set => SetValue(GameStateProperty, value);
         }
 
-        public MainPage MainPage
-        {
-            get => ( MainPage )GetValue(MainPageProperty);
-            set => SetValue(MainPageProperty, value);
-        }
-
         public MainPageModel MainPageModel
         {
             get => ( MainPageModel )GetValue(MainPageModelProperty);
@@ -92,24 +96,42 @@ namespace Catan10
 
         public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(PlayersTrackerCtrl), new PropertyMetadata(null, MainPageModelChanged));
 
-        public static readonly DependencyProperty MainPageProperty = DependencyProperty.Register("MainPage", typeof(MainPage), typeof(PlayersTrackerCtrl), new PropertyMetadata(null));
-
         public static readonly DependencyProperty PlayingPlayersProperty = DependencyProperty.Register("PlayingPlayers", typeof(ObservableCollection<PlayerModel>), typeof(PlayersTrackerCtrl), new PropertyMetadata(null, PlayingPlayersChanged));
 
         public PlayersTrackerCtrl()
         {
             this.InitializeComponent();
         }
-
-        public double ControlHeight
+        public double ControlWidth
         {
             get
             {
-                if (MainPageModel.PlayingPlayers.Count < 5)
-                    return 225.0;
+                if (ListBox_PlayerResourceCountList.Items.Count == 0) return 600;
+                var item = ListBox_PlayerResourceCountList.Items[0]; 
+                var listViewItem = ListBox_PlayerResourceCountList.ContainerFromItem(item) as ListViewItem;
 
-                return 175.0;
+                if (listViewItem != null)
+                {
+                    double width = listViewItem.ActualWidth;
+                    return width;
+                }
+
+                return 600;
+
             }
+        }
+        public double ControlHeight(ObservableCollection<PlayerModel> players)
+        {
+            var max = 263;
+            var totalAvailableHeight = ListBox_PlayerResourceCountList.ActualHeight;
+            var itemHeight = totalAvailableHeight / players.Count;
+            if (double.IsNaN(itemHeight)) return max;
+            if (itemHeight > 0 && itemHeight < max )
+                return itemHeight;
+
+            return max;
+ 
+
         }
 
     }

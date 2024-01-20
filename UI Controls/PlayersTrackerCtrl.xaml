@@ -6,81 +6,57 @@
     <Control.Resources>
 
         <DataTemplate x:Key="RegularTemplate" x:DataType="local:PlayerModel">
-            <Grid>
-                <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" Height="225" RenderTransformOrigin="0 0"
-                        RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
-                    <local:PublicDataCtrl.RenderTransform>
-                        <CompositeTransform ScaleX="1" ScaleY="1" TranslateX="0" />
-                    </local:PublicDataCtrl.RenderTransform>
-                </local:PublicDataCtrl>
-            </Grid>
+            <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}"
+                    RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
+            </local:PublicDataCtrl>
+        </DataTemplate>
+        <DataTemplate x:Key="ExpansionTemplate" x:DataType="local:PlayerModel">
+            <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" HorizontalAlignment="Stretch"
+                    RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
+            </local:PublicDataCtrl>
         </DataTemplate>
 
-        <DataTemplate x:Key="ExpansionTemplate" x:DataType="local:PlayerModel">
-            <Grid>
-                <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" Height="175" RenderTransformOrigin="0 0"
+        <DataTemplate x:Key="ExpansionTemplate_CitiesAndKnights" x:DataType="local:PlayerModel">
+            <Viewbox Stretch="None">
+                <local:PublicDataCitiesAndKnightCtrl Player="{x:Bind Mode=OneWay}"
                         RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
-                    <local:PublicDataCtrl.RenderTransform>
-                        <CompositeTransform ScaleX="1" ScaleY="1" TranslateX="0" />
-                    </local:PublicDataCtrl.RenderTransform>
-                </local:PublicDataCtrl>
-            </Grid>
+                </local:PublicDataCitiesAndKnightCtrl>
+            </Viewbox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="RegularTemplate_CititesAndKnights" x:DataType="local:PlayerModel">
+            <Viewbox Stretch="Uniform">
+                <local:PublicDataCitiesAndKnightCtrl Player="{x:Bind Mode=OneWay}" HorizontalAlignment="Stretch"
+                        RenderTransformOrigin="0 0"
+                        RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
+                </local:PublicDataCitiesAndKnightCtrl>
+            </Viewbox>
         </DataTemplate>
 
     </Control.Resources>
 
-    <StackPanel Name="Grid_PlayerResourceCount" HorizontalAlignment="Left" VerticalAlignment="Top"
-            Background="Transparent" CornerRadius="10">
-        <Viewbox>
-            <StackPanel Name="StackPanel_TotalResourceCount" Grid.Row="0" Grid.RowSpan="1" Grid.Column="1"
-                    Margin="0,5,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Background="Transparent"
-                    Height="90" BorderBrush="{StaticResource bmMaple}" BorderThickness="1" CornerRadius="10"
-                    Orientation="Horizontal">
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.Wood}" />
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Sheep, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.Sheep}" />
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Brick, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.Brick}" />
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wheat, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.Wheat}" />
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Ore, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.Ore}" />
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.GoldMine}" />
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Paper, Mode=OneWay}"
-                        Margin="5,0,0,0"
-                        Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.Coin}" />
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Coin, Mode=OneWay}"
-                        Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.Paper}" />
-                <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Cloth, Mode=OneWay}"
-                        Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                        Image="{StaticResource ResourceType.Cloth}" />
+    <ListView x:Name="ListBox_PlayerResourceCountList" Margin="0,5,0,0" HorizontalAlignment="Center"
+            VerticalAlignment="Stretch" AllowDrop="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
+            Background="Transparent" CanReorderItems="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
+            ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
+            ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionMode="Single" UseSystemFocusVisuals="False">
+        <ListView.ItemContainerStyle>
+            <Style TargetType="ListViewItem">
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Padding" Value="2" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="Height" Value="{x:Bind ControlHeight(MainPageModel.PlayingPlayers), Mode=OneWay}" />
+            </Style>
+        </ListView.ItemContainerStyle>
+        <ListView.ItemTemplateSelector>
+            <local:GameTemplateSelector Regular="{StaticResource RegularTemplate}"
+                    Regular_CitiesAndKnights="{StaticResource RegularTemplate_CititesAndKnights}"
+                    Expansion="{StaticResource ExpansionTemplate}"
+                    Expansion_CitesAndKnights="{StaticResource ExpansionTemplate_CitiesAndKnights}"
+                    SourceCollection="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
+                    CitiesAndKnights="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Mode=OneWay}" />
+        </ListView.ItemTemplateSelector>
 
-            </StackPanel>
-        </Viewbox>
-        <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Height="2" Margin="0,5,0,0" Fill="{StaticResource bmMaple}" />
-        <ListView x:Name="ListBox_PlayerResourceCountList" Margin="0,5,0,0" HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch" AllowDrop="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
-                Background="Transparent" CanReorderItems="{x:Bind MainPageModel.Settings.IsLocalGame, Mode=OneWay}"
-                ItemsSource="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}"
-                ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionMode="Single" UseSystemFocusVisuals="False">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="Margin" Value="0" />
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="HorizontalAlignment" Value="Left" />
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplateSelector>
-                <local:GameTemplateSelector Regular="{StaticResource RegularTemplate}"
-                        Expansion="{StaticResource ExpansionTemplate}"
-                        SourceCollection="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
+    </ListView>
 
-            </ListView.ItemTemplateSelector>
-        </ListView>
-
-    </StackPanel>
 </UserControl>

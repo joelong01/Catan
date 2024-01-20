@@ -104,7 +104,7 @@
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem Text="Game">
                             <!--<MenuFlyoutItem Click="OnNewNetworkGame" Text="New Network Game" />-->
-                            <MenuFlyoutItem Click="OnNewLocalGame" Text="New Local Game" />
+                            <MenuFlyoutItem Click="OnNewLocalGame" Text="New Game" />
                             <!--<MenuFlyoutItem Click="OnJoinNetworkGame" Text="Join Network Game" />-->
                             <MenuFlyoutSeparator />
                             <MenuFlyoutItem Click="Menu_OnEndGame" Text="End Game" />
@@ -162,7 +162,6 @@
                         </MenuFlyoutSubItem>
                         <MenuFlyoutItem Click="OnAssignNumbers" Text="Randomize Board" />
                         <MenuFlyoutItem Click="OnViewSettings" Text="Settings" />
-                        <MenuFlyoutItem Click="Menu_ShowSavedGames" Text="Show Saved Games" />
                         <MenuFlyoutSeparator />
                         <MenuFlyoutSubItem x:Name="Menu_Games" Text="Games" />
                         <MenuFlyoutSeparator />
@@ -183,6 +182,7 @@
             </Button>
             <local:DragableGridCtrl x:Name="DGC_PirateInvasion" Caption="Invasion" Width="500" Height="500"
                     HorizontalAlignment="Left" VerticalAlignment="Center"
+                    MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     Visibility="{x:Bind MainPageModel.IsCitiesAndKnights, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2" CornerRadius="5"
@@ -200,7 +200,8 @@
             </local:DragableGridCtrl>
             <local:DragableGridCtrl x:Name="DGC_Game" Height="1075" HorizontalAlignment="Center" VerticalAlignment="Top"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                    BorderBrush="{StaticResource bmMaple}" BorderThickness="2"
+                    MainPageModel="{x:Bind MainPageModel, Mode=OneWay}" BorderBrush="{StaticResource bmMaple}"
+                    BorderThickness="2"
                     Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"
                     CornerRadius="5" OnGridPositionChanged="OnGridPositionChanged"
                     PointerPressed="Draggable_PointerPressed">
@@ -209,6 +210,8 @@
 
                         <local:GameContainerCtrl x:Name="CTRL_GameView" Margin="0" Canvas.ZIndex="2" CornerRadius="0"
                                 DoubleTapped="GameViewControlDoubleTapped" IsEnabled="True"
+                                MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
+                                CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
                                 PointerPressed="GameViewControlPointerPressed" RenderTransformOrigin="0.5,0.5">
                             <local:GameContainerCtrl.RenderTransform>
 
@@ -222,10 +225,11 @@
             </local:DragableGridCtrl>
 
             <s:SliderCtrl Width="400" Height="220" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                    Background="{x:Bind TheHuman.BackgroundBrush, Mode=OneWay}" Canvas.ZIndex="15" Caption="Board Stats"
-                    CornerRadius="10" FontSize="18" Foreground="{x:Bind TheHuman.ForegroundBrush, Mode=OneWay}"
+                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}" Canvas.ZIndex="15"
+                    Caption="Board Stats" CornerRadius="10" FontSize="18"
+                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                     Open="{x:Bind MainPageModel.ShowBoardMeasurements(MainPageModel.GameState), Mode=OneWay}"
-                    SlideDirection="Right">
+                    MainPageModel="{x:Bind MainPageModel, Mode=OneWay}" SlideDirection="Right">
                 <local:BoardMeasurementCtrl CornerRadius="0"
                         FiveStarPositions="{x:Bind Path=MainPageModel.FiveStarPositions, Mode=OneWay}"
                         FourStarPositions="{x:Bind Path=MainPageModel.FourStarPositions, Mode=OneWay}"
@@ -235,17 +239,20 @@
                         ShowPips="OnShowPips" />
 
             </s:SliderCtrl>
+            <!--Width="{x:Bind GetPlayerTrackerWidth(MainPageModel.PlayingPlayers), Mode=OneWay}"-->
 
-            <local:PlayersTrackerCtrl x:Name="Ctrl_PlayerResourceCountCtrl" Margin="0,0,12,0" MaxWidth="500"
-                    Width="{x:Bind GetPlayerTrackerWidth(MainPageModel.PlayingPlayers), Mode=OneWay}"
-                    HorizontalAlignment="Right" Canvas.ZIndex="5"
-                    GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
-                    GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}"
-                    MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
-                    PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
-
+            <Border Width="{x:Bind CalculatePlayerTrackerWidth(GameContainer.CurrentGame, MainPageModel.PlayingPlayers), Mode=OneWay}" VerticalAlignment="Stretch" BorderBrush="{StaticResource bmMaple}" CornerRadius="0,20,20,0" Margin="-1"
+                    BorderThickness="2" Grid.Column="3" HorizontalAlignment="Right">
+                <local:PlayersTrackerCtrl x:Name="CTRL_PlayerTrackerCtrl" Margin="0,0,12,0" Background="Black" BorderBrush="White" BorderThickness="2"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Canvas.ZIndex="5"
+                        GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
+                        GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}"
+                        MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
+                        PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
+            </Border>
             <local:DragableGridCtrl x:Name="LocalPurchase" Width="285" Margin="0,500,0,0" CornerRadius="10"
                     OnGridPositionChanged="OnGridPositionChanged" HorizontalAlignment="Left" VerticalAlignment="Center"
+                    MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{x:Bind CurrentPlayer.SolidPrimaryBrush, Mode=OneWay}" Caption="Purchase and Play"
                     Player="{x:Bind CurrentPlayer, Mode=OneWay}"
@@ -256,14 +263,50 @@
                             CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay, TargetNullValue=PlayerModel.Default}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
+            <local:DragableGridCtrl x:Name="TotalGameResources" Height="125" HorizontalAlignment="Center"
+                    VerticalAlignment="Center" Canvas.ZIndex="999" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
+                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                    BorderBrush="{StaticResource bmMaple}" BorderThickness="2" Caption="Game Resource Count"
+                    CornerRadius="10" OnGridPositionChanged="OnGridPositionChanged"
+                    Player="{x:Bind CurrentPlayer, Mode=OneWay}" PointerPressed="Draggable_PointerPressed">
+                <local:DragableGridCtrl.Child>
+
+                    <StackPanel Name="StackPanel_TotalResourceCount" HorizontalAlignment="Center"
+                            VerticalAlignment="Top" CornerRadius="10" Orientation="Horizontal">
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.Wood}" />
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Sheep, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.Sheep}" />
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Brick, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.Brick}" />
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Wheat, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.Wheat}" />
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Ore, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.Ore}" />
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.GoldMine}" />
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Paper, Mode=OneWay}"
+                                Margin="5,0,0,0"
+                                Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.Coin}" />
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Coin, Mode=OneWay}"
+                                Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.Paper}" />
+                        <local:ResourceCardSlimCtrl Count="{x:Bind MainPageModel.GameResources.Cloth, Mode=OneWay}"
+                                Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                                Image="{StaticResource ResourceType.Cloth}" />
+
+                    </StackPanel>
+                </local:DragableGridCtrl.Child>
+            </local:DragableGridCtrl>
 
             <local:DragableGridCtrl x:Name="ActionAndStats" Height="380" HorizontalAlignment="Center"
-                    VerticalAlignment="Center" Canvas.ZIndex="10"
+                    VerticalAlignment="Center" Canvas.ZIndex="10" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2"
                     Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"
                     CornerRadius="10" Foreground="Black" OnGridPositionChanged="OnGridPositionChanged"
-                    Player="{x:Bind TheHuman, Mode=OneWay}" PointerPressed="Draggable_PointerPressed">
+                    Player="{x:Bind CurrentPlayer, Mode=OneWay}" PointerPressed="Draggable_PointerPressed">
 
                 <local:DragableGridCtrl.Child>
 
@@ -332,40 +375,9 @@
 
             <ProgressRing Name="_progress" Grid.Row="0" Width="100" Height="100" HorizontalAlignment="Center"
                     VerticalAlignment="Center" Canvas.ZIndex="20" IsActive="True" Visibility="Visible" />
-            <Viewbox Grid.Row="0" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="5" Width="75" Margin="20,0,0,20"
-                    HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                <Grid Visibility="{x:Bind SpyVisible, Mode=OneWay}">
-                    <TextBlock Margin="5,14,5,-5" HorizontalAlignment="Center" FontSize="12"
-                            Text="{x:Bind TurnedSpyOn, Mode=OneWay}" />
-                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="54" Text="" />
-                </Grid>
-            </Viewbox>
+           
 
-            <Grid Name="_savedGameGrid" Grid.Row="1" Width="383" Height="280" Margin="0" HorizontalAlignment="Center"
-                    VerticalAlignment="Center" x:Load="False" Background="{StaticResource bmCherry}"
-                    BorderBrush="{StaticResource bmMaple}" BorderThickness="4" Canvas.ZIndex="10" CornerRadius="4"
-                    PointerPressed="OnPointerPressed" Visibility="Collapsed">
-                <Grid.RenderTransform>
-                    <CompositeTransform />
-                </Grid.RenderTransform>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="350*" />
-                    <ColumnDefinition Width="0" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30" />
-                    <RowDefinition Height="33*" />
-                </Grid.RowDefinitions>
-                <Viewbox Grid.RowSpan="1" Grid.ColumnSpan="2">
-                    <TextBlock Grid.RowSpan="2" Grid.ColumnSpan="2" CharacterSpacing="0" Foreground="White"
-                            Text="Saved Games" />
-                </Viewbox>
-                <Viewbox HorizontalAlignment="Right" VerticalAlignment="Stretch">
-                    <Button Background="Transparent" Click="OnCloseSavedGames" Content="&#xE947;"
-                            FontFamily="Segoe MDL2 Assets" />
-                </Viewbox>
-
-            </Grid>
+           
         </Grid>
     </Viewbox>
 </Page>

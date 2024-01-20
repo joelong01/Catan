@@ -201,7 +201,7 @@ namespace Catan10
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Ctrl_PlayerResourceCountCtrl.MainPage = this;
+     
 
             var ignored = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
@@ -558,10 +558,6 @@ namespace Catan10
             _showPipGroupIndex = 0;
         }
 
-        private void OnCloseSavedGames(object sender, RoutedEventArgs e)
-        {
-            _savedGameGrid.Visibility = Visibility.Collapsed;
-        }
 
         private void OnGameViewControlTapped(object sender, TappedRoutedEventArgs e)
         {
@@ -1169,7 +1165,18 @@ namespace Catan10
             Debug.Assert(enable == enableNextButton);
             return enable;
         }
+        /// <summary>
+        ///     via visual inspection, these 2 values work ok for 3-4 players in regular and 5-6 players in expansion
+        /// </summary>
+        double CalculatePlayerTrackerWidth(CatanGameCtrl currentGame, ObservableCollection<PlayerModel> players)
+        {
 
+            double width = 650;
+            if (currentGame != null && currentGame.GameType == GameType.SupplementalBuildPhase) width=485;
+            this.TraceMessage($"PlayerTracker Width set to {width}");
+            return width;
+           
+        }
         private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
         {
             if (MainPageModel.EnableNextButton == false) return;
@@ -1568,6 +1575,7 @@ namespace Catan10
                 case GameState.WaitingForNewGame:
                 case GameState.Supplemental:
                 case GameState.WaitingForNext:
+                case GameState.WaitingForRoll: // so you can play a knight...
                     return Visibility.Visible;
                 default:
                     return Visibility.Collapsed;
@@ -1601,7 +1609,7 @@ namespace Catan10
         }
         private double GetPlayerTrackerWidth(ObservableCollection<PlayerModel> players)
         {
-            if (players.Count < 4) return 500;
+            if (players.Count < 4) return 600;
 
             return 400;
         }

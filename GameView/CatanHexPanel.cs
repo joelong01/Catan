@@ -296,7 +296,7 @@ namespace Catan10
             //  first bucket the controls into their various collections
             //
             //  the order they are entered in the XAML file will determine the order they are here
-            List<Harbor> harbors = this.Harbors;
+            List<HarborCtrl> harbors = this.Harbors;
             for (int i = Children.Count - 1; i >= 0; i--)
             {
                 UIElement element = Children[i];
@@ -309,9 +309,9 @@ namespace Catan10
                     }
                 }
 
-                if (element.GetType() == typeof(Harbor))
+                if (element.GetType() == typeof(HarborCtrl))
                 {
-                    harbors.Add(element as Harbor); // we don't care the order these are in
+                    harbors.Add(element as HarborCtrl); // we don't care the order these are in
                     this.Children.RemoveAt(i);
                     HarborLayer.Children.Add(element);
                     Canvas.SetZIndex(element, 10);
@@ -320,7 +320,7 @@ namespace Catan10
 
             if (HarborLayer.Children.Count == 0)
             {
-                foreach (Harbor h in harbors)
+                foreach (HarborCtrl h in harbors)
                 {
                     HarborLayer.Children.Add(h);
                 }
@@ -587,7 +587,7 @@ namespace Catan10
 
             Size desiredHarborSize = new Size(50, 50);
 
-            foreach (Harbor harbor in Harbors)
+            foreach (HarborCtrl harbor in Harbors)
             {
                 harbor.Arrange(new Rect(0, 0, desiredHarborSize.Width, desiredHarborSize.Height));
                 TileCtrl tile = TilesInIndexOrder[harbor.TileIndex];
@@ -650,6 +650,40 @@ namespace Catan10
             _baron.Visibility = Visibility.Visible;
             _baron.MoveAsync(to);
         }
+
+        private void SetPropertyBindings()
+        {
+            var bindings = _baron.GetBindingExpression(BaronCtrl.MainPageModelProperty);
+
+            // Create a common binding for both _baron and _merchant
+            var binding = new Binding()
+            {
+                Path = new PropertyPath("MainPageModel"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Source = MainPage.Current
+            };
+
+            if (bindings == null)
+            {
+                // Apply the same binding to both _baron and _merchant
+                _baron.SetBinding(BaronCtrl.MainPageModelProperty, binding);
+            }
+            bindings = _merchant.GetBindingExpression(MerchantCtrl.MainPageModelProperty);
+            if (bindings == null)
+            {
+                _merchant.SetBinding(MerchantCtrl.MainPageModelProperty, binding);
+            }
+            foreach (var harbor in Harbors)
+            {
+                bindings = harbor.GetBindingExpression(HarborCtrl.MainPageModelProperty);
+                if (bindings == null)
+                {
+                    harbor.SetBinding(HarborCtrl.MainPageModelProperty, binding);
+                }
+            }
+        }
+
 
         private void SetMerchantTile(TileCtrl tile)
         {
@@ -838,6 +872,7 @@ namespace Catan10
             }
 
             BuildChildList();
+            SetPropertyBindings();
             //
             //  Build the roads and buildings on the TopLayer
             CreateBuildings();
@@ -870,7 +905,7 @@ namespace Catan10
                 s.Reset();
             }
 
-            foreach (Harbor h in Harbors)
+            foreach (HarborCtrl h in Harbors)
             {
                 h.Reset();
                 h.SetOrientationAsync(TileOrientation.FaceUp);
@@ -982,7 +1017,7 @@ namespace Catan10
             set => SetValue(HarborCountProperty, value);
         }
 
-        public List<Harbor> Harbors { get; } = new List<Harbor>();
+        public List<HarborCtrl> Harbors { get; } = new List<HarborCtrl>();
         public bool HasIslands => TileToIslandDictionary.Keys.Count > 1;
 
         public string Islands
@@ -2085,7 +2120,7 @@ namespace Catan10
 
         //
         //  move this harbor to this location on this tile
-        public static void DoLayout(Harbor harbor, TileCtrl tile, UIElement canvas, Dictionary<HarborLocation, HarborLayoutData> harborLayoutDataDictionary)
+        public static void DoLayout(HarborCtrl harbor, TileCtrl tile, UIElement canvas, Dictionary<HarborLocation, HarborLayoutData> harborLayoutDataDictionary)
         {
             HarborLayoutData data = harborLayoutDataDictionary[harbor.HarborLocation];
             GeneralTransform gtToSource = tile.TransformToVisual(canvas);

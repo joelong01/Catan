@@ -25,6 +25,12 @@ namespace Catan10
             this.InitializeComponent();
         }
         public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register("Stroke", typeof(SolidColorBrush), typeof(MerchantCtrl), new PropertyMetadata(new SolidColorBrush(Colors.White)));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(MerchantCtrl), new PropertyMetadata(MainPageModel.Default));
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
 
         public SolidColorBrush Stroke
         {

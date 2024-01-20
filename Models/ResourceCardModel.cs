@@ -54,6 +54,7 @@ namespace Catan10
             }
         }
 
+
         #endregion Properties
 
         #region Constructors + Destructors

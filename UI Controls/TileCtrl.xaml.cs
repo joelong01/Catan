@@ -162,9 +162,9 @@ namespace Catan10
             _ppHexFront.RotationY = 90;
         }
 
-        public Harbor AdjacentHarbor
+        public HarborCtrl AdjacentHarbor
         {
-            get => (Harbor)GetValue(AdjacentHarborProperty);
+            get => (HarborCtrl)GetValue(AdjacentHarborProperty);
             set => SetValue(AdjacentHarborProperty, value);
         }
 
@@ -376,7 +376,7 @@ namespace Catan10
 
         //
         //  keep track of harbors near this tile.  this is set in the XAML
-        public static readonly DependencyProperty AdjacentHarborProperty = DependencyProperty.Register("AdjacentHarbor", typeof(Harbor), typeof(TileCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty AdjacentHarborProperty = DependencyProperty.Register("AdjacentHarbor", typeof(HarborCtrl), typeof(TileCtrl), new PropertyMetadata(null));
 
         public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(TileCtrl), new PropertyMetadata(new PlayerModel(), CurrentPlayerChanged));
 

@@ -27,8 +27,14 @@ namespace Catan10
         public static readonly DependencyProperty GridPositionProperty = DependencyProperty.Register("GridPosition", typeof(GridPosition), typeof(DragableGridCtrl), new PropertyMetadata(new GridPosition(0, 0, 1.0, 1.0), GridPositionChanged));
 
         public static readonly DependencyProperty PlayerProperty = DependencyProperty.Register("Player", typeof(PlayerModel), typeof(DragableGridCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(DragableGridCtrl), new PropertyMetadata(MainPageModel.Default));
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
 
-        private int fullSize = 1;
+
 
         #endregion Delegates + Fields + Events + Enums
 
@@ -207,15 +213,12 @@ namespace Catan10
 
             GridPosition.TranslateX = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateX;
             GridPosition.TranslateY = ((CompositeTransform)LayoutRoot.RenderTransform).TranslateY;
-            //GridPosition.ScaleX = (fullSize == 1.0) ? 1.0 : 0.5;
-            //GridPosition.ScaleY = GridPosition.ScaleX;
-
+            
             OnGridPositionChanged?.Invoke(userControl.Name, GridPosition);
         }
         private void OnGrowOrShrinkControls(object sender, RoutedEventArgs e)
         {
-            fullSize = 1 - fullSize;
-
+ 
             if (GridPosition.ScaleX > 0.6)
             {
                 GridPosition.ScaleX = 0.5;

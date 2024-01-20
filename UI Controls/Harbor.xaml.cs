@@ -15,15 +15,23 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
-    public sealed partial class Harbor : UserControl, INotifyPropertyChanged
+    public sealed partial class HarborCtrl : UserControl, INotifyPropertyChanged
     {
         #region Delegates + Fields + Events + Enums
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(Harbor), new PropertyMetadata(HarborType.Brick));
-        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(Harbor), new PropertyMetadata(0));
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(Harbor), new PropertyMetadata(PlayerModel.DefaultPlayer, OwnerChanged));
+        public static readonly DependencyProperty HarborTypeProperty = DependencyProperty.Register("HarborType", typeof(HarborType), typeof(HarborCtrl), new PropertyMetadata(HarborType.Brick));
+        public static readonly DependencyProperty IndexProperty = DependencyProperty.Register("Index", typeof(int), typeof(HarborCtrl), new PropertyMetadata(0));
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.Register("Owner", typeof(PlayerModel), typeof(HarborCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer, OwnerChanged));
+        
+        // set in code behind in CatanHexPanel.cs
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(HarborCtrl), new PropertyMetadata(MainPageModel.Default));
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
         private readonly SolidColorBrush _blackBrush = CatanColors.GetResourceBrush("Black", Colors.Black);
 
         private readonly string[] _savePropName = new string[] { "HarborLocation" };
@@ -174,7 +182,7 @@ namespace Catan10
 
         #region Constructors + Destructors
 
-        public Harbor()
+        public HarborCtrl()
         {
             this.InitializeComponent();
             this.DataContext = this;
@@ -404,7 +412,7 @@ namespace Catan10
 
         private static void OwnerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var depPropClass = d as Harbor;
+            var depPropClass = d as HarborCtrl;
             var newOwner = (PlayerModel)e.NewValue;
             var oldOwner = (PlayerModel)e.OldValue;
             depPropClass?.SetOwner(oldOwner, newOwner);

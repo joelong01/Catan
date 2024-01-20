@@ -10,10 +10,10 @@
         <Storyboard x:Name="_sbMove">
             <DoubleAnimation x:Name="_daX" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="110"
-                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daY" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="110"
-                    Duration="{x:Bind GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
     </UserControl.Resources>
 

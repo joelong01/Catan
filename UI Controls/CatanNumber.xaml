@@ -8,10 +8,10 @@
         <Storyboard x:Name="AnimateMove">
             <DoubleAnimation Storyboard.TargetName="LayoutRoot" x:Name="DA_X"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
-                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation Storyboard.TargetName="LayoutRoot" x:Name="DA_Y"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                   Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
     </UserControl.Resources>
     <Grid Name="LayoutRoot" PointerPressed="OnPointerPressed">

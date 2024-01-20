@@ -216,7 +216,7 @@ namespace Catan10
         public List<BuildingCtrl> AdjacentBuildings { get; } = new List<BuildingCtrl>();
 
         // the harbor that is acquired when the user gets this adjacent
-        public Harbor AdjacentHarbor { get; set; } = null;
+        public HarborCtrl AdjacentHarbor { get; set; } = null;
 
         public List<RoadCtrl> AdjacentRoads { get; } = new List<RoadCtrl>();
 

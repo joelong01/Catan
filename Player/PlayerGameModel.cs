@@ -383,7 +383,7 @@ namespace Catan10
         public bool NotificationsEnabled { get; set; } = false;
 
         [JsonIgnore]
-        public ObservableCollection<Harbor> OwnedHarbors { get; } = new ObservableCollection<Harbor>();
+        public ObservableCollection<HarborCtrl> OwnedHarbors { get; } = new ObservableCollection<HarborCtrl>();
 
         public int Pips
         {
@@ -814,7 +814,7 @@ namespace Catan10
         }
 
         // back pointer
-        public void AddOwnedHarbor(Harbor harbor)
+        public void AddOwnedHarbor(HarborCtrl harbor)
         {
             OwnedHarbors.Add(harbor);
         }
@@ -835,7 +835,7 @@ namespace Catan10
             UpdateScore();
         }
 
-        public void RemoveOwnedHarbor(Harbor harbor)
+        public void RemoveOwnedHarbor(HarborCtrl harbor)
         {
             OwnedHarbors.Remove(harbor);
         }

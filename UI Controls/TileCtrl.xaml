@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" x:Name="_TileCtrl" Width="110"
         Height="96" mc:Ignorable="d">
     <Control.Resources>
-        <Style x:Key="HarborStyle" TargetType="local:Harbor">
+        <Style x:Key="HarborStyle" TargetType="local:HarborCtrl">
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalAlignment" Value="Top" />
             <Setter Property="Margin" Value="0" />
@@ -15,29 +15,29 @@
         <Storyboard x:Name="_sbFlipTile">
             <DoubleAnimation x:Name="_daFlipBackTile" Storyboard.TargetName="_hexBackGrid"
                     Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" To="-90"
-                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daFlipFrontTile" Storyboard.TargetName="_hexFrontGrid"
                     Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationY)" To="0"
-                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbMoveTile">
             <DoubleAnimation x:Name="_daToX" d:IsOptimized="True" Storyboard.TargetName="ResourceTileGrid"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="0"
-                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daToY" d:IsOptimized="True" Storyboard.TargetName="ResourceTileGrid"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="0"
-                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbRotate">
             <DoubleAnimation x:Name="_daRotateTile" d:IsOptimized="True" Storyboard.TargetName="ResourceTileGrid"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="0"
-                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbAnimateOpacity">
             <DoubleAnimation x:Name="_daAnimateOpacity" AutoReverse="False" Completed="AnimateFadeCompleted"
                     Storyboard.TargetName="_hexFrontGrid" Storyboard.TargetProperty="(UIElement.Opacity)" From="1.0"
                     To="0.25"
-                   Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
+                    Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.VeryFast, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="_sbAnimateOpacityReverse">
             <DoubleAnimation x:Name="_daAnimateOpacityReverse" AutoReverse="False" BeginTime="0:0:3"
@@ -76,7 +76,8 @@
                         StrokeThickness="6" />
                 <!--<Polygon Name="_hexInsideBorder" Stroke="Red" StrokeThickness="1" Margin="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Points="31,6.5 79,6.5 102.5,48 79,89.5 31,89.5 7.5,48" />-->
                 <local:CatanNumber x:Name="_number" Width="80" Height="80" Margin="0,-10,0,0"
-                        HorizontalAlignment="Center" VerticalAlignment="Top" Number="12">
+                        HorizontalAlignment="Center" VerticalAlignment="Top" Number="12"
+                        MainPageModel="{x:Bind MainPageModel, Mode=OneWay}">
                     <local:CatanNumber.RenderTransform>
                         <CompositeTransform ScaleX="0.5" ScaleY="0.5" />
                     </local:CatanNumber.RenderTransform>
@@ -87,11 +88,9 @@
                             Image="{x:Bind BrushifyResourceType(ResourceType), Mode=OneWay}"
                             Visibility="{x:Bind ShownResourceType, Converter={StaticResource ResourceTypeToVisibilityConverter}, Mode=OneWay, ConverterParameter=GoldMine}" />
                 </Viewbox>
-                <Viewbox Width="50" Height="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,5" >
-                <TextBlock Name="_txtIndex" HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                         FontSize="20" Foreground="Red" 
-                           
-                        Text="{x:Bind Index, Mode=OneWay}" Visibility="Visible" />
+                <Viewbox Width="50" Height="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,5">
+                    <TextBlock Name="_txtIndex" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="20"
+                            Foreground="Red" Text="{x:Bind Index, Mode=OneWay}" Visibility="Visible" />
                 </Viewbox>
             </Grid>
             <Grid x:Name="_hexBackGrid" HorizontalAlignment="Center" VerticalAlignment="Center">

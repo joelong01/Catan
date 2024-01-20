@@ -34,6 +34,12 @@ namespace Catan10
         }
 
         public static readonly DependencyProperty SwappableProperty = DependencyProperty.Register("Swappable", typeof(bool), typeof(CatanNumber), new PropertyMetadata(false));
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(CatanNumber), new PropertyMetadata(MainPageModel.Default));
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
         public bool Swappable
         {
             get => ( bool )GetValue(SwappableProperty);

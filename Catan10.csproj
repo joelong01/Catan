@@ -16,7 +16,8 @@
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>Catan10_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>
+    </PackageCertificateKeyFile>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -24,7 +25,7 @@
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>575AD3DFBCEA069BD3EEBD81AD32A83B2D577E88</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>05EFE95CED8D5548978914A625E7B77380B77561</PackageCertificateThumbprint>
     <RuntimeIdentifiers>win10-arm;win10-arm-aot;win10-x86;win10-x86-aot;win10-x64;win10-x64-aot</RuntimeIdentifiers>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
@@ -252,6 +253,9 @@
     </Compile>
     <Compile Include="UI Controls\CitiesAndKnights\LaurelCtrl.xaml.cs">
       <DependentUpon>LaurelCtrl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI Controls\CitiesAndKnights\PublicDataCitiesAndKnightCtrl.xaml.cs">
+      <DependentUpon>PublicDataCitiesAndKnightCtrl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI Controls\DiceCtrl.xaml.cs">
       <DependentUpon>DiceCtrl.xaml</DependentUpon>
@@ -564,6 +568,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI Controls\CitiesAndKnights\LaurelCtrl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI Controls\CitiesAndKnights\PublicDataCitiesAndKnightCtrl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

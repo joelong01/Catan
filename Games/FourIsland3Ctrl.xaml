@@ -2,16 +2,16 @@
 
     <Viewbox Grid.Column="0" Margin="0,20,0,-20">
         <local:CatanHexPanel x:Name="_HexPanel" PirateShipTile="{Binding ElementName=_Tile28, Mode=OneTime}" RowsPerColumn="4,5,6,7,6,5,4" TileGap="0" TileGroups="0-36.True" UniformMargin="50">
-            <local:Harbor HarborLocation="BottomLeft" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="2" UseClassic="True" />
-            <local:Harbor HarborLocation="TopRight" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="6" UseClassic="True" />
-            <local:Harbor HarborLocation="BottomRight" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="3" UseClassic="True" />
-            <local:Harbor HarborLocation="TopLeft" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="3" UseClassic="True" />
-            <local:Harbor HarborLocation="BottomLeft" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="9" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="BottomLeft" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="2" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="TopRight" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="6" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="BottomRight" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="3" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="TopLeft" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="3" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="BottomLeft" HarborType="ThreeForOne" Orientation="FaceUp" TileIndex="9" UseClassic="True" />
 
-            <local:Harbor HarborLocation="TopRight" HarborType="Wheat" Orientation="FaceUp" TileIndex="10" UseClassic="True" />
-            <local:Harbor HarborLocation="BottomLeft" HarborType="Sheep" Orientation="FaceUp" TileIndex="13" UseClassic="True" />
-            <local:Harbor HarborLocation="TopLeft" HarborType="Ore" Orientation="FaceUp" TileIndex="15" UseClassic="True" />
-            <local:Harbor HarborLocation="BottomRight" HarborType="Brick" Orientation="FaceUp" TileIndex="17" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="TopRight" HarborType="Wheat" Orientation="FaceUp" TileIndex="10" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="BottomLeft" HarborType="Sheep" Orientation="FaceUp" TileIndex="13" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="TopLeft" HarborType="Ore" Orientation="FaceUp" TileIndex="15" UseClassic="True" />
+            <local:HarborCtrl HarborLocation="BottomRight" HarborType="Brick" Orientation="FaceUp" TileIndex="17" UseClassic="True" />
 
             <local:TileCtrl Index="0" Number="12" ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="20" Number="0" ResourceType="Sea" TileOrientation="FaceUp" UseClassic="True" />

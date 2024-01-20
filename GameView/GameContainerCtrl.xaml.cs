@@ -102,7 +102,18 @@ namespace Catan10
         public static readonly DependencyProperty CurrentGameProperty = DependencyProperty.Register("CurrentGame", typeof(CatanGameCtrl), typeof(CatanHexPanel), new PropertyMetadata(null, OnCurrentGameChanged));
 
         public static readonly DependencyProperty GamesProperty = DependencyProperty.Register("Games", typeof(List<CatanGameCtrl>), typeof(CatanHexPanel), new PropertyMetadata(""));
-
+        public static readonly DependencyProperty MainPageModelProperty = DependencyProperty.Register("MainPageModel", typeof(MainPageModel), typeof(GameContainerCtrl), new PropertyMetadata(MainPageModel.Default));
+        public static readonly DependencyProperty CurrentPlayerProperty = DependencyProperty.Register("CurrentPlayer", typeof(PlayerModel), typeof(GameContainerCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
+        public PlayerModel CurrentPlayer
+        {
+            get => ( PlayerModel )GetValue(CurrentPlayerProperty);
+            set => SetValue(CurrentPlayerProperty, value);
+        }
+        public MainPageModel MainPageModel
+        {
+            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            set => SetValue(MainPageModelProperty, value);
+        }
         //
         //  when you build a new Game control, add it to this list
         //
@@ -317,7 +328,7 @@ namespace Catan10
             int i = 0;
             int middleIndex = _currentHexPanel.Tiles.Count / 2;
             TileCtrl animationMiddle = _currentHexPanel.TilesInIndexOrder[middleIndex];
-            foreach (Harbor harbor in _currentHexPanel.Harbors)
+            foreach (HarborCtrl harbor in _currentHexPanel.Harbors)
             {
                 GeneralTransform gt = animationMiddle.TransformToVisual(harbor);
                 Point pt = gt.TransformPoint(new Point(harbor.Width, harbor.Height));
@@ -331,7 +342,7 @@ namespace Catan10
             Random r = new Random(DateTime.Now.Millisecond);
             ms = MainPage.Current.MainPageModel.GetAnimationSpeed(harborAnimationSpeed);
 
-            foreach (Harbor h in _currentHexPanel.Harbors)
+            foreach (HarborCtrl h in _currentHexPanel.Harbors)
             {
                 Task task = h.RotateTask(r.Next(1, 10) * 360, ms);
                 list.Add(task);
@@ -341,7 +352,7 @@ namespace Catan10
             list.Clear();
             i = 0;
             ms = MainPage.Current.MainPageModel.GetAnimationSpeed(harborAnimationSpeed);
-            foreach (Harbor h in _currentHexPanel.Harbors)
+            foreach (HarborCtrl h in _currentHexPanel.Harbors)
             {
                 Task task = h.AnimateMoveTask(new Point(0, 0), ms, i * ms);
                 i++;
@@ -352,7 +363,7 @@ namespace Catan10
             i = 0;
             ms = ms = MainPage.Current.MainPageModel.GetAnimationSpeed(harborAnimationSpeed);
 
-            foreach (Harbor h in _currentHexPanel.Harbors)
+            foreach (HarborCtrl h in _currentHexPanel.Harbors)
             {
                 Task task = h.SetOrientation(TileOrientation.FaceUp, ms, i * ms);
                 i++;
@@ -485,7 +496,7 @@ namespace Catan10
                 }
             }
 
-            foreach (Harbor harbor in _currentHexPanel.Harbors)
+            foreach (HarborCtrl harbor in _currentHexPanel.Harbors)
             {
                 harbor.SetOrientationAsync(orientation, 0);
             }

@@ -160,6 +160,7 @@ namespace Catan10
                 return;
             }
 
+
             //
             //  get the resources for the rollModel
             foreach (var player in GameController.PlayingPlayers)

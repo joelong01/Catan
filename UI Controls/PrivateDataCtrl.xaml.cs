@@ -386,7 +386,7 @@ namespace Catan10
             TradeMenu.Items.Clear();
             foreach (ResourceType resource in Enum.GetValues(typeof(ResourceType)))
             {
-                var menu = Harbor.BuildResourceTradeMenu(this.Player, 4, resource);
+                var menu = HarborCtrl.BuildResourceTradeMenu(this.Player, 4, resource);
                 if (menu != null)
                 {
                     TradeMenu.Items.Add(menu);

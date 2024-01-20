@@ -371,6 +371,7 @@ namespace Catan10
             if (publiclyVisible)
             {
                 ResourcesThisTurn.AddResources(tr);
+                GoldTotal += tr.GoldMine;
             }
             if (tr.Count != 0)
             {
@@ -383,6 +384,8 @@ namespace Catan10
             NotifyPropertyChanged("ResourcesThisTurn");
             NotifyPropertyChanged("TotalResources");
             NotifyPropertyChanged("EnabledEntitlementPurchase");
+   
+
         }
 
         public bool HasEntitlement(Entitlement entitlement)

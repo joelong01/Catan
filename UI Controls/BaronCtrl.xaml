@@ -8,14 +8,14 @@
         <Storyboard x:Name="_sbMove">
             <DoubleAnimation x:Name="_daX" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" To="110"
-                     Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                     Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
             <DoubleAnimation x:Name="_daY" Storyboard.TargetName="userControl"
                     Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" To="110"
-                     Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                     Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
         <Storyboard x:Name="SB_AnimateOpacity">
             <DoubleAnimation x:Name="DA_Opacity" Storyboard.TargetName="userControl" Storyboard.TargetProperty="Opacity"
-                    To="0"  Duration="{x:Bind local:MainPage.Current.MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, local:MainPage.Current.MainPageModel.Testing), Mode=OneWay}" />
+                    To="0"  Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
 
         </Storyboard>
     </UserControl.Resources>
@@ -24,11 +24,11 @@
         <CompositeTransform />
     </Control.RenderTransform>
 
-    <Grid Name="_baron" Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}"
-            Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}" Margin="0" HorizontalAlignment="Left"
+    <Grid Name="_baron" Width="{Binding ElementName=userControl, Path=Width, Mode=OneWay}"
+            Height="{Binding ElementName=userControl, Path=Height, Mode=OneWay}" Margin="0" HorizontalAlignment="Left"
             VerticalAlignment="Top" Background="Transparent" Canvas.ZIndex="200">
-        <Viewbox Width="{Binding ElementName=userControl, Path=Width, Mode=TwoWay}"
-                Height="{Binding ElementName=userControl, Path=Height, Mode=TwoWay}">
+        <Viewbox Width="{Binding ElementName=userControl, Path=Width, Mode=OneWay}"
+                Height="{Binding ElementName=userControl, Path=Height, Mode=OneWay}">
             <Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" RenderTransformOrigin="0.5,0.5">
                 <Grid.RenderTransform>
                     <CompositeTransform Rotation="180" />
