@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Catan10.Logging.StateTransitions;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
@@ -412,65 +413,60 @@ namespace Catan10
 
         public async Task OnNewGame()
         {
-            // you are looking for OnNewLocalGame!
-            await Task.Delay(0);
-            //if (MainPageModel.Log != null && MainPageModel.Log.ActionCount != 0)
-            //{
-            //    if (State.GameState != GameState.WaitingForNewGame)
-            //    {
-            //        if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
-            //        {
-            //            return;
-            //        }
-            //    }
-            //}
+            MainPageModel.Settings.IsLocalGame = true;
 
-            //try
-            //{
-            //    if (MainPageModel.AllPlayers.Count == 0)
-            //    {
-            //        await LoadGameData();
-            //    }
+            if (MainPageModel.GameState != GameState.WaitingForNewGame)
+            {
+                if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
+                {
+                    return;
+                }
+            }
 
-            //    Debug.Assert(MainPageModel.AllPlayers.Count > 0);
+            NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, CTRL_GameView.Games);
 
-            //    NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, CTRL_GameView.Games);
+            ContentDialogResult result = await dlg.ShowAsync();
+            if (( dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6 ) && result == ContentDialogResult.Primary)
+            {
+                string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
+                MessageDialog msgDlg = new MessageDialog(content);
+                await msgDlg.ShowAsync();
+                return;
+            }
 
-            //    ContentDialogResult result = await dlg.ShowAsync();
-            //    if ((dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6) && result == ContentDialogResult.Primary)
-            //    {
-            //        string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
-            //        MessageDialog msgDlg = new MessageDialog(content);
-            //        await msgDlg.ShowAsync();
-            //        return;
-            //    }
+            if (dlg.SelectedGame == null)
+            {
+                string content = String.Format($"Pick a game!!");
+                MessageDialog msgDlg = new MessageDialog(content);
+                await msgDlg.ShowAsync();
+                return;
+            }
 
-            //    if (dlg.SelectedGame == null)
-            //    {
-            //        string content = String.Format($"Pick a game!!");
-            //        MessageDialog msgDlg = new MessageDialog(content);
-            //        await msgDlg.ShowAsync();
-            //        return;
-            //    }
+            if (result != ContentDialogResult.Secondary)
+            {
+                CTRL_GameView.Reset();
+                await this.Reset();
 
-            //    if (result != ContentDialogResult.Secondary)
-            //    {
-            //        CTRL_GameView.Reset();
-            //        await this.Reset();
-            //        await MainPageModel.Log.Init(dlg.SaveFileName);
-            //        await SetStateAsync(null, GameState.WaitingForNewGame, true);
-            //        CTRL_GameView.CurrentGame = dlg.SelectedGame;
+                CTRL_GameView.CurrentGame = dlg.SelectedGame;
+                MainPageModel.PlayingPlayers.Clear();
+                GameInfo info = new GameInfo()
+                {
+                    Creator = TheHuman.PlayerName,
+                    GameIndex = dlg.SelectedIndex,
+                    Id = Guid.NewGuid(),
+                    Started = false,
+                    CitiesAndKnights = dlg.CitiesAndKnights
+                };
+                await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
+                GameContainer.CurrentGame.HexPanel.CitiesAndKnights = dlg.CitiesAndKnights;
+                MainPageModel.PlayingPlayers.Clear();
+                foreach (var player in dlg.PlayingPlayers)
+                {
+                    await AddPlayerLog.AddPlayer(this, player.PlayerName);
+                }
 
-            //        SavedGames.Insert(0, MainPageModel.Log);
-            //        await AddLogEntry(null, GameState.GamePicked, CatanAction.SelectGame, true, LogType.Normal, dlg.SelectedIndex);
-            //        await StartTestGame(dlg.PlayingPlayers, dlg.SelectedIndex);
-            //    }
-
-            //}
-            //finally
-            //{
-            //    VerifyRoundTrip<MainPageModel>(MainPageModel);
-            //}
+                CTRL_PlayerTrackerCtrl.UpdateLayout();
+            }
         }
 
         public void RoadEntered(RoadCtrl road, PointerRoutedEventArgs e)

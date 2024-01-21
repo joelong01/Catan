@@ -242,7 +242,7 @@
             <!--Width="{x:Bind GetPlayerTrackerWidth(MainPageModel.PlayingPlayers), Mode=OneWay}"-->
 
             <Border Width="{x:Bind CalculatePlayerTrackerWidth(GameContainer.CurrentGame, MainPageModel.PlayingPlayers), Mode=OneWay}" VerticalAlignment="Stretch" BorderBrush="{StaticResource bmMaple}" CornerRadius="0,20,20,0" Margin="-1"
-                    BorderThickness="2" Grid.Column="3" HorizontalAlignment="Right">
+                    BorderThickness="0" Grid.Column="3" HorizontalAlignment="Right">
                 <local:PlayersTrackerCtrl x:Name="CTRL_PlayerTrackerCtrl" Margin="0,0,12,0" Background="Black" BorderBrush="White" BorderThickness="2"
                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Canvas.ZIndex="5"
                         GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
@@ -250,7 +250,7 @@
                         MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                         PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
             </Border>
-            <local:DragableGridCtrl x:Name="LocalPurchase" Width="285" Margin="0,500,0,0" CornerRadius="10"
+            <local:DragableGridCtrl x:Name="LocalPurchase" Width="500" Margin="0,500,0,0" CornerRadius="10"
                     OnGridPositionChanged="OnGridPositionChanged" HorizontalAlignment="Left" VerticalAlignment="Center"
                     MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
@@ -263,7 +263,7 @@
                             CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay, TargetNullValue=PlayerModel.Default}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:DragableGridCtrl x:Name="TotalGameResources" Height="125" HorizontalAlignment="Center"
+            <local:DragableGridCtrl x:Name="TotalGameResources" Width="500" HorizontalAlignment="Center" Margin="0,0,0,0"
                     VerticalAlignment="Center" Canvas.ZIndex="999" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2" Caption="Game Resource Count"
@@ -300,7 +300,7 @@
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
 
-            <local:DragableGridCtrl x:Name="ActionAndStats" Height="380" HorizontalAlignment="Center"
+            <local:DragableGridCtrl x:Name="ActionAndStats" Width="500" HorizontalAlignment="Center" Margin="100,500, 0, 0" RenderTransformOrigin="0, 0 "
                     VerticalAlignment="Center" Canvas.ZIndex="10" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2"

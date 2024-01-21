@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-
+using Windows.Security.Credentials.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -107,7 +107,7 @@ namespace Catan10
             get
             {
                 if (ListBox_PlayerResourceCountList.Items.Count == 0) return 600;
-                var item = ListBox_PlayerResourceCountList.Items[0]; 
+                var item = ListBox_PlayerResourceCountList.Items[0];
                 var listViewItem = ListBox_PlayerResourceCountList.ContainerFromItem(item) as ListViewItem;
 
                 if (listViewItem != null)
@@ -123,14 +123,27 @@ namespace Catan10
         public double ControlHeight(ObservableCollection<PlayerModel> players)
         {
             var max = 263;
-            var totalAvailableHeight = ListBox_PlayerResourceCountList.ActualHeight;
-            var itemHeight = totalAvailableHeight / players.Count;
-            if (double.IsNaN(itemHeight)) return max;
-            if (itemHeight > 0 && itemHeight < max )
-                return itemHeight;
+            double height = max;
+            try
+            {
 
-            return max;
- 
+
+                var totalAvailableHeight = ListBox_PlayerResourceCountList.ActualHeight;
+                var itemHeight = totalAvailableHeight / players.Count;
+                if (double.IsNaN(itemHeight)) height = max;
+                else if (itemHeight > 0 && itemHeight < max)
+                {
+                    height = itemHeight;
+                }
+
+
+                return height;
+            }
+            finally
+            {
+               this.TraceMessage($"PlayerCount = {players.Count} height={height}");
+            }
+
 
         }
 

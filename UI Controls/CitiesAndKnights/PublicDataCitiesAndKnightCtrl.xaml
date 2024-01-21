@@ -7,9 +7,33 @@
 
     <UserControl.Resources>
         <x:Double x:Key="PictogramHeight">75</x:Double>
-        <x:Double x:Key="CounterHeight">20</x:Double>
+        <x:Double x:Key="CounterHeight">30</x:Double>
         <x:Double x:Key="UpgradeWidth">100</x:Double>
         <x:Double x:Key="ResourceCardWidth">60</x:Double>
+
+        <Style x:Key="CounterStyle" TargetType="ContentControl">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+        </Style>
+        <Style x:Key="PictogramGridStyle" TargetType="Grid">
+            <Setter Property="Width" Value="{StaticResource PictogramHeight}" />
+            <Setter Property="Height" Value="{StaticResource PictogramHeight}" />
+        </Style>
+
+        <DataTemplate x:Key="CounterDataTemplate">
+
+            <Grid Background="Black" BorderThickness="2" Width="{StaticResource CounterHeight}"
+                    Visibility="{Binding Converter={StaticResource StringToVisibilityConverter},Mode=OneWay}"
+                    Height="{StaticResource CounterHeight}"
+                    CornerRadius="{Binding Source={StaticResource CounterHeight}, Converter={StaticResource HeightToCornerRadiusConverter}}">
+                <Viewbox Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <TextBlock Foreground="White" Text="{Binding}" Padding="0" Margin="0"
+                            TextLineBounds="Tight" />
+                </Viewbox>
+
+            </Grid>
+        </DataTemplate>
+
     </UserControl.Resources>
     <Viewbox Stretch="Uniform" Width="{Binding ElementName=usercontrol, Path=Width, Mode=OneWay}"
             Height="{Binding Path=Height, ElementName=userControl,Mode=OneWay}">
@@ -37,21 +61,17 @@
                     </GridView.ItemContainerStyle>
                     <GridView.Items>
 
-                        <Grid Height="{StaticResource PictogramHeight}" Width="{StaticResource PictogramHeight}">
+                        <Grid Style="{StaticResource PictogramGridStyle}">
                             <Ellipse Margin="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                     Fill="{x:Bind Player.ImageBrush, Mode=OneWay, FallbackValue=Blue, TargetNullValue=Blue}"
                                     IsRightTapEnabled="True" IsTapEnabled="True" PointerPressed="Picture_PointerPressed"
                                     Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
-                                    Tag="{x:Bind Player, Mode=OneTime}" />
-                            <!--  Score  -->
-                            <Viewbox Height="{StaticResource CounterHeight}" Width="{StaticResource CounterHeight}"
-                                    Stretch="Fill" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                                <Border Background="Black" BorderBrush="Gold" BorderThickness="2" CornerRadius="3">
-                                    <TextBlock Padding="2" Foreground="White"
-                                            Text="{x:Bind Player.GameData.Score, Mode=OneWay}"
-                                            ToolTipService.ToolTip="Score" />
-                                </Border>
-                            </Viewbox>
+                                    Tag="{x:Bind Player, Mode=OneWay}" />
+
+                            <ContentControl Content="{x:Bind Player.GameData.Score, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
+
                         </Grid>
                         <local:PurchaseItemCtrl Entitlement="PoliticsUpgrade" ShowCount="False"
                                 FontFamily="Segoe MDL2 Assets" CurrentPlayer="{x:Bind Player, Mode=OneWay}">
@@ -98,73 +118,69 @@
                             </local:PurchaseItemCtrl.Child>
                         </local:PurchaseItemCtrl>
 
-                        <local:ResourceCardSlimCtrl Margin="0,0,5,0" Width="{StaticResource ResourceCardWidth}"
-                                CornerRadius="5" CountVisible="True"
-                                Count="{x:Bind Player.GameData.VictoryPoints, Mode=OneWay, FallbackValue=0}"
-                                Image="{StaticResource ResourceType.VictoryPoint}" />
-
-                        <local:ResourceCardSlimCtrl Margin="2,0,0,0" Width="{StaticResource ResourceCardWidth}"
-                                CountVisible="True"
-                                Count="{x:Bind Player.GameData.Resources.GoldTotal, Mode=OneWay, FallbackValue=0}"
-                                Image="{StaticResource ResourceType.GoldMine}" />
-
-                        <local:ResourceCardSlimCtrl Margin="2,0,0,0" Width="{StaticResource ResourceCardWidth}"
-                                CountVisible="True"
-                                Count="{x:Bind Player.GameData.Resources.TotalResourcesForGame.Count, Mode=OneWay, FallbackValue=0}"
-                                Image="{StaticResource ResourceType.Back}" />
-
-                        <Grid Height="{StaticResource PictogramHeight}" Width="30">
-                            <Grid Background="{x:Bind Player.BackgroundBrush, Mode=OneWay}">
-                                <Line Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" X1="5"
-                                        X2="5" Y1="5" Y2="55" />
-                                <Line Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeDashArray="2 1"
-                                        StrokeThickness="3" X1="15" X2="15" Y1="5" Y2="55" />
-                                <Line Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2" X1="25"
-                                        X2="25" Y1="5" Y2="55" />
-                            </Grid>
-                            <Viewbox Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
-                                    HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <Grid Background="Black">
-
-                                    <TextBlock Grid.Column="1" Margin="0,0,0,0" FontFamily="Century Schoolbook"
-                                            FontSize="35"
-                                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
-                                            Text="{x:Bind Player.GameData.RoadsPlayed, Mode=OneWay, FallbackValue=7}" />
-
+                        <!-- Victory Points -->
+                        <Grid Style="{StaticResource PictogramGridStyle}">
+                            <local:ResourceCardSlimCtrl Margin="2,0,0,0" Width="{StaticResource ResourceCardWidth}"
+                                    HorizontalAlignment="Center" CountVisible="False"
+                                    Image="{StaticResource ResourceType.VictoryPoint}" />
+                            <ContentControl Content="{x:Bind Player.GameData.VictoryPoints, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
+                        </Grid>
+                        <!--Gold Cards Won -->
+                        <Grid Style="{StaticResource PictogramGridStyle}">
+                            <local:ResourceCardSlimCtrl Margin="2,0,0,0" Width="{StaticResource ResourceCardWidth}"
+                                    HorizontalAlignment="Center" CountVisible="False"
+                                    Image="{StaticResource ResourceType.GoldMine}" />
+                            <ContentControl Content="{x:Bind Player.GameData.GoldRolls, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
+                        </Grid>
+                        <!--Total Resources Won -->
+                        <Grid Style="{StaticResource PictogramGridStyle}">
+                            <local:ResourceCardSlimCtrl Margin="2,0,0,0" Width="{StaticResource ResourceCardWidth}"
+                                    CountVisible="False"
+                                    Image="{StaticResource ResourceType.Back}" />
+                            <ContentControl Content="{x:Bind Player.GameData.Resources.TotalResourcesForGame.Count, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
+                        </Grid>
+                        <!--Roads-->
+                        <Grid Style="{StaticResource PictogramGridStyle}">
+                            <Grid Width="{StaticResource ResourceCardWidth}" HorizontalAlignment="Center"
+                                    VerticalAlignment="Stretch">
+                                <Grid Width="30" VerticalAlignment="Stretch">
+                                    <Line Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2"
+                                            X1="5" X2="5" Y1="5" Y2="55" />
+                                    <Line Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeDashArray="2 1"
+                                            StrokeThickness="3" X1="15" X2="15" Y1="5" Y2="55" />
+                                    <Line Stroke="{x:Bind Player.ForegroundBrush, Mode=OneWay}" StrokeThickness="2"
+                                            X1="25" X2="25" Y1="5" Y2="55" />
                                 </Grid>
-                            </Viewbox>
-
+                            </Grid>
+                            <ContentControl Content="{x:Bind Player.GameData.RoadsPlayed, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
                         </Grid>
 
                         <!--  Settlements  -->
-                        <Grid>
+                        <Grid Style="{StaticResource PictogramGridStyle}">
                             <local:SettlementCtrl Height="{StaticResource PictogramHeight}"
                                     Width="{StaticResource PictogramHeight}" Margin="0"
                                     Owner="{x:Bind Player, Mode=OneWay}" />
-                            <Viewbox Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
-                                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0">
-                                <Grid Background="Black">
-                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                                            FontFamily="Century Schoolbook" FontSize="35" Foreground="White"
-                                            Text="{x:Bind Player.GameData.SettlementsPlayed, Mode=OneWay, FallbackValue=7}" />
-                                </Grid>
-                            </Viewbox>
+                            <ContentControl Content="{x:Bind Player.GameData.SettlementsPlayed, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
                         </Grid>
 
                         <!--  Cities  -->
-                        <Grid Height="{StaticResource PictogramHeight}" Width="{StaticResource PictogramHeight}">
-
-                            <local:CityCtrl Margin="0" Owner="{x:Bind Player, Mode=OneWay}"
-                                    Height="{StaticResource PictogramHeight}" Width="{StaticResource PictogramHeight}" />
-                            <Viewbox Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
-                                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0">
-                                <Grid Background="Black">
-                                    <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
-                                            FontFamily="Century Schoolbook" FontSize="35"
-                                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
-                                            Text="{x:Bind Player.GameData.CitiesPlayed, Mode=OneWay, FallbackValue=7}" />
-                                </Grid>
-                            </Viewbox>
+                        <Grid Style="{StaticResource PictogramGridStyle}">
+                            <local:CityCtrl Height="{StaticResource PictogramHeight}"
+                                    Width="{StaticResource PictogramHeight}" Margin="0"
+                                    Owner="{x:Bind Player, Mode=OneWay}" />
+                            <ContentControl Content="{x:Bind Player.GameData.Cities.Count, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
                         </Grid>
                         <!--  Boats  -->
                         <!--<Grid Visibility="{x:Bind Player.GameData.ShipsVisible, Mode=OneTime}" >
@@ -188,6 +204,7 @@
                         <Grid Height="{StaticResource PictogramHeight}">
                             <local:MerchantCtrl Stroke="Gold" StrokeThickness="4" />
                             <Grid Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
+                                    Visibility="{x:Bind Player.GameData.PlayedMerchantLast, Converter={StaticResource BoolToVisibilityConverter},Mode=OneWay}"
                                     HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="Black">
                                 <Grid.RenderTransform>
                                     <TranslateTransform X="0" Y="-4" />
@@ -201,8 +218,7 @@
                         </Grid>
 
                         <!--  Longest Road  -->
-                        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                                Height="{StaticResource PictogramHeight}" Width="{StaticResource PictogramHeight}"
+                        <Grid Style="{StaticResource PictogramGridStyle}"
                                 BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}" BorderThickness="2"
                                 CornerRadius="5">
                             <Viewbox Stretch="Uniform" Margin="5">
@@ -210,98 +226,88 @@
                                         Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                                         Text="⛐" />
                             </Viewbox>
-                            <Grid Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
-                                    Background="Black" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                                <TextBlock Foreground="White" FontSize="50"
-                                        Text="{x:Bind Player.GameData.LongestRoad, Mode=OneWay, FallbackValue=12}" />
-                            </Grid>
-                            <Grid Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
-                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                            <ContentControl Content="{x:Bind Player.GameData.LongestRoad, Mode=OneWay}"
+                                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
+                            <ContentControl Content="✔"
                                     Visibility="{x:Bind Player.GameData.HasLongestRoad, FallbackValue=Visible, Mode=OneWay, Converter={StaticResource ResourceKey=BoolToVisibilityConverter}}"
-                                    Background="Black">
-
-                                <Viewbox Stretch="Fill" Width="{StaticResource CounterHeight}"
-                                        Height="{StaticResource CounterHeight}" HorizontalAlignment="Right"
-                                        VerticalAlignment="Top">
-                                    <TextBlock Foreground="White" Text="✔" FontWeight="ExtraBold" />
-                                </Viewbox>
-                            </Grid>
-
+                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
                         </Grid>
                         <!--  Times Targetted  -->
-                        <Grid Width="{StaticResource PictogramHeight}" Height="{StaticResource PictogramHeight}"
-                                CornerRadius="5"
-                                BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
-                                BorderThickness="2">
+                        <Grid Style="{StaticResource PictogramGridStyle}">
                             <TextBlock Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                                     FontFamily="Segoe MDL2 Assets" FontSize="50"
                                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                                     Text="&#xF272;" />
-                            <Viewbox Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
-                                    HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <Grid Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <TextBlock Margin="2,0,0,0" HorizontalAlignment="Center"
-                                            FontFamily="Century Schoolbook" FontSize="16"
-                                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
-                                            Text="{x:Bind Player.GameData.TimesTargeted, Mode=OneWay, FallbackValue=0}" />
-                                </Grid>
-                            </Viewbox>
+                            <ContentControl Content="{x:Bind Player.GameData.TimesTargeted, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
                         </Grid>
                         <!--  Cards lost to Baron  -->
-                        <Grid Height="{StaticResource PictogramHeight}">
+                        <Grid Style="{StaticResource PictogramGridStyle}">
 
-                            <local:ResourceCardSlimCtrl Margin="0,0,0,0" CountVisible="True"
-                                    Height="{StaticResource PictogramHeight}" Image="{StaticResource ResourceType.Back}"
-                                    Count="{x:Bind Player.GameData.Resources.ResourcesLostToBaron.Count, Mode=OneWay, FallbackValue=9}" />
+                            <local:ResourceCardSlimCtrl Margin="0,0,0,0" CountVisible="false"
+                                    Height="{StaticResource PictogramHeight}" Width="{StaticResource ResourceCardWidth}"
+                                    Image="{StaticResource ResourceType.Back}" />
 
                             <local:BaronCtrl Width="25" Height="25" HorizontalAlignment="Right" VerticalAlignment="Top"
-                                    Margin="0, 5, 0,0" />
+                                    Margin="0, 0, 10,0" />
+                            <ContentControl
+                                    Content="{x:Bind Player.GameData.Resources.ResourcesLostToBaron.Count, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
 
                         </Grid>
                         <!--  Bad Rolls  -->
-                        <Viewbox Width="{StaticResource PictogramHeight}" Height="{StaticResource PictogramHeight}">
-                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
-                                    BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}" CornerRadius="5"
-                                    BorderThickness="2">
 
-                                <TextBlock Text="&#x2682;" FontFamily="Segoe UI Symbol" FontSize="35" Margin="0,-10,0,0"
-                                        Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
-                                        HorizontalAlignment="Left" VerticalAlignment="Top" />
+                        <Grid Style="{StaticResource PictogramGridStyle}">
+                            <Grid Name="GRID_DiceGrid" Margin="15,0,15, 30">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#x2682;" FontFamily="Segoe UI Symbol" FontSize="40"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center" TextLineBounds="Tight"
+                                        Padding="0" Margin="0" Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
 
-                                <TextBlock Text="&#x2685;" FontFamily="Segoe UI Symbol" FontSize="35" Margin="0,-10,0,0"
-                                        Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
-                                        HorizontalAlignment="Right" VerticalAlignment="Bottom" />
-                                <TextBlock Text="⊘" FontSize="50" Foreground="Red" Margin="0,-10,0,0" />
-                                <Viewbox Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
-                                        HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                    <Grid Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                        <TextBlock Margin="2,0,0,0" FontFamily="Century Schoolbook" FontSize="35"
-                                                Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}"
-                                                Text="{x:Bind Player.GameData.NoResourceCount, Mode=OneWay, FallbackValue=7}" />
-                                    </Grid>
-                                </Viewbox>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="&#x2685;" FontFamily="Segoe UI Symbol"
+                                        FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        TextLineBounds="Tight" Padding="0" Margin="0"
+                                        Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay}" />
+                                <TextBlock Grid.RowSpan="2" Grid.ColumnSpan="2" Text="⊘" FontSize="50" Foreground="Red"
+                                        TextLineBounds="Tight" Margin="0" HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+
                             </Grid>
-                        </Viewbox>
+
+                            <ContentControl Content="{x:Bind Player.GameData.NoResourceCount, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
+
+                        </Grid>
 
                         <!--  Pips  -->
                         <Grid Width="{StaticResource PictogramHeight}" Height="{StaticResource PictogramHeight}"
-                                BorderThickness="2" CornerRadius="25"
+                                BorderThickness="2"
+                                CornerRadius="{Binding Source={StaticResource PictogramHeight}, Converter={StaticResource HeightToCornerRadiusConverter}}"
                                 BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}">
 
-                            <TextBlock Margin="0,-20,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            <TextBlock Margin="0,-50,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                                     CharacterSpacing="0" FontFamily="Segoe UI Symbol" FontSize="22"
+                                    FontWeight="ExtraBold"
                                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                                     Text="&#xE0C2;" />
 
-                            <Viewbox Width="{StaticResource CounterHeight}" Height="{StaticResource CounterHeight}"
-                                    HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black">
-                                    <TextBlock Margin="2,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                            FontFamily="Century Schoolbook" FontSize="35"
-                                            Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
-                                            Text="{x:Bind Player.GameData.Pips, Mode=OneWay, FallbackValue=0}" />
-                                </Grid>
-                            </Viewbox>
+                            <ContentControl Content="{x:Bind Player.GameData.Pips, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
                         </Grid>
 
                         <!-- Knight Rank -->
@@ -312,11 +318,9 @@
 
                             <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind Player, Mode=OneWay}"
                                     Width="{StaticResource PictogramHeight}" Height="{StaticResource PictogramHeight}" />
-                            <Rectangle Fill="Black" Width="20" Height="20" HorizontalAlignment="Right"
-                                    Visibility="Collapsed" VerticalAlignment="Top" />
-                            <TextBlock x:Name="TB_KnightCount" FontSize="22" HorizontalAlignment="Right"
-                                    VerticalAlignment="Top" Text="{x:Bind Player.GameData.TotalKnightRank, Mode=OneWay}"
-                                    Foreground="White" />
+                            <ContentControl Content="{x:Bind Player.GameData.TotalKnightRank, Mode=OneWay}"
+                                    Style="{StaticResource CounterStyle}"
+                                    ContentTemplate="{StaticResource CounterDataTemplate}" />
                         </Grid>
 
                     </GridView.Items>

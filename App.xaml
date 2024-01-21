@@ -24,6 +24,7 @@
             <SolidColorBrush x:Key="TransparentBrush" Color="Transparent" />
             <local:ColorToBooleanConverter x:Key="ColorToBooleanConverter" />
             <local:VisibilityToHeightConverter x:Key="VisibilityToHeightConverter" />
+            <local:HeightToCornerRadiusConverter x:Key="HeightToCornerRadiusConverter" />
             <local:GameStateToBooleanConverter x:Key="GameStateToBooleanConverter" />
             <local:AnimationSpeedValueConverter x:Key="AnimationSpeedValueConverter" />
             <local:TileOrientationToObjectConverter x:Key="TileOrientationToObjectConverter" />

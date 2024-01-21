@@ -17,7 +17,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ExpansionTemplate_CitiesAndKnights" x:DataType="local:PlayerModel">
-            <Viewbox Stretch="None">
+            <Viewbox Stretch="Uniform">
                 <local:PublicDataCitiesAndKnightCtrl Player="{x:Bind Mode=OneWay}"
                         RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
                 </local:PublicDataCitiesAndKnightCtrl>

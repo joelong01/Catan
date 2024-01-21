@@ -1,14 +1,24 @@
-﻿<UserControl x:Class="Catan10.ExpansionCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="300" d:DesignWidth="400" mc:Ignorable="d">
+﻿<UserControl x:Class="Catan10.ExpansionCtrl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="using:Catan10"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="300" d:DesignWidth="400"
+        mc:Ignorable="d">
 
-    <Viewbox Stretch="UniformToFIll">
+    <Viewbox Stretch="UniformToFIll" RenderTransformOrigin=".5 .5">
         <Viewbox.RenderTransform>
-            <CompositeTransform ScaleX="1.05" ScaleY="1.05" TranslateY="10" TranslateX="-10" />
+            <CompositeTransform ScaleX="1.05" ScaleY="1.05" TranslateY="25"/>
         </Viewbox.RenderTransform>
-        <local:CatanHexPanel x:Name="_HexPanel" BuildingIndexToHarborIndex="3=0,9=0,50=1,63=1,53=2,54=2,62=3,72=3,64=4,65=4,78=5,79=5,13=6,12=6,17=7,0=7,36=8,37=8,41=9,38=9,75=10,76=10" Description="5 or 6 Player Expansion" GameType="SupplementalBuildPhase" NormalHeight="96" NormalWidth="110" RowsPerColumn="3,4,5,6,5,4,3" TileGap="1" UniformMargin="50">
+        <local:CatanHexPanel x:Name="_HexPanel"
+                BuildingIndexToHarborIndex="3=0,9=0,50=1,63=1,53=2,54=2,62=3,72=3,64=4,65=4,78=5,79=5,13=6,12=6,17=7,0=7,36=8,37=8,41=9,38=9,75=10,76=10"
+                Description="5 or 6 Player Expansion" GameType="SupplementalBuildPhase" NormalHeight="96"
+                NormalWidth="110" RowsPerColumn="3,4,5,6,5,4,3" TileGap="1" UniformMargin="50">
             <local:TileCtrl Index="0" Number="2" ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Sheep}" Index="1" Number="2" ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_2}" Index="2" Number="3" ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_3}" Index="3" Number="3" ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Sheep}" Index="1" Number="2"
+                    ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_2}" Index="2" Number="3"
+                    ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_3}" Index="3" Number="3"
+                    ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="4" Number="3" ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="5" Number="4" ResourceType="Sheep" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="6" Number="4" ResourceType="Ore" TileOrientation="FaceUp" UseClassic="True" />
@@ -17,38 +27,57 @@
             <local:TileCtrl Index="8" Number="5" ResourceType="Wood" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="9" Number="5" ResourceType="Wood" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="10" Number="5" ResourceType="Wood" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_4}" Index="11" Number="6" ResourceType="Wood" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_5}" Index="12" Number="6" ResourceType="Wood" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_4}" Index="11" Number="6"
+                    ResourceType="Wood" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_5}" Index="12" Number="6"
+                    ResourceType="Wood" TileOrientation="FaceUp" UseClassic="True" />
 
             <local:TileCtrl Index="13" Number="6" ResourceType="Wheat" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="14" Number="8" ResourceType="Wheat" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="15" Number="8" ResourceType="Wheat" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="16" Number="8" ResourceType="Wheat" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="17" Number="9" ResourceType="Wheat" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Ore}" Index="18" Number="9" ResourceType="Ore" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Ore}" Index="18" Number="9" ResourceType="Ore"
+                    TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="19" Number="9" ResourceType="Ore" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="20" Number="10" ResourceType="Ore" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="21" Number="10" ResourceType="Ore" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_1}" Index="22" Number="10" ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_1}" Index="22" Number="10"
+                    ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="23" Number="11" ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="24" Number="11" ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
             <local:TileCtrl Index="25" Number="11" ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Brick}" Index="26" Number="12" ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Wheat}" Index="27" Number="12" ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_6}" Index="28" Number="7" ResourceType="Desert" TileOrientation="FaceUp" UseClassic="True" />
-            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Wood}" Index="29" Number="7" ResourceType="Desert" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Brick}" Index="26" Number="12"
+                    ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Wheat}" Index="27" Number="12"
+                    ResourceType="Brick" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_TFO_6}" Index="28" Number="7"
+                    ResourceType="Desert" TileOrientation="FaceUp" UseClassic="True" />
+            <local:TileCtrl AdjacentHarbor="{Binding ElementName=Harbor_Wood}" Index="29" Number="7"
+                    ResourceType="Desert" TileOrientation="FaceUp" UseClassic="True" />
 
-            <local:HarborCtrl x:Name="Harbor_Sheep" Width="50" Height="50" HarborLocation="TopLeft" HarborType="Sheep" Index="0" Orientation="FaceUp" TileIndex="1" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_TFO_1" Width="50" Height="50" HarborLocation="Bottom" HarborType="ThreeForOne" Index="1" Orientation="FaceUp" TileIndex="22" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_Ore" Width="50" Height="50" HarborLocation="TopRight" HarborType="Ore" Index="2" Orientation="FaceUp" TileIndex="18" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_Brick" Width="50" Height="50" HarborLocation="Bottom" HarborType="Brick" Index="3" Orientation="FaceUp" TileIndex="26" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_Wheat" Width="50" Height="50" HarborLocation="TopRight" HarborType="Wheat" Index="4" Orientation="FaceUp" TileIndex="23" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_Wood" Width="50" Height="50" HarborLocation="BottomRight" HarborType="Wood" Index="5" Orientation="FaceUp" TileIndex="29" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_TFO_2" Width="50" Height="50" HarborLocation="BottomLeft" HarborType="ThreeForOne" Index="6" Orientation="FaceUp" TileIndex="2" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_TFO_3" Width="50" Height="50" HarborLocation="TopLeft" HarborType="ThreeForOne" Index="7" Orientation="FaceUp" TileIndex="3" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_TFO_4" Width="50" Height="50" HarborLocation="Bottom" HarborType="ThreeForOne" Index="8" Orientation="FaceUp" TileIndex="11" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_TFO_5" Width="50" Height="50" HarborLocation="Top" HarborType="ThreeForOne" Index="9" Orientation="FaceUp" TileIndex="12" UseClassic="True" />
-            <local:HarborCtrl x:Name="Harbor_TFO_6" Width="50" Height="50" HarborLocation="TopRight" HarborType="ThreeForOne" Index="10" Orientation="FaceUp" TileIndex="28" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_Sheep" Width="50" Height="50" HarborLocation="TopLeft" HarborType="Sheep"
+                    Index="0" Orientation="FaceUp" TileIndex="1" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_TFO_1" Width="50" Height="50" HarborLocation="Bottom"
+                    HarborType="ThreeForOne" Index="1" Orientation="FaceUp" TileIndex="22" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_Ore" Width="50" Height="50" HarborLocation="TopRight" HarborType="Ore"
+                    Index="2" Orientation="FaceUp" TileIndex="18" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_Brick" Width="50" Height="50" HarborLocation="Bottom" HarborType="Brick"
+                    Index="3" Orientation="FaceUp" TileIndex="26" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_Wheat" Width="50" Height="50" HarborLocation="TopRight" HarborType="Wheat"
+                    Index="4" Orientation="FaceUp" TileIndex="23" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_Wood" Width="50" Height="50" HarborLocation="BottomRight" HarborType="Wood"
+                    Index="5" Orientation="FaceUp" TileIndex="29" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_TFO_2" Width="50" Height="50" HarborLocation="BottomLeft"
+                    HarborType="ThreeForOne" Index="6" Orientation="FaceUp" TileIndex="2" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_TFO_3" Width="50" Height="50" HarborLocation="TopLeft"
+                    HarborType="ThreeForOne" Index="7" Orientation="FaceUp" TileIndex="3" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_TFO_4" Width="50" Height="50" HarborLocation="Bottom"
+                    HarborType="ThreeForOne" Index="8" Orientation="FaceUp" TileIndex="11" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_TFO_5" Width="50" Height="50" HarborLocation="Top" HarborType="ThreeForOne"
+                    Index="9" Orientation="FaceUp" TileIndex="12" UseClassic="True" />
+            <local:HarborCtrl x:Name="Harbor_TFO_6" Width="50" Height="50" HarborLocation="TopRight"
+                    HarborType="ThreeForOne" Index="10" Orientation="FaceUp" TileIndex="28" UseClassic="True" />
         </local:CatanHexPanel>
     </Viewbox>
 </UserControl>

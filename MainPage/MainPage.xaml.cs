@@ -201,7 +201,7 @@ namespace Catan10
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-     
+
 
             var ignored = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
@@ -1172,10 +1172,10 @@ namespace Catan10
         {
 
             double width = 650;
-            if (currentGame != null && currentGame.GameType == GameType.SupplementalBuildPhase) width=485;
+            if (currentGame != null && currentGame.GameType == GameType.SupplementalBuildPhase) width = 485;
             this.TraceMessage($"PlayerTracker Width set to {width}");
             return width;
-           
+
         }
         private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
         {
@@ -1210,59 +1210,7 @@ namespace Catan10
 
         private async void OnNewLocalGame(object sender, RoutedEventArgs e)
         {
-            MainPageModel.Settings.IsLocalGame = true;
-
-            if (MainPageModel.GameState != GameState.WaitingForNewGame)
-            {
-                if (await StaticHelpers.AskUserYesNoQuestion("Start a new game?", "Yes", "No") == false)
-                {
-                    return;
-                }
-            }
-
-            NewGameDlg dlg = new NewGameDlg(MainPageModel.AllPlayers, CTRL_GameView.Games);
-
-            ContentDialogResult result = await dlg.ShowAsync();
-            if (( dlg.PlayingPlayers.Count < 3 || dlg.PlayingPlayers.Count > 6 ) && result == ContentDialogResult.Primary)
-            {
-                string content = String.Format($"You must pick at least 3 players and no more than 6 to play the game.");
-                MessageDialog msgDlg = new MessageDialog(content);
-                await msgDlg.ShowAsync();
-                return;
-            }
-
-            if (dlg.SelectedGame == null)
-            {
-                string content = String.Format($"Pick a game!!");
-                MessageDialog msgDlg = new MessageDialog(content);
-                await msgDlg.ShowAsync();
-                return;
-            }
-
-            if (result != ContentDialogResult.Secondary)
-            {
-                CTRL_GameView.Reset();
-                await this.Reset();
-
-                CTRL_GameView.CurrentGame = dlg.SelectedGame;
-                MainPageModel.PlayingPlayers.Clear();
-                GameInfo info = new GameInfo()
-                {
-                    Creator = TheHuman.PlayerName,
-                    GameIndex = dlg.SelectedIndex,
-                    Id = Guid.NewGuid(),
-                    Started = false,
-                    CitiesAndKnights = dlg.CitiesAndKnights
-                };
-                await NewGameLog.CreateGame(this, info, CatanAction.GameCreated);
-                GameContainer.CurrentGame.HexPanel.CitiesAndKnights = dlg.CitiesAndKnights;
-                MainPageModel.PlayingPlayers.Clear();
-
-                dlg.PlayingPlayers.ForEach(async (p) =>
-              {
-                  await AddPlayerLog.AddPlayer(this, p.PlayerName);
-              });
-            }
+            await OnNewGame();
         }
 
         private async void OnShowCatanSpy(object sender, RoutedEventArgs e)

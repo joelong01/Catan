@@ -20,8 +20,10 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
+    public delegate void PlayerSelected(PlayerModel player);
     public sealed partial class PublicDataCitiesAndKnightCtrl : UserControl
     {
+        public event PlayerSelected OnPlayerSelected;
         private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as PublicDataCitiesAndKnightCtrl;
@@ -37,10 +39,8 @@ namespace Catan10
 
         private void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            //
-            //  7/9/2020:  this used to open Trade in multiplayer.  leave it here in case we need a real time debug entry point
-
-            this.TraceMessage($"clicked on {((FrameworkElement)sender).Tag}");
+  
+            OnPlayerSelected?.Invoke(Player);
         }
 
         private void SetPlayer(PlayerModel value)
@@ -103,7 +103,7 @@ namespace Catan10
 
             return count.ToString();
         }
-
+       
         private bool IsControlOrShiftPressed
         {
             get

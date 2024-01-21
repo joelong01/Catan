@@ -14,6 +14,29 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Catan10
 {
+    public class HeightToCornerRadiusConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is int height)
+            {
+                // Convert height to CornerRadius
+                return new CornerRadius(height *.5);
+            }
+            if (value is double doubleHeight)
+            {
+                // Convert height to CornerRadius
+                return new CornerRadius(doubleHeight * .5);
+            }
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class VisibilityToHeightConverter : IValueConverter
     {
 
@@ -886,6 +909,10 @@ namespace Catan10
             if (value is string)
             {
                 if (String.IsNullOrEmpty(( string )value)) return Visibility.Collapsed;
+            }
+            if (value is int val)
+            {
+                if (val == 0) return Visibility.Collapsed;
             }
 
             return Visibility.Visible;
