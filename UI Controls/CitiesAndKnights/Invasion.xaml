@@ -35,126 +35,127 @@
                     Duration="{x:Bind MainPageModel.GetAnimationDuration(local:AnimationSpeed.Normal, MainPageModel.Testing), Mode=OneWay}" />
         </Storyboard>
     </Control.Resources>
+    <Viewbox Stretch="Uniform">
+        <Grid Background="Transparent" Height="400" Width="400">
+            <TextBlock x:Name="TXT_InvasionCount" Text="{x:Bind InvasionData.TotalInvasions, Mode=OneWay}"
+                    Foreground="Red" Canvas.ZIndex="10" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="30"
+                    FontFamily="Segoe UI" FontWeight="ExtraBold">
+                <TextBlock.RenderTransform>
+                    <CompositeTransform TranslateX="87" TranslateY="95" />
+                </TextBlock.RenderTransform>
+            </TextBlock>
+            <Ellipse x:Name="Ellipse_Path" Width="300" Height="300" Fill="Transparent"
+                    Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeThickness="4"
+                    StrokeDashArray="0.5" />
 
-    <Grid Background="Transparent">
-        <TextBlock x:Name="TXT_InvasionCount" Text="{x:Bind InvasionData.TotalInvasions, Mode=OneWay}" Foreground="Red"
-                Canvas.ZIndex="999" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="30"
-                FontFamily="Segoe UI" FontWeight="ExtraBold">
-            <TextBlock.RenderTransform>
-                <CompositeTransform TranslateX="87" TranslateY="95" />
-            </TextBlock.RenderTransform>
-        </TextBlock>
-        <Ellipse x:Name="Ellipse_Path" Width="300" Height="300" Fill="Transparent"
-                Stroke="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" StrokeThickness="4" StrokeDashArray="0.5" />
+            <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+                <local:TileCtrl.RenderTransform>
+                    <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="0" CenterX="0" CenterY="150" />
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
+            <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+                <local:TileCtrl.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform CenterX="0" CenterY="0" Angle="-45" />
+                        <TranslateTransform X="0" Y="-150" />
+                        <RotateTransform CenterX="0" CenterY="0" Angle="45" />
+                    </TransformGroup>
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
+            <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+                <local:TileCtrl.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform CenterX="0" CenterY="0" Angle="90" />
+                        <TranslateTransform X="0" Y="-150" />
+                        <RotateTransform CenterX="0" CenterY="0" Angle="90" />
+                    </TransformGroup>
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
+            <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+                <local:TileCtrl.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform CenterX="0" CenterY="0" Angle="-135" />
+                        <TranslateTransform X="0" Y="-150" />
+                        <RotateTransform CenterX="0" CenterY="0" Angle="135" />
+                    </TransformGroup>
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
+            <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+                <local:TileCtrl.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform CenterX="0" CenterY="0" Angle="-180" />
+                        <TranslateTransform X="0" Y="-150" />
+                        <RotateTransform CenterX="0" CenterY="0" Angle="180" />
+                    </TransformGroup>
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
+            <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+                <local:TileCtrl.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform CenterX="0" CenterY="0" Angle="-225" />
+                        <TranslateTransform X="0" Y="-150" />
+                        <RotateTransform CenterX="0" CenterY="0" Angle="225" />
+                    </TransformGroup>
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
+            <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
+                <local:TileCtrl.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform CenterX="0" CenterY="0" Angle="-270" />
+                        <TranslateTransform X="0" Y="-150" />
+                        <RotateTransform CenterX="0" CenterY="0" Angle="270" />
+                    </TransformGroup>
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
+            <local:TileCtrl Style="{StaticResource TileCtrlStyle}" ResourceType="Invasion" TileOrientation="FaceUp"
+                    HideNumber="True">
+                <local:TileCtrl.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform CenterX="0" CenterY="0" Angle="-315" />
+                        <TranslateTransform X="0" Y="-150" />
+                        <RotateTransform CenterX="0" CenterY="0" Angle="315" />
+                    </TransformGroup>
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
+            <Viewbox Canvas.ZIndex="99" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80"
+                    Height="75" x:Name="PirateShip" RenderTransformOrigin=".5 .5">
+                <local:PirateShip />
+                <Viewbox.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform x:Name="FirstRotateTransform" CenterX="0" CenterY="0" Angle="-0" />
+                        <TranslateTransform X="0" Y="-150" />
+                        <RotateTransform x:Name="SecondRotateTransform" CenterX="0" CenterY="0" Angle="0" />
+                    </TransformGroup>
+                </Viewbox.RenderTransform>
+            </Viewbox>
 
-        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
-            <local:TileCtrl.RenderTransform>
-                <CompositeTransform TranslateX="0" TranslateY="-150" Rotation="0" CenterX="0" CenterY="150" />
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
-        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
-            <local:TileCtrl.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform CenterX="0" CenterY="0" Angle="-45" />
-                    <TranslateTransform X="0" Y="-150" />
-                    <RotateTransform CenterX="0" CenterY="0" Angle="45" />
-                </TransformGroup>
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
-        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
-            <local:TileCtrl.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform CenterX="0" CenterY="0" Angle="90" />
-                    <TranslateTransform X="0" Y="-150" />
-                    <RotateTransform CenterX="0" CenterY="0" Angle="90" />
-                </TransformGroup>
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
-        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
-            <local:TileCtrl.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform CenterX="0" CenterY="0" Angle="-135" />
-                    <TranslateTransform X="0" Y="-150" />
-                    <RotateTransform CenterX="0" CenterY="0" Angle="135" />
-                </TransformGroup>
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
-        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
-            <local:TileCtrl.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform CenterX="0" CenterY="0" Angle="-180" />
-                    <TranslateTransform X="0" Y="-150" />
-                    <RotateTransform CenterX="0" CenterY="0" Angle="180" />
-                </TransformGroup>
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
-        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
-            <local:TileCtrl.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform CenterX="0" CenterY="0" Angle="-225" />
-                    <TranslateTransform X="0" Y="-150" />
-                    <RotateTransform CenterX="0" CenterY="0" Angle="225" />
-                </TransformGroup>
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
-        <local:TileCtrl Style="{StaticResource TileCtrlStyle}">
-            <local:TileCtrl.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform CenterX="0" CenterY="0" Angle="-270" />
-                    <TranslateTransform X="0" Y="-150" />
-                    <RotateTransform CenterX="0" CenterY="0" Angle="270" />
-                </TransformGroup>
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
-        <local:TileCtrl Style="{StaticResource TileCtrlStyle}" ResourceType="Invasion" TileOrientation="FaceUp"
-                HideNumber="True">
-            <local:TileCtrl.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform CenterX="0" CenterY="0" Angle="-315" />
-                    <TranslateTransform X="0" Y="-150" />
-                    <RotateTransform CenterX="0" CenterY="0" Angle="315" />
-                </TransformGroup>
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
-        <Viewbox Canvas.ZIndex="99" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80"
-                Height="75" x:Name="PirateShip" RenderTransformOrigin=".5 .5">
-            <local:PirateShip />
-            <Viewbox.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform x:Name="FirstRotateTransform" CenterX="0" CenterY="0" Angle="-0" />
-                    <TranslateTransform X="0" Y="-150" />
-                    <RotateTransform x:Name="SecondRotateTransform" CenterX="0" CenterY="0" Angle="0" />
-                </TransformGroup>
-            </Viewbox.RenderTransform>
-        </Viewbox>
+            <local:TileCtrl ResourceType="Desert" TileOrientation="FaceUp" HorizontalAlignment="Center"
+                    VerticalAlignment="Center" HideNumber="True" Margin="0" RenderTransformOrigin=".5 .5">
+                <local:TileCtrl.RenderTransform>
+                    <CompositeTransform ScaleX="1.5" ScaleY="1.5" />
+                </local:TileCtrl.RenderTransform>
+            </local:TileCtrl>
 
-        <local:TileCtrl ResourceType="Desert" TileOrientation="FaceUp" HorizontalAlignment="Center"
-                VerticalAlignment="Center" HideNumber="True" Margin="0" RenderTransformOrigin=".5 .5">
-            <local:TileCtrl.RenderTransform>
-                <CompositeTransform ScaleX="1.5" ScaleY="1.5" />
-            </local:TileCtrl.RenderTransform>
-        </local:TileCtrl>
+            <local:BaronCtrl x:Name="CTRL_Baron" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
+            <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent" Width="60" Height="60"
+                    Margin="0,0,0,0">
 
-        <local:BaronCtrl x:Name="CTRL_Baron" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
-        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent" Width="60" Height="60"
-                Margin="0,0,0,0">
+                <local:CityCtrl Width="60" Height="60" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                <TextBlock x:Name="TB_CityCount" FontSize="22"
+                        Text="{x:Bind MainPageModel.TotalCitiesBinding(), Mode=OneWay}"
+                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" HorizontalAlignment="Left"
+                        VerticalAlignment="Top" />
 
-            <local:CityCtrl Width="60" Height="60"
-                    CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}" />
-            <TextBlock x:Name="TB_CityCount" FontSize="22"
-                    Text="{x:Bind MainPageModel.TotalCitiesBinding(), Mode=OneWay}"
-                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" HorizontalAlignment="Left"
-                    VerticalAlignment="Top" />
+            </Grid>
 
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Transparent" Width="60" Height="60"
+                    Margin="0,0,0,0">
+
+                <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
+                <TextBlock x:Name="TB_KnightCount" FontSize="22" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Text="{x:Bind MainPageModel.TotalKnightRanksBinding(), Mode=OneWay}"
+                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
+            </Grid>
         </Grid>
-
-        <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="Transparent" Width="60" Height="60"
-                Margin="0,0,0,0">
-
-            <local:KnightCtrl Activated="True" KnightRank="Unset" Owner="{x:Bind CurrentPlayer, Mode=OneWay}" />
-            <TextBlock x:Name="TB_KnightCount" FontSize="22" HorizontalAlignment="Right" VerticalAlignment="Top"
-                    Text="{x:Bind MainPageModel.TotalKnightRanksBinding(), Mode=OneWay}"
-                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" />
-        </Grid>
-    </Grid>
+    </Viewbox>
 </UserControl>

@@ -529,8 +529,7 @@ namespace Catan10
             CTRL_GameView.SetCallbacks(this, this);
             await LoadMainPageModel();
             UpdateGridLocations();
-            _progress.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            _progress.IsActive = false;
+        
 
             //    CurrentPlayer = TheHuman;
             this.TraceMessage("If you want to set the CurrentPlayer to startup, do it here");

@@ -17,8 +17,7 @@ namespace Catan10
     {
         #region Delegates + Fields + Events + Enums
 
-        private int _roadSkipped = 0;
-
+ 
         #endregion Delegates + Fields + Events + Enums
 
         #region Properties

@@ -113,7 +113,12 @@ namespace Catan10
         {
             double ret = 0;
 
-            if (widthOrHeight == Double.NaN) return 0;
+            if (widthOrHeight is Double.NaN)
+            {
+                this.TraceMessage($"returned: 175");
+                return 175;
+            }
+        
             double rectWidth = 25;
             switch (SlideDirection)
             {
@@ -130,6 +135,7 @@ namespace Catan10
                 default:
                     break;
             }
+            this.TraceMessage($"returned: {ret}");
             return ret;
         }
 

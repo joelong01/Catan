@@ -206,8 +206,7 @@ namespace Catan10
                 _starting = true;
                 if (e.NavigationMode == NavigationMode.New)
                 {
-                    _progress.IsActive = true;
-                    _progress.Visibility = Visibility.Visible;
+                  
 
                     CTRL_GameView.Init(this, this);
                     CreateMenuItems();
@@ -1562,7 +1561,7 @@ namespace Catan10
         /// </summary>
         double CalculatePlayerTrackerWidth(CatanGameCtrl currentGame, ObservableCollection<PlayerModel> players)
         {
-
+            
             double width = 650;
             if (currentGame != null && currentGame.GameType == GameType.SupplementalBuildPhase) width = 485;
             this.TraceMessage($"PlayerTracker Width set to {width}");

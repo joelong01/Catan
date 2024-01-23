@@ -122,7 +122,7 @@ namespace Catan10
         }
         public double ControlHeight(ObservableCollection<PlayerModel> players)
         {
-            var max = 263;
+            var max = 250;
             double height = max;
             try
             {
