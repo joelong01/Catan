@@ -276,7 +276,7 @@ namespace Catan10
             {
                 road = building.AdjacentRoads[testRandom.Next(building.AdjacentRoads.Count)];
             }
-            while (road.Owner != null);
+            while (road.Owner != null && road.Owner != PlayerModel.DefaultPlayer);
 
             await UpdateRoadLog.PostLogEntry(this, road, RoadState.Road);
         }

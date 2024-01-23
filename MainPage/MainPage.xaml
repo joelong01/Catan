@@ -57,7 +57,7 @@
                 <ColumnDefinition Width="0" />
                 <ColumnDefinition Width="400" x:Name="GRID_COLUMN_TWO_WIDTH" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="550" x:Name="GRID_COLUMN_PLAYER_DATA_WIDTH" />
+                <ColumnDefinition Width="470" x:Name="GRID_COLUMN_PLAYER_DATA_WIDTH" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1050" />
@@ -68,7 +68,72 @@
                     <MenuFlyout x:Name="_menuBaron" Placement="Right" />
                 </Button.Flyout>
             </Button>
+            <local:DragableGridCtrl x:Name="ActionAndStats" Width="200" HorizontalAlignment="Center" Grid.RowSpan="2"
+                    Grid.Column="4" VerticalAlignment="Center" Canvas.ZIndex="50000"
+                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                    BorderBrush="{StaticResource bmMaple}" BorderThickness="2"
+                    Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"
+                    CornerRadius="10" Foreground="Black" OnGridPositionChanged="OnGridPositionChanged"
+                    Player="{x:Bind TheHuman, Mode=OneWay}" PointerPressed="Draggable_PointerPressed">
 
+                <local:DragableGridCtrl.Child>
+                    <Viewbox Name="VB_Controls" Stretch="Uniform" Margin="10">
+                        <StackPanel HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                                <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
+                                        Height="130">
+
+                                    <StackPanel Name="SP_UndoButton" Orientation="Vertical">
+                                        <Button x:Name="_btnUndo"
+                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                Click="OnUndo" Content="&#xE10E;"
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}"
+                                                Style="{StaticResource GameControllerStyle}" />
+                                        <TextBlock
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
+                                    </StackPanel>
+                                    <StackPanel Name="SP_NextButton">
+                                        <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"
+                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                                                Click="OnNextStep" Content="&#xE101;"
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}"
+                                                Style="{StaticResource GameControllerStyle}" />
+                                        <TextBlock
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                Style="{StaticResource ControlGridTextStyle}" Text="Next" />
+
+                                    </StackPanel>
+                                    <StackPanel Name="SP_RedoButton" HorizontalAlignment="Center" Orientation="Vertical">
+                                        <Button
+                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                Click="OnRedo" Content="&#xE10D;"
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}"
+                                                Style="{StaticResource GameControllerStyle}" />
+                                        <TextBlock
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                                Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
+                                    </StackPanel>
+
+                                    <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1"
+                                            Height="40" Visibility="Collapsed" Margin="30,0,10,40"
+                                            VerticalAlignment="Center" ColorCodeTimer="True" />
+
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock Margin="0" HorizontalAlignment="Center"
+                                    Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                    Style="{StaticResource ControlGridTextStyle}"
+                                    Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" />
+
+                        </StackPanel>
+                    </Viewbox>
+                </local:DragableGridCtrl.Child>
+            </local:DragableGridCtrl>
             <Viewbox Stretch="Uniform" Grid.Column="2" Grid.RowSpan="2">
 
                 <local:GameContainerCtrl x:Name="CTRL_GameView" Margin="0" Canvas.ZIndex="2" CornerRadius="0"
@@ -92,8 +157,7 @@
             <Viewbox Stretch="Uniform" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Grid.Row="0"
                     Grid.ColumnSpan="2" Grid.RowSpan="2" Canvas.ZIndex="10">
                 <s:SliderCtrl Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}" Canvas.ZIndex="15"
-                              Height="225"
-                        Caption="Board Stats" CornerRadius="10" FontSize="18"
+                        Height="225" Caption="Board Stats" CornerRadius="10" FontSize="18"
                         Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                         Open="{x:Bind MainPageModel.ShowBoardMeasurements(MainPageModel.GameState), Mode=OneWay}"
                         MainPageModel="{x:Bind MainPageModel, Mode=OneWay}" SlideDirection="Up">
@@ -258,63 +322,7 @@
                                         OnRoll="OnNumberRolled" />
                             </Viewbox>
                             <Rectangle Height="3" Fill="{StaticResource bmMaple}" Margin="5" />
-                            <Viewbox Name="VB_Controls" Stretch="Uniform">
-                                <StackPanel HorizontalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
-                                        <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center"
-                                                Orientation="Horizontal" Height="130">
-
-                                            <StackPanel Name="SP_UndoButton" Orientation="Vertical">
-                                                <Button x:Name="_btnUndo"
-                                                        Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                        Click="OnUndo" Content="&#xE10E;"
-                                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                        IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}"
-                                                        Style="{StaticResource GameControllerStyle}" />
-                                                <TextBlock
-                                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                        Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
-                                            </StackPanel>
-                                            <StackPanel Name="SP_NextButton">
-                                                <Button x:Name="_btnNextStep" Margin="10,0,0,0"
-                                                        HorizontalAlignment="Center"
-                                                        Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                                                        Click="OnNextStep" Content="&#xE101;"
-                                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                        IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}"
-                                                        Style="{StaticResource GameControllerStyle}" />
-                                                <TextBlock
-                                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                        Style="{StaticResource ControlGridTextStyle}" Text="Next" />
-
-                                            </StackPanel>
-                                            <StackPanel Name="SP_RedoButton" HorizontalAlignment="Center"
-                                                    Orientation="Vertical">
-                                                <Button
-                                                        Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                        Click="OnRedo" Content="&#xE10D;"
-                                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                        IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}"
-                                                        Style="{StaticResource GameControllerStyle}" />
-                                                <TextBlock
-                                                        Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                        Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
-                                            </StackPanel>
-
-                                            <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1"
-                                                    Height="40" Visibility="Collapsed" Margin="30,0,10,40"
-                                                    VerticalAlignment="Center" ColorCodeTimer="True" />
-
-                                        </StackPanel>
-                                    </StackPanel>
-                                    <TextBlock Margin="0" HorizontalAlignment="Center"
-                                            Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                            Style="{StaticResource ControlGridTextStyle}"
-                                            Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" />
-
-                                </StackPanel>
-                            </Viewbox>
                             <Viewbox Name="VB_Purchase" Stretch="UniformToFill" Grid.Column="0" Grid.ColumnSpan="2"
                                     HorizontalAlignment="Stretch" Margin="0,0,0,0">
 
@@ -337,10 +345,9 @@
                         </StackPanel>
                     </Viewbox>
 
-                    <Viewbox Stretch="Uniform" Margin="0,0,0,0" HorizontalAlignment="Center">
-                        <StackPanel>
-                            <StackPanel Name="StackPanel_TotalResourceCount" VerticalAlignment="Top" CornerRadius="10"
-                                    Orientation="Horizontal">
+                    <StackPanel >
+                        <Viewbox Stretch="Uniform">
+                            <StackPanel Name="StackPanel_TotalResourceCount" Orientation="Horizontal" Height="153">
                                 <local:ResourceCardSlimCtrl
                                         Count="{x:Bind MainPageModel.GameResources.Wood, Mode=OneWay}"
                                         Image="{StaticResource ResourceType.Wood}" />
@@ -360,7 +367,9 @@
                                         Count="{x:Bind MainPageModel.GameResources.GoldMine, Mode=OneWay}"
                                         Image="{StaticResource ResourceType.GoldMine}" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        </Viewbox>
+                        <Viewbox Stretch="Uniform" Height="153">
+                            <StackPanel Orientation="Horizontal" >
                                 <local:ResourceCardSlimCtrl
                                         Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                                         Count="{x:Bind MainPageModel.GameResources.Paper, Mode=OneWay}" Margin="5,0,0,0"
@@ -373,8 +382,8 @@
                                         Image="{StaticResource ResourceType.Cloth}" />
 
                             </StackPanel>
-                        </StackPanel>
-                    </Viewbox>
+                        </Viewbox>
+                    </StackPanel>
 
                 </StackPanel>
             </Viewbox>

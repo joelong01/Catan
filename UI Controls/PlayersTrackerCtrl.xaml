@@ -45,6 +45,7 @@
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="Padding" Value="2" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
+                 <Setter Property="Height" Value="214" />
                
             </Style>
         </ListView.ItemContainerStyle>
