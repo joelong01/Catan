@@ -518,7 +518,7 @@ namespace Catan10
                     }
                 }
             }
-            this.TraceMessage($"[LongestRoad={max} [Name={PlayerName}] [Start={maxRoadStartedAt?.Index}]");
+          //  this.TraceMessage($"[LongestRoad={max} [Name={PlayerName}] [Start={maxRoadStartedAt?.Index}]");
             return max;
         }
         //

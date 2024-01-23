@@ -45,7 +45,7 @@
                 <Setter Property="Margin" Value="0" />
                 <Setter Property="Padding" Value="2" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
-                 <Setter Property="Height" Value="214" />
+                 <Setter Property="Height" Value="{x:Bind ControlHeight(PlayingPlayers), Mode=OneWay}" />
                
             </Style>
         </ListView.ItemContainerStyle>

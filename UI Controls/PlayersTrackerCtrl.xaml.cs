@@ -122,7 +122,7 @@ namespace Catan10
         }
         public double ControlHeight(ObservableCollection<PlayerModel> players)
         {
-            var max = 250;
+            var max = 215;
             double height = max;
             try
             {
@@ -141,7 +141,7 @@ namespace Catan10
             }
             finally
             {
-               this.TraceMessage($"PlayerCount = {players.Count} height={height}");
+             //  this.TraceMessage($"PlayerCount = {players.Count} height={height}");
             }
 
 

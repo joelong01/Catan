@@ -68,9 +68,9 @@
                     <MenuFlyout x:Name="_menuBaron" Placement="Right" />
                 </Button.Flyout>
             </Button>
-            <local:DragableGridCtrl x:Name="ActionAndStats" Width="200" HorizontalAlignment="Center" Grid.RowSpan="2"
-                    Grid.Column="4" VerticalAlignment="Center" Canvas.ZIndex="50000"
-                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+            <local:DragableGridCtrl x:Name="ActionAndStats" Width="400" HorizontalAlignment="Center" Grid.RowSpan="2"
+                    RenderTransformOrigin="0 0" Margin="0, 0, 0,0" Grid.Column="4" VerticalAlignment="Center"
+                    Canvas.ZIndex="50000" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2"
                     Caption="{x:Bind MainPageTitle(MainPageModel.GameInfo, CurrentPlayer, MainPageModel.GameState), Mode=OneWay}"
                     CornerRadius="10" Foreground="Black" OnGridPositionChanged="OnGridPositionChanged"
@@ -146,7 +146,7 @@
             </Viewbox>
             <Border Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.RowSpan="2"
                     BorderBrush="{StaticResource bmMaple}" CornerRadius="0,20,20,0" Margin="0" BorderThickness="0">
-                <local:PlayersTrackerCtrl x:Name="CTRL_PlayerTrackerCtrl" Margin="0" Background="Black"
+                <local:PlayersTrackerCtrl x:Name="CTRL_PlayerTrackerCtrl" Margin="0" Background="Black" Height="1080"
                         BorderBrush="White" BorderThickness="2" HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch" Canvas.ZIndex="5"
                         GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
@@ -345,7 +345,7 @@
                         </StackPanel>
                     </Viewbox>
 
-                    <StackPanel >
+                    <StackPanel>
                         <Viewbox Stretch="Uniform">
                             <StackPanel Name="StackPanel_TotalResourceCount" Orientation="Horizontal" Height="153">
                                 <local:ResourceCardSlimCtrl
@@ -369,7 +369,7 @@
                             </StackPanel>
                         </Viewbox>
                         <Viewbox Stretch="Uniform" Height="153">
-                            <StackPanel Orientation="Horizontal" >
+                            <StackPanel Orientation="Horizontal">
                                 <local:ResourceCardSlimCtrl
                                         Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                                         Count="{x:Bind MainPageModel.GameResources.Paper, Mode=OneWay}" Margin="5,0,0,0"
