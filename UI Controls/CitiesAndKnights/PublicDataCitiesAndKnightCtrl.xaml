@@ -299,8 +299,8 @@
                                 CornerRadius="{Binding Source={StaticResource PictogramHeight}, Converter={StaticResource HeightToCornerRadiusConverter}}"
                                 BorderBrush="{x:Bind Player.ForegroundBrush, Mode=OneWay}">
 
-                            <TextBlock Margin="0,-50,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                    CharacterSpacing="0" FontFamily="Segoe UI Symbol" FontSize="22"
+                            <TextBlock Margin="0,-20,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    CharacterSpacing="0" FontFamily="Segoe UI Symbol" FontSize="40"
                                     FontWeight="ExtraBold"
                                     Foreground="{x:Bind Player.ForegroundBrush, Mode=OneWay, FallbackValue=White}"
                                     Text="&#xE0C2;" />

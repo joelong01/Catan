@@ -134,8 +134,7 @@ namespace Catan10
     public interface IGameCallback
     {
         GameState CurrentGameState { get; }
-        Task BuildingStateChanged(PlayerModel player, BuildingCtrl settlement, BuildingState oldState);
-
+     
         bool BuildingStateChangeOk(BuildingCtrl building);
 
         bool CanBuildRoad();
@@ -247,8 +246,7 @@ namespace Catan10
         Task SetRandomTileToGold(List<int> goldTiles);
 
         Task SetRoadState(UpdateRoadLog updateRoadModel);
-        void UpdateRoadState(PlayerModel player, RoadCtrl road, RoadState oldState, RoadState newState, RoadRaceTracking raceTracking);
-
+      
         void SetSpyInfo(string sentBy, bool spyOn);
 
         Task SetState(SetStateLog log);
@@ -269,7 +267,6 @@ namespace Catan10
 
         Task UndoSetRandomBoard(RandomBoardLog logHeader);
 
-        Task UndoSetRoadState(UpdateRoadLog updateRoadModel);
 
         Task UndoSetState(SetStateLog setStateLog);
 
@@ -286,7 +283,7 @@ namespace Catan10
         void MoveMerchant(Point to);
         PlayerModel PlayerFromId(Guid id);
         RoadCtrl GetRoad(int destroyedRoadIndex);
-        RoadRaceTracking RaceTracking { get; }
+ 
     }
 
     public interface IGameViewCallback

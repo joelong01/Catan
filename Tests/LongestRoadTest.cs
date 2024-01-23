@@ -7,7 +7,33 @@ using System.Threading.Tasks;
 
 namespace Catan10
 {
-  
+    public static class PlayerExtensions
+    {
+        public static PlayerExpect Expect(this PlayerModel player)
+        {
+            return new PlayerExpect() { Player = player };
+        }
+    }
+    public class PlayerExpect
+    {
+        public PlayerModel Player { get; set; }
+        public void LongestRoad(int count, string msg = "")
+        {
+            Debug.Assert(Player.CalculateLongestRoad() == count, msg);
+        }
+        public void RoadCount(int count, string msg = "")
+        {
+            //
+            //  assumes all roads for now
+            Debug.Assert(Player.GameData.RoadsAndShips.Count == count, msg);
+            Debug.Assert(Player.GameData.Roads.Count == count, msg);
+        }
+
+        public void HasLongestRoad(bool yes, string msg = "")
+        {
+            Debug.Assert(Player.GameData.HasLongestRoad == yes, msg);
+        }
+    }
 
     internal class LongestRoadTest
     {
@@ -52,7 +78,13 @@ namespace Catan10
             int playerIndex;
             int roadIndex;
     
-            
+            foreach (var player in Controller.PlayingPlayers)
+            {
+                player.Expect().LongestRoad(1);
+                player.Expect().RoadCount(2);
+
+            }
+
             Debug.Assert(Controller.CurrentGameState == GameState.WaitingForRoll);
             await Controller.Test_DoRoll(3, 5, SpecialDice.Science);
             playerIndex = Controller.PlayingPlayers.IndexOf(Controller.CurrentPlayer);

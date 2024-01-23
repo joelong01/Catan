@@ -328,7 +328,7 @@ namespace Catan10
         {
             var road = CTRL_GameView.GetRoad(roadIndex);
             await PurchaseEntitlement(Entitlement.Road);
-            await UpdateRoadLog.PostLogEntry(this, road, RoadState.Road, RaceTracking);
+            await UpdateRoadLog.PostLogEntry(this, road, RoadState.Road);
         }
         /// <summary>
         ///     build a building. can start with None and build a City directly buy buying both entitlements
@@ -1431,7 +1431,7 @@ namespace Catan10
             {
                 if (road.Owner == null)
                 {
-                    await UpdateRoadLog.PostLogEntry(this, road, NextRoadState(road), RaceTracking);
+                    await UpdateRoadLog.PostLogEntry(this, road, NextRoadState(road));
                 }
             }
 

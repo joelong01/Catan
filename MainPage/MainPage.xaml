@@ -250,7 +250,7 @@
                         MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                         PlayingPlayers="{x:Bind MainPageModel.PlayingPlayers, Mode=OneWay}" />
             </Border>
-            <local:DragableGridCtrl x:Name="LocalPurchase" Width="500" Margin="0,500,0,0" CornerRadius="10"
+            <local:DragableGridCtrl x:Name="LocalPurchase" Width="{x:Bind CalculateFirstColumnWidth(GameContainer.CurrentGame), Mode=OneWay}" Margin="0,500,0,0" CornerRadius="10"
                     OnGridPositionChanged="OnGridPositionChanged" HorizontalAlignment="Left" VerticalAlignment="Center"
                     MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
@@ -263,7 +263,7 @@
                             CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay, TargetNullValue=PlayerModel.Default}" />
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
-            <local:DragableGridCtrl x:Name="TotalGameResources" Width="500" HorizontalAlignment="Center" Margin="0,0,0,0"
+            <local:DragableGridCtrl x:Name="TotalGameResources" Width="{x:Bind CalculateFirstColumnWidth(GameContainer.CurrentGame), Mode=OneWay}" HorizontalAlignment="Center" Margin="0,0,0,0"
                     VerticalAlignment="Center" Canvas.ZIndex="999" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2" Caption="Game Resource Count"
@@ -300,7 +300,7 @@
                 </local:DragableGridCtrl.Child>
             </local:DragableGridCtrl>
 
-            <local:DragableGridCtrl x:Name="ActionAndStats" Width="500" HorizontalAlignment="Center" Margin="100,500, 0, 0" RenderTransformOrigin="0, 0 "
+            <local:DragableGridCtrl x:Name="ActionAndStats" Width="{x:Bind CalculateFirstColumnWidth(GameContainer.CurrentGame), Mode=OneWay}" HorizontalAlignment="Center" Margin="100,500, 0, 0" RenderTransformOrigin="0, 0 "
                     VerticalAlignment="Center" Canvas.ZIndex="10" MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"
                     Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2"

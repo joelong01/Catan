@@ -46,7 +46,6 @@ namespace Catan10
         public static readonly DependencyProperty TheHumanProperty = DependencyProperty.Register("TheHuman", typeof(PlayerModel), typeof(MainPage), new PropertyMetadata(PlayerModel.DefaultPlayer));
         private const int MAX_SAVE_FILES_RETAINED = 5;
         private const int SMALLEST_STATE_COUNT = 8;
-        public RoadRaceTracking RaceTracking { get; private set; }
         private readonly List<RandomBoardSettings> _randomBoardList = new List<RandomBoardSettings>();
         private bool _doDragDrop = false;
         private DateTime _dt = DateTime.Now;
@@ -111,7 +110,6 @@ namespace Catan10
             Current = this;
             GameController = this;
             this.DataContext = this;
-            RaceTracking = new RoadRaceTracking(this);
             MainPageModel = MainPageModel.Default;
         }
 
@@ -281,7 +279,7 @@ namespace Catan10
             }
             while (road.Owner != null);
 
-            await UpdateRoadLog.PostLogEntry(this, road, RoadState.Road, RaceTracking);
+            await UpdateRoadLog.PostLogEntry(this, road, RoadState.Road);
         }
 
         private void GameViewControlDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -875,7 +873,6 @@ namespace Catan10
             }
 
             CTRL_GameView.CurrentGame.HexPanel.BaronVisibility = Visibility.Collapsed;
-            RaceTracking.Reset();
 
             CTRL_Invasion.Reset();
 
@@ -1165,18 +1162,7 @@ namespace Catan10
             Debug.Assert(enable == enableNextButton);
             return enable;
         }
-        /// <summary>
-        ///     via visual inspection, these 2 values work ok for 3-4 players in regular and 5-6 players in expansion
-        /// </summary>
-        double CalculatePlayerTrackerWidth(CatanGameCtrl currentGame, ObservableCollection<PlayerModel> players)
-        {
-
-            double width = 650;
-            if (currentGame != null && currentGame.GameType == GameType.SupplementalBuildPhase) width = 485;
-            this.TraceMessage($"PlayerTracker Width set to {width}");
-            return width;
-
-        }
+       
         private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
         {
             if (MainPageModel.EnableNextButton == false) return;
@@ -1560,6 +1546,28 @@ namespace Catan10
             if (players.Count < 4) return 600;
 
             return 400;
+        }
+
+        private double CalculateFirstColumnWidth(CatanGameCtrl game)
+        {
+            if (game == null) return 600;
+            if (game.Tiles.Count < 20)
+                return 600;
+
+            return 500;
+           
+        }
+        /// <summary>
+        ///     via visual inspection, these 2 values work ok for 3-4 players in regular and 5-6 players in expansion
+        /// </summary>
+        double CalculatePlayerTrackerWidth(CatanGameCtrl currentGame, ObservableCollection<PlayerModel> players)
+        {
+
+            double width = 650;
+            if (currentGame != null && currentGame.GameType == GameType.SupplementalBuildPhase) width = 485;
+            this.TraceMessage($"PlayerTracker Width set to {width}");
+            return width;
+
         }
 
         private async void OnTestLongestRoad(object sender, RoutedEventArgs e)

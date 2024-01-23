@@ -147,7 +147,7 @@ namespace Catan10
         {
             try
             {
-                if (logHeader.LogType != LogType.Redo)
+                if (logHeader.LogType != LogType.Redo && logHeader.UndoNext == false)
                 {
                     UndoneStack.Clear();
                 }
@@ -381,7 +381,7 @@ namespace Catan10
         {
             try
             {
-                if (logHeader.LogType == LogType.Normal)
+                if (logHeader.LogType == LogType.Normal && logHeader.UndoNext == false)
                 {
                     Stacks.ClearUndo();
                 }
@@ -458,7 +458,7 @@ namespace Catan10
             {
                 var logHeader = Stacks.PeekAction;
 
-                Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
+                Contract.Assert(logHeader.LogId == incomingLogHeader.LogId, "if this fires, make sure you are not adding a LogEntry in an Undo()");
                 if (!logHeader.CanUndo)
                 {
                     await Task.Delay(0);

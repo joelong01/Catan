@@ -44,7 +44,7 @@ namespace Catan10
                     {
                         await UpdateBuildingLog.UpdateBuildingState(Controller, building, BuildingState.City, Controller.CurrentGameState);
                     }
-                    await UpdateRoadLog.PostLogEntry(Controller, road, RoadState.Road, Controller.RaceTracking);
+                    await UpdateRoadLog.PostLogEntry(Controller, road, RoadState.Road);
                     success = await Controller.NextState();
                     Debug.Assert(success);
 

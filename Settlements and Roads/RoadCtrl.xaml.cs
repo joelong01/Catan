@@ -376,7 +376,7 @@ namespace Catan10
             set => SetValue(LocationProperty, value);
         }
 
-        public int Number { get; internal set; } = 0;
+        
 
         public PlayerModel Owner
         {

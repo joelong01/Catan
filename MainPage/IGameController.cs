@@ -828,15 +828,12 @@ namespace Catan10
             Contract.Assert(road != null);
             var player = NameToPlayer(updateRoadModel.SentBy);
             Contract.Assert(player != null);
-            string raceTrackCopy = JsonSerializer.Serialize<RoadRaceTracking>(updateRoadModel.OldRaceTracking);
-            RoadRaceTracking newRaceTracker = JsonSerializer.Deserialize<RoadRaceTracking>(raceTrackCopy);
-            Contract.Assert(newRaceTracker != null);
             //if (road.Owner != null)
             //{
             //    this.TraceMessage("Owner changing!");
             //}
 
-            UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
+          //  UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 
             await Task.Delay(0);
         }
@@ -937,17 +934,7 @@ namespace Catan10
             }
         }
 
-        public async Task UndoSetRoadState(UpdateRoadLog updateRoadModel)
-        {
-            RoadCtrl road = GetRoad(updateRoadModel.RoadIndex);
-            Contract.Assert(road != null);
-            var player = NameToPlayer(updateRoadModel.SentBy);
-            Contract.Assert(player != null);
-
-            UpdateRoadState(player, road, updateRoadModel.NewRoadState, updateRoadModel.OldRoadState, updateRoadModel.OldRaceTracking);
-
-            await Task.Delay(0);
-        }
+  
 
         //
         //  State in the game is stored at the top of the NewLog.ActionStack
@@ -1155,60 +1142,11 @@ namespace Catan10
 
             }
 
-            CalculateAndSetLongestRoad();
+            await LongestRoadChangedLog.CalculateAndSetLongestRoad(this);
             UpdateTileBuildingOwner(player, building, building.BuildingState, oldState);
         }
 
-        /// <summary>
-        ///     Function here so both Do and Undo can call it
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="road"></param>
-        /// <param name="oldState"></param>
-        /// <param name="newState"></param>
-        /// <param name="raceTracking"></param>
-        public void UpdateRoadState(PlayerModel player, RoadCtrl road, RoadState oldState, RoadState newState, RoadRaceTracking raceTracking)
-        {
-            road.RoadState = newState;
-            Contract.Assert(player != null);
-            switch (newState)
-            {
-                case RoadState.Unowned:
-                    if (oldState == RoadState.Ship)
-                    {
-                        player.GameData.Ships.Remove(road);
-                        player.GameData.Resources.GrantEntitlement(Entitlement.Ship);
-                    }
-                    else
-                    {
-                        player.GameData.Roads.Remove(road);
-                        player.GameData.Resources.GrantEntitlement(Entitlement.Road);
-                    }
-
-                    road.Owner = null;
-                    road.Number = -1;
-                    break;
-
-                case RoadState.Road:
-                    player.GameData.Resources.ConsumeEntitlement(Entitlement.Road);
-                    road.Number = player.GameData.Roads.Count; // undo-able
-                    Contract.Assert(player.GameData != null);
-                    player.GameData.Roads.Add(road);
-                    road.Owner = player;
-                    break;
-
-                case RoadState.Ship:
-                    player.GameData.Resources.ConsumeEntitlement(Entitlement.Ship);
-                    player.GameData.Roads.Remove(road); // can't be a ship if you aren't a road
-                    player.GameData.Ships.Add(road);
-                    break;
-
-                default:
-                    break;
-            }
-
-            CalculateAndSetLongestRoad(raceTracking);
-        }
+      
 
         private void DumpAllRolls()
         {

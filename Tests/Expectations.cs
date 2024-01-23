@@ -12,6 +12,7 @@ namespace Catan10
             Debug.Assert(longestRoad == player.GameData.LongestRoad);
             Debug.Assert(hasLongestRoad == player.GameData.HasLongestRoad);
             Debug.Assert(score == player.GameData.Score);
+            Debug.Assert(player.CalculateLongestRoad() == longestRoad);
         }
     }
 

@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Catan10.CatanService;
 using Windows.ApplicationModel;
+using System.Collections.Generic;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -496,6 +497,134 @@ namespace Catan10
         public override string ToString()
         {
             return String.Format($"{PlayerName}");
+        }
+
+        public int CalculateLongestRoad()
+        {
+            int max = 0;
+            RoadCtrl maxRoadStartedAt = null;
+            foreach (RoadCtrl startRoad in GameData.RoadsAndShips)
+            {
+                {
+                    int count = CalculateLongestRoad(startRoad, new List<RoadCtrl>(), null);
+                    if (count > max)
+                    {
+                        max = count;
+                        maxRoadStartedAt = startRoad;
+                        if (max == GameData.Roads.Count) // the most roads you can have…only count once
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            this.TraceMessage($"[LongestRoad={max} [Name={PlayerName}] [Start={maxRoadStartedAt?.Index}]");
+            return max;
+        }
+        //
+        //  Start is just any old road you want to start counting from
+        //  counted are all the roads that have been counted so far -- presumably starts with .Count = 0
+        //  blockedFork roads is set when we recurse so that we can pick a direction.  we need it in case of closed loops
+        private int CalculateLongestRoad(RoadCtrl start, List<RoadCtrl> counted, RoadCtrl blockedFork)
+        {
+            int count = 1;
+            int max = 1;
+            counted.Add(start); // it is counted in the "max=1" above
+            RoadCtrl next = start;
+            List<RoadCtrl> ownedAdjacentNotCounted = next.OwnedAdjacentRoadsNotCounted(counted, blockedFork, out bool adjacentFork);
+            do
+            {
+                switch (ownedAdjacentNotCounted.Count)
+                {
+                    case 0:
+                        return max;
+
+                    case 1:
+                        {
+                            count++;
+                            next = ownedAdjacentNotCounted[0];
+                            counted.Add(next);                  // we counted it, add it to the counted list.
+
+                            if (count > max)
+                            {
+                                max = count;
+                            }
+
+                            ownedAdjacentNotCounted = next.OwnedAdjacentRoadsNotCounted(counted, blockedFork, out adjacentFork);
+                            if (adjacentFork)
+                            {
+                                //ah...the loop
+                                count++;
+                                counted.Add(next); // we shouldn't have to do this more than once
+                                if (count > max)
+                                {
+                                    max = count;
+                                }
+
+                                return max;
+                            }
+                        }
+                        //
+                        //  loop to the next road to see if it terminates, forks, or just continues...
+                        break;
+
+                    default:
+
+                        //
+                        //   general strategy:  for each fork in the road, pretend that all but one of the forks are already counted
+                        //                      then count the remaining one.  after that, pick another to be counted
+                        //                      because we "count" the entered line, there are only ever 2 forks in the road
+
+                        // ownedAdjacentNotCounted.Count > 1
+                        //  usually there means there is a fork like this
+
+                        //                           /
+                        //                          /    <=== fork1
+                        //                         /
+                        //                  ------     <=== always counted
+                        //                         \
+                        //                          \   <=== Fork 2
+                        //                           \
+
+                        //  if we ever get this or the equivalent:
+                        //
+                        //                           /
+                        //                          /    <=== fork1
+                        //                         /
+                        //                  ------     <=== always counted
+                        //                /        \
+                        //   Fork 3 -->  /          \   <=== Fork 2
+                        //              /            \
+                        //
+                        //  e.g the adjacent count is > 2 then the road with all the forks around it (the horizontal in ascii art) doesn't have to be counted because we'll count all the
+                        //  roads coming into that fork
+
+                        List<RoadCtrl> forks = new List<RoadCtrl>();
+                        forks.AddRange(ownedAdjacentNotCounted);
+                        if (forks.Count > 2)
+                        {
+                            //
+                            //  if the fork count is not 2 then that means we are in a middle segment, and we don't need to start there
+                            return max;
+                        }
+                        foreach (RoadCtrl road in ownedAdjacentNotCounted)
+                        {
+                            forks.Remove(road);// now the list has everything except this one road...so we've effectively picked a direction
+                            int forkCount = CalculateLongestRoad(road, counted, forks[0]); // --> only one element in the forks list at this point
+
+                            if (count + forkCount > max)
+                            {
+                                max = count + forkCount;
+                            }
+
+                            forks.Add(road); // put fork back so we can count that fork
+                        }
+
+                        return max;
+                }
+            } while (ownedAdjacentNotCounted.Count != 0);
+
+            return max;
         }
     }
 }
