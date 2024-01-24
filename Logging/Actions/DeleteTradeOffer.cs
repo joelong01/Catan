@@ -29,16 +29,16 @@ namespace Catan10
                 //
                 //   this might happen if the user has deleted an offer locally (e.g. not the owner) and then 
                 //   the owner subsequently deletes it.  not a problem.                
-                await Task.Delay(0);
+                await DefaultTask;
             }
 
             gameController.TheHuman.GameData.Trades.PotentialTrades.Remove(localOffer);
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Replay (IGameController gameController)

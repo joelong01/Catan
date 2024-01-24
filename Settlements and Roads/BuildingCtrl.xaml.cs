@@ -25,6 +25,7 @@ namespace Catan10
 
     public sealed partial class BuildingCtrl : UserControl
     {
+        public static Task DefaultTask { get; } = Task.CompletedTask;
         private static void BuildingStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             BuildingCtrl depPropClass = d as BuildingCtrl;
@@ -512,7 +513,7 @@ namespace Catan10
                 AdjacentHarbor.Owner = Owner;
             }
             // this.TraceMessage($"TotalKnightCount: {MainPage.Current.MainPageModel.TotalKnightRanks}");
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         private bool GeneratesResources()

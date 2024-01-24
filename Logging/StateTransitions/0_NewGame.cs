@@ -67,7 +67,7 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         #endregion Methods

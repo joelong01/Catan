@@ -48,7 +48,7 @@ namespace Catan10
                 //
                 if (player.GameData.Resources.CurrentResources.Count > 7)
                 {
-                     await Task.Delay(0);
+                     await DefaultTask;
                 }
             }
 
@@ -89,7 +89,7 @@ namespace Catan10
             PlayerModel sentBy = gameController.NameToPlayer(this.SentBy);
             sentBy.GameData.Resources.GrantResources(LostResources.GetNegated());
             gameController.MainPageModel.Bank.GameData.Resources.GrantResources(LostResources);
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Undo(IGameController gameController)

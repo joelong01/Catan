@@ -221,7 +221,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task AddPlayer(string playerToAdd)
         {
-            if (playerToAdd == "Catan Spy") await Task.Delay(0);
+            if (playerToAdd == "Catan Spy") await DefaultTask;
             //
             //  7/25/2020:  if you are replaying a game, this call comes in at GameState.FinishedRollOrder
             Contract.Assert(CurrentGameState == GameState.WaitingForPlayers || CurrentGameState == GameState.WaitingForNewGame || CurrentGameState == GameState.FinishedRollOrder);
@@ -277,7 +277,7 @@ namespace Catan10
                 this.TraceMessage($"Recieved an AddPlayer call for {newPlayer} when they are already in the game");
             }
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task ChangePlayer(ChangePlayerLog changePlayerLog)
@@ -554,7 +554,7 @@ namespace Catan10
             MainPageModel.IsGameStarted = true;
             if (gameInfo.CitiesAndKnights && MainPageModel.Settings.HouseRules.HideBaronBeforeFirstInvasion)
             { CTRL_GameView.CurrentGame.HexPanel.HideBaron(); }
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public PlayerModel NameToPlayer(string playerName)
@@ -672,7 +672,7 @@ namespace Catan10
 
         public async Task ResetRollControl()
         {
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         //
@@ -834,7 +834,7 @@ namespace Catan10
 
           //  UpdateRoadState(player, road, updateRoadModel.OldRoadState, updateRoadModel.NewRoadState, newRaceTracker);
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public void SetSpyInfo(string sentBy, bool spyOn)
@@ -870,10 +870,10 @@ namespace Catan10
 
         public async Task TellServiceGameStarted()
         {
-            if (MainPageModel.CatanService == null) await Task.Delay(0);
+            if (MainPageModel.CatanService == null) await DefaultTask;
             this.TraceMessage("you took this out.  put it back or delete it.");
             // await MainPageModel.CatanService.StartTestGame(MainPageModel.GameInfo);
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public TileCtrl TileFromIndex(int targetTile)
@@ -892,7 +892,7 @@ namespace Catan10
             var player = NameToPlayer(playerLogHeader.SentBy);
             Contract.Assert(player != null, "Player Can't Be Null");
             MainPageModel.PlayingPlayers.Remove(player);
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task<bool> UndoAsync()
@@ -1029,7 +1029,7 @@ namespace Catan10
                 player.GameData.Resources.ConsumeEntitlement(Entitlement.Wall);
             }
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
         public void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron)
         {
@@ -1063,6 +1063,9 @@ namespace Catan10
                 return GameContainer.CurrentGame.HexPanel.BaronVisibility == Visibility.Visible;
             }
         }
+
+        public Task DefaultTask { get; } = Task.CompletedTask;
+
         public async Task UpdateBuilding(UpdateBuildingLog updateBuildingLog, ActionType actionType)
         {
             BuildingCtrl building = GetBuilding(updateBuildingLog.BuildingIndex);

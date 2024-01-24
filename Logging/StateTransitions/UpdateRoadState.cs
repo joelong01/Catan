@@ -86,7 +86,7 @@ namespace Catan10
 
 
             await LongestRoadChangedLog.CalculateAndSetLongestRoad(gameController);
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public static PlayerModel LongestRoadPlayer(List<PlayerModel> players)
@@ -148,7 +148,7 @@ namespace Catan10
             }
             
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

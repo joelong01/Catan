@@ -70,7 +70,7 @@ namespace Catan10
 
             gameController.CurrentPlayer.GameData.Resources.ThisTurnsDevCard = this.DevCardPlayedThisTurn;
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

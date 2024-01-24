@@ -148,7 +148,7 @@
                     BorderBrush="{StaticResource bmMaple}" CornerRadius="0,20,20,0" Margin="0" BorderThickness="0">
                 <local:PlayersTrackerCtrl x:Name="CTRL_PlayerTrackerCtrl" Margin="0" Background="Black" Height="1080"
                         BorderBrush="White" BorderThickness="2" HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch" Canvas.ZIndex="5"
+                        VerticalAlignment="Stretch" Canvas.ZIndex="5" OnPlayerSelected="OnPlayerSelected"
                         GameResources="{x:Bind MainPageModel.GameResources, Mode=OneWay}"
                         GameState="{x:Bind MainPageModel.Log.GameState, Mode=OneWay}"
                         MainPageModel="{x:Bind MainPageModel, Mode=OneWay}"

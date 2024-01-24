@@ -23,7 +23,7 @@ namespace Catan10
         {
             var player = gameController.NameToPlayer(this.SentBy);
             player.GameData.Resources.GrantResources(this.TradeResources);
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Replay (IGameController gameController)
@@ -40,7 +40,7 @@ namespace Catan10
         {
             var player = gameController.NameToPlayer(this.SentBy);
             player.GameData.Resources.GrantResources(this.TradeResources.GetNegated());
-             await Task.Delay(0);
+             await DefaultTask;
         }
     }
 }

@@ -20,7 +20,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Catan10
 {
-    public delegate void PlayerSelected(PlayerModel player);
+ 
     public sealed partial class PublicDataCitiesAndKnightCtrl : UserControl
     {
         public event PlayerSelected OnPlayerSelected;

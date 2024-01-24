@@ -36,7 +36,7 @@ namespace Catan10
             await MustMoveBaronLog.PostLog(gameController, MoveBaronReason.Knight, true);
             gameController.GetBuilding(KnightIndex).Knight.Activated = false;
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
@@ -47,14 +47,14 @@ namespace Catan10
         public async Task Replay(IGameController gameController)
         {
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task Undo(IGameController gameController)
         {
             gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.MoveBaronWithKnight);
             gameController.GetBuilding(KnightIndex).Knight.Activated = true;
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

@@ -50,7 +50,7 @@ namespace Catan10
                 gameController.TheHuman.GameData.Trades.PotentialTrades.Add(o);
             }
 
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Replay (IGameController gameController)
@@ -60,12 +60,12 @@ namespace Catan10
 
         public async Task Redo(IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public async Task Undo(IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
     }
 }

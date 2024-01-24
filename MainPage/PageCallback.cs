@@ -593,13 +593,13 @@ namespace Catan10
             }
             int newRank = (int) building.Knight.KnightRank + 1;
             await KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, ( KnightRank )newRank, building.Knight.Activated);
-            await Task.Delay(0); 
+            await DefaultTask; 
         }
         public async Task ActivateKnight(BuildingCtrl building, bool activated)
         {
             if (!CurrentPlayer.GameData.Resources.HasEntitlement(Entitlement.ActivateKnight))
             {
-                await Task.Delay(0); //ignoring the request
+                await DefaultTask; //ignoring the request
             }
 
             await KnightStateChangeLog.ToggleActiveState(this, building.Index, building.Knight, building.Knight.KnightRank, activated);
@@ -804,7 +804,7 @@ namespace Catan10
                     MustMoveBaron = false;
                 }
             }
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         //

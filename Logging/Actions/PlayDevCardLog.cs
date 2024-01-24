@@ -120,7 +120,7 @@ namespace Catan10
                 Contract.Assert(false, "What kind of devcard is it?");
             }
 
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Redo(IGameController gameController)

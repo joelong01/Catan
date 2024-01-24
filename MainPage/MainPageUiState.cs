@@ -20,7 +20,7 @@ namespace Catan10
 
         public async Task PlayerWon()
         {
-           await Task.Delay(0);
+           await DefaultTask;
             throw new NotImplementedException();
         }
     }

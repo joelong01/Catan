@@ -39,6 +39,8 @@ namespace Catan10
 
     public sealed partial class PlayersTrackerCtrl : UserControl
     {
+
+        public event PlayerSelected OnPlayerSelected;
         /// <summary>
         ///     this has the *global* resource count
         /// </summary>
@@ -123,6 +125,9 @@ namespace Catan10
         public double ControlHeight(ObservableCollection<PlayerModel> players)
         {
             var max = 215;
+            if (players == null) return max;
+            if (players.Count == 0) return max;
+
             double height = max;
             try
             {
@@ -141,11 +146,15 @@ namespace Catan10
             }
             finally
             {
-             //  this.TraceMessage($"PlayerCount = {players.Count} height={height}");
+                //  this.TraceMessage($"PlayerCount = {players.Count} height={height}");
             }
 
 
         }
 
+        private void PlayerSelected(PlayerModel player)
+        {
+            OnPlayerSelected?.Invoke(player);
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace Catan10
                 Debug.Assert(this.PlayingPlayers[i].PlayerName == gameController.PlayingPlayers[i].PlayerName);
             }
             Contract.Assert(this.CurrentPlayer.PlayerName == gameController.CurrentPlayer.PlayerName);
-             await Task.Delay(0);
+             await DefaultTask;
         }
         public Task Replay (IGameController gameController)
         {

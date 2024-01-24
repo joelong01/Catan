@@ -24,7 +24,7 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Redo(IGameController gameController)
@@ -34,7 +34,7 @@ namespace Catan10
 
         public async Task Replay (IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Undo(IGameController gameController)

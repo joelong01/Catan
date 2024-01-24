@@ -52,7 +52,7 @@ namespace Catan10
                 gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.UpgradeKnight);
             }
 
-            return Task.Delay(0);
+            return DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
@@ -79,7 +79,7 @@ namespace Catan10
                 building.Knight.Activated = this.OldActivated;
             }
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

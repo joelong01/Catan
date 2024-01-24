@@ -1351,26 +1351,26 @@ namespace Catan10
             while (CurrentPlayer.GameData.PoliticsRank < 5)
             {
                 await ImprovementLog.PostLog(this, Entitlement.PoliticsUpgrade, CurrentPlayer.GameData.PoliticsRank);
-                await Task.Delay(0); // force UI to update
+                await DefaultTask; // force UI to update
 
             }
-            await Task.Delay(0); // force UI to update
+            await DefaultTask; // force UI to update
             Debug.Assert(CurrentGameState == GameState.WaitingForNext); // Tie does not get the win!
                                                                         // move to Player
             await NextState();
-            await Task.Delay(0); // force UI to update
+            await DefaultTask; // force UI to update
             // roll
             await Test_DoRoll(1, 2, SpecialDice.Pirate);
             while (CurrentPlayer.GameData.PoliticsRank < 6)
             {
                 await ImprovementLog.PostLog(this, Entitlement.PoliticsUpgrade, CurrentPlayer.GameData.PoliticsRank);
-                await Task.Delay(0); // force UI to update
+                await DefaultTask; // force UI to update
             }
 
             Debug.Assert(CurrentPlayer.GameData.PoliticsRank == 6);
 
             Debug.Assert(CurrentGameState == GameState.UpgradeToMetro);
-            await Task.Delay(0); // force UI to update
+            await DefaultTask; // force UI to update
             await MetroTransitionLog.UpgradeCityLog(this, this.CurrentPlayer.GameData.Cities[0].Index);
 
             Debug.Assert(CurrentPlayer.GameData.Score == 5);

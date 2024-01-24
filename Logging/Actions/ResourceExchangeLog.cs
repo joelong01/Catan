@@ -36,7 +36,7 @@ namespace Catan10
 
             var owner = gameController.NameToPlayer(this.SentBy);
             owner.GameData.Resources.GrantResources(this.Traded);
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public Task Replay (IGameController gameController)
@@ -53,7 +53,7 @@ namespace Catan10
         {
             var owner = gameController.NameToPlayer(this.SentBy);
             owner.GameData.Resources.GrantResources(this.Traded.GetNegated());
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         #endregion Methods

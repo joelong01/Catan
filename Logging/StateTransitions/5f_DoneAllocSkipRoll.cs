@@ -56,7 +56,7 @@ namespace Catan10
                 p.GameData.Resources.ResourcesThisTurn.Reset();
             });
 
-             await Task.Delay(0);
+             await DefaultTask;
 
         }
 

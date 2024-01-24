@@ -98,7 +98,7 @@ namespace Catan10
             }
             finally
             {
-                await Task.Delay(0);
+                await DefaultTask;
             }
         }
 
@@ -140,7 +140,7 @@ namespace Catan10
 
                 gameController.CurrentPlayer.GameData.Resources.RevokeEntitlement(Entitlement.UpgradeToMetro);
             }
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

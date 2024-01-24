@@ -110,7 +110,7 @@ namespace Catan10
             {
                 gameController.PlayingPlayers[i].GameData.LongestRoad = NewLongestRoads[i];
             }
-            return Task.Delay(0);
+            return DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
@@ -142,7 +142,7 @@ namespace Catan10
             {
                 gameController.PlayingPlayers[i].GameData.LongestRoad = PreviousLongestRoads[i];
             }
-            return Task.Delay(0);
+            return DefaultTask;
         }
     }
 }

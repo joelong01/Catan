@@ -22,7 +22,7 @@ namespace Catan10
         {
 
             ChangePlayerHelper.ChangePlayer(gameController, 1);
-             await Task.Delay(0);
+             await DefaultTask;
 
         }
 
@@ -39,7 +39,7 @@ namespace Catan10
         public async Task Undo(IGameController gameController)
         {
             ChangePlayerHelper.ChangePlayer(gameController, -1);
-             await Task.Delay(0);
+             await DefaultTask;
         }
     }
 }

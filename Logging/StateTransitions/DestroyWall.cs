@@ -24,7 +24,7 @@ namespace Catan10.Logging.StateTransitions
             BuildingCtrl building = gameController.GetBuilding(this.Index);
             building.City.HasWall = false;
             gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.DestroyCity);
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Redo(IGameController gameController)
@@ -41,7 +41,7 @@ namespace Catan10.Logging.StateTransitions
         {
             BuildingCtrl building = gameController.GetBuilding(this.Index);
             building.City.HasWall = true;
-             await Task.Delay(0);
+             await DefaultTask;
         }
     }
 }

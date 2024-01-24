@@ -20,7 +20,7 @@ namespace Catan10
         public async Task Do(IGameController gameController)
         {
             gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Merchant);
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
@@ -36,7 +36,7 @@ namespace Catan10
         public async Task Undo(IGameController gameController)
         {
             gameController.CurrentPlayer.GameData.Resources.RevokeEntitlement(Entitlement.Merchant);
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

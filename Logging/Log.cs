@@ -343,6 +343,8 @@ namespace Catan10
             }
         }
 
+        public Task DefaultTask { get; } = Task.CompletedTask;
+
         public Log(IGameController gameController)
         {
             Stacks.PropertyChanged += Stacks_PropertyChanged;
@@ -387,7 +389,7 @@ namespace Catan10
                 }
                 logHeader.LogType = LogType.Normal;
                 Stacks.PushAction(logHeader);
-                await Task.Delay(0);
+                await DefaultTask;
             }
             finally
             {
@@ -429,7 +431,7 @@ namespace Catan10
                 Contract.Assert(logHeader.LogId == incomingLogHeader.LogId);
                 logHeader.LogType = LogType.Redo;  // 5/21/2020:  We need this so that we know to know clear the undo stack on the push
                 Stacks.PushAction(logHeader);
-                await Task.Delay(0);
+                await DefaultTask;
             }
             finally
             {
@@ -461,13 +463,13 @@ namespace Catan10
                 Contract.Assert(logHeader.LogId == incomingLogHeader.LogId, "if this fires, make sure you are not adding a LogEntry in an Undo()");
                 if (!logHeader.CanUndo)
                 {
-                    await Task.Delay(0);
+                    await DefaultTask;
                     return;
                 }
                 Stacks.PopAction();
                 logHeader.LogType = LogType.Undo;
                 Stacks.PushUndo(logHeader);
-                await Task.Delay(0);
+                await DefaultTask;
             }
             finally
             {

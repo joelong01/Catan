@@ -21,7 +21,7 @@ namespace Catan10
         public async Task Do(IGameController gameController)
         {
             gameController.SetSpyInfo(this.SentBy.PlayerName, this.SpyOn);
-             await Task.Delay(0);
+             await DefaultTask;
         }
         public Task Replay (IGameController gameController)
         {

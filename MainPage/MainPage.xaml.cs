@@ -206,7 +206,7 @@ namespace Catan10
                 _starting = true;
                 if (e.NavigationMode == NavigationMode.New)
                 {
-                  
+
 
                     CTRL_GameView.Init(this, this);
                     CreateMenuItems();
@@ -247,7 +247,7 @@ namespace Catan10
             pData.GameData.MaxSettlements = CTRL_GameView.CurrentGame.GameData.MaxSettlements;
             pData.GameData.MaxShips = CTRL_GameView.CurrentGame.GameData.MaxShips;
             pData.GameData.MaxKnights = CTRL_GameView.CurrentGame.GameData.MaxKnights;
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         /// <summary>
@@ -908,9 +908,9 @@ namespace Catan10
             try
             {
                 if (SaveSettingsTimer == null) { return; }
-                if (SaveSettingsTimer.IsEnabled) await Task.Delay(0);
+                if (SaveSettingsTimer.IsEnabled) await DefaultTask;
                 SaveSettingsTimer.Start();
-                await Task.Delay(0);
+                await DefaultTask;
             }
             catch
             {
@@ -1094,7 +1094,7 @@ namespace Catan10
             _randomBoardList.Clear();
             _randomBoardList.Add(CTRL_GameView.RandomBoardSettings);
             _randomBoardListIndex = 0;
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         #endregion Methods
@@ -1161,7 +1161,7 @@ namespace Catan10
             Debug.Assert(enable == enableNextButton);
             return enable;
         }
-       
+
         private async void OnJoinNetworkGame(object sender, RoutedEventArgs e)
         {
             if (MainPageModel.EnableNextButton == false) return;
@@ -1554,14 +1554,14 @@ namespace Catan10
                 return 600;
 
             return 500;
-           
+
         }
         /// <summary>
         ///     via visual inspection, these 2 values work ok for 3-4 players in regular and 5-6 players in expansion
         /// </summary>
         double CalculatePlayerTrackerWidth(CatanGameCtrl currentGame, ObservableCollection<PlayerModel> players)
         {
-            
+
             double width = 650;
             if (currentGame != null && currentGame.GameType == GameType.SupplementalBuildPhase) width = 485;
             this.TraceMessage($"PlayerTracker Width set to {width}");
@@ -1578,6 +1578,25 @@ namespace Catan10
         {
             var test = new KnightDisplacementTest(this);
             await test.TestKnightDisplacement();
+        }
+
+        private void OnPlayerSelected(PlayerModel player)
+        {
+            if (player == null || !MainPageModel.PlayingPlayers.Contains(player))
+            {
+                Debug.Assert(false, "should be here!");
+                return;
+            }
+
+            if (CurrentGameState != GameState.FinishedRollOrder && CurrentGameState != GameState.WaitingForRollForOrder) { return;  }
+          
+            while (MainPageModel.PlayingPlayers[0] != player)
+            {
+                var p = MainPageModel.PlayingPlayers[0];
+                MainPageModel.PlayingPlayers.RemoveAt(0);
+                MainPageModel.PlayingPlayers.Add(p);
+            }
+
         }
     }
 }

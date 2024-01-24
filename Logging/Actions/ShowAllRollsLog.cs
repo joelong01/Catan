@@ -40,11 +40,11 @@ namespace Catan10
             Contract.Assert(sentBy != null);
             sentBy.GameData.SyncronizedPlayerRolls.LatestRolls.ForEach((r) => r.Orientation = TileOrientation.FaceUp);
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
         public async Task Replay(IGameController gameController)
         {
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public Task Redo(IGameController gameController)

@@ -19,6 +19,7 @@ namespace Catan10
         public event OnRolledHandler OnRolled;
 
         public event OnRolledHandler OnShowAllRolls;
+        private static Task DefaultTask { get; } = Task.CompletedTask;
 
         private bool _rolled = false;
         private bool clicked = false;
@@ -65,7 +66,7 @@ namespace Catan10
 
             _rolled = false;
 
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public void TestSetRolls (List<RollModel> rolls)

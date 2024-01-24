@@ -28,7 +28,7 @@ namespace Catan10.Spy
     public sealed partial class CatanSpyPage : Page
     {
         #region Delegates + Fields + Events + Enums
-
+        private static Task DefaultTask { get; } = Task.CompletedTask;
         public static readonly DependencyProperty LogHeaderJsonProperty = DependencyProperty.Register("LogHeaderJson", typeof(string), typeof(CatanSpyPage), new PropertyMetadata(""));
         public static readonly DependencyProperty SelectedGameProperty = DependencyProperty.Register("SelectedGame", typeof(GameInfo), typeof(CatanSpyPage), new PropertyMetadata(null, SelectedGameChanged));
         public static readonly DependencyProperty SelectedMessageProperty = DependencyProperty.Register("SelectedMessage", typeof(CatanMessage), typeof(CatanSpyPage), new PropertyMetadata(null, SelectedMessageChanged));
@@ -228,7 +228,7 @@ namespace Catan10.Spy
             {
                 connectionTCS.TrySetResult(null);
                 HubConnection.Reconnected -= Reconnected;
-                 await Task.Delay(0);
+                 await DefaultTask;
             }
 
             int n = 0;

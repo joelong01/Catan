@@ -29,7 +29,7 @@ namespace Catan10
             (target.Number, source.Number) = (source.Number, target.Number);
             source.CatanNumber.MoveAsync(new Windows.Foundation.Point(0,0));
             gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.Inventor);
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
@@ -49,7 +49,7 @@ namespace Catan10
             TileCtrl target = gameController.TileFromIndex(TargetTileIndex);
             (source.Number, target.Number) = (target.Number, source.Number) ;
             gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Inventor);
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

@@ -459,7 +459,7 @@ namespace Catan10
                 GameController.StopHighlightingTiles();
             }
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         internal Task UpdateUiForRoll(RollState rollState)
@@ -679,6 +679,8 @@ namespace Catan10
                 }
             }
         }
+
+        private static Task DefaultTask { get; } = Task.CompletedTask;
 
         public RollLog(IGameController gameController)
         {

@@ -32,22 +32,22 @@ namespace Catan10
         {
             // move current player to the first player that needs to destroy a city
            
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public async Task Replay(IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public async Task Undo(IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
     }

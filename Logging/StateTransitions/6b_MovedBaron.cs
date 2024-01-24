@@ -200,7 +200,7 @@ namespace Catan10
             gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.MoveBaron);
 
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public Task Replay(IGameController gameController)
@@ -254,7 +254,7 @@ namespace Catan10
             gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.MoveBaron);
 
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         #endregion Methods

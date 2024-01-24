@@ -57,7 +57,7 @@ namespace Catan10
             //  move to the next player.  
             ChangePlayerHelper.ChangePlayer(gameController, -1);
             
-             await Task.Delay(0);
+             await DefaultTask;
         }
     }
 }

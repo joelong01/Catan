@@ -159,7 +159,7 @@ namespace Catan10
             {
                 await WaitingForRollToWaitingForNext.PostRollMessage(gameController, this.RollModel);
             }
-            await Task.Delay(0);
+            await DefaultTask;
 
         }
 
@@ -214,7 +214,7 @@ namespace Catan10
                 ActiveKnights.ForEach(knight => knight.Activated = true);
 
             }
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

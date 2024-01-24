@@ -329,7 +329,7 @@ namespace Catan10
         private async Task ReplayGame(GameInfo game, string playerName)
         {
             this.TraceMessage("You need to build this...");
-             await Task.Delay(0);
+             await DefaultTask;
             //   var messages = await Proxy.
         }
 

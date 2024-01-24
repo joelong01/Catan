@@ -56,7 +56,7 @@ namespace Catan10
         {
             gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.MoveBaron);
 
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public async Task Redo (IGameController gameController)
@@ -67,13 +67,13 @@ namespace Catan10
         public async Task Replay (IGameController gameController)
         {
        
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task Undo (IGameController gameController)
         {
             gameController.CurrentPlayer.GameData.Resources.RevokeEntitlement(Entitlement.MoveBaron);
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         #endregion Methods

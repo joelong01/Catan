@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using System.Threading.Tasks;
 using Catan.Proxy;
 using Catan10.CatanService;
 
@@ -11,6 +11,7 @@ namespace Catan10
 {
     public class LogHeader
     {
+        public static Task DefaultTask { get; } = Task.CompletedTask;
         #region Properties + Fields
 
         public CatanAction Action { get; set; }
@@ -26,7 +27,7 @@ namespace Catan10
             {
                 Contract.Assert(SentBy != null);
                 Contract.Assert(MainPage.Current.TheHuman != null);
-                return (MainPage.Current.TheHuman == SentBy);
+                return ( MainPage.Current.TheHuman == SentBy );
             }
         }
 
@@ -36,7 +37,7 @@ namespace Catan10
 
         public GameState NewState { get; set; } = MainPage.Current.CurrentGameState;
 
-        public GameState OldState { get; set; } = (MainPage.Current.MainPageModel.Log.PeekAction == null) ? GameState.WaitingForNewGame : MainPage.Current.MainPageModel.Log.PeekAction.NewState;
+        public GameState OldState { get; set; } = ( MainPage.Current.MainPageModel.Log.PeekAction == null ) ? GameState.WaitingForNewGame : MainPage.Current.MainPageModel.Log.PeekAction.NewState;
 
         [JsonIgnore]
         public LogHeader Previous { get; set; } = MainPage.Current.MainPageModel.Log.PeekAction;
@@ -44,7 +45,7 @@ namespace Catan10
         public PlayerModel SentBy { get; set; } = MainPage.Current.TheHuman;
 
         public DateTime CreatedTime { get; set; } = DateTime.Now;
-        
+
 
         public string TypeName { get; set; }
         public bool UndoNext { get; set; } = false; // if this is true, then on an Undo, the record following this one is also undone

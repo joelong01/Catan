@@ -49,7 +49,7 @@ namespace Catan10
 
         public async Task Replay (IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Catan10
         /// <returns></returns>
         public async Task Redo(IGameController gameController)
         {
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public override string ToString()
@@ -69,7 +69,7 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

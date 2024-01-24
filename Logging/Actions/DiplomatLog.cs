@@ -55,7 +55,7 @@ namespace Catan10
                 player.GameData.Resources.RevokeEntitlement(Entitlement.Road); // this will be consumed next
             }
 
-            await Task.Delay(0);
+            await DefaultTask;
 
         }
     }

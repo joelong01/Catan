@@ -97,7 +97,7 @@ namespace Catan10
             var newPlayer = playingPlayers[newPlayerIndex];
             gameController.CurrentPlayer = newPlayer;
             MainPage.Current.TheHuman = gameController.CurrentPlayer;
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public Task Redo(IGameController gameController)
@@ -131,7 +131,7 @@ namespace Catan10
             var newPlayer = playingPlayers[newPlayerIndex];
             gameController.CurrentPlayer = newPlayer;
             MainPage.Current.TheHuman = gameController.CurrentPlayer;
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

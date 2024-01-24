@@ -35,7 +35,7 @@ namespace Catan10
                 Contract.Assert(PlayersInOrder[i].PlayerIdentifier == gameController.PlayingPlayers[i].PlayerIdentifier);
             }
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
         /// <summary>
         ///     this is where we set the correct order for the players, having ignored the rolls previously
@@ -65,12 +65,12 @@ namespace Catan10
             {
                 gameController.PlayingPlayers[i] = PlayersInOrder[i];
             }
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public async Task Undo(IGameController gameController)
         {
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         #endregion Methods

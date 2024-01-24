@@ -53,7 +53,7 @@ namespace Catan10
         public async Task Replay (IGameController gameController)
         {
             gameController.MainPageModel.FinishedAddingPlayers();
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
@@ -83,7 +83,7 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

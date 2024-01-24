@@ -80,7 +80,7 @@ namespace Catan10
 
         public async Task Replay (IGameController gameController)
         {
-             await Task.Delay(0); // TODO: what if this is the last message?
+             await DefaultTask; // TODO: what if this is the last message?
         }
 
         public Task Undo(IGameController gameController)

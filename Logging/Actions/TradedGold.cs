@@ -38,7 +38,7 @@ namespace Catan10
             {
                 if (p.GameData.Resources.CurrentResources.GetCount(ResourceType.GoldMine) > 0)
                 {
-                     await Task.Delay(0);
+                     await DefaultTask;
                 }
             }
 
@@ -49,14 +49,14 @@ namespace Catan10
                 await TradeGoldToWaitingForNext.PostMessage(gameController);
             }
 
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public async Task Replay (IGameController gameController)
         {
             var player = gameController.NameToPlayer(this.SentBy);            
             player.GameData.Resources.GrantResources(this.GoldTrade);           
-             await Task.Delay(0);
+             await DefaultTask;
         }
 
         public Task Redo(IGameController gameController)

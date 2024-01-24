@@ -55,7 +55,7 @@ namespace Catan10
         {
             ChangePlayerHelper.ChangePlayer(gameController, 1);
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
-             await Task.Delay(0);
+             await DefaultTask;
         }
     }
 }

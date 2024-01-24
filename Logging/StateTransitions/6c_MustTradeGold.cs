@@ -81,7 +81,7 @@ namespace Catan10
 
         public async Task Replay (IGameController gameController)
         {
-             await Task.Delay(0); //TODO: Fix this by calling Do() if this is the last message we are replaying.
+             await DefaultTask; //TODO: Fix this by calling Do() if this is the last message we are replaying.
         }
 
         public Task Redo(IGameController gameController)

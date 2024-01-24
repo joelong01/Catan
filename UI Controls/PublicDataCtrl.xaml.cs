@@ -11,8 +11,10 @@ using Windows.UI.Xaml.Input;
 
 namespace Catan10
 {
+    public delegate void PlayerSelected(PlayerModel player);
     public sealed partial class PublicDataCtrl : UserControl
     {
+        public event PlayerSelected OnPlayerSelected;
         private static void PlayerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var depPropClass = d as PublicDataCtrl;
@@ -28,8 +30,8 @@ namespace Catan10
 
         private void Picture_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            //
-            //  7/9/2020:  this used to open Trade in multiplayer.  leave it here in case we need a real time debug entry point
+
+            OnPlayerSelected?.Invoke(Player);
         }
 
         private void SetPlayer(PlayerModel value)

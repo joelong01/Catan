@@ -6,19 +6,19 @@
     <Control.Resources>
 
         <DataTemplate x:Key="RegularTemplate" x:DataType="local:PlayerModel">
-            <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}"
+            <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" OnPlayerSelected="PlayerSelected"
                     RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
             </local:PublicDataCtrl>
         </DataTemplate>
         <DataTemplate x:Key="ExpansionTemplate" x:DataType="local:PlayerModel">
-            <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" HorizontalAlignment="Stretch"
+            <local:PublicDataCtrl Player="{x:Bind Mode=OneWay}" HorizontalAlignment="Stretch" OnPlayerSelected="PlayerSelected"
                     RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
             </local:PublicDataCtrl>
         </DataTemplate>
 
         <DataTemplate x:Key="ExpansionTemplate_CitiesAndKnights" x:DataType="local:PlayerModel">
             <Viewbox Stretch="Uniform">
-                <local:PublicDataCitiesAndKnightCtrl Player="{x:Bind Mode=OneWay}"
+                <local:PublicDataCitiesAndKnightCtrl Player="{x:Bind Mode=OneWay}" OnPlayerSelected="PlayerSelected"
                         RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
                 </local:PublicDataCitiesAndKnightCtrl>
             </Viewbox>
@@ -27,7 +27,7 @@
         <DataTemplate x:Key="RegularTemplate_CititesAndKnights" x:DataType="local:PlayerModel">
             <Viewbox Stretch="Uniform">
                 <local:PublicDataCitiesAndKnightCtrl Player="{x:Bind Mode=OneWay}" HorizontalAlignment="Stretch"
-                        RenderTransformOrigin="0 0"
+                        RenderTransformOrigin="0 0" OnPlayerSelected="PlayerSelected"
                         RollOrientation="{x:Bind GameData.RollOrientation, Mode=OneWay, FallbackValue=FaceDown}">
                 </local:PublicDataCitiesAndKnightCtrl>
             </Viewbox>

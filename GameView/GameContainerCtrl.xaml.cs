@@ -660,7 +660,7 @@ namespace Catan10
                 }
             }
 
-            await Task.Delay(0);
+            await Task.CompletedTask;
         }
 
         /// <summary>

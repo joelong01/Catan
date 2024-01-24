@@ -47,7 +47,7 @@ namespace Catan10
                 player.GameData.Resources.AvailableDevCards.Add(model);
             }
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
         public Task Replay (IGameController gameController)
         {

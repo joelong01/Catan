@@ -39,7 +39,7 @@ namespace Catan10
                 if (devCard == DevCardType.None) // ran out of DevCards!
                 {
                     player.GameData.Resources.CurrentResources += cost; //refund!
-                    await Task.Delay(0);
+                    await DefaultTask;
                 }
 
                 player.GameData.Resources.AddDevCard(devCard);
@@ -48,7 +48,7 @@ namespace Catan10
             {
                 player.GameData.Resources.GrantEntitlement(PurchasedEntitlement);
             }
-            await Task.Delay(0);
+            await DefaultTask;
         }
         public Task Replay (IGameController gameController)
         {
@@ -69,7 +69,7 @@ namespace Catan10
             player.GameData.Resources.CurrentResources += cost;
             player.GameData.Resources.RevokeEntitlement(PurchasedEntitlement);
 
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }

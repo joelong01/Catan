@@ -37,7 +37,7 @@ namespace Catan10
            
 
             AllocationPhaseHelper.GrantEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
-             await Task.Delay(0);
+             await DefaultTask;
         }
         public Task Replay (IGameController gameController)
         {
@@ -52,7 +52,7 @@ namespace Catan10
         public async Task Undo(IGameController gameController)
         {
             AllocationPhaseHelper.RevokeEntitlements(gameController, gameController.CurrentPlayer.PlayerName);
-             await Task.Delay(0);
+             await DefaultTask;
         }
     }
 }

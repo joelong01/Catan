@@ -646,7 +646,7 @@ namespace Catan10.CatanService
             message.MessageDirection = MessageDirection.ClientToServer;
             MessageQueue.Enqueue(message);
             ProcessQueueAsync();
-             await Task.Delay(0);
+             await Task.CompletedTask;
         }
 
         public async Task SendPrivateMessage(string playerName, CatanMessage message)

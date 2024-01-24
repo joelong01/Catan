@@ -41,7 +41,7 @@ namespace Catan10
             gameController.PlayingPlayers.ForEach((p) => p.GameData.PlayedMerchantLast = false);
             gameController.CurrentPlayer.GameData.Resources.ConsumeEntitlement(Entitlement.Merchant);
             gameController.CurrentPlayer.GameData.PlayedMerchantLast = true;
-            await Task.Delay(0);
+            await DefaultTask;
         }
 
         public async Task Redo(IGameController gameController)
@@ -67,7 +67,7 @@ namespace Catan10
             }
             gameController.CurrentPlayer.GameData.Resources.GrantEntitlement(Entitlement.Merchant);
             gameController.MoveMerchant(From);
-            await Task.Delay(0);
+            await DefaultTask;
         }
     }
 }
