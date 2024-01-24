@@ -532,7 +532,7 @@ namespace Catan10
         
 
             //    CurrentPlayer = TheHuman;
-            this.TraceMessage("If you want to set the CurrentPlayer to startup, do it here");
+           // this.TraceMessage("If you want to set the CurrentPlayer to startup, do it here");
 
         }
 

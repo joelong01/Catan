@@ -135,7 +135,7 @@ namespace Catan10
                 default:
                     break;
             }
-            this.TraceMessage($"returned: {ret}");
+         //   this.TraceMessage($"returned: {ret}");
             return ret;
         }
 
