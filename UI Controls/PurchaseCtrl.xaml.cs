@@ -67,11 +67,11 @@ namespace Catan10
         {
             if (!pirates)
             {
-                return 100;
+                return 135;
             }
             else
             {
-                return 300;
+                return 395;
             }
         }
     }

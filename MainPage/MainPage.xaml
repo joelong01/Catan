@@ -317,15 +317,13 @@
                     <Viewbox Stretch="Uniform" Name="VB_Rolls" Margin="0,10,0,10">
 
                         <local:TraditionalRollCtrl x:Name="CTRL_RollControl"
-                               
                                 Foreground="{x:Bind CurrentPlayer.ForegroundBrush,Mode=OneWay}"
                                 IsEnabled="{x:Bind MainPageModel.GameState, Mode=OneWay, Converter={StaticResource GameStateToBooleanConverter}, ConverterParameter=WaitingForRoll}"
                                 MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
                                 OnRoll="OnNumberRolled" />
                     </Viewbox>
 
-                    <Viewbox Name="VB_Purchase" Stretch="Uniform" Grid.Column="0" Grid.ColumnSpan="2"
-                           Margin="0,10,0,10">
+                    <Viewbox Name="VB_Purchase" Stretch="Uniform" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,10">
 
                         <local:PurchaseCtrl OnPurchaseEntitlement="OnPurchaseEntitlement"
                                 MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
@@ -367,10 +365,10 @@
                                         Image="{StaticResource ResourceType.GoldMine}" />
                             </StackPanel>
                         </Viewbox>
-                        <Viewbox Stretch="Uniform" Height="153">
+                        <Viewbox Stretch="Uniform" Height="153"
+                                Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal">
                                 <local:ResourceCardSlimCtrl
-                                        Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                                         Count="{x:Bind MainPageModel.GameResources.Paper, Mode=OneWay}" Margin="5,0,0,0"
                                         Image="{StaticResource ResourceType.Coin}" />
                                 <local:ResourceCardSlimCtrl
