@@ -21,7 +21,7 @@
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
     </Control.Resources>
-    <Viewbox Stretch="Fill">
+    <Viewbox Stretch="Uniform">
         <Grid Style="{StaticResource PurchaseGridStyle}"
                 BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Red}">
 

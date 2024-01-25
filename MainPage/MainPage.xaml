@@ -77,12 +77,12 @@
                     Player="{x:Bind TheHuman, Mode=OneWay}" PointerPressed="Draggable_PointerPressed">
 
                 <local:DragableGridCtrl.Child>
-                    <Viewbox Name="VB_Controls" Stretch="Uniform" Margin="10">
+                    <Viewbox Name="VB_Controls" Stretch="Uniform" Margin="0">
                         <StackPanel HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
                                 <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
-                                        Height="130">
+                                        Height="65">
 
                                     <StackPanel Name="SP_UndoButton" Orientation="Vertical">
                                         <Button x:Name="_btnUndo"
@@ -173,8 +173,11 @@
             </Viewbox>
             <Viewbox Grid.Column="0" Grid.ColumnSpan="2" Margin="0" Grid.Row="0" HorizontalAlignment="Stretch"
                     VerticalAlignment="Top">
-                <StackPanel HorizontalAlignment="Stretch">
-                    <Viewbox Stretch="Uniform" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <StackPanel HorizontalAlignment="Stretch"
+                        Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                        BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" BorderThickness="0"
+                        CornerRadius="10">
+                    <Viewbox Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75">
                         <Button Margin="0" VerticalAlignment="Top" Background="Transparent" Canvas.ZIndex="10"
                                 FontSize="33">
                             <Button.Content>
@@ -311,38 +314,34 @@
                             </Button.Flyout>
                         </Button>
                     </Viewbox>
-                    <Viewbox Stretch="Uniform" Name="VB_Rolls">
-                        <StackPanel Orientation="Vertical"
-                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                                BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" BorderThickness="2">
-                            <Viewbox Stretch="Uniform" Margin="0">
-                                <local:TraditionalRollCtrl x:Name="CTRL_RollControl"
-                                        IsEnabled="{x:Bind MainPageModel.GameState, Mode=OneWay, Converter={StaticResource GameStateToBooleanConverter}, ConverterParameter=WaitingForRoll}"
-                                        MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
-                                        OnRoll="OnNumberRolled" />
-                            </Viewbox>
-                            <Rectangle Height="3" Fill="{StaticResource bmMaple}" Margin="5" />
+                    <Viewbox Stretch="Uniform" Name="VB_Rolls" Margin="0,10,0,10">
 
-                            <Viewbox Name="VB_Purchase" Stretch="UniformToFill" Grid.Column="0" Grid.ColumnSpan="2"
-                                    HorizontalAlignment="Stretch" Margin="0,0,0,0">
+                        <local:TraditionalRollCtrl x:Name="CTRL_RollControl"
+                               
+                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush,Mode=OneWay}"
+                                IsEnabled="{x:Bind MainPageModel.GameState, Mode=OneWay, Converter={StaticResource GameStateToBooleanConverter}, ConverterParameter=WaitingForRoll}"
+                                MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
+                                OnRoll="OnNumberRolled" />
+                    </Viewbox>
 
-                                <local:PurchaseCtrl OnPurchaseEntitlement="OnPurchaseEntitlement"
-                                        MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
-                                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay, TargetNullValue=PlayerModel.Default}" />
+                    <Viewbox Name="VB_Purchase" Stretch="Uniform" Grid.Column="0" Grid.ColumnSpan="2"
+                           Margin="0,10,0,10">
 
-                            </Viewbox>
-                            <Viewbox Name="VB_Invasion" Stretch="Uniform">
+                        <local:PurchaseCtrl OnPurchaseEntitlement="OnPurchaseEntitlement"
+                                MainPageModel="{x:Bind MainPageModel, Mode=OneWay, TargetNullValue=MainPageModel.Default}"
+                                CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay, TargetNullValue=PlayerModel.Default}" />
 
-                                <local:InvasionCtrl x:Name="CTRL_Invasion"
-                                        Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                                        CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
-                                        MainPageModel="{x:Bind MainPageModel, Mode=OneWay}">
-                                    <local:InvasionCtrl.RenderTransform>
-                                        <CompositeTransform />
-                                    </local:InvasionCtrl.RenderTransform>
-                                </local:InvasionCtrl>
-                            </Viewbox>
-                        </StackPanel>
+                    </Viewbox>
+                    <Viewbox Name="VB_Invasion" Stretch="Uniform" Margin="10,0,0,10">
+
+                        <local:InvasionCtrl x:Name="CTRL_Invasion"
+                                Visibility="{x:Bind MainPageModel.GameInfo.CitiesAndKnights, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                                CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
+                                MainPageModel="{x:Bind MainPageModel, Mode=OneWay}">
+                            <local:InvasionCtrl.RenderTransform>
+                                <CompositeTransform />
+                            </local:InvasionCtrl.RenderTransform>
+                        </local:InvasionCtrl>
                     </Viewbox>
 
                     <StackPanel>

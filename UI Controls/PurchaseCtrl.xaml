@@ -6,8 +6,8 @@
     <Control.Resources>
 
     </Control.Resources>
-    <Viewbox Stretch="Uniform">
-        <ListView Name="LV_UniversalPurchase" Margin="5"
+ 
+        <ListView Name="LV_UniversalPurchase" Margin="0"
                 Height="{x:Bind GetHeight(MainPageModel.IsCitiesAndKnights), Mode=OneWay}">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -18,7 +18,8 @@
                 <Style TargetType="ListViewItem">
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="0" />
-                    <Setter Property="Height" Value="100" />
+                    <Setter Property="Height" Value="130" />
+                    <Setter Property="Width" Value="130" />
                 </Style>
             </ListView.ItemContainerStyle>
             <local:PurchaseItemCtrl Entitlement="Settlement" CurrentPlayer="{x:Bind CurrentPlayer, Mode=OneWay}"
@@ -237,7 +238,5 @@
                 </local:PurchaseItemCtrl.Child>
             </local:PurchaseItemCtrl>
         </ListView>
-
-    </Viewbox>
 
 </UserControl>
