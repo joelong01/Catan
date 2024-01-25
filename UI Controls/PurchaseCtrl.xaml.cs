@@ -67,11 +67,11 @@ namespace Catan10
         {
             if (!pirates)
             {
-                return 135;
+                return 130; // one control high
             }
             else
             {
-                return 395;
+                return 390; // 3 controls hight
             }
         }
     }
