@@ -1598,5 +1598,18 @@ namespace Catan10
             }
 
         }
+
+        private async void OnRandomizeBuild(object sender, RoutedEventArgs e)
+        {
+            CTRL_GameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
+            if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
+            {
+                await RedoAsync();
+            }
+            else
+            {
+                await RandomBoardLog.RandomizeBoard(this, 0);
+            }
+        }
     }
 }

@@ -193,6 +193,7 @@
                                         <MenuFlyoutItem Click="OnTestRegularGame" Text="Test Regular Game" />
                                         <MenuFlyoutItem Click="OnTestExpansionGame" Text="Test Expansion" />
                                         <MenuFlyoutSeparator />
+                                        <MenuFlyoutItem Click="OnRandomizeBuild" Text="Randomize Board" />
                                         <MenuFlyoutItem Click="OnTestKnightDisplacement" Text="Test Knight Displacement" />
                                         <MenuFlyoutItem Click="OnTestLongestRoad" Text="Test Longest road (expansion)" />
                                         <MenuFlyoutItem Click="OnTestBaron" Text="Test Baron" />

@@ -90,7 +90,7 @@
                 </Viewbox>
                 <Viewbox Width="50" Height="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,5">
                     <TextBlock Name="_txtIndex" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="20"
-                            Foreground="Red" Text="{x:Bind Index, Mode=OneWay}" Visibility="Visible" />
+                            Foreground="White" Text="{x:Bind Index, Mode=OneWay}" Visibility="Visible" />
                 </Viewbox>
             </Grid>
             <Grid x:Name="_hexBackGrid" HorizontalAlignment="Center" VerticalAlignment="Center">
