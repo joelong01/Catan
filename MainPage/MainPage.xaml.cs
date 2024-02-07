@@ -1601,14 +1601,40 @@ namespace Catan10
 
         private async void OnRandomizeBuild(object sender, RoutedEventArgs e)
         {
+            if (this.CurrentGameState == GameState.PickingBoard)
+            {
+                await NewRandomBoard();
+            }
+        }
+        private async Task NewRandomBoard()
+        {
             CTRL_GameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
-            if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
+            if (MainPageModel.Log.CanRedo && ( MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard ))
             {
                 await RedoAsync();
             }
             else
             {
                 await RandomBoardLog.RandomizeBoard(this, 0);
+            }
+        }
+        private async void OnGetNewBoard()
+        {
+            if (this.CurrentGameState == GameState.PickingBoard)
+            {
+                await NewRandomBoard();
+            }
+        }
+
+        private async void OnPreviousBoard()
+        {
+            if (this.CurrentGameState == GameState.PickingBoard)
+            {
+                if (MainPageModel.Log.PeekAction.Action == CatanAction.RandomizeBoard)
+                {
+                    CTRL_GameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
+                    await UndoAsync();
+                }
             }
         }
     }

@@ -8,8 +8,11 @@ using Windows.UI.Xaml.Controls;
 namespace Catan10
 {
     public delegate void ShowPipsHandler(int pipCount);
+    public delegate void NextBoard();
+    public delegate void PreviousBoard();
     public sealed partial class BoardMeasurementCtrl : UserControl
     {
+
         public int FiveStarPositions
         {
             get => ( int )GetValue(FiveStarPositionsProperty);
@@ -45,8 +48,26 @@ namespace Catan10
         public static readonly DependencyProperty PipCountProperty = DependencyProperty.Register("PipCount", typeof(TradeResources), typeof(BoardMeasurementCtrl), new PropertyMetadata(new TradeResources()));
         public static readonly DependencyProperty ThreeStarPositionsProperty = DependencyProperty.Register("ThreeStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
         public static readonly DependencyProperty TwoStarPositionsProperty = DependencyProperty.Register("TwoStarPositions", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(0));
-        public event ShowPipsHandler ShowPips;
+        public static readonly DependencyProperty ShownPipsProperty = DependencyProperty.Register("ShownPips", typeof(int), typeof(BoardMeasurementCtrl), new PropertyMetadata(13, ShownPipsChanged));
+        public int ShownPips
+        {
+            get => ( int )GetValue(ShownPipsProperty);
+            set => SetValue(ShownPipsProperty, value);
+        }
+        private static void ShownPipsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var depPropClass = d as BoardMeasurementCtrl;
+            var depPropValue = (int)e.NewValue;
+            depPropClass?.SetShownPips(depPropValue);
+        }
+        private void SetShownPips(int value)
+        {
+            ShowPips?.Invoke(value);
+        }
 
+        public event ShowPipsHandler ShowPips;
+        public event NextBoard OnNextBoard;
+        public event PreviousBoard OnPreviousBoard;
         public BoardMeasurementCtrl()
         {
             this.InitializeComponent();
@@ -55,7 +76,23 @@ namespace Catan10
         private void OnPointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             var number = Int32.Parse(((FrameworkElement)sender).Tag as String);
-            ShowPips?.Invoke(number);
+            ShownPips = number;
+            
         }
+
+        private void NextBoard(object sender, RoutedEventArgs e)
+        {
+            ShownPips = 14;
+            OnNextBoard?.Invoke();
+
+        }
+
+        private void PreviousBoard(object sender, RoutedEventArgs e)
+        {
+            ShownPips = 14;
+            OnPreviousBoard?.Invoke();
+        }
+
+
     }
 }

@@ -81,42 +81,27 @@
                         <StackPanel HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
-                                <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
-                                        Height="65">
+                                <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal">
 
                                     <StackPanel Name="SP_UndoButton" Orientation="Vertical">
-                                        <Button x:Name="_btnUndo"
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Click="OnUndo" Content="&#xE10E;"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                        <Button x:Name="_btnUndo" Click="OnUndo" Content="&#xE10E;" Background="Transparent" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                                 IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}"
                                                 Style="{StaticResource GameControllerStyle}" />
-                                        <TextBlock
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
+                                        <TextBlock Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
                                     </StackPanel>
                                     <StackPanel Name="SP_NextButton">
-                                        <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                                        <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"  Background="Transparent" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                                 Click="OnNextStep" Content="&#xE101;"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                                 IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}"
                                                 Style="{StaticResource GameControllerStyle}" />
-                                        <TextBlock
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Style="{StaticResource ControlGridTextStyle}" Text="Next" />
+                                        <TextBlock Style="{StaticResource ControlGridTextStyle}" Text="Next" />
 
                                     </StackPanel>
                                     <StackPanel Name="SP_RedoButton" HorizontalAlignment="Center" Orientation="Vertical">
-                                        <Button
-                                                Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Click="OnRedo" Content="&#xE10D;"
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
+                                        <Button Click="OnRedo" Content="&#xE10D;"  Background="Transparent" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                                 IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}"
                                                 Style="{StaticResource GameControllerStyle}" />
-                                        <TextBlock
-                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
-                                                Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
+                                        <TextBlock Style="{StaticResource ControlGridTextStyle}" Text="Redo" />
                                     </StackPanel>
 
                                     <local:StopWatchCtrl x:Name="_stopWatchForTurn" Grid.Row="1" Grid.Column="1"
@@ -125,7 +110,7 @@
 
                                 </StackPanel>
                             </StackPanel>
-                            <TextBlock Margin="0" HorizontalAlignment="Center"
+                            <TextBlock Margin="20" HorizontalAlignment="Center"
                                     Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay, FallbackValue=Green}"
                                     Style="{StaticResource ControlGridTextStyle}"
                                     Text="{x:Bind MainPageModel.StateMessage, FallbackValue=Next, TargetNullValue=Next, Mode=OneWay}" />
@@ -167,16 +152,13 @@
                             PipCount="{Binding Path=PipCount, Mode=OneWay}"
                             ThreeStarPositions="{x:Bind Path=MainPageModel.ThreeStarPositions, Mode=OneWay}"
                             TwoStarPositions="{x:Bind Path=MainPageModel.TwoStarPositions, Mode=OneWay}"
-                            ShowPips="OnShowPips" />
+                            ShowPips="OnShowPips" OnNextBoard="OnGetNewBoard" OnPreviousBoard="OnPreviousBoard" />
 
                 </s:SliderCtrl>
             </Viewbox>
             <Viewbox Grid.Column="0" Grid.ColumnSpan="2" Margin="0" Grid.Row="0" HorizontalAlignment="Stretch"
                     VerticalAlignment="Top">
-                <StackPanel HorizontalAlignment="Stretch"
-                        Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
-                        BorderBrush="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}" BorderThickness="0"
-                        CornerRadius="10">
+                <StackPanel HorizontalAlignment="Stretch" CornerRadius="10">
                     <Viewbox Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75">
                         <Button Margin="0" VerticalAlignment="Top" Background="Transparent" Canvas.ZIndex="10"
                                 FontSize="33">
@@ -216,8 +198,7 @@
                                         <MenuFlyoutSeparator />
                                         <MenuFlyoutItem Click="PickSettlementsAndRoads" Text="Pick Settlements and Road" />
                                         <MenuFlyoutSeparator />
-                                        <ToggleMenuFlyoutItem Click="ToggleShowTile" IsChecked="False"
-                                                Text="Show Tile Index" />
+
                                         <MenuFlyoutSeparator />
                                         <MenuFlyoutItem Click="Menu_OnNewGame" Text="New Game" />
                                         <MenuFlyoutItem Click="Menu_OnResetService" Text="Reset Service" />
@@ -256,13 +237,7 @@
                                                 IsChecked="{x:Bind MainPageModel.Settings.HouseRules.MoveBaronBeforeRoll, Mode=TwoWay}"
                                                 Text="Knight Moves Baron Before Roll" />
                                     </MenuFlyoutSubItem>
-                                    <MenuFlyoutSeparator />
-                                    <MenuFlyoutSubItem Text="Random Gold Tiles">
-                                        <ToggleMenuFlyoutItem IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}"
-                                                Text="Random Gold Tile" />
-                                        <MenuFlyoutItem Click="OnChangeRandomGoldTileCount" Text="Change Count" />
-                                    </MenuFlyoutSubItem>
-                                    <MenuFlyoutSeparator />
+
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutSubItem Text="Resource Tests">
                                         <MenuFlyoutSubItem Text="Resource Cards">
@@ -292,7 +267,13 @@
                                     </MenuFlyoutSubItem>
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutSubItem Text="Options">
-                                        <ToggleMenuFlyoutItem IsChecked="False" Text="Hide Players On Next" />
+                                        <MenuFlyoutSubItem Text="Random Gold Tiles">
+                                            <ToggleMenuFlyoutItem IsChecked="{x:Bind Mode=TwoWay, Path=RandomGold}"
+                                                    Text="Random Gold Tile" />
+                                            <MenuFlyoutItem Click="OnChangeRandomGoldTileCount" Text="Change Count" />
+                                        </MenuFlyoutSubItem>
+                                        <ToggleMenuFlyoutItem Click="ToggleShowTile" IsChecked="True"
+                                                Text="Show Tile Index" />
                                     </MenuFlyoutSubItem>
                                     <MenuFlyoutItem Click="OnAssignNumbers" Text="Randomize Board" />
                                     <MenuFlyoutItem Click="OnViewSettings" Text="Settings" />

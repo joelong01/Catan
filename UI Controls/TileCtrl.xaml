@@ -83,14 +83,15 @@
                     </local:CatanNumber.RenderTransform>
                 </local:CatanNumber>
 
-                <Viewbox Width="18.75" Height="28.5" Margin="0,0,0,6" VerticalAlignment="Bottom">
+                <Viewbox Height="25" Margin="0,0,0,21" VerticalAlignment="Bottom">
                     <local:ResourceCardSlimCtrl CountVisible="False"
                             Image="{x:Bind BrushifyResourceType(ResourceType), Mode=OneWay}"
                             Visibility="{x:Bind ShownResourceType, Converter={StaticResource ResourceTypeToVisibilityConverter}, Mode=OneWay, ConverterParameter=GoldMine}" />
                 </Viewbox>
-                <Viewbox Width="50" Height="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,5">
-                    <TextBlock Name="_txtIndex" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="20"
-                            Foreground="White" Text="{x:Bind Index, Mode=OneWay}" Visibility="Visible" />
+                <Viewbox Height="15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,5" Visibility="{x:Bind ShowIndex, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+                    <Grid Background="Black" CornerRadius="2">
+                        <TextBlock Name="_txtIndex"  TextLineBounds="Tight" Foreground="White" Text="{x:Bind Index, Mode=OneWay}" />
+                    </Grid>
                 </Viewbox>
             </Grid>
             <Grid x:Name="_hexBackGrid" HorizontalAlignment="Center" VerticalAlignment="Center">

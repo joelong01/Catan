@@ -309,10 +309,11 @@ namespace Catan10
             set => _border.Visibility = (value == true) ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        public static readonly DependencyProperty ShowIndexProperty = DependencyProperty.Register("ShowIndex", typeof(bool), typeof(TileCtrl), new PropertyMetadata(true));
         public bool ShowIndex
         {
-            get => _txtIndex.Visibility == Visibility.Visible;
-            set => _txtIndex.Visibility = (value) ? Visibility.Visible : Visibility.Collapsed;
+            get => ( bool )GetValue(ShowIndexProperty);
+            set => SetValue(ShowIndexProperty, value);
         }
 
         public ResourceType ShownResourceType
