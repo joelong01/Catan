@@ -247,7 +247,9 @@ namespace Catan10
         [Description("Move Target Knight")]
         DisplaceKnightMoveVictim,
         [Description("Select Knight")]
-        ClickOnKnight
+        ClickOnKnight,
+        [Description("Pick Supplemental Players")]
+        PickSupplementalPlayers
     };
 
     public enum GameType { Regular, SupplementalBuildPhase, Saved };

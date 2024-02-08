@@ -193,7 +193,7 @@ namespace Catan10
                         await GameContainer.ResetRandomGoldTiles();
                         if (HasSupplementalBuild)
                         {
-                            await WaitingForNextToSupplemental.PostLog(this);
+                            await WaitingForNextToPickSupplementalPlayers.PostLog(this);
                         }
                         else
                         {
@@ -201,14 +201,39 @@ namespace Catan10
 
                         }
                         break;
+                    case GameState.PickSupplementalPlayers:
+                        if (MainPageModel.SupplementalPlayers.Count > 0)
+                        {
+                            // need to put the supplemental players list in the same order as PlayingPlayers
+
+                            int currentIndex = PlayingPlayers.IndexOf(CurrentPlayer);
+                            var reordered = PlayingPlayers.Skip(currentIndex)
+                                                .Concat(PlayingPlayers.Take(currentIndex))
+                                                .ToList();
+
+                            var orderedSupplementalPlayers = reordered
+                                            .Where(player => MainPageModel.SupplementalPlayers.Select(supplemental => supplemental.PlayerIdentifier).Contains(player.PlayerIdentifier))
+                                            .ToList();
+
+                            // Replace the original SupplementalPlayers list with the ordered list
+                            MainPageModel.SupplementalPlayers.Clear();
+                            MainPageModel.SupplementalPlayers.AddRange(orderedSupplementalPlayers);
+                            await PickingPlayersToSupplemental.PostLog(this);
+                        }
+                        else
+                        {
+                            await WaitingForNextToPickingRandomGoldTiles.PostLog(this);
+                        }
+                        break;
                     case GameState.Supplemental:
                         //
                         //  when you transition in supplemental build phase, if the next player is the one that last rolled, 
                         //  you skip them and the player after them rolls
-                        if (NextPlayer.PlayerIdentifier == LastPlayerToRoll.PlayerIdentifier)
+
+                        if (MainPageModel.SupplementalPlayers.Count == 0)
                         {
-                            // this will skip the next player (+2 to current player)
-                            await SupplementalToPickingGoldTiles.PostLog(this);
+
+                            await SupplementalToPickingGoldTiles.PostLog(this, LastPlayerToRoll.PlayerIdentifier);
 
                         }
                         else
@@ -374,7 +399,7 @@ namespace Catan10
             await ChangeGame(item.Tag as CatanGameCtrl);
         }
 
-        
+
 
         private void OnCancelClicked(object sender, RoutedEventArgs e)
         {

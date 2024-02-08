@@ -1,18 +1,29 @@
 ﻿using Catan.Proxy;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Catan10
 {
     internal class SupplementalToSupplemental : LogHeader, ILogController
     {
+        public Guid CurrentPlayerId { get; set; } // so you can move back to it on Undo
+        public Guid NextPlayerId { get; set; } // where to go in Do()
+
+
         public static async Task PostLog(IGameController gameController)
         {
+
 
             SupplementalToSupplemental logHeader = new SupplementalToSupplemental()
             {
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
                 NewState = GameState.Supplemental,
+                CurrentPlayerId = gameController.CurrentPlayer.PlayerIdentifier,
+                NextPlayerId = gameController.MainPageModel.SupplementalPlayers[0].PlayerIdentifier
+
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -20,9 +31,9 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-
-            ChangePlayerHelper.ChangePlayer(gameController, 1);
-             await DefaultTask;
+            gameController.MainPageModel.SupplementalPlayers.RemoveAt(0);
+            ChangePlayerHelper.ChangePlayerTo(gameController, NextPlayerId);
+            await DefaultTask;
 
         }
 
@@ -38,8 +49,10 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
-            ChangePlayerHelper.ChangePlayer(gameController, -1);
-             await DefaultTask;
+            var player = gameController.PlayerFromId(NextPlayerId);
+            gameController.MainPageModel.SupplementalPlayers.Insert(0, player);
+            ChangePlayerHelper.ChangePlayerTo(gameController, CurrentPlayerId);
+            await DefaultTask;
         }
     }
 }

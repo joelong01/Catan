@@ -21,7 +21,7 @@ namespace Catan10
             if (value is int height)
             {
                 // Convert height to CornerRadius
-                return new CornerRadius(height *.5);
+                return new CornerRadius(height * .5);
             }
             if (value is double doubleHeight)
             {
@@ -55,7 +55,7 @@ namespace Catan10
             // Adjust the height based on the visibility value
             if (value is bool visibility)
             {
-                return visibility  ? 0 : height;
+                return visibility ? 0 : height;
             }
 
             // Default return value if the value is not a Visibility type
@@ -98,7 +98,7 @@ namespace Catan10
             }
         }
 
-        
+
 
         public static LinearGradientBrush CreateLinearGradiantBrush(Color color1, Color color2)
         {
@@ -392,16 +392,28 @@ namespace Catan10
 
     /// <summary>
     ///     used in the PlayersTrackerCtrl
-    ///     allows you to bind Visibility to *one* gamestate.  if the GameState is the parameter value, then be visible.
+    ///     allows you to bind Visibility to CSV gamestate(s).  if the GameState is the parameter value, then be visible.
     ///     else be collapsed
     /// </summary>
     public class GameStateToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            GameState desiredState = StaticHelpers.ParseEnum<GameState>((string)parameter);
+            if (( string )parameter == "") return Visibility.Collapsed;
+
+            string stateString = (string)parameter;
+
+            List<GameState> visibleStates = new List<GameState>();
+
+            var tokens = stateString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var token in tokens)
+            {
+                GameState gameState = StaticHelpers.ParseEnum<GameState>(token);
+                visibleStates.Add(gameState);
+            }
             GameState actualState = (GameState)value;
-            if (actualState == desiredState)
+            if (visibleStates.Contains(actualState))
             {
                 return Visibility.Visible;
             }

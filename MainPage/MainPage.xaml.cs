@@ -862,6 +862,11 @@ namespace Catan10
                 MainPageModel.PlayingPlayers.RemoveAt(0); // the clear doesn't trigger the unsubscribe because the NewItems and the OldItems are both null
             }
 
+            while (MainPageModel.SupplementalPlayers.Count > 0)
+            {
+                MainPageModel.SupplementalPlayers.RemoveAt(0);
+            }
+
             MainPageModel.Log = new Log(this);
 
             await ResetTiles(true);
@@ -1588,8 +1593,21 @@ namespace Catan10
                 return;
             }
 
-            if (CurrentGameState != GameState.FinishedRollOrder && CurrentGameState != GameState.WaitingForRollForOrder) { return;  }
-          
+            //
+            //  during the PickSupplementalPlayers state, Right click on the image
+            //  to add them to the list of players that want to do supplemental build
+
+            if (CurrentGameState == GameState.PickSupplementalPlayers)
+            {
+                if (!MainPageModel.SupplementalPlayers.Contains(player)  && player != CurrentPlayer)
+                {
+                    MainPageModel.SupplementalPlayers.Add(player);
+                }
+                return;
+            }
+
+            if (CurrentGameState != GameState.FinishedRollOrder && CurrentGameState != GameState.WaitingForRollForOrder) { return; }
+
             while (MainPageModel.PlayingPlayers[0] != player)
             {
                 var p = MainPageModel.PlayingPlayers[0];

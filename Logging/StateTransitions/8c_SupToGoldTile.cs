@@ -1,11 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Catan.Proxy;
 
 namespace Catan10
 {
     internal class SupplementalToPickingGoldTiles : LogHeader, ILogController
     {
-        public static async Task PostLog(IGameController gameController)
+        public Guid StartPlayerId { get; set; }
+        public Guid CurrentPlayerId { get; set; }
+        public static async Task PostLog(IGameController gameController, Guid startPlayerId)
         {
 
             SupplementalToPickingGoldTiles logHeader = new SupplementalToPickingGoldTiles()
@@ -13,6 +16,8 @@ namespace Catan10
                 CanUndo = true,
                 Action = CatanAction.ChangedState,
                 NewState = GameState.WaitingForRoll,
+                StartPlayerId = startPlayerId, 
+                CurrentPlayerId = gameController.CurrentPlayer.PlayerIdentifier
             };
 
             await gameController.PostMessage(logHeader, ActionType.Normal);
@@ -20,7 +25,8 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            ChangePlayerHelper.ChangePlayer(gameController, 2);
+            var nextPlayer = ChangePlayerHelper.NextPlayerId(gameController, StartPlayerId, 1); // first player after the last player to roll
+            ChangePlayerHelper.ChangePlayerTo(gameController, nextPlayer);
 
             await ToPickGold.PostLog(gameController, MainPage.Current.RandomGoldTileCount);
         }
@@ -37,8 +43,8 @@ namespace Catan10
 
         public async Task Undo(IGameController gameController)
         {
-            ChangePlayerHelper.ChangePlayer(gameController, -2);
-             await DefaultTask;
+            ChangePlayerHelper.ChangePlayerTo(gameController, CurrentPlayerId);
+            await DefaultTask;
         }
     }
 }

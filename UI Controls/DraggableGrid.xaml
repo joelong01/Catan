@@ -43,7 +43,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Rectangle Fill="{x:Bind Player.SolidSecondaryBrush, Mode=OneWay}" />
-        <Viewbox Grid.Row="0" Margin="25,0,25,0">
+        <Viewbox Grid.Row="0" Margin="25,0,40,0">
             <TextBlock Margin="0,-5,0,0" HorizontalAlignment="Center" VerticalAlignment="Center"
                     Foreground="{x:Bind FallbackValue=White, Mode=OneWay, Path=Player.ForegroundBrush, TargetNullValue=Colors.Blue}"
                     Style="{StaticResource HeaderTextBlockStyle}" Text="{x:Bind Caption, Mode=OneWay}" />

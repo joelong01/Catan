@@ -68,7 +68,42 @@
                     <MenuFlyout x:Name="_menuBaron" Placement="Right" />
                 </Button.Flyout>
             </Button>
-            <local:DragableGridCtrl x:Name="ActionAndStats" Width="400" HorizontalAlignment="Center" Grid.RowSpan="2"
+            <local:DragableGridCtrl x:Name="SupplementalPlayers" Height="125" HorizontalAlignment="Center"
+                    Grid.RowSpan="2" RenderTransformOrigin="0 0" Margin="0, 0, 0,0" Grid.Column="4"
+                    VerticalAlignment="Center" Canvas.ZIndex="50000"
+                    Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
+                    BorderBrush="{StaticResource bmMaple}" BorderThickness="2" Caption="Supplemental Players"
+                    Visibility="{x:Bind MainPageModel.GameState, Mode=OneWay, Converter={StaticResource GameStateToVisibilityConverter}, ConverterParameter='PickSupplementalPlayers,WaitingForNewGame,Supplemental'}"
+                    CornerRadius="10" Foreground="Black" OnGridPositionChanged="OnGridPositionChanged"
+                    Player="{x:Bind TheHuman, Mode=OneWay}" PointerPressed="Draggable_PointerPressed">
+                <GridView ItemsSource="{x:Bind MainPageModel.SupplementalPlayers, Mode=OneWay}">
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="6" />
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <GridView.ItemContainerStyle>
+                        <Style TargetType="GridViewItem">
+                            <Setter Property="Margin" Value="0,5,0,0" />
+                            <Setter Property="Padding" Value="5" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </GridView.ItemContainerStyle>
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="local:PlayerModel">
+
+                            <Ellipse Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100"
+                                    Height="100"
+                                    Fill="{x:Bind ImageBrush, Mode=OneWay, FallbackValue=Blue, TargetNullValue=Blue}"
+                                    IsRightTapEnabled="True" IsTapEnabled="True"
+                                    Stroke="{x:Bind ForegroundBrush, Mode=OneWay}" />
+
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+
+            </local:DragableGridCtrl>
+            <local:DragableGridCtrl x:Name="ActionAndStats" Width="200" HorizontalAlignment="Center" Grid.RowSpan="2"
                     RenderTransformOrigin="0 0" Margin="0, 0, 0,0" Grid.Column="4" VerticalAlignment="Center"
                     Canvas.ZIndex="50000" Background="{x:Bind CurrentPlayer.BackgroundBrush, Mode=OneWay}"
                     BorderBrush="{StaticResource bmMaple}" BorderThickness="2"
@@ -84,13 +119,17 @@
                                 <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Orientation="Horizontal">
 
                                     <StackPanel Name="SP_UndoButton" Orientation="Vertical">
-                                        <Button x:Name="_btnUndo" Click="OnUndo" Content="&#xE10E;" Background="Transparent" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                        <Button x:Name="_btnUndo" Click="OnUndo" Content="&#xE10E;"
+                                                Background="Transparent"
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                                 IsEnabled="{x:Bind MainPageModel.EnableUndo, Mode=OneWay}"
                                                 Style="{StaticResource GameControllerStyle}" />
                                         <TextBlock Style="{StaticResource ControlGridTextStyle}" Text="Undo" />
                                     </StackPanel>
                                     <StackPanel Name="SP_NextButton">
-                                        <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"  Background="Transparent" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                        <Button x:Name="_btnNextStep" Margin="10,0,0,0" HorizontalAlignment="Center"
+                                                Background="Transparent"
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                                 Click="OnNextStep" Content="&#xE101;"
                                                 IsEnabled="{x:Bind EnableNextButton(MainPageModel.EnableNextButton, MainPageModel.GameState, MainPageModel.UnprocessedMessages), Mode=OneWay}"
                                                 Style="{StaticResource GameControllerStyle}" />
@@ -98,7 +137,8 @@
 
                                     </StackPanel>
                                     <StackPanel Name="SP_RedoButton" HorizontalAlignment="Center" Orientation="Vertical">
-                                        <Button Click="OnRedo" Content="&#xE10D;"  Background="Transparent" Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
+                                        <Button Click="OnRedo" Content="&#xE10D;" Background="Transparent"
+                                                Foreground="{x:Bind CurrentPlayer.ForegroundBrush, Mode=OneWay}"
                                                 IsEnabled="{x:Bind MainPageModel.EnableRedo, Mode=OneWay}"
                                                 Style="{StaticResource GameControllerStyle}" />
                                         <TextBlock Style="{StaticResource ControlGridTextStyle}" Text="Redo" />

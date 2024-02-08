@@ -13,7 +13,7 @@ namespace Catan10
     public class MainPageModel : INotifyPropertyChanged
     {
         #region Properties + Fields
-
+        public  ObservableCollection<PlayerModel> SupplementalPlayers { get;  } = new ObservableCollection<PlayerModel>();
         private bool _EnableUiInteraction = true;
         private int _FiveStarPositions = 0;
         private int _FourStarPosition = 0;
@@ -206,6 +206,7 @@ namespace Catan10
                         case GameState.WaitingForNext:
                         case GameState.Supplemental:
                         case GameState.DoneDestroyingCities:
+                        case GameState.PickSupplementalPlayers:
                             return true;
 
                         default:

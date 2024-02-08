@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace Catan10
@@ -11,16 +12,35 @@ namespace Catan10
     /// </summary>
     public static class ChangePlayerHelper
     {
-        public static void ChangePlayer(IGameController gameController, int numberOfPositions)
+        public static void ChangePlayerTo(IGameController gameController, Guid playerId)
         {
-            Contract.Assert(gameController.CurrentPlayer != null);
-
             // Notify all players that the turn ended
             gameController.PlayingPlayers.ForEach(p => p.TurnEnded());
+            var newPlayer = gameController.PlayerFromId(playerId);
+            gameController.CurrentPlayer = newPlayer;
+            gameController.CurrentPlayer.TurnStarted();
+            MainPage.Current.TheHuman = gameController.CurrentPlayer;
+        }
 
+        public static int DistanceBetweenPlayers(IGameController gameController, Guid startId, Guid endId)
+        {
             List<PlayerModel> playingPlayers = gameController.PlayingPlayers;
+            var startPlayer = gameController.PlayerFromId(startId);
+            var endPlayer = gameController.PlayerFromId(endId);
+            int idxStart = playingPlayers.IndexOf(startPlayer);
+            int idxEnd = playingPlayers.IndexOf(endPlayer);
 
-            int idx = playingPlayers.IndexOf(gameController.CurrentPlayer);
+            int distance = (idxEnd - idxStart + playingPlayers.Count) % playingPlayers.Count;
+            return distance;
+
+            
+        }
+
+        public static Guid NextPlayerId(IGameController gameController, Guid startPlayerId,  int numberOfPositions)
+        {
+            List<PlayerModel> playingPlayers = gameController.PlayingPlayers;
+            var startPlayer = gameController.PlayerFromId(startPlayerId);
+            int idx = playingPlayers.IndexOf(startPlayer);
 
             Contract.Assert(idx != -1, "The player needs to be playing!");
 
@@ -35,11 +55,14 @@ namespace Catan10
             }
 
             var newPlayer = playingPlayers[newPlayerIndex];
-            gameController.CurrentPlayer = newPlayer;
+            return newPlayer.PlayerIdentifier;
+        }
 
-            // Notify the current player that the turn started
-            gameController.CurrentPlayer.TurnStarted();
-            MainPage.Current.TheHuman = gameController.CurrentPlayer;
+        public static void ChangePlayer(IGameController gameController, int numberOfPositions)
+        {
+            Contract.Assert(gameController.CurrentPlayer != null);
+            var id = NextPlayerId(gameController, gameController.CurrentPlayer.PlayerIdentifier, numberOfPositions);
+            ChangePlayerTo(gameController, id);
 
         }
 
