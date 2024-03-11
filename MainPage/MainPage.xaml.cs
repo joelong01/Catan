@@ -82,7 +82,7 @@ namespace Catan10
 
         public MainPageModel MainPageModel
         {
-            get => ( MainPageModel )GetValue(MainPageModelProperty);
+            get => (MainPageModel)GetValue(MainPageModelProperty);
             set => SetValue(MainPageModelProperty, value);
         }
 
@@ -91,7 +91,7 @@ namespace Catan10
         // a global for the game
         public PlayerModel TheHuman
         {
-            get => ( PlayerModel )GetValue(TheHumanProperty);
+            get => (PlayerModel)GetValue(TheHumanProperty);
             set => SetValue(TheHumanProperty, value);
         }
 
@@ -133,9 +133,9 @@ namespace Catan10
 
         public Duration GetAnimationDuration(AnimationSpeed requestedSpeed, bool testing)
         {
-            if (testing) return new Duration(TimeSpan.FromMilliseconds(( double )AnimationSpeed.Testing));
+            if (testing) return new Duration(TimeSpan.FromMilliseconds((double)AnimationSpeed.Testing));
 
-            return new Duration(TimeSpan.FromMilliseconds(( double )requestedSpeed));
+            return new Duration(TimeSpan.FromMilliseconds((double)requestedSpeed));
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Catan10
         {
             var depPropClass = d as MainPage;
             var depPropValue = (MainPageModel)e.NewValue;
-            depPropClass?.SetMainPageModel(( MainPageModel )e.OldValue, ( MainPageModel )e.NewValue);
+            depPropClass?.SetMainPageModel((MainPageModel)e.OldValue, (MainPageModel)e.NewValue);
         }
 
         private async Task AddPlayer(PlayerModel pData, LogType logType)
@@ -458,43 +458,6 @@ namespace Catan10
             try
             {
                 this.MainPageModel = await ReadMainPageModelOffDisk();
-                if (MainPageModel == null || MainPageModel.AllPlayers == null || MainPageModel.AllPlayers.Count == 0)
-                {
-                    var list = await GetDefaultUsers();
-
-                    MainPageModel = new MainPageModel()
-                    {
-                        AllPlayers = list,
-                        Settings = new Settings(),
-
-                    };
-
-                    await SaveGameState();
-                    await ResetGridLayout();
-                }
-
-                foreach (var player in MainPageModel.AllPlayers)
-                {
-                    if (player.PlayerIdentifier == Guid.Empty)
-                    {
-                        player.PlayerIdentifier = Guid.NewGuid();
-                    }
-
-                    await player.LoadImage();
-
-                    if (MainPageModel.TheHuman == player.PlayerName)
-                    {
-                        TheHuman = player;
-                    }
-                }
-
-                await MainPageModel.Bank.LoadImage();
-
-                if (MainPageModel.TheHuman == "")
-                {
-                    await PickDefaultUser();
-                    //    CurrentPlayer = TheHuman; // this means each client will start with CurrentPlayer being themselves so that all UI binding to current player will give decent colors
-                }
             }
             catch (FileLoadException fle)
             {
@@ -504,10 +467,46 @@ namespace Catan10
             {
                 this.TraceMessage($"Generic Exception: {e}");
             }
-            finally
+            if (MainPageModel == null || MainPageModel.AllPlayers == null || MainPageModel.AllPlayers.Count == 0)
             {
+                var list = await GetDefaultUsers();
+
+                MainPageModel = new MainPageModel()
+                {
+                    AllPlayers = list,
+                    Settings = new Settings(),
+
+                };
+
+                await SaveGameState();
+                await ResetGridLayout();
+            }
+
+            foreach (var player in MainPageModel.AllPlayers)
+            {
+                if (player.PlayerIdentifier == Guid.Empty)
+                {
+                    player.PlayerIdentifier = Guid.NewGuid();
+                }
+
+                await player.LoadImage();
+
+                if (MainPageModel.TheHuman == player.PlayerName)
+                {
+                    TheHuman = player;
+                }
+            }
+
+            await MainPageModel.Bank.LoadImage();
+
+            if (MainPageModel.TheHuman == "")
+            {
+                await PickDefaultUser();
+                //    CurrentPlayer = TheHuman; // this means each client will start with CurrentPlayer being themselves so that all UI binding to current player will give decent colors
             }
         }
+
+
 
         /// <summary>
         ///     Load Data that is global to the game
@@ -1012,7 +1011,7 @@ namespace Catan10
                 if (e.GetCurrentPoint(this).Properties.MouseWheelDelta >= 0)
                 {
                     CTRL_GameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
-                    if (MainPageModel.Log.CanRedo && ( MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard ))
+                    if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
                     {
                         await RedoAsync();
                     }
@@ -1112,13 +1111,13 @@ namespace Catan10
 
         public bool SpyVisible
         {
-            get => ( bool )GetValue(SpyVisibleProperty);
+            get => (bool)GetValue(SpyVisibleProperty);
             set => SetValue(SpyVisibleProperty, value);
         }
 
         public string TurnedSpyOn
         {
-            get => ( string )GetValue(TurnedSpyOnProperty);
+            get => (string)GetValue(TurnedSpyOnProperty);
             set => SetValue(TurnedSpyOnProperty, value);
         }
 
@@ -1137,8 +1136,8 @@ namespace Catan10
         private void Draggable_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             e.Handled = false; // bubble up
-            //
-            //  set everybody's zIndex
+                               //
+                               //  set everybody's zIndex
             foreach (var name in MainPageModel.Settings.GridPositions.Keys)
             {
                 if (this.FindName(name) is FrameworkElement ctrl)
@@ -1149,7 +1148,7 @@ namespace Catan10
 
             //
             //  boost the one clicked
-            Canvas.SetZIndex(( ( FrameworkElement )sender ), 11);
+            Canvas.SetZIndex(((FrameworkElement)sender), 11);
         }
 
         private bool EnableNextButton(bool enableNextButton, GameState gameState, int unprocessedMessages)
@@ -1322,7 +1321,7 @@ namespace Catan10
                     break;
                 case Entitlement.KnightDisplacement:
                 case Entitlement.Intrigue: // "displace any knight, no matter the rank
-                    // check to see if the current user has a knight that can be displaced
+                                           // check to see if the current user has a knight that can be displaced
                     bool foundConnection = false;
                     foreach (var knight in CurrentPlayer.GameData.CK_Knights)
                     {
@@ -1537,7 +1536,7 @@ namespace Catan10
         {
             if (isCitiesAndKnights) return Visibility.Collapsed;
             //     this.TraceMessage($"GameState.{state} PlayedDevCard = {CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType}");
-            if (( state == GameState.WaitingForNext || state == GameState.WaitingForRoll ) &&
+            if ((state == GameState.WaitingForNext || state == GameState.WaitingForRoll) &&
                 CurrentPlayer.GameData.Resources.ThisTurnsDevCard.DevCardType == DevCardType.None)
             {
                 return Visibility.Visible;
@@ -1599,7 +1598,7 @@ namespace Catan10
 
             if (CurrentGameState == GameState.PickSupplementalPlayers)
             {
-                if (!MainPageModel.SupplementalPlayers.Contains(player)  && player != CurrentPlayer)
+                if (!MainPageModel.SupplementalPlayers.Contains(player) && player != CurrentPlayer)
                 {
                     MainPageModel.SupplementalPlayers.Add(player);
                 }
@@ -1627,7 +1626,7 @@ namespace Catan10
         private async Task NewRandomBoard()
         {
             CTRL_GameView.AllBuildings.ForEach((b) => b.Reset()); // turn off pips
-            if (MainPageModel.Log.CanRedo && ( MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard ))
+            if (MainPageModel.Log.CanRedo && (MainPageModel.Log.PeekUndo.Action == CatanAction.RandomizeBoard))
             {
                 await RedoAsync();
             }

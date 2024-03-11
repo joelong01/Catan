@@ -88,7 +88,7 @@
                             Image="{x:Bind BrushifyResourceType(ResourceType), Mode=OneWay}"
                             Visibility="{x:Bind ShownResourceType, Converter={StaticResource ResourceTypeToVisibilityConverter}, Mode=OneWay, ConverterParameter=GoldMine}" />
                 </Viewbox>
-                <Viewbox Height="15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,5" Visibility="{x:Bind ShowIndex, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" >
+                <Viewbox Height="15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,5" Visibility="Visible" >
                     <Grid Background="Black" CornerRadius="2">
                         <TextBlock Name="_txtIndex"  TextLineBounds="Tight" Foreground="White" Text="{x:Bind Index, Mode=OneWay}" />
                     </Grid>

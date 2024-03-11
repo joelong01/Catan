@@ -165,7 +165,7 @@ namespace Catan10
             this.Add(ResourceType.Sheep);
             this.Add(ResourceType.Ore);
             this.Add(ResourceType.GoldMine);
-            if (MainPage.Current != null)
+            if (MainPage.Current != null && MainPage.Current.MainPageModel != null)
             {
                 if (MainPage.Current.MainPageModel.GameInfo != null && MainPage.Current.MainPageModel.GameInfo.CitiesAndKnights)
                
