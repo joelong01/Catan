@@ -575,7 +575,7 @@ namespace Catan10
 
             foreach (BuildingCtrl settlement in tile.OwnedBuildings)
             {
-                if (settlement.Owner != owner)
+                if (settlement.Owner != owner && settlement.Owner != null)
                 {
                     targets.Add(settlement.Owner.PlayerName);
                 }

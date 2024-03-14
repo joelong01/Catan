@@ -472,7 +472,7 @@ namespace Catan10
         public void HighlightTile() // you should never see Hotpink!
         {
             // _hexFront.Stroke = CurrentPlayer.BackgroundBrush;
-            _hexFront.Stroke = ( Brush )App.Current.Resources["bmCherry"];
+            _hexFront.Stroke = ( Brush )App.Current.Resources["YellowBrush"];
             Highlighted = true;
         }
 
