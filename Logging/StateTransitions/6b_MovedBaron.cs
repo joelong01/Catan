@@ -72,6 +72,12 @@ namespace Catan10
 
             }
 
+            Guid previousMovedBy = Guid.Empty;
+            if (gameController.Log.FindLatestLogEntry(typeof(MovedBaronLog)) is MovedBaronLog prevMovedBaron)
+            {
+                previousMovedBy = prevMovedBaron.BaronModel.MovedBy;
+            }
+
             // Debug.Assert(((MustMoveBaronLog)gameController.MainPageModel.Log.PeekAction).StartingState == previousState);
 
             MovedBaronLog logHeader = new MovedBaronLog()
@@ -89,6 +95,9 @@ namespace Catan10
                     Reason = reason,
                     MainBaronHidden = showBaron,
                     PreviousLargestArmyPlayerId = previousLargestArmyId,
+                    MovedBy = gameController.CurrentPlayer.PlayerIdentifier,
+                    PreviousMovedBy = previousMovedBy,
+                    ResourcesStolen = gameController.Baron.ResourcesStolen
                 }
             };
 
@@ -143,14 +152,13 @@ namespace Catan10
 
         public async Task Do(IGameController gameController)
         {
-            PlayerModel targetPlayer = null;
             var weapon = this.BaronModel.Weapon;
             var targetTile = gameController.TileFromIndex(this.BaronModel.TargetTile);
             if (BaronModel.Victims != null)
             {
                 foreach (var victim in this.BaronModel.Victims)
                 {
-                    targetPlayer = gameController.NameToPlayer(victim);
+                    PlayerModel targetPlayer = gameController.NameToPlayer(victim);
 
                     if (targetPlayer != null)
                     {
@@ -192,7 +200,7 @@ namespace Catan10
             //
             //  this will move the weapon in the UI
 
-            gameController.SetBaronTile(weapon, targetTile, true);
+            gameController.SetBaronTile(gameController.PlayerFromId(BaronModel.MovedBy), weapon, targetTile, true);
 
             //
             //    consume the entitlement - this is there for both rolling 7 and playing a Baron Dev Card
@@ -238,8 +246,8 @@ namespace Catan10
                 }
             }
 
-            gameController.SetBaronTile(weapon, previousTile, BaronModel.MainBaronHidden);
-
+            gameController.SetBaronTile(gameController.PlayerFromId(this.BaronModel.PreviousMovedBy), weapon, previousTile, BaronModel.MainBaronHidden);
+            gameController.Baron.ResourcesStolen = this.BaronModel.ResourcesStolen;
 
             if (BaronModel.Reason == MoveBaronReason.PlayedDevCard)
             {

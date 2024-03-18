@@ -155,6 +155,13 @@ namespace Catan10
             set => _currentHexPanel.BaronTile = value;
         }
 
+        public BaronCtrl Baron => _currentHexPanel.Baron;
+
+        public void SetBaronTile(PlayerModel movedBy, TileCtrl tile)
+        {
+            _currentHexPanel.SetBaronTile(movedBy, tile);
+        }
+
         public CatanGameCtrl CurrentGame
         {
             get => ( CatanGameCtrl )GetValue(CurrentGameProperty);

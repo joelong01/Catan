@@ -3,6 +3,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <!--  Other app resources here  -->
+            <FontFamily x:Key="CatanFont">ms-appx:///Assets/Fonts/Catan.ttf#Catan</FontFamily>
+
             <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
             <x:Double x:Key="ContentDialogMaxHeight">800</x:Double>
             <x:String x:Key="Dice_1">&#x2680;</x:String>

@@ -1654,5 +1654,7 @@ namespace Catan10
                 }
             }
         }
+
+        public BaronCtrl Baron => GameContainer.Baron;
     }
 }

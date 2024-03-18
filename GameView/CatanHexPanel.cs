@@ -16,6 +16,7 @@ namespace Catan10
         private Canvas RoadLayer { get; set; } = new Canvas();
 
         private readonly BaronCtrl _baron = new BaronCtrl();
+        public BaronCtrl Baron => _baron;
         private TileCtrl _baronTile = null;
 
         private readonly MerchantCtrl _merchant = new MerchantCtrl();
@@ -649,6 +650,8 @@ namespace Catan10
             to = gt.TransformPoint(to);
             _baron.Visibility = Visibility.Visible;
             _baron.MoveAsync(to);
+            _baron.ResourcesStolen = 0;
+            
         }
 
         private void SetPropertyBindings()
@@ -2087,6 +2090,13 @@ namespace Catan10
         internal void BaronnAnimationSkipToEnd()
         {
             _baron.SkipAnimationToEnd();
+        }
+
+        internal void SetBaronTile(PlayerModel movedBy, TileCtrl tile)
+        {
+            BaronTile = tile; // need to set Dependency Property to invoke the on changed method
+            _baron.MovedBy = movedBy;
+            _baron.TileNumber = tile.Number;
         }
     } // End CatanHexPanel
 

@@ -20,6 +20,26 @@ namespace Catan10
             set => SetValue(MainPageModelProperty, value);
         }
 
+        public static readonly DependencyProperty MovedByProperty = DependencyProperty.Register("MovedBy", typeof(PlayerModel), typeof(BaronCtrl), new PropertyMetadata(PlayerModel.DefaultPlayer));
+        public PlayerModel MovedBy
+        {
+            get => ( PlayerModel )GetValue(MovedByProperty);
+            set => SetValue(MovedByProperty, value);
+        }
+        public static readonly DependencyProperty ResourcesStolenProperty = DependencyProperty.Register("ResourcesStolen", typeof(int), typeof(BaronCtrl), new PropertyMetadata(0));
+        public int ResourcesStolen
+        {
+            get => ( int )GetValue(ResourcesStolenProperty);
+            set => SetValue(ResourcesStolenProperty, value);
+        }
+
+        public static readonly DependencyProperty TileNumberProperty = DependencyProperty.Register("TileNumber", typeof(int), typeof(BaronCtrl), new PropertyMetadata(0));
+        public int TileNumber
+        {
+            get => ( int )GetValue(TileNumberProperty);
+            set => SetValue(TileNumberProperty, value);
+        }
+
         public void MoveAsync(Point to)
         {
             var animationDuration = System.TimeSpan.FromMilliseconds(MainPage.Current.MainPageModel.GetAnimationSpeed(AnimationSpeed.VeryFast));
@@ -28,7 +48,8 @@ namespace Catan10
             _daX.Duration = animationDuration;
             _daY.Duration = animationDuration;
             _daX.To = to.X;
-            _daY.To = to.Y;
+            _daY.To = to.Y + 4;
+
             _sbMove.Begin();
         }
 
@@ -47,6 +68,20 @@ namespace Catan10
         {
             DA_Opacity.To = 0.0;
             SB_AnimateOpacity.Begin();
+        }
+
+        private Visibility ShowCount(int count)
+        {
+            return count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private Visibility ShowTileNumber(int number)
+        {
+            if (number == 0 || number == 7)
+                return Visibility.Collapsed;
+
+            return Visibility.Visible;
+          
         }
     }
 }

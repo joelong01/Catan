@@ -176,6 +176,7 @@ namespace Catan10
     }
     public interface IGameController : IGameTest, IGameCallback
     {
+        BaronCtrl Baron { get; }
         InvasionData InvasionData { get; }
         BuildingCtrl GetBuilding(int index);
 
@@ -279,7 +280,7 @@ namespace Catan10
 
         Task RolledSeven();
         Task ProtectCity(ProtectCityLog protectCityLog, ActionType normal);
-        void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron);
+        void SetBaronTile(PlayerModel movedBy, TargetWeapon weapon, TileCtrl targetTile, bool showBaron);
         void MoveMerchant(Point to);
         PlayerModel PlayerFromId(Guid id);
         RoadCtrl GetRoad(int destroyedRoadIndex);

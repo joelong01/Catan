@@ -1031,9 +1031,11 @@ namespace Catan10
 
             await DefaultTask;
         }
-        public void SetBaronTile(TargetWeapon weapon, TileCtrl targetTile, bool showBaron)
+        public void SetBaronTile(PlayerModel movedBy, TargetWeapon weapon, TileCtrl targetTile, bool showBaron)
         {
-            GameContainer.BaronTile = targetTile;
+            GameContainer.SetBaronTile(movedBy, targetTile);
+            
+           
 
             if (showBaron || !MainPageModel.Settings.HouseRules.HideBaronBeforeFirstInvasion)
             {

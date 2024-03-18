@@ -169,6 +169,7 @@ namespace Catan10
 
                 //12/20/2023: we pushed the action into ResourcesForRoll to make this work always
                 player.GameData.Resources.ResourcesLostToBaron += Baroned;
+                MainPage.Current.Baron.ResourcesStolen += Baroned.Count;
                 player.GameData.Resources.GrantResources(Granted);
 
                 if (Granted.Count == 0)
